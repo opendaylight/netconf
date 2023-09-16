@@ -97,22 +97,6 @@ enum OperationsContent {
     }
 
     /**
-     * Return the content for a particular {@link EffectiveModelContext}.
-     *
-     * @param context Context to use
-     * @return Content of HTTP GET operation as a String
-     */
-    public final @NonNull String bodyFor(final EffectiveModelContext context) {
-        if (isEmptyContext(context)) {
-            // No modules, or defensive return empty content
-            return emptyBody;
-        }
-
-        final var moduleRpcs = getModuleRpcs(context, context.getModuleStatements());
-        return moduleRpcs.isEmpty() ? emptyBody : createBody(moduleRpcs);
-    }
-
-    /**
      * Return content with RPCs and actions for a particular {@link Inference}.
      *
      * @param inference Inference to use

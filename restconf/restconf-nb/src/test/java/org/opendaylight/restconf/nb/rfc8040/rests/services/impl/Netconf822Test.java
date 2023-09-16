@@ -12,20 +12,19 @@ import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class Netconf822Test {
-    private static Inference INFERENCE;
+    private static final Absolute NEW1 = Absolute.of(QName.create("foo", "2021-09-30", "new1"));
+
+    private static EffectiveModelContext SCHEMA;
 
     @BeforeClass
     public static void beforeClass() {
-        final var context = YangParserTestUtils.parseYangResourceDirectory("/nc822");
-        INFERENCE = SchemaInferenceStack.of(context,
-            Absolute.of(QName.create("foo", "new1", Revision.of("2021-09-30")))).toInference();
+        SCHEMA = YangParserTestUtils.parseYangResourceDirectory("/nc822");
     }
 
     @Test
@@ -36,7 +35,7 @@ public class Netconf822Test {
                 "foo:new": [null],
                 "foo:new1": [null]
               }
-            }""", OperationsContent.JSON.bodyFor(INFERENCE.getEffectiveModelContext()));
+            }""", OperationsContent.JSON.bodyFor(SchemaInferenceStack.of(SCHEMA).toInference()));
     }
 
     @Test
@@ -46,7 +45,7 @@ public class Netconf822Test {
               "ietf-restconf:operations" : {
                 "foo:new1": [null]
               }
-            }""", OperationsContent.JSON.bodyFor(INFERENCE));
+            }""", OperationsContent.JSON.bodyFor(SchemaInferenceStack.of(SCHEMA, NEW1).toInference()));
     }
 
     @Test
@@ -57,7 +56,7 @@ public class Netconf822Test {
                         xmlns:ns0="foo" >
               <ns0:new/>
               <ns0:new1/>
-            </operations>""", OperationsContent.XML.bodyFor(INFERENCE.getEffectiveModelContext()));
+            </operations>""", OperationsContent.XML.bodyFor(SchemaInferenceStack.of(SCHEMA).toInference()));
     }
 
     @Test
@@ -67,6 +66,6 @@ public class Netconf822Test {
             <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"
                         xmlns:ns0="foo" >
               <ns0:new1/>
-            </operations>""", OperationsContent.XML.bodyFor(INFERENCE));
+            </operations>""", OperationsContent.XML.bodyFor(SchemaInferenceStack.of(SCHEMA, NEW1).toInference()));
     }
 }

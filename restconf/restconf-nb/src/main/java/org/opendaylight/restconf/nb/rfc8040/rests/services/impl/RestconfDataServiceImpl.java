@@ -22,13 +22,13 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Consumes;
@@ -58,12 +58,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
@@ -82,14 +82,11 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -119,35 +116,22 @@ import org.slf4j.LoggerFactory;
 public final class RestconfDataServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
-    private static final VarHandle LOCAL_STRATEGY;
-
-    static {
-        try {
-            LOCAL_STRATEGY = MethodHandles.lookup()
-                .findVarHandle(RestconfDataServiceImpl.class, "localStrategy", RestconfStrategy.class);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
     private final DatabindProvider databindProvider;
-    private final DOMMountPointService mountPointService;
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
+    private final MdsalRestconfServer server;
+    @Deprecated(forRemoval = true)
     private final DOMDataBroker dataBroker;
     private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
 
-    @SuppressWarnings("unused")
-    private volatile RestconfStrategy localStrategy;
-
-    public RestconfDataServiceImpl(final DatabindProvider databindProvider,
-            final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
-            final RestconfStreamsSubscriptionService delegRestconfSubscrService,
+    public RestconfDataServiceImpl(final DatabindProvider databindProvider, final MdsalRestconfServer server,
+            final DOMDataBroker dataBroker, final RestconfStreamsSubscriptionService delegRestconfSubscrService,
             final DOMActionService actionService, final StreamsConfiguration configuration) {
         this.databindProvider = requireNonNull(databindProvider);
+        this.server = requireNonNull(server);
         this.dataBroker = requireNonNull(dataBroker);
-        this.mountPointService = requireNonNull(mountPointService);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         this.actionService = requireNonNull(actionService);
         streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
@@ -170,7 +154,8 @@ public final class RestconfDataServiceImpl {
         MediaType.TEXT_XML
     })
     public Response readData(@Context final UriInfo uriInfo) {
-        return readData(null, uriInfo);
+        final var readParams = QueryParams.newReadDataParams(uriInfo);
+        return readData(server.bindRequestRoot(databindProvider.currentContext()), readParams).getValue();
     }
 
     /**
@@ -192,11 +177,10 @@ public final class RestconfDataServiceImpl {
     public Response readData(@Encoded @PathParam("identifier") final String identifier,
             @Context final UriInfo uriInfo) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
-        final var schemaContextRef = databindProvider.currentContext().modelContext();
-        // FIXME: go through
-        final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier, schemaContextRef,
-            mountPointService);
-        final var mountPoint = instanceIdentifier.getMountPoint();
+        final var databind = databindProvider.currentContext();
+        final var schemaContextRef = databind.modelContext();
+        final var reqPath = server.bindRequestPath(databind, identifier);
+        final var mountPoint = reqPath.getMountPoint();
 
         // FIXME: this looks quite crazy, why do we even have it?
         if (mountPoint == null && identifier != null && identifier.contains(STREAMS_PATH)
@@ -204,25 +188,31 @@ public final class RestconfDataServiceImpl {
             createAllYangNotificationStreams(schemaContextRef, uriInfo);
         }
 
-        final var queryParams = QueryParams.newQueryParameters(readParams, instanceIdentifier);
-        final var fieldPaths = queryParams.fieldPaths();
-        // FIXME:the model context should be coming from instanceIdentifier!
-        final var strategy = getRestconfStrategy(schemaContextRef, mountPoint);
-        final NormalizedNode node;
-        if (fieldPaths != null && !fieldPaths.isEmpty()) {
-            node = strategy.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                readParams.withDefaults(), fieldPaths);
-        } else {
-            node = strategy.readData(readParams.content(), instanceIdentifier.getInstanceIdentifier(),
-                readParams.withDefaults());
-        }
+        final var nodeAndResponse = readData(reqPath, readParams);
 
         // FIXME: this is utter craziness, refactor it properly!
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
-            final String value = (String) node.body();
+            final String value = (String) nodeAndResponse.getKey().body();
             final String streamName = value.substring(value.indexOf(NOTIFICATION_STREAM + '/'));
             delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
+        }
+
+        return nodeAndResponse.getValue();
+    }
+
+    private Entry<NormalizedNode, Response> readData(final InstanceIdentifierContext reqPath,
+            final ReadDataParams readParams) {
+        final var queryParams = QueryParams.newQueryParameters(readParams, reqPath);
+        final var fieldPaths = queryParams.fieldPaths();
+        final var strategy = server.getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
+        final NormalizedNode node;
+        if (fieldPaths != null && !fieldPaths.isEmpty()) {
+            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
+                readParams.withDefaults(), fieldPaths);
+        } else {
+            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
+                readParams.withDefaults());
         }
         if (node == null) {
             throw new RestconfDocumentedException(
@@ -230,20 +220,20 @@ public final class RestconfDataServiceImpl {
                     ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
         }
 
-        return switch (readParams.content()) {
+        return Map.entry(node, switch (readParams.content()) {
             case ALL, CONFIG -> {
                 final QName type = node.name().getNodeType();
                 yield Response.status(Status.OK)
-                    .entity(new NormalizedNodePayload(instanceIdentifier.inference(), node, queryParams))
+                    .entity(new NormalizedNodePayload(reqPath.inference(), node, queryParams))
                     .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null) + "-"
                         + type.getLocalName() + '"')
                     .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                     .build();
             }
             case NONCONFIG -> Response.status(Status.OK)
-                .entity(new NormalizedNodePayload(instanceIdentifier.inference(), node, queryParams))
+                .entity(new NormalizedNodePayload(reqPath.inference(), node, queryParams))
                 .build();
-        };
+        });
     }
 
     private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
@@ -382,10 +372,9 @@ public final class RestconfDataServiceImpl {
     }
 
     private Response putData(final @Nullable String identifier, final UriInfo uriInfo, final ResourceBody body) {
-        final var localModel = databindProvider.currentContext().modelContext();
-        final var context = ParserIdentifier.toInstanceIdentifier(identifier, localModel, mountPointService);
-        final var insert = QueryParams.parseInsert(context.getSchemaContext(), uriInfo);
-        final var req = bindResourceRequest(context, body);
+        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
+        final var insert = QueryParams.parseInsert(reqPath.getSchemaContext(), uriInfo);
+        final var req = bindResourceRequest(reqPath, body);
 
         return switch (
             req.strategy().putData(req.path(), req.data(), insert)) {
@@ -430,17 +419,16 @@ public final class RestconfDataServiceImpl {
     })
     public Response postDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo) {
-        final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
-            databindProvider.currentContext().modelContext(), mountPointService);
-        if (instanceIdentifier.getSchemaNode() instanceof ActionDefinition) {
+        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
+        if (reqPath.getSchemaNode() instanceof ActionDefinition) {
             try (var jsonBody = new JsonOperationInputBody(body)) {
-                return invokeAction(instanceIdentifier, jsonBody);
+                return invokeAction(reqPath, jsonBody);
             }
         }
 
         try (var jsonBody = new JsonChildBody(body)) {
-            return postData(instanceIdentifier.inference(), instanceIdentifier.getInstanceIdentifier(), jsonBody,
-                uriInfo, instanceIdentifier.getMountPoint());
+            return postData(reqPath.inference(), reqPath.getInstanceIdentifier(), jsonBody, uriInfo,
+                reqPath.getMountPoint());
         }
     }
 
@@ -481,16 +469,16 @@ public final class RestconfDataServiceImpl {
     })
     public Response postDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo) {
-        final var iid = ParserIdentifier.toInstanceIdentifier(identifier,
-            databindProvider.currentContext().modelContext(), mountPointService);
-        if (iid.getSchemaNode() instanceof ActionDefinition) {
+        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
+        if (reqPath.getSchemaNode() instanceof ActionDefinition) {
             try (var xmlBody = new XmlOperationInputBody(body)) {
-                return invokeAction(iid, xmlBody);
+                return invokeAction(reqPath, xmlBody);
             }
         }
 
         try (var xmlBody = new XmlChildBody(body)) {
-            return postData(iid.inference(), iid.getInstanceIdentifier(), xmlBody, uriInfo, iid.getMountPoint());
+            return postData(reqPath.inference(), reqPath.getInstanceIdentifier(), xmlBody, uriInfo,
+                reqPath.getMountPoint());
         }
     }
 
@@ -503,7 +491,7 @@ public final class RestconfDataServiceImpl {
             final UriInfo uriInfo, final @Nullable DOMMountPoint mountPoint) {
         final var modelContext = inference.getEffectiveModelContext();
         final var insert = QueryParams.parseInsert(modelContext, uriInfo);
-        final var strategy = getRestconfStrategy(modelContext, mountPoint);
+        final var strategy = server.getRestconfStrategy(modelContext, mountPoint);
         var path = parentPath;
         final var payload = body.toPayload(path, inference);
         final var data = payload.body();
@@ -547,12 +535,10 @@ public final class RestconfDataServiceImpl {
     @Path("/data/{identifier:.+}")
     public void deleteData(@Encoded @PathParam("identifier") final String identifier,
             @Suspended final AsyncResponse ar) {
-        final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
-            databindProvider.currentContext().modelContext(), mountPointService);
-        final var strategy = getRestconfStrategy(instanceIdentifier.getSchemaContext(),
-            instanceIdentifier.getMountPoint());
+        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
+        final var strategy = server.getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
 
-        Futures.addCallback(strategy.delete(instanceIdentifier.getInstanceIdentifier()), new FutureCallback<>() {
+        Futures.addCallback(strategy.delete(reqPath.getInstanceIdentifier()), new FutureCallback<>() {
             @Override
             public void onSuccess(final Empty result) {
                 ar.resume(Response.noContent().build());
@@ -581,7 +567,7 @@ public final class RestconfDataServiceImpl {
     })
     public void plainPatchDataXML(final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            plainPatchData(null, xmlBody, ar);
+            plainPatchData(xmlBody, ar);
         }
     }
 
@@ -622,7 +608,7 @@ public final class RestconfDataServiceImpl {
     })
     public void plainPatchDataJSON(final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            plainPatchData(null, jsonBody, ar);
+            plainPatchData(jsonBody, ar);
         }
     }
 
@@ -651,15 +637,36 @@ public final class RestconfDataServiceImpl {
      * Partially modify the target data resource, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
      *
+     * @param body data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    private void plainPatchData(final ResourceBody body, final AsyncResponse ar) {
+        plainPatchData(server.bindRequestRoot(databindProvider.currentContext()), body, ar);
+    }
+
+    /**
+     * Partially modify the target data resource, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
+     *
      * @param identifier path to target
      * @param body data node for put to config DS
      * @param ar {@link AsyncResponse} which needs to be completed
      */
-    private void plainPatchData(final @Nullable String identifier, final ResourceBody body, final AsyncResponse ar) {
-        final var req = bindResourceRequest(
-            ParserIdentifier.toInstanceIdentifier(identifier, databindProvider.currentContext().modelContext(),
-                mountPointService),
-            body);
+    private void plainPatchData(final String identifier, final ResourceBody body, final AsyncResponse ar) {
+        plainPatchData(server.bindRequestPath(databindProvider.currentContext(), identifier), body, ar);
+    }
+
+    /**
+     * Partially modify the target data resource, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
+     *
+     * @param reqPath path to target
+     * @param body data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    private void plainPatchData(final InstanceIdentifierContext reqPath, final ResourceBody body,
+            final AsyncResponse ar) {
+        final var req = bindResourceRequest(reqPath, body);
         final var future = req.strategy().merge(req.path(), req.data());
 
         Futures.addCallback(future, new FutureCallback<>() {
@@ -675,13 +682,14 @@ public final class RestconfDataServiceImpl {
         }, MoreExecutors.directExecutor());
     }
 
-    private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext context,
+    private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
             final ResourceBody body) {
-        final var inference = context.inference();
-        final var path = context.getInstanceIdentifier();
-        final var data = body.toNormalizedNode(path, inference, context.getSchemaNode());
+        final var inference = reqPath.inference();
+        final var path = reqPath.getInstanceIdentifier();
+        final var data = body.toNormalizedNode(path, inference, reqPath.getSchemaNode());
 
-        return new ResourceRequest(getRestconfStrategy(inference.getEffectiveModelContext(), context.getMountPoint()),
+        return new ResourceRequest(
+            server.getRestconfStrategy(inference.getEffectiveModelContext(), reqPath.getMountPoint()),
             path, data);
     }
 
@@ -775,17 +783,17 @@ public final class RestconfDataServiceImpl {
     }
 
     private PatchStatusContext yangPatchData(final String identifier, final @NonNull PatchBody body) {
-        final var iid = ParserIdentifier.toInstanceIdentifier(requireNonNull(identifier),
-            databindProvider.currentContext().modelContext(), mountPointService);
-        final var context = iid.getSchemaContext();
-        return yangPatchData(context, parsePatchBody(context, iid.getInstanceIdentifier(), body), iid.getMountPoint());
+        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
+        final var modelContext = reqPath.getSchemaContext();
+        return yangPatchData(modelContext, parsePatchBody(modelContext, reqPath.getInstanceIdentifier(), body),
+            reqPath.getMountPoint());
     }
 
 
     @VisibleForTesting
     @NonNull PatchStatusContext yangPatchData(final @NonNull EffectiveModelContext modelContext,
             final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint) {
-        return getRestconfStrategy(modelContext, mountPoint).patchData(patch);
+        return server.getRestconfStrategy(modelContext, mountPoint).patchData(patch);
     }
 
     private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,
@@ -799,53 +807,25 @@ public final class RestconfDataServiceImpl {
         }
     }
 
-    @VisibleForTesting
-    @NonNull RestconfStrategy getRestconfStrategy(final EffectiveModelContext modelContext,
-            final @Nullable DOMMountPoint mountPoint) {
-        if (mountPoint == null) {
-            return localStrategy(modelContext);
-        }
-
-        final var ret = RestconfStrategy.forMountPoint(modelContext, mountPoint);
-        if (ret == null) {
-            final var mountId = mountPoint.getIdentifier();
-            LOG.warn("Mount point {} does not expose a suitable access interface", mountId);
-            throw new RestconfDocumentedException("Could not find a supported access interface in mount point "
-                + mountId);
-        }
-        return ret;
-    }
-
-    private @NonNull RestconfStrategy localStrategy(final EffectiveModelContext modelContext) {
-        final var local = (RestconfStrategy) LOCAL_STRATEGY.getAcquire(this);
-        if (local != null && modelContext.equals(local.modelContext())) {
-            return local;
-        }
-
-        final var created = new MdsalRestconfStrategy(modelContext, dataBroker);
-        LOCAL_STRATEGY.setRelease(this, created);
-        return created;
-    }
-
     /**
      * Invoke Action operation.
      *
      * @param payload {@link NormalizedNodePayload} - the body of the operation
      * @return {@link NormalizedNodePayload} wrapped in {@link Response}
      */
-    private Response invokeAction(final InstanceIdentifierContext context, final OperationInputBody body) {
-        final var yangIIdContext = context.getInstanceIdentifier();
+    private Response invokeAction(final InstanceIdentifierContext reqPath, final OperationInputBody body) {
+        final var yangIIdContext = reqPath.getInstanceIdentifier();
         final ContainerNode input;
         try {
-            input = body.toContainerNode(context.inference());
+            input = body.toContainerNode(reqPath.inference());
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, e);
         }
 
-        final var mountPoint = context.getMountPoint();
-        final var inference = context.inference();
+        final var mountPoint = reqPath.getMountPoint();
+        final var inference = reqPath.inference();
         final var schemaPath = inference.toSchemaInferenceStack().toSchemaNodeIdentifier();
         final var response = mountPoint != null ? invokeAction(input, schemaPath, yangIIdContext, mountPoint)
             : invokeAction(input, schemaPath, yangIIdContext, actionService);
