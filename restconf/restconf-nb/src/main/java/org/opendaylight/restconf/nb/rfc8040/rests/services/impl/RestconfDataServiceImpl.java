@@ -65,7 +65,8 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.databind.CreateResourceMode;
+import org.opendaylight.restconf.nb.rfc8040.databind.InvokeOperationMode;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonPatchBody;
@@ -73,12 +74,12 @@ import org.opendaylight.restconf.nb.rfc8040.databind.JsonResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.ResourceMode;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
@@ -99,12 +100,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +117,6 @@ public final class RestconfDataServiceImpl {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
-    private final DatabindProvider databindProvider;
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
     private final MdsalRestconfServer server;
@@ -126,10 +124,9 @@ public final class RestconfDataServiceImpl {
     private final DOMDataBroker dataBroker;
     private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
 
-    public RestconfDataServiceImpl(final DatabindProvider databindProvider, final MdsalRestconfServer server,
-            final DOMDataBroker dataBroker, final RestconfStreamsSubscriptionService delegRestconfSubscrService,
-            final DOMActionService actionService, final StreamsConfiguration configuration) {
-        this.databindProvider = requireNonNull(databindProvider);
+    public RestconfDataServiceImpl(final MdsalRestconfServer server, final DOMDataBroker dataBroker,
+            final RestconfStreamsSubscriptionService delegRestconfSubscrService, final DOMActionService actionService,
+            final StreamsConfiguration configuration) {
         this.server = requireNonNull(server);
         this.dataBroker = requireNonNull(dataBroker);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
@@ -155,7 +152,7 @@ public final class RestconfDataServiceImpl {
     })
     public Response readData(@Context final UriInfo uriInfo) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
-        return readData(server.bindRequestRoot(databindProvider.currentContext()), readParams).getValue();
+        return readData(server.bindResource(), readParams).getValue();
     }
 
     /**
@@ -177,15 +174,13 @@ public final class RestconfDataServiceImpl {
     public Response readData(@Encoded @PathParam("identifier") final String identifier,
             @Context final UriInfo uriInfo) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
-        final var databind = databindProvider.currentContext();
-        final var schemaContextRef = databind.modelContext();
-        final var reqPath = server.bindRequestPath(databind, identifier);
-        final var mountPoint = reqPath.getMountPoint();
+        final var reqPath = server.bindResource(identifier);
+        final var mountPoint = reqPath.mountPoint();
 
         // FIXME: this looks quite crazy, why do we even have it?
         if (mountPoint == null && identifier != null && identifier.contains(STREAMS_PATH)
             && !identifier.contains(STREAM_PATH_PART)) {
-            createAllYangNotificationStreams(schemaContextRef, uriInfo);
+            createAllYangNotificationStreams(reqPath.localDatabind().modelContext(), uriInfo);
         }
 
         final var nodeAndResponse = readData(reqPath, readParams);
@@ -201,18 +196,18 @@ public final class RestconfDataServiceImpl {
         return nodeAndResponse.getValue();
     }
 
-    private Entry<NormalizedNode, Response> readData(final InstanceIdentifierContext reqPath,
-            final ReadDataParams readParams) {
-        final var queryParams = QueryParams.newQueryParameters(readParams, reqPath);
+    private Entry<NormalizedNode, Response> readData(final ResourceMode reqPath, final ReadDataParams readParams) {
+        final var queryParams = QueryParams.newQueryParameters(reqPath, readParams);
         final var fieldPaths = queryParams.fieldPaths();
-        final var strategy = server.getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
+        final var inference = reqPath.inference();
+
+        final var strategy = server.getRestconfStrategy(inference.getEffectiveModelContext(),
+            reqPath.mountPoint());
         final NormalizedNode node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
-            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
-                readParams.withDefaults(), fieldPaths);
+            node = strategy.readData(readParams.content(), reqPath.path(), readParams.withDefaults(), fieldPaths);
         } else {
-            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
-                readParams.withDefaults());
+            node = strategy.readData(readParams.content(), reqPath.path(), readParams.withDefaults());
         }
         if (node == null) {
             throw new RestconfDocumentedException(
@@ -224,14 +219,14 @@ public final class RestconfDataServiceImpl {
             case ALL, CONFIG -> {
                 final QName type = node.name().getNodeType();
                 yield Response.status(Status.OK)
-                    .entity(new NormalizedNodePayload(reqPath.inference(), node, queryParams))
+                    .entity(new NormalizedNodePayload(inference, node, queryParams))
                     .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null) + "-"
                         + type.getLocalName() + '"')
                     .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                     .build();
             }
             case NONCONFIG -> Response.status(Status.OK)
-                .entity(new NormalizedNodePayload(reqPath.inference(), node, queryParams))
+                .entity(new NormalizedNodePayload(inference, node, queryParams))
                 .build();
         });
     }
@@ -372,8 +367,8 @@ public final class RestconfDataServiceImpl {
     }
 
     private Response putData(final @Nullable String identifier, final UriInfo uriInfo, final ResourceBody body) {
-        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
-        final var insert = QueryParams.parseInsert(reqPath.getSchemaContext(), uriInfo);
+        final var reqPath = server.bindResource(identifier);
+        final var insert = QueryParams.parseInsert(reqPath.inference().getEffectiveModelContext(), uriInfo);
         final var req = bindResourceRequest(reqPath, body);
 
         return switch (
@@ -419,16 +414,17 @@ public final class RestconfDataServiceImpl {
     })
     public Response postDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo) {
-        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
-        if (reqPath.getSchemaNode() instanceof ActionDefinition) {
+        final var reqPath = server.bindPOST(identifier);
+        if (reqPath instanceof InvokeOperationMode invoke) {
             try (var jsonBody = new JsonOperationInputBody(body)) {
-                return invokeAction(reqPath, jsonBody);
+                return invokeAction(invoke, jsonBody);
             }
-        }
-
-        try (var jsonBody = new JsonChildBody(body)) {
-            return postData(reqPath.inference(), reqPath.getInstanceIdentifier(), jsonBody, uriInfo,
-                reqPath.getMountPoint());
+        } if (reqPath instanceof CreateResourceMode create) {
+            try (var jsonBody = new JsonChildBody(body)) {
+                return createResource(create, jsonBody, uriInfo);
+            }
+        } else {
+            throw new IllegalStateException("Unhandled POST path" + reqPath);
         }
     }
 
@@ -469,31 +465,31 @@ public final class RestconfDataServiceImpl {
     })
     public Response postDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo) {
-        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
-        if (reqPath.getSchemaNode() instanceof ActionDefinition) {
+        final var reqPath = server.bindPOST(identifier);
+        if (reqPath instanceof InvokeOperationMode invoke) {
             try (var xmlBody = new XmlOperationInputBody(body)) {
-                return invokeAction(reqPath, xmlBody);
+                return invokeAction(invoke, xmlBody);
             }
-        }
-
-        try (var xmlBody = new XmlChildBody(body)) {
-            return postData(reqPath.inference(), reqPath.getInstanceIdentifier(), xmlBody, uriInfo,
-                reqPath.getMountPoint());
+        } else if (reqPath instanceof CreateResourceMode create) {
+            try (var xmlBody = new XmlChildBody(body)) {
+                return createResource(create, xmlBody, uriInfo);
+            }
+        } else {
+            throw new IllegalStateException("Unhandled request " + reqPath);
         }
     }
 
     private Response postData(final ChildBody body, final UriInfo uriInfo) {
-        return postData(Inference.ofDataTreePath(databindProvider.currentContext().modelContext()),
-            YangInstanceIdentifier.of(), body, uriInfo, null);
+        return createResource(server.bindPOST(), body, uriInfo);
     }
 
-    private Response postData(final Inference inference, final YangInstanceIdentifier parentPath, final ChildBody body,
-            final UriInfo uriInfo, final @Nullable DOMMountPoint mountPoint) {
-        final var modelContext = inference.getEffectiveModelContext();
+    private Response createResource(final CreateResourceMode reqPath, final ChildBody body, final UriInfo uriInfo) {
+        final var parentInference = reqPath.parentInference();
+        final var modelContext = parentInference.getEffectiveModelContext();
         final var insert = QueryParams.parseInsert(modelContext, uriInfo);
-        final var strategy = server.getRestconfStrategy(modelContext, mountPoint);
-        var path = parentPath;
-        final var payload = body.toPayload(path, inference);
+        final var strategy = server.getRestconfStrategy(modelContext, reqPath.mountPoint());
+        var path = reqPath.parentPath();
+        final var payload = body.toPayload(path, parentInference);
         final var data = payload.body();
 
         for (var arg : payload.prefix()) {
@@ -535,10 +531,11 @@ public final class RestconfDataServiceImpl {
     @Path("/data/{identifier:.+}")
     public void deleteData(@Encoded @PathParam("identifier") final String identifier,
             @Suspended final AsyncResponse ar) {
-        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
-        final var strategy = server.getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
+        final var reqPath = server.bindResource(identifier);
+        final var strategy = server.getRestconfStrategy(reqPath.inference().getEffectiveModelContext(),
+            reqPath.mountPoint());
 
-        Futures.addCallback(strategy.delete(reqPath.getInstanceIdentifier()), new FutureCallback<>() {
+        Futures.addCallback(strategy.delete(reqPath.path()), new FutureCallback<>() {
             @Override
             public void onSuccess(final Empty result) {
                 ar.resume(Response.noContent().build());
@@ -641,7 +638,7 @@ public final class RestconfDataServiceImpl {
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     private void plainPatchData(final ResourceBody body, final AsyncResponse ar) {
-        plainPatchData(server.bindRequestRoot(databindProvider.currentContext()), body, ar);
+        plainPatchData(server.bindResource(), body, ar);
     }
 
     /**
@@ -653,7 +650,7 @@ public final class RestconfDataServiceImpl {
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     private void plainPatchData(final String identifier, final ResourceBody body, final AsyncResponse ar) {
-        plainPatchData(server.bindRequestPath(databindProvider.currentContext(), identifier), body, ar);
+        plainPatchData(server.bindResource(identifier), body, ar);
     }
 
     /**
@@ -664,8 +661,7 @@ public final class RestconfDataServiceImpl {
      * @param body data node for put to config DS
      * @param ar {@link AsyncResponse} which needs to be completed
      */
-    private void plainPatchData(final InstanceIdentifierContext reqPath, final ResourceBody body,
-            final AsyncResponse ar) {
+    private void plainPatchData(final ResourceMode reqPath, final ResourceBody body, final AsyncResponse ar) {
         final var req = bindResourceRequest(reqPath, body);
         final var future = req.strategy().merge(req.path(), req.data());
 
@@ -682,14 +678,13 @@ public final class RestconfDataServiceImpl {
         }, MoreExecutors.directExecutor());
     }
 
-    private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
-            final ResourceBody body) {
+    private @NonNull ResourceRequest bindResourceRequest(final ResourceMode reqPath, final ResourceBody body) {
         final var inference = reqPath.inference();
-        final var path = reqPath.getInstanceIdentifier();
-        final var data = body.toNormalizedNode(path, inference, reqPath.getSchemaNode());
+        final var path = reqPath.path();
+        final var data = body.toNormalizedNode(path, inference);
 
         return new ResourceRequest(
-            server.getRestconfStrategy(inference.getEffectiveModelContext(), reqPath.getMountPoint()),
+            server.getRestconfStrategy(inference.getEffectiveModelContext(), reqPath.mountPoint()),
             path, data);
     }
 
@@ -778,15 +773,14 @@ public final class RestconfDataServiceImpl {
     }
 
     private PatchStatusContext yangPatchData(final @NonNull PatchBody body) {
-        final var context = databindProvider.currentContext().modelContext();
-        return yangPatchData(context, parsePatchBody(context, YangInstanceIdentifier.of(), body), null);
+        final var modelContext = server.bindResource().inference().getEffectiveModelContext();
+        return yangPatchData(modelContext, parsePatchBody(modelContext, YangInstanceIdentifier.of(), body), null);
     }
 
     private PatchStatusContext yangPatchData(final String identifier, final @NonNull PatchBody body) {
-        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
-        final var modelContext = reqPath.getSchemaContext();
-        return yangPatchData(modelContext, parsePatchBody(modelContext, reqPath.getInstanceIdentifier(), body),
-            reqPath.getMountPoint());
+        final var reqPath = server.bindResource(identifier);
+        final var modelContext = reqPath.inference().getEffectiveModelContext();
+        return yangPatchData(modelContext, parsePatchBody(modelContext, reqPath.path(), body), reqPath.mountPoint());
     }
 
 
@@ -813,20 +807,21 @@ public final class RestconfDataServiceImpl {
      * @param payload {@link NormalizedNodePayload} - the body of the operation
      * @return {@link NormalizedNodePayload} wrapped in {@link Response}
      */
-    private Response invokeAction(final InstanceIdentifierContext reqPath, final OperationInputBody body) {
-        final var yangIIdContext = reqPath.getInstanceIdentifier();
+    private Response invokeAction(final InvokeOperationMode reqPath, final OperationInputBody body) {
+        final var operation = reqPath.operation();
+
         final ContainerNode input;
         try {
-            input = body.toContainerNode(reqPath.inference());
+            input = body.toContainerNode(operation);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, e);
         }
 
-        final var mountPoint = reqPath.getMountPoint();
-        final var inference = reqPath.inference();
-        final var schemaPath = inference.toSchemaInferenceStack().toSchemaNodeIdentifier();
+        final var mountPoint = reqPath.mountPoint();
+        final var schemaPath = operation.toSchemaInferenceStack().toSchemaNodeIdentifier();
+        final var yangIIdContext = reqPath.parentPath();
         final var response = mountPoint != null ? invokeAction(input, schemaPath, yangIIdContext, mountPoint)
             : invokeAction(input, schemaPath, yangIIdContext, actionService);
         final var result = checkActionResponse(response);
@@ -835,7 +830,7 @@ public final class RestconfDataServiceImpl {
         if (resultData == null || resultData.isEmpty()) {
             return Response.status(Status.NO_CONTENT).build();
         }
-        return Response.status(Status.OK).entity(new NormalizedNodePayload(inference, resultData)).build();
+        return Response.status(Status.OK).entity(new NormalizedNodePayload(operation, resultData)).build();
     }
 
     /**

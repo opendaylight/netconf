@@ -19,14 +19,16 @@ import org.junit.Test;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.ResourceMode;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTest {
@@ -37,10 +39,9 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     private static final QNameModule Q_NAME_MODULE_FOO = QNameModule.create(
         XMLNamespace.of("urn:foo"), Revision.of("2023-03-27"));
 
-    private InstanceIdentifierContext identifierJukebox;
-    private InstanceIdentifierContext identifierTestServices;
-    private InstanceIdentifierContext identifierFoo;
-
+    private ResourceMode identifierJukebox;
+    private ResourceMode identifierTestServices;
+    private ResourceMode identifierFoo;
 
     // container augmented library
     protected static final QName AUGMENTED_LIBRARY_Q_NAME = QName.create(Q_NAME_MODULE_AUGMENTED_JUKEBOX,
@@ -102,18 +103,20 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
 
     @Before
     public void setUp() {
-        identifierJukebox = InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.ofDataTreePath(JUKEBOX_SCHEMA, JUKEBOX_QNAME));
+        identifierJukebox = new ResourceMode(DatabindContext.ofModel(JUKEBOX_SCHEMA),
+            Inference.ofDataTreePath(JUKEBOX_SCHEMA, JUKEBOX_QNAME), JUKEBOX_IID, null);
 
-        identifierTestServices = InstanceIdentifierContext.ofStack(
-            SchemaInferenceStack.ofDataTreePath(YangParserTestUtils.parseYangResourceDirectory("/test-services"),
-                TEST_DATA_Q_NAME));
+        final var testServices = YangParserTestUtils.parseYangResourceDirectory("/test-services");
+        identifierTestServices = new ResourceMode(DatabindContext.ofModel(testServices),
+            Inference.ofDataTreePath(testServices, TEST_DATA_Q_NAME), YangInstanceIdentifier.of(TEST_DATA_Q_NAME),
+            null);
 
-        identifierFoo = InstanceIdentifierContext.ofStack(SchemaInferenceStack.ofDataTreePath(
-            YangParserTestUtils.parseYangResourceDirectory("/same-qname-nodes"), FOO_Q_NAME));
+        final var sameNodes = YangParserTestUtils.parseYangResourceDirectory("/same-qname-nodes");
+        identifierFoo = new ResourceMode(DatabindContext.ofModel(sameNodes),
+            Inference.ofDataTreePath(sameNodes, FOO_Q_NAME), YangInstanceIdentifier.of(FOO_Q_NAME), null);
     }
 
-    protected abstract List<T> translateFields(InstanceIdentifierContext context, FieldsParam fields);
+    protected abstract List<T> translateFields(ResourceMode reqPath, FieldsParam fields);
 
     /**
      * Test parse fields parameter containing only one child selected.
