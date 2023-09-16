@@ -16,6 +16,7 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -883,12 +884,22 @@ public final class RestconfDataServiceImpl {
     // FIXME: NETCONF-718: we should be returning a future here
     private static DOMActionResult invokeAction(final ContainerNode data, final Absolute schemaPath,
             final YangInstanceIdentifier yangIId, final DOMActionService actionService) {
-        return RestconfInvokeOperationsServiceImpl.checkedGet(Futures.catching(actionService.invokeAction(
-            schemaPath, new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, yangIId.getParent()), data),
+        final var future = Futures.catching(
+            actionService.invokeAction(schemaPath,
+                new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, yangIId.getParent()), data),
             DOMActionException.class,
             cause -> new SimpleDOMActionResult(List.of(RpcResultBuilder.newError(
                 ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage()))),
-            MoreExecutors.directExecutor()));
+            MoreExecutors.directExecutor());
+
+        try {
+            return future.get();
+        } catch (InterruptedException e) {
+            throw new RestconfDocumentedException("Interrupted while waiting for result of invocation", e);
+        } catch (ExecutionException e) {
+            Throwables.throwIfInstanceOf(e.getCause(), RestconfDocumentedException.class);
+            throw new RestconfDocumentedException("Invocation failed", e);
+        }
     }
 
     /**

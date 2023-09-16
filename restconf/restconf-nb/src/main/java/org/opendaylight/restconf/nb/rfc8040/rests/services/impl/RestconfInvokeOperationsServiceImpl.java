@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -18,7 +17,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.POST;
@@ -237,17 +235,5 @@ public final class RestconfInvokeOperationsServiceImpl {
     private static @NonNull ContainerNode nonnullInput(final QName type, final ContainerNode input) {
         return input != null ? input
                 : ImmutableNodes.containerNode(YangConstants.operationInputQName(type.getModule()));
-    }
-
-    @Deprecated
-    static <T> T checkedGet(final ListenableFuture<T> future) {
-        try {
-            return future.get();
-        } catch (InterruptedException e) {
-            throw new RestconfDocumentedException("Interrupted while waiting for result of invocation", e);
-        } catch (ExecutionException e) {
-            Throwables.throwIfInstanceOf(e.getCause(), RestconfDocumentedException.class);
-            throw new RestconfDocumentedException("Invocation failed", e);
-        }
     }
 }
