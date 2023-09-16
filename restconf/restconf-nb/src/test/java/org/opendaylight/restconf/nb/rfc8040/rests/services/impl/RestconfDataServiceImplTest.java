@@ -49,6 +49,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -60,8 +61,6 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -111,6 +110,8 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     @Mock
     private DOMActionService actionService;
     @Mock
+    private DOMRpcService rpcService;
+    @Mock
     private RestconfStreamsSubscriptionService delegRestconfSubscrService;
     @Mock
     private MultivaluedMap<String, String> queryParamenters;
@@ -128,13 +129,15 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
 
-        dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA), dataBroker,
-                mountPointService, delegRestconfSubscrService, actionService, new StreamsConfiguration(0, 1, 0, false));
+        dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA),
+            new MdsalRestconfServer(dataBroker, rpcService, mountPointService), dataBroker, delegRestconfSubscrService,
+            actionService, new StreamsConfiguration(0, 1, 0, false));
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
                 .getService(DOMSchemaService.class);
         doReturn(Optional.of(mountDataBroker)).when(mountPoint).getService(DOMDataBroker.class);
+        doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(read).when(mountDataBroker).newReadOnlyTransaction();
         doReturn(readWrite).when(mountDataBroker).newReadWriteTransaction();
@@ -459,15 +462,5 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         assertFalse(status.editCollection().get(2).getEditErrors().isEmpty());
         final String errorMessage = status.editCollection().get(2).getEditErrors().get(0).getErrorMessage();
         assertEquals("Data does not exist", errorMessage);
-    }
-
-    @Test
-    public void testGetRestconfStrategy() {
-        var restconfStrategy = dataService.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint);
-        assertTrue(restconfStrategy instanceof MdsalRestconfStrategy);
-
-        doReturn(Optional.of(netconfService)).when(mountPoint).getService(NetconfDataTreeService.class);
-        restconfStrategy = dataService.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint);
-        assertTrue(restconfStrategy instanceof NetconfRestconfStrategy);
     }
 }
