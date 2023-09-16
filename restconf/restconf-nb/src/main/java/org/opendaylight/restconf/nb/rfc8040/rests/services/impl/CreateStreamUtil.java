@@ -18,7 +18,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationListenerAdaptor;
@@ -108,7 +107,7 @@ final class CreateStreamUtil {
      *     </pre>
      */
     // FIXME: this really should be a normal RPC implementation
-    static DOMRpcResult createDataChangeNotifiStream(final ListenersBroker listenersBroker, final ContainerNode input,
+    static ContainerNode createDataChangeNotifiStream(final ListenersBroker listenersBroker, final ContainerNode input,
             final EffectiveModelContext refSchemaCtx) {
         // parsing out of container with settings and path
         final YangInstanceIdentifier path = preparePath(input);
@@ -126,10 +125,10 @@ final class CreateStreamUtil {
         listenersBroker.registerDataChangeListener(path, streamName, outputType);
 
         // building of output
-        return new DefaultDOMRpcResult(Builders.containerBuilder()
+        return Builders.containerBuilder()
             .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
             .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, streamName))
-            .build());
+            .build();
     }
 
     /**
@@ -141,7 +140,8 @@ final class CreateStreamUtil {
      * @param mountPointService dom mount point service
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
-    static DOMRpcResult createDeviceNotificationListener(final String baseUrl, final ContainerNode input,
+    // FIXME: this should be an RPC invocation
+    static ContainerNode createDeviceNotificationListener(final String baseUrl, final ContainerNode input,
             final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
@@ -187,12 +187,11 @@ final class CreateStreamUtil {
                 mountPointService, mountPoint.getIdentifier());
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 
-        // building of output
-        return new DefaultDOMRpcResult(Builders.containerBuilder()
+        return Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
-            .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH, baseUrl + deviceName
-                + "?" + RestconfStreamsConstants.NOTIFICATION_TYPE + "=" + RestconfStreamsConstants.DEVICE))
-            .build());
+            .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH, baseUrl + deviceName + "?"
+                + RestconfStreamsConstants.NOTIFICATION_TYPE + "=" + RestconfStreamsConstants.DEVICE))
+            .build();
     }
 
     /**

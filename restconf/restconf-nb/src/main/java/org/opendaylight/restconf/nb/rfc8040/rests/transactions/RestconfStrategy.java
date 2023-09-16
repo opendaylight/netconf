@@ -28,6 +28,8 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.ContentParam;
@@ -109,9 +111,11 @@ public abstract class RestconfStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
 
     private final @NonNull EffectiveModelContext modelContext;
+    private final @Nullable DOMRpcService rpcService;
 
-    RestconfStrategy(final EffectiveModelContext modelContext) {
+    RestconfStrategy(final EffectiveModelContext modelContext, final @Nullable DOMRpcService rpcService) {
         this.modelContext = requireNonNull(modelContext);
+        this.rpcService = rpcService;
     }
 
     /**
@@ -124,13 +128,15 @@ public abstract class RestconfStrategy {
      */
     public static @Nullable RestconfStrategy forMountPoint(final EffectiveModelContext modelContext,
             final DOMMountPoint mountPoint) {
+        final var rpcService = mountPoint.getService(DOMRpcService.class).orElse(null);
+
         final var netconfService = mountPoint.getService(NetconfDataTreeService.class);
         if (netconfService.isPresent()) {
-            return new NetconfRestconfStrategy(modelContext, netconfService.orElseThrow());
+            return new NetconfRestconfStrategy(modelContext, netconfService.orElseThrow(), rpcService);
         }
         final var dataBroker = mountPoint.getService(DOMDataBroker.class);
         if (dataBroker.isPresent()) {
-            return new MdsalRestconfStrategy(modelContext, dataBroker.orElseThrow());
+            return new MdsalRestconfStrategy(modelContext, dataBroker.orElseThrow(), rpcService);
         }
         return null;
     }
@@ -994,5 +1000,44 @@ public abstract class RestconfStrategy {
         // it is enough to process only config data because operational contains the same data
         configMap.entrySet().stream().filter(x -> stateMap.containsKey(x.getKey())).forEach(
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
+    }
+
+    public @NonNull RestconfFuture<Optional<ContainerNode>> invokeRpc(final QName type, final ContainerNode input) {
+        final var ret = new SettableRestconfFuture<Optional<ContainerNode>>();
+
+        final var local = rpcService;
+        if (local != null) {
+            Futures.addCallback(local.invokeRpc(requireNonNull(type), requireNonNull(input)),
+                new FutureCallback<DOMRpcResult>() {
+                    @Override
+                    public void onSuccess(final DOMRpcResult response) {
+                        final var errors = response.errors();
+                        if (!errors.isEmpty()) {
+                            LOG.debug("RpcError message {}", response.errors());
+                            ret.setFailure(new RestconfDocumentedException("RPCerror message ", null,
+                                response.errors()));
+                        } else {
+                            ret.set(Optional.ofNullable(response.value()));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(final Throwable cause) {
+                        LOG.debug("RPC invocation failed, cause");
+                        if (cause instanceof RestconfDocumentedException ex) {
+                            ret.setFailure(ex);
+                        } else {
+                            // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
+                            ret.setFailure(new RestconfDocumentedException(cause,
+                                new RestconfError(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage())));
+                        }
+                    }
+                }, MoreExecutors.directExecutor());
+        } else {
+            LOG.debug("RPC invocation is not available");
+            ret.setFailure(new RestconfDocumentedException("RPC invocation is not available",
+                ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED));
+        }
+        return ret;
     }
 }

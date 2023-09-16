@@ -10,16 +10,19 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
@@ -39,9 +42,15 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final DOMDataBroker dataBroker;
 
-    public MdsalRestconfStrategy(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker) {
-        super(modelContext);
+    public MdsalRestconfStrategy(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker,
+            final @Nullable DOMRpcService rpcService) {
+        super(modelContext, rpcService);
         this.dataBroker = requireNonNull(dataBroker);
+    }
+
+    @VisibleForTesting
+    MdsalRestconfStrategy(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker) {
+        this(modelContext, dataBroker, null);
     }
 
     @Override
