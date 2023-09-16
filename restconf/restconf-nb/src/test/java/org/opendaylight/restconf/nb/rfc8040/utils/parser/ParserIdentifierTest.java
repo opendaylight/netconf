@@ -171,16 +171,6 @@ public class ParserIdentifierTest {
     }
 
     /**
-     * Test of creating <code>InstanceIdentifierContext</code> when identifier is <code>null</code>.
-     * <code>{@link YangInstanceIdentifier#empty()}</code> should be returned.
-     */
-    @Test
-    public void toInstanceIdentifierNullIdentifierTest() {
-        final var context = ParserIdentifier.toInstanceIdentifier(null, SCHEMA_CONTEXT, null);
-        assertEquals(YangInstanceIdentifier.of(), context.getInstanceIdentifier());
-    }
-
-    /**
      * Negative test of creating <code>InstanceIdentifierContext</code> when <code>SchemaContext</code> is
      * <code>null</code>. Test fails expecting <code>NullPointerException</code>.
      */

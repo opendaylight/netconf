@@ -82,8 +82,8 @@ public class RestconfOperationsServiceImplTest {
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
 
-        opService = new RestconfOperationsServiceImpl(() -> DatabindContext.ofModel(SCHEMA),
-            new MdsalRestconfServer(dataBroker, rpcService, mountPointService));
+        opService = new RestconfOperationsServiceImpl(
+            new MdsalRestconfServer(() -> DatabindContext.ofModel(SCHEMA), dataBroker, rpcService, mountPointService));
     }
 
     @Test
