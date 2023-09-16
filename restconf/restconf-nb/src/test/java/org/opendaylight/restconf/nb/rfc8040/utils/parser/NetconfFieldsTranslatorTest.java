@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.api.query.FieldsParam;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.ResourceMode;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -28,9 +28,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 @RunWith(MockitoJUnitRunner.class)
 public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<YangInstanceIdentifier> {
     @Override
-    protected List<YangInstanceIdentifier> translateFields(final InstanceIdentifierContext context,
-            final FieldsParam fields) {
-        return NetconfFieldsTranslator.translate(context, fields);
+    protected List<YangInstanceIdentifier> translateFields(final ResourceMode reqPath, final FieldsParam fields) {
+        return NetconfFieldsTranslator.translate(reqPath, fields);
     }
 
     @Override

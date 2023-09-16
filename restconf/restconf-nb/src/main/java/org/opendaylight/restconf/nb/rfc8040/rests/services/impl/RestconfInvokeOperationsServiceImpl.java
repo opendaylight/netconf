@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -33,10 +34,10 @@ import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.databind.InvokeOperationMode;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
@@ -44,6 +45,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controll
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,11 +135,13 @@ public final class RestconfInvokeOperationsServiceImpl {
     private void invokeRpc(final String identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
         final var databind = databindProvider.currentContext();
-        final var reqPath = server.bindRequestPath(databind, identifier);
+        // FIXME: bad cast
+        final var reqPath = (InvokeOperationMode) server.bindPOST(databind, identifier);
+        final var operation = reqPath.operation();
 
         final ContainerNode input;
         try {
-            input = body.toContainerNode(reqPath.inference());
+            input = body.toContainerNode(operation);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
@@ -150,7 +154,7 @@ public final class RestconfInvokeOperationsServiceImpl {
                 if (result.isPresent()) {
                     final var output = result.orElseThrow();
                     if (!output.isEmpty()) {
-                        ar.resume(new NormalizedNodePayload(reqPath.inference(), output));
+                        ar.resume(new NormalizedNodePayload(operation, output));
                     }
                 }
                 ar.resume(Response.noContent().build());
@@ -164,10 +168,15 @@ public final class RestconfInvokeOperationsServiceImpl {
     }
 
     private RestconfFuture<Optional<ContainerNode>> hackInvokeRpc(final DatabindContext localDatabind,
-            final InstanceIdentifierContext reqPath, final UriInfo uriInfo, final ContainerNode input) {
-        // RPC type
-        final var type = reqPath.getSchemaNode().getQName();
-        final var mountPoint = reqPath.getMountPoint();
+            final InvokeOperationMode reqPath, final UriInfo uriInfo, final ContainerNode input) {
+        final var operation = reqPath.operation();
+        final var operStmt = Iterables.getLast(operation.statementPath());
+        if (!(operStmt instanceof RpcEffectiveStatement rpc)) {
+            throw new IllegalStateException("Unexpected statement " + operStmt);
+        }
+
+        final var type = rpc.argument();
+        final var mountPoint = reqPath.mountPoint();
         if (mountPoint == null) {
             // Hacked-up integration of streams
             if (CreateDataChangeEventSubscription.QNAME.equals(type)) {
@@ -180,6 +189,6 @@ public final class RestconfInvokeOperationsServiceImpl {
             }
         }
 
-        return server.getRestconfStrategy(reqPath.getSchemaContext(), mountPoint).invokeRpc(type, input);
+        return server.getRestconfStrategy(operation.getEffectiveModelContext(), mountPoint).invokeRpc(type, input);
     }
 }

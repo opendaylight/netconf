@@ -47,7 +47,7 @@ public final class RestconfOperationsServiceImpl {
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
     public String getOperationsJSON() {
         return OperationsContent.JSON.bodyFor(
-            server.bindRequestRoot(databindProvider.currentContext()).inference());
+            server.bindResource(databindProvider.currentContext()).inference());
     }
 
     /**
@@ -61,7 +61,7 @@ public final class RestconfOperationsServiceImpl {
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
     public String getOperationJSON(@PathParam("identifier") final String identifier) {
         return OperationsContent.JSON.bodyFor(
-            server.bindRequestPath(databindProvider.currentContext(), identifier).inference());
+            server.bindResource(databindProvider.currentContext(), identifier).inference());
     }
 
     /**
@@ -74,7 +74,7 @@ public final class RestconfOperationsServiceImpl {
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public String getOperationsXML() {
         return OperationsContent.XML.bodyFor(
-            server.bindRequestRoot(databindProvider.currentContext()).inference());
+            server.bindResource(databindProvider.currentContext()).inference());
     }
 
     /**
@@ -88,6 +88,6 @@ public final class RestconfOperationsServiceImpl {
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public String getOperationXML(@PathParam("identifier") final String identifier) {
         return OperationsContent.XML.bodyFor(
-            server.bindRequestPath(databindProvider.currentContext(), identifier).inference());
+            server.bindResource(databindProvider.currentContext(), identifier).inference());
     }
 }

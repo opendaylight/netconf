@@ -22,12 +22,16 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.CreateResourceMode;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.POSTMode;
+import org.opendaylight.restconf.nb.rfc8040.databind.ResourceMode;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
@@ -69,7 +73,13 @@ public final class MdsalRestconfServer {
         this.mountPointService = requireNonNull(mountPointService);
     }
 
-    @NonNull InstanceIdentifierContext bindRequestPath(final DatabindContext databind, final String identifier) {
+    @SuppressWarnings("static-method")
+    @NonNull CreateResourceMode bindPOST(final DatabindContext databind) {
+        return new CreateResourceMode(databind, YangInstanceIdentifier.of(),
+            Inference.ofDataTreePath(databind.modelContext()), null);
+    }
+
+    @NonNull POSTMode bindPOST(final DatabindContext databind, final String identifier) {
         // FIXME: go through ApiPath first. That part should eventually live in callers
         // FIXME: DatabindContext looks like it should be internal
         return verifyNotNull(ParserIdentifier.toInstanceIdentifier(requireNonNull(identifier), databind.modelContext(),
@@ -77,8 +87,16 @@ public final class MdsalRestconfServer {
     }
 
     @SuppressWarnings("static-method")
-    @NonNull InstanceIdentifierContext bindRequestRoot(final DatabindContext databind) {
-        return InstanceIdentifierContext.ofLocalRoot(databind.modelContext());
+    @NonNull ResourceMode bindResource(final DatabindContext databind) {
+        return new ResourceMode(databind, Inference.ofDataTreePath(databind.modelContext()),
+            YangInstanceIdentifier.of(), null);
+    }
+
+    @NonNull ResourceMode bindResource(final DatabindContext databind, final String identifier) {
+        // FIXME: go through ApiPath first. That part should eventually live in callers
+        // FIXME: DatabindContext looks like it should be internal
+        return verifyNotNull(ParserIdentifier.toInstanceIdentifier(requireNonNull(identifier), databind.modelContext(),
+            mountPointService));
     }
 
     @VisibleForTesting
