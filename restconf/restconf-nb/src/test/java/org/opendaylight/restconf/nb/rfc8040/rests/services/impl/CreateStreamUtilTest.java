@@ -13,13 +13,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
-import java.util.List;
 import java.util.function.Function;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -51,14 +49,12 @@ public class CreateStreamUtilTest {
 
     @Test
     public void createStreamTest() {
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(listenersBroker,
-            prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster", "path"),
-            SCHEMA_CTX);
-        assertEquals(List.of(), result.errors());
         assertEquals(prepareDomPayload("create-data-change-event-subscription",
             RpcDefinition::getOutput,
             "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE", "stream-name"),
-            result.value());
+            CreateStreamUtil.createDataChangeNotifiStream(listenersBroker,
+                prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster", "path"),
+                SCHEMA_CTX));
     }
 
     @Test
