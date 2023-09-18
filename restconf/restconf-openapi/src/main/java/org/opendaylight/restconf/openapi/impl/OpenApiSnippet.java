@@ -8,12 +8,17 @@
 package org.opendaylight.restconf.openapi.impl;
 
 import java.util.Iterator;
-import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 
-public class OpenApiSnippet implements Iterable<@NonNull Integer> {
+public class OpenApiSnippet implements Iterable<OpenApiEntity> {
+    private final OpenApiEntity entity;
+
+    public OpenApiSnippet(final OpenApiEntity entity) {
+        this.entity = entity;
+    }
 
     @Override
-    public Iterator<@NonNull Integer> iterator() {
+    public Iterator<OpenApiEntity> iterator() {
         return null;
     }
 }

@@ -84,38 +84,14 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiObject getControllerModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
+    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo) {
         final var context = requireNonNull(schemaService.getGlobalContext());
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
         final var title = "Controller modules of RESTCONF";
         final var info = new Info(API_VERSION, title, DESCRIPTION);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
-
-        final var paths = new HashMap<String, Path>();
-        final var schemas = new HashMap<String, Schema>();
-
-        /**
-        for modules:
-            for identities:
-                yield: Iterable<OpenApiEntity>
-            for childNodes:
-                yield: Iterable<OpenApiEntity>
-            for rpcs:
-                yield: Iterable<OpenApiEntity>
-
-        return new OpenApiInputStream(List.of(iterable, iterable, ...))
-         */
-
-        for (final var module : getSortedModules(context)) {
-            final var formatter = new OpenApiFormatter();
-            LOG.debug("Working on [{},{}]...", module.getName(), module.getQNameModule().getRevision().orElse(null));
-            schemas.putAll(getSchemas(module, context, definitionNames, false));
-            paths.putAll(getPaths(module, "", CONTROLLER_RESOURCE_NAME, context, definitionNames, false));
-        }
-
-        final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
-        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
+        return new OpenApiInputStream(context, OPEN_API_VERSION, info, servers, SECURITY);
     }
 
     public static Set<Module> filterByRange(final SortedSet<Module> modules, final Range<Integer> range) {
