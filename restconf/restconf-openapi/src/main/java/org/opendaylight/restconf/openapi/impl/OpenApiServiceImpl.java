@@ -76,9 +76,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public synchronized Response getAllModulesDoc(final UriInfo uriInfo) {
-        final DefinitionNames definitionNames = new DefinitionNames();
-        final OpenApiObject doc = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, definitionNames);
-        return Response.ok(doc).build();
+        final var openApiInputStream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo);
+        return Response.ok(openApiInputStream).build();
     }
 
     /**
