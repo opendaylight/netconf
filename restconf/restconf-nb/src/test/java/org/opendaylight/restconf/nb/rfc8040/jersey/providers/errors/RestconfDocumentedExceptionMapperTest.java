@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -19,8 +20,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +39,9 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.ElementSelectors;
 
 @RunWith(Parameterized.class)
 public class RestconfDocumentedExceptionMapperTest {
@@ -287,7 +289,7 @@ public class RestconfDocumentedExceptionMapperTest {
     }
 
     @Test
-    public void testFormatingJson() throws JSONException {
+    public void testFormattingJson() throws JSONException {
         assumeTrue(expectedResponse.getMediaType().equals(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE));
 
         exceptionMapper.setHttpHeaders(httpHeaders);
@@ -312,9 +314,20 @@ public class RestconfDocumentedExceptionMapperTest {
             JSONAssert.assertEquals(expectedResponse.getEntity().toString(),
                     actualResponse.getEntity().toString(), true);
         } else {
-            final JSONObject expectedResponseInJson = XML.toJSONObject(expectedResponse.getEntity().toString());
-            final JSONObject actualResponseInJson = XML.toJSONObject(actualResponse.getEntity().toString());
-            JSONAssert.assertEquals(expectedResponseInJson, actualResponseInJson, true);
+            final String exp = expectedResponse.getEntity().toString();
+            final String act = actualResponse.getEntity().toString();
+            assertEquals(exp, act);
+            compareXml(expectedResponse.getEntity().toString(), actualResponse.getEntity().toString());
         }
+    }
+
+    private static void compareXml(final String expected, final String actual) {
+        final var diff = DiffBuilder.compare(expected)
+            .withTest(actual)
+            .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+            .checkForSimilar()
+            .build();
+
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 }
