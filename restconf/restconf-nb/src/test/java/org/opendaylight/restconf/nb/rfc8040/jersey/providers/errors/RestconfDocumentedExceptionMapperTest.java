@@ -287,7 +287,7 @@ public class RestconfDocumentedExceptionMapperTest {
     }
 
     @Test
-    public void testFormatingJson() throws JSONException {
+    public void testFormattingJson() throws JSONException {
         assumeTrue(expectedResponse.getMediaType().equals(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE));
 
         exceptionMapper.setHttpHeaders(httpHeaders);
