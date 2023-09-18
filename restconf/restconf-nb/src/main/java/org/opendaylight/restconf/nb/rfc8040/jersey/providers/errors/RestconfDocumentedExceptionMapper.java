@@ -11,10 +11,11 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.$YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.gson.stream.JsonWriter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -34,7 +35,9 @@ import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -99,7 +102,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         final String serializedResponseBody;
         final MediaType responseMediaType = transformToResponseMediaType(getSupportedMediaType());
         if (MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE.equals(responseMediaType)) {
-            serializedResponseBody = serializeErrorsContainerToJson(errorsContainer);
+            serializedResponseBody = serializeErrorsContainerToJson(exception);
         } else {
             serializedResponseBody = serializeErrorsContainerToXml(errorsContainer);
         }
@@ -167,18 +170,57 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     /**
      * Serialization of the errors container into JSON representation.
      *
-     * @param errorsContainer To be serialized errors container.
+     * @param exception To be serialized errors container.
      * @return JSON representation of the errors container.
      */
-    private String serializeErrorsContainerToJson(final ContainerNode errorsContainer) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             OutputStreamWriter streamStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
-        ) {
-            return writeNormalizedNode(errorsContainer, outputStream,
-                new JsonStreamWriterWithDisabledValidation(databindProvider.currentContext(), streamStreamWriter));
+    private String serializeErrorsContainerToJson(final RestconfDocumentedException exception) {
+        var currentDatabindContext = getCurrentDatabindContext(exception);
+        try (var writer = new StringWriter();
+             var jsonWriter = new JsonWriter(writer)) {
+            jsonWriter.beginObject();
+            if (exception.getErrors() != null && !exception.getErrors().isEmpty()) {
+                jsonWriter.name(Errors.QNAME.getLocalName()).beginObject();
+                jsonWriter.name(Error.QNAME.getLocalName()).beginArray();
+                for (final RestconfError error : exception.getErrors()) {
+                    jsonWriter.beginObject()
+                        .name(ERROR_TYPE_QNAME.getLocalName()).value(error.getErrorType().elementBody())
+                        .name(ERROR_TAG_QNAME.getLocalName()).value(error.getErrorTag().elementBody());
+                    if (error.getErrorMessage() != null) {
+                        jsonWriter.name(ERROR_MESSAGE_QNAME.getLocalName()).value(error.getErrorMessage());
+                    }
+                    if (error.getErrorAppTag() != null) {
+                        jsonWriter.name(ERROR_APP_TAG_QNAME.getLocalName()).value(error.getErrorAppTag());
+                    }
+                    if (error.getErrorInfo() != null) {
+                        jsonWriter.name(ERROR_INFO_QNAME.getLocalName()).value(error.getErrorInfo());
+                    }
+                    if (error.getErrorPath() != null) {
+                        jsonWriter.name((ERROR_PATH_QNAME.getLocalName()));
+                        currentDatabindContext.jsonCodecs().instanceIdentifierCodec()
+                            .writeValue(jsonWriter, error.getErrorPath());
+                        jsonWriter.endObject();
+                    }
+                    jsonWriter.endObject();
+                }
+                jsonWriter.endArray().endObject();
+            }
+            jsonWriter.endObject();
+            return writer.toString();
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output JSON writers", e);
         }
+    }
+
+    private DatabindContext getCurrentDatabindContext(final RestconfDocumentedException exception) {
+        var currentDatabindContext = databindProvider.currentContext();
+        if (exception.identifier() != null && !exception.identifier().isEmpty()) {
+            final var identifierContext = ParserIdentifier.toInstanceIdentifier(exception.identifier(),
+                databindProvider.currentContext().modelContext(), mountPointService);
+            if (identifierContext.getMountPoint() != null) {
+                currentDatabindContext = DatabindContext.ofModel(identifierContext.getSchemaContext());
+            }
+        }
+        return currentDatabindContext;
     }
 
     /**
