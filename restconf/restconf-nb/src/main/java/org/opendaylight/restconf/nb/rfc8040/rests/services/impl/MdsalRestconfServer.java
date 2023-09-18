@@ -29,6 +29,8 @@ import org.opendaylight.restconf.nb.rfc8040.databind.ResourceMode;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.spi.AbstractRestconfServer;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
@@ -45,8 +47,8 @@ import org.slf4j.LoggerFactory;
 // FIXME: factor out the 'RestconfServer' interface once we're ready
 // FIXME: this should live in 'org.opendaylight.restconf.server.mdsal' package
 @Singleton
-@Component(service = MdsalRestconfServer.class)
-public final class MdsalRestconfServer {
+@Component(service = RestconfServer.class)
+public final class MdsalRestconfServer extends AbstractRestconfServer {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfServer.class);
     private static final VarHandle LOCAL_STRATEGY;
 
