@@ -9,9 +9,9 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -52,9 +52,9 @@ public final class YangInstanceIdentifierSerializer {
      * @return {@link String}
      */
     public static String create(final EffectiveModelContext schemaContext, final YangInstanceIdentifier data) {
-        final DataSchemaContext current = DataSchemaContextTree.from(schemaContext).getRoot();
-        final MainVarsWrapper variables = new MainVarsWrapper(current);
-        final StringBuilder path = new StringBuilder();
+        final var current = DataSchemaContextTree.from(schemaContext).getRoot();
+        final var variables = new MainVarsWrapper(current);
+        final var path = new StringBuilder();
 
         QNameModule parentModule = null;
         for (final PathArgument arg : data.getPathArguments()) {
@@ -89,43 +89,41 @@ public final class YangInstanceIdentifierSerializer {
                 path.append('/');
             }
 
-            if (arg instanceof NodeIdentifierWithPredicates) {
-                prepareNodeWithPredicates(path, arg);
-            } else if (arg instanceof NodeWithValue) {
-                prepareNodeWithValue(path, arg);
-            } else {
-                appendQName(path, arg.getNodeType());
+            path.append(arg.getNodeType().getLocalName());
+            if (arg instanceof NodeIdentifierWithPredicates withPredicates) {
+                prepareNodeWithPredicates(path, withPredicates.entrySet());
+            } else if (arg instanceof NodeWithValue<?> withValue) {
+                prepareNodeWithValue(path, withValue.getValue());
             }
         }
 
         return path.toString();
     }
 
-    private static void prepareNodeWithValue(final StringBuilder path, final PathArgument arg) {
-        path.append(arg.getNodeType().getLocalName());
+    private static void prepareNodeWithValue(final StringBuilder path, final Object value) {
         path.append('=');
 
-        String value = String.valueOf(((NodeWithValue<String>) arg).getValue());
-        if (PERCENT_ENCODE_CHARS.matchesAnyOf(value)) {
-            value = parsePercentEncodeChars(value);
+        // FIXME: this is quite fishy
+        var str = String.valueOf(value);
+        if (PERCENT_ENCODE_CHARS.matchesAnyOf(str)) {
+            str = parsePercentEncodeChars(str);
         }
-        path.append(value);
+        path.append(str);
     }
 
-    private static void prepareNodeWithPredicates(final StringBuilder path, final PathArgument arg) {
-        path.append(arg.getNodeType().getLocalName());
-
-        final Iterator<Entry<QName, Object>> iterator = ((NodeIdentifierWithPredicates) arg).entrySet().iterator();
+    private static void prepareNodeWithPredicates(final StringBuilder path, final Set<Entry<QName, Object>> entries) {
+        final var iterator = entries.iterator();
         if (iterator.hasNext()) {
             path.append('=');
         }
 
         while (iterator.hasNext()) {
-            String valueOf = String.valueOf(iterator.next().getValue());
-            if (PERCENT_ENCODE_CHARS.matchesAnyOf(valueOf)) {
-                valueOf = parsePercentEncodeChars(valueOf);
+            // FIXME: this is quite fishy
+            var str = String.valueOf(iterator.next().getValue());
+            if (PERCENT_ENCODE_CHARS.matchesAnyOf(str)) {
+                str = parsePercentEncodeChars(str);
             }
-            path.append(valueOf);
+            path.append(str);
             if (iterator.hasNext()) {
                 path.append(',');
             }
@@ -140,33 +138,19 @@ public final class YangInstanceIdentifierSerializer {
      * @return encoded {@link String}
      */
     private static String parsePercentEncodeChars(final String valueOf) {
-        final StringBuilder sb = new StringBuilder();
+        final var sb = new StringBuilder();
 
         for (int i = 0; i < valueOf.length(); ++i) {
             final char ch = valueOf.charAt(i);
 
             if (PERCENT_ENCODE_CHARS.matches(ch)) {
-                final String upperCase = String.format(Locale.ROOT, "%X", (int) ch);
+                final var upperCase = String.format(Locale.ROOT, "%X", (int) ch);
                 sb.append('%').append(upperCase);
             } else {
                 sb.append(ch);
             }
         }
         return sb.toString();
-    }
-
-    /**
-     * Add {@link QName} to the serialized string.
-     *
-     * @param path
-     *             {@link StringBuilder}
-     * @param qname
-     *             {@link QName} node
-     * @return {@link StringBuilder}
-     */
-    private static StringBuilder appendQName(final StringBuilder path, final QName qname) {
-        path.append(qname.getLocalName());
-        return path;
     }
 
     /**
