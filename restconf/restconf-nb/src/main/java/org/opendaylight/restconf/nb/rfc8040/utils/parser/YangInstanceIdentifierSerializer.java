@@ -9,7 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
-import java.util.Locale;
+import java.util.HexFormat;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -36,6 +36,7 @@ public final class YangInstanceIdentifierSerializer {
     @VisibleForTesting
     static final CharMatcher PERCENT_ENCODE_CHARS =
             CharMatcher.anyOf(ParserConstants.RFC3986_RESERVED_CHARACTERS).precomputed();
+    private static final HexFormat PERCENT_HEXFORMAT = HexFormat.of().withUpperCase();
 
     private YangInstanceIdentifierSerializer() {
         // Hidden on purpose
@@ -106,7 +107,7 @@ public final class YangInstanceIdentifierSerializer {
         // FIXME: this is quite fishy
         var str = String.valueOf(value);
         if (PERCENT_ENCODE_CHARS.matchesAnyOf(str)) {
-            str = parsePercentEncodeChars(str);
+            str = percentEncodeChars(str);
         }
         path.append(value);
     }
@@ -121,7 +122,7 @@ public final class YangInstanceIdentifierSerializer {
             // FIXME: this is quite fishy
             var str = String.valueOf(iterator.next().getValue());
             if (PERCENT_ENCODE_CHARS.matchesAnyOf(str)) {
-                str = parsePercentEncodeChars(str);
+                str = percentEncodeChars(str);
             }
             path.append(str);
             if (iterator.hasNext()) {
@@ -131,21 +132,20 @@ public final class YangInstanceIdentifierSerializer {
     }
 
     /**
-     * Encode {@link Serializer#DISABLED_CHARS} chars to percent encoded chars.
+     * Encode {@link PERCENT_ENCODE_CHARS} chars to percent encoded chars. The implementation assumes all characters lie
+     * within basic range {@code 0-127} and can be encoded as {@code %XX}.
      *
-     * @param valueOf
-     *             string to encode
+     * @param str string to encode
      * @return encoded {@link String}
      */
-    private static String parsePercentEncodeChars(final String valueOf) {
+    private static String percentEncodeChars(final String str) {
         final var sb = new StringBuilder();
 
-        for (int i = 0; i < valueOf.length(); ++i) {
-            final char ch = valueOf.charAt(i);
+        for (int i = 0; i < str.length(); ++i) {
+            final char ch = str.charAt(i);
 
             if (PERCENT_ENCODE_CHARS.matches(ch)) {
-                final var upperCase = String.format(Locale.ROOT, "%X", (int) ch);
-                sb.append('%').append(upperCase);
+                sb.append('%').append(PERCENT_HEXFORMAT.toHighHexDigit(ch)).append(PERCENT_HEXFORMAT.toLowHexDigit(ch));
             } else {
                 sb.append(ch);
             }
