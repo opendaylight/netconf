@@ -21,6 +21,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 /**
  * JSON stream-writer with disabled leaf-type validation for specified QName.
  */
+// FIXME remove this class
 final class JsonStreamWriterWithDisabledValidation extends StreamWriterWithDisabledValidation {
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
     private static final XMLNamespace IETF_RESTCONF_URI = Errors.QNAME.getModule().getNamespace();
