@@ -12,30 +12,43 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.List;
+import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
+import org.opendaylight.restconf.openapi.model.Info;
+import org.opendaylight.restconf.openapi.model.InfoEntity;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
+import org.opendaylight.restconf.openapi.model.Server;
+import org.opendaylight.restconf.openapi.model.ServerEntity;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class OpenApiModelIterator extends AbstractIterator<Integer> {
-    private static final byte[] ARRAY = new byte[0];
-    private static final Reader READER = new InputStreamReader(new ByteArrayInputStream(ARRAY));
+    private static final ArrayDeque<OpenApiEntity> stack = new ArrayDeque<>();
 
-    public OpenApiModelIterator(final OpenApiEntity entity) throws IOException { // FIXME
-        final var openApiWriter = new OpenApiBodyWriter();
-        final var outStream = new ByteArrayOutputStream(0);
-        openApiWriter.writeTo(entity, null, null, null, null, null, outStream);
+    public OpenApiModelIterator(final EffectiveModelContext context, final String openApiVersion, final Info info,
+        final List<Server> servers, final List<Map<String, List<String>>> security) {
+        stack.add(new InfoEntity(info.version(), info.title(), info.description()));
+        stack.add(new ServerEntity(servers.iterator().next().url()));
     }
 
     @Override
     protected @NonNull Integer computeNext() {
+        if (stack.isEmpty()) {
+            endOfData();
+            return -1;
+        }
+
         try {
-            final var read = READER.read();
-            if (read == -1) {
+            final var pop = stack.pop();
+            final var openApiBodyWriter = new OpenApiBodyWriter();
+            final var outStream = new ByteArrayOutputStream();
+            openApiBodyWriter.writeTo(pop, null, null, null, null, null, outStream);
+
+            final var reader = new InputStreamReader(new ByteArrayInputStream(outStream.toByteArray()));
+            final var read = reader.read();
+            while (read != -1) { // FIXME
                 endOfData();
             }
             return read;
