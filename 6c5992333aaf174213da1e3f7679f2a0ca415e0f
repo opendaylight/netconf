@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3ceb333_09b40678",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Path.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-09-18T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "525be527_e25d5a04",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 4
+      },
+      "revId": "6c5992333aaf174213da1e3f7679f2a0ca415e0f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "edbeab4a_ad018df7",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-09-13T17:19:40Z",
       "side": 1,
       "message": "Adding builder allow us avoid using null. Consider using it.",
+      "range": {
+        "startLine": 211,
+        "startChar": 80,
+        "endLine": 211,
+        "endChar": 92
+      },
+      "revId": "6c5992333aaf174213da1e3f7679f2a0ca415e0f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db85f9a7_decf63ae",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-09-18T15:12:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "edbeab4a_ad018df7",
       "range": {
         "startLine": 211,
         "startChar": 80,
