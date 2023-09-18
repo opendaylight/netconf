@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -28,9 +26,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -100,13 +97,16 @@ public class RestconfInvokeOperationsServiceImplTest {
 
         prepNNC(result);
         final var ar = mock(AsyncResponse.class);
-        final var response = ArgumentCaptor.forClass(NormalizedNodePayload.class);
+        final var captor = ArgumentCaptor.forClass(Response.class);
         invokeOperationsService.invokeRpcXML("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
             <input xmlns="invoke:rpc:module"/>
             """.getBytes(StandardCharsets.UTF_8)), mock(UriInfo.class), ar);
-        verify(ar).resume(response.capture());
+        verify(ar).resume(captor.capture());
 
-        assertSame(result, response.getValue().data());
+        final var response = captor.getValue();
+        assertEquals(200, response.getStatus());
+        final var entity = (NormalizedNodePayload) response.getEntity();
+        assertSame(result, entity.data());
     }
 
     @Test
@@ -116,18 +116,17 @@ public class RestconfInvokeOperationsServiceImplTest {
 
         prepNNC(result);
         final var ar = mock(AsyncResponse.class);
-        final var response = ArgumentCaptor.forClass(Throwable.class);
+        final var captor = ArgumentCaptor.forClass(Response.class);
         invokeOperationsService.invokeRpcJSON("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
             {
               "invoke-rpc-module:input" : {
               }
             }
             """.getBytes(StandardCharsets.UTF_8)), mock(UriInfo.class), ar);
-        verify(ar).resume(response.capture());
+        verify(ar).resume(captor.capture());
 
-        final Throwable failure = response.getValue();
-        assertThat(failure, instanceOf(WebApplicationException.class));
-        assertEquals(Status.NO_CONTENT.getStatusCode(), ((WebApplicationException) failure).getResponse().getStatus());
+        final var response = captor.getValue();
+        assertEquals(204, response.getStatus());
     }
 
     @Test
