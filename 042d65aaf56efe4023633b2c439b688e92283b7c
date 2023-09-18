@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d69955c2_252a565e",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfSchemaSourceUrlProvider.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-18T14:34:16Z",
+      "side": 1,
+      "message": "final",
+      "revId": "042d65aaf56efe4023633b2c439b688e92283b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b5722ba_6778547a",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfSchemaSourceUrlProvider.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-18T14:34:16Z",
+      "side": 1,
+      "message": "One empty line is fine.",
+      "revId": "042d65aaf56efe4023633b2c439b688e92283b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af5cea82_7c54b514",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfSchemaSourceUrlProviderTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-18T14:34:16Z",
+      "side": 1,
+      "message": "IMO: We do not need this line.",
+      "revId": "042d65aaf56efe4023633b2c439b688e92283b7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
