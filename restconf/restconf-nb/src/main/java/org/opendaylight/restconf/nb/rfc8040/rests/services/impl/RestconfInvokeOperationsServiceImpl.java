@@ -23,12 +23,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -184,9 +183,9 @@ public final class RestconfInvokeOperationsServiceImpl {
 
                 final ContainerNode resultData = response.value();
                 if (resultData == null || resultData.isEmpty()) {
-                    ar.resume(new WebApplicationException(Status.NO_CONTENT));
+                    ar.resume(Response.noContent().build());
                 } else {
-                    ar.resume(new NormalizedNodePayload(context.inference(), resultData));
+                    ar.resume(Response.ok().entity(new NormalizedNodePayload(context.inference(), resultData)).build());
                 }
             }
 
