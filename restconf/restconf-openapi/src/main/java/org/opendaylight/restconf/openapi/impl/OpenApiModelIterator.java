@@ -12,29 +12,30 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.List;
+import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
+import org.opendaylight.restconf.openapi.model.Info;
+import org.opendaylight.restconf.openapi.model.InfoEntity;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
+import org.opendaylight.restconf.openapi.model.Server;
+import org.opendaylight.restconf.openapi.model.ServerEntity;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class OpenApiModelIterator extends AbstractIterator<Integer> {
-    private static final byte[] ARRAY = new byte[0];
-    private static final Reader READER = new InputStreamReader(new ByteArrayInputStream(ARRAY));
+    private final Reader reader;
 
-    public OpenApiModelIterator(final OpenApiEntity entity) throws IOException { // FIXME
-        final var openApiWriter = new OpenApiBodyWriter();
-        final var outStream = new ByteArrayOutputStream(0);
-        openApiWriter.writeTo(entity, null, null, null, null, null, outStream);
+    public OpenApiModelIterator(final Reader reader) {
+        this.reader = reader;
     }
 
     @Override
     protected @NonNull Integer computeNext() {
         try {
-            final var read = READER.read();
+            final var read = reader.read();
             if (read == -1) {
                 endOfData();
             }
