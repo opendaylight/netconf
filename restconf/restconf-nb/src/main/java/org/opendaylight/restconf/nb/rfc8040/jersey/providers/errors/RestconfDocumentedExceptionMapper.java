@@ -33,6 +33,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsMediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
@@ -42,6 +43,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
+import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.slf4j.Logger;
@@ -66,8 +68,10 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private static final QName ERROR_TAG_QNAME = qnameOf("error-tag");
     private static final QName ERROR_APP_TAG_QNAME = qnameOf("error-app-tag");
     private static final QName ERROR_MESSAGE_QNAME = qnameOf("error-message");
-    private static final QName ERROR_PATH_QNAME = qnameOf("error-path");
+    // FIXME make this private
     static final QName ERROR_INFO_QNAME = qnameOf("error-info");
+    private static final QName ERROR_PATH_QNAME = qnameOf("error-path");
+    private static final int DEFAULT_INDENT_SPACES_NUM = 2;
 
     private final DatabindProvider databindProvider;
 
@@ -101,7 +105,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         final String serializedResponseBody;
         final MediaType responseMediaType = transformToResponseMediaType(getSupportedMediaType());
         if (JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON.equals(responseMediaType)) {
-            serializedResponseBody = serializeErrorsContainerToJson(errorsContainer);
+            serializedResponseBody = serializeExceptionToJson(exception);
         } else {
             serializedResponseBody = serializeErrorsContainerToXml(errorsContainer);
         }
@@ -167,17 +171,51 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     }
 
     /**
-     * Serialization of the errors container into JSON representation.
+     * Serialization exceptions into JSON representation.
      *
-     * @param errorsContainer To be serialized errors container.
-     * @return JSON representation of the errors container.
+     * @param exception To be serialized exception.
+     * @return JSON representation of the exception.
      */
-    private String serializeErrorsContainerToJson(final ContainerNode errorsContainer) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             OutputStreamWriter streamStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
-        ) {
-            return writeNormalizedNode(errorsContainer, outputStream,
-                new JsonStreamWriterWithDisabledValidation(databindProvider.currentDatabind(), streamStreamWriter));
+    private String serializeExceptionToJson(final RestconfDocumentedException exception) {
+        try (var outputStream = new ByteArrayOutputStream();
+             var streamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+             var jsonWriter = JsonWriterFactory.createJsonWriter(streamWriter, DEFAULT_INDENT_SPACES_NUM)) {
+            final var currentDatabindContext = exception.modelContext() != null
+                ? DatabindContext.ofModel(exception.modelContext()) : this.databindProvider.currentDatabind();
+            jsonWriter.beginObject();
+            final var errors = exception.getErrors();
+            if (errors != null && !errors.isEmpty()) {
+                jsonWriter.name(Errors.QNAME.getLocalName()).beginObject();
+                jsonWriter.name(Error.QNAME.getLocalName()).beginArray();
+                for (final var error : errors) {
+                    jsonWriter.beginObject()
+                        .name(ERROR_TAG_QNAME.getLocalName()).value(error.getErrorTag().elementBody());
+                    final var errorAppTag = error.getErrorAppTag();
+                    if (errorAppTag != null) {
+                        jsonWriter.name(ERROR_APP_TAG_QNAME.getLocalName()).value(errorAppTag);
+                    }
+                    final var errorInfo = error.getErrorInfo();
+                    if (errorInfo != null) {
+                        jsonWriter.name(ERROR_INFO_QNAME.getLocalName()).value(errorInfo);
+                    }
+                    final var errorMessage = error.getErrorMessage();
+                    if (errorMessage != null) {
+                        jsonWriter.name(ERROR_MESSAGE_QNAME.getLocalName()).value(errorMessage);
+                    }
+                    final var errorPath = error.getErrorPath();
+                    if (errorPath != null) {
+                        jsonWriter.name(ERROR_PATH_QNAME.getLocalName());
+                        currentDatabindContext.jsonCodecs().instanceIdentifierCodec()
+                            .writeValue(jsonWriter, errorPath);
+                    }
+                    jsonWriter.name(ERROR_TYPE_QNAME.getLocalName()).value(error.getErrorType().elementBody());
+                    jsonWriter.endObject();
+                }
+                jsonWriter.endArray().endObject();
+            }
+            jsonWriter.endObject();
+            streamWriter.flush();
+            return outputStream.toString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output JSON writers", e);
         }
