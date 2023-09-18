@@ -588,6 +588,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sal-rest-connector-config</artifactId>
                 <version>${project.version}</version>
