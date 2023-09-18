@@ -21,6 +21,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
  * the schema and thus will expect a LeafSchemaNode but the schema has a ContainerSchemaNode so, to avoid an error,
  * we override the leafNode behavior for error-info.
  */
+// FIXME remove this class
 abstract class StreamWriterWithDisabledValidation extends ForwardingNormalizedNodeStreamWriter {
     private boolean inOurLeaf;
 
