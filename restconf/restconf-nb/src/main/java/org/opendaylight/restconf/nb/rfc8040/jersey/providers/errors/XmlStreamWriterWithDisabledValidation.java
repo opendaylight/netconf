@@ -23,6 +23,7 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStr
 /**
  * XML stream-writer with disabled leaf-type validation for specified QName.
  */
+// FIXME remove this class
 final class XmlStreamWriterWithDisabledValidation extends StreamWriterWithDisabledValidation {
     private static final XMLOutputFactory XML_FACTORY;
 
