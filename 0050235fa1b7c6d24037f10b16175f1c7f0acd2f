@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f3358ec_3575b69f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Path.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-19T07:31:46Z",
+      "side": 1,
+      "message": "Let\u0027s make List\u003cServer\u003e servers unmodifiable\n\n    public Path {\n        servers \u003d servers \u003d\u003d null ? null : List.copyOf(servers);\n    }",
+      "revId": "0050235fa1b7c6d24037f10b16175f1c7f0acd2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db051288_215d233c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Server.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-19T07:31:46Z",
+      "side": 1,
+      "message": "Let\u0027s make Map\u003cString, ServerVariable\u003e variables unmodifiable\n\n        variables \u003d variables \u003d\u003d null ? null : Map.copyOf(variables);",
+      "revId": "0050235fa1b7c6d24037f10b16175f1c7f0acd2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f31daa4_f5ec4ffa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/ServerVariable.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-19T07:31:46Z",
+      "side": 1,
+      "message": "Let\u0027s make List\u003cString\u003e values unmodifiable\nvalues \u003d values \u003d\u003d null ? null : List.copyOf(values);",
+      "revId": "0050235fa1b7c6d24037f10b16175f1c7f0acd2f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
