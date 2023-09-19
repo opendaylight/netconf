@@ -26,6 +26,7 @@ import org.opendaylight.netconf.server.api.monitoring.YangModuleCapability;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactoryListener;
+import org.opendaylight.netconf.server.mdsal.operations.MapperAggregatorRegistry;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -56,7 +57,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     @Activate
     public MdsalNetconfOperationServiceFactory(@Reference final DOMSchemaService schemaService,
             @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
-            @Reference(target = "(type=mapper-aggregator-registry)")
+            @Reference(target = "(type=" + MapperAggregatorRegistry.OSGI_TYPE + ")")
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener) {
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcService = requireNonNull(rpcService);

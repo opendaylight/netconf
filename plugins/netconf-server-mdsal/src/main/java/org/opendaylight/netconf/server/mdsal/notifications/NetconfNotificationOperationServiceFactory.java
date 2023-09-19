@@ -16,6 +16,7 @@ import org.opendaylight.netconf.server.api.notifications.NetconfNotificationRegi
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactoryListener;
+import org.opendaylight.netconf.server.mdsal.operations.MapperAggregatorRegistry;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
@@ -31,8 +32,9 @@ public final class NetconfNotificationOperationServiceFactory implements Netconf
 
     @Activate
     public NetconfNotificationOperationServiceFactory(
-            @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationRegistry notifManager,
-            @Reference(target = "(type=mapper-aggregator-registry)")
+            @Reference(target = "(type= " + NetconfNotificationManager.OSGI_TYPE + ")")
+            final NetconfNotificationRegistry notifManager,
+            @Reference(target = "(type=" + MapperAggregatorRegistry.OSGI_TYPE + ")")
             final NetconfOperationServiceFactoryListener aggregatorRegistry) {
         this.notifManager = requireNonNull(notifManager);
         this.aggregatorRegistry = requireNonNull(aggregatorRegistry);

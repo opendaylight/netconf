@@ -39,7 +39,8 @@ public final class YangLibraryNotificationProducer implements DataTreeChangeList
 
     @Activate
     public YangLibraryNotificationProducer(
-            @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
+            @Reference(target = "(type=" + NetconfNotificationManager.OSGI_TYPE + ")")
+            final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
         yangLibraryPublisherRegistration = notifManager.registerYangLibraryPublisher();
         yangLibraryChangeListenerRegistration = dataBroker.registerDataTreeChangeListener(

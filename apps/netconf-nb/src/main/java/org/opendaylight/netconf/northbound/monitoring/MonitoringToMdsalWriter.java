@@ -17,6 +17,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.netconf.northbound.DefaultNetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService.CapabilitiesListener;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService.SessionsListener;
@@ -54,7 +55,7 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, Capabilitie
 
     @Activate
     public MonitoringToMdsalWriter(@Reference final DataBroker dataBroker,
-            @Reference(target = "(type=netconf-server-monitoring)")
+            @Reference(target = "(type=" + DefaultNetconfMonitoringService.OSGI_TYPE + ")")
             final NetconfMonitoringService serverMonitoringDependency) {
         this.dataBroker = requireNonNull(dataBroker);
 

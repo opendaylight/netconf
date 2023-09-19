@@ -46,7 +46,8 @@ public final class NotificationToMdsalWriter implements NetconfNotificationStrea
 
     @Activate
     public NotificationToMdsalWriter(
-            @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
+            @Reference(target = "(type=" + NetconfNotificationManager.OSGI_TYPE + ")")
+            final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
         this.dataBroker = requireNonNull(dataBroker);
         notificationRegistration = notifManager.registerStreamListener(this);

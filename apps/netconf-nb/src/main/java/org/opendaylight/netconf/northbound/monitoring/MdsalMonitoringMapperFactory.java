@@ -10,6 +10,7 @@ package org.opendaylight.netconf.northbound.monitoring;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Set;
+import org.opendaylight.netconf.northbound.DefaultNetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -18,6 +19,7 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactoryListener;
 import org.opendaylight.netconf.server.mdsal.monitoring.GetSchema;
+import org.opendaylight.netconf.server.mdsal.operations.MapperAggregatorRegistry;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
@@ -32,9 +34,9 @@ public final class MdsalMonitoringMapperFactory implements NetconfOperationServi
 
     @Activate
     public MdsalMonitoringMapperFactory(
-            @Reference(target = "(type=mapper-aggregator-registry)")
+            @Reference(target = "(type=" + MapperAggregatorRegistry.OSGI_TYPE + ")")
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
-            @Reference(target = "(type=netconf-server-monitoring)")
+            @Reference(target = "(type=" + DefaultNetconfMonitoringService.OSGI_TYPE + ")")
             final NetconfMonitoringService netconfMonitoringService) {
         this.netconfOperationServiceFactoryListener = requireNonNull(netconfOperationServiceFactoryListener);
         this.netconfMonitoringService = requireNonNull(netconfMonitoringService);

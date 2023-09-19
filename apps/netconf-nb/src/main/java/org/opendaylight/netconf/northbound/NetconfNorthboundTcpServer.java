@@ -46,7 +46,8 @@ public final class NetconfNorthboundTcpServer implements AutoCloseable {
 
     @Activate
     public NetconfNorthboundTcpServer(
-            @Reference(target = "(type=netconf-server-factory)") final NetconfServerFactory serverFactory,
+            @Reference(target = "(type=" + DefaultNetconfServerFactory.OSGI_TYPE + ")")
+            final NetconfServerFactory serverFactory,
             final Configuration configuration) {
         this(serverFactory, configuration.bindingAddress(), configuration.portNumber());
     }

@@ -15,8 +15,10 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 
 @Component(service = { NetconfOperationServiceFactory.class, NetconfOperationServiceFactoryListener.class },
-           property = "type=mapper-aggregator-registry", immediate = true)
+           property = "type=" + MapperAggregatorRegistry.OSGI_TYPE, immediate = true)
 public final class MapperAggregatorRegistry extends AggregatedNetconfOperationServiceFactory {
+    public static final String OSGI_TYPE = "mapper-aggregator-registry";
+
     @Activate
     public MapperAggregatorRegistry() {
         super();

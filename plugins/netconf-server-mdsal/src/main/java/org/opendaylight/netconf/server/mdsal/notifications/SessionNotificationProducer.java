@@ -43,7 +43,8 @@ public final class SessionNotificationProducer implements DataTreeChangeListener
 
     @Activate
     public SessionNotificationProducer(
-            @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
+            @Reference(target = "(type=" + NetconfNotificationManager.OSGI_TYPE + ")")
+            final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
         baseNotificationPublisherRegistration = notifManager.registerBaseNotificationPublisher();
         sessionListenerRegistration = dataBroker.registerDataTreeChangeListener(

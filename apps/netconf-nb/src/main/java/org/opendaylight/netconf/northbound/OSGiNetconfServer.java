@@ -12,11 +12,11 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.util.Timer;
 import java.util.Map;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.ServerChannelInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
+import org.opendaylight.netconf.server.mdsal.operations.MapperAggregatorRegistry;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.ComponentFactory;
@@ -50,16 +50,14 @@ public final class OSGiNetconfServer {
             final ComponentFactory<DefaultNetconfMonitoringService> monitoringFactory,
             @Reference(target = "(component.factory=" + DefaultNetconfServerFactory.FACTORY_NAME + ")")
             final ComponentFactory<DefaultNetconfServerFactory> serverFactory,
-            @Reference(target = "(type=mapper-aggregator-registry)")
+            @Reference(target = "(type=" + MapperAggregatorRegistry.OSGI_TYPE + ")")
             final NetconfOperationServiceFactory mapperAggregatorRegistry,
-            @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
-            final ScheduledThreadPool sshScheduledExecutor,
             @Reference(target = "(type=global-timer)") final Timer timer,
             @Reference final SessionIdProvider sessionIdProvider,
             final Configuration configuration) {
         mappers.onAddNetconfOperationServiceFactory(mapperAggregatorRegistry);
         monitoring = monitoringFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfMonitoringService.props(
-            mapperAggregatorRegistry, sshScheduledExecutor, configuration.monitoring$_$update$_$interval())));
+            mapperAggregatorRegistry, configuration.monitoring$_$update$_$interval())));
         this.serverFactory = serverFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfServerFactory.props(
             new ServerChannelInitializer(new NetconfServerSessionNegotiatorFactory(timer,
                 mappers, sessionIdProvider, configuration.connection$_$timeout$_$millis(),

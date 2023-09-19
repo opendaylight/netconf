@@ -31,7 +31,6 @@ import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
-import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector.NetconfNotificationStreamListener;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationListener;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationRegistry;
 import org.opendaylight.netconf.server.api.notifications.NotificationPublisherRegistration;
@@ -66,9 +65,11 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Component(service = { NetconfNotificationCollector.class, NetconfNotificationRegistry.class }, immediate = true,
-           property = "type=netconf-notification-manager")
+           property = "type= " + NetconfNotificationManager.OSGI_TYPE)
 public final class NetconfNotificationManager implements NetconfNotificationCollector, NetconfNotificationRegistry,
         NetconfNotificationListener, AutoCloseable {
+    public static final String OSGI_TYPE = "netconf-notification-manager";
+
     public static final StreamNameType BASE_STREAM_NAME = new StreamNameType("NETCONF");
     public static final Stream BASE_NETCONF_STREAM = new StreamBuilder()
                 .setName(BASE_STREAM_NAME)

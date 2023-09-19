@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 
 @Component(factory = DefaultNetconfServerFactory.FACTORY_NAME, service = NetconfServerFactory.class)
 public final class DefaultNetconfServerFactory implements NetconfServerFactory {
+    static final String OSGI_TYPE = "netconf-server-factory";
     static final String FACTORY_NAME = "org.opendaylight.netconf.northbound.DefaultNetconfServerFactory";
 
     private static final String INITIALIZER_PROP = ".initializer";
@@ -41,7 +42,7 @@ public final class DefaultNetconfServerFactory implements NetconfServerFactory {
 
     static Map<String, ?> props(final ServerChannelInitializer initializer) {
         return Map.of(
-            "type", "netconf-server-factory",
+            "type", OSGI_TYPE,
             INITIALIZER_PROP, requireNonNull(initializer));
     }
 

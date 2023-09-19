@@ -11,25 +11,31 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import org.opendaylight.netconf.config.GlobalNetconfSshScheduledExecutor;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.osgi.NetconfMonitoringServiceImpl;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 @Component(factory = DefaultNetconfMonitoringService.FACTORY_NAME, service = NetconfMonitoringService.class)
 public final class DefaultNetconfMonitoringService extends NetconfMonitoringServiceImpl {
+    public static final String OSGI_TYPE = "netconf-server-monitoring";
+
     static final String FACTORY_NAME = "org.opendaylight.netconf.impl.mdsal.DefaultNetconfMonitoringService";
 
     private static final String OP_PROVIDER_PROP = ".opProvider";
-    private static final String THREAD_POOL_PROP = ".threadPool";
     private static final String UPDATE_INTERVAL_PROP = ".updateInterval";
 
     @Activate
-    public DefaultNetconfMonitoringService(final Map<String, ?> properties) {
+    public DefaultNetconfMonitoringService(
+            @Reference(target = "(type=" + GlobalNetconfSshScheduledExecutor.OSGI_TYPE + ")")
+            final ScheduledThreadPool threadPool,
+            final Map<String, ?> properties) {
         super(OSGiNetconfServer.extractProp(properties, OP_PROVIDER_PROP, NetconfOperationServiceFactory.class),
-            OSGiNetconfServer.extractProp(properties, THREAD_POOL_PROP, ScheduledThreadPool.class),
+            threadPool,
             OSGiNetconfServer.extractProp(properties, UPDATE_INTERVAL_PROP, Long.class));
     }
 
@@ -39,12 +45,10 @@ public final class DefaultNetconfMonitoringService extends NetconfMonitoringServ
         super.close();
     }
 
-    static Map<String, ?> props(final NetconfOperationServiceFactory opProvider, final ScheduledThreadPool threadPool,
-            final long updateInterval) {
+    static Map<String, ?> props(final NetconfOperationServiceFactory opProvider, final long updateInterval) {
         return Map.of(
-            "type", "netconf-server-monitoring",
+            "type", OSGI_TYPE,
             OP_PROVIDER_PROP, requireNonNull(opProvider),
-            THREAD_POOL_PROP, requireNonNull(threadPool),
             UPDATE_INTERVAL_PROP, updateInterval);
     }
 }

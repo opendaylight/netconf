@@ -47,7 +47,8 @@ public final class CapabilityChangeNotificationProducer implements DataTreeChang
 
     @Activate
     public CapabilityChangeNotificationProducer(
-            @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
+            @Reference(target = "(type=" + NetconfNotificationManager.OSGI_TYPE + ")")
+            final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
         baseNotificationPublisherRegistration = notifManager.registerBaseNotificationPublisher();
         capabilityChangeListenerRegistration = dataBroker.registerDataTreeChangeListener(
