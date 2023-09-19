@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4117c7d_a9c87a87",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-19T08:08:12Z",
+      "side": 1,
+      "message": "Resolved I have installed odl-restconf-nb instead of odl-restconf-all.",
+      "parentUuid": "85adde77_79d17cff",
+      "revId": "0cb247332b6b0247586ea7777f6059d84e132e44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e1cf1d1_5415e63c",
