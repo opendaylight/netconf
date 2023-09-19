@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23d35472_9daae0e4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-19T13:22:55Z",
+      "side": 1,
+      "message": "So now we pass down the raw request URL down the entire stack just so that we can parse it again?",
+      "revId": "fad39946457aef116d084a51f98ce3dda6f418e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
