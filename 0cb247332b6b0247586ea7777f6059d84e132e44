@@ -20,6 +20,63 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2e1cf1d1_5415e63c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Operation.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-19T07:54:12Z",
+      "side": 1,
+      "message": "Let\u0027s make each List and Map unmodifiable\n\ne.g.\n    public Operation {\n        tags \u003d tags \u003d\u003d null ? null : List.copyOf(tags);\n        parameters \u003d parameters \u003d\u003d null ? null : List.copyOf(parameters);\n    }",
+      "revId": "0cb247332b6b0247586ea7777f6059d84e132e44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0501e77_2d7beb1c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/RequestBody.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-19T07:54:12Z",
+      "side": 1,
+      "message": "Accordingly to https://swagger.io/specification/#request-body-object content should be Map\u003cString, Media Type Object\u003e",
+      "revId": "0cb247332b6b0247586ea7777f6059d84e132e44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6331fc5_08aeb5aa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/ResponseObject.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-19T07:54:12Z",
+      "side": 1,
+      "message": "Accordingly to https://swagger.io/specification/#responses-object\nObjectNode should be replaced by Map",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 24
+      },
+      "revId": "0cb247332b6b0247586ea7777f6059d84e132e44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "55b9adbb_7835c333",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
         "patchSetId": 3
