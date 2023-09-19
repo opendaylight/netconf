@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23d5c464_13aaedb2",
+        "filename": "apps/netconf-topology/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-09-19T14:15:22Z",
+      "side": 1,
+      "message": "Everywhere else in netconf this dependency is used instead so consider using it too\n\n        \u003cdependency\u003e\n            \u003cgroupId\u003ejakarta.annotation\u003c/groupId\u003e\n            \u003cartifactId\u003ejakarta.annotation-api\u003c/artifactId\u003e\n            \u003cscope\u003eprovided\u003c/scope\u003e\n            \u003coptional\u003etrue\u003c/optional\u003e\n        \u003c/dependency\u003e",
+      "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "211d8650_739f0821",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-09-19T14:15:22Z",
+      "side": 1,
+      "message": "final\n\nniid too",
+      "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd76619a_7035e317",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-09-19T14:15:22Z",
+      "side": 1,
+      "message": "why are we catching exception here?",
+      "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
