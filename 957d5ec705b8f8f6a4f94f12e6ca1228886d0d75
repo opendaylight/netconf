@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "538a739c_148b0cfc",
+        "filename": "apps/netconf-topology/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-20T07:10:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23d5c464_13aaedb2",
+      "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "211d8650_739f0821",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-19T14:15:22Z",
       "side": 1,
       "message": "final\n\nniid too",
+      "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ce1d6aa_3dbc8316",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-20T07:10:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "211d8650_739f0821",
       "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
