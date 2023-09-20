@@ -1,0 +1,314 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22537c5c_afbd7aa6",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "this can be final as well",
+      "range": {
+        "startLine": 61,
+        "startChar": 3,
+        "endLine": 61,
+        "endChar": 11
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f22a5e9_2b136422",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "this log output is useless\njust remove as extra",
+      "range": {
+        "startLine": 81,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 52
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c99a7094_b6fbd83b",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "```\nif (netconfAugmentation \u003d\u003d null) {\n    continue;\n}\n```\nthen no extra checks will be necessary below\nalso rename `netconfAugmentation` \u003e `netconfNodeChange` for better meaning",
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab5ec5e5_21533ffa",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "```\n} else if (passwordAfter \u003d\u003d null) {\n   return false; \n}\n```\navoid NPE, just ignore the change, the error will be thrown on connection params validation",
+      "range": {
+        "startLine": 159,
+        "startChar": 7,
+        "endLine": 159,
+        "endChar": 9
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1bed3bc_57a5c6a8",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "combine:\n```\nif (node !\u003d null \u0026\u0026 node.getCredentials() instanceof LoginPassword lp) {\n    return lp.getPassword();\n}\n```",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 174,
+        "endChar": 9
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fc6af8e_b6e2022e",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListenerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "it\u0027s a new test, please use Junit5\n@RunWith()  -\u003e @ExtendWith(MockitoExtention.class)\n@Before -\u003e @BeforeEach\n@Test update package",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 46
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b537d33_b31b6492",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListenerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "keep transaction related mock stabbing in one place - move to setup",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 80
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25da097a_00fb0a77",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListenerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "make these `@Mock` annotated properties of the class, \nno reason to mix different ways for mocks instantiations",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 103
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01646db6_0a8fa597",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListenerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "make Node, not builder",
+      "range": {
+        "startLine": 90,
+        "startChar": 0,
+        "endLine": 90,
+        "endChar": 48
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca5c5c96_25914c6d",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListenerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "none of these parameters is used/checked in test, only credentials, omit what\u0027s extra. same below",
+      "range": {
+        "startLine": 93,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 33
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a59729bb_3ec449cd",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListenerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "no reason to create a collection for single value if it can be set inline like below\n`listener.onDataTreeChanged(Set.of(ch));`",
+      "range": {
+        "startLine": 125,
+        "startChar": 6,
+        "endLine": 125,
+        "endChar": 79
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb12e879_7d01d29b",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListenerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "pls make var names meaningful\non -\u003e netconfNodeBefore\nnn -\u003e netconfNodeAfter\nch -\u003e change (also move to `@Mock` annotated property)\nalso (mocks above)\nnewNode -\u003e rootNodeChange\nmockNetconfNode -\u003e netconfNodeChange",
+      "range": {
+        "startLine": 126,
+        "startChar": 41,
+        "endLine": 126,
+        "endChar": 43
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9ffa675_ab59772b",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListenerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "pls make mock stabs sequence follow same order as in code\n\n1. doReturn(rootNodeChange).when(change).getRootNode();\n2. doReturn(netconfNodeChange).when(rootNodeChange).getModifiedAugmentation(..)\n3. .getDataBefore()/.getDataAfter()\n\ntest code should be easy to follow",
+      "range": {
+        "startLine": 127,
+        "startChar": 8,
+        "endLine": 127,
+        "endChar": 49
+      },
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1bd4d9b_29f345a3",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListenerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "iiCaptor value is never checked, add validation",
+      "revId": "f9e3663809d9626ea9dd20d0bc1663b8a6b23294",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

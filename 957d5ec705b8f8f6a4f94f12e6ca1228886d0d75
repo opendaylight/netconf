@@ -86,6 +86,24 @@
       "message": "why are we catching exception here?",
       "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2f84b34_a67d9a17",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-20T09:19:31Z",
+      "side": 1,
+      "message": "runtime exception is thrown here on attempt to decrypt non-encrypted value",
+      "parentUuid": "cd76619a_7035e317",
+      "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
