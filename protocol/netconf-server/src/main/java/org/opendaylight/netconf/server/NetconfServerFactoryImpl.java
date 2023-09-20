@@ -19,7 +19,6 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.server.api.NetconfServerFactory;
-import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.server.SshServer;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -73,10 +72,18 @@ public final class NetconfServerFactoryImpl implements NetconfServerFactory {
 
     @Override
     public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
-        final SshServerGrouping sshParams, final ServerFactoryManagerConfigurator configurator)
-            throws UnsupportedConfigurationException {
-        return SSHServer.listen(EMPTY_LISTENER, createBootstrap(), tcpParams, sshParams,
-            new FactoryManagerConfigurator(channelInitializer, configurator));
+            final SshServerGrouping sshParams, final ServerFactoryManagerConfigurator configurator)
+                throws UnsupportedConfigurationException {
+        final var initializer = requireNonNull(channelInitializer);
+
+        return SSHServer.listen(EMPTY_LISTENER, createBootstrap(), tcpParams, sshParams, factoryManager -> {
+            if (configurator != null) {
+                configurator.configureServerFactoryManager(factoryManager);
+            }
+            if (factoryManager instanceof SshServer server) {
+                server.setSubsystemFactories(List.of(new NetconfSubsystemFactory(initializer)));
+            }
+        });
     }
 
     private record ChannelInitializerListener(
@@ -93,25 +100,6 @@ public final class NetconfServerFactoryImpl implements NetconfServerFactory {
         @Override
         public void onTransportChannelFailed(final Throwable cause) {
             LOG.error("Transport channel failed", cause);
-        }
-    }
-
-    private record FactoryManagerConfigurator(
-            @NonNull ServerChannelInitializer channelInitializer,
-            @Nullable ServerFactoryManagerConfigurator configurator) implements ServerFactoryManagerConfigurator {
-        FactoryManagerConfigurator {
-            requireNonNull(channelInitializer);
-        }
-
-        @Override
-        public void configureServerFactoryManager(final ServerFactoryManager factoryManager)
-                throws UnsupportedConfigurationException {
-            if (configurator != null) {
-                configurator.configureServerFactoryManager(factoryManager);
-            }
-            if (factoryManager instanceof SshServer server) {
-                server.setSubsystemFactories(List.of(new NetconfSubsystemFactory(channelInitializer)));
-            }
         }
     }
 }
