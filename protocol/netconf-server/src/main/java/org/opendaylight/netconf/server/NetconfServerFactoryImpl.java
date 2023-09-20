@@ -12,14 +12,11 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
-import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.util.List;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.server.api.NetconfServerFactory;
 import org.opendaylight.netconf.shaded.sshd.server.SshServer;
-import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
@@ -28,17 +25,14 @@ import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class NetconfServerFactoryImpl implements NetconfServerFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfServerFactoryImpl.class);
-    private static final TransportChannelListener EMPTY_LISTENER =  new ChannelInitializerListener(null, null);
+    private static final TransportChannelListener EMPTY_LISTENER = new BaseTransportChannelListener();
 
     private final EventLoopGroup parentGroup;
     private final EventLoopGroup workerGroup;
+    private final EventExecutor executor;
     private final ServerChannelInitializer channelInitializer;
-    private final TransportChannelListener transportChannelListener;
 
     public NetconfServerFactoryImpl(final ServerChannelInitializer channelInitializer, final EventLoopGroup bossGroup,
             final EventLoopGroup workerGroup) {
@@ -49,50 +43,31 @@ public final class NetconfServerFactoryImpl implements NetconfServerFactory {
             final EventLoopGroup parentGroup, final EventLoopGroup workerGroup, final EventExecutor executor) {
         this.parentGroup = requireNonNull(parentGroup);
         this.workerGroup = requireNonNull(workerGroup);
-        this.channelInitializer = channelInitializer;
-        transportChannelListener = new ChannelInitializerListener(channelInitializer, executor);
+        this.executor = requireNonNull(executor);
+        this.channelInitializer = requireNonNull(channelInitializer);
     }
 
     @Override
     public ListenableFuture<TCPServer> createTcpServer(final TcpServerGrouping params)
             throws UnsupportedConfigurationException {
-        return TCPServer.listen(transportChannelListener, createBootstrap(), params);
+        return TCPServer.listen(new BaseServerTransport(executor, channelInitializer), createBootstrap(), params);
     }
 
     @Override
     public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
             final SshServerGrouping sshParams, final ServerFactoryManagerConfigurator configurator)
                 throws UnsupportedConfigurationException {
-        final var initializer = requireNonNull(channelInitializer);
-
         return SSHServer.listen(EMPTY_LISTENER, createBootstrap(), tcpParams, sshParams, factoryManager -> {
             if (configurator != null) {
                 configurator.configureServerFactoryManager(factoryManager);
             }
             if (factoryManager instanceof SshServer server) {
-                server.setSubsystemFactories(List.of(new NetconfSubsystemFactory(initializer)));
+                server.setSubsystemFactories(List.of(new NetconfSubsystemFactory(channelInitializer)));
             }
         });
     }
 
     private ServerBootstrap createBootstrap() {
         return NettyTransportSupport.newServerBootstrap().group(parentGroup, workerGroup);
-    }
-
-    private record ChannelInitializerListener(
-            @Nullable ServerChannelInitializer channelInitializer,
-            @Nullable EventExecutor executor) implements TransportChannelListener {
-        @Override
-        public void onTransportChannelEstablished(final TransportChannel channel) {
-            LOG.debug("Transport channel {} established", channel);
-            if (channelInitializer != null && executor != null) {
-                channelInitializer.initialize(channel.channel(), new DefaultPromise<>(executor));
-            }
-        }
-
-        @Override
-        public void onTransportChannelFailed(final Throwable cause) {
-            LOG.error("Transport channel failed", cause);
-        }
     }
 }
