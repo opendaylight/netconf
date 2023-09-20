@@ -27,7 +27,6 @@ import static org.opendaylight.netconf.transport.ssh.TestUtils.buildServerIdenti
 import static org.opendaylight.netconf.transport.ssh.TestUtils.generateKeyPairWithCertificate;
 
 import io.netty.channel.Channel;
-import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -58,7 +57,6 @@ import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHo
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
-import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -74,13 +72,14 @@ import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
 public class SshClientServerTest {
-
     private static final String RSA = "RSA";
     private static final String EC = "EC";
     private static final String USER = "user";
     private static final String PASSWORD = "pa$$w0rd";
     private static final AtomicInteger COUNTER = new AtomicInteger(0);
     private static final AtomicReference<String> USERNAME = new AtomicReference<>(USER);
+
+    private static SSHTransportStackFactory FACTORY;
 
     @Mock
     private TcpClientGrouping tcpClientConfig;
@@ -100,18 +99,16 @@ public class SshClientServerTest {
     @Captor
     ArgumentCaptor<TransportChannel> serverTransportChannelCaptor;
 
-    private static EventLoopGroup group;
     private ServerSocket socket;
 
     @BeforeAll
     static void beforeAll() {
-        group = NettyTransportSupport.newEventLoopGroup("IntegrationTest");
+        FACTORY = new SSHTransportStackFactory("IntegrationTest", 0);
     }
 
     @AfterAll
     static void afterAll() {
-        group.shutdownGracefully();
-        group = null;
+        FACTORY.close();
     }
 
     @BeforeEach
@@ -220,12 +217,12 @@ public class SshClientServerTest {
 
     private void integrationTest() throws Exception {
         // start server
-        final var server = SSHServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
-                tcpServerConfig, sshServerConfig).get(2, TimeUnit.SECONDS);
+        final var server = FACTORY.listenServer(serverListener, tcpServerConfig, sshServerConfig)
+            .get(2, TimeUnit.SECONDS);
         try {
             // connect with client
-            final var client = SSHClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
-                    tcpClientConfig, sshClientConfig).get(2, TimeUnit.SECONDS);
+            final var client = FACTORY.connectClient(clientListener, tcpClientConfig, sshClientConfig)
+                .get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(10_000))
                         .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
@@ -257,9 +254,8 @@ public class SshClientServerTest {
         // Accept all keys
         when(sshClientConfig.getServerAuthentication()).thenReturn(null);
 
-        final var server = SSHServer.listen(serverListener,
-            NettyTransportSupport.newServerBootstrap().group(group),
-            tcpServerConfig, null, factoryManager -> {
+        final var server = FACTORY.listenServer(serverListener, tcpServerConfig, null,
+            factoryManager -> {
                 // authenticate user by credentials and generate host key
                 factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
                 factoryManager.setPasswordAuthenticator(
@@ -267,8 +263,8 @@ public class SshClientServerTest {
                 factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
             }).get(2, TimeUnit.SECONDS);
         try {
-            final var client = SSHClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
-                tcpClientConfig, sshClientConfig).get(2, TimeUnit.SECONDS);
+            final var client = FACTORY.connectClient(clientListener, tcpClientConfig, sshClientConfig)
+                .get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(10_000))
                     .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
