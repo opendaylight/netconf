@@ -27,7 +27,7 @@ public final class SchemaEntity extends OpenApiEntity {
 
     @Override
     public void generate(final JsonGenerator generator) throws IOException {
-        generator.writeStartObject();
+        generator.writeObjectFieldStart("schema");
         final var title = title();
         if (title != null) {
             generator.writeStringField("title", title);
