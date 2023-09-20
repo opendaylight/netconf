@@ -13,9 +13,8 @@ import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoService;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactory;
 
-public class SshIoService extends NettyIoService {
-
-    protected SshIoService(FactoryManager factoryManager, final ChannelGroup group, IoHandler handler) {
+final class SshIoService extends NettyIoService {
+    SshIoService(final FactoryManager factoryManager, final ChannelGroup group, final IoHandler handler) {
         super(new NettyIoServiceFactory(factoryManager, null), handler);
         channelGroup = group;
     }

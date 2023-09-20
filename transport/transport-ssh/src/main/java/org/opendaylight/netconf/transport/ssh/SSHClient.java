@@ -46,7 +46,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
  * A {@link TransportStack} acting as an SSH client.
  */
 public final class SSHClient extends SSHTransportStack {
-
     private final ClientFactoryManager clientFactoryManager;
     private final SessionFactory sessionFactory;
 
@@ -68,7 +67,7 @@ public final class SSHClient extends SSHTransportStack {
     }
 
     @Override
-    protected IoHandler getSessionFactory() {
+    IoHandler getSessionFactory() {
         return sessionFactory;
     }
 
