@@ -10,6 +10,7 @@ package org.opendaylight.netconf.transport.ssh;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -50,35 +51,31 @@ public final class SSHClient extends SSHTransportStack {
                 sessionFactory);
     }
 
-    @Override
-    IoHandler getSessionFactory() {
-        return sessionFactory;
-    }
-
-    public static @NonNull ListenableFuture<SSHClient> connect(final TransportChannelListener listener,
-            final Bootstrap bootstrap, final TcpClientGrouping connectParams,
+    static SSHClient of(final EventLoopGroup group, final TransportChannelListener listener,
             final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
-        final var sshClient = newClient(listener, clientParams);
-        return transformUnderlay(sshClient, TCPClient.connect(sshClient.asListener(), bootstrap, connectParams));
-    }
-
-    public static @NonNull ListenableFuture<SSHClient> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final TcpServerGrouping listenParams, final SshClientGrouping clientParams)
-            throws UnsupportedConfigurationException {
-        final var sshClient = newClient(listener, clientParams);
-        return transformUnderlay(sshClient, TCPServer.listen(sshClient.asListener(), bootstrap, listenParams));
-    }
-
-    private static SSHClient newClient(final TransportChannelListener listener, final SshClientGrouping clientParams)
-            throws UnsupportedConfigurationException {
         final var clientIdentity = clientParams.getClientIdentity();
         final var username = clientIdentity == null ? "" : clientIdentity.getUsername();
 
-        return new SSHClient(listener, new TransportSshClient.Builder()
+        return new SSHClient(listener, new TransportSshClient.Builder(group)
             .transportParams(clientParams.getTransportParams())
             .keepAlives(clientParams.getKeepalives())
             .clientIdentity(clientParams.getClientIdentity())
             .serverAuthentication(clientParams.getServerAuthentication())
             .buildChecked(), username);
+    }
+
+    @Override
+    IoHandler getSessionFactory() {
+        return sessionFactory;
+    }
+
+    @NonNull ListenableFuture<SSHClient> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
+            throws UnsupportedConfigurationException {
+        return transformUnderlay(this, TCPClient.connect(asListener(), bootstrap, connectParams));
+    }
+
+    @NonNull ListenableFuture<SSHClient> listen(final ServerBootstrap bootstrap, final TcpServerGrouping listenParams)
+            throws UnsupportedConfigurationException {
+        return transformUnderlay(this, TCPServer.listen(asListener(), bootstrap, listenParams));
     }
 }

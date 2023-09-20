@@ -7,8 +7,11 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.DoNotCall;
+import io.netty.channel.EventLoopGroup;
 import java.security.cert.Certificate;
 import org.opendaylight.netconf.shaded.sshd.client.ClientBuilder;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
@@ -65,8 +68,14 @@ final class TransportSshClient extends SshClient {
      * {@code ietf-netconf-client.yang} configuration.
      */
     static final class Builder extends ClientBuilder {
+        private final EventLoopGroup group;
+
         private Keepalives keepAlives;
         private ClientIdentity clientIdentity;
+
+        Builder(final EventLoopGroup group) {
+            this.group = requireNonNull(group);
+        }
 
         Builder transportParams(final TransportParamsGrouping params) throws UnsupportedConfigurationException {
             ConfigUtils.setTransportParams(this, params, TransportUtils::getClientKexFactories);
@@ -115,9 +124,7 @@ final class TransportSshClient extends SshClient {
             if (clientIdentity != null && clientIdentity.getNone() == null) {
                 setClientIdentity(ret, clientIdentity);
             }
-
-            // FIXME: this is the default added by checkConfig(), but we really want to use an EventLoopGroup for this
-            // ret.setScheduledExecutorService(group);
+            ret.setScheduledExecutorService(group);
 
             try {
                 ret.checkConfig();
