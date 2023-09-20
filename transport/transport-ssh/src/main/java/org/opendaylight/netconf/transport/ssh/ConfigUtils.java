@@ -19,11 +19,10 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
+import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController;
-import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.AsymmetricKeyPairGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.EcPrivateKeyFormat;
@@ -48,48 +47,18 @@ final class ConfigUtils {
         // utility class
     }
 
-    static void setTransportParams(final @NonNull ClientFactoryManager factoryMgr,
-            final @Nullable TransportParamsGrouping params) throws UnsupportedConfigurationException {
-        setTransportParams(factoryMgr, params, TransportUtils::getClientKexFactories);
-    }
-
-    static void setTransportParams(final @NonNull ServerFactoryManager factoryMgr,
-            final @Nullable TransportParamsGrouping params) throws UnsupportedConfigurationException {
-        setTransportParams(factoryMgr, params, TransportUtils::getServerKexFactories);
-    }
-
-    static void setTransportParams(final @NonNull FactoryManager factoryMgr,
+    static void setTransportParams(final @NonNull BaseBuilder<?, ?> builder,
             final @Nullable TransportParamsGrouping params, final @NonNull KexFactoryProvider kexProvider)
             throws UnsupportedConfigurationException {
-
-        factoryMgr.setCipherFactories(
-                TransportUtils.getCipherFactories(params == null ? null : params.getEncryption()));
-        factoryMgr.setSignatureFactories(
-                TransportUtils.getSignatureFactories(params == null ? null : params.getHostKey()));
-        factoryMgr.setKeyExchangeFactories(
-                kexProvider.getKexFactories(params == null ? null : params.getKeyExchange()));
-        factoryMgr.setMacFactories(
-                TransportUtils.getMacFactories(params == null ? null : params.getMac()));
-    }
-
-    static void setKeepAlives(final @NonNull ServerFactoryManager factoryMgr,
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417
-                    .ssh.server.grouping.Keepalives keepAlives) {
-        setKeepAlives(factoryMgr,
-                keepAlives == null ? null : keepAlives.getMaxWait(),
-                keepAlives == null ? null : keepAlives.getMaxAttempts());
-    }
-
-    static void setKeepAlives(final @NonNull ClientFactoryManager factoryMgr,
-            final org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417
-                    .ssh.client.grouping.Keepalives keepAlives) {
-        setKeepAlives(factoryMgr,
-                keepAlives == null ? null : keepAlives.getMaxWait(),
-                keepAlives == null ? null : keepAlives.getMaxAttempts());
+        builder
+            .cipherFactories(TransportUtils.getCipherFactories(params == null ? null : params.getEncryption()))
+            .signatureFactories(TransportUtils.getSignatureFactories(params == null ? null : params.getHostKey()))
+            .keyExchangeFactories(kexProvider.getKexFactories(params == null ? null : params.getKeyExchange()))
+            .macFactories(TransportUtils.getMacFactories(params == null ? null : params.getMac()));
     }
 
     @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "maxAttempts usage need clarification")
-    private static void setKeepAlives(final @NonNull FactoryManager factoryMgr, final @Nullable Uint16 cfgMaxWait,
+    static void setKeepAlives(final @NonNull FactoryManager factoryMgr, final @Nullable Uint16 cfgMaxWait,
             final @Nullable Uint8 cfgMaxAttempts) {
         // FIXME: utilize max attempts
         final var maxAttempts = cfgMaxAttempts == null ? KEEP_ALIVE_DEFAULT_ATTEMPTS : cfgMaxAttempts.intValue();
@@ -252,7 +221,7 @@ final class ConfigUtils {
     }
 
     @FunctionalInterface
-    private interface KexFactoryProvider {
+    interface KexFactoryProvider {
         List<KeyExchangeFactory> getKexFactories(KeyExchange input) throws UnsupportedConfigurationException;
     }
 }
