@@ -33,6 +33,24 @@
       "message": "For example - this one is unused now.",
       "revId": "90123d2987b5578d0977f7c719faa5b791cbf040",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a819d455_8248000e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-20T16:04:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4394bdab_9ed5864b",
+      "revId": "90123d2987b5578d0977f7c719faa5b791cbf040",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
