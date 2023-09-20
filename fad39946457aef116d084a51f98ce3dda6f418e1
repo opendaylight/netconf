@@ -16,6 +16,24 @@
       "message": "So now we pass down the raw request URL down the entire stack just so that we can parse it again?",
       "revId": "fad39946457aef116d084a51f98ce3dda6f418e1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6835cab2_caec777d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-20T07:30:26Z",
+      "side": 1,
+      "message": "Would it be preferable to store the EffectiveModelContext instead of the raw URL within the RestconfDocumentedException class?",
+      "parentUuid": "23d35472_9daae0e4",
+      "revId": "fad39946457aef116d084a51f98ce3dda6f418e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
