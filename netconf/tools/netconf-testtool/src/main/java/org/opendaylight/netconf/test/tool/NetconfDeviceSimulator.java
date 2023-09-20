@@ -11,11 +11,9 @@ import static java.util.Objects.requireNonNullElseGet;
 
 import com.google.common.collect.Collections2;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.local.LocalAddress;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import java.io.Closeable;
 import java.io.IOException;
@@ -23,22 +21,18 @@ import java.net.BindException;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.nio.channels.AsynchronousChannelGroup;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.netconf.api.CapabilityURN;
-import org.opendaylight.netconf.northbound.ssh.SshProxyServer;
+import org.opendaylight.netconf.northbound.SshServerTransport;
+import org.opendaylight.netconf.northbound.TransportFactoryHolder;
 import org.opendaylight.netconf.northbound.ssh.SshProxyServerConfiguration;
 import org.opendaylight.netconf.northbound.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.server.NetconfServerDispatcherImpl;
-import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.ServerChannelInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
@@ -49,7 +43,6 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFac
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
-import org.opendaylight.netconf.shaded.sshd.common.util.threads.ThreadUtils;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.customrpc.SettableOperationProvider;
 import org.opendaylight.netconf.test.tool.monitoring.NetconfMonitoringOperationServiceFactory;
@@ -57,7 +50,11 @@ import org.opendaylight.netconf.test.tool.operations.DefaultOperationsCreator;
 import org.opendaylight.netconf.test.tool.operations.OperationsProvider;
 import org.opendaylight.netconf.test.tool.rpchandler.SettableOperationRpcProvider;
 import org.opendaylight.netconf.test.tool.schemacache.SchemaSourceCache;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev230417.netconf.server.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
@@ -77,12 +74,10 @@ import org.slf4j.LoggerFactory;
 public class NetconfDeviceSimulator implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSimulator.class);
 
-    private final NioEventLoopGroup nettyThreadgroup;
-    private final HashedWheelTimer hashedWheelTimer;
+    private final TransportFactoryHolder factoryHolder;
+    private final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
     private final List<Channel> devicesChannels = new ArrayList<>();
-    private final List<SshProxyServer> sshWrappers = new ArrayList<>();
-    private final ScheduledExecutorService minaTimerExecutor;
-    private final ExecutorService nioExecutor;
+    private final List<SshServerTransport> sshWrappers = new ArrayList<>();
     private final Configuration configuration;
     private EffectiveModelContext schemaContext;
 
@@ -90,17 +85,12 @@ public class NetconfDeviceSimulator implements Closeable {
 
     public NetconfDeviceSimulator(final Configuration configuration) {
         this.configuration = configuration;
-        nettyThreadgroup = new NioEventLoopGroup();
-        hashedWheelTimer = new HashedWheelTimer();
-        minaTimerExecutor = Executors.newScheduledThreadPool(configuration.getThreadPoolSize(),
-                new ThreadFactoryBuilder().setNameFormat("netconf-ssh-server-mina-timers-%d").build());
-        nioExecutor = ThreadUtils.newFixedThreadPool("netconf-ssh-server-nio-group", configuration.getThreadPoolSize());
+        factoryHolder = new TransportFactoryHolder(0, configuration.getThreadPoolSize());
     }
 
     private NetconfServerDispatcherImpl createDispatcher(final Set<Capability> capabilities,
             final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
-
-        final Set<Capability> transformedCapabilities = new HashSet<>(Collections2.transform(capabilities, input -> {
+        final var transformedCapabilities = new HashSet<>(Collections2.transform(capabilities, input -> {
             if (sendFakeSchema) {
                 sendFakeSchema = false;
                 return new FakeCapability((YangModuleCapability) input);
@@ -109,21 +99,16 @@ public class NetconfDeviceSimulator implements Closeable {
             }
         }));
         transformedCapabilities.add(new BasicCapability(CapabilityURN.CANDIDATE));
-        final NetconfMonitoringService monitoringService1 = new DummyMonitoringService(transformedCapabilities);
-        final SessionIdProvider idProvider = new DefaultSessionIdProvider();
+        final var monitoringService = new DummyMonitoringService(transformedCapabilities);
+        final var idProvider = new DefaultSessionIdProvider();
 
-        final NetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(
-            sourceProvider, transformedCapabilities, monitoringService1, idProvider);
+        final var aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(sourceProvider,
+            transformedCapabilities, monitoringService, idProvider);
 
-        final Set<String> serverCapabilities = configuration.getCapabilities();
-
-        final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new TesttoolNegotiationFactory(
-                hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider,
-                configuration.getGenerateConfigsTimeout(),
-                monitoringService1, serverCapabilities);
-
-        final ServerChannelInitializer serverChannelInitializer =
-            new ServerChannelInitializer(serverNegotiatorFactory);
+        final var serverChannelInitializer = new ServerChannelInitializer(new TesttoolNegotiationFactory(
+            hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider,
+            configuration.getGenerateConfigsTimeout(),
+            monitoringService, configuration.getCapabilities()));
         return new NetconfServerDispatcherImpl(serverChannelInitializer, nettyThreadgroup, nettyThreadgroup);
     }
 
@@ -131,8 +116,7 @@ public class NetconfDeviceSimulator implements Closeable {
             final SchemaSourceProvider<YangTextSchemaSource> sourceProvider,
             final Set<Capability> transformedCapabilities, final NetconfMonitoringService monitoringService1,
             final SessionIdProvider idProvider) {
-        final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory =
-            new AggregatedNetconfOperationServiceFactory();
+        final var aggregatedNetconfOperationServiceFactory = new AggregatedNetconfOperationServiceFactory();
 
         final NetconfOperationServiceFactory operationProvider;
         if (configuration.isMdSal()) {
@@ -176,11 +160,30 @@ public class NetconfDeviceSimulator implements Closeable {
         LOG.info("Starting {}, {} simulated devices starting on port {}",
                 configuration.getDeviceCount(), proto, configuration.getStartingPort());
 
-        final SharedSchemaRepository schemaRepo = new SharedSchemaRepository("netconf-simulator");
-        final Set<Capability> capabilities = parseSchemasToModuleCapabilities(schemaRepo);
+        final var schemaRepo = new SharedSchemaRepository("netconf-simulator");
+        final var capabilities = parseSchemasToModuleCapabilities(schemaRepo);
 
-        final NetconfServerDispatcherImpl dispatcher = createDispatcher(capabilities,
-            sourceIdentifier -> schemaRepo.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class));
+        final var transformedCapabilities = new HashSet<>(Collections2.transform(capabilities, input -> {
+            if (sendFakeSchema) {
+                sendFakeSchema = false;
+                return new FakeCapability((YangModuleCapability) input);
+            } else {
+                return input;
+            }
+        }));
+        transformedCapabilities.add(new BasicCapability(CapabilityURN.CANDIDATE));
+        final var monitoringService = new DummyMonitoringService(transformedCapabilities);
+        final var idProvider = new DefaultSessionIdProvider();
+
+        final SchemaSourceProvider<YangTextSchemaSource> sourceProvider =
+            sourceIdentifier -> schemaRepo.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
+        final var aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(sourceProvider,
+            transformedCapabilities, monitoringService, idProvider);
+
+        final var serverChannelInitializer = new ServerChannelInitializer(new TesttoolNegotiationFactory(
+            hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider,
+            configuration.getGenerateConfigsTimeout(),
+            monitoringService, configuration.getCapabilities()));
 
         int currentPort = configuration.getStartingPort();
 
@@ -188,13 +191,6 @@ public class NetconfDeviceSimulator implements Closeable {
 
         // Generate key to temp folder
         final KeyPairProvider keyPairProvider = new VirtualKeyPairProvider();
-
-        final AsynchronousChannelGroup group;
-        try {
-            group = AsynchronousChannelGroup.withThreadPool(nioExecutor);
-        } catch (final IOException e) {
-            throw new IllegalStateException("Failed to create group", e);
-        }
 
         for (int i = 0; i < configuration.getDeviceCount(); i++) {
             if (currentPort > 65535) {
@@ -205,15 +201,14 @@ public class NetconfDeviceSimulator implements Closeable {
 
             final ChannelFuture server;
             if (configuration.isSsh()) {
-                final InetSocketAddress bindingAddress = InetSocketAddress.createUnresolved("0.0.0.0", currentPort);
-                final LocalAddress tcpLocalAddress = new LocalAddress(address.toString());
-
-                server = dispatcher.createLocalServer(tcpLocalAddress);
                 try {
-                    final SshProxyServer sshServer = new SshProxyServer(
-                        minaTimerExecutor, nettyThreadgroup, group);
-                    sshServer.bind(getSshConfiguration(bindingAddress, tcpLocalAddress, keyPairProvider));
-                    sshWrappers.add(sshServer);
+                    // FIXME: this should be async
+                    sshWrappers.add(new SshServerTransport(factoryHolder, serverChannelInitializer,
+                        configuration.getAuthProvider(),
+                        new TcpServerParametersBuilder()
+                            .setLocalAddress(IetfInetUtil.ipAddressFor("0.0.0.0"))
+                            .setLocalPort(new PortNumber(Uint16.valueOf(currentPort)))
+                        .build()));
                 } catch (final BindException e) {
                     LOG.warn("Cannot start simulated device on {}, port already in use. Skipping.", address);
                     // Close local server and continue
@@ -225,17 +220,13 @@ public class NetconfDeviceSimulator implements Closeable {
                 } catch (final IOException e) {
                     LOG.warn("Cannot start simulated device on {} due to IOException.", address, e);
                     break;
-                } finally {
-                    currentPort++;
-                }
-
-                try {
-                    server.get();
                 } catch (final InterruptedException e) {
                     throw new IllegalStateException("Interrupted while waiting for server", e);
                 } catch (final ExecutionException e) {
                     LOG.warn("Cannot start ssh simulated device on {}, skipping", address, e);
                     continue;
+                } finally {
+                    currentPort++;
                 }
 
                 LOG.debug("Simulated SSH device started on {}", address);
@@ -381,18 +372,16 @@ public class NetconfDeviceSimulator implements Closeable {
 
     @Override
     public void close() {
-        for (final SshProxyServer sshWrapper : sshWrappers) {
+        for (var sshWrapper : sshWrappers) {
             try {
                 sshWrapper.close();
-            } catch (final IOException e) {
+            } catch (IOException e) {
                 LOG.debug("Wrapper {} failed to close", sshWrapper, e);
             }
         }
-        for (final Channel deviceCh : devicesChannels) {
+        for (var deviceCh : devicesChannels) {
             deviceCh.close();
         }
-        nettyThreadgroup.shutdownGracefully();
-        minaTimerExecutor.shutdownNow();
-        nioExecutor.shutdownNow();
+        factoryHolder.close();
     }
 }
