@@ -10,6 +10,7 @@ package org.opendaylight.restconf.openapi.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -76,7 +77,12 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public synchronized Response getAllModulesDoc(final UriInfo uriInfo) {
-        final var openApiInputStream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo);
+        final OpenApiInputStream openApiInputStream;
+        try {
+            openApiInputStream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return Response.ok(openApiInputStream).build();
     }
 

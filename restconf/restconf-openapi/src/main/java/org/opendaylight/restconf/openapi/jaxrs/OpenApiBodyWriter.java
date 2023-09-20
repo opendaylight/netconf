@@ -7,8 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.jaxrs;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
+import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -26,7 +25,11 @@ import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
 public final class OpenApiBodyWriter implements MessageBodyWriter<OpenApiEntity> {
-    private final JsonFactory factory = new JsonFactoryBuilder().build();
+    private final JsonGenerator generator;
+
+    public OpenApiBodyWriter(final JsonGenerator generator) {
+        this.generator = generator;
+    }
 
     @Override
     public boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations,
@@ -38,8 +41,6 @@ public final class OpenApiBodyWriter implements MessageBodyWriter<OpenApiEntity>
     public void writeTo(final OpenApiEntity t, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
-        try (var generator = factory.createGenerator(entityStream)) {
-            t.generate(generator);
-        }
+        t.generate(generator);
     }
 }
