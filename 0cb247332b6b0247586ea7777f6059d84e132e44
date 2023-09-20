@@ -53,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4417d73_18c95923",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/Operation.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-20T11:42:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e1cf1d1_5415e63c",
+      "revId": "0cb247332b6b0247586ea7777f6059d84e132e44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c0501e77_2d7beb1c",
@@ -66,6 +84,24 @@
       "writtenOn": "2023-09-19T07:54:12Z",
       "side": 1,
       "message": "Accordingly to https://swagger.io/specification/#request-body-object content should be Map\u003cString, Media Type Object\u003e",
+      "revId": "0cb247332b6b0247586ea7777f6059d84e132e44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e7ac99d_b565b129",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/RequestBody.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-20T11:42:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0501e77_2d7beb1c",
       "revId": "0cb247332b6b0247586ea7777f6059d84e132e44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -93,6 +129,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc3e622a_bb269acb",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/ResponseObject.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-20T11:42:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6331fc5_08aeb5aa",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 24
+      },
+      "revId": "0cb247332b6b0247586ea7777f6059d84e132e44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "55b9adbb_7835c333",
@@ -106,6 +166,24 @@
       "writtenOn": "2023-09-19T07:54:03Z",
       "side": 1,
       "message": "Use here createRequestBodyParameter method and delete duplicate createResponse method.\n\nIt performs the same task as the createResponse method for input:\n```\nfinal String summary \u003d SUMMARY_TEMPLATE.formatted(HttpMethod.GET, deviceName, moduleName,\n                node.getQName().getLocalName());\n```",
+      "revId": "0cb247332b6b0247586ea7777f6059d84e132e44",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01a50672_f1729325",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/builder/OperationBuilder.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-09-20T11:42:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55b9adbb_7835c333",
       "revId": "0cb247332b6b0247586ea7777f6059d84e132e44",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
