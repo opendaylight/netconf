@@ -66,12 +66,6 @@ public final class NetconfServerFactoryImpl implements NetconfServerFactory {
 
     @Override
     public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
-            final SshServerGrouping sshParams) throws UnsupportedConfigurationException {
-        return SSHServer.listen(EMPTY_LISTENER, createBootstrap(), tcpParams, sshParams);
-    }
-
-    @Override
-    public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
             final SshServerGrouping sshParams, final ServerFactoryManagerConfigurator configurator)
                 throws UnsupportedConfigurationException {
         final var initializer = requireNonNull(channelInitializer);
