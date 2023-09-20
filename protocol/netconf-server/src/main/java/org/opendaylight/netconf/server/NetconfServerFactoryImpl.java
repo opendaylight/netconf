@@ -16,7 +16,6 @@ import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.util.List;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.server.api.NetconfServerFactory;
 import org.opendaylight.netconf.shaded.sshd.server.SshServer;
@@ -54,20 +53,10 @@ public final class NetconfServerFactoryImpl implements NetconfServerFactory {
         transportChannelListener = new ChannelInitializerListener(channelInitializer, executor);
     }
 
-    @NonNull protected ServerBootstrap createBootstrap() {
-        return NettyTransportSupport.newServerBootstrap().group(parentGroup, workerGroup);
-    }
-
     @Override
     public ListenableFuture<TCPServer> createTcpServer(final TcpServerGrouping params)
             throws UnsupportedConfigurationException {
         return TCPServer.listen(transportChannelListener, createBootstrap(), params);
-    }
-
-    @Override
-    public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
-            final SshServerGrouping sshParams) throws UnsupportedConfigurationException {
-        return SSHServer.listen(EMPTY_LISTENER, createBootstrap(), tcpParams, sshParams);
     }
 
     @Override
@@ -84,6 +73,10 @@ public final class NetconfServerFactoryImpl implements NetconfServerFactory {
                 server.setSubsystemFactories(List.of(new NetconfSubsystemFactory(initializer)));
             }
         });
+    }
+
+    private ServerBootstrap createBootstrap() {
+        return NettyTransportSupport.newServerBootstrap().group(parentGroup, workerGroup);
     }
 
     private record ChannelInitializerListener(
