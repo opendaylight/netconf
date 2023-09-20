@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.server.api;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
@@ -38,8 +40,10 @@ public interface NetconfServerFactory {
      * @throws UnsupportedConfigurationException if server cannot be started using given configuration
      * @throws NullPointerException if either tcpParams or sshParams is null
      */
-    ListenableFuture<SSHServer> createSshServer(TcpServerGrouping tcpParams, SshServerGrouping sshParams)
-        throws UnsupportedConfigurationException;
+    default ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
+            final SshServerGrouping sshParams) throws UnsupportedConfigurationException {
+        return createSshServer(tcpParams, requireNonNull(sshParams), null);
+    }
 
     /**
      * Build SSH Netconf server with integration support.
