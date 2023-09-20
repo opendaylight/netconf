@@ -24,7 +24,7 @@ public final class InfoEntity extends OpenApiEntity {
 
     @Override
     public void generate(@NonNull JsonGenerator generator) throws IOException {
-        generator.writeStartObject();
+        generator.writeObjectFieldStart("info");
         if (version != null) {
             generator.writeStringField("version", version);
         }

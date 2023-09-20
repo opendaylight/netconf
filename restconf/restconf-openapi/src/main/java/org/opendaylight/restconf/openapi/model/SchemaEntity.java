@@ -18,24 +18,20 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
  */
 public final class SchemaEntity extends OpenApiEntity {
     private final SchemaNode value;
+    private final String title;
     private final String type;
 
-    public SchemaEntity(final @NonNull SchemaNode value, final String type) {
+    public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title, @NonNull final String type) {
         this.value = value;
+        this.title = title;
         this.type = type;
     }
 
     @Override
     public void generate(final JsonGenerator generator) throws IOException {
-        generator.writeStartObject();
-        final var title = title();
-        if (title != null) {
-            generator.writeStringField("title", title);
-        }
-        final var type = type();
-        if (type != null) {
-            generator.writeStringField("type", type);
-        }
+        generator.writeObjectFieldStart(title());
+        generator.writeStringField("title", title());
+        generator.writeStringField("type", type());
         final var description = description();
         if (description != null) {
             generator.writeStringField("description", description);
@@ -54,7 +50,7 @@ public final class SchemaEntity extends OpenApiEntity {
     }
 
     @Nullable String title() {
-        return value.getQName().getLocalName();
+        return title;
     }
 
     @Nullable String type() {

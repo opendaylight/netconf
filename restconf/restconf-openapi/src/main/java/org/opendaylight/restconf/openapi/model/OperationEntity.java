@@ -7,10 +7,67 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import java.io.IOException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
+
 /**
  *
  */
-public abstract non-sealed class OperationEntity extends OpenApiEntity {
+public abstract sealed class OperationEntity extends OpenApiEntity permits PostEntity {
+    private final OperationDefinition schema;
+    private final String deviceName;
+    private final String moduleName;
+
+    protected OperationDefinition schema() {
+        return schema;
+    }
+
+    protected String deviceName() {
+        return deviceName;
+    }
+
+    protected String moduleName() {
+        return moduleName;
+    }
+
+    public OperationEntity(final OperationDefinition schema, final String deviceName, final String moduleName) {
+        this.schema = schema;
+        this.deviceName = deviceName;
+        this.moduleName = moduleName;
+    }
+
+    @Override
+    public void generate(@NonNull JsonGenerator generator) throws IOException {
+        generator.writeObjectFieldStart(operation());
+        final var deprecated = deprecated();
+        if (deprecated != null) {
+            generator.writeBooleanField("deprecated", deprecated);
+        }
+        final var description = description();
+        if (description != null) {
+            generator.writeStringField("description", description);
+        }
+        final var summary = summary();
+        if (summary != null) {
+            generator.writeStringField("summary", summary);
+        }
+        generator.writeEndObject();
+    }
+
+    protected abstract String operation();
+
+    @Nullable Boolean deprecated() {
+        return Boolean.FALSE;
+    }
+
+    @Nullable String description() {
+        return null;
+    }
+
+    @Nullable abstract String summary();
 //    boolean deprecated, ArrayNode tags, List<Parameter> parameters, ArrayNode security,
 //    ArrayNode servers, ObjectNode callbacks, ObjectNode externalDocs, ObjectNode requestBody,
 //    ObjectNode responses, String description, String operationId, String summary
