@@ -32,8 +32,8 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswor
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
-import org.opendaylight.netconf.transport.ssh.SSHClient;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
+import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.crypt.hash.rev140806.CryptHash;
@@ -66,13 +66,12 @@ import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
 class NetconfServerFactoryImplTest {
-
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$w0rd";
     private static final String RSA = "RSA";
 
-    private static EventLoopGroup parentGroup;
-    private static EventLoopGroup workerGroup;
+    private static SSHTransportStackFactory FACTORY;
+
     private static EventLoopGroup clientGroup;
     @Mock
     private ServerChannelInitializer serverChannelInitializer;
@@ -85,21 +84,19 @@ class NetconfServerFactoryImplTest {
 
     @BeforeAll
     static void beforeAll() {
-        parentGroup = NettyTransportSupport.newEventLoopGroup("parent");
-        workerGroup = NettyTransportSupport.newEventLoopGroup("worker");
+        FACTORY = new SSHTransportStackFactory("testThreads", 0);
         clientGroup = NettyTransportSupport.newEventLoopGroup("client");
     }
 
     @AfterAll
     static void afterAll() {
-        parentGroup.shutdownGracefully();
-        workerGroup.shutdownGracefully();
+        FACTORY.close();
         clientGroup.shutdownGracefully();
     }
 
     @BeforeEach
     void beforeEach() throws Exception {
-        factory = new NetconfServerFactoryImpl(serverChannelInitializer, parentGroup, workerGroup);
+        factory = new NetconfServerFactoryImpl(serverChannelInitializer, FACTORY);
 
         // create temp socket to get available port for test
         final var socket = new ServerSocket(0);
@@ -156,8 +153,7 @@ class NetconfServerFactoryImplTest {
         throws Exception {
         final var server = serverFuture.get(2, TimeUnit.SECONDS);
         try {
-            final var client = SSHClient.connect(clientListener,
-                    NettyTransportSupport.newBootstrap().group(clientGroup), tcpClientParams, sshClientParams)
+            final var client = FACTORY.connectClient(clientListener, tcpClientParams, sshClientParams)
                 .get(2, TimeUnit.SECONDS);
             try {
                 // FIXME commented line requires netconf client to trigger netconf subsystem initialization on server
