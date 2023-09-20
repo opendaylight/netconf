@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8b483eb_3a11f3de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-20T14:49:21Z",
+      "side": 1,
+      "message": "Please clean up the code - we cannot end up with unused fields in classes.",
+      "revId": "90123d2987b5578d0977f7c719faa5b791cbf040",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
