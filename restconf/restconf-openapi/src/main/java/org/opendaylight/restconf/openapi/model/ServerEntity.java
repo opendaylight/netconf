@@ -21,9 +21,11 @@ public final class ServerEntity extends OpenApiEntity {
     @Override
     public void generate(@NonNull JsonGenerator generator) throws IOException {
         generator.writeStartObject();
+        generator.writeObjectFieldStart("server");
         if (url != null) {
             generator.writeStringField("url", url);
         }
+        generator.writeEndObject();
         generator.writeEndObject();
     }
 }
