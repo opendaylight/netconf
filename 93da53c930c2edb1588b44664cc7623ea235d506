@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "864e3337_f795de86",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-20T08:02:40Z",
+      "side": 1,
+      "message": "Can be inlined.",
+      "revId": "93da53c930c2edb1588b44664cc7623ea235d506",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87ca374b_32c293ad",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-20T08:02:40Z",
+      "side": 1,
+      "message": "final",
+      "revId": "93da53c930c2edb1588b44664cc7623ea235d506",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
