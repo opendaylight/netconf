@@ -10,7 +10,6 @@ package org.opendaylight.netconf.transport.ssh;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoService;
@@ -24,7 +23,6 @@ import org.opendaylight.netconf.transport.api.TransportStack;
  */
 public abstract sealed class SSHTransportStack extends AbstractOverlayTransportStack<SSHTransportChannel>
         permits SSHClient, SSHServer {
-
     protected final Map<Long, UserAuthSessionListener.AuthHandler> sessionAuthHandlers = new ConcurrentHashMap<>();
     protected final Map<Long, Session> sessions = new ConcurrentHashMap<>();
     protected NettyIoService ioService;
@@ -34,14 +32,16 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     }
 
     @Override
-    protected void onUnderlayChannelEstablished(@NonNull TransportChannel underlayChannel) {
-        var channel = underlayChannel.channel();
-        final SshIoSession ioSession = new SshIoSession(ioService, getSessionFactory(), channel.localAddress());
+    protected void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
+        final var channel = underlayChannel.channel();
+        final var ioSession = new SshIoSession(ioService, getSessionFactory(), channel.localAddress());
         channel.pipeline().addLast(ioSession.getHandler());
         // authentication triggering and handlers processing is performed by UserAuthSessionListener
         sessionAuthHandlers.put(ioSession.getId(), new UserAuthSessionListener.AuthHandler(
-                () -> addTransportChannel(new SSHTransportChannel(underlayChannel)), // auth success
-                () -> channel.close()) // auth failure
+            // auth success
+            () -> addTransportChannel(new SSHTransportChannel(underlayChannel)),
+            // auth failure
+            () -> channel.close())
         );
     }
 
