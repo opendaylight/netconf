@@ -7,12 +7,12 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
@@ -45,52 +45,27 @@ public final class SSHServer extends SSHTransportStack {
                 serverSessionFactory);
     }
 
+    static SSHServer of(final EventLoopGroup group, final TransportChannelListener listener,
+            final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
+                throws UnsupportedConfigurationException {
+        return new SSHServer(listener, new TransportSshServer.Builder(group)
+            .serverParams(serverParams)
+            .configurator(configurator)
+            .buildChecked());
+    }
+
     @Override
     IoHandler getSessionFactory() {
         return serverSessionFactory;
     }
 
-    public static @NonNull ListenableFuture<SSHServer> connect(final TransportChannelListener listener,
-            final Bootstrap bootstrap, final TcpClientGrouping connectParams, final SshServerGrouping serverParams)
-                throws UnsupportedConfigurationException {
-        final var server = newServer(listener, requireNonNull(serverParams), null);
-        return transformUnderlay(server, TCPClient.connect(server.asListener(), bootstrap, connectParams));
+    @NonNull ListenableFuture<SSHServer> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
+            throws UnsupportedConfigurationException {
+        return transformUnderlay(this, TCPClient.connect(asListener(), bootstrap, connectParams));
     }
 
-    public static @NonNull ListenableFuture<SSHServer> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final TcpServerGrouping connectParams,
-            final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
-        return listen(listener, bootstrap, connectParams, requireNonNull(serverParams), null);
-    }
-
-    /**
-     * Builds and starts SSH Server.
-     *
-     * @param listener server channel listener, required
-     * @param bootstrap server bootstrap instance, required
-     * @param connectParams tcp transport configuration, required
-     * @param serverParams ssh overlay configuration, optional if configurator is defined, required otherwise
-     * @param configurator server factory manager configurator, optional if serverParams is defined, required otherwise
-     * @return server instance as listenable future
-     * @throws UnsupportedConfigurationException if any of configurations is invalid or incomplete
-     * @throws NullPointerException if any of required parameters is null
-     * @throws IllegalArgumentException if both configurator and serverParams are null
-     */
-    public static @NonNull ListenableFuture<SSHServer> listen(final TransportChannelListener listener,
-            final ServerBootstrap bootstrap, final TcpServerGrouping connectParams,
-            final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
-                throws UnsupportedConfigurationException {
-        checkArgument(serverParams != null || configurator != null,
-            "Neither server parameters nor factory configurator is defined");
-        final var server = newServer(listener, serverParams, configurator);
-        return transformUnderlay(server, TCPServer.listen(server.asListener(), bootstrap, connectParams));
-    }
-
-    private static SSHServer newServer(final TransportChannelListener listener, final SshServerGrouping serverParams,
-            final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
-        return new SSHServer(listener, new TransportSshServer.Builder()
-            .serverParams(serverParams)
-            .configurator(configurator)
-            .buildChecked());
+    @NonNull ListenableFuture<SSHServer> listen(final ServerBootstrap bootstrap, final TcpServerGrouping connectParams)
+            throws UnsupportedConfigurationException {
+        return transformUnderlay(this, TCPServer.listen(asListener(), bootstrap, connectParams));
     }
 }
