@@ -10,16 +10,14 @@ package org.opendaylight.netconf.server;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.EventLoopGroup;
 import java.util.List;
 import org.opendaylight.netconf.server.api.NetconfServerFactory;
 import org.opendaylight.netconf.shaded.sshd.server.SshServer;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
+import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.ssh.ServerFactoryManagerConfigurator;
-import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
@@ -27,28 +25,26 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
 public final class NetconfServerFactoryImpl implements NetconfServerFactory {
     private static final TransportChannelListener EMPTY_LISTENER = new BaseTransportChannelListener();
 
-    private final EventLoopGroup parentGroup;
-    private final EventLoopGroup workerGroup;
+    private final SSHTransportStackFactory factory;
     private final ServerChannelInitializer channelInitializer;
 
     public NetconfServerFactoryImpl(final ServerChannelInitializer channelInitializer,
-            final EventLoopGroup parentGroup, final EventLoopGroup workerGroup) {
-        this.parentGroup = requireNonNull(parentGroup);
-        this.workerGroup = requireNonNull(workerGroup);
+            final SSHTransportStackFactory factory) {
+        this.factory = requireNonNull(factory);
         this.channelInitializer = requireNonNull(channelInitializer);
     }
 
     @Override
     public ListenableFuture<TCPServer> createTcpServer(final TcpServerGrouping params)
             throws UnsupportedConfigurationException {
-        return TCPServer.listen(new BaseServerTransport(channelInitializer), createBootstrap(), params);
+        return TCPServer.listen(new BaseServerTransport(channelInitializer), factory.newServerBootstrap(), params);
     }
 
     @Override
     public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
             final SshServerGrouping sshParams, final ServerFactoryManagerConfigurator configurator)
                 throws UnsupportedConfigurationException {
-        return SSHServer.listen(EMPTY_LISTENER, createBootstrap(), tcpParams, sshParams, factoryManager -> {
+        return factory.listenServer(EMPTY_LISTENER, tcpParams, sshParams, factoryManager -> {
             if (configurator != null) {
                 configurator.configureServerFactoryManager(factoryManager);
             }
@@ -56,9 +52,5 @@ public final class NetconfServerFactoryImpl implements NetconfServerFactory {
                 server.setSubsystemFactories(List.of(new NetconfSubsystemFactory(channelInitializer)));
             }
         });
-    }
-
-    private ServerBootstrap createBootstrap() {
-        return NettyTransportSupport.newServerBootstrap().group(parentGroup, workerGroup);
     }
 }
