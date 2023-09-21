@@ -15,7 +15,7 @@ import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactory;
 
 final class SshIoService extends NettyIoService {
     SshIoService(final FactoryManager factoryManager, final ChannelGroup group, final IoHandler handler) {
-        super(new NettyIoServiceFactory(factoryManager, null), handler);
+        super((NettyIoServiceFactory) factoryManager.getIoServiceFactory(), handler);
         channelGroup = group;
     }
 }
