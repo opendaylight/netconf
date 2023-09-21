@@ -7,12 +7,13 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
-import org.opendaylight.netconf.shaded.sshd.netty.NettyIoService;
 import org.opendaylight.netconf.transport.api.AbstractOverlayTransportStack;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -23,18 +24,23 @@ import org.opendaylight.netconf.transport.api.TransportStack;
  */
 public abstract sealed class SSHTransportStack extends AbstractOverlayTransportStack<SSHTransportChannel>
         permits SSHClient, SSHServer {
-    protected final Map<Long, UserAuthSessionListener.AuthHandler> sessionAuthHandlers = new ConcurrentHashMap<>();
-    protected final Map<Long, Session> sessions = new ConcurrentHashMap<>();
-    protected NettyIoService ioService;
+    private final TransportIoService ioService;
 
-    SSHTransportStack(final TransportChannelListener listener) {
+    // FIXME: hide these fields
+    final Map<Long, UserAuthSessionListener.AuthHandler> sessionAuthHandlers = new ConcurrentHashMap<>();
+    final Map<Long, Session> sessions = new ConcurrentHashMap<>();
+
+    SSHTransportStack(final TransportChannelListener listener, final FactoryManager factoryManager,
+            final IoHandler handler) {
         super(listener);
+        ioService = new TransportIoService(factoryManager, handler);
     }
 
     @Override
-    protected void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
+    protected final void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
         final var channel = underlayChannel.channel();
-        final var ioSession = new SshIoSession(ioService, getSessionFactory(), channel.localAddress());
+        final var ioSession = ioService.createSession(channel.localAddress());
+
         channel.pipeline().addLast(ioSession.getHandler());
         // authentication triggering and handlers processing is performed by UserAuthSessionListener
         sessionAuthHandlers.put(ioSession.getId(), new UserAuthSessionListener.AuthHandler(
@@ -45,10 +51,8 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         );
     }
 
-    abstract IoHandler getSessionFactory();
-
-    public Collection<Session> getSessions() {
+    @VisibleForTesting
+    final Collection<Session> getSessions() {
         return sessions.values();
     }
-
 }

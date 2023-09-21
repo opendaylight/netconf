@@ -7,14 +7,11 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -30,13 +27,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
  * A {@link TransportStack} acting as an SSH server.
  */
 public final class SSHServer extends SSHTransportStack {
-    private final TransportSshServer sshServer;
-
     private SSHServer(final TransportChannelListener listener, final TransportSshServer sshServer) {
-        super(listener);
-        this.sshServer = requireNonNull(sshServer);
+        super(listener, sshServer, sshServer.getSessionFactory());
         sshServer.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
-        ioService = new SshIoService(sshServer, sshServer.getSessionFactory());
     }
 
     static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
@@ -47,11 +40,6 @@ public final class SSHServer extends SSHTransportStack {
             .serverParams(serverParams)
             .configurator(configurator)
             .buildChecked());
-    }
-
-    @Override
-    IoHandler getSessionFactory() {
-        return sshServer.getSessionFactory();
     }
 
     @NonNull ListenableFuture<SSHServer> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)

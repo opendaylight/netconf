@@ -7,14 +7,11 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
@@ -29,13 +26,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
  * A {@link TransportStack} acting as an SSH client.
  */
 public final class SSHClient extends SSHTransportStack {
-    private final TransportSshClient sshClient;
-
     private SSHClient(final TransportChannelListener listener, final TransportSshClient sshClient) {
-        super(listener);
-        this.sshClient = requireNonNull(sshClient);
+        super(listener, sshClient, sshClient.getSessionFactory());
         sshClient.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
-        ioService = new SshIoService(sshClient, sshClient.getSessionFactory());
     }
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
@@ -47,11 +40,6 @@ public final class SSHClient extends SSHTransportStack {
             .clientIdentity(clientParams.getClientIdentity())
             .serverAuthentication(clientParams.getServerAuthentication())
             .buildChecked());
-    }
-
-    @Override
-    IoHandler getSessionFactory() {
-        return sshClient.getSessionFactory();
     }
 
     @NonNull ListenableFuture<SSHClient> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
