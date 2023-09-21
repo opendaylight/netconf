@@ -14,12 +14,12 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
+import org.opendaylight.netconf.transport.ssh.NettyIoChannelHandler.HandlerAndId;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.SshClientGrouping;
@@ -60,11 +60,8 @@ public final class SSHClient extends SSHTransportStack {
     }
 
     @Override
-    SshIoSession createIoSession(final Channel channel) {
-        final var sessionFactory = sshClient.getSessionFactory();
-        final var ioService = new SshIoService(sshClient,
-            new DefaultChannelGroup("sshd-client-channels", channel.eventLoop()), sessionFactory);
-
-        return new SshIoSession(ioService, sessionFactory, channel.localAddress());
+    HandlerAndId createHandler(final Channel channel) {
+        return NettyIoChannelHandler.createAdapter(sshClient, sshClient.getSessionFactory(), channel,
+            "sshd-client-channels");
     }
 }

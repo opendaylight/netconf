@@ -17,6 +17,7 @@ import org.opendaylight.netconf.transport.api.AbstractOverlayTransportStack;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
+import org.opendaylight.netconf.transport.ssh.NettyIoChannelHandler.HandlerAndId;
 
 /**
  * An SSH {@link TransportStack}. Instances of this class are built indirectly.
@@ -34,11 +35,11 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     @Override
     protected final void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
         final var channel = underlayChannel.channel();
-        final var ioSession = createIoSession(channel);
+        final var handlerAndId = createHandler(channel);
 
-        channel.pipeline().addLast(ioSession.getHandler());
+        channel.pipeline().addLast(handlerAndId.handler());
         // authentication triggering and handlers processing is performed by UserAuthSessionListener
-        sessionAuthHandlers.put(ioSession.getId(), new UserAuthSessionListener.AuthHandler(
+        sessionAuthHandlers.put(handlerAndId.id(), new UserAuthSessionListener.AuthHandler(
             // auth success
             () -> addTransportChannel(new SSHTransportChannel(underlayChannel)),
             // auth failure
@@ -46,7 +47,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         );
     }
 
-    abstract SshIoSession createIoSession(Channel channel);
+    abstract HandlerAndId createHandler(Channel channel);
 
     @VisibleForTesting
     final Collection<Session> getSessions() {
