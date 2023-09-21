@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f8b83c6_ac8e283b",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/NettyThreads.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-21T08:17:48Z",
+      "side": 1,
+      "message": "the name is confusing. it\u0027s an ssh transport factory holder \nso artifact name and methods should reflect this\nthreads.factory().. expected to return some treads related factory \nnot transport related\nsuggested renaming to smth like Transports. with method getSshTransportFactory()\ncould be extended with similar for TCP, TLS",
+      "range": {
+        "startLine": 35,
+        "startChar": 19,
+        "endLine": 35,
+        "endChar": 31
+      },
+      "revId": "c91a9982e138b015ad4093c793dbc7fd0fb24afd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c23cbe72_b7f5921b",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/SshServerTransport.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-21T08:17:48Z",
+      "side": 1,
+      "message": "the class extends BaseServerTransport implementing TransportChannelListener\nit means server channel initializer will be applied on tcp transport channel\nnot on internal channel managed by NetconfSubsystem[Factory] expected for ssh transport",
+      "range": {
+        "startLine": 65,
+        "startChar": 8,
+        "endLine": 65,
+        "endChar": 27
+      },
+      "revId": "c91a9982e138b015ad4093c793dbc7fd0fb24afd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
