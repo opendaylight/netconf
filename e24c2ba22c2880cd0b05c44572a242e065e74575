@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1d65cd6_603b3b6e",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-21T12:53:09Z",
+      "side": 1,
+      "message": "yes it should, but I need to untangle sessionFactory/ioService lifecycle. This will be done in a follow-up patch.",
+      "parentUuid": "5af4ff98_1d0a0003",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 32
+      },
+      "revId": "e24c2ba22c2880cd0b05c44572a242e065e74575",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "411e6ba9_8b9e6876",
@@ -54,6 +78,30 @@
       "writtenOn": "2023-09-21T08:55:55Z",
       "side": 1,
       "message": "same here, ioServiceFactory need to be used to create ioService.\nhaving suspicion the factory wont be ever used.\nprobably it make sense to pass ioService as parameter, not factory",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 38
+      },
+      "revId": "e24c2ba22c2880cd0b05c44572a242e065e74575",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "952389d0_e643bc3a",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHServer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-21T12:53:09Z",
+      "side": 1,
+      "message": "right:\n- we start with IoServiceFactoryFactory\n- we can acquire IoServiceFactory via serverFactoryManager.getIoServiceFactory(), which does the right thing\n\nbut then we can create either an IoConnector or IoAcceptor ... so that\u0027s not entirely helpful.\n\nSo yes, our FactoryFactory is not being used with this patch, but this lays the ground work for that to happen -- and as mentioned, eliminates potential confusion with the default FactoryFactory",
+      "parentUuid": "411e6ba9_8b9e6876",
       "range": {
         "startLine": 44,
         "startChar": 0,
