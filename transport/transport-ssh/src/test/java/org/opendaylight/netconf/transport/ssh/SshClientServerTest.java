@@ -140,7 +140,7 @@ public class SshClientServerTest {
             final ServerAuthentication serverAuth) throws Exception {
         final var clientIdentity = buildClientIdentityWithPassword(getUsername(), PASSWORD);
         final var clientAuth = buildClientAuthWithPassword(getUsernameAndUpdate(), "$0$" + PASSWORD);
-        when(sshClientConfig.nonnullClientIdentity()).thenReturn(clientIdentity);
+        when(sshClientConfig.getClientIdentity()).thenReturn(clientIdentity);
         when(sshClientConfig.getServerAuthentication()).thenReturn(serverAuth);
         when(sshServerConfig.getServerIdentity()).thenReturn(serverIdentity);
         when(sshServerConfig.getClientAuthentication()).thenReturn(clientAuth);
@@ -167,7 +167,7 @@ public class SshClientServerTest {
     void itUserAuth(final String testDesc, final ClientIdentity clientIdentity, final ClientAuthentication clientAuth)
             throws Exception {
         final var serverIdentity = buildServerIdentityWithKeyPair(generateKeyPairWithCertificate(RSA)); // required
-        when(sshClientConfig.nonnullClientIdentity()).thenReturn(clientIdentity);
+        when(sshClientConfig.getClientIdentity()).thenReturn(clientIdentity);
         when(sshClientConfig.getServerAuthentication()).thenReturn(null); // Accept all keys
         when(sshServerConfig.getServerIdentity()).thenReturn(serverIdentity);
         when(sshServerConfig.getClientAuthentication()).thenReturn(clientAuth);
@@ -253,7 +253,7 @@ public class SshClientServerTest {
     @DisplayName("SSH server with external initializer")
     void externalServerInitializer() throws Exception {
         final var username = getUsernameAndUpdate();
-        when(sshClientConfig.nonnullClientIdentity()).thenReturn(buildClientIdentityWithPassword(username, PASSWORD));
+        when(sshClientConfig.getClientIdentity()).thenReturn(buildClientIdentityWithPassword(username, PASSWORD));
         // Accept all keys
         when(sshClientConfig.getServerAuthentication()).thenReturn(null);
 
