@@ -93,6 +93,30 @@
       },
       "revId": "c91a9982e138b015ad4093c793dbc7fd0fb24afd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f68a0144_785b1a97",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/SshServerTransport.java",
+        "patchSetId": 30
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-21T12:26:25Z",
+      "side": 1,
+      "message": "Done in https://git.opendaylight.org/gerrit/c/netconf/+/107938",
+      "parentUuid": "823ec7fc_6ab743fa",
+      "range": {
+        "startLine": 65,
+        "startChar": 8,
+        "endLine": 65,
+        "endChar": 27
+      },
+      "revId": "c91a9982e138b015ad4093c793dbc7fd0fb24afd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
