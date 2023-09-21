@@ -22,6 +22,8 @@ import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentit
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.client.keyverifier.ServerKeyVerifier;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
+import org.opendaylight.netconf.shaded.sshd.client.session.SessionFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -124,6 +126,14 @@ final class TransportSshClient extends SshClient {
             } else {
                 ConfigUtils.setKeepAlives(ret, null, null);
             }
+            if (clientIdentity == null) {
+                throw new UnsupportedConfigurationException("Client parameters are required");
+            }
+            final var username = clientIdentity.getUsername();
+            if (username == null) {
+                throw new UnsupportedConfigurationException("Client parameters are missing username");
+            }
+
             if (clientIdentity != null && clientIdentity.getNone() == null) {
                 setClientIdentity(ret, clientIdentity);
             }
@@ -135,6 +145,14 @@ final class TransportSshClient extends SshClient {
             } catch (IllegalArgumentException e) {
                 throw new UnsupportedConfigurationException("Inconsistent client configuration", e);
             }
+
+            ret.setSessionFactory(new SessionFactory(ret) {
+                @Override
+                protected ClientSessionImpl setupSession(final ClientSessionImpl session) {
+                    session.setUsername(username);
+                    return session;
+                }
+            });
             return ret;
         }
 

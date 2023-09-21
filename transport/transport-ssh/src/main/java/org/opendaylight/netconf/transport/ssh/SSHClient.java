@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -14,9 +16,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
-import org.opendaylight.netconf.shaded.sshd.client.session.SessionFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -32,46 +31,31 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
  * A {@link TransportStack} acting as an SSH client.
  */
 public final class SSHClient extends SSHTransportStack {
-    private final ClientFactoryManager clientFactoryManager;
-    private final SessionFactory sessionFactory;
+    private final TransportSshClient sshClient;
 
-    private SSHClient(final TransportChannelListener listener, final ClientFactoryManager clientFactoryManager,
-            final String username) {
+    private SSHClient(final TransportChannelListener listener, final TransportSshClient sshClient) {
         super(listener);
-        this.clientFactoryManager = clientFactoryManager;
-        this.clientFactoryManager.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
-        sessionFactory = new SessionFactory(clientFactoryManager) {
-            @Override
-            protected ClientSessionImpl setupSession(final ClientSessionImpl session) {
-                session.setUsername(username);
-                return session;
-            }
-        };
-        ioService = new SshIoService(this.clientFactoryManager,
+        this.sshClient = requireNonNull(sshClient);
+        sshClient.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
+        ioService = new SshIoService(sshClient,
                 new DefaultChannelGroup("sshd-client-channels", GlobalEventExecutor.INSTANCE),
-                sessionFactory);
+                sshClient.getSessionFactory());
     }
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
             final TransportChannelListener listener, final SshClientGrouping clientParams)
                 throws UnsupportedConfigurationException {
-        final var clientIdentity = clientParams.nonnullClientIdentity();
-        final var username = clientIdentity.getUsername();
-        if (username == null) {
-            throw new UnsupportedConfigurationException("Client parameters are missing username");
-        }
-
         return new SSHClient(listener, new TransportSshClient.Builder(ioServiceFactory, group)
             .transportParams(clientParams.getTransportParams())
             .keepAlives(clientParams.getKeepalives())
-            .clientIdentity(clientIdentity)
+            .clientIdentity(clientParams.getClientIdentity())
             .serverAuthentication(clientParams.getServerAuthentication())
-            .buildChecked(), username);
+            .buildChecked());
     }
 
     @Override
     IoHandler getSessionFactory() {
-        return sessionFactory;
+        return sshClient.getSessionFactory();
     }
 
     @NonNull ListenableFuture<SSHClient> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
