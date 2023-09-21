@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import static java.util.Objects.requireNonNull;
+
 import io.netty.channel.group.ChannelGroup;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
@@ -16,6 +18,6 @@ import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactory;
 final class SshIoService extends NettyIoService {
     SshIoService(final FactoryManager factoryManager, final ChannelGroup group, final IoHandler handler) {
         super((NettyIoServiceFactory) factoryManager.getIoServiceFactory(), handler);
-        channelGroup = group;
+        channelGroup = requireNonNull(group);
     }
 }

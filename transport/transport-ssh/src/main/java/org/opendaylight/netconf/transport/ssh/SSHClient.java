@@ -12,11 +12,10 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
@@ -37,9 +36,6 @@ public final class SSHClient extends SSHTransportStack {
         super(listener);
         this.sshClient = requireNonNull(sshClient);
         sshClient.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
-        ioService = new SshIoService(sshClient,
-                new DefaultChannelGroup("sshd-client-channels", GlobalEventExecutor.INSTANCE),
-                sshClient.getSessionFactory());
     }
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
@@ -53,11 +49,6 @@ public final class SSHClient extends SSHTransportStack {
             .buildChecked());
     }
 
-    @Override
-    IoHandler getSessionFactory() {
-        return sshClient.getSessionFactory();
-    }
-
     @NonNull ListenableFuture<SSHClient> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
             throws UnsupportedConfigurationException {
         return transformUnderlay(this, TCPClient.connect(asListener(), bootstrap, connectParams));
@@ -66,5 +57,14 @@ public final class SSHClient extends SSHTransportStack {
     @NonNull ListenableFuture<SSHClient> listen(final ServerBootstrap bootstrap, final TcpServerGrouping listenParams)
             throws UnsupportedConfigurationException {
         return transformUnderlay(this, TCPServer.listen(asListener(), bootstrap, listenParams));
+    }
+
+    @Override
+    SshIoSession createIoSession(final Channel channel) {
+        final var sessionFactory = sshClient.getSessionFactory();
+        final var ioService = new SshIoService(sshClient,
+            new DefaultChannelGroup("sshd-client-channels", channel.eventLoop()), sessionFactory);
+
+        return new SshIoSession(ioService, sessionFactory, channel.localAddress());
     }
 }
