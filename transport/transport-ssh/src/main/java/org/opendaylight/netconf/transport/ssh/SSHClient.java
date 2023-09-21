@@ -55,13 +55,16 @@ public final class SSHClient extends SSHTransportStack {
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
             final TransportChannelListener listener, final SshClientGrouping clientParams)
                 throws UnsupportedConfigurationException {
-        final var clientIdentity = clientParams.getClientIdentity();
-        final var username = clientIdentity == null ? "" : clientIdentity.getUsername();
+        final var clientIdentity = clientParams.nonnullClientIdentity();
+        final var username = clientIdentity.getUsername();
+        if (username == null) {
+            throw new UnsupportedConfigurationException("Client parameters are missing username");
+        }
 
         return new SSHClient(listener, new TransportSshClient.Builder(ioServiceFactory, group)
             .transportParams(clientParams.getTransportParams())
             .keepAlives(clientParams.getKeepalives())
-            .clientIdentity(clientParams.getClientIdentity())
+            .clientIdentity(clientIdentity)
             .serverAuthentication(clientParams.getServerAuthentication())
             .buildChecked(), username);
     }
