@@ -12,7 +12,7 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class BaseTransportChannelListener implements TransportChannelListener {
+public class BaseTransportChannelListener implements TransportChannelListener {
     private static final Logger LOG = LoggerFactory.getLogger(BaseTransportChannelListener.class);
 
     @Override

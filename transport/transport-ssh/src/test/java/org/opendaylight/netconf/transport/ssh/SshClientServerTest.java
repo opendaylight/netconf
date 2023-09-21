@@ -55,6 +55,7 @@ import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
+import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -93,6 +94,8 @@ public class SshClientServerTest {
     private SshServerGrouping sshServerConfig;
     @Mock
     private TransportChannelListener serverListener;
+    @Mock
+    private SubsystemFactory subsystemFactory;
 
     @Captor
     ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
@@ -217,7 +220,7 @@ public class SshClientServerTest {
 
     private void integrationTest() throws Exception {
         // start server
-        final var server = FACTORY.listenServer(serverListener, tcpServerConfig, sshServerConfig)
+        final var server = FACTORY.listenServer(serverListener, subsystemFactory, tcpServerConfig, sshServerConfig)
             .get(2, TimeUnit.SECONDS);
         try {
             // connect with client
@@ -254,7 +257,7 @@ public class SshClientServerTest {
         // Accept all keys
         when(sshClientConfig.getServerAuthentication()).thenReturn(null);
 
-        final var server = FACTORY.listenServer(serverListener, tcpServerConfig, null,
+        final var server = FACTORY.listenServer(serverListener, subsystemFactory, tcpServerConfig, null,
             factoryManager -> {
                 // authenticate user by credentials and generate host key
                 factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));

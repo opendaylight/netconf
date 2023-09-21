@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.server.session.SessionFactory;
+import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -46,9 +47,9 @@ public final class SSHServer extends SSHTransportStack {
     }
 
     static SSHServer of(final EventLoopGroup group, final TransportChannelListener listener,
-            final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
-                throws UnsupportedConfigurationException {
-        return new SSHServer(listener, new TransportSshServer.Builder(group)
+            final SubsystemFactory subsystemFactory, final SshServerGrouping serverParams,
+            final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
+        return new SSHServer(listener, new TransportSshServer.Builder(group, subsystemFactory)
             .serverParams(serverParams)
             .configurator(configurator)
             .buildChecked());

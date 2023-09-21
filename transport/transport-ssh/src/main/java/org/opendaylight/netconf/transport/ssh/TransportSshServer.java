@@ -22,6 +22,7 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.UserAuthFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.hostbased.UserAuthHostBasedFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
+import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.ssh.server.grouping.ClientAuthentication;
@@ -67,14 +68,16 @@ final class TransportSshServer extends SshServer {
      */
     static final class Builder extends ServerBuilder {
         private final EventLoopGroup group;
+        private final SubsystemFactory subsystemFactory;
 
         private ServerFactoryManagerConfigurator configurator;
         private ClientAuthentication clientAuthentication;
         private ServerIdentity serverIdentity;
         private Keepalives keepAlives;
 
-        Builder(final EventLoopGroup group) {
+        Builder(final EventLoopGroup group, final SubsystemFactory subsystemFactory) {
             this.group = requireNonNull(group);
+            this.subsystemFactory = requireNonNull(subsystemFactory);
         }
 
         Builder serverParams(final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
@@ -136,7 +139,10 @@ final class TransportSshServer extends SshServer {
             if (configurator != null) {
                 configurator.configureServerFactoryManager(ret);
             }
+
+            ret.setSubsystemFactories(List.of(subsystemFactory));
             ret.setScheduledExecutorService(group);
+
 
             try {
                 ret.checkConfig();

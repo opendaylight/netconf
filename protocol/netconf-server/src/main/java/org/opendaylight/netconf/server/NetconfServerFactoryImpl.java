@@ -10,9 +10,7 @@ package org.opendaylight.netconf.server;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.List;
 import org.opendaylight.netconf.server.api.NetconfServerFactory;
-import org.opendaylight.netconf.shaded.sshd.server.SshServer;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
@@ -44,13 +42,7 @@ public final class NetconfServerFactoryImpl implements NetconfServerFactory {
     public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
             final SshServerGrouping sshParams, final ServerFactoryManagerConfigurator configurator)
                 throws UnsupportedConfigurationException {
-        return factory.listenServer(EMPTY_LISTENER, tcpParams, sshParams, factoryManager -> {
-            if (configurator != null) {
-                configurator.configureServerFactoryManager(factoryManager);
-            }
-            if (factoryManager instanceof SshServer server) {
-                server.setSubsystemFactories(List.of(new NetconfSubsystemFactory(channelInitializer)));
-            }
-        });
+        return factory.listenServer(EMPTY_LISTENER, new NetconfSubsystemFactory(channelInitializer), tcpParams,
+            sshParams, configurator);
     }
 }
