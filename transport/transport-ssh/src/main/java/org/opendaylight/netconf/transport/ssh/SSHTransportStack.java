@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,10 +35,11 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     @Override
     protected void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
         final var channel = underlayChannel.channel();
-        final var ioSession = new SshIoSession(ioService, getSessionFactory(), channel.localAddress());
-        channel.pipeline().addLast(ioSession.getHandler());
+        final var adapterAndId = NettyIoChannelHandler.createAdapter(ioService, getSessionFactory(),
+            channel.localAddress());
+        channel.pipeline().addLast(adapterAndId.handler());
         // authentication triggering and handlers processing is performed by UserAuthSessionListener
-        sessionAuthHandlers.put(ioSession.getId(), new UserAuthSessionListener.AuthHandler(
+        sessionAuthHandlers.put(adapterAndId.id(), new UserAuthSessionListener.AuthHandler(
             // auth success
             () -> addTransportChannel(new SSHTransportChannel(underlayChannel)),
             // auth failure
@@ -47,7 +49,8 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     abstract IoHandler getSessionFactory();
 
-    public Collection<Session> getSessions() {
+    @VisibleForTesting
+    Collection<Session> getSessions() {
         return sessions.values();
     }
 
