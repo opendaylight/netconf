@@ -17,6 +17,7 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
+import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.server.session.SessionFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -45,10 +46,10 @@ public final class SSHServer extends SSHTransportStack {
                 serverSessionFactory);
     }
 
-    static SSHServer of(final EventLoopGroup group, final TransportChannelListener listener,
-            final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
-                throws UnsupportedConfigurationException {
-        return new SSHServer(listener, new TransportSshServer.Builder(group)
+    static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
+            final TransportChannelListener listener, final SshServerGrouping serverParams,
+            final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
+        return new SSHServer(listener, new TransportSshServer.Builder(ioServiceFactory, group)
             .serverParams(serverParams)
             .configurator(configurator)
             .buildChecked());

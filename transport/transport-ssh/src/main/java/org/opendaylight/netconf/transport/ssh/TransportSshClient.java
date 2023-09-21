@@ -23,6 +23,7 @@ import org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswor
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.client.keyverifier.ServerKeyVerifier;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
+import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.password.grouping.password.type.CleartextPassword;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentity;
@@ -68,12 +69,14 @@ final class TransportSshClient extends SshClient {
      * {@code ietf-netconf-client.yang} configuration.
      */
     static final class Builder extends ClientBuilder {
+        private final NettyIoServiceFactoryFactory ioServiceFactory;
         private final EventLoopGroup group;
 
         private Keepalives keepAlives;
         private ClientIdentity clientIdentity;
 
-        Builder(final EventLoopGroup group) {
+        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group) {
+            this.ioServiceFactory = requireNonNull(ioServiceFactory);
             this.group = requireNonNull(group);
         }
 
@@ -124,6 +127,7 @@ final class TransportSshClient extends SshClient {
             if (clientIdentity != null && clientIdentity.getNone() == null) {
                 setClientIdentity(ret, clientIdentity);
             }
+            ret.setIoServiceFactoryFactory(ioServiceFactory);
             ret.setScheduledExecutorService(group);
 
             try {
