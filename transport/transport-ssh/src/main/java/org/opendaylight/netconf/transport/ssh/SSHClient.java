@@ -13,8 +13,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
@@ -37,9 +35,7 @@ public final class SSHClient extends SSHTransportStack {
         super(listener);
         this.sshClient = requireNonNull(sshClient);
         sshClient.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
-        ioService = new SshIoService(sshClient,
-                new DefaultChannelGroup("sshd-client-channels", GlobalEventExecutor.INSTANCE),
-                sshClient.getSessionFactory());
+        ioService = new SshIoService(sshClient, sshClient.getSessionFactory());
     }
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
