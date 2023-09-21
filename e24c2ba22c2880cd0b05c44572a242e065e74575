@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c47a590b_e5fd32d1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-21T08:55:55Z",
+      "side": 1,
+      "message": "seems incomplete",
+      "revId": "e24c2ba22c2880cd0b05c44572a242e065e74575",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5af4ff98_1d0a0003",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHClient.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-21T08:55:55Z",
+      "side": 1,
+      "message": "shouldn\u0027t ioServiceFactory to be used to create ioService?",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 32
+      },
+      "revId": "e24c2ba22c2880cd0b05c44572a242e065e74575",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "411e6ba9_8b9e6876",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/SSHServer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-09-21T08:55:55Z",
+      "side": 1,
+      "message": "same here, ioServiceFactory need to be used to create ioService.\nhaving suspicion the factory wont be ever used.\nprobably it make sense to pass ioService as parameter, not factory",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 38
+      },
+      "revId": "e24c2ba22c2880cd0b05c44572a242e065e74575",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
