@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea5277ef_33e72710",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-21T15:31:58Z",
+      "side": 1,
+      "message": "OK, just remove Server field from Path and we are done.",
+      "revId": "19d1cfff38442689e267c0a8f5b80ea41622e026",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
