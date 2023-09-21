@@ -18,6 +18,7 @@ import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.client.session.SessionFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
+import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -51,12 +52,13 @@ public final class SSHClient extends SSHTransportStack {
                 sessionFactory);
     }
 
-    static SSHClient of(final EventLoopGroup group, final TransportChannelListener listener,
-            final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
+    static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
+            final TransportChannelListener listener, final SshClientGrouping clientParams)
+                throws UnsupportedConfigurationException {
         final var clientIdentity = clientParams.getClientIdentity();
         final var username = clientIdentity == null ? "" : clientIdentity.getUsername();
 
-        return new SSHClient(listener, new TransportSshClient.Builder(group)
+        return new SSHClient(listener, new TransportSshClient.Builder(ioServiceFactory, group)
             .transportParams(clientParams.getTransportParams())
             .keepAlives(clientParams.getKeepalives())
             .clientIdentity(clientParams.getClientIdentity())

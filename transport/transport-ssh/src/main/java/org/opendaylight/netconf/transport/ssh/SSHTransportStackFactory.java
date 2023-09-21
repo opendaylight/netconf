@@ -15,6 +15,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -30,11 +31,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
 public final class SSHTransportStackFactory implements AutoCloseable {
     private final EventLoopGroup group;
     private final EventLoopGroup parentGroup;
+    private final NettyIoServiceFactoryFactory ioServiceFactory;
 
     private SSHTransportStackFactory(final EventLoopGroup group, final EventLoopGroup parentGroup) {
         this.group = requireNonNull(group);
         this.parentGroup = parentGroup;
-        // FIXME: factoryFactory = new NettyIoServiceFactoryFactory(group);
+        ioServiceFactory = new NettyIoServiceFactoryFactory(group);
     }
 
     public SSHTransportStackFactory(final @NonNull String groupName, final int groupThreads) {
@@ -50,19 +52,19 @@ public final class SSHTransportStackFactory implements AutoCloseable {
     public @NonNull ListenableFuture<SSHClient> connectClient(final TransportChannelListener listener,
             final TcpClientGrouping connectParams, final SshClientGrouping clientParams)
                 throws UnsupportedConfigurationException {
-        return SSHClient.of(group, listener, clientParams).connect(newBootstrap(), connectParams);
+        return SSHClient.of(ioServiceFactory, group, listener, clientParams).connect(newBootstrap(), connectParams);
     }
 
     public @NonNull ListenableFuture<SSHClient> listenClient(final TransportChannelListener listener,
             final TcpServerGrouping listenParams, final SshClientGrouping clientParams)
                 throws UnsupportedConfigurationException {
-        return SSHClient.of(group, listener, clientParams).listen(newServerBootstrap(), listenParams);
+        return SSHClient.of(ioServiceFactory, group, listener, clientParams).listen(newServerBootstrap(), listenParams);
     }
 
     public @NonNull ListenableFuture<SSHServer> connectServer(final TransportChannelListener listener,
             final SubsystemFactory subsystemFactory, final TcpClientGrouping connectParams,
             final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
-        return SSHServer.of(group, listener, subsystemFactory, requireNonNull(serverParams), null)
+        return SSHServer.of(ioServiceFactory, group, listener, subsystemFactory, requireNonNull(serverParams), null)
             .connect(newBootstrap(), connectParams);
     }
 
@@ -91,7 +93,7 @@ public final class SSHTransportStackFactory implements AutoCloseable {
                     throws UnsupportedConfigurationException {
         checkArgument(serverParams != null || configurator != null,
             "Neither server parameters nor factory configurator is defined");
-        return SSHServer.of(group, listener, subsystemFactory, serverParams, configurator)
+        return SSHServer.of(ioServiceFactory, group, listener, subsystemFactory, serverParams, configurator)
             .listen(newServerBootstrap(), listenParams);
     }
 
