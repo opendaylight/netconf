@@ -16,6 +16,7 @@ import io.netty.channel.EventLoopGroup;
 import java.security.PublicKey;
 import java.util.List;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
+import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.server.ServerBuilder;
 import org.opendaylight.netconf.shaded.sshd.server.SshServer;
 import org.opendaylight.netconf.shaded.sshd.server.auth.UserAuthFactory;
@@ -66,6 +67,7 @@ final class TransportSshServer extends SshServer {
      * {@code ietf-netconf-server.yang} configuration.
      */
     static final class Builder extends ServerBuilder {
+        private final NettyIoServiceFactoryFactory ioServiceFactory;
         private final EventLoopGroup group;
 
         private ServerFactoryManagerConfigurator configurator;
@@ -73,7 +75,8 @@ final class TransportSshServer extends SshServer {
         private ServerIdentity serverIdentity;
         private Keepalives keepAlives;
 
-        Builder(final EventLoopGroup group) {
+        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group) {
+            this.ioServiceFactory = requireNonNull(ioServiceFactory);
             this.group = requireNonNull(group);
         }
 
@@ -136,6 +139,7 @@ final class TransportSshServer extends SshServer {
             if (configurator != null) {
                 configurator.configureServerFactoryManager(ret);
             }
+            ret.setIoServiceFactoryFactory(ioServiceFactory);
             ret.setScheduledExecutorService(group);
 
             try {
