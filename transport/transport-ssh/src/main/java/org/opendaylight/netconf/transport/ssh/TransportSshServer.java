@@ -153,6 +153,8 @@ final class TransportSshServer extends SshServer {
             } catch (IllegalArgumentException e) {
                 throw new UnsupportedConfigurationException("Inconsistent client configuration", e);
             }
+
+            ret.setSessionFactory(ret.createSessionFactory());
             return ret;
         }
 

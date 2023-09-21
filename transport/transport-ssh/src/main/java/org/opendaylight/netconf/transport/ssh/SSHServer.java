@@ -18,8 +18,6 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
-import org.opendaylight.netconf.shaded.sshd.server.ServerFactoryManager;
-import org.opendaylight.netconf.shaded.sshd.server.session.SessionFactory;
 import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
@@ -34,17 +32,15 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
  * A {@link TransportStack} acting as an SSH server.
  */
 public final class SSHServer extends SSHTransportStack {
-    private final ServerFactoryManager serverFactoryManager;
-    private final SessionFactory serverSessionFactory;
+    private final TransportSshServer sshServer;
 
-    private SSHServer(final TransportChannelListener listener, final ServerFactoryManager serverFactoryManager) {
+    private SSHServer(final TransportChannelListener listener, final TransportSshServer sshServer) {
         super(listener);
-        this.serverFactoryManager = requireNonNull(serverFactoryManager);
-        this.serverFactoryManager.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
-        serverSessionFactory = new SessionFactory(serverFactoryManager);
-        ioService = new SshIoService(this.serverFactoryManager,
+        this.sshServer = requireNonNull(sshServer);
+        sshServer.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
+        ioService = new SshIoService(sshServer,
                 new DefaultChannelGroup("sshd-server-channels", GlobalEventExecutor.INSTANCE),
-                serverSessionFactory);
+                sshServer.getSessionFactory());
     }
 
     static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
@@ -59,7 +55,7 @@ public final class SSHServer extends SSHTransportStack {
 
     @Override
     IoHandler getSessionFactory() {
-        return serverSessionFactory;
+        return sshServer.getSessionFactory();
     }
 
     @NonNull ListenableFuture<SSHServer> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
