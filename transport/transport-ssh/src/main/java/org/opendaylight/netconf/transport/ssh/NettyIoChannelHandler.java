@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.group.DefaultChannelGroup;
 import java.net.SocketAddress;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
@@ -38,8 +37,7 @@ final class NettyIoChannelHandler extends NettyIoSession {
     @SuppressWarnings("resource")
     static HandlerAndId createAdapter(final FactoryManager factoryManager, final IoHandler sessionFactory,
             final Channel channel, final String groupName) {
-        final var ioService = new SshIoService(factoryManager, new DefaultChannelGroup(groupName, channel.eventLoop()),
-            sessionFactory);
+        final var ioService = new SshIoService(factoryManager, sessionFactory);
         final var instance = new NettyIoChannelHandler(ioService, sessionFactory, channel.localAddress());
         return new HandlerAndId(instance.adapter, instance.id);
     }
