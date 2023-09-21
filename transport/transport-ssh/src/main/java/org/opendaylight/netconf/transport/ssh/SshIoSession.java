@@ -10,11 +10,10 @@ package org.opendaylight.netconf.transport.ssh;
 import io.netty.channel.ChannelHandler;
 import java.net.SocketAddress;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
-import org.opendaylight.netconf.shaded.sshd.netty.NettyIoService;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoSession;
 
 final class SshIoSession extends NettyIoSession {
-    SshIoSession(final NettyIoService service, final IoHandler handler, final SocketAddress acceptanceAddress) {
+    SshIoSession(final SshIoService service, final IoHandler handler, final SocketAddress acceptanceAddress) {
         super(service, handler, acceptanceAddress);
     }
 

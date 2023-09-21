@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import java.net.SocketAddress;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoService;
@@ -17,5 +18,9 @@ final class SshIoService extends NettyIoService {
         super((NettyIoServiceFactory) factoryManager.getIoServiceFactory(), handler);
         // Required to keep things working, but does not need to be functional at all
         channelGroup = CompatChannelGroup.INSTANCE;
+    }
+
+    SshIoSession createSession(final SocketAddress acceptanceAddress) {
+        return new SshIoSession(this, handler, acceptanceAddress);
     }
 }
