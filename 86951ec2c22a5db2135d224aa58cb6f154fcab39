@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29194cfe_db541a30",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-22T07:47:53Z",
+      "side": 1,
+      "message": "This means we can remove new (not needed classes as well).",
+      "revId": "86951ec2c22a5db2135d224aa58cb6f154fcab39",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
