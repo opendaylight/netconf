@@ -34,6 +34,24 @@
       "parentUuid": "23d35472_9daae0e4",
       "revId": "fad39946457aef116d084a51f98ce3dda6f418e1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa7c65d9_8ae764e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-22T14:16:13Z",
+      "side": 1,
+      "message": "yes, make it a transient field so we lose it during serialization",
+      "parentUuid": "6835cab2_caec777d",
+      "revId": "fad39946457aef116d084a51f98ce3dda6f418e1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
