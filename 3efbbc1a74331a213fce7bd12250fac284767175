@@ -16,6 +16,24 @@
       "message": "Delete this empty line.",
       "revId": "3efbbc1a74331a213fce7bd12250fac284767175",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e41e51d4_b12fdfae",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9136
+      },
+      "writtenOn": "2023-09-22T15:27:37Z",
+      "side": 1,
+      "message": "resolved + rebased",
+      "parentUuid": "e121d01c_cfd6cd87",
+      "revId": "3efbbc1a74331a213fce7bd12250fac284767175",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
