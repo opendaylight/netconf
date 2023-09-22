@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b34b79c0_1cfcb486",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/ClientSubsystemFactory.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-22T19:25:39Z",
+      "side": 1,
+      "message": "I don\u0027t think we need this -- all we need is the subsystem name, we know how to create it in core. Or is there a use case I am missing?",
+      "range": {
+        "startLine": 16,
+        "startChar": 17,
+        "endLine": 16,
+        "endChar": 39
+      },
+      "revId": "acd80d1c4ce9899814847aedbe992126c784d917",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
