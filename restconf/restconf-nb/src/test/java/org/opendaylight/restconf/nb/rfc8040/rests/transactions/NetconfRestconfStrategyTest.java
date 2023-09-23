@@ -119,7 +119,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutCreateContainerData() {
+    public void testPutCreateContainerData() throws Exception {
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -133,7 +133,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutReplaceContainerData() {
+    public void testPutReplaceContainerData() throws Exception {
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)
             .getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
@@ -147,7 +147,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutCreateLeafData() {
+    public void testPutCreateLeafData() throws Exception {
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(GAP_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -159,7 +159,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutReplaceLeafData() {
+    public void testPutReplaceLeafData() throws Exception {
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)
             .getConfig(GAP_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
@@ -172,7 +172,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutCreateListData() {
+    public void testPutCreateListData() throws Exception {
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -185,7 +185,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Test
-    public void testPutReplaceListData() {
+    public void testPutReplaceListData() throws Exception {
         doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)
             .getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();

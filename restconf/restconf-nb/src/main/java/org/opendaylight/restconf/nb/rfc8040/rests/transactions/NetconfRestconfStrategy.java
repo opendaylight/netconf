@@ -20,6 +20,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -43,7 +44,12 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     @Override
     void delete(final SettableRestconfFuture<Empty> future, final YangInstanceIdentifier path) {
         final var tx = prepareWriteExecution();
-        tx.delete(path);
+        try {
+            tx.delete(path);
+        } catch (RestconfDocumentedException e) {
+            tx.cancel();
+            future.setFailure(e);
+        }
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {

@@ -84,7 +84,8 @@ public final class ParserIdentifier {
     //        @NonNull InstanceIdentifierContext forUrl(identifier, schemaContexxt, mountPointService)
     //
     public static InstanceIdentifierContext toInstanceIdentifier(final String identifier,
-            final EffectiveModelContext schemaContext, final @Nullable DOMMountPointService mountPointService) {
+            final EffectiveModelContext schemaContext, final @Nullable DOMMountPointService mountPointService)
+                throws RestconfDocumentedException {
         if (identifier == null || !identifier.contains(MOUNT)) {
             return createIIdContext(schemaContext, identifier, null);
         }
@@ -115,7 +116,7 @@ public final class ParserIdentifier {
      * @throws RestconfDocumentedException if the path cannot be resolved
      */
     private static InstanceIdentifierContext createIIdContext(final EffectiveModelContext schemaContext,
-            final String url, final @Nullable DOMMountPoint mountPoint) {
+            final String url, final @Nullable DOMMountPoint mountPoint) throws RestconfDocumentedException {
         // First things first: an empty path means data invocation on SchemaContext
         if (url == null) {
             return mountPoint != null ? InstanceIdentifierContext.ofMountPointRoot(mountPoint, schemaContext)
@@ -134,7 +135,7 @@ public final class ParserIdentifier {
      * @return {@link QName}
      */
     @VisibleForTesting
-    static Entry<String, Revision> makeQNameFromIdentifier(final String identifier) {
+    static Entry<String, Revision> makeQNameFromIdentifier(final String identifier) throws RestconfDocumentedException {
         // check if more than one slash is not used as path separator
         if (identifier.contains("//")) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' {}", identifier);
@@ -186,7 +187,7 @@ public final class ParserIdentifier {
      */
     public static SchemaExportContext toSchemaExportContextFromIdentifier(final EffectiveModelContext schemaContext,
             final String identifier, final DOMMountPointService domMountPointService,
-            final DOMYangTextSourceProvider sourceProvider) {
+            final DOMYangTextSourceProvider sourceProvider) throws RestconfDocumentedException {
         final Iterable<String> pathComponents = SLASH_SPLITTER.split(identifier);
         final Iterator<String> componentIter = pathComponents.iterator();
         if (!Iterables.contains(pathComponents, MOUNT)) {
@@ -227,7 +228,7 @@ public final class ParserIdentifier {
      * @return A Revision
      */
     @VisibleForTesting
-    static Revision validateAndGetRevision(final Iterator<String> revisionDate) {
+    static Revision validateAndGetRevision(final Iterator<String> revisionDate) throws RestconfDocumentedException {
         RestconfDocumentedException.throwIf(!revisionDate.hasNext(), "Revision date must be supplied.",
             ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         try {
@@ -244,7 +245,7 @@ public final class ParserIdentifier {
      * @return {@link String}
      */
     @VisibleForTesting
-    static String validateAndGetModulName(final Iterator<String> moduleName) {
+    static String validateAndGetModulName(final Iterator<String> moduleName) throws RestconfDocumentedException {
         RestconfDocumentedException.throwIf(!moduleName.hasNext(), "Module name must be supplied.", ErrorType.PROTOCOL,
             ErrorTag.INVALID_VALUE);
         final String name = moduleName.next();

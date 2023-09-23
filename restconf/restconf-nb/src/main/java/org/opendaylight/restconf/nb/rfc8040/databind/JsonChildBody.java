@@ -42,7 +42,7 @@ public final class JsonChildBody extends ChildBody {
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
     PrefixAndBody toPayload(final InputStream inputStream, final YangInstanceIdentifier parentPath,
-            final Inference parentInference) {
+            final Inference parentInference) throws RestconfDocumentedException {
         NormalizedNode result;
         try {
             result = toNormalizedNode(inputStream, parentInference);

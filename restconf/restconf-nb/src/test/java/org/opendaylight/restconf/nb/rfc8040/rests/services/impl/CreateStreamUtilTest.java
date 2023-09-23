@@ -50,7 +50,7 @@ public class CreateStreamUtilTest {
     }
 
     @Test
-    public void createStreamTest() {
+    public void createStreamTest() throws Exception {
         final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(listenersBroker,
             prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster", "path"),
             SCHEMA_CTX);

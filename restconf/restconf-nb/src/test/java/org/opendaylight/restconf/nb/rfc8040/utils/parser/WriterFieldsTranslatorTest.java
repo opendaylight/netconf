@@ -15,6 +15,7 @@ import java.util.Set;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.api.query.FieldsParam;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
 
@@ -24,7 +25,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 @RunWith(MockitoJUnitRunner.class)
 public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set<QName>> {
     @Override
-    protected List<Set<QName>> translateFields(final InstanceIdentifierContext context, final FieldsParam fields) {
+    protected List<Set<QName>> translateFields(final InstanceIdentifierContext context, final FieldsParam fields)
+            throws RestconfDocumentedException {
         return WriterFieldsTranslator.translate(context, fields);
     }
 

@@ -177,7 +177,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
         ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
                 final NotificationOutputType outputType, final boolean leafNodesOnly,
-                final boolean skipNotificationData, final boolean changedLeafNodesOnly, final boolean childNodesOnly) {
+                final boolean skipNotificationData, final boolean changedLeafNodesOnly, final boolean childNodesOnly)
+                    throws Exception {
             super(path, streamName, outputType);
             setQueryParams(NotificationQueryParams.of(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
                 leafNodesOnly ? LeafNodesOnlyParam.of(true) : null,

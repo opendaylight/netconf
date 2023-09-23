@@ -17,7 +17,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class ResourceBodyTest extends AbstractJukeboxTest {
     @Test
-    public void testValidTopLevelNodeName() {
+    public void testValidTopLevelNodeName() throws Exception {
         ResourceBody.validTopLevelNodeName(GAP_IID.getLastPathArgument(), GAP_LEAF);
     }
 
@@ -29,7 +29,7 @@ public class ResourceBodyTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testValidateListKeysEqualityInPayloadAndUri() {
+    public void testValidateListKeysEqualityInPayloadAndUri() throws Exception {
         final var path = YangInstanceIdentifier.builder()
             .node(JUKEBOX_QNAME)
             .node(PLAYLIST_QNAME)

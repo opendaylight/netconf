@@ -45,7 +45,7 @@ public class Netconf799Test extends AbstractInstanceIdentifierTest {
     private RestconfStreamsSubscriptionService restconfStreamSubService;
 
     @Test
-    public void testInvokeAction() {
+    public void testInvokeAction() throws Exception {
         doReturn(Futures.immediateFuture(new SimpleDOMActionResult(
             Builders.containerBuilder().withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME)).build())))
             .when(actionService).invokeAction(eq(Absolute.of(CONT_QNAME, CONT1_QNAME, RESET_QNAME)), any(), any());

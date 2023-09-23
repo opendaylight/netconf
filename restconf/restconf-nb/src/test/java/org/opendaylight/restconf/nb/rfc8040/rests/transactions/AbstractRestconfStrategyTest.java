@@ -241,14 +241,14 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy testNegativeDeleteDataStrategy();
 
     @Test
-    public final void testPostContainerData() {
+    public final void testPostContainerData() throws Exception {
         testPostContainerDataStrategy().postData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
     }
 
     abstract @NonNull RestconfStrategy testPostContainerDataStrategy();
 
     @Test
-    public final void testPostListData() {
+    public final void testPostListData() throws Exception {
         testPostListDataStrategy(BAND_ENTRY, PLAYLIST_IID.node(BAND_ENTRY.name())).postData(PLAYLIST_IID, PLAYLIST,
             null);
     }
@@ -268,21 +268,21 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy testPostDataFailStrategy(DOMException domException);
 
     @Test
-    public final void testPatchContainerData() {
+    public final void testPatchContainerData() throws Exception {
         testPatchContainerDataStrategy().merge(JUKEBOX_IID, EMPTY_JUKEBOX).getOrThrow();
     }
 
     abstract @NonNull RestconfStrategy testPatchContainerDataStrategy();
 
     @Test
-    public final void testPatchLeafData() {
+    public final void testPatchLeafData() throws Exception {
         testPatchLeafDataStrategy().merge(GAP_IID, GAP_LEAF).getOrThrow();
     }
 
     abstract @NonNull RestconfStrategy testPatchLeafDataStrategy();
 
     @Test
-    public final void testPatchListData() {
+    public final void testPatchListData() throws Exception {
         testPatchListDataStrategy().merge(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST).getOrThrow();
     }
 
@@ -338,35 +338,35 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract void assertTestDeleteNonexistentData(@NonNull PatchStatusContext status);
 
     @Test
-    public final void readDataConfigTest() {
+    public final void readDataConfigTest() throws Exception {
         assertEquals(DATA_3, readData(ContentParam.CONFIG, PATH, readDataConfigTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readDataConfigTestStrategy();
 
     @Test
-    public final void readAllHavingOnlyConfigTest() {
+    public final void readAllHavingOnlyConfigTest() throws Exception {
         assertEquals(DATA_3, readData(ContentParam.ALL, PATH, readAllHavingOnlyConfigTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readAllHavingOnlyConfigTestStrategy();
 
     @Test
-    public final void readAllHavingOnlyNonConfigTest() {
+    public final void readAllHavingOnlyNonConfigTest() throws Exception {
         assertEquals(DATA_2, readData(ContentParam.ALL, PATH_2, readAllHavingOnlyNonConfigTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readAllHavingOnlyNonConfigTestStrategy();
 
     @Test
-    public final void readDataNonConfigTest() {
+    public final void readDataNonConfigTest() throws Exception {
         assertEquals(DATA_2, readData(ContentParam.NONCONFIG, PATH_2, readDataNonConfigTestStrategy()));
     }
 
     abstract @NonNull RestconfStrategy readDataNonConfigTestStrategy();
 
     @Test
-    public final void readContainerDataAllTest() {
+    public final void readContainerDataAllTest() throws Exception {
         assertEquals(Builders.containerBuilder()
             .withNodeIdentifier(NODE_IDENTIFIER)
             .withChild(CONTENT_LEAF)
@@ -377,7 +377,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy readContainerDataAllTestStrategy();
 
     @Test
-    public final void readContainerDataConfigNoValueOfContentTest() {
+    public final void readContainerDataConfigNoValueOfContentTest() throws Exception {
         assertEquals(Builders.containerBuilder()
             .withNodeIdentifier(NODE_IDENTIFIER)
             .withChild(CONTENT_LEAF)
@@ -388,7 +388,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy();
 
     @Test
-    public final void readListDataAllTest() {
+    public final void readListDataAllTest() throws Exception {
         assertEquals(Builders.mapBuilder()
             .withNodeIdentifier(new NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
             .withChild(CHECK_DATA)
@@ -398,7 +398,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy readListDataAllTestStrategy();
 
     @Test
-    public final void readOrderedListDataAllTest() {
+    public final void readOrderedListDataAllTest() throws Exception {
         assertEquals(Builders.orderedMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
             .withChild(CHECK_DATA)
@@ -408,7 +408,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy readOrderedListDataAllTestStrategy();
 
     @Test
-    public void readUnkeyedListDataAllTest() {
+    public void readUnkeyedListDataAllTest() throws Exception {
         assertEquals(Builders.unkeyedListBuilder()
             .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
             .withChild(Builders.unkeyedListEntryBuilder()
@@ -422,7 +422,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy readUnkeyedListDataAllTestStrategy();
 
     @Test
-    public final void readLeafListDataAllTest() {
+    public final void readLeafListDataAllTest() throws Exception {
         assertEquals(Builders.<String>leafSetBuilder()
             .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
             .withValue(ImmutableList.<LeafSetEntryNode<String>>builder()
@@ -435,7 +435,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy readLeafListDataAllTestStrategy();
 
     @Test
-    public final void readOrderedLeafListDataAllTest() {
+    public final void readOrderedLeafListDataAllTest() throws Exception {
         assertEquals(Builders.<String>orderedLeafSetBuilder()
             .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
             .withValue(ImmutableList.<LeafSetEntryNode<String>>builder()
@@ -448,7 +448,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy readOrderedLeafListDataAllTestStrategy();
 
     @Test
-    public void readDataWrongPathOrNoContentTest() {
+    public void readDataWrongPathOrNoContentTest() throws Exception {
         assertNull(readData(ContentParam.CONFIG, PATH_2, readDataWrongPathOrNoContentTestStrategy()));
     }
 
@@ -462,7 +462,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      * @return {@link NormalizedNode}
      */
     private static @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) {
+            final YangInstanceIdentifier path, final @NonNull RestconfStrategy strategy) throws Exception {
         return strategy.readData(content, path, null);
     }
 

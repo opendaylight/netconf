@@ -57,7 +57,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     }
 
     @Override
-    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
+    public Response subscribeToStream(final String identifier, final UriInfo uriInfo)
+            throws RestconfDocumentedException {
         final var params = QueryParams.newNotificationQueryParams(uriInfo);
 
         final URI location;

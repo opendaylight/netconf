@@ -11,6 +11,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 
 /**
@@ -27,5 +28,5 @@ public interface RestconfSchemaService {
     @GET
     @Produces({ YangConstants.RFC6020_YIN_MEDIA_TYPE, YangConstants.RFC6020_YANG_MEDIA_TYPE })
     @Path("modules/{identifier:.+}")
-    SchemaExportContext getSchema(@PathParam("identifier") String identifier);
+    SchemaExportContext getSchema(@PathParam("identifier") String identifier) throws RestconfDocumentedException;
 }

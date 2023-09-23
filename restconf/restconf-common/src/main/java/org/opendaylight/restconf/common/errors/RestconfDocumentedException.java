@@ -9,11 +9,9 @@ package org.opendaylight.restconf.common.errors;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -27,17 +25,14 @@ import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
 
 /**
- * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
- * client.
- *
- * <p>
- * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>
+ * A checked exception to communicate error information, as defined in
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.9">"errors" YANG Data Template</a>
  *
  * @author Devin Avery
  * @author Thomas Pantelis
  */
-public class RestconfDocumentedException extends WebApplicationException {
-    @Serial
+public class RestconfDocumentedException extends Exception {
+    @java.io.Serial
     private static final long serialVersionUID = 2L;
 
     private final List<RestconfError> errors;
@@ -159,19 +154,19 @@ public class RestconfDocumentedException extends WebApplicationException {
     }
 
     public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
-        super(cause, ErrorTags.statusOf(error.getErrorTag()));
+        super(cause);
+        status = ErrorTags.statusOf(error.getErrorTag());
         errors = List.of(error);
-        status = null;
     }
 
     public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
-        super(cause, ErrorTags.statusOf(errors.get(0).getErrorTag()));
+        super(cause);
+        status = ErrorTags.statusOf(errors.get(0).getErrorTag());
         this.errors = List.copyOf(errors);
-        status = null;
     }
 
     public static RestconfDocumentedException decodeAndThrow(final String message,
-            final OperationFailedException cause) {
+            final OperationFailedException cause) throws RestconfDocumentedException {
         for (final RpcError error : cause.getErrorList()) {
             if (error.getErrorType() == ErrorType.TRANSPORT && error.getTag().equals(ErrorTag.RESOURCE_DENIED)) {
                 throw new RestconfDocumentedException(error.getMessage(), ErrorType.TRANSPORT,
@@ -193,9 +188,9 @@ public class RestconfDocumentedException extends WebApplicationException {
      * @throws RestconfDocumentedException if the expression evaluates to true.
      */
     public static void throwIf(final boolean expression, final ErrorType errorType, final ErrorTag errorTag,
-            final @NonNull String format, final Object... args) {
+            final @NonNull String format, final Object... args) throws RestconfDocumentedException {
         if (expression) {
-            throw new RestconfDocumentedException(String.format(format, args), errorType, errorTag);
+            throw new RestconfDocumentedException(format.formatted(args), errorType, errorTag);
         }
     }
 
@@ -210,7 +205,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      * @throws RestconfDocumentedException if the expression evaluates to true.
      */
     public static void throwIf(final boolean expression, final @NonNull String message,
-            final ErrorType errorType, final ErrorTag errorTag) {
+            final ErrorType errorType, final ErrorTag errorTag) throws RestconfDocumentedException {
         if (expression) {
             throw new RestconfDocumentedException(message, errorType, errorTag);
         }
@@ -228,9 +223,9 @@ public class RestconfDocumentedException extends WebApplicationException {
      * @throws RestconfDocumentedException if the expression evaluates to true.
      */
     public static <T> @NonNull T throwIfNull(final @Nullable T obj, final ErrorType errorType, final ErrorTag errorTag,
-            final @NonNull String format, final Object... args) {
+            final @NonNull String format, final Object... args) throws RestconfDocumentedException {
         if (obj == null) {
-            throw new RestconfDocumentedException(String.format(format, args), errorType, errorTag);
+            throw new RestconfDocumentedException(format.formatted(args), errorType, errorTag);
         }
         return obj;
     }
@@ -240,7 +235,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      *
      * @param cause Proposed cause of a RestconfDocumented exception
      */
-    public static void throwIfYangError(final Throwable cause) {
+    public static void throwIfYangError(final Throwable cause) throws RestconfDocumentedException {
         if (cause instanceof YangNetconfErrorAware infoAware) {
             throw new RestconfDocumentedException(cause, infoAware.getNetconfErrors().stream()
                 .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),

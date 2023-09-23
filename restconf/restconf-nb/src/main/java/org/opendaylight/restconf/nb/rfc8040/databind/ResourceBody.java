@@ -55,9 +55,9 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
      * @throws RestconfDocumentedException if the body cannot be decoded or it does not match {@code path}
      */
     // TODO: pass down DatabindContext corresponding to inference
-    @SuppressWarnings("checkstyle:illegalCatch")
     public @NonNull NormalizedNode toNormalizedNode(final @NonNull YangInstanceIdentifier path,
-            final @NonNull Inference inference, final @NonNull SchemaNode schemaNode) {
+            final @NonNull Inference inference, final @NonNull SchemaNode schemaNode)
+                    throws RestconfDocumentedException {
         final var expected = path.isEmpty() ? DATA_NID : path.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
         try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
@@ -66,8 +66,6 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, e);
-        } catch (RestconfDocumentedException e) {
-            throw e;
         } catch (RuntimeException e) {
             RestconfDocumentedException.throwIfYangError(e);
             throw e;
@@ -99,7 +97,8 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
      * @param data data
      */
     @VisibleForTesting
-    static final void validTopLevelNodeName(final PathArgument expected, final NormalizedNode data) {
+    static final void validTopLevelNodeName(final PathArgument expected, final NormalizedNode data)
+            throws RestconfDocumentedException {
         final var payloadName = data.name();
         if (!payloadName.equals(expected)) {
             throw new RestconfDocumentedException(
@@ -116,7 +115,7 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
      */
     @VisibleForTesting
     static final void validateListKeysEqualityInPayloadAndUri(final SchemaNode schemaNode,
-            final YangInstanceIdentifier path, final NormalizedNode data) {
+            final YangInstanceIdentifier path, final NormalizedNode data) throws RestconfDocumentedException {
         if (schemaNode instanceof ListSchemaNode listSchema
             && path.getLastPathArgument() instanceof NodeIdentifierWithPredicates nip
             && data instanceof MapEntryNode mapEntry) {
@@ -125,7 +124,7 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
     }
 
     private static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
-            final List<QName> keyDefinitions) {
+            final List<QName> keyDefinitions) throws RestconfDocumentedException {
         final var mutableCopyUriKeyValues = new HashMap<>(uriKeyValues);
         for (var keyDefinition : keyDefinitions) {
             final var uriKeyValue = RestconfDocumentedException.throwIfNull(

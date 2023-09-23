@@ -52,7 +52,8 @@ public final class YangInstanceIdentifierSerializer {
      *             path to data
      * @return {@link String}
      */
-    public static String create(final EffectiveModelContext schemaContext, final YangInstanceIdentifier data) {
+    public static String create(final EffectiveModelContext schemaContext, final YangInstanceIdentifier data)
+            throws RestconfDocumentedException {
         final var current = DataSchemaContextTree.from(schemaContext).getRoot();
         final var variables = new MainVarsWrapper(current);
         final var path = new StringBuilder();

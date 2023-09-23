@@ -25,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -91,7 +90,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void testInvokeRpcWithNonEmptyOutput() {
+    public void testInvokeRpcWithNonEmptyOutput() throws Exception {
         final var result = mock(ContainerNode.class);
         doReturn(false).when(result).isEmpty();
 
@@ -110,7 +109,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void testInvokeRpcWithEmptyOutput() {
+    public void testInvokeRpcWithEmptyOutput() throws Exception {
         final var result = mock(ContainerNode.class);
         doReturn(true).when(result).isEmpty();
 
@@ -130,7 +129,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void invokeRpcTest() throws InterruptedException, ExecutionException {
+    public void invokeRpcTest() throws Exception {
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(OUTPUT, List.of());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(RPC, INPUT);
         final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, rpcService).get();
@@ -139,7 +138,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void invokeRpcErrorsAndCheckTestTest() throws InterruptedException, ExecutionException {
+    public void invokeRpcErrorsAndCheckTestTest() throws Exception {
         final QName errorRpc = QName.create(RPC, "error-rpc");
         final DOMRpcException exception = new DOMRpcImplementationNotAvailableException(
                 "No implementation of RPC " + errorRpc + " available.");
@@ -155,7 +154,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void invokeRpcViaMountPointTest() throws InterruptedException, ExecutionException {
+    public void invokeRpcViaMountPointTest() throws Exception {
         doReturn(Optional.ofNullable(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(OUTPUT, List.of());
         doReturn(immediateFluentFuture(mockResult)).when(rpcService).invokeRpc(RPC, INPUT);
@@ -172,7 +171,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void checkResponseTest() throws InterruptedException, ExecutionException {
+    public void checkResponseTest() throws Exception {
         doReturn(immediateFluentFuture(new DefaultDOMRpcResult(OUTPUT, List.of())))
             .when(rpcService).invokeRpc(RPC, INPUT);
         final DOMRpcResult rpcResult = RestconfInvokeOperationsServiceImpl.invokeRpc(INPUT, RPC, rpcService).get();
