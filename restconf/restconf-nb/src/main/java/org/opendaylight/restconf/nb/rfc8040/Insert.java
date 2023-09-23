@@ -16,6 +16,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 
@@ -33,7 +34,7 @@ public final class Insert implements Immutable {
     @FunctionalInterface
     public interface PointParser {
 
-        PathArgument parseValue(String value);
+        PathArgument parseValue(String value) throws RestconfDocumentedException;
     }
 
     private final @NonNull InsertParam insert;
@@ -45,7 +46,7 @@ public final class Insert implements Immutable {
     }
 
     public static @Nullable Insert forParams(final @Nullable InsertParam insert, final @Nullable PointParam point,
-            final PointParser pointParser) {
+            final PointParser pointParser) throws RestconfDocumentedException {
         if (insert == null) {
             if (point != null) {
                 throw invalidPointIAE();

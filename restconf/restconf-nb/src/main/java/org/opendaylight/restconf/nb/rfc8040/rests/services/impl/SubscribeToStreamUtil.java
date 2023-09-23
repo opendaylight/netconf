@@ -130,7 +130,8 @@ abstract class SubscribeToStreamUtil {
      * @return Stream location for listening.
      */
     final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder)
+                throws RestconfDocumentedException {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         if (isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -170,7 +171,8 @@ abstract class SubscribeToStreamUtil {
      * @return Location for listening.
      */
     final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder)
+                throws RestconfDocumentedException {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
 
         final String datastoreParam = mapOfValues.get(RestconfStreamsConstants.DATASTORE_PARAM_NAME);
@@ -220,7 +222,8 @@ abstract class SubscribeToStreamUtil {
             mapToStreams);
     }
 
-    private static void submitData(final DOMDataTreeWriteTransaction readWriteTransaction) {
+    private static void submitData(final DOMDataTreeWriteTransaction readWriteTransaction)
+            throws RestconfDocumentedException {
         try {
             readWriteTransaction.commit().get();
         } catch (final InterruptedException | ExecutionException e) {

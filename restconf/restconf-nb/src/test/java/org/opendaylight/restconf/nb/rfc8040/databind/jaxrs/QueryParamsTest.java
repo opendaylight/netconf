@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
@@ -46,11 +45,16 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class QueryParamsTest {
+    @FunctionalInterface
+    interface UriFunction<R> {
+        R apply(UriInfo info) throws Exception;
+    }
+
     /**
      * Test when parameter is present at most once.
      */
     @Test
-    public void optionalParamTest() {
+    public void optionalParamTest() throws Exception {
         assertEquals("all", QueryParams.optionalParam(ContentParam.uriName, List.of("all")));
     }
 
@@ -73,7 +77,7 @@ public class QueryParamsTest {
      * Test when not allowed parameter type is used.
      */
     @Test
-    public void checkParametersTypesNegativeTest() {
+    public void checkParametersTypesNegativeTest() throws Exception {
         assertUnknownParam(QueryParams::newNotificationQueryParams);
         assertUnknownParam(QueryParams::newReadDataParams);
         assertUnknownParam(uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo));
@@ -89,7 +93,7 @@ public class QueryParamsTest {
      * Test of parsing default parameters from URI request.
      */
     @Test
-    public void parseUriParametersDefaultTest() {
+    public void parseUriParametersDefaultTest() throws Exception {
         // no parameters, default values should be used
         final var params = assertParams(QueryParams::newReadDataParams, new MultivaluedHashMap<>());
         assertEquals(ContentParam.ALL, params.content());
@@ -98,7 +102,7 @@ public class QueryParamsTest {
     }
 
     @Test
-    public void testInvalidValueReadDataParams() {
+    public void testInvalidValueReadDataParams() throws Exception {
         assertInvalidValue(QueryParams::newReadDataParams, ContentParam.uriName);
         assertInvalidValue(QueryParams::newReadDataParams, DepthParam.uriName);
         assertInvalidValue(QueryParams::newReadDataParams, WithDefaultsParam.uriName);
@@ -113,7 +117,7 @@ public class QueryParamsTest {
      * Testing parsing of with-defaults parameter which value matches 'report-all-tagged' setting.
      */
     @Test
-    public void parseUriParametersWithDefaultAndTaggedTest() {
+    public void parseUriParametersWithDefaultAndTaggedTest() throws Exception {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "report-all-tagged");
         assertEquals(WithDefaultsParam.REPORT_ALL_TAGGED, params.withDefaults());
     }
@@ -122,7 +126,7 @@ public class QueryParamsTest {
      * Testing parsing of with-defaults parameter which value matches 'report-all' setting.
      */
     @Test
-    public void parseUriParametersWithDefaultAndReportAllTest() {
+    public void parseUriParametersWithDefaultAndReportAllTest() throws Exception {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "report-all");
         assertEquals(WithDefaultsParam.REPORT_ALL, params.withDefaults());
     }
@@ -132,7 +136,7 @@ public class QueryParamsTest {
      * - non-reporting setting.
      */
     @Test
-    public void parseUriParametersWithDefaultAndNonTaggedTest() {
+    public void parseUriParametersWithDefaultAndNonTaggedTest() throws Exception {
         final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "explicit");
         assertEquals(WithDefaultsParam.EXPLICIT, params.withDefaults());
     }
@@ -141,7 +145,7 @@ public class QueryParamsTest {
      * Test of parsing user defined parameters from URI request.
      */
     @Test
-    public void parseUriParametersUserDefinedTest() {
+    public void parseUriParametersUserDefinedTest() throws Exception {
         final QName containerChild = QName.create("ns", "container-child");
 
         final var parameters = new MultivaluedHashMap<String, String>();
@@ -186,30 +190,29 @@ public class QueryParamsTest {
         assertEquals(Set.of(containerChild), fields.get(0));
     }
 
-    private static void assertInvalidParam(final Function<UriInfo, ?> paramsMethod, final RestconfQueryParam<?> param) {
+    private static void assertInvalidParam(final UriFunction<?> paramsMethod, final RestconfQueryParam<?> param) {
         final var params = new MultivaluedHashMap<String, String>();
         params.putSingle(param.paramName(), "odl-test-value");
         assertParamsThrows(ErrorTag.MALFORMED_MESSAGE, paramsMethod, params);
     }
 
-    private static void assertUnknownParam(final Function<UriInfo, ?> paramsMethod) {
+    private static void assertUnknownParam(final UriFunction<?> paramsMethod) {
         final var params = new MultivaluedHashMap<String, String>();
         params.putSingle("odl-unknown-param", "odl-test-value");
         assertParamsThrows(ErrorTag.UNKNOWN_ATTRIBUTE, paramsMethod, params);
     }
 
-    private static void assertInvalidValue(final Function<UriInfo, ?> paramsMethod, final String name) {
+    private static void assertInvalidValue(final UriFunction<?> paramsMethod, final String name) {
         assertInvalidValue(paramsMethod, name, "odl-invalid-value");
     }
 
-    private static void assertInvalidValue(final Function<UriInfo, ?> paramsMethod, final String name,
-            final String value) {
+    private static void assertInvalidValue(final UriFunction<?> paramsMethod, final String name, final String value) {
         final var params = new MultivaluedHashMap<String, String>();
         params.putSingle(name, value);
         assertParamsThrows(ErrorTag.INVALID_VALUE, paramsMethod, params);
     }
 
-    private static void assertParamsThrows(final ErrorTag expectedTag, final Function<UriInfo, ?> paramsMethod,
+    private static void assertParamsThrows(final ErrorTag expectedTag, final UriFunction<?> paramsMethod,
             final MultivaluedMap<String, String> params) {
         final var uriInfo = mock(UriInfo.class);
         doReturn(params).when(uriInfo).getQueryParameters();
@@ -223,15 +226,15 @@ public class QueryParamsTest {
         assertEquals(expectedTag, error.getErrorTag());
     }
 
-    private static <T> T assertParams(final Function<UriInfo, T> paramsMethod, final String name,
-            final String value) {
+    private static <T> T assertParams(final UriFunction<T> paramsMethod, final String name, final String value)
+            throws Exception {
         final var params = new MultivaluedHashMap<String, String>();
         params.putSingle(name, value);
         return assertParams(paramsMethod, params);
     }
 
-    private static <T> T assertParams(final Function<UriInfo, T> paramsMethod,
-            final MultivaluedMap<String, String> params) {
+    private static <T> T assertParams(final UriFunction<T> paramsMethod, final MultivaluedMap<String, String> params)
+            throws Exception {
         final var uriInfo = mock(UriInfo.class);
         doReturn(params).when(uriInfo).getQueryParameters();
         return paramsMethod.apply(uriInfo);

@@ -42,7 +42,8 @@ final class TransactionUtil {
      * @return The accessed value
      * @throws RestconfDocumentedException if commit fails
      */
-    static <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path) {
+    static <T> T syncAccess(final ListenableFuture<T> future, final YangInstanceIdentifier path)
+            throws RestconfDocumentedException {
         try {
             return future.get();
         } catch (ExecutionException e) {
@@ -62,7 +63,7 @@ final class TransactionUtil {
      * @throws RestconfDocumentedException if commit fails
      */
     static void syncCommit(final ListenableFuture<? extends CommitInfo> future, final String txType,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path) throws RestconfDocumentedException {
         try {
             future.get();
         } catch (InterruptedException e) {

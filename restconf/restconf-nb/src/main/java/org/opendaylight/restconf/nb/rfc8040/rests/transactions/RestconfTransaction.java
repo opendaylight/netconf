@@ -16,6 +16,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.odlparent.logging.markers.Markers;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -57,12 +58,12 @@ abstract class RestconfTransaction {
      *
      * @param path the data object path
      */
-    final void delete(final YangInstanceIdentifier path) {
+    final void delete(final YangInstanceIdentifier path) throws RestconfDocumentedException {
         LOG.trace("Delete {}", path);
         deleteImpl(requireNonNull(path));
     }
 
-    abstract void deleteImpl(@NonNull YangInstanceIdentifier path);
+    abstract void deleteImpl(@NonNull YangInstanceIdentifier path) throws RestconfDocumentedException;
 
     /**
      * Remove data from the datastore.
@@ -96,13 +97,14 @@ abstract class RestconfTransaction {
      * @param path    the data object path
      * @param data    the data object to be merged to the specified path
      */
-    final void create(final YangInstanceIdentifier path, final NormalizedNode data) {
+    final void create(final YangInstanceIdentifier path, final NormalizedNode data) throws RestconfDocumentedException {
         LOG.trace("Create {}", path);
         LOG.trace(Markers.confidential(), "Create as {}", data.prettyTree());
         createImpl(requireNonNull(path), data);
     }
 
-    abstract void createImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data);
+    abstract void createImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data)
+        throws RestconfDocumentedException;
 
     /**
      * Replace a piece of data at the specified path.
@@ -118,7 +120,8 @@ abstract class RestconfTransaction {
 
     abstract void replaceImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data);
 
-    final @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) {
+    final @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path)
+            throws RestconfDocumentedException {
         return (NormalizedNodeContainer<?>) TransactionUtil.syncAccess(read(path), path).orElse(null);
     }
 

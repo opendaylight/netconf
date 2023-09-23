@@ -14,6 +14,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 
@@ -33,5 +34,6 @@ public interface RestconfStreamsSubscriptionService {
     //        and remove this special case. Besides it routes to a very bad thing in RestconfDataServiceImpl
     @GET
     @Path("data/" + RestconfStreamsConstants.STREAMS_PATH  + "/stream/{identifier:.+}")
-    Response subscribeToStream(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo);
+    Response subscribeToStream(@Encoded @PathParam("identifier") String identifier, @Context UriInfo uriInfo)
+        throws RestconfDocumentedException;
 }

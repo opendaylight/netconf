@@ -15,6 +15,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -61,7 +62,8 @@ public final class RestconfOperationsServiceImpl {
     @GET
     @Path("/operations/{identifier:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-    public String getOperationJSON(@PathParam("identifier") final String identifier) {
+    public String getOperationJSON(@PathParam("identifier") final String identifier)
+            throws RestconfDocumentedException {
         return OperationsContent.JSON.bodyFor(ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), mountPointService).inference());
     }
@@ -87,7 +89,8 @@ public final class RestconfOperationsServiceImpl {
     @GET
     @Path("/operations/{identifier:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public String getOperationXML(@PathParam("identifier") final String identifier) {
+    public String getOperationXML(@PathParam("identifier") final String identifier)
+            throws RestconfDocumentedException {
         return OperationsContent.XML.bodyFor(ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), mountPointService).inference());
     }

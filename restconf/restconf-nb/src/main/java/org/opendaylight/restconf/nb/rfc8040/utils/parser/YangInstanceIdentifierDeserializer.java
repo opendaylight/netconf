@@ -97,7 +97,8 @@ public final class YangInstanceIdentifierDeserializer {
      * @return {@link Iterable} of {@link PathArgument}
      * @throws RestconfDocumentedException the path is not valid
      */
-    public static Result create(final EffectiveModelContext schemaContext, final String data) {
+    public static Result create(final EffectiveModelContext schemaContext, final String data)
+            throws RestconfDocumentedException {
         final ApiPath path;
         try {
             path = ApiPath.parse(requireNonNull(data));
@@ -108,7 +109,8 @@ public final class YangInstanceIdentifierDeserializer {
         return create(schemaContext, path);
     }
 
-    public static Result create(final EffectiveModelContext schemaContext, final ApiPath path) {
+    public static Result create(final EffectiveModelContext schemaContext, final ApiPath path)
+            throws RestconfDocumentedException {
         return new YangInstanceIdentifierDeserializer(schemaContext, path).parse();
     }
 
@@ -120,7 +122,7 @@ public final class YangInstanceIdentifierDeserializer {
     //
     // All of this really is an utter mess because we end up calling into this code from various places which,
     // for example, should not allow RPCs to be valid targets
-    private Result parse() {
+    private Result parse() throws RestconfDocumentedException {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
             return new Result(schemaContext);
@@ -232,7 +234,8 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private NodeIdentifierWithPredicates prepareNodeWithPredicates(final SchemaInferenceStack stack, final QName qname,
-            final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues) {
+            final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues)
+                throws RestconfDocumentedException {
         final var keyDef = schema.getKeyDefinition();
         final var keySize = keyDef.size();
         final var varSize = keyValues.size();
@@ -256,7 +259,7 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private Object prepareValueByType(final SchemaInferenceStack stack, final DataSchemaNode schemaNode,
-            final @NonNull String value) {
+            final @NonNull String value) throws RestconfDocumentedException {
 
         TypeDefinition<? extends TypeDefinition<?>> typedef;
         if (schemaNode instanceof LeafListSchemaNode) {
@@ -286,14 +289,15 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private NodeWithValue<?> prepareNodeWithValue(final SchemaInferenceStack stack, final QName qname,
-            final DataSchemaNode schema, final List<String> keyValues) {
+            final DataSchemaNode schema, final List<String> keyValues) throws RestconfDocumentedException {
         // TODO: qname should be always equal to schema.getQName(), right?
         return new NodeWithValue<>(qname, prepareValueByType(stack, schema,
             // FIXME: ahem: we probably want to do something differently here
             keyValues.get(0)));
     }
 
-    private QName toIdentityrefQName(final String value, final DataSchemaNode schemaNode) {
+    private QName toIdentityrefQName(final String value, final DataSchemaNode schemaNode)
+            throws RestconfDocumentedException {
         final QNameModule namespace;
         final String localName;
         final int firstColon = value.indexOf(':');
@@ -315,7 +319,7 @@ public final class YangInstanceIdentifierDeserializer {
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
     }
 
-    private @NonNull QNameModule resolveNamespace(final String moduleName) {
+    private @NonNull QNameModule resolveNamespace(final String moduleName) throws RestconfDocumentedException {
         final var modules = schemaContext.findModules(moduleName);
         RestconfDocumentedException.throwIf(modules.isEmpty(), ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT,
             "Failed to lookup for module with name '%s'.", moduleName);

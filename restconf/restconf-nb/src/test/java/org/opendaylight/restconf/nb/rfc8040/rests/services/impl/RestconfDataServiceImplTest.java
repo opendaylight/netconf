@@ -147,7 +147,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testReadData() {
+    public void testReadData() throws Exception {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFluentFuture(Optional.of(EMPTY_JUKEBOX))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
@@ -160,7 +160,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testReadRootData() {
+    public void testReadRootData() throws Exception {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(CONFIG_JUKEBOX))))
                 .when(read)
@@ -192,7 +192,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
      * {@link LogicalDatastoreType#OPERATIONAL} contains the same data and some additional data to be merged.
      */
     @Test
-    public void testReadDataMountPoint() {
+    public void testReadDataMountPoint() throws Exception {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFluentFuture(Optional.of(CONFIG_JUKEBOX))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
@@ -236,7 +236,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
      * Read data from config datastore according to content parameter.
      */
     @Test
-    public void testReadDataConfigTest() {
+    public void testReadDataConfigTest() throws Exception {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.put("content", List.of("config"));
 
@@ -264,7 +264,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
      * Read data from operational datastore according to content parameter.
      */
     @Test
-    public void testReadDataOperationalTest() {
+    public void testReadDataOperationalTest() throws Exception {
         final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
         parameters.put("content", List.of("nonconfig"));
 
@@ -289,7 +289,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testPutData() {
+    public void testPutData() throws Exception {
         doReturn(immediateTrueFluentFuture()).when(read)
                 .exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
@@ -306,7 +306,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testPutDataWithMountPoint() {
+    public void testPutDataWithMountPoint() throws Exception {
         doReturn(immediateTrueFluentFuture()).when(read)
                 .exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
@@ -326,7 +326,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testPostData() {
+    public void testPostData() throws Exception {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
@@ -343,7 +343,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testPostMapEntryData() {
+    public void testPostMapEntryData() throws Exception {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         final var node = PLAYLIST_IID.node(BAND_ENTRY.name());
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
@@ -364,7 +364,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testDeleteData() {
+    public void testDeleteData() throws Exception {
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
@@ -376,7 +376,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testDeleteDataNotExisting() {
+    public void testDeleteDataNotExisting() throws Exception {
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         final var captor = ArgumentCaptor.forClass(RestconfDocumentedException.class);
@@ -394,7 +394,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
      * Test of deleting data on mount point.
      */
     @Test
-    public void testDeleteDataMountPoint() {
+    public void testDeleteDataMountPoint() throws Exception {
         doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
@@ -406,7 +406,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testPatchData() {
+    public void testPatchData() throws Exception {
         final var patch = new PatchContext("test patch id", List.of(
             new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
             new PatchEntity("replace data", Operation.Replace, JUKEBOX_IID, EMPTY_JUKEBOX),
@@ -442,7 +442,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testPatchDataDeleteNotExist() {
+    public void testPatchDataDeleteNotExist() throws Exception {
         final PatchContext patch = new PatchContext("test patch id", List.of(
             new PatchEntity("create data", Operation.Create, JUKEBOX_IID, EMPTY_JUKEBOX),
             new PatchEntity("remove data", Operation.Remove, GAP_IID),
@@ -468,7 +468,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     }
 
     @Test
-    public void testGetRestconfStrategy() {
+    public void testGetRestconfStrategy() throws Exception {
         var restconfStrategy = dataService.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint);
         assertTrue(restconfStrategy instanceof MdsalRestconfStrategy);
 
