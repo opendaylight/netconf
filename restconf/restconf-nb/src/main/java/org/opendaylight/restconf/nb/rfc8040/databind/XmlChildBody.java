@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
@@ -47,14 +46,11 @@ public final class XmlChildBody extends ChildBody {
     }
 
     @Override
-    @SuppressWarnings("checkstyle:illegalCatch")
     PrefixAndBody toPayload(final InputStream inputStream, final YangInstanceIdentifier parentPath,
-            final Inference parentInference) {
+            final Inference parentInference) throws RestconfDocumentedException {
         try {
             return parse(parentPath, parentInference, UntrustedXML.newDocumentBuilder().parse(inputStream));
-        } catch (final RestconfDocumentedException e) {
-            throw e;
-        } catch (final Exception e) {
+        } catch (XMLStreamException | IOException | SAXException e) {
             LOG.debug("Error parsing xml input", e);
             RestconfDocumentedException.throwIfYangError(e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
@@ -63,7 +59,7 @@ public final class XmlChildBody extends ChildBody {
     }
 
     private static @NonNull PrefixAndBody parse(final YangInstanceIdentifier path, final Inference pathInference,
-            final Document doc) throws XMLStreamException, IOException, SAXException, URISyntaxException {
+            final Document doc) throws XMLStreamException, IOException {
         final DataSchemaNode parentNode;
         if (pathInference.isEmpty()) {
             parentNode = pathInference.getEffectiveModelContext();

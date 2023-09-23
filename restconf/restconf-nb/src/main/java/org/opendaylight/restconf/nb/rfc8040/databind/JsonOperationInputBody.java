@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +31,7 @@ public final class JsonOperationInputBody extends OperationInputBody {
 
     @Override
     void streamTo(final InputStream inputStream, final Inference inference, final NormalizedNodeStreamWriter writer)
-            throws IOException {
+            throws RestconfDocumentedException {
         try {
             JsonParserStream.create(writer,
                 JSONCodecFactorySupplier.RFC7951.getShared(inference.getEffectiveModelContext()), inference)

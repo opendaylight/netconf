@@ -37,7 +37,7 @@ public class IdentifierCodecTest {
      * URI contains list identifier and leaf identifier.
      */
     @Test
-    public void codecListAndLeafTest() {
+    public void codecListAndLeafTest() throws Exception {
         final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(
                 IdentifierCodecTest.URI_WITH_LIST_AND_LEAF, SCHEMA_CONTEXT);
         final String serializedDataYangII = IdentifierCodec.serialize(dataYangII, SCHEMA_CONTEXT);
@@ -52,7 +52,7 @@ public class IdentifierCodecTest {
      * URI contains leaf list identifier.
      */
     @Test
-    public void codecLeafListTest() {
+    public void codecLeafListTest() throws Exception {
         final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(
                 IdentifierCodecTest.URI_WITH_INT_VAL_LEAF_LIST, SCHEMA_CONTEXT);
         final String serializedDataYangII = IdentifierCodec.serialize(dataYangII, SCHEMA_CONTEXT);
@@ -67,7 +67,7 @@ public class IdentifierCodecTest {
      * expected to be returned.
      */
     @Test
-    public void codecDeserializeNullTest() {
+    public void codecDeserializeNullTest() throws Exception {
         final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(null, SCHEMA_CONTEXT);
         assertEquals("Failed codec deserialization test", YangInstanceIdentifier.of(), dataYangII);
     }
@@ -77,7 +77,7 @@ public class IdentifierCodecTest {
      * expected to be returned.
      */
     @Test
-    public void codecSerializeEmptyTest() {
+    public void codecSerializeEmptyTest() throws Exception {
         final String serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), SCHEMA_CONTEXT);
         assertTrue("Failed codec serialization test", serialized.isEmpty());
     }
@@ -87,7 +87,7 @@ public class IdentifierCodecTest {
      * <code>YangInstanceIdentifier.EMPTY</code>.
      */
     @Test
-    public void codecDeserializeAndSerializeEmptyTest() {
+    public void codecDeserializeAndSerializeEmptyTest() throws Exception {
         final String serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), SCHEMA_CONTEXT);
         assertEquals("Failed codec serialization and deserialization test",
                 YangInstanceIdentifier.of(), IdentifierCodec.deserialize(serialized, SCHEMA_CONTEXT));

@@ -102,7 +102,7 @@ public class RestconfSchemaServiceTest {
      * Get schema with identifier of existing module and check if correct module was found.
      */
     @Test
-    public void getSchemaTest() {
+    public void getSchemaTest() throws Exception {
         // prepare conditions - return not-mount point schema context
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
 
@@ -125,7 +125,7 @@ public class RestconfSchemaServiceTest {
      * should be set to <code>null</code>.
      */
     @Test
-    public void getSchemaForNotExistingModuleTest() {
+    public void getSchemaForNotExistingModuleTest() throws Exception {
         // prepare conditions - return not-mount point schema context
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
 
@@ -141,7 +141,7 @@ public class RestconfSchemaServiceTest {
      * Get schema with identifier of existing module behind mount point and check if correct module was found.
      */
     @Test
-    public void getSchemaMountPointTest() {
+    public void getSchemaMountPointTest() throws Exception {
         // prepare conditions - return schema context with mount points
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
@@ -165,7 +165,7 @@ public class RestconfSchemaServiceTest {
      * created, but module should be set to <code>null</code>.
      */
     @Test
-    public void getSchemaForNotExistingModuleMountPointTest() {
+    public void getSchemaForNotExistingModuleMountPointTest() throws Exception {
         // prepare conditions - return schema context with mount points
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 

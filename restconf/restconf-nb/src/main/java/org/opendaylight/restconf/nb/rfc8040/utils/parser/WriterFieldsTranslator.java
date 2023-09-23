@@ -53,7 +53,7 @@ public final class WriterFieldsTranslator {
      * @return {@link List} of levels; each level contains set of {@link QName}
      */
     public static @NonNull List<Set<QName>> translate(final @NonNull InstanceIdentifierContext identifier,
-            final @NonNull FieldsParam input) {
+            final @NonNull FieldsParam input) throws RestconfDocumentedException {
         final DataSchemaContext startNode = DataSchemaContext.of((DataSchemaNode) identifier.getSchemaNode());
         if (startNode == null) {
             throw new RestconfDocumentedException(
@@ -68,7 +68,7 @@ public final class WriterFieldsTranslator {
 
     private static void processSelectors(final List<Set<QName>> parsed, final EffectiveModelContext context,
             final QNameModule startNamespace, final DataSchemaContext startNode, final List<NodeSelector> selectors,
-            final int index) {
+            final int index) throws RestconfDocumentedException {
         final Set<QName> startLevel;
         if (parsed.size() <= index) {
             startLevel = new HashSet<>();
@@ -155,7 +155,7 @@ public final class WriterFieldsTranslator {
      * @return {@link DataSchemaContextNode}
      */
     private static DataSchemaContext addChildToResult(final DataSchemaContext currentNode, final QName childQName,
-            final Set<QName> level) {
+            final Set<QName> level) throws RestconfDocumentedException {
         // resolve parent node
         final var parentNode = resolveMixinNode(currentNode, level, currentNode.dataSchemaNode().getQName());
         if (parentNode == null) {

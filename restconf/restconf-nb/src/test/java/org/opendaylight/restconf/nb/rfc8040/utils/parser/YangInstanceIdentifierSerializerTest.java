@@ -46,7 +46,7 @@ public class YangInstanceIdentifierSerializerTest {
      * <code>String</code>. Returned <code>String</code> is compared to have expected value.
      */
     @Test
-    public void serializeContainerTest() {
+    public void serializeContainerTest() throws Exception {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "contA"))
                 .build();
@@ -61,7 +61,7 @@ public class YangInstanceIdentifierSerializerTest {
      * <code>String</code>. Returned <code>String</code> is compared to have expected value.
      */
     @Test
-    public void serializeContainerWithLeafTest() {
+    public void serializeContainerWithLeafTest() throws Exception {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "contA"))
                 .node(QName.create("serializer:test", "2016-06-06", "leaf-A"))
@@ -76,7 +76,7 @@ public class YangInstanceIdentifierSerializerTest {
      * list node to <code>String</code>. Returned <code>String</code> is compared to have expected value.
      */
     @Test
-    public void serializeContainerWithListWithLeafListTest() {
+    public void serializeContainerWithListWithLeafListTest() throws Exception {
         final QName list = QName.create("serializer:test", "2016-06-06", "list-A");
         final QName leafList = QName.create("serializer:test", "2016-06-06", "leaf-list-AA");
 
@@ -100,7 +100,7 @@ public class YangInstanceIdentifierSerializerTest {
      * expected value.
      */
     @Test
-    public void serializeListWithNoKeysTest() {
+    public void serializeListWithNoKeysTest() throws Exception {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "list-no-key"))
                 .node(QName.create("serializer:test", "2016-06-06", "list-no-key"))
@@ -116,7 +116,7 @@ public class YangInstanceIdentifierSerializerTest {
      * <code>String</code> is compared to have expected value.
      */
     @Test
-    public void serializeMapWithNoKeysTest() {
+    public void serializeMapWithNoKeysTest() throws Exception {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "list-one-key"))
                 .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-one-key"), Map.of())
@@ -132,7 +132,7 @@ public class YangInstanceIdentifierSerializerTest {
      * expected value.
      */
     @Test
-    public void serializeMapWithOneKeyTest() {
+    public void serializeMapWithOneKeyTest() throws Exception {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "list-one-key"))
                 .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-one-key"),
@@ -149,7 +149,7 @@ public class YangInstanceIdentifierSerializerTest {
      * to have expected value.
      */
     @Test
-    public void serializeMapWithMultipleKeysTest() {
+    public void serializeMapWithMultipleKeysTest() throws Exception {
         final QName list = QName.create("serializer:test", "2016-06-06", "list-multiple-keys");
         final Map<QName, Object> values = new LinkedHashMap<>();
         values.put(QName.create(list, "name"), "value-1");
@@ -169,7 +169,7 @@ public class YangInstanceIdentifierSerializerTest {
      * expected value.
      */
     @Test
-    public void serializeLeafTest() {
+    public void serializeLeafTest() throws Exception {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "leaf-0"))
                 .build();
@@ -184,7 +184,7 @@ public class YangInstanceIdentifierSerializerTest {
      * expected value.
      */
     @Test
-    public void serializeLeafListTest() {
+    public void serializeLeafListTest() throws Exception {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "leaf-list-0"))
                 .node(new NodeWithValue<>(QName.create("serializer:test", "2016-06-06", "leaf-list-0"), "instance"))
@@ -222,7 +222,7 @@ public class YangInstanceIdentifierSerializerTest {
      * Empty <code>String</code> is expected as a return value.
      */
     @Test
-    public void serializeEmptyDataTest() {
+    public void serializeEmptyDataTest() throws Exception {
         final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, YangInstanceIdentifier.of());
         assertTrue("Empty identifier is expected", result.isEmpty());
     }
@@ -266,7 +266,7 @@ public class YangInstanceIdentifierSerializerTest {
      * Test if URIs with percent encoded characters are all correctly serialized.
      */
     @Test
-    public void serializePercentEncodingTest() {
+    public void serializePercentEncodingTest() throws Exception {
         final String value = "foo:foo bar/foo,bar/'bar'";
         final String encoded = "foo%3Afoo%20bar%2Ffoo%2Cbar%2F%27bar%27";
 
@@ -284,7 +284,7 @@ public class YangInstanceIdentifierSerializerTest {
      * Test if URIs with no percent encoded characters are correctly serialized. Input should be untouched.
      */
     @Test
-    public void serializeNoPercentEncodingTest() {
+    public void serializeNoPercentEncodingTest() throws Exception {
         final String value = "foo\"b\"bar";
 
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
@@ -302,7 +302,7 @@ public class YangInstanceIdentifierSerializerTest {
      * modules by using augmentation.
      */
     @Test
-    public void serializeIncludedNodesTest() {
+    public void serializeIncludedNodesTest() throws Exception {
         final QName list = QName.create("serializer:test:included", "2016-06-06", "augmented-list");
         final QName child = QName.create("serializer:test", "2016-06-06", "augmented-leaf");
 
@@ -325,7 +325,7 @@ public class YangInstanceIdentifierSerializerTest {
      * parent and will not be found.
      */
     @Test
-    public void serializeIncludedNodesSerializationTest() {
+    public void serializeIncludedNodesSerializationTest() throws Exception {
         final QName list = QName.create("serializer:test:included", "2016-06-06", "augmented-list");
         // child should has different namespace
         final QName child = QName.create("serializer:test:included", "2016-06-06", "augmented-leaf");

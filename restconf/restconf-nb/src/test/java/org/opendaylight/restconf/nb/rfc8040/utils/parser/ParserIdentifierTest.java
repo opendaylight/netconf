@@ -143,7 +143,7 @@ public class ParserIdentifierTest {
      * in one module.
      */
     @Test
-    public void toInstanceIdentifierTest() {
+    public void toInstanceIdentifierTest() throws Exception {
         final var context = ParserIdentifier.toInstanceIdentifier(TEST_IDENT, SCHEMA_CONTEXT, null);
         assertEquals(TEST_IDENT_RESULT, context.getInstanceIdentifier().toString());
     }
@@ -153,7 +153,7 @@ public class ParserIdentifierTest {
      * multiple modules.
      */
     @Test
-    public void toInstanceIdentifierOtherModulesTest() {
+    public void toInstanceIdentifierOtherModulesTest() throws Exception {
         final var context = ParserIdentifier.toInstanceIdentifier(TEST_IDENT_OTHERS, SCHEMA_CONTEXT, null);
         assertEquals(TEST_IDENT_OTHERS_RESULT, context.getInstanceIdentifier().toString());
     }
@@ -162,7 +162,7 @@ public class ParserIdentifierTest {
      * Positive test of creating {@code InstanceIdentifierContext} from identifier containing {@code yang-ext:mount}.
      */
     @Test
-    public void toInstanceIdentifierMountPointTest() {
+    public void toInstanceIdentifierMountPointTest() throws Exception {
         final var context = ParserIdentifier.toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + TEST_IDENT, SCHEMA_CONTEXT,
             mountPointService);
         assertEquals(TEST_IDENT_RESULT.toString(), context.getInstanceIdentifier().toString());
@@ -175,7 +175,7 @@ public class ParserIdentifierTest {
      * <code>{@link YangInstanceIdentifier#empty()}</code> should be returned.
      */
     @Test
-    public void toInstanceIdentifierNullIdentifierTest() {
+    public void toInstanceIdentifierNullIdentifierTest() throws Exception {
         final var context = ParserIdentifier.toInstanceIdentifier(null, SCHEMA_CONTEXT, null);
         assertEquals(YangInstanceIdentifier.of(), context.getInstanceIdentifier());
     }
@@ -193,7 +193,7 @@ public class ParserIdentifierTest {
      * Api path can be empty. <code>YangInstanceIdentifier.EMPTY</code> is expected to be returned.
      */
     @Test
-    public void toInstanceIdentifierEmptyIdentifierTest() {
+    public void toInstanceIdentifierEmptyIdentifierTest() throws Exception {
         final var context = ParserIdentifier.toInstanceIdentifier("", SCHEMA_CONTEXT, null);
         assertEquals(YangInstanceIdentifier.of(), context.getInstanceIdentifier());
     }
@@ -254,7 +254,7 @@ public class ParserIdentifierTest {
      * to expected values.
      */
     @Test
-    public void makeQNameFromIdentifierTest() {
+    public void makeQNameFromIdentifierTest() throws Exception {
         final Entry<String, Revision> qName = ParserIdentifier.makeQNameFromIdentifier(
             TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION);
 
@@ -296,7 +296,7 @@ public class ParserIdentifierTest {
      * <code>QName</code> are compared to expected values.
      */
     @Test
-    public void makeQNameFromIdentifierMountTest() {
+    public void makeQNameFromIdentifierMountTest() throws Exception {
         final Entry<String, Revision> qName = ParserIdentifier.makeQNameFromIdentifier(
                 MOUNT_POINT_IDENT
                 + "/"
@@ -385,7 +385,7 @@ public class ParserIdentifierTest {
      * verified.
      */
     @Test
-    public void toSchemaExportContextFromIdentifierTest() {
+    public void toSchemaExportContextFromIdentifierTest() throws Exception {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null, sourceProvider);
 
@@ -405,7 +405,7 @@ public class ParserIdentifierTest {
      * <code>SchemaExportContext</code> should be created but module should be set to <code>null</code>.
      */
     @Test
-    public void toSchemaExportContextFromIdentifierNotFoundTest() {
+    public void toSchemaExportContextFromIdentifierNotFoundTest() throws Exception {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT,
                 "not-existing-module" + "/" + "2016-01-01",
@@ -435,7 +435,7 @@ public class ParserIdentifierTest {
      * Expected module name, revision and namespace are verified.
      */
     @Test
-    public void toSchemaExportContextFromIdentifierMountPointTest() {
+    public void toSchemaExportContextFromIdentifierMountPointTest() throws Exception {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT,
                 MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
@@ -457,7 +457,7 @@ public class ParserIdentifierTest {
      * <code>SchemaExportContext</code> should be still created but module should be set to <code>null</code>.
      */
     @Test
-    public void toSchemaExportContextFromIdentifierMountPointNotFoundTest() {
+    public void toSchemaExportContextFromIdentifierMountPointNotFoundTest() throws Exception {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT,
                 MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
@@ -542,7 +542,7 @@ public class ParserIdentifierTest {
      * Verify if RPC schema node was found.
      */
     @Test
-    public void invokeRpcTest() {
+    public void invokeRpcTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(INVOKE_RPC, SCHEMA_CONTEXT, null);
 
         // RPC schema node
@@ -563,7 +563,7 @@ public class ParserIdentifierTest {
      * Verify if RPC schema node was found.
      */
     @Test
-    public void invokeRpcOnMountPointTest() {
+    public void invokeRpcOnMountPointTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + INVOKE_RPC, SCHEMA_CONTEXT,
             mountPointService);
 
@@ -583,7 +583,7 @@ public class ParserIdentifierTest {
      * Verify if Action schema node was found.
      */
     @Test
-    public void invokeActionTest() {
+    public void invokeActionTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(INVOKE_ACTION, SCHEMA_CONTEXT, null);
 
         // Action schema node
@@ -602,7 +602,7 @@ public class ParserIdentifierTest {
      * Verify if Action schema node was found.
      */
     @Test
-    public void invokeActionOnMountPointTest() {
+    public void invokeActionOnMountPointTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + INVOKE_ACTION,
             SCHEMA_CONTEXT, mountPointService);
 

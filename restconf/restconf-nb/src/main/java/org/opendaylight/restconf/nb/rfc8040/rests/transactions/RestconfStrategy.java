@@ -236,7 +236,7 @@ public abstract class RestconfStrategy {
      * @return A {@link CreateOrReplaceResult}
      */
     public final @NonNull CreateOrReplaceResult putData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final @Nullable Insert insert) {
+            final @Nullable Insert insert) throws RestconfDocumentedException {
         final var exists = TransactionUtil.syncAccess(exists(path), path);
 
         final ListenableFuture<? extends CommitInfo> commitFuture;
@@ -253,7 +253,8 @@ public abstract class RestconfStrategy {
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPut(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parentPath) {
+            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parentPath)
+                throws RestconfDocumentedException {
         final var tx = prepareWriteExecution();
 
         return switch (insert.insert()) {
@@ -322,7 +323,8 @@ public abstract class RestconfStrategy {
         return tx.commit();
     }
 
-    private DataSchemaNode checkListAndOrderedType(final YangInstanceIdentifier path) {
+    private DataSchemaNode checkListAndOrderedType(final YangInstanceIdentifier path)
+            throws RestconfDocumentedException {
         // FIXME: we have this available in InstanceIdentifierContext
         final var dataSchemaNode = DataSchemaContextTree.from(modelContext).findChild(path).orElseThrow()
             .dataSchemaNode();
@@ -352,7 +354,7 @@ public abstract class RestconfStrategy {
      * @param insert  {@link Insert}
      */
     public final void postData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final @Nullable Insert insert) {
+            final @Nullable Insert insert) throws RestconfDocumentedException {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
             final var parentPath = path.coerceParent();
@@ -365,7 +367,8 @@ public abstract class RestconfStrategy {
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parent) {
+            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parent)
+                throws RestconfDocumentedException {
         final var grandParent = parent.coerceParent();
         final var tx = prepareWriteExecution();
 
@@ -527,7 +530,7 @@ public abstract class RestconfStrategy {
     }
 
     private static ListenableFuture<? extends CommitInfo> createAndCommit(final RestconfTransaction tx,
-            final YangInstanceIdentifier path, final NormalizedNode data) {
+            final YangInstanceIdentifier path, final NormalizedNode data) throws RestconfDocumentedException {
         try {
             tx.create(path, data);
         } catch (RestconfDocumentedException e) {
@@ -547,7 +550,7 @@ public abstract class RestconfStrategy {
      * @throws RestconfDocumentedException if data already exists.
      */
     static void checkItemDoesNotExists(final ListenableFuture<Boolean> existsFuture,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path) throws RestconfDocumentedException {
         if (TransactionUtil.syncAccess(existsFuture, path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
             throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
@@ -565,7 +568,8 @@ public abstract class RestconfStrategy {
      * @return {@link NormalizedNode}
      */
     public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) {
+            final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode)
+                throws RestconfDocumentedException {
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
@@ -597,7 +601,7 @@ public abstract class RestconfStrategy {
      */
     public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
-            final @NonNull List<YangInstanceIdentifier> fields) {
+            final @NonNull List<YangInstanceIdentifier> fields) throws RestconfDocumentedException {
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
@@ -617,7 +621,7 @@ public abstract class RestconfStrategy {
     }
 
     private @Nullable NormalizedNode readDataViaTransaction(final LogicalDatastoreType store,
-            final YangInstanceIdentifier path) {
+            final YangInstanceIdentifier path) throws RestconfDocumentedException {
         return TransactionUtil.syncAccess(read(store, path), path).orElse(null);
     }
 
@@ -633,12 +637,13 @@ public abstract class RestconfStrategy {
      * @return {@link NormalizedNode}
      */
     private @Nullable NormalizedNode readDataViaTransaction(final @NonNull LogicalDatastoreType store,
-            final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields) {
+            final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields)
+                throws RestconfDocumentedException {
         return TransactionUtil.syncAccess(read(store, path, fields), path).orElse(null);
     }
 
     private NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData, final YangInstanceIdentifier path,
-            final WithDefaultsMode defaultsMode) {
+            final WithDefaultsMode defaultsMode) throws RestconfDocumentedException {
         final boolean trim = switch (defaultsMode) {
             case Trim -> true;
             case Explicit -> false;
@@ -796,7 +801,7 @@ public abstract class RestconfStrategy {
     }
 
     private static NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
-                                                                  final NormalizedNode configDataNode) {
+            final NormalizedNode configDataNode) throws RestconfDocumentedException {
         // if no data exists
         if (stateDataNode == null && configDataNode == null) {
             return null;
@@ -824,7 +829,8 @@ public abstract class RestconfStrategy {
      * @return {@link NormalizedNode}
      */
     private static @NonNull NormalizedNode mergeStateAndConfigData(
-            final @NonNull NormalizedNode stateDataNode, final @NonNull NormalizedNode configDataNode) {
+            final @NonNull NormalizedNode stateDataNode, final @NonNull NormalizedNode configDataNode)
+                throws RestconfDocumentedException {
         validateNodeMerge(stateDataNode, configDataNode);
         // FIXME: this check is bogus, as it confuses yang.data.api (NormalizedNode) with yang.model.api (RpcDefinition)
         if (configDataNode instanceof RpcDefinition) {
@@ -841,7 +847,7 @@ public abstract class RestconfStrategy {
      * @param configDataNode data node of config data
      */
     private static void validateNodeMerge(final @NonNull NormalizedNode stateDataNode,
-                                          final @NonNull NormalizedNode configDataNode) {
+            final @NonNull NormalizedNode configDataNode) throws RestconfDocumentedException {
         final QNameModule moduleOfStateData = stateDataNode.name().getNodeType().getModule();
         final QNameModule moduleOfConfigData = configDataNode.name().getNodeType().getModule();
         if (!moduleOfStateData.equals(moduleOfConfigData)) {
@@ -892,7 +898,7 @@ public abstract class RestconfStrategy {
      */
     @SuppressWarnings("unchecked")
     private static @NonNull NormalizedNode prepareData(final @NonNull NormalizedNode configDataNode,
-                                                       final @NonNull NormalizedNode stateDataNode) {
+            final @NonNull NormalizedNode stateDataNode) throws RestconfDocumentedException {
         if (configDataNode instanceof UserMapNode configMap) {
             final var builder = Builders.orderedMapBuilder().withNodeIdentifier(configMap.name());
             mapValueToBuilder(configMap.body(), ((UserMapNode) stateDataNode).body(), builder);
@@ -951,7 +957,8 @@ public abstract class RestconfStrategy {
      */
     private static <T extends NormalizedNode> void mapValueToBuilder(
             final @NonNull Collection<T> configData, final @NonNull Collection<T> stateData,
-            final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
+            final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder)
+                throws RestconfDocumentedException {
         final var configMap = configData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity()));
         final var stateMap = stateData.stream().collect(Collectors.toMap(NormalizedNode::name, Function.identity()));
 
@@ -990,7 +997,8 @@ public abstract class RestconfStrategy {
     @SuppressWarnings("unchecked")
     private static <T extends NormalizedNode> void mergeDataToBuilder(
             final @NonNull Map<PathArgument, T> configMap, final @NonNull Map<PathArgument, T> stateMap,
-            final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
+            final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder)
+                throws RestconfDocumentedException {
         // it is enough to process only config data because operational contains the same data
         configMap.entrySet().stream().filter(x -> stateMap.containsKey(x.getKey())).forEach(
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));

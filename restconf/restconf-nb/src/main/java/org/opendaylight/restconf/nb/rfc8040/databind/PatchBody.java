@@ -12,6 +12,7 @@ import static com.google.common.base.Verify.verify;
 import java.io.IOException;
 import java.io.InputStream;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -38,7 +39,7 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         @NonNull YangInstanceIdentifier urlPath, @NonNull InputStream inputStream) throws IOException;
 
     static final YangInstanceIdentifier parsePatchTarget(final EffectiveModelContext context,
-            final YangInstanceIdentifier urlPath, final String target) {
+            final YangInstanceIdentifier urlPath, final String target) throws RestconfDocumentedException {
         if (target.equals("/")) {
             verify(!urlPath.isEmpty(),
                 "target resource of URI must not be a datastore resource when target is '/'");

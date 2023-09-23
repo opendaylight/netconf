@@ -29,7 +29,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<YangInstanceIdentifier> {
     @Override
     protected List<YangInstanceIdentifier> translateFields(final InstanceIdentifierContext context,
-            final FieldsParam fields) {
+            final FieldsParam fields) throws Exception {
         return NetconfFieldsTranslator.translate(context, fields);
     }
 

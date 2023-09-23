@@ -51,7 +51,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void deleteImpl(final YangInstanceIdentifier path) {
+    void deleteImpl(final YangInstanceIdentifier path) throws RestconfDocumentedException {
         if (TransactionUtil.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
             rwTx.delete(CONFIGURATION, path);
         } else {
@@ -72,7 +72,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
+    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) throws RestconfDocumentedException {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final var emptySubTree = ImmutableNodes.fromInstanceId(modelContext, path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
@@ -123,7 +123,8 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
         return verifyNotNull(rwTx).read(CONFIGURATION, path);
     }
 
-    private static void checkExistence(final YangInstanceIdentifier path, final BatchedExistenceCheck check) {
+    private static void checkExistence(final YangInstanceIdentifier path, final BatchedExistenceCheck check)
+            throws RestconfDocumentedException {
         final Map.Entry<YangInstanceIdentifier, ReadFailedException> failure;
         try {
             failure = check.getFailure();

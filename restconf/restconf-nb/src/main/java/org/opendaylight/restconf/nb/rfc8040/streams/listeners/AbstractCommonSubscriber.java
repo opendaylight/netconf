@@ -131,7 +131,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
      *
      * @param params NotificationQueryParams to use.
      */
-    public final void setQueryParams(final NotificationQueryParams params) {
+    public final void setQueryParams(final NotificationQueryParams params) throws RestconfDocumentedException {
         final var startTime = params.startTime();
         start = startTime == null ? Instant.now() : parseDateAndTime(startTime.value());
 
@@ -214,7 +214,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    final boolean checkStartStop(final Instant now) {
+    final boolean checkStartStop(final Instant now) throws RestconfDocumentedException {
         if (stop != null) {
             if (start.compareTo(now) < 0 && stop.compareTo(now) > 0) {
                 return true;
@@ -253,7 +253,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
      * @param dateAndTime Start-time or stop-time as {@link DateAndTime} object.
      * @return Parsed {@link Instant} by entry.
      */
-    private static @NonNull Instant parseDateAndTime(final DateAndTime dateAndTime) {
+    private static @NonNull Instant parseDateAndTime(final DateAndTime dateAndTime) throws RestconfDocumentedException {
         final TemporalAccessor accessor;
         try {
             accessor = FORMATTER.parse(dateAndTime.getValue());

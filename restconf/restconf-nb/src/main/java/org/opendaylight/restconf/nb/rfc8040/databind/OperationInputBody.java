@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -59,7 +60,7 @@ public abstract sealed class OperationInputBody extends AbstractBody
     }
 
     abstract void streamTo(@NonNull InputStream inputStream, @NonNull Inference inference,
-        @NonNull NormalizedNodeStreamWriter writer) throws IOException;
+        @NonNull NormalizedNodeStreamWriter writer) throws RestconfDocumentedException;
 
     static final @NonNull QName extractInputQName(final SchemaInferenceStack stack) {
         final var stmt = stack.currentStatement();

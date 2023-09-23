@@ -59,7 +59,8 @@ public final class JsonPatchBody extends PatchBody {
     }
 
     private static ImmutableList<PatchEntity> read(final JsonReader in, final EffectiveModelContext context,
-            final YangInstanceIdentifier urlPath, final AtomicReference<String> patchId) throws IOException {
+            final YangInstanceIdentifier urlPath, final AtomicReference<String> patchId)
+                throws IOException, RestconfDocumentedException {
         final var schemaTree = DataSchemaContextTree.from(context);
         final var edits = ImmutableList.<PatchEntity>builder();
         final var edit = new PatchEdit();
@@ -106,7 +107,7 @@ public final class JsonPatchBody extends PatchBody {
     private static void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
             final @NonNull JsonReader in, final @NonNull YangInstanceIdentifier urlPath,
             final @NonNull DataSchemaContextTree schemaTree, final @NonNull Builder<PatchEntity> resultCollection,
-            final @NonNull AtomicReference<String> patchId) throws IOException {
+            final @NonNull AtomicReference<String> patchId) throws IOException, RestconfDocumentedException {
         switch (name) {
             case "edit":
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
@@ -307,7 +308,7 @@ public final class JsonPatchBody extends PatchBody {
      * @param edit Instance of PatchEdit
      * @return PatchEntity Patch entity
      */
-    private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) {
+    private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) throws RestconfDocumentedException {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
             && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
             if (!requiresValue(edit.getOperation())) {
