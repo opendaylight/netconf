@@ -109,7 +109,7 @@ final class CreateStreamUtil {
      */
     // FIXME: this really should be a normal RPC implementation
     static DOMRpcResult createDataChangeNotifiStream(final ListenersBroker listenersBroker, final ContainerNode input,
-            final EffectiveModelContext refSchemaCtx) {
+            final EffectiveModelContext refSchemaCtx) throws RestconfDocumentedException {
         // parsing out of container with settings and path
         final YangInstanceIdentifier path = preparePath(input);
 
@@ -142,7 +142,8 @@ final class CreateStreamUtil {
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
     static DOMRpcResult createDeviceNotificationListener(final String baseUrl, final ContainerNode input,
-            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService) {
+            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService)
+                throws RestconfDocumentedException {
         // parsing out of container with settings and path
         // FIXME: ugly cast
         final YangInstanceIdentifier path =
@@ -215,7 +216,7 @@ final class CreateStreamUtil {
      * @return Parsed stream name.
      */
     private static String prepareDataChangeNotifiStreamName(final YangInstanceIdentifier path,
-            final EffectiveModelContext schemaContext, final ContainerNode data) {
+            final EffectiveModelContext schemaContext, final ContainerNode data) throws RestconfDocumentedException {
         final String datastoreName = extractStringLeaf(data, DATASTORE_NODEID);
         final LogicalDatastoreType datastoreType = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
             : LogicalDatastoreType.CONFIGURATION;
@@ -237,7 +238,7 @@ final class CreateStreamUtil {
      * @return Parsed {@link YangInstanceIdentifier} of data element from which the data-change-event notifications
      *         are going to be generated.
      */
-    private static YangInstanceIdentifier preparePath(final ContainerNode data) {
+    private static YangInstanceIdentifier preparePath(final ContainerNode data) throws RestconfDocumentedException {
         final var pathLeaf = data.childByArg(PATH_NODEID);
         if (pathLeaf != null && pathLeaf.body() instanceof YangInstanceIdentifier pathValue) {
             return pathValue;

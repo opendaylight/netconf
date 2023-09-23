@@ -169,7 +169,7 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response readData(@Context final UriInfo uriInfo) {
+    public Response readData(@Context final UriInfo uriInfo) throws RestconfDocumentedException {
         return readData(null, uriInfo);
     }
 
@@ -190,7 +190,7 @@ public final class RestconfDataServiceImpl {
         MediaType.TEXT_XML
     })
     public Response readData(@Encoded @PathParam("identifier") final String identifier,
-            @Context final UriInfo uriInfo) {
+            @Context final UriInfo uriInfo) throws RestconfDocumentedException {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
         final var schemaContextRef = databindProvider.currentContext().modelContext();
         // FIXME: go through
@@ -246,7 +246,8 @@ public final class RestconfDataServiceImpl {
         };
     }
 
-    private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
+    private void createAllYangNotificationStreams(final EffectiveModelContext schemaContext, final UriInfo uriInfo)
+            throws RestconfDocumentedException {
         final var transaction = dataBroker.newWriteOnlyTransaction();
 
         for (var module : schemaContext.getModuleStatements().values()) {
@@ -312,7 +313,8 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public Response putDataJSON(@Context final UriInfo uriInfo, final InputStream body) {
+    public Response putDataJSON(@Context final UriInfo uriInfo, final InputStream body)
+            throws RestconfDocumentedException {
         try (var jsonBody = new JsonResourceBody(body)) {
             return putData(null, uriInfo, jsonBody);
         }
@@ -333,7 +335,7 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_JSON,
     })
     public Response putDataJSON(@Encoded @PathParam("identifier") final String identifier,
-            @Context final UriInfo uriInfo, final InputStream body) {
+            @Context final UriInfo uriInfo, final InputStream body) throws RestconfDocumentedException {
         try (var jsonBody = new JsonResourceBody(body)) {
             return putData(identifier, uriInfo, jsonBody);
         }
@@ -353,7 +355,8 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response putDataXML(@Context final UriInfo uriInfo, final InputStream body) {
+    public Response putDataXML(@Context final UriInfo uriInfo, final InputStream body)
+            throws RestconfDocumentedException {
         try (var xmlBody = new XmlResourceBody(body)) {
             return putData(null, uriInfo, xmlBody);
         }
@@ -375,13 +378,14 @@ public final class RestconfDataServiceImpl {
         MediaType.TEXT_XML
     })
     public Response putDataXML(@Encoded @PathParam("identifier") final String identifier,
-            @Context final UriInfo uriInfo, final InputStream body) {
+            @Context final UriInfo uriInfo, final InputStream body) throws RestconfDocumentedException {
         try (var xmlBody = new XmlResourceBody(body)) {
             return putData(identifier, uriInfo, xmlBody);
         }
     }
 
-    private Response putData(final @Nullable String identifier, final UriInfo uriInfo, final ResourceBody body) {
+    private Response putData(final @Nullable String identifier, final UriInfo uriInfo, final ResourceBody body)
+            throws RestconfDocumentedException {
         final var localModel = databindProvider.currentContext().modelContext();
         final var context = ParserIdentifier.toInstanceIdentifier(identifier, localModel, mountPointService);
         final var insert = QueryParams.parseInsert(context.getSchemaContext(), uriInfo);
@@ -408,7 +412,8 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public Response postDataJSON(final InputStream body, @Context final UriInfo uriInfo) {
+    public Response postDataJSON(final InputStream body, @Context final UriInfo uriInfo)
+            throws RestconfDocumentedException {
         try (var jsonBody = new JsonChildBody(body)) {
             return postData(jsonBody, uriInfo);
         }
@@ -429,7 +434,7 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_JSON,
     })
     public Response postDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
-            @Context final UriInfo uriInfo) {
+            @Context final UriInfo uriInfo) throws RestconfDocumentedException {
         final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), mountPointService);
         if (instanceIdentifier.getSchemaNode() instanceof ActionDefinition) {
@@ -458,7 +463,8 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response postDataXML(final InputStream body, @Context final UriInfo uriInfo) {
+    public Response postDataXML(final InputStream body, @Context final UriInfo uriInfo)
+            throws RestconfDocumentedException {
         try (var xmlBody = new XmlChildBody(body)) {
             return postData(xmlBody, uriInfo);
         }
@@ -480,7 +486,7 @@ public final class RestconfDataServiceImpl {
         MediaType.TEXT_XML
     })
     public Response postDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
-            @Context final UriInfo uriInfo) {
+            @Context final UriInfo uriInfo) throws RestconfDocumentedException {
         final var iid = ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), mountPointService);
         if (iid.getSchemaNode() instanceof ActionDefinition) {
@@ -494,13 +500,13 @@ public final class RestconfDataServiceImpl {
         }
     }
 
-    private Response postData(final ChildBody body, final UriInfo uriInfo) {
+    private Response postData(final ChildBody body, final UriInfo uriInfo) throws RestconfDocumentedException {
         return postData(Inference.ofDataTreePath(databindProvider.currentContext().modelContext()),
             YangInstanceIdentifier.of(), body, uriInfo, null);
     }
 
     private Response postData(final Inference inference, final YangInstanceIdentifier parentPath, final ChildBody body,
-            final UriInfo uriInfo, final @Nullable DOMMountPoint mountPoint) {
+            final UriInfo uriInfo, final @Nullable DOMMountPoint mountPoint) throws RestconfDocumentedException {
         final var modelContext = inference.getEffectiveModelContext();
         final var insert = QueryParams.parseInsert(modelContext, uriInfo);
         final var strategy = getRestconfStrategy(modelContext, mountPoint);
@@ -523,9 +529,10 @@ public final class RestconfDataServiceImpl {
      * @param initialPath   data path
      * @param schemaContext reference to {@link SchemaContext}
      * @return {@link URI}
+     * @throws RestconfDocumentedException
      */
     private static URI resolveLocation(final UriInfo uriInfo, final YangInstanceIdentifier initialPath,
-                                       final EffectiveModelContext schemaContext, final NormalizedNode data) {
+            final EffectiveModelContext schemaContext, final NormalizedNode data) throws RestconfDocumentedException {
         YangInstanceIdentifier path = initialPath;
         if (data instanceof MapNode mapData) {
             final var children = mapData.body();
@@ -546,7 +553,7 @@ public final class RestconfDataServiceImpl {
     @DELETE
     @Path("/data/{identifier:.+}")
     public void deleteData(@Encoded @PathParam("identifier") final String identifier,
-            @Suspended final AsyncResponse ar) {
+            @Suspended final AsyncResponse ar) throws RestconfDocumentedException {
         final var instanceIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
             databindProvider.currentContext().modelContext(), mountPointService);
         final var strategy = getRestconfStrategy(instanceIdentifier.getSchemaContext(),
@@ -579,7 +586,8 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void plainPatchDataXML(final InputStream body, @Suspended final AsyncResponse ar) {
+    public void plainPatchDataXML(final InputStream body, @Suspended final AsyncResponse ar)
+            throws RestconfDocumentedException {
         try (var xmlBody = new XmlResourceBody(body)) {
             plainPatchData(null, xmlBody, ar);
         }
@@ -601,7 +609,7 @@ public final class RestconfDataServiceImpl {
         MediaType.TEXT_XML
     })
     public void plainPatchDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
-            @Suspended final AsyncResponse ar) {
+            @Suspended final AsyncResponse ar) throws RestconfDocumentedException {
         try (var xmlBody = new XmlResourceBody(body)) {
             plainPatchData(identifier, xmlBody, ar);
         }
@@ -620,7 +628,8 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public void plainPatchDataJSON(final InputStream body, @Suspended final AsyncResponse ar) {
+    public void plainPatchDataJSON(final InputStream body, @Suspended final AsyncResponse ar)
+            throws RestconfDocumentedException {
         try (var jsonBody = new JsonResourceBody(body)) {
             plainPatchData(null, jsonBody, ar);
         }
@@ -641,7 +650,7 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_JSON,
     })
     public void plainPatchDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
-            @Suspended final AsyncResponse ar) {
+            @Suspended final AsyncResponse ar) throws RestconfDocumentedException {
         try (var jsonBody = new JsonResourceBody(body)) {
             plainPatchData(identifier, jsonBody, ar);
         }
@@ -655,7 +664,8 @@ public final class RestconfDataServiceImpl {
      * @param body data node for put to config DS
      * @param ar {@link AsyncResponse} which needs to be completed
      */
-    private void plainPatchData(final @Nullable String identifier, final ResourceBody body, final AsyncResponse ar) {
+    private void plainPatchData(final @Nullable String identifier, final ResourceBody body, final AsyncResponse ar)
+            throws RestconfDocumentedException {
         final var req = bindResourceRequest(
             ParserIdentifier.toInstanceIdentifier(identifier, databindProvider.currentContext().modelContext(),
                 mountPointService),
@@ -676,7 +686,7 @@ public final class RestconfDataServiceImpl {
     }
 
     private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext context,
-            final ResourceBody body) {
+            final ResourceBody body) throws RestconfDocumentedException {
         final var inference = context.inference();
         final var path = context.getInstanceIdentifier();
         final var data = body.toNormalizedNode(path, inference, context.getSchemaNode());
@@ -701,7 +711,7 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public PatchStatusContext yangPatchDataXML(@Encoded @PathParam("identifier") final String identifier,
-            final InputStream body) {
+            final InputStream body) throws RestconfDocumentedException {
         try (var xmlBody = new XmlPatchBody(body)) {
             return yangPatchData(identifier, xmlBody);
         }
@@ -721,7 +731,7 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchDataXML(final InputStream body) {
+    public PatchStatusContext yangPatchDataXML(final InputStream body) throws RestconfDocumentedException {
         try (var xmlBody = new XmlPatchBody(body)) {
             return yangPatchData(xmlBody);
         }
@@ -743,7 +753,7 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public PatchStatusContext yangPatchDataJSON(@Encoded @PathParam("identifier") final String identifier,
-            final InputStream body) {
+            final InputStream body) throws RestconfDocumentedException {
         try (var jsonBody = new JsonPatchBody(body)) {
             return yangPatchData(identifier, jsonBody);
         }
@@ -763,33 +773,37 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchDataJSON(final InputStream body) {
+    public PatchStatusContext yangPatchDataJSON(final InputStream body) throws RestconfDocumentedException {
         try (var jsonBody = new JsonPatchBody(body)) {
             return yangPatchData(jsonBody);
         }
     }
 
-    private PatchStatusContext yangPatchData(final @NonNull PatchBody body) {
+    private PatchStatusContext yangPatchData(final @NonNull PatchBody body) throws RestconfDocumentedException {
         final var context = databindProvider.currentContext().modelContext();
         return yangPatchData(context, parsePatchBody(context, YangInstanceIdentifier.of(), body), null);
     }
 
-    private PatchStatusContext yangPatchData(final String identifier, final @NonNull PatchBody body) {
+    private PatchStatusContext yangPatchData(final String identifier, final @NonNull PatchBody body)
+            throws RestconfDocumentedException {
         final var iid = ParserIdentifier.toInstanceIdentifier(requireNonNull(identifier),
             databindProvider.currentContext().modelContext(), mountPointService);
         final var context = iid.getSchemaContext();
-        return yangPatchData(context, parsePatchBody(context, iid.getInstanceIdentifier(), body), iid.getMountPoint());
+        return yangPatchData(context, parsePatchBody(context, iid.getInstanceIdentifier(), body),
+            iid.getMountPoint());
     }
 
 
     @VisibleForTesting
     @NonNull PatchStatusContext yangPatchData(final @NonNull EffectiveModelContext modelContext,
-            final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint) {
+            final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint)
+                throws RestconfDocumentedException {
         return getRestconfStrategy(modelContext, mountPoint).patchData(patch);
     }
 
     private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,
-            final @NonNull YangInstanceIdentifier urlPath, final @NonNull PatchBody body) {
+            final @NonNull YangInstanceIdentifier urlPath, final @NonNull PatchBody body)
+                throws RestconfDocumentedException {
         try {
             return body.toPatchContext(context, urlPath);
         } catch (IOException e) {
@@ -801,7 +815,7 @@ public final class RestconfDataServiceImpl {
 
     @VisibleForTesting
     @NonNull RestconfStrategy getRestconfStrategy(final EffectiveModelContext modelContext,
-            final @Nullable DOMMountPoint mountPoint) {
+            final @Nullable DOMMountPoint mountPoint) throws RestconfDocumentedException {
         if (mountPoint == null) {
             return localStrategy(modelContext);
         }
@@ -833,7 +847,8 @@ public final class RestconfDataServiceImpl {
      * @param payload {@link NormalizedNodePayload} - the body of the operation
      * @return {@link NormalizedNodePayload} wrapped in {@link Response}
      */
-    private Response invokeAction(final InstanceIdentifierContext context, final OperationInputBody body) {
+    private Response invokeAction(final InstanceIdentifierContext context, final OperationInputBody body)
+            throws RestconfDocumentedException {
         final var yangIIdContext = context.getInstanceIdentifier();
         final ContainerNode input;
         try {
@@ -867,7 +882,8 @@ public final class RestconfDataServiceImpl {
      * @return {@link DOMActionResult}
      */
     private static DOMActionResult invokeAction(final ContainerNode data,
-            final Absolute schemaPath, final YangInstanceIdentifier yangIId, final DOMMountPoint mountPoint) {
+            final Absolute schemaPath, final YangInstanceIdentifier yangIId, final DOMMountPoint mountPoint)
+                throws RestconfDocumentedException {
         return invokeAction(data, schemaPath, yangIId, mountPoint.getService(DOMActionService.class)
             .orElseThrow(() -> new RestconfDocumentedException("DomAction service is missing.")));
     }
@@ -882,8 +898,10 @@ public final class RestconfDataServiceImpl {
      * @return {@link DOMActionResult}
      */
     // FIXME: NETCONF-718: we should be returning a future here
+    // FIXME: return RestconfFuture instead and do not throw RestconfDocumentedException
     private static DOMActionResult invokeAction(final ContainerNode data, final Absolute schemaPath,
-            final YangInstanceIdentifier yangIId, final DOMActionService actionService) {
+            final YangInstanceIdentifier yangIId, final DOMActionService actionService)
+                throws RestconfDocumentedException {
         final var future = Futures.catching(
             actionService.invokeAction(schemaPath,
                 new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, yangIId.getParent()), data),
@@ -908,7 +926,9 @@ public final class RestconfDataServiceImpl {
      * @param response response of Action
      * @return {@link DOMActionResult} result
      */
-    private static DOMActionResult checkActionResponse(final DOMActionResult response) {
+    // FIXME: do not throw but map to DOMActionResult
+    private static DOMActionResult checkActionResponse(final DOMActionResult response)
+            throws RestconfDocumentedException {
         if (response == null) {
             return null;
         }

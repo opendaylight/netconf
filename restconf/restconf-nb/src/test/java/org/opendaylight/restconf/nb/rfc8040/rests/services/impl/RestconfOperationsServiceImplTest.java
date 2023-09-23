@@ -91,19 +91,19 @@ public class RestconfOperationsServiceImplTest {
     }
 
     @Test
-    public void testMountPointOperationsJson() {
+    public void testMountPointOperationsJson() throws Exception {
         final var operationJSON = opService.getOperationJSON(DEVICE_ID);
         assertEquals(EXPECTED_JSON, operationJSON);
     }
 
     @Test
-    public void testMountPointOperationsXml() {
+    public void testMountPointOperationsXml() throws Exception {
         final var operationXML = opService.getOperationXML(DEVICE_ID);
         assertEquals(EXPECTED_XML, operationXML);
     }
 
     @Test
-    public void testMountPointSpecificOperationsJson() {
+    public void testMountPointSpecificOperationsJson() throws Exception {
         final var operationJSON = opService.getOperationJSON(DEVICE_RPC1_MODULE1_ID);
         assertEquals("""
             {
@@ -114,7 +114,7 @@ public class RestconfOperationsServiceImplTest {
     }
 
     @Test
-    public void testMountPointSpecificOperationsXml() {
+    public void testMountPointSpecificOperationsXml() throws Exception {
         final var operationXML = opService.getOperationXML(DEVICE_RPC1_MODULE1_ID);
         assertEquals("""
             <?xml version="1.0" encoding="UTF-8"?>

@@ -36,7 +36,7 @@ public class RestconfValidationTest {
      * Test of successful validation of module revision.
      */
     @Test
-    public void validateAndGetRevisionTest() {
+    public void validateAndGetRevisionTest() throws Exception {
         final Revision revision = ParserIdentifier.validateAndGetRevision(REVISIONS.iterator());
         assertNotNull("Correct module revision should be validated", revision);
         assertEquals(Revision.of("2014-01-01"), revision);
@@ -68,7 +68,7 @@ public class RestconfValidationTest {
      * Test of successful validation of module name.
      */
     @Test
-    public void validateAndGetModulNameTest() {
+    public void validateAndGetModulNameTest() throws Exception {
         final String moduleName = ParserIdentifier.validateAndGetModulName(NAMES.iterator());
         assertNotNull("Correct module name should be validated", moduleName);
         assertEquals("_module-1", moduleName);

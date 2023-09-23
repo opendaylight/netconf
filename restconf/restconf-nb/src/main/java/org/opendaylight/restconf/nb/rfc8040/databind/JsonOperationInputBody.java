@@ -32,7 +32,7 @@ public final class JsonOperationInputBody extends OperationInputBody {
 
     @Override
     void streamTo(final InputStream inputStream, final Inference inference, final NormalizedNodeStreamWriter writer)
-            throws IOException {
+            throws RestconfDocumentedException {
         try {
             JsonParserStream.create(writer,
                 JSONCodecFactorySupplier.RFC7951.getShared(inference.getEffectiveModelContext()), inference)

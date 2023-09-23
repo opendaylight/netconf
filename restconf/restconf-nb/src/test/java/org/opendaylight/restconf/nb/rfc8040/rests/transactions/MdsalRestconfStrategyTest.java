@@ -105,7 +105,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     }
 
     @Test
-    public void testPutContainerData() {
+    public void testPutContainerData() throws Exception {
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
@@ -118,7 +118,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     }
 
     @Test
-    public void testPutLeafData() {
+    public void testPutLeafData() throws Exception {
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
@@ -132,7 +132,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
 
 
     @Test
-    public void testPutListData() {
+    public void testPutListData() throws Exception {
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
         doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
@@ -324,7 +324,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     }
 
     @Test
-    public void readLeafWithDefaultParameters() {
+    public void readLeafWithDefaultParameters() throws Exception {
         final var data = Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
             .withChild(ImmutableNodes.leafNode(QName.create(BASE, "exampleLeaf"), "i am leaf"))
@@ -341,7 +341,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     }
 
     @Test
-    public void readContainerWithDefaultParameters() {
+    public void readContainerWithDefaultParameters() throws Exception {
         final var exampleList = new NodeIdentifier(QName.create(BASE, "exampleList"));
         final var data = Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
@@ -372,7 +372,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     }
 
     @Test
-    public void readLeafInListWithDefaultParameters() {
+    public void readLeafInListWithDefaultParameters() throws Exception {
         final var exampleList = new NodeIdentifier(QName.create(BASE, "exampleList"));
         final var content = Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))

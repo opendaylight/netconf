@@ -64,7 +64,8 @@ public final class QueryParams {
         // Utility class
     }
 
-    public static @NonNull NotificationQueryParams newNotificationQueryParams(final UriInfo uriInfo) {
+    public static @NonNull NotificationQueryParams newNotificationQueryParams(final UriInfo uriInfo)
+            throws RestconfDocumentedException {
         StartTimeParam startTime = null;
         StopTimeParam stopTime = null;
         FilterParam filter = null;
@@ -120,7 +121,7 @@ public final class QueryParams {
     }
 
     public static QueryParameters newQueryParameters(final ReadDataParams params,
-            final InstanceIdentifierContext identifier) {
+            final InstanceIdentifierContext identifier) throws RestconfDocumentedException {
         final var fields = params.fields();
         if (fields == null) {
             return QueryParameters.of(params);
@@ -137,7 +138,7 @@ public final class QueryParams {
      * @param uriInfo    URI info
      * @return {@link ReadDataParams}
      */
-    public static @NonNull ReadDataParams newReadDataParams(final UriInfo uriInfo) {
+    public static @NonNull ReadDataParams newReadDataParams(final UriInfo uriInfo) throws RestconfDocumentedException {
         ContentParam content = ContentParam.ALL;
         DepthParam depth = null;
         FieldsParam fields = null;
@@ -184,7 +185,8 @@ public final class QueryParams {
         return new ReadDataParams(content, depth, fields, withDefaults, prettyPrint);
     }
 
-    public static @Nullable Insert parseInsert(final EffectiveModelContext modelContext, final UriInfo uriInfo) {
+    public static @Nullable Insert parseInsert(final EffectiveModelContext modelContext, final UriInfo uriInfo)
+            throws RestconfDocumentedException {
         InsertParam insert = null;
         PointParam point = null;
 
@@ -230,7 +232,8 @@ public final class QueryParams {
     }
 
     @VisibleForTesting
-    static @Nullable String optionalParam(final String name, final List<String> values) {
+    static @Nullable String optionalParam(final String name, final List<String> values)
+            throws RestconfDocumentedException {
         return switch (values.size()) {
             case 0 -> null;
             case 1 -> requireNonNull(values.get(0));
@@ -241,7 +244,7 @@ public final class QueryParams {
     }
 
     private static <T> @Nullable T optionalParam(final Function<String, @NonNull T> factory, final String name,
-            final List<String> values) {
+            final List<String> values) throws RestconfDocumentedException {
         final String str = optionalParam(name, values);
         return str == null ? null : factory.apply(str);
     }

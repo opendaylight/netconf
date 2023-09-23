@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -21,11 +22,13 @@ public final class IdentifierCodec {
         // Hidden on purpose
     }
 
-    public static String serialize(final YangInstanceIdentifier data, final EffectiveModelContext schemaContext) {
+    public static String serialize(final YangInstanceIdentifier data, final EffectiveModelContext schemaContext)
+            throws RestconfDocumentedException {
         return YangInstanceIdentifierSerializer.create(schemaContext, data);
     }
 
-    public static YangInstanceIdentifier deserialize(final String data, final EffectiveModelContext schemaContext) {
+    public static YangInstanceIdentifier deserialize(final String data, final EffectiveModelContext schemaContext)
+            throws RestconfDocumentedException {
         return data == null ? YangInstanceIdentifier.of()
             : YangInstanceIdentifierDeserializer.create(schemaContext, data).path;
     }

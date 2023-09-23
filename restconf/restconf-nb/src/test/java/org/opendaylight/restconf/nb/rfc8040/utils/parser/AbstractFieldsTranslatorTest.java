@@ -113,13 +113,13 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
             YangParserTestUtils.parseYangResourceDirectory("/same-qname-nodes"), FOO_Q_NAME));
     }
 
-    protected abstract List<T> translateFields(InstanceIdentifierContext context, FieldsParam fields);
+    protected abstract List<T> translateFields(InstanceIdentifierContext context, FieldsParam fields) throws Exception;
 
     /**
      * Test parse fields parameter containing only one child selected.
      */
     @Test
-    public void testSimplePath() {
+    public void testSimplePath() throws Exception{
         final var result = translateFields(identifierJukebox, assertFields("library"));
         assertNotNull(result);
         assertSimplePath(result);
@@ -131,7 +131,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
      * Test parse fields parameter containing two child nodes selected.
      */
     @Test
-    public void testDoublePath() {
+    public void testDoublePath() throws Exception {
         final var result = translateFields(identifierJukebox, assertFields("library;player"));
         assertNotNull(result);
         assertDoublePath(result);
@@ -143,7 +143,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
      * Test parse fields parameter containing sub-children selected delimited by slash.
      */
     @Test
-    public void testSubPath() {
+    public void testSubPath() throws Exception {
         final var result = translateFields(identifierJukebox, assertFields("library/artist/album/name"));
         assertNotNull(result);
         assertSubPath(result);
@@ -155,7 +155,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
      * Test parse fields parameter containing sub-children selected delimited by parenthesis.
      */
     @Test
-    public void testChildrenPath() {
+    public void testChildrenPath() throws Exception {
         final var result = translateFields(identifierJukebox, assertFields("library(artist(album(name)))"));
         assertNotNull(result);
         assertChildrenPath(result);
@@ -167,7 +167,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
      * Test parse fields parameter when augmentation with different namespace is used.
      */
     @Test
-    public void testNamespace() {
+    public void testNamespace() throws Exception {
         final var result = translateFields(identifierJukebox, assertFields("augmented-jukebox:augmented-library"));
         assertNotNull(result);
         assertNamespace(result);
@@ -180,7 +180,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
      * direct children of parent node - multiple children which are constructed using '/'.
      */
     @Test
-    public void testMultipleChildren1() {
+    public void testMultipleChildren1() throws Exception {
         final var result = translateFields(identifierTestServices,
             assertFields("services(type-of-service;instance/instance-name;instance/provider)"));
         assertNotNull(result);
@@ -194,7 +194,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
      * direct children of parent node - one of children nodes is typed using brackets, other is constructed using '/'.
      */
     @Test
-    public void testMultipleChildren2() {
+    public void testMultipleChildren2() throws Exception {
         final var result = translateFields(identifierTestServices,
             assertFields("services(type-of-service;instance(instance-name;provider))"));
         assertNotNull(result);
@@ -208,7 +208,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
      * direct children of parent node - multiple children with different parent nodes.
      */
     @Test
-    public void testMultipleChildren3() {
+    public void testMultipleChildren3() throws Exception {
         final var result = translateFields(identifierTestServices,
             assertFields("services(instance/instance-name;type-of-service;next-data/next-service)"));
         assertNotNull(result);
@@ -218,7 +218,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     protected abstract void assertMultipleChildren3(@NonNull List<T> result);
 
     @Test
-    public void testMultipleChildren4() {
+    public void testMultipleChildren4() throws Exception {
         final var result = translateFields(identifierTestServices,
                 assertFields("services(type-of-service;instance(instance-name;provider);next-data(next-service))"));
         assertNotNull(result);
@@ -228,7 +228,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     protected abstract void assertMultipleChildren4(@NonNull List<T> result);
 
     @Test
-    public void testMultipleChildren5() {
+    public void testMultipleChildren5() throws Exception {
         final var result = translateFields(identifierTestServices,
                 assertFields("services(type-of-service;instance(instance-name;provider);next-data/next-service)"));
         assertNotNull(result);
@@ -238,7 +238,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     protected abstract void assertMultipleChildren5(@NonNull List<T> result);
 
     @Test
-    public void testAugmentedChild() {
+    public void testAugmentedChild() throws Exception {
         final var result = translateFields(identifierJukebox, assertFields("player/augmented-jukebox:speed"));
         assertNotNull(result);
         assertAugmentedChild(result);
@@ -247,7 +247,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     protected abstract void assertAugmentedChild(@NonNull List<T> result);
 
     @Test
-    public void testListFieldUnderList() {
+    public void testListFieldUnderList() throws Exception {
         final var result = translateFields(identifierTestServices, assertFields("services/instance"));
         assertNotNull(result);
         assertListFieldUnderList(result);
@@ -256,14 +256,14 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     protected abstract void assertListFieldUnderList(@NonNull List<T> result);
 
     @Test
-    public void testLeafList() {
+    public void testLeafList() throws Exception {
         final var result = translateFields(identifierTestServices, assertFields("protocols"));
         assertNotNull(result);
         assertLeafList(result);
     }
 
     @Test
-    public void testKeyedList() {
+    public void testKeyedList() throws Exception {
         final var result = translateFields(identifierJukebox, assertFields("library/artist(name)"));
         assertNotNull(result);
         assertKeyedList(result);
@@ -274,7 +274,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     protected abstract void assertLeafList(@NonNull List<T> result);
 
     @Test
-    public void testDuplicateNodes1() {
+    public void testDuplicateNodes1() throws Exception {
         final var result = translateFields(identifierFoo,
             assertFields("bar(alpha;beta/gamma);baz(alpha;beta/gamma)"));
         assertNotNull(result);
@@ -284,7 +284,7 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
     protected abstract void assertDuplicateNodes1(List<T> result);
 
     @Test
-    public void testDuplicateNodes2() {
+    public void testDuplicateNodes2() throws Exception {
         final var result = translateFields(identifierFoo,
             assertFields("bar(alpha;beta/delta);baz(alpha;beta/epsilon)"));
         assertNotNull(result);

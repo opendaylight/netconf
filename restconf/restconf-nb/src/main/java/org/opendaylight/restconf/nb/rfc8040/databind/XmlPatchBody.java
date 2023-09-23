@@ -11,7 +11,6 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
@@ -37,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 public final class XmlPatchBody extends PatchBody {
     private static final Logger LOG = LoggerFactory.getLogger(XmlPatchBody.class);
@@ -51,7 +49,7 @@ public final class XmlPatchBody extends PatchBody {
             final InputStream inputStream) throws IOException {
         try {
             return parse(context, urlPath, UntrustedXML.newDocumentBuilder().parse(inputStream));
-        } catch (XMLStreamException | SAXException | URISyntaxException e) {
+        } catch (XMLStreamException e) {
             LOG.debug("Failed to parse YANG Patch XML", e);
             throw new RestconfDocumentedException("Error parsing YANG Patch XML: " + e.getMessage(), ErrorType.PROTOCOL,
                 ErrorTag.MALFORMED_MESSAGE, e);
@@ -60,7 +58,7 @@ public final class XmlPatchBody extends PatchBody {
 
     private static @NonNull PatchContext parse(final EffectiveModelContext context,
             final YangInstanceIdentifier urlPath, final Document doc)
-                throws XMLStreamException, IOException, SAXException, URISyntaxException {
+                throws XMLStreamException, IOException, RestconfDocumentedException {
         final var entities = ImmutableList.<PatchEntity>builder();
         final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final var editNodes = doc.getElementsByTagName("edit");
@@ -114,7 +112,8 @@ public final class XmlPatchBody extends PatchBody {
      * @param operation Name of current operation
      * @return List of value elements
      */
-    private static List<Element> readValueNodes(final @NonNull Element element, final @NonNull Operation operation) {
+    private static List<Element> readValueNodes(final @NonNull Element element, final @NonNull Operation operation)
+            throws RestconfDocumentedException {
         final Node valueNode = element.getElementsByTagName("value").item(0);
 
         final boolean isWithValue = requiresValue(operation);

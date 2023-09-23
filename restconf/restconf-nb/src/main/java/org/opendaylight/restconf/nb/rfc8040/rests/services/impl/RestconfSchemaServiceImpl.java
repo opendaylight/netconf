@@ -14,6 +14,7 @@ import javax.ws.rs.Path;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -42,7 +43,7 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
     }
 
     @Override
-    public SchemaExportContext getSchema(final String identifier) {
+    public SchemaExportContext getSchema(final String identifier) throws RestconfDocumentedException {
         return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaService.getGlobalContext(), identifier,
             mountPointService, sourceProvider);
     }

@@ -103,7 +103,7 @@ public final class RestconfInvokeOperationsServiceImpl {
         MediaType.TEXT_XML
     })
     public void invokeRpcXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) throws RestconfDocumentedException {
         try (var xmlBody = new XmlOperationInputBody(body)) {
             invokeRpc(identifier, uriInfo, ar, xmlBody);
         }
@@ -132,14 +132,14 @@ public final class RestconfInvokeOperationsServiceImpl {
         MediaType.TEXT_XML
     })
     public void invokeRpcJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) throws RestconfDocumentedException {
         try (var jsonBody = new JsonOperationInputBody(body)) {
             invokeRpc(identifier, uriInfo, ar, jsonBody);
         }
     }
 
     private void invokeRpc(final String identifier, final UriInfo uriInfo, final AsyncResponse ar,
-            final OperationInputBody body) {
+            final OperationInputBody body) throws RestconfDocumentedException {
         final var dataBind = databindProvider.currentContext();
         final var schemaContext = dataBind.modelContext();
         final var context = ParserIdentifier.toInstanceIdentifier(identifier, schemaContext, mountPointService);
@@ -206,7 +206,7 @@ public final class RestconfInvokeOperationsServiceImpl {
      */
     @VisibleForTesting
     static ListenableFuture<? extends DOMRpcResult> invokeRpc(final ContainerNode data, final QName rpc,
-            final DOMMountPoint mountPoint) {
+            final DOMMountPoint mountPoint) throws RestconfDocumentedException{
         return invokeRpc(data, rpc, mountPoint.getService(DOMRpcService.class).orElseThrow(() -> {
             final String errmsg = "RPC service is missing.";
             LOG.debug(errmsg);
