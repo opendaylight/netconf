@@ -8,7 +8,8 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.CharMatcher;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import java.util.HexFormat;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -32,11 +33,25 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * Serializer for {@link YangInstanceIdentifier} to {@link String} for restconf.
  */
 public final class YangInstanceIdentifierSerializer {
-    // RFC8040 specifies that reserved characters need to be percent-encoded
+    // Escaper based on RFC8040-requirement to percent-encode reserved characters, as defined in
+    // https://tools.ietf.org/html/rfc3986#section-2.2
     @VisibleForTesting
-    static final CharMatcher PERCENT_ENCODE_CHARS =
-            CharMatcher.anyOf(ParserConstants.RFC3986_RESERVED_CHARACTERS).precomputed();
-    private static final HexFormat PERCENT_HEXFORMAT = HexFormat.of().withUpperCase();
+    static final Escaper PERCENT_ESCAPER;
+
+    static {
+        final var hexFormat = HexFormat.of().withUpperCase();
+        final var builder = Escapers.builder();
+        for (char ch : new char[] {
+            // Reserved characters as per https://tools.ietf.org/html/rfc3986#section-2.2
+            ':', '/', '?', '#', '[', ']', '@',
+            '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=',
+            // FIXME: this space should not be here, but that was a day-0 bug and we have asserts on this
+            ' '
+        }) {
+            builder.addEscape(ch, "%" + hexFormat.toHighHexDigit(ch) + hexFormat.toLowHexDigit(ch));
+        }
+        PERCENT_ESCAPER = builder.build();
+    }
 
     private YangInstanceIdentifierSerializer() {
         // Hidden on purpose
@@ -105,11 +120,8 @@ public final class YangInstanceIdentifierSerializer {
         path.append('=');
 
         // FIXME: this is quite fishy
-        var str = String.valueOf(value);
-        if (PERCENT_ENCODE_CHARS.matchesAnyOf(str)) {
-            str = percentEncodeChars(str);
-        }
-        path.append(str);
+        final var str = String.valueOf(value);
+        path.append(PERCENT_ESCAPER.escape(str));
     }
 
     private static void prepareNodeWithPredicates(final StringBuilder path, final Set<Entry<QName, Object>> entries) {
@@ -120,37 +132,12 @@ public final class YangInstanceIdentifierSerializer {
 
         while (iterator.hasNext()) {
             // FIXME: this is quite fishy
-            var str = String.valueOf(iterator.next().getValue());
-            if (PERCENT_ENCODE_CHARS.matchesAnyOf(str)) {
-                str = percentEncodeChars(str);
-            }
-            path.append(str);
+            final var str = String.valueOf(iterator.next().getValue());
+            path.append(PERCENT_ESCAPER.escape(str));
             if (iterator.hasNext()) {
                 path.append(',');
             }
         }
-    }
-
-    /**
-     * Encode {@link PERCENT_ENCODE_CHARS} chars to percent encoded chars. The implementation assumes all characters lie
-     * within basic range {@code 0-127} and can be encoded as {@code %XX}.
-     *
-     * @param str string to encode
-     * @return encoded {@link String}
-     */
-    private static String percentEncodeChars(final String str) {
-        final var sb = new StringBuilder();
-
-        for (int i = 0; i < str.length(); ++i) {
-            final char ch = str.charAt(i);
-
-            if (PERCENT_ENCODE_CHARS.matches(ch)) {
-                sb.append('%').append(PERCENT_HEXFORMAT.toHighHexDigit(ch)).append(PERCENT_HEXFORMAT.toLowHexDigit(ch));
-            } else {
-                sb.append(ch);
-            }
-        }
-        return sb.toString();
     }
 
     /**

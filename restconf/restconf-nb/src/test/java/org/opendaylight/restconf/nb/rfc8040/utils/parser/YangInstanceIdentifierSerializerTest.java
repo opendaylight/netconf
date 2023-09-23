@@ -251,15 +251,19 @@ public class YangInstanceIdentifierSerializerTest {
         final char[] genDelims = { ':', '/', '?', '#', '[', ']', '@' };
         final char[] subDelims = { '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=' };
 
-        for (final char c : genDelims) {
-            assertTrue("Current character is reserved and should be percent encoded",
-                    YangInstanceIdentifierSerializer.PERCENT_ENCODE_CHARS.matches(c));
+        for (final char ch : genDelims) {
+            assertPercentEncoded(ch);
         }
 
-        for (final char c : subDelims) {
-            assertTrue("Current character is reserved and should be percent encoded",
-                    YangInstanceIdentifierSerializer.PERCENT_ENCODE_CHARS.matches(c));
+        for (final char ch : subDelims) {
+            assertPercentEncoded(ch);
         }
+    }
+
+    private static void assertPercentEncoded(final char ch) {
+        final var str = YangInstanceIdentifierSerializer.PERCENT_ESCAPER.escape(String.valueOf(ch));
+        assertEquals(3, str.length());
+        assertEquals('%', str.charAt(0));
     }
 
     /**

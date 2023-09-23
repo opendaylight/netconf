@@ -14,11 +14,6 @@ import org.opendaylight.yangtools.yang.common.YangNames;
  * Various constants related to RFC3986 (URI) and RFC7950 (YANG) parsing in the context of RFC8040.
  */
 final class ParserConstants {
-    // Reserved characters as per https://tools.ietf.org/html/rfc3986#section-2.2
-    static final String RFC3986_RESERVED_CHARACTERS = ":/?#[]@" + "!$&'()*+,;="
-            // FIXME: this space should not be here, but that was a day-0 bug and we have asserts on this
-            + " ";
-
     // Subsequent characters of RFC7950 "identifier" rule
     static final CharMatcher YANG_IDENTIFIER_PART = YangNames.NOT_IDENTIFIER_PART.negate().precomputed();
 
