@@ -402,6 +402,25 @@ public final class OpenApiGeneratorRFC8040Test {
     }
 
     /**
+     * Test that checks if namespace for rpc is present.
+     */
+    @Test
+    public void testRpcNamespace() {
+        final var doc = generator.getApiDeclaration("toaster", "2009-11-20", uriInfo);
+
+        assertNotNull("Failed to find Datastore API", doc);
+        final var paths = doc.paths();
+        final var schema = paths.get("/rests/operations/toaster:cancel-toast")
+            .post().requestBody().content().get("application/xml").schema();
+        assertNotNull(schema);
+        final var xml = schema.xml();
+        assertNotNull(xml);
+        final var namespace = xml.namespace();
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace);
+    }
+
+    /**
      *  Test JSON and XML references for request operation.
      */
     private static void verifyPostDataRequestRef(final Operation operation, final String expectedJsonRef,
