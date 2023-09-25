@@ -286,7 +286,7 @@ public final class DefinitionGenerator {
             final Schema.Builder childSchemaBuilder = new Schema.Builder()
                 .title(filename)
                 .type(OBJECT_TYPE)
-                .xml(new Xml(isInput ? INPUT : OUTPUT, null, null));
+                .xml(new Xml(isInput ? INPUT : OUTPUT, container.getQName().getNamespace().toString(), null));
             processChildren(childSchemaBuilder, container.getChildNodes(), parentName, definitions, definitionNames,
                 stack, module, false);
             final String discriminator =
