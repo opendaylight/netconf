@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0f000ad_a51b072e",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/DefaultNetconfClientConfigurationBuilderFactory.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-25T07:23:40Z",
+      "side": 1,
+      "message": "We have no idea for which device, etc.\n\nSee: https://docs.opendaylight.org/en/latest/developer-guides/logging-subsystem.html",
+      "revId": "b4edc6fa906546a95d49095cec2c9778271733cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4f474c9_a012fad4",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-25T07:23:40Z",
+      "side": 1,
+      "message": "For which device?\nhttps://docs.opendaylight.org/en/latest/developer-guides/logging-subsystem.html",
+      "revId": "b4edc6fa906546a95d49095cec2c9778271733cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42dd74ca_5c5b1b04",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-25T07:23:40Z",
+      "side": 1,
+      "message": "Please add description what is expected here.",
+      "revId": "b4edc6fa906546a95d49095cec2c9778271733cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
