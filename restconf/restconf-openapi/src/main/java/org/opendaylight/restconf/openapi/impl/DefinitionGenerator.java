@@ -312,7 +312,8 @@ public class DefinitionGenerator {
             final Schema.Builder childSchemaBuilder = new Schema.Builder()
                 .title(filename)
                 .type(OBJECT_TYPE)
-                .xml(JsonNodeFactory.instance.objectNode().put(NAME_KEY, isInput ? INPUT : OUTPUT));
+                .xml(JsonNodeFactory.instance.objectNode().put(NAME_KEY, isInput ? INPUT : OUTPUT)
+                    .put("namespace", container.getQName().getNamespace().toString()));
             processChildren(childSchemaBuilder, container.getChildNodes(), parentName, definitions, definitionNames,
                     false, stack);
             final String discriminator =
