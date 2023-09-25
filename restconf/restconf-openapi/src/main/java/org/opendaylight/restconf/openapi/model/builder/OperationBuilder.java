@@ -225,7 +225,7 @@ public final class OperationBuilder {
             final SimpleEntry<String, MediaTypeObject> jsonEntry = new SimpleEntry<>(MediaType.APPLICATION_JSON,
                 jsonTypeValue);
 
-            final Xml xml = new Xml(INPUT_KEY, null, null);
+            final Xml xml = new Xml(INPUT_KEY, input.getQName().getNamespace().toString(), null);
             final Schema xmlSchema = new Schema.Builder()
                 .type(OBJECT)
                 .xml(xml)
