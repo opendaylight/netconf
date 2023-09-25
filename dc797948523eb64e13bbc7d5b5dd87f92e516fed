@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fc10db9_5585f3e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-25T07:30:40Z",
+      "side": 1,
+      "message": "We will make @Nonnull module and throws exception earlier in the code (when module cannot be found).",
+      "revId": "dc797948523eb64e13bbc7d5b5dd87f92e516fed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
