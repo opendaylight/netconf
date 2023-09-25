@@ -313,6 +313,7 @@ public class DefinitionGenerator {
                 .title(filename)
                 .type(OBJECT_TYPE)
                 .xml(JsonNodeFactory.instance.objectNode().put(NAME_KEY, isInput ? INPUT : OUTPUT));
+                .xml(new Xml(isInput ? INPUT : OUTPUT, container.getQName().getNamespace().toString(), null));
             processChildren(childSchemaBuilder, container.getChildNodes(), parentName, definitions, definitionNames,
                     false, stack);
             final String discriminator =
