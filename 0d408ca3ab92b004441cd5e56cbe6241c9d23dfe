@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6309370d_692994e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-25T07:48:59Z",
+      "side": 1,
+      "message": "Can be one line.",
+      "revId": "0d408ca3ab92b004441cd5e56cbe6241c9d23dfe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00f0b679_4b0ae1bd",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-25T07:48:59Z",
+      "side": 1,
+      "message": "public ImmutableClassToInstanceMap\u003cRpc\u003c?, ?\u003e\u003e getRpcClassToInstanceMap() {",
+      "revId": "0d408ca3ab92b004441cd5e56cbe6241c9d23dfe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2269920c_77b7cfa5",
+        "filename": "netconf/tools/netconf-test-perf/src/main/java/org/opendaylight/test/endtoend/NcmountRpcs.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-25T07:48:59Z",
+      "side": 1,
+      "message": "private static",
+      "revId": "0d408ca3ab92b004441cd5e56cbe6241c9d23dfe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9680b46f_811b8f95",
+        "filename": "netconf/tools/netconf-test-perf/src/main/java/org/opendaylight/test/endtoend/NcmountRpcs.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-25T07:48:59Z",
+      "side": 1,
+      "message": "private static",
+      "revId": "0d408ca3ab92b004441cd5e56cbe6241c9d23dfe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d863eb1b_76153ec3",
+        "filename": "netconf/tools/netconf-test-perf/src/main/java/org/opendaylight/test/endtoend/NcmountRpcs.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-25T07:48:59Z",
+      "side": 1,
+      "message": "ImmutableClassToInstanceMap\u003cRpc\u003c?, ?\u003e\u003e",
+      "revId": "0d408ca3ab92b004441cd5e56cbe6241c9d23dfe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "091955e5_8aa73ea2",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfSalKeystoreRpcs.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-09-25T07:48:59Z",
+      "side": 1,
+      "message": "ImmutableClassToInstanceMap\u003cRpc\u003c?, ?\u003e\u003e",
+      "revId": "0d408ca3ab92b004441cd5e56cbe6241c9d23dfe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
