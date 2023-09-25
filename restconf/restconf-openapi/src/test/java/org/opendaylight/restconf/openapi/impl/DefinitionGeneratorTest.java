@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -143,5 +144,22 @@ public final class DefinitionGeneratorTest {
         assertEquals("00:00:00:00:00:00", properties.get("mac-address").example().toString());
         assertEquals("0000-00-00T00:00:00Z", properties.get("login-date-time").example().toString());
         assertEquals("0.0.0.0", properties.get("ipv4-address").example().toString());
+    }
+
+    /**
+     * Test that checks if namespace for rpc is present.
+     */
+    @Test
+    public void testRpcNamespace() throws Exception {
+        final var module = context.findModule("toaster", Revision.of("2009-11-20")).orElseThrow();
+        final var jsonObject = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(jsonObject);
+        final var schema = jsonObject.get("toaster_make-toast_input");
+        assertNotNull(schema);
+        final var xml = schema.xml();
+        assertNotNull(xml);
+        final var namespace = xml.namespace();
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace);
     }
 }
