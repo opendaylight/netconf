@@ -338,4 +338,52 @@ public final class MountPointOpenApiTest {
         // verify that the filtered set (from openapi for all modules) is the same as the set from openapi for toaster
         assertEquals(toasterPathsFromToaster, toasterPathsFromAll);
     }
+
+    /**
+     * Test that checks if namespace for rpc is present.
+     */
+    @Test
+    public void testRpcNamespace() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+        final var paths = mountPointApi.paths();
+        final var path = paths.get("/rests/operations/nodes/node=123/yang-ext:mount/toaster:cancel-toast");
+        assertNotNull(path);
+        final var content = path.post().requestBody().get("content").get("application/xml");
+        assertNotNull(content);
+        final var schema = content.get("schema");
+        assertNotNull(schema);
+        final var xml = schema.get("xml");
+        assertNotNull(xml);
+        final var namespace = xml.get("namespace");
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace.asText());
+    }
+
+    /**
+     * Test that checks if namespace for actions is present.
+     */
+    @Test
+    public void testActionsNamespace() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.empty());
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+        final var paths = mountPointApi.paths();
+        final var path = paths.get(
+            "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action");
+        assertNotNull(path);
+        final var content = path.post().requestBody().get("content").get("application/xml");
+        assertNotNull(content);
+        final var schema = content.get("schema");
+        assertNotNull(schema);
+        final var xml = schema.get("xml");
+        assertNotNull(xml);
+        final var namespace = xml.get("namespace");
+        assertNotNull(namespace);
+        assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace.asText());
+    }
 }
