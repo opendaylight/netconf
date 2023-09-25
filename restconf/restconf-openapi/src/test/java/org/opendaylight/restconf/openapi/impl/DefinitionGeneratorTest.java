@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Objects;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -143,5 +144,15 @@ public final class DefinitionGeneratorTest {
         assertEquals("00:00:00:00:00:00", properties.get("mac-address").example().toString());
         assertEquals("0000-00-00T00:00:00Z", properties.get("login-date-time").example().toString());
         assertEquals("0.0.0.0", properties.get("ipv4-address").example().toString());
+    }
+
+    @Test
+    public void testRpcNamespace() throws IOException {
+        final var module = context.findModule("toaster", Revision.of("2009-11-20")).orElseThrow();
+        final var jsonObject = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(jsonObject);
+        final var namespace = Objects.requireNonNull(jsonObject.get("toaster_make-toast_input").xml()).namespace();
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace);
     }
 }
