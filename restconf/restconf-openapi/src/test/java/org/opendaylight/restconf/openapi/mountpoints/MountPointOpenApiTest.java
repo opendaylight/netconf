@@ -342,4 +342,51 @@ public final class MountPointOpenApiTest {
         // verify that the filtered set (from openapi for all modules) is the same as the set from openapi for toaster
         assertEquals(toasterPathsFromToaster, toasterPathsFromAll);
     }
+
+    /**
+     * Test that checks if namespace for rpc is present.
+     */
+    @Test
+    public void testRpcNamespace() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, null);
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+        final var paths = mountPointApi.paths();
+        final var path = paths.get("/rests/operations/nodes/node=123/yang-ext:mount/toaster:cancel-toast");
+        assertNotNull(path);
+        final var content = path.post().requestBody().content().get("application/xml");
+        assertNotNull(content);
+        final var schema = content.schema();
+        assertNotNull(schema);
+        final var xml = schema.xml();
+        assertNotNull(xml);
+        final var namespace = xml.namespace();
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace);
+    }
+
+    /**
+     * Test that checks if namespace for actions is present.
+     */
+    @Test
+    public void testActionsNamespace() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, null);
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+        final var paths = mountPointApi.paths();
+        final var path = paths.get("/rests/operations/nodes/node=123/yang-ext:mount/toaster:cancel-toast");
+        assertNotNull(path);
+        final var content = path.post().requestBody().content().get("application/xml");
+        assertNotNull(content);
+        final var schema = content.schema();
+        assertNotNull(schema);
+        final var xml = schema.xml();
+        assertNotNull(xml);
+        final var namespace = xml.namespace();
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace);
+    }
 }
