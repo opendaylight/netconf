@@ -19,6 +19,7 @@ import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BA
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -341,5 +342,23 @@ public final class MountPointOpenApiTest {
 
         // verify that the filtered set (from openapi for all modules) is the same as the set from openapi for toaster
         assertEquals(toasterPathsFromToaster, toasterPathsFromAll);
+    }
+
+    /**
+     * Test that checks if namespace for rpc is present.
+     */
+    @Test
+    public void testRpcNamespace() throws Exception {
+        final UriInfo mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+
+        final OpenApiObject mountPointApi = openApi.getMountPointApi(mockInfo, 1L, null);
+        assertNotNull("Failed to find Datastore API", mountPointApi);
+        final Map<String, Path> paths = mountPointApi.paths();
+        final var namespace = Objects.requireNonNull(Objects.requireNonNull(
+            paths.get("/rests/operations/nodes/node=123/yang-ext:mount/toaster:cancel-toast")
+                .post().requestBody().content().get("application/xml").schema()).xml()).namespace();
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace);
     }
 }

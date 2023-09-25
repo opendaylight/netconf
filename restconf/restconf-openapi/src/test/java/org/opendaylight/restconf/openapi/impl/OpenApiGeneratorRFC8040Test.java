@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;
 import org.junit.BeforeClass;
@@ -399,6 +400,22 @@ public final class OpenApiGeneratorRFC8040Test {
         for (final var secObjRef : referencedSecurityObjects) {
             assertTrue(securitySchemesObjectNames.contains(secObjRef));
         }
+    }
+
+    /**
+     * Test that checks if namespace for rpc is present.
+     */
+    @Test
+    public void testRpcNamespace() throws Exception {
+        final var doc = generator.getApiDeclaration("toaster", "2009-11-20", uriInfo);
+
+        assertNotNull("Failed to find Datastore API", doc);
+        final Map<String, Path> paths = doc.paths();
+        final var namespace = Objects.requireNonNull(Objects.requireNonNull(
+            paths.get("/rests/operations/toaster:cancel-toast")
+                .post().requestBody().content().get("application/xml").schema()).xml()).namespace();
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace);
     }
 
     /**
