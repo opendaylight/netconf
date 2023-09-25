@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d9df7f7_fc324c09",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/DefaultNetconfClientConfigurationBuilderFactory.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-25T20:54:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0f000ad_a51b072e",
+      "revId": "b4edc6fa906546a95d49095cec2c9778271733cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4f474c9_a012fad4",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd8ba041_dbb3150a",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-25T20:54:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4f474c9_a012fad4",
+      "revId": "b4edc6fa906546a95d49095cec2c9778271733cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42dd74ca_5c5b1b04",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-09-25T07:23:40Z",
       "side": 1,
       "message": "Please add description what is expected here.",
+      "revId": "b4edc6fa906546a95d49095cec2c9778271733cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12c444f1_ed7215d5",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-25T20:54:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42dd74ca_5c5b1b04",
       "revId": "b4edc6fa906546a95d49095cec2c9778271733cb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
