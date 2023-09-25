@@ -402,6 +402,48 @@ public final class OpenApiGeneratorRFC8040Test {
     }
 
     /**
+     * Test that checks if namespace for rpc is present.
+     */
+    @Test
+    public void testRpcNamespace() {
+        final var doc = generator.getApiDeclaration("toaster", "2009-11-20", uriInfo);
+        assertNotNull("Failed to find Datastore API", doc);
+        final var paths = doc.paths();
+        final var path = paths.get("/rests/operations/toaster:cancel-toast");
+        assertNotNull(path);
+        final var content = path.post().requestBody().content().get("application/xml");
+        assertNotNull(content);
+        final var schema = content.schema();
+        assertNotNull(schema);
+        final var xml = schema.xml();
+        assertNotNull(xml);
+        final var namespace = xml.namespace();
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace);
+    }
+
+    /**
+     * Test that checks if namespace for actions is present.
+     */
+    @Test
+    public void testActionsNamespace() {
+        final var doc = generator.getApiDeclaration("action-types", null, uriInfo);
+        assertNotNull("Failed to find Datastore API", doc);
+        final var paths = doc.paths();
+        final var path = paths.get("/rests/operations/action-types:multi-container/inner-container/action");
+        assertNotNull(path);
+        final var content = path.post().requestBody().content().get("application/xml");
+        assertNotNull(content);
+        final var schema = content.schema();
+        assertNotNull(schema);
+        final var xml = schema.xml();
+        assertNotNull(xml);
+        final var namespace = xml.namespace();
+        assertNotNull(namespace);
+        assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace);
+    }
+
+    /**
      *  Test JSON and XML references for request operation.
      */
     private static void verifyPostDataRequestRef(final Operation operation, final String expectedJsonRef,

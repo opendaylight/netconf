@@ -280,7 +280,8 @@
             "application/xml": {
               "schema": {
                 "xml": {
-                  "name": "input"
+                  "name": "input",
+                  "namespace": "http://netconfcentral.org/ns/toaster"
                 },
                 "type": "object"
               }
@@ -331,7 +332,8 @@
           }
         },
         "xml": {
-          "name": "input"
+          "name": "input",
+          "namespace": "http://netconfcentral.org/ns/toaster"
         },
         "title": "toaster_make-toast_input",
         "type": "object"
@@ -368,7 +370,8 @@
           }
         },
         "xml": {
-          "name": "input"
+          "name": "input",
+          "namespace": "http://netconfcentral.org/ns/toaster"
         },
         "title": "toaster_restock-toaster_input",
         "type": "object"
