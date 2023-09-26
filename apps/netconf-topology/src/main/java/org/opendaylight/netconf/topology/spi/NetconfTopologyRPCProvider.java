@@ -10,7 +10,6 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -19,6 +18,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -43,6 +43,8 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.Rpc;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -51,24 +53,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
-public class NetconfTopologyRPCProvider {
+public final class NetconfTopologyRPCProvider extends AbstractRegistration {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyRPCProvider.class);
 
     private final @NonNull InstanceIdentifier<Topology> topologyPath;
     private final @NonNull AAAEncryptionService encryptionService;
     private final @NonNull DataBroker dataBroker;
 
-    public NetconfTopologyRPCProvider(final DataBroker dataBroker, final AAAEncryptionService encryptionService,
-            final String topologyId) {
+    private final Registration reg;
+
+    public NetconfTopologyRPCProvider(final RpcProviderService rpcProviderService, final DataBroker dataBroker,
+            final AAAEncryptionService encryptionService, final String topologyId) {
         this.dataBroker = requireNonNull(dataBroker);
         this.encryptionService = requireNonNull(encryptionService);
         topologyPath = InstanceIdentifier.builder(NetworkTopology.class)
             .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
             .build();
+        reg = rpcProviderService.registerRpcImplementations(ImmutableClassToInstanceMap.<Rpc<?, ?>>builder()
+            .put(CreateDevice.class, this::createDevice)
+            .put(DeleteDevice.class, this::deleteDevice)
+            .build());
     }
 
-    protected final @NonNull InstanceIdentifier<Topology> topologyPath() {
+    protected @NonNull InstanceIdentifier<Topology> topologyPath() {
         return topologyPath;
+    }
+
+    @Override
+    protected void removeRegistration() {
+        reg.close();
     }
 
     private ListenableFuture<RpcResult<CreateDeviceOutput>> createDevice(final CreateDeviceInput input) {
@@ -153,12 +166,5 @@ public class NetconfTopologyRPCProvider {
                 futureResult.setException(exception);
             }
         }, MoreExecutors.directExecutor());
-    }
-
-    public ClassToInstanceMap<Rpc<?, ?>> getRpcClassToInstanceMap() {
-        return ImmutableClassToInstanceMap.<Rpc<?, ?>>builder()
-            .put(CreateDevice.class, this::createDevice)
-            .put(DeleteDevice.class, this::deleteDevice)
-            .build();
     }
 }

@@ -185,8 +185,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         this.builderFactory = requireNonNull(builderFactory);
 
         dataChangeListenerRegistration = registerDataTreeChangeListener();
-        final var nodeTopologyRpcs = new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId);
-        rpcReg = rpcProviderService.registerRpcImplementations(nodeTopologyRpcs.getRpcClassToInstanceMap());
+        rpcReg = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, topologyId);
     }
 
     @Override
