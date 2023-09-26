@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "921d4bfc_9c1ba741",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/errors/RestconfDocumentedException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-26T21:32:36Z",
+      "side": 1,
+      "message": "modelContext",
+      "range": {
+        "startLine": 180,
+        "startChar": 40,
+        "endLine": 180,
+        "endChar": 46
+      },
+      "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a505186_b0f0158e",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/errors/RestconfDocumentedException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-26T21:32:36Z",
+      "side": 1,
+      "message": "requireNonNull()",
+      "range": {
+        "startLine": 184,
+        "startChar": 29,
+        "endLine": 184,
+        "endChar": 42
+      },
+      "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25166f0d_9b502176",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/errors/RestconfDocumentedException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-26T21:32:36Z",
+      "side": 1,
+      "message": "@Nullable modelContext()",
+      "range": {
+        "startLine": 292,
+        "startChar": 11,
+        "endLine": 292,
+        "endChar": 49
+      },
+      "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
