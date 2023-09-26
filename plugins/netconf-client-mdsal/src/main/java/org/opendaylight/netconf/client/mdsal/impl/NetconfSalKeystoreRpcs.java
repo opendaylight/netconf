@@ -9,7 +9,7 @@ package org.opendaylight.netconf.client.mdsal.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -89,7 +89,14 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
         this.dataBroker = requireNonNull(dataBroker);
         this.encryptionService = requireNonNull(encryptionService);
 
-        reg = rpcProvider.registerRpcImplementations(getRpcClassToInstanceMap());
+        reg = rpcProvider.registerRpcImplementations(ImmutableClassToInstanceMap.<Rpc<?, ?>>builder()
+            .put(RemoveKeystoreEntry.class, this::removeKeystoreEntry)
+            .put(AddKeystoreEntry.class, this::addKeystoreEntry)
+            .put(AddTrustedCertificate.class, this::addTrustedCertificate)
+            .put(RemoveTrustedCertificate.class, this::removeTrustedCertificate)
+            .put(AddPrivateKey.class, this::addPrivateKey)
+            .put(RemovePrivateKey.class, this::removePrivateKey)
+            .build());
         LOG.info("NETCONF keystore service started");
     }
 
@@ -166,7 +173,8 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
         return rpcResult;
     }
 
-    private ListenableFuture<RpcResult<AddTrustedCertificateOutput>> addTrustedCertificate(
+    @VisibleForTesting
+    ListenableFuture<RpcResult<AddTrustedCertificateOutput>> addTrustedCertificate(
             final AddTrustedCertificateInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
 
@@ -222,7 +230,8 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
         return rpcResult;
     }
 
-    private ListenableFuture<RpcResult<AddPrivateKeyOutput>> addPrivateKey(final AddPrivateKeyInput input) {
+    @VisibleForTesting
+    ListenableFuture<RpcResult<AddPrivateKeyOutput>> addPrivateKey(final AddPrivateKeyInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
 
         for (PrivateKey key: input.nonnullPrivateKey().values()) {
@@ -274,16 +283,5 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
         }, MoreExecutors.directExecutor());
 
         return rpcResult;
-    }
-
-    public ClassToInstanceMap<Rpc<?, ?>> getRpcClassToInstanceMap() {
-        return ImmutableClassToInstanceMap.<Rpc<?, ?>>builder()
-            .put(RemoveKeystoreEntry.class, this::removeKeystoreEntry)
-            .put(AddKeystoreEntry.class, this::addKeystoreEntry)
-            .put(AddTrustedCertificate.class, this::addTrustedCertificate)
-            .put(RemoveTrustedCertificate.class, this::removeTrustedCertificate)
-            .put(AddPrivateKey.class, this::addPrivateKey)
-            .put(RemovePrivateKey.class, this::removePrivateKey)
-            .build();
     }
 }

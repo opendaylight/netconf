@@ -29,10 +29,8 @@ import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
@@ -83,7 +81,7 @@ public class NetconfSalKeystoreRpcsTest {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
         try (var keystoreService = new NetconfSalKeystoreRpcs(dataBroker, encryptionService, rpcProvider)) {
             final AddPrivateKeyInput input = getPrivateKeyInput();
-            keystoreService.getRpcClassToInstanceMap().getInstance(AddPrivateKey.class).invoke(input).get();
+            keystoreService.addPrivateKey(input).get();
 
             verify(writeTx, times(input.nonnullPrivateKey().size()))
                 .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
@@ -95,7 +93,7 @@ public class NetconfSalKeystoreRpcsTest {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
         try (var keystoreService = new NetconfSalKeystoreRpcs(dataBroker, encryptionService, rpcProvider)) {
             final var input = getTrustedCertificateInput();
-            keystoreService.getRpcClassToInstanceMap().getInstance(AddTrustedCertificate.class).invoke(input).get();
+            keystoreService.addTrustedCertificate(input).get();
 
             verify(writeTx, times(input.nonnullTrustedCertificate().size()))
                 .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
