@@ -134,6 +134,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -184,6 +185,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final String TEST_DEFAULT_SUBDIR = "test-schema";
 
     @Mock private RpcProviderService mockRpcProviderService;
+    @Mock private Registration mockRpcReg;
     @Mock private NetconfClientDispatcher mockClientDispatcher;
     @Mock private AAAEncryptionService mockEncryptionService;
     @Mock private ScheduledExecutorService mockKeepaliveExecutor;
@@ -261,6 +263,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         builderFactory = new DefaultNetconfClientConfigurationBuilderFactory(mockEncryptionService, credentialProvider,
             sslHandlerFactoryProvider);
+
+        doReturn(mockRpcReg).when(mockRpcProviderService).registerRpcImplementations(any());
 
         setupMaster();
 

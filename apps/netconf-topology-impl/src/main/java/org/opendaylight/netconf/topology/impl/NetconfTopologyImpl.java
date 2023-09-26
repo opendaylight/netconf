@@ -60,7 +60,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyImpl.class);
 
     private Registration dtclReg;
-    private Registration rpcReg;
+    private NetconfTopologyRPCProvider rpcProvider;
 
     @Inject
     @Activate
@@ -107,17 +107,16 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
         LOG.debug("Registering datastore listener");
         dtclReg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(
             LogicalDatastoreType.CONFIGURATION, createTopologyListPath(topologyId).child(Node.class)), this);
-        final var nodeTopologyRpcs = new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId);
-        rpcReg = rpcProviderService.registerRpcImplementations(nodeTopologyRpcs.getRpcClassToInstanceMap());
+        rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, topologyId);
     }
 
     @PreDestroy
     @Deactivate
     @Override
     public void close() {
-        if (rpcReg != null) {
-            rpcReg.close();
-            rpcReg = null;
+        if (rpcProvider != null) {
+            rpcProvider.close();
+            rpcProvider = null;
         }
 
         // close all existing connectors, delete whole topology in datastore?

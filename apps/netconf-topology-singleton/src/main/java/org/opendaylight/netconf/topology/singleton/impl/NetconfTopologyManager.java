@@ -62,7 +62,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.osgi.service.component.annotations.Activate;
@@ -108,14 +107,12 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     private final String topologyId;
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
-    private final AAAEncryptionService encryptionService;
-    private final RpcProviderService rpcProviderService;
     private final DeviceActionFactory deviceActionFactory;
     private final NetconfClientConfigurationBuilderFactory builderFactory;
     private final SchemaResourceManager resourceManager;
 
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
-    private Registration rpcReg;
+    private NetconfTopologyRPCProvider rpcProvider;
 
     @Activate
     public NetconfTopologyManager(@Reference final BaseNetconfSchemas baseSchemas,
@@ -178,15 +175,12 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         this.topologyId = requireNonNull(topologyId);
         writeTxIdleTimeout = Duration.ofSeconds(writeTransactionIdleTimeout.toJava());
         this.mountPointService = mountPointService;
-        this.encryptionService = requireNonNull(encryptionService);
-        this.rpcProviderService = requireNonNull(rpcProviderService);
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
         this.resourceManager = requireNonNull(resourceManager);
         this.builderFactory = requireNonNull(builderFactory);
 
         dataChangeListenerRegistration = registerDataTreeChangeListener();
-        final var nodeTopologyRpcs = new NetconfTopologyRPCProvider(dataBroker, encryptionService, topologyId);
-        rpcReg = rpcProviderService.registerRpcImplementations(nodeTopologyRpcs.getRpcClassToInstanceMap());
+        rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, topologyId);
     }
 
     @Override
@@ -282,9 +276,9 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     @Deactivate
     @Override
     public void close() {
-        if (rpcReg != null) {
-            rpcReg.close();
-            rpcReg = null;
+        if (rpcProvider != null) {
+            rpcProvider.close();
+            rpcProvider = null;
         }
         if (dataChangeListenerRegistration != null) {
             dataChangeListenerRegistration.close();

@@ -73,6 +73,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
@@ -87,9 +88,10 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
     @Mock
     private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-
     @Mock
     private ListenerRegistration<?> mockListenerReg;
+    @Mock
+    private Registration mockRpcReg;
 
     private DataBroker dataBroker;
 
@@ -122,6 +124,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
         doNothing().when(mockListenerReg).close();
         doReturn(mockListenerReg).when(dataBroker).registerDataTreeChangeListener(any(), any());
+        doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any());
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
                 keepaliveExecutor, processingService, actorSystem, eventExecutor, clientDispatcher,

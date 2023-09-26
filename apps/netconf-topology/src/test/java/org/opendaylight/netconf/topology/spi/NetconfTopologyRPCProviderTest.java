@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology.spi;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import org.junit.Before;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -33,6 +35,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev22
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -43,8 +46,11 @@ public class NetconfTopologyRPCProviderTest {
     private static final String ENC_PWD = "4o9/Hn3Pi4150YrP12N/1g==";
 
     @Mock
+    private RpcProviderService rpcProviderService;
+    @Mock
+    private Registration rpcReg;
+    @Mock
     private DataBroker dataBroker;
-
     @Mock
     private AAAEncryptionService encryptionService;
 
@@ -53,7 +59,8 @@ public class NetconfTopologyRPCProviderTest {
     @Before
     public void setUp() {
         doReturn(ENC_PWD).when(encryptionService).encrypt(TEST_PWD);
-        rpcProvider = new NetconfTopologyRPCProvider(dataBroker, encryptionService, TOPOLOGY_ID);
+        doReturn(rpcReg).when(rpcProviderService).registerRpcImplementations(any());
+        rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, TOPOLOGY_ID);
     }
 
     @Test
