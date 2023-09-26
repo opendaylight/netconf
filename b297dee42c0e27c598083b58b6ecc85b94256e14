@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1b62cdd_74021190",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-26T10:09:54Z",
+      "side": 1,
+      "message": "When I attempted to use the PUT operation described in this JIRA task, I encountered these two errors in the Karaf logs:\n\n1)\njava.lang.NullPointerException: Cannot invoke \"org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode.getCredentials()\" because \"node\" is null\n\tat org.opendaylight.netconf.topology.spi.EncryptedPasswordChangeListener.getPassword(EncryptedPasswordChangeListener.java:169) ~[bundleFile:?]\n\tat org.opendaylight.netconf.topology.spi.EncryptedPasswordChangeListener.onDataTreeChanged(EncryptedPasswordChangeListener.java:94) ~[bundleFile:?]\n\tat org.opendaylight.mdsal.binding.dom.adapter.BindingDOMDataTreeChangeListenerAdapter.onDataTreeChanged(BindingDOMDataTreeChangeListenerAdapter.java:44) ~[bundleFile:?]\n\n\n2)\n11:58:40.569 ERROR [opendaylight-cluster-data-notification-dispatcher-42] Failed to decrypt encoded data\njavax.crypto.IllegalBlockSizeException: Input length must be multiple of 16 when decrypting with padded cipher\n\tat com.sun.crypto.provider.CipherCore.prepareInputBuffer(CipherCore.java:891) ~[?:?]\n\tat com.sun.crypto.provider.CipherCore.doFinal(CipherCore.java:730) ~[?:?]\n\tat com.sun.crypto.provider.AESCipher.engineDoFinal(AESCipher.java:436) ~[?:?]\n\tat javax.crypto.Cipher.doFinal(Cipher.java:2205) ~[?:?]",
+      "revId": "b297dee42c0e27c598083b58b6ecc85b94256e14",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

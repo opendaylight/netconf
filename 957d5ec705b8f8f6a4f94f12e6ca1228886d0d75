@@ -104,6 +104,24 @@
       "parentUuid": "cd76619a_7035e317",
       "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94527c1a_c1874e1b",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-26T10:09:54Z",
+      "side": 1,
+      "message": "The current Exception allows a failing test to pass:\n\ntestUpdateDatastoreWithEncryptedPassword() 113\norg.mockito.configuration.UnstubbedMethodException: encryptionService.decrypt(\"test\"); was not stubbed\n\nSo, it\u0027s likely that the UnstubbedMethodException or a similar Exception is not the one that should return \"true\" on this line.\n\nCan we catch IllegalArgumentException or something expected here?",
+      "parentUuid": "b2f84b34_a67d9a17",
+      "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
