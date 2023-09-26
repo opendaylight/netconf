@@ -300,12 +300,7 @@
                 <artifactId>netconf-client</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-netty-util</artifactId>
-                <version>${project.version}</version>
-                <type>test-jar</type>
+                <scope>test</scope>
             </dependency>
 
             <!-- Applications -->

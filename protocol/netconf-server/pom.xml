@@ -133,7 +133,6 @@
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-client</artifactId>
       <type>test-jar</type>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
