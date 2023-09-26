@@ -68,6 +68,52 @@
       },
       "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "104c0b1c_76348fe3",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-26T21:33:47Z",
+      "side": 1,
+      "message": "this is not necessary, each strategy already has a modelContext and it is never null",
+      "range": {
+        "startLine": 239,
+        "startChar": 43,
+        "endLine": 239,
+        "endChar": 94
+      },
+      "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5d005c0_505d6b25",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-26T21:33:47Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 416,
+        "startChar": 18,
+        "endLine": 416,
+        "endChar": 63
+      },
+      "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
