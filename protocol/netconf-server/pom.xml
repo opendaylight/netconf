@@ -123,6 +123,7 @@
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>mockito-configuration</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
@@ -133,10 +134,12 @@
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-client</artifactId>
       <type>test-jar</type>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-test-util</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xmlunit</groupId>

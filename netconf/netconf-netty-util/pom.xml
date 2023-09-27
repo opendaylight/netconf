@@ -85,14 +85,17 @@
     <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-legacy</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>mockito-configuration</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-test-util</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
