@@ -47,11 +47,9 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -97,15 +95,11 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     private RestconfDataServiceImpl dataService;
 
     @Mock
-    private DOMTransactionChain domTransactionChain;
-    @Mock
     private UriInfo uriInfo;
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
     private DOMDataTreeReadTransaction read;
-    @Mock
-    private DOMDataTreeWriteTransaction write;
     @Mock
     private DOMMountPointService mountPointService;
     @Mock
