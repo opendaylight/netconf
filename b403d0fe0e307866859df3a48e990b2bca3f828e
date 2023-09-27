@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b86344db_90edf24e",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/errors/RestconfDocumentedException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-27T10:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "921d4bfc_9c1ba741",
+      "range": {
+        "startLine": 180,
+        "startChar": 40,
+        "endLine": 180,
+        "endChar": 46
+      },
+      "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a505186_b0f0158e",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-09-26T21:32:36Z",
       "side": 1,
       "message": "requireNonNull()",
+      "range": {
+        "startLine": 184,
+        "startChar": 29,
+        "endLine": 184,
+        "endChar": 42
+      },
+      "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b77640f8_8a1d3f27",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/errors/RestconfDocumentedException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-27T10:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a505186_b0f0158e",
       "range": {
         "startLine": 184,
         "startChar": 29,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0035011f_b80b4f81",
+        "filename": "restconf/restconf-common/src/main/java/org/opendaylight/restconf/common/errors/RestconfDocumentedException.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-27T10:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25166f0d_9b502176",
+      "range": {
+        "startLine": 292,
+        "startChar": 11,
+        "endLine": 292,
+        "endChar": 49
+      },
+      "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "104c0b1c_76348fe3",
@@ -93,6 +165,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "686f17d7_142a3858",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-27T10:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "104c0b1c_76348fe3",
+      "range": {
+        "startLine": 239,
+        "startChar": 43,
+        "endLine": 239,
+        "endChar": 94
+      },
+      "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f5d005c0_505d6b25",
@@ -106,6 +202,30 @@
       "writtenOn": "2023-09-26T21:33:47Z",
       "side": 1,
       "message": "same here",
+      "range": {
+        "startLine": 416,
+        "startChar": 18,
+        "endLine": 416,
+        "endChar": 63
+      },
+      "revId": "b403d0fe0e307866859df3a48e990b2bca3f828e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c2dd9db_a6267326",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-27T10:42:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5d005c0_505d6b25",
       "range": {
         "startLine": 416,
         "startChar": 18,
