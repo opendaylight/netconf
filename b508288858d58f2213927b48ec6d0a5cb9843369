@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24f56972_60eb6494",
+        "filename": "netconf/netconf-netty-util/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-09-27T09:27:09Z",
+      "side": 1,
+      "message": "all these have scope\u003dtest inherited from bom/parent...",
+      "range": {
+        "startLine": 93,
+        "startChar": 6,
+        "endLine": 93,
+        "endChar": 25
+      },
+      "revId": "b508288858d58f2213927b48ec6d0a5cb9843369",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
