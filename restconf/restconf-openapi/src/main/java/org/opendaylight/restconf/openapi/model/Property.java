@@ -25,7 +25,7 @@ public record Property(
         @JsonProperty("$ref") @Nullable String ref,
         @Nullable Integer minItems,
         @Nullable Integer maxItems,
-        boolean uniqueItems,
+        @Nullable Boolean uniqueItems,
         @JsonProperty("enum") List<String> enums,
         @Nullable Integer minLength,
         @Nullable Integer maxLength) {
@@ -53,7 +53,7 @@ public record Property(
         private String ref;
         private Integer minItems;
         private Integer maxItems;
-        private boolean uniqueItems;
+        private Boolean uniqueItems;
         private List<String> enums;
         private Integer minLength;
         private Integer maxLength;
@@ -113,7 +113,7 @@ public record Property(
             return this;
         }
 
-        public Builder uniqueItems(final boolean uniqueItems) {
+        public Builder uniqueItems(final Boolean uniqueItems) {
             this.uniqueItems = uniqueItems;
             return this;
         }
