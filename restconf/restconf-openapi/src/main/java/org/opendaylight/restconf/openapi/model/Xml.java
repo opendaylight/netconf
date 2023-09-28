@@ -14,11 +14,5 @@ import org.eclipse.jdt.annotation.Nullable;
 public record Xml(
         @Nullable String name,
         @Nullable String namespace,
-        @Nullable String prefix,
-        boolean attribute,
-        boolean wrapped) {
-
-    public Xml(@Nullable final String name, @Nullable final String namespace, @Nullable final String prefix) {
-        this(name, namespace, prefix, false, false);
-    }
+        @Nullable String prefix) {
 }

@@ -13,7 +13,7 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record Operation(
-        boolean deprecated,
+        Boolean deprecated,
         List<String> tags,
         List<Parameter> parameters,
         List<Map<String, List<String>>> security,
@@ -43,7 +43,7 @@ public record Operation(
 
     @SuppressWarnings("checkstyle:hiddenField")
     public static class Builder {
-        private boolean deprecated;
+        private Boolean deprecated;
         private List<String> tags;
         private List<Parameter> parameters;
         private List<Map<String, List<String>>> security;
@@ -56,7 +56,7 @@ public record Operation(
         private String operationId;
         private String summary;
 
-        public Builder deprecated(final boolean deprecated) {
+        public Builder deprecated(final Boolean deprecated) {
             this.deprecated = deprecated;
             return this;
         }
