@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "043bfe44_82d544a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-28T08:18:27Z",
+      "side": 1,
+      "message": "Test for Actions is no more required?\nhttps://git.opendaylight.org/gerrit/c/netconf/+/107762/comments/909d131d_bf5eb9a3",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a452b246_d581d1fe",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-28T08:18:27Z",
+      "side": 1,
+      "message": "throws Exception\n\nUsing an Exception instead is a better approach for test maintenance.",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a43388cc_ed164472",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-28T08:18:27Z",
+      "side": 1,
+      "message": "Please split this variable into multiple lines, with each line dedicated to checking for a possible NullPointerException.\n\nVerify the \".get(\"...\")\" operation as well, as it can also result in a NPE.",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4800707_c764faa0",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-28T08:18:27Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b39a7bf4_392d9feb",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-28T08:18:27Z",
+      "side": 1,
+      "message": "Please split this variable into multiple lines, with each line dedicated to checking for a possible NullPointerException.\n\nVerify the \".get(\"...\")\" operation as well, as it can also result in a NPE.",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e97b166_0c3b76fd",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-28T08:18:27Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05994356_9053b893",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-28T08:18:27Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fde0725_b3021c6e",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-28T08:18:27Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfa669b9_f887b23b",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-09-28T08:18:27Z",
+      "side": 1,
+      "message": "Please divide this into more variables.",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
