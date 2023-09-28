@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 public record RequestBody(
         @Nullable String description,
         @NonNull Map<String, MediaTypeObject> content,
-        boolean required) {
+        Boolean required) {
 
     public RequestBody {
         content = Map.copyOf(Objects.requireNonNull(content));
@@ -31,7 +31,7 @@ public record RequestBody(
     public static class Builder {
         private String description;
         private Map<String, MediaTypeObject> content;
-        private boolean required;
+        private Boolean required;
 
         public Builder description(final String description) {
             this.description = description;
@@ -43,7 +43,7 @@ public record RequestBody(
             return this;
         }
 
-        public Builder required(final boolean required) {
+        public Builder required(final Boolean required) {
             this.required = required;
             return this;
         }
