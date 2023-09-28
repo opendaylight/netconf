@@ -122,6 +122,24 @@
       "parentUuid": "b2f84b34_a67d9a17",
       "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c00ce116_ae508dda",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-09-28T14:19:37Z",
+      "side": 1,
+      "message": "UT has been reworked",
+      "parentUuid": "94527c1a_c1874e1b",
+      "revId": "957d5ec705b8f8f6a4f94f12e6ca1228886d0d75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
