@@ -91,16 +91,16 @@
 
     <!-- test dependencies -->
     <dependency>
-      <groupId>org.xmlunit</groupId>
-      <artifactId>xmlunit-legacy</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>mockito-configuration</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-test-util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-core</artifactId>
     </dependency>
   </dependencies>
 </project>

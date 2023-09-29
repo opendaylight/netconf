@@ -5,74 +5,59 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler.exi;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
-import java.util.Arrays;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
 import org.opendaylight.netconf.shaded.exificient.core.FidelityOptions;
+import org.xmlunit.builder.DiffBuilder;
 
-@RunWith(Parameterized.class)
 public class NetconfStartExiMessageTest {
+    @Test
+    public void testCreateEmpty() {
+        assertCreate("""
+              <rpc message-id="id" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <start-exi xmlns="urn:ietf:params:xml:ns:netconf:exi:1.0">
+                <alignment>bit-packed</alignment>
+              </start-exi>
+            </rpc>""", EXIParameters.empty());
+    }
 
-    @Parameterized.Parameters
-    public static Iterable<Object[]> data() throws Exception {
-        final String noChangeXml = "<rpc message-id=\"id\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n"
-                + "<alignment>bit-packed</alignment>\n"
-                + "</start-exi>\n"
-                + "</rpc>";
-
-
-        final String fullOptionsXml = "<rpc message-id=\"id\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n"
-                + "<alignment>byte-aligned</alignment>\n"
-                + "<fidelity>\n"
-                + "<comments/>\n"
-                + "<dtd/>\n"
-                + "<lexical-values/>\n"
-                + "<pis/>\n"
-                + "<prefixes/>\n"
-                + "</fidelity>\n"
-                + "</start-exi>\n"
-                + "</rpc>";
-
-        final FidelityOptions fullOptions = FidelityOptions.createDefault();
+    @Test
+    public void testCreateFull() throws Exception {
+        final var fullOptions = FidelityOptions.createDefault();
         fullOptions.setFidelity(FidelityOptions.FEATURE_LEXICAL_VALUE, true);
         fullOptions.setFidelity(FidelityOptions.FEATURE_DTD, true);
         fullOptions.setFidelity(FidelityOptions.FEATURE_COMMENT, true);
         fullOptions.setFidelity(FidelityOptions.FEATURE_PREFIX, true);
         fullOptions.setFidelity(FidelityOptions.FEATURE_PI, true);
 
-        return Arrays.asList(new Object[][]{
-            {noChangeXml, EXIParameters.empty()},
-            {fullOptionsXml, new EXIParameters(CodingMode.BYTE_PACKED, fullOptions)},
-        });
+        assertCreate("""
+              <rpc message-id="id" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <start-exi xmlns="urn:ietf:params:xml:ns:netconf:exi:1.0">
+                  <alignment>byte-aligned</alignment>
+                  <fidelity>
+                    <comments/>
+                    <dtd/>
+                    <lexical-values/>
+                    <pis/>
+                    <prefixes/>
+                  </fidelity>
+                </start-exi>
+              </rpc>""", new EXIParameters(CodingMode.BYTE_PACKED, fullOptions));
     }
 
-    private final String controlXml;
-    private final EXIParameters exiOptions;
+    private static void assertCreate(final String control, final EXIParameters exiOptions) {
+        final var startExiMessage = NetconfStartExiMessageProvider.create(exiOptions, "id");
 
-    public NetconfStartExiMessageTest(final String controlXml, final EXIParameters exiOptions) {
-        this.controlXml = controlXml;
-        this.exiOptions = exiOptions;
+        final var diff = DiffBuilder.compare(control)
+            .withTest(startExiMessage.getDocument())
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
-    @Test
-    public void testCreate() throws Exception {
-        final RpcMessage startExiMessage = NetconfStartExiMessageProvider.create(exiOptions, "id");
-
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-        final Diff diff = XMLUnit.compareXML(XMLUnit.buildControlDocument(controlXml), startExiMessage.getDocument());
-        assertTrue(diff.toString(), diff.similar());
-    }
 }
