@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bb82a6f_af18079b",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-29T11:19:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a452b246_d581d1fe",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a43388cc_ed164472",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-09-28T08:18:27Z",
       "side": 1,
       "message": "Please split this variable into multiple lines, with each line dedicated to checking for a possible NullPointerException.\n\nVerify the \".get(\"...\")\" operation as well, as it can also result in a NPE.",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ae4d878_b46ec915",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-29T11:19:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a43388cc_ed164472",
       "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee0cc508_d46a659a",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-29T11:19:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4800707_c764faa0",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b39a7bf4_392d9feb",
@@ -82,6 +136,24 @@
       "writtenOn": "2023-09-28T08:18:27Z",
       "side": 1,
       "message": "Please split this variable into multiple lines, with each line dedicated to checking for a possible NullPointerException.\n\nVerify the \".get(\"...\")\" operation as well, as it can also result in a NPE.",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24748f3b_8d9dcd13",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-29T11:19:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b39a7bf4_392d9feb",
       "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60cc6ece_0e898e97",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-29T11:19:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e97b166_0c3b76fd",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "05994356_9053b893",
@@ -116,6 +206,24 @@
       "writtenOn": "2023-09-28T08:18:27Z",
       "side": 1,
       "message": "var",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d42ef021_ba4d6300",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-29T11:19:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05994356_9053b893",
       "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -137,6 +245,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6576dbf2_08965265",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-29T11:19:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4fde0725_b3021c6e",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dfa669b9_f887b23b",
@@ -150,6 +276,24 @@
       "writtenOn": "2023-09-28T08:18:27Z",
       "side": 1,
       "message": "Please divide this into more variables.",
+      "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6dede575_a3b81883",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-09-29T11:19:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfa669b9_f887b23b",
       "revId": "bdf769494022f3a065a796076b6e8dfb9a15061b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
