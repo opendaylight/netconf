@@ -57,6 +57,10 @@
       <artifactId>netty-transport</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jdt</groupId>
+      <artifactId>org.eclipse.jdt.annotation</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.aaa</groupId>
       <artifactId>aaa-encrypt-service</artifactId>
     </dependency>
@@ -79,6 +83,10 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>shaded-sshd</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf.model</groupId>
+      <artifactId>rfc6241</artifactId>
     </dependency>
 
     <!-- test dependencies -->
