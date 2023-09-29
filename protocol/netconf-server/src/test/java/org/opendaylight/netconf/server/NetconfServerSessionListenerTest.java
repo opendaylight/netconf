@@ -7,8 +7,10 @@
  */
 package org.opendaylight.netconf.server;
 
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
@@ -17,10 +19,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
@@ -36,7 +35,7 @@ import org.opendaylight.netconf.server.api.monitoring.SessionListener;
 import org.opendaylight.netconf.server.osgi.NetconfOperationRouterImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.w3c.dom.Document;
+import org.xmlunit.builder.DiffBuilder;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfServerSessionListenerTest {
@@ -51,11 +50,6 @@ public class NetconfServerSessionListenerTest {
     private NetconfServerSession session;
     private EmbeddedChannel channel;
     private NetconfServerSessionListener listener;
-
-    @BeforeClass
-    public static void classSetUp() throws Exception {
-        XMLUnit.setIgnoreWhitespace(true);
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -76,7 +70,7 @@ public class NetconfServerSessionListenerTest {
 
     @Test
     public void testOnSessionDown() throws Exception {
-        final Exception cause = new RuntimeException("cause");
+        final var cause = new RuntimeException("cause");
         listener.onSessionDown(session, cause);
         verify(monitoringListener).onSessionDown(session);
         verify(closeable).close();
@@ -93,55 +87,60 @@ public class NetconfServerSessionListenerTest {
 
     @Test
     public void testOnMessage() throws Exception {
-        final Document reply = XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\" "
+        final var reply = XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\" "
                 + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc-reply>");
         doReturn(reply).when(router).onNetconfMessage(any(), any());
-        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument("<rpc message-id=\"101\" "
-                + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc>"));
-        listener.onMessage(session, msg);
+        listener.onMessage(session, new NetconfMessage(XmlUtil.readXmlToDocument("<rpc message-id=\"101\" "
+            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc>")));
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_SUCCESS)));
         channel.runPendingTasks();
         final NetconfMessage sentMsg = channel.readOutbound();
-        final Diff diff = XMLUnit.compareXML(reply, sentMsg.getDocument());
-        assertTrue(diff.toString(), diff.similar());
+
+        final var diff = DiffBuilder.compare(sentMsg.getDocument())
+            .withTest(reply)
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test
     public void testOnMessageRuntimeFail() throws Exception {
         doThrow(new RuntimeException("runtime fail")).when(router).onNetconfMessage(any(), any());
-        final Document reply =
-                XmlUtil.readXmlToDocument("<rpc message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-                        + "<example/></rpc>");
-        final NetconfMessage msg = new NetconfMessage(reply);
-        final IllegalStateException ex = assertThrows(IllegalStateException.class,
-            () -> listener.onMessage(session, msg));
+        final var msg = new NetconfMessage(XmlUtil.readXmlToDocument(
+            "<rpc message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><example/></rpc>"));
+        final var ex = assertThrows(IllegalStateException.class, () -> listener.onMessage(session, msg));
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
+        assertThat(ex.getMessage(), startsWith("Unable to process incoming message "));
     }
 
     @Test
     public void testOnMessageDocumentedFail() throws Exception {
-        final Document reply =
-                XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                        + "<rpc-error>\n"
-                        + "<error-type>protocol</error-type>\n"
-                        + "<error-tag>unknown-element</error-tag>\n"
-                        + "<error-severity>error</error-severity>\n"
-                        + "<error-message>Unknown tag bad-rpc in message:\n"
-                        + "&lt;bad-rpc/&gt;\n"
-                        + "</error-message>\n"
-                        + "<error-info>\n"
-                        + "<bad-element>bad-rpc</bad-element>\n"
-                        + "</error-info>\n"
-                        + "</rpc-error>\n"
-                        + "</rpc-reply>");
-        final NetconfMessage msg = new NetconfMessage(XmlUtil.readXmlToDocument("<bad-rpc/>"));
+        final var msg = new NetconfMessage(XmlUtil.readXmlToDocument("<bad-rpc/>"));
         listener.onMessage(session, msg);
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.OUT_RPC_ERROR)));
         channel.runPendingTasks();
         final NetconfMessage sentMsg = channel.readOutbound();
-        final Diff diff = XMLUnit.compareXML(reply, sentMsg.getDocument());
-        assertTrue(diff.toString(), diff.similar());
+
+        final var diff = DiffBuilder.compare(sentMsg.getDocument())
+            .withTest("""
+                <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                  <rpc-error>
+                    <error-type>protocol</error-type>
+                    <error-tag>unknown-element</error-tag>
+                    <error-severity>error</error-severity>
+                    <error-message>Unknown tag bad-rpc in message:\n&lt;bad-rpc/&gt;
+                    </error-message>
+                    <error-info>
+                      <bad-element>bad-rpc</bad-element>
+                    </error-info>
+                   </rpc-error>
+                </rpc-reply>""")
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test

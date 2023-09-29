@@ -99,6 +99,10 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>transport-tcp</artifactId>
     </dependency>
     <dependency>
@@ -140,8 +144,7 @@
     </dependency>
     <dependency>
       <groupId>org.xmlunit</groupId>
-      <artifactId>xmlunit-legacy</artifactId>
-      <scope>test</scope>
+      <artifactId>xmlunit-core</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -7,63 +7,55 @@
  */
 package org.opendaylight.netconf.server.spi;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
 
 @RunWith(value = Parameterized.class)
 public class SubtreeFilterRpcTest {
-    private static final Logger LOG = LoggerFactory.getLogger(SubtreeFilterRpcTest.class);
-
     private final int directoryIndex;
 
     @Parameters
     public static Collection<Object[]> data() {
-        List<Object[]> result = new ArrayList<>();
-        for (int i = 0; i <= 10; i++) {
-            result.add(new Object[]{i});
-        }
-        return result;
+        return List.of(
+            new Object[] { 0  },
+            new Object[] { 1  },
+            new Object[] { 2  },
+            new Object[] { 3  },
+            new Object[] { 4  },
+            new Object[] { 5  },
+            new Object[] { 6  },
+            new Object[] { 7  },
+            new Object[] { 8  },
+            new Object[] { 9  },
+            new Object[] { 10 });
     }
 
     public SubtreeFilterRpcTest(final int directoryIndex) {
         this.directoryIndex = directoryIndex;
     }
 
-    @Before
-    public void setUp() {
-        XMLUnit.setIgnoreWhitespace(true);
-    }
-
     @Test
     public void test() throws Exception {
-        Document requestDocument = getDocument("request.xml");
-        Document preFilterDocument = getDocument("pre-filter.xml");
-        Document postFilterDocument = getDocument("post-filter.xml");
-        Document actualPostFilterDocument = SubtreeFilter.applyRpcSubtreeFilter(requestDocument, preFilterDocument);
-        LOG.info("Actual document: {}", XmlUtil.toString(actualPostFilterDocument));
-        Diff diff = XMLUnit.compareXML(postFilterDocument, actualPostFilterDocument);
-        assertTrue(diff.toString(), diff.similar());
-
+        final var diff = DiffBuilder
+            .compare(SubtreeFilter.applyRpcSubtreeFilter(getDocument("request.xml"), getDocument("pre-filter.xml")))
+            .withTest(getDocument("post-filter.xml"))
+            .ignoreWhitespace()
+            .checkForSimilar()
+            .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
-    public Document getDocument(final String fileName) throws SAXException, IOException {
+    private Document getDocument(final String fileName) throws Exception {
         return XmlUtil.readXmlToDocument(
-                getClass().getResourceAsStream("/subtree/rpc/" + directoryIndex + "/" + fileName));
+            SubtreeFilterRpcTest.class.getResourceAsStream("/subtree/rpc/" + directoryIndex + "/" + fileName));
     }
 }
