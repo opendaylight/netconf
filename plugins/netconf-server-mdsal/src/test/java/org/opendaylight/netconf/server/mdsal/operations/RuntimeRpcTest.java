@@ -268,7 +268,7 @@ public class RuntimeRpcTest {
         final DetailedDiff dd = new DetailedDiff(new Diff(response, template));
         dd.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
         //we care about order so response has to be identical
-        assertTrue(dd.identical());
+        assertTrue(dd.toString(), dd.identical());
     }
 
     private static RpcDefinition getRpcDefinitionFromModule(final Module module, final XMLNamespace namespaceURI,
