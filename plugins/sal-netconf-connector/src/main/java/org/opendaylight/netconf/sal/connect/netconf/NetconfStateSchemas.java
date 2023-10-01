@@ -13,10 +13,8 @@ import static com.google.common.base.Verify.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_MONITORING;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_TYPE_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -82,10 +80,9 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     static {
         final Document document = XmlUtil.newDocument();
 
-        final Element filterElem = XmlUtil.createElement(document, NETCONF_FILTER_QNAME.getLocalName(),
-            Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
-        filterElem.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
-            "subtree");
+        final Element filterElem = XmlUtil.createElement(document, "filter",
+            Optional.of("urn:ietf:params:xml:ns:netconf:base:1.0"));
+        filterElem.setAttribute("type", "subtree");
 
         final Element stateElem = XmlUtil.createElement(document, NetconfState.QNAME.getLocalName(),
             Optional.of(NetconfState.QNAME.getNamespace().toString()));

@@ -365,7 +365,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<schemas>\n"
                 + "<schema>\n"
@@ -393,7 +393,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<schemas/>\n"
                 + "</netconf-state>"
@@ -474,7 +474,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
                 + "<get xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<capabilities>\n"
                 + "<capability>a:b:c</capability>\n"
@@ -497,7 +497,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<capabilities>\n"
                 + "<capability/>\n"
@@ -520,7 +520,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<datastores>\n"
                 + "<datastore/>\n"
@@ -890,7 +890,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         // testing
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<statistics>\n"
                 + "<netconf-start-time/>\n"
@@ -924,7 +924,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         // testing
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<capabilities/>\n"
                 + "<datastores/>\n"
@@ -950,7 +950,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         // testing
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\"/>\n"
                 + "</filter>\n"
                 + "</get>\n"
@@ -976,7 +976,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         // testing
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<schemas>\n"
                 + "<schema>\n"
@@ -1017,7 +1017,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         // testing
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<datastores>\n"
                 + "<datastore>\n"
@@ -1055,7 +1055,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         // testing
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<datastores>\n"
                 + "<datastore/>\n"
@@ -1090,7 +1090,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         // testing
         assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
                 + "<get>\n"
-                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<filter type=\"subtree\">\n"
                 + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
                 + "<sessions>\n"
                 + "<session>\n"

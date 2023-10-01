@@ -11,7 +11,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_OPERATION_QNAME;
 import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
 import static org.opendaylight.netconf.util.NetconfUtil.appendListKeyNodes;
@@ -135,12 +134,8 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     private static Element prepareFilterElement(final Document document) {
-        // FIXME: use a constant
-        final var filterNs = NETCONF_FILTER_QNAME.getNamespace().toString();
-        final var filter = document.createElementNS(filterNs, NETCONF_FILTER_QNAME.getLocalName());
-        final var attr = document.createAttributeNS(filterNs, "type");
-        attr.setTextContent("subtree");
-        filter.setAttributeNode(attr);
+        final var filter = document.createElementNS("urn:ietf:params:xml:ns:netconf:base:1.0", "filter");
+        filter.setAttribute("type", "subtree");
         document.appendChild(filter);
         return filter;
     }

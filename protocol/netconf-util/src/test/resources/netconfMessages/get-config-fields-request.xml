@@ -3,7 +3,7 @@
         <source>
             <running/>
         </source>
-        <filter xmlns:ns0="urn:ietf:params:xml:ns:netconf:base:1.0" ns0:type="subtree">
+        <filter type="subtree">
             <c xmlns="test:namespace">
                 <a/>
                 <b/>
