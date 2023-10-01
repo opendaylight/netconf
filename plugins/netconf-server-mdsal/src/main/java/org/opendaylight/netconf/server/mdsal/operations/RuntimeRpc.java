@@ -155,7 +155,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             throw DocumentedException.wrap(e);
         }
         if (result.value() == null) {
-            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.of(NamespaceURN.BASE));
+            return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
         }
         return transformNormalizedNode(document, result.value(),
                 Absolute.of(rpcDefinition.getQName(), rpcDefinition.getOutput().getQName()));
@@ -170,8 +170,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final Map<String, Attr> attributes = requestElement.getAttributes();
 
         final Element response = handle(document, operationElement, subsequentOperation);
-        final Element rpcReply = XmlUtil.createElement(document, RpcReplyMessage.ELEMENT_NAME,
-                Optional.of(NamespaceURN.BASE));
+        final Element rpcReply = document.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
 
         if (XmlElement.fromDomElement(response).hasNamespace()) {
             rpcReply.appendChild(response);

@@ -248,7 +248,7 @@ public final class NetconfMessageTransformUtil {
     }
 
     private static Element newFilterElement() {
-        final var element = XmlUtil.createElement(BLANK_DOCUMENT, "filter", Optional.of(NamespaceURN.BASE));
+        final var element = BLANK_DOCUMENT.createElementNS(NamespaceURN.BASE, "filter");
         element.setAttribute("type", "subtree");
         return element;
     }
@@ -307,8 +307,8 @@ public final class NetconfMessageTransformUtil {
                     + "but was: %s", override);
         }
 
-        final var element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
-                Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
+        final var element = BLANK_DOCUMENT.createElementNS(NETCONF_CONFIG_QNAME.getNamespace().toString(),
+            NETCONF_CONFIG_QNAME.getLocalName());
         final var metadata = operation.map(o -> leafMetadata(dataPath, o)).orElse(null);
         try {
             if (lastChildOverride.isPresent()) {
