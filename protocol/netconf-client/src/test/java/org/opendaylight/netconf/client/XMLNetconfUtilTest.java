@@ -12,21 +12,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
 import org.junit.Test;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.w3c.dom.Element;
 
 public class XMLNetconfUtilTest {
     @Test
     public void testXPath() throws Exception {
-        final XPathExpression correctXPath = XMLNetconfUtil.compileXPath("/top/innerText");
-        final IllegalStateException ex = assertThrows(IllegalStateException.class,
+        final var correctXPath = XMLNetconfUtil.compileXPath("/top/innerText");
+        final var ex = assertThrows(IllegalStateException.class,
             () -> XMLNetconfUtil.compileXPath("!@(*&$!"));
         assertThat(ex.getMessage(), startsWith("Error while compiling xpath expression "));
-        final Object value = XmlUtil.evaluateXPath(correctXPath,
-                XmlUtil.readXmlToDocument("<top><innerText>value</innerText></top>"), XPathConstants.NODE);
-        assertEquals("value", ((Element) value).getTextContent());
+        final var value = NetconfClientSessionNegotiator.evaluateXPath(correctXPath,
+                XmlUtil.readXmlToDocument("<top><innerText>value</innerText></top>"));
+        assertEquals("value", value.getTextContent());
     }
 }
