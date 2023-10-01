@@ -18,7 +18,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.DISCARD_CHANGES_RPC_CONTENT;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
 
 import com.google.common.util.concurrent.Futures;
@@ -46,7 +46,6 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -77,11 +76,9 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     public void testIgnoreNonVisibleData() {
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)),
                 false);
-        final MapNode emptyList = ImmutableNodes.mapNodeBuilder(NETCONF_FILTER_QNAME).build();
-        tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier
-                .create(new NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
-        tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier
-                .create(new NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
+        final MapNode emptyList = ImmutableNodes.mapNodeBuilder(NETCONF_FILTER_NODEID).build();
+        tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(NETCONF_FILTER_NODEID), emptyList);
+        tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(NETCONF_FILTER_NODEID), emptyList);
 
         verify(rpc, atMost(1)).invokeNetconf(any(), any());
     }

@@ -38,6 +38,7 @@ import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
@@ -96,7 +97,6 @@ public final class NetconfMessageTransformUtil {
 
     public static final @NonNull QName CREATE_SUBSCRIPTION_RPC_QNAME =
             QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
-    private static final String SUBTREE = "subtree";
 
     // Blank document used for creation of new DOM nodes
     private static final Document BLANK_DOCUMENT = XmlUtil.newDocument();
@@ -176,9 +176,8 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull Absolute NETCONF_GET_CONFIG_PATH = toPath(NETCONF_GET_CONFIG_QNAME);
     public static final @NonNull QName NETCONF_DISCARD_CHANGES_QNAME = QName.create(NETCONF_QNAME, "discard-changes");
     public static final @NonNull Absolute NETCONF_DISCARD_CHANGES_PATH = toPath(NETCONF_DISCARD_CHANGES_QNAME);
-    public static final @NonNull QName NETCONF_TYPE_QNAME = QName.create(NETCONF_QNAME, "type").intern();
-    public static final @NonNull QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter").intern();
-    public static final @NonNull QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get").intern();
+    public static final @NonNull QName NETCONF_GET_QNAME =
+        QName.create(NETCONF_QNAME, XmlNetconfConstants.GET).intern();
     public static final @NonNull NodeIdentifier NETCONF_GET_NODEID = NodeIdentifier.create(NETCONF_GET_QNAME);
     public static final @NonNull Absolute NETCONF_GET_PATH = toPath(NETCONF_GET_QNAME);
     public static final @NonNull QName NETCONF_RPC_QNAME = QName.create(NETCONF_QNAME, "rpc").intern();
@@ -226,9 +225,10 @@ public final class NetconfMessageTransformUtil {
 
     public static final @NonNull Absolute CREATE_SUBSCRIPTION_RPC_PATH = toPath(CREATE_SUBSCRIPTION_RPC_QNAME);
 
-    public static final @NonNull NodeIdentifier NETCONF_FILTER_NODEID = NodeIdentifier.create(NETCONF_FILTER_QNAME);
+    public static final @NonNull NodeIdentifier NETCONF_FILTER_NODEID =
+        NodeIdentifier.create(QName.create(NETCONF_QNAME, "filter").intern());
 
-    public static final @NonNull AnyxmlNode<?> EMPTY_FILTER = buildFilterStructure(getNetconfFilterElement());
+    public static final @NonNull AnyxmlNode<?> EMPTY_FILTER = buildFilterStructure(newFilterElement());
 
     /**
      * Creation of the subtree filter structure using {@link YangInstanceIdentifier} path.
@@ -239,7 +239,7 @@ public final class NetconfMessageTransformUtil {
      */
     public static AnyxmlNode<?> toFilterStructure(final YangInstanceIdentifier identifier,
                                                        final EffectiveModelContext ctx) {
-        final Element element = getNetconfFilterElement();
+        final Element element = newFilterElement();
         try {
             NetconfUtil.writeFilter(identifier, new DOMResult(element), ctx, null);
         } catch (IOException | XMLStreamException e) {
@@ -259,7 +259,7 @@ public final class NetconfMessageTransformUtil {
     public static AnyxmlNode<?> toFilterStructure(final List<FieldsFilter> fieldsFilters,
                                                   final EffectiveModelContext ctx) {
         Preconditions.checkState(!fieldsFilters.isEmpty(), "An empty list of subtree filters is not allowed");
-        final Element element = getNetconfFilterElement();
+        final Element element = newFilterElement();
 
         for (final FieldsFilter filter : fieldsFilters) {
             try {
@@ -273,11 +273,10 @@ public final class NetconfMessageTransformUtil {
         return buildFilterStructure(element);
     }
 
-    private static Element getNetconfFilterElement() {
-        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
-                Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
-        element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
-                SUBTREE);
+    private static Element newFilterElement() {
+        final var element = XmlUtil.createElement(BLANK_DOCUMENT, "filter",
+            Optional.of("urn:ietf:params:xml:ns:netconf:base:1.0"));
+        element.setAttribute("type", "subtree");
         return element;
     }
 
