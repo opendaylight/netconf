@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,8 +27,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -166,14 +163,6 @@ public final class XmlUtil {
 
     public static String toString(final Document doc, final boolean addXmlDeclaration) {
         return toString(doc.getDocumentElement(), addXmlDeclaration);
-    }
-
-    public static Object evaluateXPath(final XPathExpression expr, final Object rootNode, final QName returnType) {
-        try {
-            return expr.evaluate(rootNode, returnType);
-        } catch (final XPathExpressionException e) {
-            throw new IllegalStateException("Error while evaluating xpath expression " + expr, e);
-        }
     }
 
     public static Document createDocumentCopy(final Document original) {

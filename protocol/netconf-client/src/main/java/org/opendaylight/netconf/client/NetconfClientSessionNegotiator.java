@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.client;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Interner;
@@ -19,6 +20,7 @@ import io.netty.util.concurrent.Promise;
 import java.util.Set;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -138,7 +140,7 @@ class NetconfClientSessionNegotiator
     }
 
     private static String getSessionIdWithXPath(final Document doc, final XPathExpression sessionIdXPath) {
-        final Node sessionIdNode = (Node) XmlUtil.evaluateXPath(sessionIdXPath, doc, XPathConstants.NODE);
+        final var sessionIdNode = evaluateXPath(sessionIdXPath, doc);
         return sessionIdNode != null ? sessionIdNode.getTextContent() : null;
     }
 
@@ -152,6 +154,15 @@ class NetconfClientSessionNegotiator
             NetconfMessageUtil.extractCapabilitiesFromHello(message .getDocument())));
 
         return new NetconfClientSession(sessionListener, channel, sessionId, capabilities);
+    }
+
+    @VisibleForTesting
+    static Node evaluateXPath(final XPathExpression expr, final Object rootNode) {
+        try {
+            return (Node) expr.evaluate(rootNode, XPathConstants.NODE);
+        } catch (final XPathExpressionException e) {
+            throw new IllegalStateException("Error while evaluating xpath expression " + expr, e);
+        }
     }
 
     /**
