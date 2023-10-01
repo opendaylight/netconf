@@ -7,9 +7,6 @@
  */
 package org.opendaylight.netconf.api.xml;
 
-import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
-import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
-
 import com.google.common.io.Resources;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -18,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -128,51 +124,6 @@ public final class XmlUtil {
 
     public static Document newDocument() {
         return DEFAULT_DOM_BUILDER.get().newDocument();
-    }
-
-    public static Element createElement(final Document document, final String qname,
-            final Optional<String> namespaceURI) {
-        if (namespaceURI.isEmpty()) {
-            return document.createElement(qname);
-        }
-
-        final String uri = namespaceURI.orElseThrow();
-        final Element element = document.createElementNS(uri, qname);
-        String name = XMLNS_ATTRIBUTE;
-        if (element.getPrefix() != null) {
-            name += ":" + element.getPrefix();
-        }
-        element.setAttributeNS(XMLNS_ATTRIBUTE_NS_URI, name, uri);
-        return element;
-    }
-
-    public static Element createTextElement(final Document document, final String qname, final String content,
-            final Optional<String> namespaceURI) {
-        Element typeElement = createElement(document, qname, namespaceURI);
-        typeElement.appendChild(document.createTextNode(content));
-        return typeElement;
-    }
-
-    public static Element createTextElementWithNamespacedContent(final Document document, final String qname,
-            final String prefix, final String namespace, final String contentWithoutPrefix) {
-
-        return createTextElementWithNamespacedContent(document, qname, prefix, namespace, contentWithoutPrefix,
-                Optional.empty());
-    }
-
-    public static Element createTextElementWithNamespacedContent(final Document document, final String qname,
-            final String prefix, final String namespace, final String contentWithoutPrefix,
-            final Optional<String> namespaceURI) {
-
-        String content = createPrefixedValue(XmlNetconfConstants.PREFIX, contentWithoutPrefix);
-        Element element = createTextElement(document, qname, content, namespaceURI);
-        String prefixedNamespaceAttr = createPrefixedValue(XMLNS_ATTRIBUTE, prefix);
-        element.setAttributeNS(XMLNS_ATTRIBUTE_NS_URI, prefixedNamespaceAttr, namespace);
-        return element;
-    }
-
-    public static String createPrefixedValue(final String prefix, final String value) {
-        return prefix + ":" + value;
     }
 
     /**

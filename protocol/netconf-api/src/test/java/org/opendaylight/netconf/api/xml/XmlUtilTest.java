@@ -8,52 +8,14 @@
 package org.opendaylight.netconf.api.xml;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 
-import java.util.Optional;
 import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXParseException;
-import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.builder.Transform;
-import org.xmlunit.diff.DefaultNodeMatcher;
-import org.xmlunit.diff.ElementSelectors;
 
 public class XmlUtilTest {
-    private static final String XML_SNIPPET = """
-        <top xmlns="namespace">
-            <innerText>value</innerText>
-            <innerPrefixedText xmlns:pref="prefixNamespace">prefix:value</innerPrefixedText>
-            <innerPrefixedText xmlns="randomNamespace" xmlns:pref="prefixNamespace">prefix:value</innerPrefixedText>
-        </top>""";
-
-    @Test
-    public void testCreateElement() throws Exception {
-        final Document document = XmlUtil.newDocument();
-        final Element top = XmlUtil.createElement(document, "top", Optional.of("namespace"));
-
-        top.appendChild(XmlUtil.createTextElement(document, "innerText", "value", Optional.of("namespace")));
-        top.appendChild(XmlUtil.createTextElementWithNamespacedContent(document, "innerPrefixedText", "pref",
-                "prefixNamespace", "value", Optional.of("namespace")));
-        top.appendChild(XmlUtil.createTextElementWithNamespacedContent(document, "innerPrefixedText", "pref",
-                "prefixNamespace", "value", Optional.of("randomNamespace")));
-
-        document.appendChild(top);
-        assertEquals("top", XmlUtil.createDocumentCopy(document).getDocumentElement().getTagName());
-
-        final var diff = DiffBuilder.compare(document)
-            .withTest(XML_SNIPPET)
-            .ignoreWhitespace()
-            .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
-            .checkForSimilar()
-            .build();
-
-        assertFalse(diff.toString(), diff.hasDifferences());
-    }
-
     @Test
     public void testXXEFlaw() {
         assertThrows(SAXParseException.class, () -> XmlUtil.readXmlToDocument("""

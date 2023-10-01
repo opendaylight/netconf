@@ -9,7 +9,6 @@ package org.opendaylight.netconf.server.api.operations;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
@@ -95,13 +94,11 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
         final var attributes = requestElement.getAttributes();
 
         final var response = handle(document, operationElement, subsequentOperation);
-        final var rpcReply = XmlUtil.createElement(document, RpcReplyMessage.ELEMENT_NAME,
-            Optional.of(NamespaceURN.BASE));
+        final var rpcReply = document.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
         if (XmlElement.fromDomElement(response).hasNamespace()) {
             rpcReply.appendChild(response);
         } else {
-            final var responseNS = XmlUtil.createElement(document, response.getNodeName(),
-                    Optional.of(NamespaceURN.BASE));
+            final var responseNS = document.createElementNS(NamespaceURN.BASE, response.getLocalName());
             final var list = response.getChildNodes();
             while (list.getLength() != 0) {
                 responseNS.appendChild(list.item(0));
