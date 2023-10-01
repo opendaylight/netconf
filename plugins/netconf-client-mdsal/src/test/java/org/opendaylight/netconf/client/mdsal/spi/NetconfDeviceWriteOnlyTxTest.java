@@ -18,7 +18,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.DISCARD_CHANGES_RPC_CONTENT;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
+import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
 
 import com.google.common.util.concurrent.Futures;
@@ -75,9 +75,9 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     public void testIgnoreNonVisibleData() {
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(MountPointContext.class)),
                 false);
-        final MapNode emptyList = ImmutableNodes.mapNodeBuilder(NETCONF_FILTER_QNAME).build();
-        tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(NETCONF_FILTER_QNAME), emptyList);
-        tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(NETCONF_FILTER_QNAME), emptyList);
+        final MapNode emptyList = ImmutableNodes.mapNodeBuilder(NETCONF_FILTER_NODEID).build();
+        tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(NETCONF_FILTER_NODEID), emptyList);
+        tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(NETCONF_FILTER_NODEID), emptyList);
 
         verify(rpc, atMost(1)).invokeNetconf(any(), any());
     }
