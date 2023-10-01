@@ -95,7 +95,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
 
         final var response = handle(document, operationElement, subsequentOperation);
         final var rpcReply = document.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
-        if (XmlElement.fromDomElement(response).hasNamespace()) {
+        if (XmlUtil.hasNamespace(response)) {
             rpcReply.appendChild(response);
         } else {
             // FIXME: use getLocalName() instead
