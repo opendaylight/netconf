@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Map.Entry;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,26 +21,28 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class XmlElementTest {
-
-    private final String elementAsString =
-            "<top xmlns=\"namespace\" xmlns:a=\"attrNamespace\" a:attr1=\"value1\" attr2=\"value2\">"
-            + "<inner>" + "<deepInner>deepValue</deepInner>" + "</inner>"
-            + "<innerNamespace xmlns=\"innerNamespace\">innerNamespaceValue</innerNamespace>"
-            + "<innerPrefixed xmlns:b=\"prefixedValueNamespace\">b:valueWithPrefix</innerPrefixed>" + "</top>";
+    private static final String ELEMENT_AS_STRING = """
+        <top xmlns="namespace" xmlns:a="attrNamespace" a:attr1="value1" attr2="value2">
+          <inner>
+            <deepInner>deepValue</deepInner>
+          </inner>
+          <innerNamespace xmlns="innerNamespace">innerNamespaceValue</innerNamespace>
+          <innerPrefixed xmlns:b="prefixedValueNamespace">b:valueWithPrefix</innerPrefixed>
+        </top>""";
     private Document document;
     private Element element;
     private XmlElement xmlElement;
 
     @Before
     public void setUp() throws Exception {
-        document = XmlUtil.readXmlToDocument(elementAsString);
+        document = XmlUtil.readXmlToDocument(ELEMENT_AS_STRING);
         element = document.getDocumentElement();
         xmlElement = XmlElement.fromDomElement(element);
     }
 
     @Test
     public void testConstruct() throws Exception {
-        final XmlElement fromString = XmlElement.fromString(elementAsString);
+        final XmlElement fromString = XmlElement.fromString(ELEMENT_AS_STRING);
         assertEquals(fromString, xmlElement);
         XmlElement.fromDomDocument(document);
         XmlElement.fromDomElement(element);
@@ -79,13 +80,13 @@ public class XmlElementTest {
         assertTrue(xmlElement.getOnlyChildElementOptionally("innerNamespace", "innerNamespace").isPresent());
         assertFalse(xmlElement.getOnlyChildElementOptionally("innerNamespace", "unknownNamespace").isPresent());
 
-        final XmlElement noNamespaceElement = XmlElement.fromString("<noNamespace/>");
+        final var noNamespaceElement = XmlElement.fromString("<noNamespace/>");
         assertFalse(noNamespaceElement.hasNamespace());
 
         assertThrows(MissingNameSpaceException.class, () -> noNamespaceElement.getNamespace());
 
-        final XmlElement inner = xmlElement.getOnlyChildElement("inner");
-        final XmlElement deepInner = inner.getOnlyChildElementWithSameNamespaceOptionally().orElseThrow();
+        final var inner = xmlElement.getOnlyChildElement("inner");
+        final var deepInner = inner.getOnlyChildElementWithSameNamespaceOptionally().orElseThrow();
         assertEquals(deepInner, inner.getOnlyChildElementWithSameNamespace());
         assertEquals(Optional.empty(), xmlElement.getOnlyChildElementOptionally("unknown"));
         assertEquals("deepValue", deepInner.getTextContent());
@@ -95,13 +96,13 @@ public class XmlElementTest {
 
     @Test
     public void testExtractNamespaces() throws Exception {
-        final XmlElement innerPrefixed = xmlElement.getOnlyChildElement("innerPrefixed");
-        Entry<String, String> namespaceOfTextContent = innerPrefixed.findNamespaceOfTextContent();
+        final var innerPrefixed = xmlElement.getOnlyChildElement("innerPrefixed");
+        var namespaceOfTextContent = innerPrefixed.findNamespaceOfTextContent();
 
         assertNotNull(namespaceOfTextContent);
         assertEquals("b", namespaceOfTextContent.getKey());
         assertEquals("prefixedValueNamespace", namespaceOfTextContent.getValue());
-        final XmlElement innerNamespace = xmlElement.getOnlyChildElement("innerNamespace");
+        final var innerNamespace = xmlElement.getOnlyChildElement("innerNamespace");
         namespaceOfTextContent = innerNamespace.findNamespaceOfTextContent();
 
         assertEquals("", namespaceOfTextContent.getKey());
