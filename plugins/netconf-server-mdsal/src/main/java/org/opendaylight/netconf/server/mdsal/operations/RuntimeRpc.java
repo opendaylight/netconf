@@ -194,15 +194,15 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     private Element transformNormalizedNode(final Document document, final NormalizedNode data,
                                             final Absolute rpcOutputPath) {
-        final DOMResult result = new DOMResult(document.createElement(RpcReplyMessage.ELEMENT_NAME));
+        final var result = new DOMResult(document.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME));
 
-        final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
+        final var xmlWriter = getXmlStreamWriter(result);
 
-        final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
+        final var nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
                 schemaContext.getCurrentContext(), rpcOutputPath);
 
-        final SchemaOrderedNormalizedNodeWriter nnWriter = new SchemaOrderedNormalizedNodeWriter(nnStreamWriter,
-                schemaContext.getCurrentContext(), rpcOutputPath);
+        final var nnWriter = new SchemaOrderedNormalizedNodeWriter(nnStreamWriter, schemaContext.getCurrentContext(),
+            rpcOutputPath);
 
         writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
         try {

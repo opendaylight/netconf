@@ -23,6 +23,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -82,7 +83,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
 
     @Override
     protected String getOperationNamespace() {
-        return "urn:ietf:params:xml:ns:netconf:notification:1.0";
+        return NamespaceURN.NOTIFICATION;
     }
 
     @Override
@@ -100,7 +101,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
                 }, delayAggregator, TimeUnit.SECONDS);
             }
         }
-        return document.createElement(XmlNetconfConstants.OK);
+        return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
     }
 
     private static NetconfMessage parseNetconfNotification(String content) {

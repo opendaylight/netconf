@@ -16,6 +16,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.EffectiveOperation;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
@@ -69,7 +70,7 @@ public final class EditConfig extends AbstractEdit {
             executeOperations(writer.getDataTreeChanges());
         }
 
-        return document.createElement(XmlNetconfConstants.OK);
+        return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
     }
 
     private void executeOperations(final List<DataTreeChange> changes) throws DocumentedException {

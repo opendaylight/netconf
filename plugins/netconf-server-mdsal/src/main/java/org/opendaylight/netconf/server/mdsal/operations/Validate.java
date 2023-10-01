@@ -9,6 +9,7 @@ package org.opendaylight.netconf.server.mdsal.operations;
 
 import com.google.common.collect.ImmutableMap;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.mdsal.TransactionProvider;
@@ -45,7 +46,7 @@ public final class Validate extends AbstractConfigOperation {
 
         transactionProvider.validateTransaction();
         LOG.trace("<validate> request completed successfully on session {}", sessionId().getValue());
-        return document.createElement(XmlNetconfConstants.OK);
+        return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
     }
 
     protected static Datastore extractSourceParameter(final XmlElement operationElement, final String operationName)

@@ -10,6 +10,7 @@ package org.opendaylight.netconf.server.mdsal.operations;
 import static java.util.Objects.requireNonNull;
 
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
@@ -34,11 +35,9 @@ public class Commit extends AbstractSingletonNetconfOperation {
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
             throws DocumentedException {
-
         boolean commitStatus = transactionProvider.commitTransaction();
         LOG.trace("Commit completed successfully {}", commitStatus);
-
-        return document.createElement(XmlNetconfConstants.OK);
+        return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
     }
 
     @Override

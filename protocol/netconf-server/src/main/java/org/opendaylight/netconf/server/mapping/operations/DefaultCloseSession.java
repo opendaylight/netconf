@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.NetconfServerSession;
@@ -61,7 +62,7 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
                     // FIXME: i.e. <error>exception.toString()</error>? That looks wrong on a few levels.
                     Map.of(ErrorSeverity.ERROR.elementBody(), e.getMessage()));
         }
-        return document.createElement(XmlNetconfConstants.OK);
+        return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
     }
 
     @Override

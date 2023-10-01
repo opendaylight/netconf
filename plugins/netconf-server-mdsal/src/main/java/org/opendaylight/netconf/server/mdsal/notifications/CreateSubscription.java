@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -86,7 +87,7 @@ final class CreateSubscription extends AbstractSingletonNetconfOperation
         subscriptions.add(notifications.registerNotificationListener(streamNameType,
             new NotificationSubscription(netconfSession, filter)));
 
-        return document.createElement(XmlNetconfConstants.OK);
+        return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
     }
 
     private static StreamNameType parseStreamIfPresent(final XmlElement operationElement) throws DocumentedException {

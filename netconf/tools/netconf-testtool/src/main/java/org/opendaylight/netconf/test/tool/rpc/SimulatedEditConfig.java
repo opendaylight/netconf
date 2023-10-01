@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.test.tool.rpc;
 
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.operations.AbstractLastNetconfOperation;
@@ -39,7 +40,7 @@ public class SimulatedEditConfig extends AbstractLastNetconfOperation {
             storage.setConfigList(configElementData.getChildElements());
         }
 
-        return document.createElement(XmlNetconfConstants.OK);
+        return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
     }
 
     @Override

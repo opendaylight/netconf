@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
@@ -42,7 +43,7 @@ public class Get extends AbstractGet {
 
         final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
         if (dataRootOptional.isEmpty()) {
-            return document.createElement(XmlNetconfConstants.DATA_KEY);
+            return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.DATA_KEY);
         }
 
         final YangInstanceIdentifier dataRoot = dataRootOptional.orElseThrow();
@@ -54,7 +55,7 @@ public class Get extends AbstractGet {
             transactionProvider.abortRunningTransaction(rwTx);
 
             if (normalizedNodeOptional.isEmpty()) {
-                return document.createElement(XmlNetconfConstants.DATA_KEY);
+                return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.DATA_KEY);
             }
 
             return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.orElseThrow());
