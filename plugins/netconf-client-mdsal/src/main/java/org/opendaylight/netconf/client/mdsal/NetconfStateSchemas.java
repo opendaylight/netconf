@@ -81,13 +81,13 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     static {
         final Document document = XmlUtil.newDocument();
 
-        final Element filterElem = XmlUtil.createElement(document, "filter", Optional.of(NamespaceURN.BASE));
+        final Element filterElem = document.createElementNS(NamespaceURN.BASE, "filter");
         filterElem.setAttribute("type", "subtree");
 
-        final Element stateElem = XmlUtil.createElement(document, NetconfState.QNAME.getLocalName(),
-            Optional.of(NetconfState.QNAME.getNamespace().toString()));
-        stateElem.appendChild(XmlUtil.createElement(document, Schemas.QNAME.getLocalName(),
-            Optional.of(Schemas.QNAME.getNamespace().toString())));
+        final Element stateElem = document.createElementNS(NetconfState.QNAME.getNamespace().toString(),
+            NetconfState.QNAME.getLocalName());
+        stateElem.appendChild(document.createElementNS(Schemas.QNAME.getNamespace().toString(),
+            Schemas.QNAME.getLocalName()));
         filterElem.appendChild(stateElem);
 
         GET_SCHEMAS_RPC = Builders.containerBuilder()

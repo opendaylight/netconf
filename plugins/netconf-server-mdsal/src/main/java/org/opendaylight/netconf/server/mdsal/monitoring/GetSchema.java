@@ -16,7 +16,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -70,10 +69,11 @@ public final class GetSchema extends AbstractSingletonNetconfOperation {
                 Map.of(ErrorTag.OPERATION_FAILED.elementBody(), e.getMessage()));
         }
 
-        final var getSchemaResult = XmlUtil.createTextElement(document, XmlNetconfConstants.DATA_KEY, schema,
-                Optional.of(URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING));
+        final var ret = document.createElementNS(URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING,
+            XmlNetconfConstants.DATA_KEY);
+        ret.appendChild(document.createTextNode(schema));
         LOG.trace("{} operation successful", GET_SCHEMA);
-        return getSchemaResult;
+        return ret;
     }
 
     private static final class GetSchemaEntry {
