@@ -19,8 +19,11 @@ import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransform
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME;
+import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME;
+import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
+import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_LOCK_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
@@ -34,20 +37,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.xml.transform.dom.DOMSource;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
-import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
@@ -76,11 +75,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -90,6 +86,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -198,23 +195,30 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testLockRequestBaseSchemaNotPresent() throws Exception {
-        final NetconfMessageTransformer transformer = getTransformer(PARTIAL_SCHEMA);
-        final NetconfMessage netconfMessage = transformer.toRpcRequest(NETCONF_LOCK_QNAME,
+        final var transformer = getTransformer(PARTIAL_SCHEMA);
+        final var netconfMessage = transformer.toRpcRequest(NETCONF_LOCK_QNAME,
                 NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_NODEID));
-
-        assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<lock"));
-        assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<rpc"));
+        assertEquals("""
+            <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
+                <lock>
+                    <target>
+                        <candidate/>
+                    </target>
+                </lock>
+            </rpc>
+            """, XmlUtil.toString(netconfMessage.getDocument()));
     }
 
     @Test
     public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
-        final NetconfMessageTransformer transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
+        final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
             BASE_SCHEMAS.getBaseSchemaWithNotifications());
-        NetconfMessage netconfMessage = transformer.toRpcRequest(CREATE_SUBSCRIPTION_RPC_QNAME,
-                CREATE_SUBSCRIPTION_RPC_CONTENT);
-        String documentString = XmlUtil.toString(netconfMessage.getDocument());
-        assertThat(documentString, CoreMatchers.containsString("<create-subscription"));
-        assertThat(documentString, CoreMatchers.containsString("<rpc"));
+        var netconfMessage = transformer.toRpcRequest(CREATE_SUBSCRIPTION_RPC_QNAME, CREATE_SUBSCRIPTION_RPC_CONTENT);
+        assertEquals("""
+            <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
+                <create-subscription xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0"/>
+            </rpc>
+            """, XmlUtil.toString(netconfMessage.getDocument()));
     }
 
     @Test
@@ -231,7 +235,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     public void testRpcEmptyBodyWithOutputDefinedSchemaResult() throws Exception {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
-        DOMRpcResult domRpcResult = actionNetconfMessageTransformer.toRpcResult(
+        final var domRpcResult = actionNetconfMessageTransformer.toRpcResult(
             RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
             RPC_WITH_OUTPUT_QNAME);
         assertNotNull(domRpcResult);
@@ -241,7 +245,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     public void testRpcEmptyBodyWithoutOutputDefinedSchemaResult() throws Exception {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
-        DOMRpcResult domRpcResult = actionNetconfMessageTransformer.toRpcResult(
+        final var domRpcResult = actionNetconfMessageTransformer.toRpcResult(
             RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
             RPC_WITHOUT_OUTPUT_QNAME);
         assertNotNull(domRpcResult);
@@ -249,69 +253,69 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testDiscardChangesRequest() throws Exception {
-        final NetconfMessage netconfMessage =
-                netconfMessageTransformer.toRpcRequest(NETCONF_DISCARD_CHANGES_QNAME, null);
-        assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<discard"));
-        assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<rpc"));
-        assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("message-id"));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_DISCARD_CHANGES_QNAME, null);
+        assertEquals("""
+            <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
+                <discard-changes/>
+            </rpc>
+            """, XmlUtil.toString(netconfMessage.getDocument()));
     }
 
     @Test
     public void testGetSchemaRequest() throws Exception {
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(GET_SCHEMA_QNAME,
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(GET_SCHEMA_QNAME,
                 MonitoringSchemaSourceProvider.createGetSchemaRequest("module", Optional.of("2012-12-12")));
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get-schema xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<format>yang</format>\n"
-                + "<identifier>module</identifier>\n"
-                + "<version>2012-12-12</version>\n"
-                + "</get-schema>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get-schema xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                <format>yang</format>
+                <identifier>module</identifier>
+                <version>2012-12-12</version>
+              </get-schema>
+            </rpc>""");
     }
 
     @Test
     public void testGetSchemaResponse() throws Exception {
-        final NetconfMessageTransformer transformer = getTransformer(SCHEMA);
-        final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
-                "<rpc-reply message-id=\"101\"\n"
-                        + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                        + "<data\n"
-                        + "xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                        + "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n"
-                        + "Random YANG SCHEMA\n"
-                        + "</xs:schema>\n"
-                        + "</data>\n"
-                        + "</rpc-reply>"
-        ));
-        final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(RpcResultBuilder.success(response).build(),
+        final var transformer = getTransformer(SCHEMA);
+        final var response = new NetconfMessage(XmlUtil.readXmlToDocument("""
+            <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <data xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                <schema xmlns="http://www.w3.org/2001/XMLSchema">Random YANG SCHEMA</schema>
+              </data>
+            </rpc-reply>"""));
+        final var compositeNodeRpcResult = transformer.toRpcResult(RpcResultBuilder.success(response).build(),
             GET_SCHEMA_QNAME);
         assertTrue(compositeNodeRpcResult.errors().isEmpty());
         assertNotNull(compositeNodeRpcResult.value());
-        final DOMSource schemaContent = ((DOMSourceAnyxmlNode) compositeNodeRpcResult.value()
+        final var schemaContent = ((DOMSourceAnyxmlNode) compositeNodeRpcResult.value()
                 .body().iterator().next()).body();
-        assertThat(schemaContent.getNode().getTextContent(),
-                CoreMatchers.containsString("Random YANG SCHEMA"));
+        assertEquals("""
+            <data xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                <schema xmlns="http://www.w3.org/2001/XMLSchema">Random YANG SCHEMA</schema>
+            </data>
+            """, XmlUtil.toString((Element) schemaContent.getNode()));
     }
 
     @Test
     public void testGetConfigResponse() throws Exception {
-        final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument("<rpc-reply message-id=\"101\"\n"
-                + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<data>\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<schemas>\n"
-                + "<schema>\n"
-                + "<identifier>module</identifier>\n"
-                + "<version>2012-12-12</version>\n"
-                + "<format xmlns:x=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">x:yang</format>\n"
-                + "</schema>\n"
-                + "</schemas>\n"
-                + "</netconf-state>\n"
-                + "</data>\n"
-                + "</rpc-reply>"));
+        final var response = new NetconfMessage(XmlUtil.readXmlToDocument("""
+            <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <data>
+                 <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                   <schemas>
+                     <schema>
+                       <identifier>module</identifier>
+                       <version>2012-12-12</version>
+                       <format xmlns:x="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">x:yang</format>
+                     </schema>
+                   </schemas>
+                 </netconf-state>
+               </data>
+             </rpc-reply>"""));
 
-        final NetconfMessageTransformer transformer = getTransformer(SCHEMA);
-        final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(RpcResultBuilder.success(response).build(),
+        final var transformer = getTransformer(SCHEMA);
+        final var compositeNodeRpcResult = transformer.toRpcResult(RpcResultBuilder.success(response).build(),
             NETCONF_GET_CONFIG_QNAME);
         assertTrue(compositeNodeRpcResult.errors().isEmpty());
         assertNotNull(compositeNodeRpcResult.value());
@@ -319,24 +323,23 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest(
             "module", Optional.of("2012-12-12")).body();
 
-        final Map<QName, Object> keys = new HashMap<>();
-        for (final DataContainerChild value : values) {
+        final var keys = new HashMap<QName, Object>();
+        for (var value : values) {
             keys.put(value.name().getNodeType(), value.body());
         }
 
-        final NodeIdentifierWithPredicates identifierWithPredicates =
-                NodeIdentifierWithPredicates.of(Schema.QNAME, keys);
-        final MapEntryNode schemaNode =
-                Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
+        final var schemaNode = Builders.mapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Schema.QNAME, keys))
+            .withValue(values)
+            .build();
 
-        final DOMSourceAnyxmlNode data = (DOMSourceAnyxmlNode) compositeNodeRpcResult.value()
-                .findChildByArg(toId(NETCONF_DATA_QNAME)).orElseThrow();
+        final var data = (DOMSourceAnyxmlNode) compositeNodeRpcResult.value().getChildByArg(toId(NETCONF_DATA_QNAME));
 
-        var nodeResult = NormalizedDataUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.body());
-        ContainerNode result = (ContainerNode) nodeResult.getResult().data();
-        final ContainerNode state = (ContainerNode) result.getChildByArg(toId(NetconfState.QNAME));
-        final ContainerNode schemas = (ContainerNode) state.getChildByArg(toId(Schemas.QNAME));
-        final MapNode schemaParent = (MapNode) schemas.getChildByArg(toId(Schema.QNAME));
+        final var nodeResult = NormalizedDataUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.body());
+        final var result = (ContainerNode) nodeResult.getResult().data();
+        final var state = (ContainerNode) result.getChildByArg(toId(NetconfState.QNAME));
+        final var schemas = (ContainerNode) state.getChildByArg(toId(Schemas.QNAME));
+        final var schemaParent = (MapNode) schemas.getChildByArg(toId(Schema.QNAME));
         assertEquals(1, schemaParent.body().size());
 
         assertEquals(schemaNode, schemaParent.body().iterator().next());
@@ -344,56 +347,58 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testGetConfigLeafRequest() throws Exception {
-        final AnyxmlNode<?> filter = toFilterStructure(
+        final var filter = toFilterStructure(
                 YangInstanceIdentifier.of(toId(NetconfState.QNAME), toId(Schemas.QNAME), toId(Schema.QNAME),
                     NodeIdentifierWithPredicates.of(Schema.QNAME),
                     toId(QName.create(Schemas.QNAME, "version"))), SCHEMA);
 
-        final ContainerNode source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_NODEID);
+        final var source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_NODEID);
 
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
-                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, source, filter));
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<schemas>\n"
-                + "<schema>\n"
-                + "<version/>\n"
-                + "</schema>\n"
-                + "</schemas>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "<source>\n"
-                + "<running/>\n"
-                + "</source>\n"
-                + "</get-config>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get-config>
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <schemas>
+                      <schema>
+                        <version/>
+                      </schema>
+                    </schemas>
+                  </netconf-state>
+                </filter>
+                <source>
+                  <running/>
+                </source>
+              </get-config>
+            </rpc>""");
     }
 
     @Test
     public void testGetConfigRequest() throws Exception {
-        final AnyxmlNode<?> filter = toFilterStructure(
+        final var filter = toFilterStructure(
                 YangInstanceIdentifier.of(toId(NetconfState.QNAME), toId(Schemas.QNAME)), SCHEMA);
 
-        final ContainerNode source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_NODEID);
+        final var source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_NODEID);
 
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
-                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_CONFIG_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, source, filter));
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<schemas/>\n"
-                + "</netconf-state>"
-                + "</filter>\n"
-                + "<source>\n"
-                + "<running/>\n"
-                + "</source>\n"
-                + "</get-config>"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get-config>
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <schemas/>
+                  </netconf-state>
+                </filter>
+                <source>
+                 <running/>
+                </source>
+              </get-config>
+            </rpc>""");
     }
 
     @Test
@@ -401,47 +406,47 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest(
             "module", Optional.of("2012-12-12")).body();
 
-        final Map<QName, Object> keys = new HashMap<>();
-        for (final DataContainerChild value : values) {
+        final var keys = new HashMap<QName, Object>();
+        for (var value : values) {
             keys.put(value.name().getNodeType(), value.body());
         }
 
-        final NodeIdentifierWithPredicates identifierWithPredicates =
-                NodeIdentifierWithPredicates.of(Schema.QNAME, keys);
-        final MapEntryNode schemaNode =
-                Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
+        final var schemaNode = Builders.mapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Schema.QNAME, keys))
+            .withValue(values)
+            .build();
 
-        final YangInstanceIdentifier id = YangInstanceIdentifier.builder()
+        final var id = YangInstanceIdentifier.builder()
                 .node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME)
                 .nodeWithKey(Schema.QNAME, keys).build();
-        final DataContainerChild editConfigStructure =
+        final var editConfigStructure =
                 createEditConfigStructure(BASE_SCHEMAS.getBaseSchemaWithNotifications().getEffectiveModelContext(), id,
                     Optional.empty(), Optional.ofNullable(schemaNode));
 
-        final DataContainerChild target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_NODEID);
+        final var target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_NODEID);
 
-        final ContainerNode wrap =
-                NetconfMessageTransformUtil.wrap(NETCONF_EDIT_CONFIG_QNAME, editConfigStructure, target);
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_EDIT_CONFIG_QNAME, wrap);
+        final var wrap = NetconfMessageTransformUtil.wrap(NETCONF_EDIT_CONFIG_NODEID, editConfigStructure, target);
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_EDIT_CONFIG_QNAME, wrap);
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<edit-config>\n"
-                + "<target>\n"
-                + "<candidate/>\n"
-                + "</target>\n"
-                + "<config>\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<schemas>\n"
-                + "<schema>\n"
-                + "<identifier>module</identifier>\n"
-                + "<version>2012-12-12</version>\n"
-                + "<format>yang</format>\n"
-                + "</schema>\n"
-                + "</schemas>\n"
-                + "</netconf-state>\n"
-                + "</config>\n"
-                + "</edit-config>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <edit-config>
+                <target>
+                  <candidate/>
+                </target>
+                <config>
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <schemas>
+                      <schema>
+                        <identifier>module</identifier>
+                        <version>2012-12-12</version>
+                        <format>yang</format>
+                      </schema>
+                    </schemas>
+                  </netconf-state>
+                </config>
+              </edit-config>
+            </rpc>""");
     }
 
     private static void assertSimilarXml(final NetconfMessage netconfMessage, final String xmlContent)
@@ -453,72 +458,72 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testGetRequest() throws Exception {
-
-        final QName capability = QName.create(Capabilities.QNAME, "capability");
-        final DataContainerChild filter = toFilterStructure(
+        final var capability = QName.create(Capabilities.QNAME, "capability");
+        final var filter = toFilterStructure(
                 YangInstanceIdentifier.of(toId(NetconfState.QNAME), toId(Capabilities.QNAME), toId(capability),
                     new NodeWithValue<>(capability, "a:b:c")), SCHEMA);
 
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
-                NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, filter));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filter));
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-                + "<get xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<capabilities>\n"
-                + "<capability>a:b:c</capability>\n"
-                + "</capabilities>\n"
-                + "</netconf-state>"
-                + "</filter>\n"
-                + "</get>"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <capabilities>
+                      <capability>a:b:c</capability>
+                    </capabilities>
+                  </netconf-state>
+                </filter>
+              </get>
+            </rpc>""");
     }
 
     @Test
     public void testGetLeafList() throws IOException, SAXException {
-        final YangInstanceIdentifier path = YangInstanceIdentifier.of(
-                NetconfState.QNAME,
-                Capabilities.QNAME,
-                QName.create(Capabilities.QNAME, "capability"));
-        final DataContainerChild filter = toFilterStructure(path, SCHEMA);
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
-                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
+        final var filter = toFilterStructure(YangInstanceIdentifier.of(
+            NetconfState.QNAME,
+            Capabilities.QNAME,
+            QName.create(Capabilities.QNAME, "capability")), SCHEMA);
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filter));
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<capabilities>\n"
-                + "<capability/>\n"
-                + "</capabilities>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>\n");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get>
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <capabilities>
+                      <capability/>
+                    </capabilities>
+                  </netconf-state>
+                </filter>
+              </get>
+            </rpc>""");
     }
 
     @Test
     public void testGetList() throws IOException, SAXException {
-        final YangInstanceIdentifier path = YangInstanceIdentifier.of(
-                NetconfState.QNAME,
-                Datastores.QNAME,
-                QName.create(Datastores.QNAME, "datastore"));
-        final DataContainerChild filter = toFilterStructure(path, SCHEMA);
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
-                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filter));
+        final var filter = toFilterStructure(YangInstanceIdentifier.of(
+            NetconfState.QNAME,
+            Datastores.QNAME,
+            QName.create(Datastores.QNAME, "datastore")), SCHEMA);
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filter));
 
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<datastores>\n"
-                + "<datastore/>\n"
-                + "</datastores>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>\n");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get>
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <datastores>
+                      <datastore/>
+                    </datastores>
+                  </netconf-state>
+                </filter>
+              </get>
+            </rpc>""");
     }
 
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
@@ -825,39 +830,37 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void toActionResultTest() throws Exception {
-        NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
-                "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-                + "<reset-finished-at xmlns=\"urn:example:server-farm\">"
-                + "now"
-                + "</reset-finished-at>"
-                + "</rpc-reply>"));
-        DOMActionResult actionResult = actionNetconfMessageTransformer.toActionResult(RESET_SERVER_PATH, message);
+        var message = new NetconfMessage(XmlUtil.readXmlToDocument("""
+            <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <reset-finished-at xmlns="urn:example:server-farm">now</reset-finished-at>
+            </rpc-reply>"""));
+        final var actionResult = actionNetconfMessageTransformer.toActionResult(RESET_SERVER_PATH, message);
         assertNotNull(actionResult);
-        ContainerNode containerNode = actionResult.getOutput().orElseThrow();
+        final var containerNode = actionResult.getOutput().orElseThrow();
         assertNotNull(containerNode);
         assertEquals("now", containerNode.body().iterator().next().body());
     }
 
     @Test
     public void toActionEmptyBodyWithOutputDefinedResultTest() throws Exception {
-        NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
-                "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-                + "<ok/>"
-                + "</rpc-reply>"));
-        DOMActionResult actionResult =
-                actionNetconfMessageTransformer.toActionResult(CHECK_WITH_OUTPUT_INTERFACE_PATH, message);
+        final var message = new NetconfMessage(XmlUtil.readXmlToDocument("""
+            <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <ok/>
+            </rpc-reply>"""));
+        final var actionResult =
+            actionNetconfMessageTransformer.toActionResult(CHECK_WITH_OUTPUT_INTERFACE_PATH, message);
         assertNotNull(actionResult);
         assertTrue(actionResult.getOutput().isEmpty());
     }
 
     @Test
     public void toActionEmptyBodyWithoutOutputDefinedResultTest() throws Exception {
-        NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
-                "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-                + "<ok/>"
-                + "</rpc-reply>"));
-        DOMActionResult actionResult =
-                actionNetconfMessageTransformer.toActionResult(CHECK_WITHOUT_OUTPUT_INTERFACE_PATH, message);
+        final var message = new NetconfMessage(XmlUtil.readXmlToDocument("""
+            <rpc-reply message-id="101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <ok/>
+            </rpc-reply>"""));
+        final var actionResult =
+            actionNetconfMessageTransformer.toActionResult(CHECK_WITHOUT_OUTPUT_INTERFACE_PATH, message);
         assertNotNull(actionResult);
         assertTrue(actionResult.getOutput().isEmpty());
     }
@@ -865,233 +868,239 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void getTwoNonOverlappingFieldsTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
-        final YangInstanceIdentifier netconfStartTimeField = YangInstanceIdentifier.of(Statistics.QNAME,
+        final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
+        final var netconfStartTimeField = YangInstanceIdentifier.of(Statistics.QNAME,
                 QName.create(Statistics.QNAME, "netconf-start-time"));
-        final YangInstanceIdentifier datastoresField = YangInstanceIdentifier.of(Datastores.QNAME);
+        final var datastoresField = YangInstanceIdentifier.of(Datastores.QNAME);
 
         // building filter structure and NETCONF message
-        final AnyxmlNode<?> filterStructure = toFilterStructure(
+        final var filterStructure = toFilterStructure(
             List.of(FieldsFilter.of(parentYiid, List.of(netconfStartTimeField, datastoresField))), SCHEMA);
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
-                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<statistics>\n"
-                + "<netconf-start-time/>\n"
-                + "</statistics>\n"
-                + "<datastores/>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get>
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <statistics>
+                      <netconf-start-time/>
+                    </statistics>
+                    <datastores/>
+                  </netconf-state>
+                </filter>
+              </get>
+            </rpc>""");
     }
 
     @Test
     public void getOverlappingFieldsTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
-        final YangInstanceIdentifier capabilitiesField = YangInstanceIdentifier.of(Capabilities.QNAME);
-        final YangInstanceIdentifier capabilityField = YangInstanceIdentifier.of(Capabilities.QNAME,
+        final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
+        final var capabilitiesField = YangInstanceIdentifier.of(Capabilities.QNAME);
+        final var capabilityField = YangInstanceIdentifier.of(Capabilities.QNAME,
                 QName.create(Capabilities.QNAME, "capability"));
-        final YangInstanceIdentifier datastoreField = YangInstanceIdentifier.of(Datastores.QNAME);
-        final YangInstanceIdentifier locksFields = YangInstanceIdentifier.of(toId(Datastores.QNAME),
+        final var datastoreField = YangInstanceIdentifier.of(Datastores.QNAME);
+        final var locksFields = YangInstanceIdentifier.of(toId(Datastores.QNAME),
                 toId(Datastore.QNAME), NodeIdentifierWithPredicates.of(Datastore.QNAME), toId(Locks.QNAME));
 
         // building filter structure and NETCONF message
-        final AnyxmlNode<?> filterStructure = toFilterStructure(
+        final var filterStructure = toFilterStructure(
                 List.of(FieldsFilter.of(parentYiid,
                     List.of(capabilitiesField, capabilityField, datastoreField, locksFields))),
                 SCHEMA);
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
-                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<capabilities/>\n"
-                + "<datastores/>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get>
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <capabilities/>
+                    <datastores/>
+                  </netconf-state>
+                </filter>
+              </get>
+            </rpc>""");
     }
 
     @Test
     public void getOverlappingFieldsWithEmptyFieldTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
-        final YangInstanceIdentifier capabilitiesField = YangInstanceIdentifier.of(Capabilities.QNAME);
+        final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
+        final var capabilitiesField = YangInstanceIdentifier.of(Capabilities.QNAME);
 
         // building filter structure and NETCONF message
-        final AnyxmlNode<?> filterStructure = toFilterStructure(
+        final var filterStructure = toFilterStructure(
                 List.of(FieldsFilter.of(parentYiid, List.of(capabilitiesField, YangInstanceIdentifier.of()))),
                 SCHEMA);
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
-                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\"/>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <get>
+            <filter type="subtree">
+            <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring"/>
+            </filter>
+            </get>
+            </rpc>""");
     }
 
     @Test
     public void getSpecificFieldsUnderListTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(toId(NetconfState.QNAME),
+        final var parentYiid = YangInstanceIdentifier.of(toId(NetconfState.QNAME),
                 toId(Schemas.QNAME), toId(Schema.QNAME), NodeIdentifierWithPredicates.of(Schema.QNAME));
-        final YangInstanceIdentifier versionField = YangInstanceIdentifier.of(
+        final var versionField = YangInstanceIdentifier.of(
                 QName.create(Schema.QNAME, "version"));
-        final YangInstanceIdentifier identifierField = YangInstanceIdentifier.of(
+        final var identifierField = YangInstanceIdentifier.of(
                 QName.create(Schema.QNAME, "namespace"));
 
         // building filter structure and NETCONF message
-        final AnyxmlNode<?> filterStructure = toFilterStructure(
+        final var filterStructure = toFilterStructure(
             List.of(FieldsFilter.of(parentYiid, List.of(versionField, identifierField))), SCHEMA);
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
-                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<schemas>\n"
-                + "<schema>\n"
-                + "<version/>\n"
-                + "<namespace/>\n"
-                // explicitly fetched list keys - identifier and format
-                + "<identifier/>\n"
-                + "<format/>\n"
-                + "</schema>\n"
-                + "</schemas>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get>
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <schemas>
+                      <schema>
+                        <version/>
+                        <namespace/>
+                        <identifier/>
+                        <format/>
+                      </schema>
+                    </schemas>
+                  </netconf-state>
+                </filter>
+              </get>
+            </rpc>""");
     }
 
     @Test
     public void getSpecificFieldsUnderMultipleLists() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME, Datastores.QNAME);
-        final YangInstanceIdentifier partialLockYiid = YangInstanceIdentifier.of(toId(Datastore.QNAME),
+        final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME, Datastores.QNAME);
+        final var partialLockYiid = YangInstanceIdentifier.of(toId(Datastore.QNAME),
                 NodeIdentifierWithPredicates.of(Datastore.QNAME), toId(Locks.QNAME),
                 toId(QName.create(Locks.QNAME, "lock-type").intern()), toId(PartialLock.QNAME),
                 NodeIdentifierWithPredicates.of(PartialLock.QNAME));
-        final YangInstanceIdentifier lockedTimeField = partialLockYiid.node(
+        final var lockedTimeField = partialLockYiid.node(
                 QName.create(Locks.QNAME, "locked-time").intern());
-        final YangInstanceIdentifier lockedBySessionField = partialLockYiid.node(
+        final var lockedBySessionField = partialLockYiid.node(
                 QName.create(Locks.QNAME, "locked-by-session").intern());
 
         // building filter structure and NETCONF message
-        final AnyxmlNode<?> filterStructure = toFilterStructure(
+        final var filterStructure = toFilterStructure(
             List.of(FieldsFilter.of(parentYiid, List.of(lockedTimeField, lockedBySessionField))),
             SCHEMA);
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
-                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<datastores>\n"
-                + "<datastore>\n"
-                + "<locks>\n"
-                + "<partial-lock>\n"
-                + "<locked-time/>\n"
-                + "<locked-by-session/>\n"
-                + "<lock-id/>\n"
-                + "</partial-lock>\n"
-                + "</locks>\n"
-                + "<name/>\n"
-                + "</datastore>\n"
-                + "</datastores>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get>
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <datastores>
+                      <datastore>
+                        <locks>
+                          <partial-lock>
+                            <locked-time/>
+                            <locked-by-session/>
+                            <lock-id/>
+                          </partial-lock>
+                        </locks>
+                        <name/>
+                      </datastore>
+                    </datastores>
+                  </netconf-state>
+                </filter>
+              </get>
+            </rpc>""");
     }
 
     @Test
     public void getWholeListsUsingFieldsTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
-        final YangInstanceIdentifier datastoreListField = YangInstanceIdentifier.of(toId(Datastores.QNAME),
+        final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME);
+        final var datastoreListField = YangInstanceIdentifier.of(toId(Datastores.QNAME),
                 toId(Datastore.QNAME), NodeIdentifierWithPredicates.of(Datastore.QNAME));
-        final YangInstanceIdentifier sessionListField = YangInstanceIdentifier.of(toId(Sessions.QNAME),
+        final var sessionListField = YangInstanceIdentifier.of(toId(Sessions.QNAME),
                 toId(Session.QNAME), NodeIdentifierWithPredicates.of(Session.QNAME));
 
         // building filter structure and NETCONF message
-        final AnyxmlNode<?> filterStructure = toFilterStructure(
+        final var filterStructure = toFilterStructure(
                 List.of(FieldsFilter.of(parentYiid, List.of(datastoreListField, sessionListField))), SCHEMA);
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
-                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<datastores>\n"
-                + "<datastore/>\n"
-                + "</datastores>\n"
-                + "<sessions>\n"
-                + "<session/>\n"
-                + "</sessions>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get>
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <datastores>
+                      <datastore/>
+                    </datastores>
+                    <sessions>
+                      <session/>
+                    </sessions>
+                  </netconf-state>
+                </filter>
+              </get>
+            </rpc>""");
     }
 
     @Test
     public void getSpecificListEntriesWithSpecificFieldsTest() throws IOException, SAXException {
         // preparation of the fields
-        final YangInstanceIdentifier parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME, Sessions.QNAME);
-        final QName sessionId = QName.create(Session.QNAME, "session-id").intern();
-        final YangInstanceIdentifier session1Field = YangInstanceIdentifier.of(toId(Session.QNAME),
+        final var parentYiid = YangInstanceIdentifier.of(NetconfState.QNAME, Sessions.QNAME);
+        final var sessionId = QName.create(Session.QNAME, "session-id").intern();
+        final var session1Field = YangInstanceIdentifier.of(toId(Session.QNAME),
                 NodeIdentifierWithPredicates.of(Session.QNAME, sessionId, 1));
-        final YangInstanceIdentifier session2TransportField = YangInstanceIdentifier.of(toId(Session.QNAME),
+        final var session2TransportField = YangInstanceIdentifier.of(toId(Session.QNAME),
                 NodeIdentifierWithPredicates.of(Session.QNAME, sessionId, 2),
                 toId(QName.create(Session.QNAME, "transport").intern()));
 
         // building filter structure and NETCONF message
-        final AnyxmlNode<?> filterStructure = toFilterStructure(
+        final var filterStructure = toFilterStructure(
                 List.of(FieldsFilter.of(parentYiid, List.of(session1Field, session2TransportField))), SCHEMA);
-        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
-                NetconfMessageTransformUtil.wrap(toId(NETCONF_GET_QNAME), filterStructure));
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_GET_QNAME,
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, filterStructure));
 
         // testing
-        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                + "<get>\n"
-                + "<filter type=\"subtree\">\n"
-                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
-                + "<sessions>\n"
-                + "<session>\n"
-                + "<session-id>1</session-id>\n"
-                + "</session>\n"
-                + "<session>\n"
-                + "<session-id>2</session-id>\n"
-                + "<transport/>\n"
-                + "</session>\n"
-                + "</sessions>\n"
-                + "</netconf-state>\n"
-                + "</filter>\n"
-                + "</get>\n"
-                + "</rpc>");
+        assertSimilarXml(netconfMessage, """
+            <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <get>
+                <filter type="subtree">
+                  <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <sessions>
+                      <session>
+                        <session-id>1</session-id>
+                      </session>
+                      <session>
+                        <session-id>2</session-id>
+                        <transport/>
+                      </session>
+                    </sessions>
+                  </netconf-state>
+                </filter>
+              </get>
+            </rpc>""");
     }
 
     @Test
