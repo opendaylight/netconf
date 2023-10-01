@@ -13,10 +13,8 @@ import static com.google.common.base.Verify.verify;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.IETF_NETCONF_MONITORING;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_TYPE_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toId;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -33,6 +31,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -82,10 +81,8 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     static {
         final Document document = XmlUtil.newDocument();
 
-        final Element filterElem = XmlUtil.createElement(document, NETCONF_FILTER_QNAME.getLocalName(),
-            Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
-        filterElem.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
-            "subtree");
+        final Element filterElem = XmlUtil.createElement(document, "filter", Optional.of(NamespaceURN.BASE));
+        filterElem.setAttribute("type", "subtree");
 
         final Element stateElem = XmlUtil.createElement(document, NetconfState.QNAME.getLocalName(),
             Optional.of(NetconfState.QNAME.getNamespace().toString()));

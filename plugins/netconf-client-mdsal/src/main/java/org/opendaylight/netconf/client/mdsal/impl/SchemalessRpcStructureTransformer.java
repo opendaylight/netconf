@@ -11,7 +11,6 @@ import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransform
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CONFIG_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_OPERATION_QNAME;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_DATA_QNAME;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.appendListKeyNodes;
@@ -22,6 +21,7 @@ import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.EffectiveOperation;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -135,12 +135,8 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     private static Element prepareFilterElement(final Document document) {
-        // FIXME: use a constant
-        final var filterNs = NETCONF_FILTER_QNAME.getNamespace().toString();
-        final var filter = document.createElementNS(filterNs, NETCONF_FILTER_QNAME.getLocalName());
-        final var attr = document.createAttributeNS(filterNs, "type");
-        attr.setTextContent("subtree");
-        filter.setAttributeNode(attr);
+        final var filter = document.createElementNS(NamespaceURN.BASE, "filter");
+        filter.setAttribute("type", "subtree");
         document.appendChild(filter);
         return filter;
     }
