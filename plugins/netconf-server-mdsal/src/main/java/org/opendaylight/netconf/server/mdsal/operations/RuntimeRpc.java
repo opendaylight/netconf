@@ -51,7 +51,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpc.class);
@@ -169,21 +168,14 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final Map<String, Attr> attributes = requestElement.getAttributes();
 
         final Element response = handle(document, operationElement, subsequentOperation);
-        final Element rpcReply = document.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
-
-        if (XmlElement.fromDomElement(response).hasNamespace()) {
-            rpcReply.appendChild(response);
+        final Element rpcReply;
+        if (NamespaceURN.BASE.equals(response.getNamespaceURI())
+            && RpcReplyMessage.ELEMENT_NAME.equals(response.getLocalName())) {
+            rpcReply = response;
         } else {
-            final NodeList list = response.getChildNodes();
-            if (list.getLength() == 0) {
-                rpcReply.appendChild(response);
-            } else {
-                while (list.getLength() != 0) {
-                    rpcReply.appendChild(list.item(0));
-                }
-            }
+            rpcReply = document.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
+            rpcReply.appendChild(response);
         }
-
         for (final Attr attribute : attributes.values()) {
             rpcReply.setAttributeNode((Attr) document.importNode(attribute, true));
         }
@@ -193,15 +185,15 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     private Element transformNormalizedNode(final Document document, final ContainerNode data,
                                             final Absolute rpcOutputPath) {
-        final DOMResult result = new DOMResult(document.createElement(RpcReplyMessage.ELEMENT_NAME));
+        final var result = new DOMResult(document.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME));
 
-        final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
+        final var xmlWriter = getXmlStreamWriter(result);
 
-        final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
+        final var nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
                 schemaContext.getCurrentContext(), rpcOutputPath);
 
-        final SchemaOrderedNormalizedNodeWriter nnWriter = new SchemaOrderedNormalizedNodeWriter(nnStreamWriter,
-                schemaContext.getCurrentContext(), rpcOutputPath);
+        final var nnWriter = new SchemaOrderedNormalizedNodeWriter(nnStreamWriter, schemaContext.getCurrentContext(),
+            rpcOutputPath);
 
         writeRootElement(xmlWriter, nnWriter, data);
         try {

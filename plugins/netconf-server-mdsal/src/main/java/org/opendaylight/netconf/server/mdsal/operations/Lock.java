@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.server.mdsal.operations;
 
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
@@ -35,7 +36,7 @@ public class Lock extends AbstractSingletonNetconfOperation {
         final Datastore targetDatastore = extractTargetParameter(operationElement);
         if (targetDatastore == Datastore.candidate) {
             LOG.debug("Locking candidate datastore on session: {}", sessionId().getValue());
-            return document.createElement(XmlNetconfConstants.OK);
+            return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
         }
 
         throw new DocumentedException("Unable to lock " + targetDatastore + " datastore",

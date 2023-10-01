@@ -10,6 +10,7 @@ package org.opendaylight.netconf.server.mdsal.operations;
 import java.util.HashMap;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.operations.AbstractSingletonNetconfOperation;
@@ -49,7 +50,7 @@ public class DiscardChanges extends AbstractSingletonNetconfOperation {
             throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                     ErrorSeverity.ERROR, errorInfo);
         }
-        return document.createElement(XmlNetconfConstants.OK);
+        return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
     }
 
     @Override

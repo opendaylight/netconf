@@ -87,7 +87,7 @@ public final class CopyConfig extends AbstractEdit {
             throw new DocumentedException("Unsupported target: " + target,
                 ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, ErrorSeverity.ERROR);
         }
-        return document.createElement(XmlNetconfConstants.OK);
+        return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
     }
 
     private void copyToCandidate(final XmlElement operationElement)

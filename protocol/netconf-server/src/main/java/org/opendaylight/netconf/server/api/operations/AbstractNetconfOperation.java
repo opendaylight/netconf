@@ -94,17 +94,13 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
         final var attributes = requestElement.getAttributes();
 
         final var response = handle(document, operationElement, subsequentOperation);
-        final var rpcReply = document.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
-        if (XmlElement.fromDomElement(response).hasNamespace()) {
-            rpcReply.appendChild(response);
+        final Element rpcReply;
+        if (NamespaceURN.BASE.equals(response.getNamespaceURI())
+            && RpcReplyMessage.ELEMENT_NAME.equals(response.getLocalName())) {
+            rpcReply = response;
         } else {
-            // FIXME: use getLocalName() instead
-            final var responseNS = document.createElementNS(NamespaceURN.BASE, response.getNodeName());
-            final var list = response.getChildNodes();
-            while (list.getLength() != 0) {
-                responseNS.appendChild(list.item(0));
-            }
-            rpcReply.appendChild(responseNS);
+            rpcReply = document.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
+            rpcReply.appendChild(response);
         }
 
         for (var attribute : attributes.values()) {

@@ -60,12 +60,11 @@ abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     // FIXME: throw a DocumentedException
     private Node transformNormalizedNode(final Document document, final NormalizedNode data,
                                          final YangInstanceIdentifier dataRoot) {
-        final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.DATA_KEY));
-        final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
-        final EffectiveModelContext currentContext = schemaContext.getCurrentContext();
+        final var result = new DOMResult(document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.DATA_KEY));
+        final var xmlWriter = getXmlStreamWriter(result);
+        final var currentContext = schemaContext.getCurrentContext();
 
-        final NormalizedNodeStreamWriter nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter,
-            currentContext);
+        final var nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, currentContext);
 
         try {
             if (dataRoot.isEmpty()) {

@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.test.tool.rpc;
 
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.server.api.operations.AbstractLastNetconfOperation;
@@ -21,7 +22,7 @@ public class SimulatedCommit extends AbstractLastNetconfOperation {
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) {
-        return document.createElement(XmlNetconfConstants.OK);
+        return document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.OK);
     }
 
     @Override
