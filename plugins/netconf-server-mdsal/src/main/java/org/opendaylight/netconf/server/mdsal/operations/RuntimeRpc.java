@@ -36,7 +36,6 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -192,7 +191,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         return document;
     }
 
-    private Element transformNormalizedNode(final Document document, final NormalizedNode data,
+    private Element transformNormalizedNode(final Document document, final ContainerNode data,
                                             final Absolute rpcOutputPath) {
         final DOMResult result = new DOMResult(document.createElement(RpcReplyMessage.ELEMENT_NAME));
 
@@ -204,7 +203,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final SchemaOrderedNormalizedNodeWriter nnWriter = new SchemaOrderedNormalizedNodeWriter(nnStreamWriter,
                 schemaContext.getCurrentContext(), rpcOutputPath);
 
-        writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
+        writeRootElement(xmlWriter, nnWriter, data);
         try {
             nnStreamWriter.close();
             xmlWriter.close();
