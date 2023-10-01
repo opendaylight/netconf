@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.api.xml;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -169,7 +170,7 @@ public final class XmlElement {
 
     public List<XmlElement> getChildElementsWithinNamespace(final String namespace) {
         return getChildElementsInternal(e -> {
-            final var elementNamespace = namespace(e);
+            final var elementNamespace = XmlUtil.namespace(e);
             return elementNamespace != null && elementNamespace.equals(namespace);
         });
     }
@@ -281,17 +282,9 @@ public final class XmlElement {
         return Optional.empty();
     }
 
-    public @Nullable String namespaceAttribute() {
-        final var attribute = element.getAttribute(XMLConstants.XMLNS_ATTRIBUTE);
-        return attribute.isEmpty() ? null : attribute;
-    }
-
-    public Optional<String> findNamespaceAttribute() {
-        return Optional.ofNullable(namespaceAttribute());
-    }
-
-    public @NonNull String getNamespaceAttribute() throws MissingNameSpaceException {
-        final var attribute = namespaceAttribute();
+    @VisibleForTesting
+    @NonNull String getNamespaceAttribute() throws MissingNameSpaceException {
+        final var attribute = XmlUtil.namespaceAttribute(element);
         if (attribute == null) {
             throw new MissingNameSpaceException("Element " + this + " must specify namespace",
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
@@ -300,16 +293,7 @@ public final class XmlElement {
     }
 
     public @Nullable String namespace() {
-        return namespace(element);
-    }
-
-    private static @Nullable String namespace(final Element element) {
-        final var namespaceURI = element.getNamespaceURI();
-        return namespaceURI == null || namespaceURI.isEmpty() ? null : namespaceURI;
-    }
-
-    public Optional<String> findNamespace() {
-        return Optional.ofNullable(namespace());
+        return XmlUtil.namespace(element);
     }
 
     public @NonNull String getNamespace() throws MissingNameSpaceException {
@@ -381,8 +365,8 @@ public final class XmlElement {
         return namespaces;
     }
 
-    public boolean hasNamespace() {
-        return namespaceAttribute() != null || namespace() != null;
+    boolean hasNamespace() {
+        return XmlUtil.hasNamespace(element);
     }
 
     @Override

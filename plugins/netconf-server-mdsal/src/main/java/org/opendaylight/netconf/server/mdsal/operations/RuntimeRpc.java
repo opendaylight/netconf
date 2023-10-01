@@ -172,7 +172,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final Element response = handle(document, operationElement, subsequentOperation);
         final Element rpcReply = document.createElementNS(NamespaceURN.BASE, RpcReplyMessage.ELEMENT_NAME);
 
-        if (XmlElement.fromDomElement(response).hasNamespace()) {
+        if (XmlUtil.hasNamespace(response)) {
             rpcReply.appendChild(response);
         } else {
             final NodeList list = response.getChildNodes();

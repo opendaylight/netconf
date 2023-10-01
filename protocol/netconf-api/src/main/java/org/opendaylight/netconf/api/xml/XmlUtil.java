@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,6 +28,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.eclipse.jdt.annotation.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -89,6 +91,20 @@ public final class XmlUtil {
 
     private XmlUtil() {
         // Hidden on purpose
+    }
+
+    public static boolean hasNamespace(final Element element) {
+        return namespaceAttribute(element) != null || namespace(element) != null;
+    }
+
+    public static @Nullable String namespace(final Element element) {
+        final var namespaceURI = element.getNamespaceURI();
+        return namespaceURI == null || namespaceURI.isEmpty() ? null : namespaceURI;
+    }
+
+    static @Nullable String namespaceAttribute(final Element element) {
+        final var attribute = element.getAttribute(XMLConstants.XMLNS_ATTRIBUTE);
+        return attribute.isEmpty() ? null : attribute;
     }
 
     public static Element readXmlToElement(final File xmlFile) throws SAXException, IOException {
