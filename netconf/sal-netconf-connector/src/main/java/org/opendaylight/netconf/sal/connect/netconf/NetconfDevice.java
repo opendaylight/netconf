@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -117,6 +118,8 @@ public class NetconfDevice
     private final NetconfNodeAugmentedOptional nodeOptional;
 
     @GuardedBy("this")
+    private ListenableFuture<List<Object>> schemaFuturesList;
+    @GuardedBy("this")
     private boolean connected = false;
 
     // Message transformer is constructed once the schemas are available
@@ -151,7 +154,7 @@ public class NetconfDevice
     }
 
     @Override
-    public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
+    public synchronized void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
                                   final NetconfDeviceCommunicator listener) {
         // SchemaContext setup has to be performed in a dedicated thread since
         // we are in a netty thread in this method
@@ -178,6 +181,7 @@ public class NetconfDevice
         // Potentially acquire mount point list and interpret it
         final ListenableFuture<MountPointContext> futureContext = Futures.transformAsync(futureSchema,
             schemaContext -> createMountPointContext(schemaContext, baseSchema, listener), processingExecutor);
+        schemaFuturesList = Futures.allAsList(sourceResolverFuture, futureSchema, futureContext);
 
         Futures.addCallback(futureContext, new FutureCallback<MountPointContext>() {
             @Override
@@ -188,8 +192,12 @@ public class NetconfDevice
 
             @Override
             public void onFailure(final Throwable cause) {
-                LOG.warn("{}: Unexpected error resolving device sources", id, cause);
+                if (cause instanceof CancellationException) {
+                    LOG.warn("{}: Device communicator was tear down since the schema setup started", id);
+                    return;
+                }
 
+                LOG.warn("{}: Unexpected error resolving device sources", id, cause);
                 // No more sources, fail or try to reconnect
                 if (cause instanceof EmptySchemaContextException) {
                     if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
@@ -342,10 +350,14 @@ public class NetconfDevice
     }
 
     @Override
-    public void onRemoteSessionDown() {
+    public synchronized void onRemoteSessionDown() {
         setConnected(false);
         notificationHandler.onRemoteSchemaDown();
-
+        if (schemaFuturesList != null && !schemaFuturesList.isDone()) {
+            if (!schemaFuturesList.cancel(true)) {
+                LOG.warn("The cleanup of Schema Futures for device {} was unsuccessful.", id);
+            }
+        }
         salFacade.onDeviceDisconnected();
         sourceRegistrations.forEach(SchemaSourceRegistration::close);
         sourceRegistrations.clear();
