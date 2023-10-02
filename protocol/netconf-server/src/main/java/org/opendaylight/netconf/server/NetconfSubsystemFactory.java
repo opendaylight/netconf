@@ -58,13 +58,13 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
         private static final Logger LOG = LoggerFactory.getLogger(NetconfSubsystem.class);
 
         private final ServerChannelInitializer channelInitializer;
-        private EmbeddedChannel innerChannel;
+        private final EmbeddedChannel innerChannel;
         private IoOutputStream ioOutputStream;
-        private ChannelSession channelSession;
 
         NetconfSubsystem(final ServerChannelInitializer channelInitializer) {
             super(NETCONF, null);
             this.channelInitializer = channelInitializer;
+            this.innerChannel = new EmbeddedChannel();
         }
 
         @Override
@@ -75,6 +75,8 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
         @Override
         public void setIoOutputStream(final IoOutputStream out) {
             this.ioOutputStream = out;
+            // init channel now, the output stream is the only required dependency
+            initChannel();
         }
 
         @Override
@@ -84,20 +86,12 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
 
         @Override
         public void setChannelSession(final ChannelSession channelSession) {
-            this.channelSession = channelSession;
-        }
-
-        @Override
-        public void run() {
-
             /*
-             * While NETCONF protocol handlers are designed to operate over Netty channel,
-             * the inner channel is used to serve NETCONF over SSH.
+             Inbound packets handler
+             NB: The channel data receiver require to be set within current method,
+                 so it could be handled with subsequent logic of
+                 ChannelSession#prepareChannelCommand() where this method is executed from.
              */
-
-            this.innerChannel = new EmbeddedChannel();
-
-            // inbound packets handler
             channelSession.setDataReceiver(new ChannelDataReceiver() {
                 @Override
                 public int data(ChannelSession channel, byte[] buf, int start, int len) throws IOException {
@@ -110,6 +104,18 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
                     innerChannel.close();
                 }
             });
+        }
+
+        @Override
+        public void run() {
+            // not used
+        }
+
+        private void initChannel() {
+            /*
+             * While NETCONF protocol handlers are designed to operate over Netty channel,
+             * the inner channel is used to serve NETCONF over SSH.
+             */
 
             // outbound packet handler, adding fist means it will be invoked last bc of flow direction
             innerChannel.pipeline().addFirst(
@@ -159,9 +165,7 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
         @Override
         protected void onExit(int exitValue, String exitMessage) {
             super.onExit(exitValue, exitMessage);
-            if (innerChannel != null) {
-                innerChannel.close();
-            }
+            innerChannel.close();
         }
 
         private byte[] getHelloAdditionalMessageBytes() {
