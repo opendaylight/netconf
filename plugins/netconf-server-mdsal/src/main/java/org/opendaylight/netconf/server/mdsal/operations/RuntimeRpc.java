@@ -74,26 +74,19 @@ public final class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     @Override
     protected HandlingPriority canHandle(final String netconfOperationName, final String namespace) {
-        final XMLNamespace namespaceURI = createNsUri(namespace);
-        final Optional<? extends Module> module = getModule(namespaceURI);
-
-        if (module.isEmpty()) {
+        final var xmlNamespace = XMLNamespace.of(namespace);
+        final var rpcDef = getModule(xmlNamespace)
+            .flatMap(module -> getRpcDefinitionFromModule(module, xmlNamespace, netconfOperationName));
+        if (rpcDef.isEmpty()) {
             LOG.debug("Cannot handle rpc: {}, {}", netconfOperationName, namespace);
             return HandlingPriority.CANNOT_HANDLE;
         }
-
-        getRpcDefinitionFromModule(module.orElseThrow(), namespaceURI, netconfOperationName);
         return HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY;
     }
 
     @Override
     protected String getOperationName() {
         throw new UnsupportedOperationException("Runtime rpc does not have a stable name");
-    }
-
-    private static XMLNamespace createNsUri(final String namespace) {
-        // May throw IllegalArgumentException, but that should never happen, as the namespace comes from parsed XML
-        return XMLNamespace.of(namespace);
     }
 
     //this returns module with the newest revision if more then 1 module with same namespace is found
@@ -103,8 +96,9 @@ public final class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     private static Optional<RpcDefinition> getRpcDefinitionFromModule(final Module module, final XMLNamespace namespace,
             final String name) {
-        for (final RpcDefinition rpcDef : module.getRpcs()) {
-            if (rpcDef.getQName().getNamespace().equals(namespace) && rpcDef.getQName().getLocalName().equals(name)) {
+        for (var rpcDef : module.getRpcs()) {
+            final var qname = rpcDef.getQName();
+            if (qname.getNamespace().equals(namespace) && qname.getLocalName().equals(name)) {
                 return Optional.of(rpcDef);
             }
         }
@@ -125,7 +119,7 @@ public final class RuntimeRpc extends AbstractSingletonNetconfOperation {
                     ErrorType.PROTOCOL, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
         }
 
-        final XMLNamespace namespaceURI = createNsUri(netconfOperationNamespace);
+        final XMLNamespace namespaceURI = XMLNamespace.of(netconfOperationNamespace);
         final Optional<? extends Module> moduleOptional = getModule(namespaceURI);
 
         if (moduleOptional.isEmpty()) {
