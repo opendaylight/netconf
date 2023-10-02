@@ -39,13 +39,12 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
         extends SimpleChannelInboundHandler<Object> implements NetconfSession, NetconfExiSession {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSession.class);
 
-    private final L sessionListener;
     private final @NonNull SessionIdType sessionId;
-    private boolean up = false;
+    private final L sessionListener;
+    private final Channel channel;
 
     private ChannelHandler delayedEncoder;
-
-    private final Channel channel;
+    private boolean up;
 
     protected AbstractNetconfSession(final L sessionListener, final Channel channel, final SessionIdType sessionId) {
         this.sessionListener = sessionListener;
@@ -58,8 +57,8 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
 
     @Override
     public void close() {
-        channel.close();
         up = false;
+        channel.close();
         sessionListener.onSessionTerminated(thisInstance(), new NetconfTerminationReason("Session closed"));
     }
 
