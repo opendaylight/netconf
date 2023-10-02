@@ -22,6 +22,30 @@
       },
       "revId": "8130c1cfac52219b42578405d570fa4e99f19494",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ad12af0_2da4e6e4",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfSubsystemFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-10-02T13:29:28Z",
+      "side": 1,
+      "message": "non-null instance is required for both setIoOutputStream() \nand setChannelSession() which are called shortly after \nsubsystem object created. No reason to delay innerChannel\nproperty initialization, made it final",
+      "parentUuid": "3ca97201_85d3f2ef",
+      "range": {
+        "startLine": 67,
+        "startChar": 30,
+        "endLine": 67,
+        "endChar": 54
+      },
+      "revId": "8130c1cfac52219b42578405d570fa4e99f19494",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
