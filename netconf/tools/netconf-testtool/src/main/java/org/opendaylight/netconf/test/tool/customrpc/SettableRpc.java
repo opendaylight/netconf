@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
  * and reply with defined output. If input isn't defined, rpc handling is delegated to the subsequent
  * {@link NetconfOperation} which is able to handle it.
  */
-class SettableRpc implements NetconfOperation {
+final class SettableRpc implements NetconfOperation {
     private final RpcMapping mapping;
 
     SettableRpc(final File rpcConfig) {
