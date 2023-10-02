@@ -50,17 +50,16 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
     }
 
     @Override
-    public Command createSubsystem(ChannelSession channel) throws IOException {
+    public Command createSubsystem(final ChannelSession channel) throws IOException {
         return new NetconfSubsystem(channelInitializer);
     }
 
     private static class NetconfSubsystem extends AbstractCommandSupport implements AsyncCommand, ChannelSessionAware {
         private static final Logger LOG = LoggerFactory.getLogger(NetconfSubsystem.class);
 
+        private final EmbeddedChannel innerChannel = new EmbeddedChannel();
         private final ServerChannelInitializer channelInitializer;
-        private EmbeddedChannel innerChannel;
         private IoOutputStream ioOutputStream;
-        private ChannelSession channelSession;
 
         NetconfSubsystem(final ServerChannelInitializer channelInitializer) {
             super(NETCONF, null);
@@ -74,7 +73,9 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
 
         @Override
         public void setIoOutputStream(final IoOutputStream out) {
-            this.ioOutputStream = out;
+            ioOutputStream = out;
+            // init channel now, the output stream is the only required dependency
+            initChannel();
         }
 
         @Override
@@ -84,23 +85,14 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
 
         @Override
         public void setChannelSession(final ChannelSession channelSession) {
-            this.channelSession = channelSession;
-        }
-
-        @Override
-        public void run() {
-
             /*
-             * While NETCONF protocol handlers are designed to operate over Netty channel,
-             * the inner channel is used to serve NETCONF over SSH.
+             * Inbound packets handler
+             * NOTE: The channel data receiver require to be set within current method, so it could be handled
+             * with subsequent logic of ChannelSession#prepareChannelCommand() where this method is executed from.
              */
-
-            this.innerChannel = new EmbeddedChannel();
-
-            // inbound packets handler
             channelSession.setDataReceiver(new ChannelDataReceiver() {
                 @Override
-                public int data(ChannelSession channel, byte[] buf, int start, int len) throws IOException {
+                public int data(final ChannelSession channel, final byte[] buf, final int start, final int len) {
                     innerChannel.writeInbound(Unpooled.copiedBuffer(buf, start, len));
                     return len;
                 }
@@ -110,8 +102,19 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
                     innerChannel.close();
                 }
             });
+        }
 
-            // outbound packet handler, adding fist means it will be invoked last bc of flow direction
+        @Override
+        public void run() {
+            // not used
+        }
+
+        private void initChannel() {
+            /*
+             * While NETCONF protocol handlers are designed to operate over Netty channel, the inner channel is used to
+             * serve NETCONF over SSH.
+             */
+            // outbound packet handler, adding fist means it will be invoked last because of flow direction
             innerChannel.pipeline().addFirst(
                 new ChannelOutboundHandlerAdapter() {
                     @Override
@@ -142,7 +145,7 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
             innerChannel.pipeline().addLast(
                 new ChannelInboundHandlerAdapter() {
                     @Override
-                    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+                    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
                         onExit(0);
                     }
                 }
@@ -157,11 +160,9 @@ public final class NetconfSubsystemFactory implements SubsystemFactory {
         }
 
         @Override
-        protected void onExit(int exitValue, String exitMessage) {
+        protected void onExit(final int exitValue, final String exitMessage) {
             super.onExit(exitValue, exitMessage);
-            if (innerChannel != null) {
-                innerChannel.close();
-            }
+            innerChannel.close();
         }
 
         private byte[] getHelloAdditionalMessageBytes() {
