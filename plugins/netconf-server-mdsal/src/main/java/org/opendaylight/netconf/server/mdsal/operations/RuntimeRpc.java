@@ -53,7 +53,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class RuntimeRpc extends AbstractSingletonNetconfOperation {
+public final class RuntimeRpc extends AbstractSingletonNetconfOperation {
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpc.class);
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
 
