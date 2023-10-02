@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -105,6 +106,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final BaseNetconfSchemas baseSchemas;
 
     @GuardedBy("this")
+    private ListenableFuture<List<Object>> schemaFuturesList;
+    @GuardedBy("this")
     private boolean connected = false;
 
     // Message transformer is constructed once the schemas are available
@@ -134,8 +137,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     @Override
-    public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
-                                  final NetconfDeviceCommunicator listener) {
+    public synchronized void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
+            final NetconfDeviceCommunicator listener) {
         // SchemaContext setup has to be performed in a dedicated thread since
         // we are in a netty thread in this method
         // Yang models are being downloaded in this method and it would cause a
@@ -163,7 +166,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             result -> Futures.transform(createMountPointContext(result.modelContext(), baseSchema, listener),
                 mount -> new NetconfDeviceSchema(result.capabilities(), mount), processingExecutor),
             processingExecutor);
-
+        schemaFuturesList = Futures.allAsList(sourceResolverFuture, futureSchema, futureContext);
         Futures.addCallback(futureContext, new FutureCallback<>() {
             @Override
             public void onSuccess(final NetconfDeviceSchema result) {
@@ -173,11 +176,17 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
             @Override
             public void onFailure(final Throwable cause) {
-                LOG.warn("{}: Unexpected error resolving device sources", id, cause);
-                // FIXME: this causes salFacade to see onDeviceDisconnected() and then onDeviceFailed(), which is quite
-                //        weird
-                handleSalInitializationFailure(cause, listener);
-                salFacade.onDeviceFailed(cause);
+                // The method onRemoteSessionDown was called while the EffectiveModelContext for the device
+                // was being processed.
+                if (cause instanceof CancellationException) {
+                    LOG.warn("{}: Device communicator was tear down since the schema setup started", id);
+                } else {
+                    LOG.warn("{}: Unexpected error resolving device sources", id, cause);
+                    // FIXME: this causes salFacade to see onDeviceDisconnected() and then onDeviceFailed(), which is quite
+                    //        weird
+                    handleSalInitializationFailure(cause, listener);
+                    salFacade.onDeviceFailed(cause);
+                }
             }
         }, MoreExecutors.directExecutor());
     }
@@ -305,10 +314,14 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     @Override
-    public void onRemoteSessionDown() {
+    public synchronized void onRemoteSessionDown() {
         setConnected(false);
         notificationHandler.onRemoteSchemaDown();
-
+        if (schemaFuturesList != null && !schemaFuturesList.isDone()) {
+            if (!schemaFuturesList.cancel(true)) {
+                LOG.warn("The cleanup of Schema Futures for device {} was unsuccessful.", id);
+            }
+        }
         salFacade.onDeviceDisconnected();
         sourceRegistrations.forEach(Registration::close);
         sourceRegistrations.clear();
