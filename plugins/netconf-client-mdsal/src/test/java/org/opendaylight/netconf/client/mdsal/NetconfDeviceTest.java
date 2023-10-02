@@ -341,6 +341,41 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     @Test
+    public void testNetconfDeviceReconnectBeforeSchemaSetup() throws Exception {
+        final RemoteDeviceHandler facade = getFacade();
+        final NetconfDeviceCommunicator listener = getListener();
+        final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
+        final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
+        doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(anyCollection());
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
+            schemaRegistry, getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+            .setReconnectOnSchemasChange(true)
+            .setSchemaResourcesDTO(schemaResourcesDTO)
+            .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
+            .setId(getId())
+            .setSalFacade(facade)
+            .setBaseSchemas(BASE_SCHEMAS)
+            .build();
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
+            List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+        // session up, start schema resolution
+        device.onRemoteSessionUp(sessionCaps, listener);
+        // session down
+        device.onRemoteSessionDown();
+        verify(facade, timeout(5000)).onDeviceDisconnected();
+        // session back up, start another schema resolution
+        device.onRemoteSessionUp(sessionCaps, listener);
+        // complete schema setup
+        schemaFuture.set(SCHEMA_CONTEXT);
+        // schema setup performed twice
+        verify(schemaContextProviderFactory, timeout(5000).times(2)).createEffectiveModelContext(anyCollection());
+        // onDeviceConnected called once
+        verify(facade, timeout(5000)).onDeviceConnected(
+            any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
+    }
+
+    @Test
     public void testNetconfDeviceAvailableCapabilitiesBuilding() throws Exception {
         final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
