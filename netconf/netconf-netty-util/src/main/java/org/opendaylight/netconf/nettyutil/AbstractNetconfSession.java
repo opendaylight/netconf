@@ -18,6 +18,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.EOFException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfExiSession;
 import org.opendaylight.netconf.api.NetconfSession;
@@ -41,7 +42,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
 
     private final L sessionListener;
     private final @NonNull SessionIdType sessionId;
-    private boolean up = false;
+    private final AtomicBoolean up = new AtomicBoolean(false);
 
     private ChannelHandler delayedEncoder;
 
@@ -58,8 +59,8 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
 
     @Override
     public void close() {
+        up.set(false);
         channel.close();
-        up = false;
         sessionListener.onSessionTerminated(thisInstance(), new NetconfTerminationReason("Session closed"));
     }
 
@@ -97,8 +98,9 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     }
 
     protected void endOfInput() {
-        LOG.debug("Session {} end of input detected while session was in state {}", this, up ? "up" : "initialized");
-        if (up) {
+        LOG.debug("Session {} end of input detected while session was in state {}", this,
+            isUp() ? "up" : "initialized");
+        if (isUp()) {
             sessionListener.onSessionDown(thisInstance(), new EOFException("End of input"));
         }
     }
@@ -106,7 +108,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     protected void sessionUp() {
         LOG.debug("Session {} up", this);
         sessionListener.onSessionUp(thisInstance());
-        up = true;
+        up.set(true);
     }
 
     @Override
@@ -167,7 +169,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
     protected abstract void addExiHandlers(ByteToMessageDecoder decoder, MessageToByteEncoder<NetconfMessage> encoder);
 
     public final boolean isUp() {
-        return up;
+        return up.get();
     }
 
     public final @NonNull SessionIdType sessionId() {
