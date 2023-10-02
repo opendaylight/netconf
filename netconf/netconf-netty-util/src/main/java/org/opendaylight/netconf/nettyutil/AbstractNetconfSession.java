@@ -15,6 +15,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.EOFException;
@@ -94,6 +95,12 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
             }
         });
 
+        if (channel instanceof EmbeddedChannel embeddedChannel){
+            // Embedded event loop implementation has no executor, it requires explicit invocation to process
+            synchronized (channel) {
+                embeddedChannel.runPendingTasks();
+            }
+        }
         return promise;
     }
 
