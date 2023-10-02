@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
@@ -100,6 +101,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final NotificationHandler notificationHandler;
     private final boolean reconnectOnSchemasChange;
     private final BaseNetconfSchemas baseSchemas;
+    @GuardedBy("this")
+    private final List<ListenableFuture<?>> schemaFutures = new ArrayList<>();
 
     @GuardedBy("this")
     private boolean connected = false;
@@ -127,21 +130,23 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     @Override
-    public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
-                                  final NetconfDeviceCommunicator listener) {
+    public synchronized void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
+            final NetconfDeviceCommunicator listener) {
         // SchemaContext setup has to be performed in a dedicated thread since we are in a Netty thread in this method
         // YANG models are being downloaded in this method and it would cause a deadlock if we used the netty thread
         // https://netty.io/wiki/thread-model.html
-        setConnected(true);
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
+        connected = true;
+        if (!schemaFutures.isEmpty()) {
+            closeSchemaFutures();
+        }
 
         final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
         final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.getEffectiveModelContext(), listener,
             new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
-        final ListenableFuture<DeviceSources> sourceResolverFuture = Futures.submit(
-            new DeviceSourcesResolver(id, baseSchema, initRpc, remoteSessionCapabilities, stateSchemasResolver),
-            processingExecutor);
-
+        final var sourceResolverFuture = Futures.submit(new DeviceSourcesResolver(id, baseSchema, initRpc,
+                remoteSessionCapabilities, stateSchemasResolver), processingExecutor);
+        schemaFutures.add(sourceResolverFuture);
         if (shouldListenOnSchemaChange(remoteSessionCapabilities)) {
             registerToBaseNetconfStream(initRpc, listener);
         }
@@ -149,14 +154,16 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         // Set up the EffectiveModelContext for the device
         final var futureSchema = Futures.transformAsync(sourceResolverFuture,
             deviceSources -> assembleSchemaContext(deviceSources, remoteSessionCapabilities), processingExecutor);
+        schemaFutures.add(futureSchema);
 
-        Futures.addCallback(
-            // Potentially acquire mount point list and interpret it
-            Futures.transformAsync(futureSchema,
-                result -> Futures.transform(createMountPointContext(result.modelContext(), baseSchema, listener),
-                    mount -> new NetconfDeviceSchema(result.capabilities(), mount), processingExecutor),
-                processingExecutor),
-            new FutureCallback<>() {
+        // Potentially acquire mount point list and interpret it
+        final var netconfDeviceSchemaFuture = Futures.transformAsync(futureSchema,
+            result -> Futures.transform(createMountPointContext(result.modelContext(), baseSchema, listener),
+                mount -> new NetconfDeviceSchema(result.capabilities(), mount), processingExecutor),
+            processingExecutor);
+        schemaFutures.add(netconfDeviceSchemaFuture);
+
+        Futures.addCallback(netconfDeviceSchemaFuture, new FutureCallback<>() {
                 @Override
                 public void onSuccess(final NetconfDeviceSchema result) {
                     handleSalInitializationSuccess(listener, result, remoteSessionCapabilities,
@@ -165,7 +172,13 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
                 @Override
                 public void onFailure(final Throwable cause) {
-                    handleSalInitializationFailure(listener, cause);
+                    // The method onRemoteSessionDown was called while the EffectiveModelContext for the device
+                    // was being processed.
+                    if (cause instanceof CancellationException) {
+                        LOG.warn("{}: Device communicator was tear down since the schema setup started", id);
+                    } else {
+                        handleSalInitializationFailure(listener, cause);
+                    }
                 }
             }, MoreExecutors.directExecutor());
     }
@@ -238,13 +251,20 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     private synchronized void cleanupInitialization() {
         connected = false;
+        closeSchemaFutures();
         notificationHandler.onRemoteSchemaDown();
         sourceRegistrations.forEach(Registration::close);
         sourceRegistrations.clear();
     }
 
-    private synchronized void setConnected(final boolean connected) {
-        this.connected = connected;
+    private synchronized void closeSchemaFutures() {
+        for (final ListenableFuture<?> schemaFuture : schemaFutures) {
+            if (!schemaFuture.isDone()) {
+                schemaFuture.cancel(true);
+                break;
+            }
+        }
+        schemaFutures.clear();
     }
 
     private ListenableFuture<SchemaResult> assembleSchemaContext(final DeviceSources deviceSources,
