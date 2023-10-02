@@ -33,9 +33,8 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
     }
 
     @Override
-    public HandlingPriority canHandle(final Document message) throws DocumentedException {
-        OperationNameAndNamespace operationNameAndNamespace = null;
-        operationNameAndNamespace = new OperationNameAndNamespace(message);
+    public final HandlingPriority canHandle(final Document message) throws DocumentedException {
+        final var operationNameAndNamespace = new OperationNameAndNamespace(message);
         return canHandle(operationNameAndNamespace.getOperationName(), operationNameAndNamespace.getNamespace());
     }
 
