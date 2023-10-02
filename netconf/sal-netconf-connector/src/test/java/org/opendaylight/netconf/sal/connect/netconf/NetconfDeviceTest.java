@@ -373,6 +373,45 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     @Test
+    public void testNetconfDeviceReconnectBeforeSchemaSetup() throws Exception {
+        final RemoteDeviceHandler<NetconfSessionPreferences>  facade = getFacade();
+
+        final EffectiveModelContextFactory schemaContextProviderFactory = mock(EffectiveModelContextFactory.class);
+        final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
+        doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(anyCollection());
+
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
+            getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+            .setReconnectOnSchemasChange(true)
+            .setSchemaResourcesDTO(schemaResourcesDTO)
+            .setGlobalProcessingExecutor(getExecutor())
+            .setId(getId())
+            .setSalFacade(facade)
+            .setBaseSchemas(BASE_SCHEMAS)
+            .build();
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
+            List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+
+        final NetconfDeviceCommunicator listener = getListener();
+        // session up, start schema resolution
+        device.onRemoteSessionUp(sessionCaps, listener);
+        // session down
+        device.onRemoteSessionDown();
+        verify(facade, timeout(5000)).onDeviceDisconnected();
+        // session back up, start another schema resolution
+        device.onRemoteSessionUp(sessionCaps, listener);
+        // complete schema setup
+        schemaFuture.set(SCHEMA_CONTEXT);
+        // schema setup performed twice
+        verify(schemaContextProviderFactory, timeout(5000)).createEffectiveModelContext(anyCollection());
+        // onDeviceConnected called once
+        verify(facade, timeout(5000)).onDeviceConnected(
+            any(MountPointContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+            isNull());
+    }
+
+    @Test
     public void testNetconfDeviceAvailableCapabilitiesBuilding() throws Exception {
         final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
