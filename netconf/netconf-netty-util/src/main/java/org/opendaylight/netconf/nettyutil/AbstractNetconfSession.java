@@ -15,6 +15,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.EOFException;
@@ -92,6 +93,14 @@ public abstract class AbstractNetconfSession<S extends NetconfSession, L extends
             }
         });
 
+        // FIXME: NETCONF-1106: this is a workaround for netconf-server's NetconfSubsystem using EmbeddedChannel instead
+        //                      of correctly integrating with the underlying transport channel
+        if (channel instanceof EmbeddedChannel embeddedChannel) {
+            // Embedded event loop implementation has no executor, it requires explicit invocation to process
+            synchronized (channel) {
+                embeddedChannel.runPendingTasks();
+            }
+        }
         return promise;
     }
 

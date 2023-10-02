@@ -27,6 +27,7 @@ import org.opendaylight.netconf.shaded.sshd.server.command.AsyncCommand;
 
 final class NetconfSubsystem extends AbstractCommandSupport
         implements AsyncCommand, ChannelSessionAware, ChannelDataReceiver {
+    // FIXME: NETCONF-1106: do not use EmbeddedChannel here!
     private final EmbeddedChannel innerChannel = new EmbeddedChannel();
     private final ServerChannelInitializer channelInitializer;
 
