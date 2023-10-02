@@ -13,23 +13,22 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.MoreObjects;
 import java.util.Objects;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 
 public final class HandlingPriority implements Comparable<HandlingPriority> {
-    public static final HandlingPriority CANNOT_HANDLE = new HandlingPriority();
+    // FIXME: remote this constant
+    public static final HandlingPriority CANNOT_HANDLE = new HandlingPriority(null);
     public static final HandlingPriority HANDLE_WITH_DEFAULT_PRIORITY = new HandlingPriority(Integer.MIN_VALUE);
     public static final HandlingPriority HANDLE_WITH_MAX_PRIORITY = new HandlingPriority(Integer.MAX_VALUE);
 
-    private Integer priority;
+    private final Integer priority;
 
-    public static HandlingPriority getHandlingPriority(final int priority) {
-        return new HandlingPriority(priority);
-    }
-
-    private HandlingPriority(final int priority) {
+    private HandlingPriority(final Integer priority) {
         this.priority = priority;
     }
 
-    private HandlingPriority() {
+    public static @NonNull HandlingPriority of(final int priority) {
+        return new HandlingPriority(priority);
     }
 
     /**
@@ -46,37 +45,16 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
         checkArgument(priorityIncrease > 0, "Negative increase");
         checkArgument(Long.valueOf(priority) + priorityIncrease < Integer.MAX_VALUE,
                 "Resulting priority cannot be higher than %s", Integer.MAX_VALUE);
-        return getHandlingPriority(priority + priorityIncrease);
-    }
-
-    public boolean isCannotHandle() {
-        return equals(CANNOT_HANDLE);
+        return of(priority + priorityIncrease);
     }
 
     @Override
     @SuppressWarnings("checkstyle:parameterName")
     public int compareTo(final HandlingPriority o) {
-        if (this == o) {
-            return 0;
+        if (priority == null) {
+            return o.priority == null ? 0 : -1;
         }
-        if (isCannotHandle()) {
-            return -1;
-        }
-        if (o.isCannotHandle()) {
-            return 1;
-        }
-
-        if (priority > o.priority) {
-            return 1;
-        }
-        if (priority.equals(o.priority)) {
-            return 0;
-        }
-        if (priority < o.priority) {
-            return -1;
-        }
-
-        throw new IllegalStateException("Unexpected state comparing " + this + " with " + priority);
+        return o.priority == null ? 1 : Integer.compare(priority, o.priority);
     }
 
     @Override
@@ -86,7 +64,7 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
 
     @Override
     public int hashCode() {
-        return priority != null ? priority.hashCode() : 0;
+        return Objects.hashCode(priority) ;
     }
 
     @Override
