@@ -103,6 +103,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     @GuardedBy("this")
     private boolean connected = false;
+    @GuardedBy("this")
+    private long connectCount = 0;
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
             final RemoteDeviceId id, final RemoteDeviceHandler salFacade, final Executor globalProcessingExecutor,
@@ -132,7 +134,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         // SchemaContext setup has to be performed in a dedicated thread since we are in a Netty thread in this method
         // YANG models are being downloaded in this method and it would cause a deadlock if we used the netty thread
         // https://netty.io/wiki/thread-model.html
-        setConnected(true);
+        final var connectEvent = setConnected();
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
         final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
@@ -160,7 +162,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
                 @Override
                 public void onSuccess(final NetconfDeviceSchema result) {
                     handleSalInitializationSuccess(listener, result, remoteSessionCapabilities,
-                        getDeviceSpecificRpc(result.mountContext(), listener, baseSchema));
+                        getDeviceSpecificRpc(result.mountContext(), listener, baseSchema), connectEvent);
                 }
 
                 @Override
@@ -208,11 +210,18 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     private synchronized void handleSalInitializationSuccess(final RemoteDeviceCommunicator listener,
             final NetconfDeviceSchema deviceSchema, final NetconfSessionPreferences remoteSessionCapabilities,
-            final Rpcs deviceRpc) {
+            final Rpcs deviceRpc, final long connectEvent) {
         // NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
         // since salFacade.onDeviceDisconnected was already called.
         if (!connected) {
             LOG.warn("{}: Device communicator was closed before schema setup finished.", id);
+            return;
+        }
+        // NetconfDevice.SchemaSetup can complete after the device is reconnected. In that case do nothing, since
+        // SchemaSetup will be done again.
+        if (connectEvent != connectCount) {
+            LOG.warn("{}: Device communicator was reconnected (session-up #{}) since schema setup started "
+                + "for session-up #{}).", id, connectCount, connectEvent);
             return;
         }
 
@@ -243,8 +252,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         sourceRegistrations.clear();
     }
 
-    private synchronized void setConnected(final boolean connected) {
-        this.connected = connected;
+    private synchronized long setConnected() {
+        connected = true;
+        return ++connectCount;
     }
 
     private ListenableFuture<SchemaResult> assembleSchemaContext(final DeviceSources deviceSources,
