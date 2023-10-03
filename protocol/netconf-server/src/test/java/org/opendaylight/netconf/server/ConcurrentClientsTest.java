@@ -212,7 +212,7 @@ public class ConcurrentClientsTest {
             }
         }
 
-        assertEquals(CONCURRENCY, testingNetconfOperation.getMessageCount());
+        assertEquals(CONCURRENCY, testingNetconfOperation.counter.get());
     }
 
     public static Set<String> getOnlyExiServerCaps() {
@@ -236,25 +236,20 @@ public class ConcurrentClientsTest {
         @Override
         public HandlingPriority canHandle(final Document message) {
             return XmlUtil.toString(message).contains(NetconfStartExiMessageProvider.START_EXI)
-                    ? HandlingPriority.CANNOT_HANDLE :
-                    HandlingPriority.HANDLE_WITH_MAX_PRIORITY;
+                ? null : HandlingPriority.HANDLE_WITH_MAX_PRIORITY;
         }
 
         @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
         public Document handle(final Document requestMessage,
                 final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
+            LOG.info("Handling netconf message from test {}", XmlUtil.toString(requestMessage));
+            counter.getAndIncrement();
             try {
-                LOG.info("Handling netconf message from test {}", XmlUtil.toString(requestMessage));
-                counter.getAndIncrement();
                 return XmlUtil.readXmlToDocument("<test/>");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        }
-
-        public long getMessageCount() {
-            return counter.get();
         }
     }
 

@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.server.osgi;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
@@ -148,23 +147,23 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter, AutoC
 
     private TreeMap<HandlingPriority, NetconfOperation> getSortedNetconfOperationsWithCanHandle(
             final Document message, final NetconfServerSession session) throws DocumentedException {
-        final TreeMap<HandlingPriority, NetconfOperation> sortedPriority = new TreeMap<>();
+        final var sortedPriority = new TreeMap<HandlingPriority, NetconfOperation>();
+        for (var netconfOperation : allNetconfOperations) {
+            final var handlingPriority = netconfOperation.canHandle(message);
+            if (handlingPriority != null) {
+                final var existing = sortedPriority.putIfAbsent(handlingPriority, netconfOperation);
+                if (existing != null) {
+                    throw new IllegalStateException(
+                        "Multiple %s available to handle message %s with priority %s, %s and %s".formatted(
+                            NetconfOperation.class.getName(), message, handlingPriority, netconfOperation, existing));
+                }
 
-        for (final NetconfOperation netconfOperation : allNetconfOperations) {
-            final HandlingPriority handlingPriority = netconfOperation.canHandle(message);
-            if (netconfOperation instanceof DefaultNetconfOperation defaultOperation) {
-                defaultOperation.setNetconfSession(session);
-            }
-            if (netconfOperation instanceof SessionAwareNetconfOperation sessionAwareOperation) {
-                sessionAwareOperation.setSession(session);
-            }
-            if (!handlingPriority.equals(HandlingPriority.CANNOT_HANDLE)) {
-
-                checkState(!sortedPriority.containsKey(handlingPriority),
-                        "Multiple %s available to handle message %s with priority %s, %s and %s",
-                        NetconfOperation.class.getName(), message, handlingPriority, netconfOperation, sortedPriority
-                                .get(handlingPriority));
-                sortedPriority.put(handlingPriority, netconfOperation);
+                if (netconfOperation instanceof DefaultNetconfOperation defaultOperation) {
+                    defaultOperation.setNetconfSession(session);
+                }
+                if (netconfOperation instanceof SessionAwareNetconfOperation sessionAwareOperation) {
+                    sessionAwareOperation.setSession(session);
+                }
             }
         }
         return sortedPriority;
