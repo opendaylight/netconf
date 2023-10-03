@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.xml.transform.dom.DOMSource;
@@ -129,7 +130,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         final var devRpc = services.rpcs();
-        task = new KeepaliveTask(devRpc);
 
         final Rpcs keepaliveRpcs;
         if (devRpc instanceof Rpcs.Normalized normalized) {
@@ -140,6 +140,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
             throw new IllegalStateException("Unhandled " + devRpc);
         }
 
+        task = new KeepaliveTask(keepaliveRpcs);
         salFacade.onDeviceConnected(deviceSchema, sessionPreferences, new RemoteDeviceServices(keepaliveRpcs,
             // FIXME: wrap with keepalive
             services.actions()));
@@ -284,8 +285,13 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public void onFailure(final Throwable throwable) {
-            LOG.warn("{}: Keepalive RPC failed. Reconnecting netconf session.", id, throwable);
-            reconnect();
+            // RequestTimeoutTask kicked in with reconnect and cancellation is propagated here
+            if (throwable instanceof CancellationException) {
+                LOG.warn("{}: Keepalive RPC failed with timeout after {}s.", id,
+                    TimeUnit.NANOSECONDS.toSeconds(timeoutNanos));
+                return;
+            }
+            LOG.warn("{}: Keepalive RPC failed with unknown error.", id, throwable);
         }
 
         private void reschedule() {
@@ -313,7 +319,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         @Override
         public void run() {
             rpcResultFuture.cancel(true);
-            userFuture.cancel(false);
             enableKeepalive();
         }
 
@@ -328,7 +333,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         @Override
         public void onFailure(final Throwable throwable) {
             // User/Application RPC failed (The RPC did not reach the remote device or ...)
-            // FIXME: what other reasons could cause this ?)
+            // rpcResultFuture has been cancelled = throwable is CancellationException
             LOG.warn("{}: Rpc failure detected. Reconnecting netconf session", id, throwable);
             userFuture.setException(throwable);
             // There is no point in keeping this session. Reconnect.
