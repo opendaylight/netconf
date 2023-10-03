@@ -69,8 +69,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     private volatile KeepaliveTask task;
 
     public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
-            final ScheduledExecutorService executor, final long keepaliveDelaySeconds,
-            final long requestTimeoutMillis) {
+                              final ScheduledExecutorService executor, final long keepaliveDelaySeconds,
+                              final long requestTimeoutMillis) {
         this.id = id;
         this.salFacade = salFacade;
         this.executor = requireNonNull(executor);
@@ -80,7 +80,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     }
 
     public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
-            final ScheduledExecutorService executor) {
+                              final ScheduledExecutorService executor) {
         this(id, salFacade, executor, DEFAULT_DELAY, DEFAULT_TRANSACTION_TIMEOUT_MILLI);
     }
 
@@ -127,7 +127,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
     @Override
     public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
-            final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
+                                  final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         final var devRpc = services.rpcs();
         task = new KeepaliveTask(devRpc);
 
@@ -141,8 +141,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         }
 
         salFacade.onDeviceConnected(deviceSchema, sessionPreferences, new RemoteDeviceServices(keepaliveRpcs,
-            // FIXME: wrap with keepalive
-            services.actions()));
+                // FIXME: wrap with keepalive
+                services.actions()));
 
         // We have performed a callback, which might have termined keepalives
         final var localTask = task;
@@ -196,7 +196,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     private final class KeepaliveTask implements Runnable, FutureCallback<DOMRpcResult> {
         // Keepalive RPC static resources
         static final @NonNull ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(
-            NETCONF_GET_CONFIG_NODEID, getSourceNode(NETCONF_RUNNING_NODEID), NetconfMessageTransformUtil.EMPTY_FILTER);
+                NETCONF_GET_CONFIG_NODEID, getSourceNode(NETCONF_RUNNING_NODEID), NetconfMessageTransformUtil.EMPTY_FILTER);
 
         private final Rpcs devRpc;
 
@@ -356,7 +356,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
-            final T rpcListener) {
+                final T rpcListener) {
             // There is no real communication with the device (yet), hence no recordActivity() or anything
             return delegate.registerRpcListener(rpcListener);
         }
