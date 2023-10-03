@@ -227,16 +227,7 @@ public final class XmlElement {
     }
 
     public XmlElement getOnlyChildElement(final String childName, final String namespace) throws DocumentedException {
-        final var children = getChildElementsWithinNamespace(namespace).stream()
-            .filter(xmlElement -> xmlElement.getName().equals(childName))
-            .collect(Collectors.toList());
-        if (children.size() != 1) {
-            throw new DocumentedException(String.format("One element %s:%s expected in %s but was %s", namespace,
-                    childName, toString(), children.size()),
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE, ErrorSeverity.ERROR);
-        }
-
-        return children.get(0);
+        return new XmlElement(XmlUtil.requireSingleElement(element, namespace, childName));
     }
 
     public XmlElement getOnlyChildElement(final String childName) throws DocumentedException {

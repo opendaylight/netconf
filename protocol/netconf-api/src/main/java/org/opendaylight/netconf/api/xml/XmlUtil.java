@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,13 +29,22 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.odlparent.logging.markers.Markers;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public final class XmlUtil {
+    private static final Logger LOG = LoggerFactory.getLogger(XmlUtil.class);
     /**
      * A pre-compiled XSL template to deal with Java XML transform creating empty lines when indenting is enabled, as
      * detailed in <a href="https://bugs.openjdk.org/browse/JDK-8262285">JDK-8262285</a>.
@@ -100,6 +110,62 @@ public final class XmlUtil {
     public static @Nullable String namespace(final Element element) {
         final var namespaceURI = element.getNamespaceURI();
         return namespaceURI == null || namespaceURI.isEmpty() ? null : namespaceURI;
+    }
+
+    /**
+     * Wrapper around {@link Element#getElementsByTagNameNS(String, String)} which ensures there is exactly one match.
+     *
+     * @param element Parent element
+     * @param namespace child element namespace
+     * @param localName child element local name
+     * @return The single matching element
+     * @throws DocumentedException if there is not exactly one match
+     * @throws NullPointerException if any argument is {@code null}
+     * @throws IllegalArgumentException if either {@code namespace} or {@code localName} is not acceptable
+     */
+    public static @NonNull Element requireSingleElement(final Element element, final String namespace,
+            final String localName) throws DocumentedException {
+        if (namespace.equals("*")) {
+            throw new IllegalArgumentException("Unsupported wildcard namespace");
+        }
+        if (localName.equals("*")) {
+            throw new IllegalArgumentException("Unsupported wildcard localName");
+        }
+
+        final var elements = element.getElementsByTagNameNS(namespace, localName);
+        // Be careful about NodeList expansion
+        final var first = (Element) elements.item(0);
+        if (first == null) {
+            if (LOG.isDebugEnabled(Markers.confidential())) {
+                LOG.debug(Markers.confidential(), "{}:{} not present in {}", namespace, localName, toString(element));
+            }
+            throw new DocumentedException("Expected %s:%s once, not found".formatted(namespace, localName),
+                // as per https://www.rfc-editor.org/rfc/rfc6241#page-77:
+                //                error-tag:      missing-element
+                //                error-type:     protocol, application
+                //                error-severity: error
+                //                error-info:     <bad-element> : name of the missing element
+                //                Description:    An expected element is missing.
+                ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT, ErrorSeverity.ERROR,
+                Map.of("bad-element", localName));
+        }
+        final var second = (Element) elements.item(1);
+        if (second != null) {
+            if (LOG.isDebugEnabled(Markers.confidential())) {
+                LOG.debug(Markers.confidential(), "{}:{} is present multiple times in {}", namespace, localName,
+                    toString(element));
+            }
+            throw new DocumentedException("Expected %s:%s once, found at least twice".formatted(namespace, localName),
+                // as per https://www.rfc-editor.org/rfc/rfc6241#page-77:
+                //              error-tag:      unknown-element
+                //              error-type:     protocol, application
+                //              error-severity: error
+                //              error-info:     <bad-element> : name of the unexpected element
+                //              Description:    An unexpected element is present.
+                ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT, ErrorSeverity.ERROR,
+                Map.of("bad-element", localName));
+        }
+        return first;
     }
 
     static @Nullable String namespaceAttribute(final Element element) {
