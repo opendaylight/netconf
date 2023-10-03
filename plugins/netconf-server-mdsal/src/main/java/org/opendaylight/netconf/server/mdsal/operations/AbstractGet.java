@@ -40,13 +40,7 @@ import org.w3c.dom.Node;
 
 // FIXME: seal when we have JDK17+
 abstract class AbstractGet extends AbstractSingletonNetconfOperation {
-    private static final XMLOutputFactory XML_OUTPUT_FACTORY;
-    private static final String FILTER = "filter";
-
-    static {
-        XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
-        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-    }
+    private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
 
     private final CurrentSchemaContext schemaContext;
     private final FilterContentValidator validator;
@@ -127,7 +121,7 @@ abstract class AbstractGet extends AbstractSingletonNetconfOperation {
      */
     final Optional<YangInstanceIdentifier> getDataRootFromFilter(final XmlElement operationElement)
             throws DocumentedException {
-        final var optFilterElement = operationElement.getOnlyChildElementOptionally(FILTER);
+        final var optFilterElement = operationElement.getOnlyChildElementOptionally("filter");
         if (optFilterElement.isEmpty()) {
             return Optional.of(YangInstanceIdentifier.of());
         }
