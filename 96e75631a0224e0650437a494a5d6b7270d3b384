@@ -36,6 +36,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a7bf221_7d85b5b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-10-03T18:39:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f3c64d0_efcf0066",
+      "revId": "96e75631a0224e0650437a494a5d6b7270d3b384",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c87aa8d_37788968",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-10-03T18:39:51Z",
+      "side": 1,
+      "message": "This is a case where connection is lost and then re-established. Or are you saying that NetconfDevice should be conected just once in its life time?",
+      "parentUuid": "91de611b_4841dc10",
+      "revId": "96e75631a0224e0650437a494a5d6b7270d3b384",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a2e11bf_9a7d44c5",
@@ -49,6 +85,24 @@
       "writtenOn": "2023-10-03T06:56:36Z",
       "side": 1,
       "message": "Can we use just primitive `long` here?",
+      "revId": "96e75631a0224e0650437a494a5d6b7270d3b384",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f52c16f2_492a5362",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-10-03T18:39:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a2e11bf_9a7d44c5",
       "revId": "96e75631a0224e0650437a494a5d6b7270d3b384",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
