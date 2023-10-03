@@ -15,6 +15,7 @@ module org.opendaylight.netconf.api {
     requires transitive org.opendaylight.yangtools.yang.common;
     requires transitive org.opendaylight.yang.gen.ietf.netconf.rfc6241;
     requires com.google.common;
+    requires org.opendaylight.odlparent.logging.markers;
     requires org.opendaylight.yangtools.util;
     requires org.opendaylight.yangtools.yang.binding;
     requires org.slf4j;
