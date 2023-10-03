@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cf1e5d7_c18ace8f",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-03T10:47:53Z",
+      "side": 1,
+      "message": "What is the process done here?",
+      "revId": "2d2f6c6ce8bc184d82d21cfb3a8b860826f06fd0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "299b4119_05c39a74",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-03T10:47:53Z",
+      "side": 1,
+      "message": "Please document why linked list, what is th process, etc.",
+      "revId": "2d2f6c6ce8bc184d82d21cfb3a8b860826f06fd0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75c6d98a_2583367e",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-03T10:47:53Z",
+      "side": 1,
+      "message": "Why LinkedList?",
+      "revId": "2d2f6c6ce8bc184d82d21cfb3a8b860826f06fd0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "648497a8_5bd10df3",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-03T10:47:53Z",
+      "side": 1,
+      "message": "No, do not create optional and then use orElse(null)",
+      "revId": "2d2f6c6ce8bc184d82d21cfb3a8b860826f06fd0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75f729ac_ac5c6793",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-03T10:47:53Z",
+      "side": 1,
+      "message": "Delete this method.",
+      "revId": "2d2f6c6ce8bc184d82d21cfb3a8b860826f06fd0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f709044c_fccbd770",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-03T10:47:53Z",
+      "side": 1,
+      "message": "Delete this method.",
+      "revId": "2d2f6c6ce8bc184d82d21cfb3a8b860826f06fd0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
