@@ -259,7 +259,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
 
         ex = assertThrows(DocumentedException.class, NetconfMDSalMappingTest::lockWithoutTarget);
         assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrorTag());
+        assertEquals(ErrorTag.MISSING_ELEMENT, ex.getErrorTag());
         assertEquals(ErrorType.APPLICATION, ex.getErrorType());
     }
 
@@ -274,7 +274,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
 
         ex = assertThrows(DocumentedException.class, NetconfMDSalMappingTest::unlockWithoutTarget);
         assertEquals(ErrorSeverity.ERROR, ex.getErrorSeverity());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrorTag());
+        assertEquals(ErrorTag.MISSING_ELEMENT, ex.getErrorTag());
         assertEquals(ErrorType.APPLICATION, ex.getErrorType());
     }
 
