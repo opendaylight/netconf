@@ -52,6 +52,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "615b89a3_fa8232fe",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-03T11:18:10Z",
+      "side": 1,
+      "message": "There was a comment about it from Ruslan.\n```\nRuslan Kashapov\nAug 30\nreturn result is recommended to be immutable. ArrayList is mutable\narray based collections are bad when size isn\u0027t predefined, bc each time backing array needs expansion the resources are taken to create new array and move the data.\nsuggested using immutable list (builder) initially with predefined size\n\nfinal var modules \u003d context.getModules();\nfinal var builder \u003d ImmutableList.\u003cYangModuleCapability\u003ebuilder(modules.size());\n... builder.add(...)...\nreturn builder.build();\n```\nAfter some conversation he suggested to use LinkedList for optimization",
+      "parentUuid": "75c6d98a_2583367e",
+      "revId": "2d2f6c6ce8bc184d82d21cfb3a8b860826f06fd0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "648497a8_5bd10df3",
