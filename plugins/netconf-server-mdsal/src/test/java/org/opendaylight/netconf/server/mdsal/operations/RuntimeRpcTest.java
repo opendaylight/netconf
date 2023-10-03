@@ -8,13 +8,13 @@
 package org.opendaylight.netconf.server.mdsal.operations;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 
-import com.google.common.base.Preconditions;
 import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -188,7 +188,7 @@ public class RuntimeRpcTest {
 
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-void-output.xml");
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
-        Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
+        assertNotNull(priority);
 
         final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
 
@@ -202,7 +202,7 @@ public class RuntimeRpcTest {
 
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid.xml");
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
-        Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
+        assertNotNull(priority);
 
         final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
         verifyResponse(response, XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid-control.xml"));
@@ -215,7 +215,7 @@ public class RuntimeRpcTest {
 
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-container.xml");
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
-        Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
+        assertNotNull(priority);
 
         final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
         verifyResponse(response, XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-container-control.xml"));
@@ -228,7 +228,7 @@ public class RuntimeRpcTest {
 
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-nonvoid.xml");
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
-        Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
+        assertNotNull(priority);
 
         final DocumentedException e = assertThrows(DocumentedException.class,
                 () -> rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT));
@@ -244,7 +244,7 @@ public class RuntimeRpcTest {
 
         final Document rpcDocument = XmlFileLoader.xmlFileToDocument("messages/mapping/rpcs/rpc-void-input-output.xml");
         final HandlingPriority priority = rpc.canHandle(rpcDocument);
-        Preconditions.checkState(priority != HandlingPriority.CANNOT_HANDLE);
+        assertNotNull(priority);
 
         final Document response = rpc.handle(rpcDocument, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
 

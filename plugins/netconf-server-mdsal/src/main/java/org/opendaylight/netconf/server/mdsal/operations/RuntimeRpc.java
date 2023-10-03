@@ -79,7 +79,7 @@ public final class RuntimeRpc extends AbstractSingletonNetconfOperation {
             .flatMap(module -> getRpcDefinitionFromModule(module, xmlNamespace, netconfOperationName));
         if (rpcDef.isEmpty()) {
             LOG.debug("Cannot handle rpc: {}, {}", netconfOperationName, namespace);
-            return HandlingPriority.CANNOT_HANDLE;
+            return null;
         }
         return HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY;
     }

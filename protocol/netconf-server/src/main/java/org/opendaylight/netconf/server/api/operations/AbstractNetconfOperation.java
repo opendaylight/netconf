@@ -40,8 +40,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
 
     protected HandlingPriority canHandle(final String operationName, final String operationNamespace) {
         return operationName.equals(getOperationName()) && operationNamespace.equals(getOperationNamespace())
-                ? getHandlingPriority()
-                : HandlingPriority.CANNOT_HANDLE;
+            ? getHandlingPriority() : null;
     }
 
     public static final class OperationNameAndNamespace {
@@ -74,7 +73,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
             NamespaceURN.BASE);
     }
 
-    protected HandlingPriority getHandlingPriority() {
+    protected @NonNull HandlingPriority getHandlingPriority() {
         return HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY;
     }
 

@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.server.api.operations;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.w3c.dom.Document;
 
@@ -24,16 +25,15 @@ import org.w3c.dom.Document;
  * the results.
  */
 public interface NetconfOperation {
-
     /**
-     * Singleton operations should return
-     * HandlingPriority.HANDLE_WITH_MAX_PRIORITY, last operations
-     * HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.
+     * Singleton operations should return {@link HandlingPriority#HANDLE_WITH_MAX_PRIORITY}, last operations
+     * {@link HandlingPriority#HANDLE_WITH_DEFAULT_PRIORITY}.
      *
      * @param message request message
-     * @return {@code handling priority}
+     * @return A {@link HandlingPriority}, or {@code null} if the message is not handled
+     * @throws DocumentedException if the message is found to have structural errors
      */
-    HandlingPriority canHandle(Document message) throws DocumentedException;
+    @Nullable HandlingPriority canHandle(Document message) throws DocumentedException;
 
     /**
      * Execute current netconf operation and trigger execution of subsequent

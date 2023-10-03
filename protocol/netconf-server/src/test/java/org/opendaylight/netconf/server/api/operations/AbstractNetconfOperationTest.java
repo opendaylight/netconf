@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.server.api.operations;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -35,7 +34,7 @@ public class AbstractNetconfOperationTest {
 
         @Override
         protected String getOperationName() {
-            return null;
+            return "edit-config";
         }
 
         @Override
@@ -62,8 +61,7 @@ public class AbstractNetconfOperationTest {
     public void testAbstractNetconfOperation() throws Exception {
         Document helloMessage = XmlFileLoader.xmlFileToDocument("netconfMessages/edit_config.xml");
         assertEquals(new SessionIdType(Uint32.ONE), netconfOperation.sessionId());
-        assertNotNull(netconfOperation.canHandle(helloMessage));
-        assertEquals(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY, netconfOperation.getHandlingPriority());
+        assertEquals(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY, netconfOperation.canHandle(helloMessage));
 
         netconfOperation.handle(helloMessage, operation);
         assertTrue(netconfOperation.handleRun);

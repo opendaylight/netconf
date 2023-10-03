@@ -18,23 +18,20 @@ public class HandlingPriorityTest {
     public void testHandlingPriority() {
         assertEquals(0,
             HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
-        assertEquals(-1, HandlingPriority.CANNOT_HANDLE.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
-        assertEquals(1, HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.CANNOT_HANDLE));
 
         assertEquals(-1,
             HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_MAX_PRIORITY));
         assertEquals(1,
             HandlingPriority.HANDLE_WITH_MAX_PRIORITY.compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
-        assertEquals(0, HandlingPriority.of(Integer.MIN_VALUE)
+        assertEquals(0, new HandlingPriority(Integer.MIN_VALUE)
             .compareTo(HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY));
 
-        HandlingPriority prio = HandlingPriority.of(10);
-        assertTrue(prio.increasePriority(1).compareTo(HandlingPriority.of(11)) == 0);
+        HandlingPriority prio = new HandlingPriority(10);
+        assertTrue(prio.increasePriority(1).compareTo(new HandlingPriority(11)) == 0);
 
-        assertFalse(HandlingPriority.CANNOT_HANDLE.getPriority().isPresent());
         assertFalse(HandlingPriority.HANDLE_WITH_MAX_PRIORITY.equals(new Object()));
-        assertEquals(HandlingPriority.HANDLE_WITH_MAX_PRIORITY, HandlingPriority.of(Integer.MAX_VALUE));
+        assertEquals(HandlingPriority.HANDLE_WITH_MAX_PRIORITY, new HandlingPriority(Integer.MAX_VALUE));
         assertEquals(HandlingPriority.HANDLE_WITH_MAX_PRIORITY.hashCode(),
-            HandlingPriority.of(Integer.MAX_VALUE).hashCode());
+            new HandlingPriority(Integer.MAX_VALUE).hashCode());
     }
 }
