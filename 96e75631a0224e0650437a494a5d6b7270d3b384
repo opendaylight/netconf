@@ -21,6 +21,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "91de611b_4841dc10",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-03T10:26:33Z",
+      "side": 1,
+      "message": "hmm... I do not believe the intent is one NetconfDevice to be connected multiple times.",
+      "revId": "96e75631a0224e0650437a494a5d6b7270d3b384",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7a2e11bf_9a7d44c5",
         "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
         "patchSetId": 3
