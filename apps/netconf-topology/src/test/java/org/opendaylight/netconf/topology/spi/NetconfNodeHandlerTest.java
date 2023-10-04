@@ -40,7 +40,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.api.CapabilityURN;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
@@ -99,7 +99,7 @@ public class NetconfNodeHandlerTest {
 
     // Mock client dispatcher-related things
     @Mock
-    private NetconfClientDispatcher clientDispatcher;
+    private NetconfClientFactory clientFactory;
     @Mock
     private NetconfClientSession clientSession;
     @Captor
@@ -134,7 +134,7 @@ public class NetconfNodeHandlerTest {
     @Before
     public void before() {
         // Instantiate the handler
-        handler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor, BASE_SCHEMAS,
+        handler = new NetconfNodeHandler(clientFactory, eventExecutor, keepaliveExecutor, BASE_SCHEMAS,
             schemaManager, processingExecutor,
             new DefaultNetconfClientConfigurationBuilderFactory(encryptionService, credentialProvider,
                 sslHandlerFactoryProvider),
@@ -157,7 +157,7 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
-    public void successfullOnDeviceConnectedPropagates() {
+    public void successfullOnDeviceConnectedPropagates() throws Exception {
         assertSuccessfulConnect();
         assertEquals(1, handler.attempts());
 
@@ -178,7 +178,7 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
-    public void failedSchemaCausesReconnect() {
+    public void failedSchemaCausesReconnect() throws Exception {
         assertSuccessfulConnect();
         assertEquals(1, handler.attempts());
 
@@ -191,7 +191,7 @@ public class NetconfNodeHandlerTest {
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
         scheduleCaptor.getValue().run();
-        verify(clientDispatcher, times(2)).createClient(any());
+        verify(clientFactory, times(2)).createClient(any());
         assertEquals(2, handler.attempts());
     }
 
@@ -230,7 +230,7 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
-    public void downAfterUpCausesReconnect() {
+    public void downAfterUpCausesReconnect() throws Exception {
         // Let's borrow common bits
         successfullOnDeviceConnectedPropagates();
 
@@ -244,15 +244,15 @@ public class NetconfNodeHandlerTest {
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
         scheduleCaptor.getValue().run();
-        verify(clientDispatcher, times(2)).createClient(any());
+        verify(clientFactory, times(2)).createClient(any());
         assertEquals(1, handler.attempts());
     }
 
     @Test
-    public void socketFailuresAreRetried() {
+    public void socketFailuresAreRetried() throws Exception {
         final var firstPromise = new DefaultPromise<NetconfClientSession>(ImmediateEventExecutor.INSTANCE);
         final var secondPromise = new DefaultPromise<NetconfClientSession>(ImmediateEventExecutor.INSTANCE);
-        doReturn(firstPromise, secondPromise).when(clientDispatcher).createClient(any());
+        doReturn(firstPromise, secondPromise).when(clientFactory).createClient(any());
         handler.connect();
         assertEquals(1, handler.attempts());
 
@@ -264,7 +264,7 @@ public class NetconfNodeHandlerTest {
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
         scheduleCaptor.getValue().run();
-        verify(clientDispatcher, times(2)).createClient(any());
+        verify(clientFactory, times(2)).createClient(any());
         assertEquals(2, handler.attempts());
 
         // now report the second failure
@@ -279,11 +279,11 @@ public class NetconfNodeHandlerTest {
 
     // Initiate a connect() which results in immediate clientDispatcher report. No interactions with delegate may occur,
     // as this is just a prelude to a follow-up callback
-    private void assertSuccessfulConnect() {
+    private void assertSuccessfulConnect() throws Exception {
         doReturn(new SucceededFuture<>(ImmediateEventExecutor.INSTANCE, clientSession))
-            .when(clientDispatcher).createClient(any());
+            .when(clientFactory).createClient(any());
         handler.connect();
-        verify(clientDispatcher).createClient(any());
+        verify(clientFactory).createClient(any());
         verifyNoInteractions(delegate);
     }
 }
