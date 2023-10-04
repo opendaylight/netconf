@@ -16,8 +16,8 @@ import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 
 public final class ClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
-    private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
     private final NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory;
+    private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
 
     public ClientChannelInitializer(final @NonNull NetconfClientSessionNegotiatorFactory negotiatorFactory,
             final @NonNull NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory) {
