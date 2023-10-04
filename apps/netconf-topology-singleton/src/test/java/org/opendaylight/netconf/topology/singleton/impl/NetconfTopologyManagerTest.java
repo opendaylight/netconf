@@ -55,7 +55,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -114,7 +114,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         final ExecutorService processingService = mock(ExecutorService.class);
         final ActorSystem actorSystem = mock(ActorSystem.class);
         final EventExecutor eventExecutor = mock(EventExecutor.class);
-        final NetconfClientDispatcher clientDispatcher = mock(NetconfClientDispatcher.class);
+        final NetconfClientFactory clientFactory = mock(NetconfClientFactory.class);
         final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
         final AAAEncryptionService encryptionService = mock(AAAEncryptionService.class);
         final DeviceActionFactory deviceActionFactory = mock(DeviceActionFactory.class);
@@ -127,7 +127,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any());
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
-                keepaliveExecutor, processingService, actorSystem, eventExecutor, clientDispatcher,
+                keepaliveExecutor, processingService, actorSystem, eventExecutor, clientFactory,
                 mountPointService, encryptionService, rpcProviderService, deviceActionFactory,
                 new DefaultSchemaResourceManager(new DefaultYangParserFactory()), builderFactory,
                 TOPOLOGY_ID, Uint16.ZERO) {
