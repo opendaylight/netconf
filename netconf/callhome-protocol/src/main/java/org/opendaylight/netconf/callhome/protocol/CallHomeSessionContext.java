@@ -138,7 +138,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         return activationPromise;
     }
 
-    protected MinaSshNettyChannel newMinaSshNettyChannel() {
+    @VisibleForTesting
+    MinaSshNettyChannel newMinaSshNettyChannel() {
         return new MinaSshNettyChannel(this, sshSession);
     }
 
