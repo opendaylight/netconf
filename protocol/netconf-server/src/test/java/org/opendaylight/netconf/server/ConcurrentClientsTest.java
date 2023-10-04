@@ -9,50 +9,48 @@ package org.opendaylight.netconf.server;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-import static org.junit.Assert.assertEquals;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.lenient;
+import static org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES;
 
-import com.google.common.io.ByteStreams;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import java.io.DataOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.DocumentedException;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
-import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
+import org.opendaylight.netconf.client.NetconfClientFactory;
+import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.NetconfMessageUtil;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
-import org.opendaylight.netconf.client.TestingNetconfClient;
-import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
@@ -69,68 +67,57 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFac
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
+import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
+import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.server.rev230417.netconf.server.listen.stack.grouping.transport.ssh.ssh.TcpServerParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-@RunWith(Parameterized.class)
+@ExtendWith(MockitoExtension.class)
 public class ConcurrentClientsTest {
     private static final Logger LOG = LoggerFactory.getLogger(ConcurrentClientsTest.class);
 
-    private static ExecutorService clientExecutor;
-
     private static final int CONCURRENCY = 32;
-    private static final InetSocketAddress NETCONF_ADDRESS = new InetSocketAddress("127.0.0.1", 8303);
+    private static final long TIMEOUT = 5000L;
+    private static final Set<String> CAPS_EXI = Set.of(CapabilityURN.BASE, CapabilityURN.EXI);
+    private static final Set<String> CAPS_1_1 = Set.of(CapabilityURN.BASE, CapabilityURN.BASE_1_1);
+    private static final Capabilities EMPTY_CAPABILITIES = new CapabilitiesBuilder().setCapability(Set.of()).build();
+    private static final SessionIdProvider ID_PROVIDER = new DefaultSessionIdProvider();
 
-    private final int nettyThreads;
-    private final Class<? extends Runnable> clientRunnable;
-    private final Set<String> serverCaps;
+    private static ExecutorService clientExecutor;
+    private static InetAddress serverAddress;
+    private static int serverPort;
+    private static TcpServerGrouping serverParams;
+    private static TcpClientGrouping clientParams;
 
-    public ConcurrentClientsTest(final int nettyThreads, final Class<? extends Runnable> clientRunnable,
-            final Set<String> serverCaps) {
-        this.nettyThreads = nettyThreads;
-        this.clientRunnable = clientRunnable;
-        this.serverCaps = serverCaps;
-    }
+    private static NetconfMessage getConfigMessage;
+    private static NetconfMessage clientHelloMessage;
 
-    @Parameterized.Parameters()
-    public static Collection<Object[]> data() {
-        return List.of(new Object[][]{
-            { 4, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
-            { 1, TestingNetconfClientRunnable.class, NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES},
-            // empty set of capabilities = only base 1.0 netconf capability
-            { 4, TestingNetconfClientRunnable.class, Set.of()},
-            { 4, TestingNetconfClientRunnable.class, getOnlyExiServerCaps()},
-            { 4, TestingNetconfClientRunnable.class, getOnlyChunkServerCaps()},
-            { 4, BlockingClientRunnable.class, getOnlyExiServerCaps()},
-            { 1, BlockingClientRunnable.class, getOnlyExiServerCaps()},
-        });
-    }
+    private HashedWheelTimer hashedWheelTimer;
+    private SSHTransportStackFactory serverTransportFactory;
+    private NetconfClientFactory clientFactory;
+    private TCPServer server;
 
-    private EventLoopGroup nettyGroup;
-    private NetconfClientDispatcher netconfClientDispatcher;
-
-    HashedWheelTimer hashedWheelTimer;
+    @Mock
+    private NetconfMonitoringService monitoringService;
+    @Mock
+    private SessionListener serverSessionListener;
     private TestingNetconfOperation testingNetconfOperation;
 
-    public static NetconfMonitoringService createMockedMonitoringService() {
-        NetconfMonitoringService monitoring = mock(NetconfMonitoringService.class);
-        final SessionListener sessionListener = mock(SessionListener.class);
-        doNothing().when(sessionListener).onSessionUp(any(NetconfServerSession.class));
-        doNothing().when(sessionListener).onSessionDown(any(NetconfServerSession.class));
-        doNothing().when(sessionListener).onSessionEvent(any(SessionEvent.class));
-        doReturn((Registration) () -> { }).when(monitoring)
-            .registerCapabilitiesListener(any(NetconfMonitoringService.CapabilitiesListener.class));
-        doReturn(sessionListener).when(monitoring).getSessionListener();
-        doReturn(new CapabilitiesBuilder().setCapability(Set.of()).build()).when(monitoring).getCapabilities();
-        return monitoring;
-    }
-
-    @BeforeClass
-    public static void setUpClientExecutor() {
+    @BeforeAll
+    public static void beforeAll() throws Exception {
         clientExecutor = Executors.newFixedThreadPool(CONCURRENCY, new ThreadFactory() {
             int index = 1;
 
@@ -142,89 +129,108 @@ public class ConcurrentClientsTest {
                 return thread;
             }
         });
+
+        // create temp socket to get available port for test
+        serverAddress = InetAddress.getLoopbackAddress();
+        final var socket = new ServerSocket(0);
+        serverPort = socket.getLocalPort();
+        socket.close();
+
+        final var address = IetfInetUtil.ipAddressFor(serverAddress);
+        final var port = new PortNumber(Uint16.valueOf(serverPort));
+        serverParams = new TcpServerParametersBuilder().setLocalAddress(address).setLocalPort(port).build();
+        clientParams =
+            new TcpClientParametersBuilder().setRemoteAddress(new Host(address)).setRemotePort(port).build();
+
+        getConfigMessage = requireNonNull(XmlFileLoader.xmlFileToNetconfMessage("netconfMessages/getConfig.xml"));
+        clientHelloMessage = requireNonNull(XmlFileLoader.xmlFileToNetconfMessage("netconfMessages/client_hello.xml"));
     }
 
-    @Before
-    public void setUp() throws Exception {
-        hashedWheelTimer = new HashedWheelTimer();
-        nettyGroup = new NioEventLoopGroup(nettyThreads);
-        netconfClientDispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup, hashedWheelTimer);
-
-        AggregatedNetconfOperationServiceFactory factoriesListener = new AggregatedNetconfOperationServiceFactory();
-
-        testingNetconfOperation = new TestingNetconfOperation();
-        factoriesListener.onAddNetconfOperationServiceFactory(
-                new TestingOperationServiceFactory(testingNetconfOperation));
-
-        SessionIdProvider idProvider = new DefaultSessionIdProvider();
-
-        NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new
-                NetconfServerSessionNegotiatorFactoryBuilder()
-                .setTimer(hashedWheelTimer)
-                .setAggregatedOpService(factoriesListener)
-                .setIdProvider(idProvider)
-                .setConnectionTimeoutMillis(5000)
-                .setMonitoringService(createMockedMonitoringService())
-                .setBaseCapabilities(serverCaps)
-                .build();
-
-        ServerChannelInitializer serverChannelInitializer =
-                new ServerChannelInitializer(serverNegotiatorFactory);
-        final NetconfServerDispatcherImpl dispatch =
-                new NetconfServerDispatcherImpl(serverChannelInitializer, nettyGroup, nettyGroup);
-
-        ChannelFuture server = dispatch.createServer(NETCONF_ADDRESS);
-        server.await();
-    }
-
-    @After
-    public void tearDown() {
-        hashedWheelTimer.stop();
-        try {
-            nettyGroup.shutdownGracefully().get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.warn("Ignoring exception while cleaning up after test", e);
-        }
-    }
-
-    @AfterClass
-    public static void tearDownClientExecutor() {
+    @AfterAll
+    static void afterAll() {
         clientExecutor.shutdownNow();
     }
 
-    @Test(timeout = CONCURRENCY * 1000)
-    public void testConcurrentClients() throws Exception {
+    @BeforeEach
+    void beforeEach() {
+        hashedWheelTimer = new HashedWheelTimer();
+    }
 
-        List<Future<?>> futures = new ArrayList<>(CONCURRENCY);
+    void startServer(final int threads, final Set<String> serverCapabilities) throws Exception {
+        testingNetconfOperation = new TestingNetconfOperation();
+        final var factoriesListener = new AggregatedNetconfOperationServiceFactory();
+        factoriesListener.onAddNetconfOperationServiceFactory(
+            new TestingOperationServiceFactory(testingNetconfOperation));
 
-        for (int i = 0; i < CONCURRENCY; i++) {
-            futures.add(clientExecutor.submit(getInstanceOfClientRunnable()));
+        doNothing().when(serverSessionListener).onSessionUp(any(NetconfServerSession.class));
+        doNothing().when(serverSessionListener).onSessionDown(any(NetconfServerSession.class));
+        doNothing().when(serverSessionListener).onSessionEvent(any(SessionEvent.class));
+        lenient().doReturn((Registration) () -> {
+        }).when(monitoringService)
+            .registerCapabilitiesListener(any(NetconfMonitoringService.CapabilitiesListener.class));
+        doReturn(serverSessionListener).when(monitoringService).getSessionListener();
+        doReturn(EMPTY_CAPABILITIES).when(monitoringService).getCapabilities();
+
+        final var serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactoryBuilder()
+            .setTimer(hashedWheelTimer)
+            .setAggregatedOpService(factoriesListener)
+            .setIdProvider(ID_PROVIDER)
+            .setConnectionTimeoutMillis(TIMEOUT)
+            .setMonitoringService(monitoringService)
+            .setBaseCapabilities(serverCapabilities)
+            .build();
+
+        serverTransportFactory = new SSHTransportStackFactory("server", threads);
+        final var serverFactory = new NetconfServerFactoryImpl(
+            new ServerChannelInitializer(serverNegotiatorFactory), serverTransportFactory);
+        server = serverFactory.createTcpServer(serverParams).get(TIMEOUT, MILLISECONDS);
+    }
+
+    @AfterEach
+    void afterEach() throws Exception {
+        hashedWheelTimer.stop();
+        server.shutdown().get(TIMEOUT, MILLISECONDS);
+        serverTransportFactory.close();
+        if (clientFactory != null) {
+            clientFactory.close();
         }
+    }
 
-        for (Future<?> future : futures) {
-            try {
-                future.get();
-            } catch (InterruptedException e) {
-                throw new IllegalStateException(e);
-            } catch (ExecutionException e) {
-                LOG.error("Thread for testing client failed", e);
-                throw e;
-            }
+    @ParameterizedTest()
+    @MethodSource("concurrentClientArgs")
+    @Timeout(CONCURRENCY * 1000)
+    void testConcurrentClients(final int threads, final Class<? extends Runnable> clientClass,
+            final Set<String> serverCaps) throws Exception {
+
+        startServer(threads, serverCaps);
+        clientFactory = clientClass == NetconfClientRunnable.class
+            ? new NetconfClientFactoryImpl(new SSHTransportStackFactory("client", threads)) : null;
+
+        final var futures = new ArrayList<Future<?>>(CONCURRENCY);
+        for (int i = 0; i < CONCURRENCY; i++) {
+            final var runnableClient = clientClass == NetconfClientRunnable.class
+                ? new NetconfClientRunnable(clientFactory) : new BlockingClientRunnable();
+            futures.add(clientExecutor.submit(runnableClient));
+        }
+        for (var future : futures) {
+            future.get(TIMEOUT, MILLISECONDS);
         }
 
         assertEquals(CONCURRENCY, testingNetconfOperation.counter.get());
     }
 
-    public static Set<String> getOnlyExiServerCaps() {
-        return Set.of(CapabilityURN.BASE, CapabilityURN.EXI);
-    }
-
-    public static Set<String> getOnlyChunkServerCaps() {
-        return Set.of(CapabilityURN.BASE, CapabilityURN.BASE_1_1);
-    }
-
-    public Runnable getInstanceOfClientRunnable() throws Exception {
-        return clientRunnable.getConstructor(ConcurrentClientsTest.class).newInstance(this);
+    private static Stream<Arguments> concurrentClientArgs() {
+        return Stream.of(
+            // (threads, runnable client class, server capabilities)
+            Arguments.of(4, NetconfClientRunnable.class, DEFAULT_BASE_CAPABILITIES),
+            Arguments.of(1, NetconfClientRunnable.class, DEFAULT_BASE_CAPABILITIES),
+            // empty set of capabilities = only base 1.0 netconf capability
+            Arguments.of(4, NetconfClientRunnable.class, Set.of()),
+            Arguments.of(4, NetconfClientRunnable.class, CAPS_EXI),
+            Arguments.of(4, NetconfClientRunnable.class, CAPS_1_1),
+            Arguments.of(4, BlockingClientRunnable.class, CAPS_EXI),
+            Arguments.of(1, BlockingClientRunnable.class, CAPS_EXI)
+        );
     }
 
     /**
@@ -256,12 +262,8 @@ public class ConcurrentClientsTest {
     /**
      * Hardcoded operation service factory.
      */
-    private static final class TestingOperationServiceFactory implements NetconfOperationServiceFactory {
-        private final NetconfOperation[] operations;
-
-        TestingOperationServiceFactory(final NetconfOperation... operations) {
-            this.operations = operations;
-        }
+    private record TestingOperationServiceFactory(NetconfOperation... operations)
+            implements NetconfOperationServiceFactory {
 
         @Override
         public Set<Capability> getCapabilities() {
@@ -293,7 +295,7 @@ public class ConcurrentClientsTest {
     /**
      * Pure socket based blocking client.
      */
-    public final class BlockingClientRunnable implements Runnable {
+    private record BlockingClientRunnable() implements Runnable {
 
         @Override
         @SuppressWarnings("checkstyle:IllegalCatch")
@@ -306,29 +308,24 @@ public class ConcurrentClientsTest {
         }
 
         private void run2() throws Exception {
-            InputStream clientHello = requireNonNull(XmlFileLoader.getResourceAsStream(
-                "netconfMessages/client_hello.xml"));
-            final InputStream getConfig = requireNonNull(XmlFileLoader.getResourceAsStream(
-                "netconfMessages/getConfig.xml"));
+            final var clientSocket = new Socket(serverAddress, serverPort);
+            final var outToServer = new DataOutputStream(clientSocket.getOutputStream());
+            final var inFromServer = new InputStreamReader(clientSocket.getInputStream());
 
-            Socket clientSocket = new Socket(NETCONF_ADDRESS.getHostString(), NETCONF_ADDRESS.getPort());
-            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-            InputStreamReader inFromServer = new InputStreamReader(clientSocket.getInputStream());
-
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             while (!sb.toString().endsWith("]]>]]>")) {
                 sb.append((char) inFromServer.read());
             }
             LOG.info(sb.toString());
 
-            outToServer.write(ByteStreams.toByteArray(clientHello));
+            outToServer.write(clientHelloMessage.toString().getBytes(StandardCharsets.UTF_8));
             outToServer.write("]]>]]>".getBytes());
             outToServer.flush();
             // Thread.sleep(100);
-            outToServer.write(ByteStreams.toByteArray(getConfig));
+            outToServer.write(getConfigMessage.toString().getBytes(StandardCharsets.UTF_8));
             outToServer.write("]]>]]>".getBytes());
             outToServer.flush();
-            Thread.sleep(100);
+            // Thread.sleep(100);
             sb = new StringBuilder();
             while (!sb.toString().endsWith("]]>]]>")) {
                 sb.append((char) inFromServer.read());
@@ -339,43 +336,30 @@ public class ConcurrentClientsTest {
     }
 
     /**
-     * TestingNetconfClient based runnable.
+     * NetconfClientFactory based runnable.
      */
-    public final class TestingNetconfClientRunnable implements Runnable {
+    private record NetconfClientRunnable(NetconfClientFactory factory) implements Runnable {
 
         @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
         public void run() {
-            try {
-                final TestingNetconfClient netconfClient =
-                        new TestingNetconfClient(Thread.currentThread().getName(), netconfClientDispatcher,
-                                getClientConfig());
-                final var sessionId = netconfClient.sessionId();
+            final var sessionListener = new SimpleNetconfClientSessionListener();
+            final var clientConfig = NetconfClientConfigurationBuilder.create()
+                .withTcpParameters(clientParams).withSessionListener(sessionListener).build();
+            try (var session = factory.createClient(clientConfig).get()) {
+                final var sessionId = session.sessionId();
                 LOG.info("Client with session id {}: hello exchanged", sessionId);
-
-                final NetconfMessage getMessage = XmlFileLoader
-                        .xmlFileToNetconfMessage("netconfMessages/getConfig.xml");
-                NetconfMessage result = netconfClient.sendRequest(getMessage).get();
+                final var result = sessionListener.sendRequest(getConfigMessage).get();
                 LOG.info("Client with session id {}: got result {}", sessionId.getValue(), result);
 
-                checkState(NetconfMessageUtil.isErrorMessage(result) == false,
-                        "Received error response: " + XmlUtil.toString(result.getDocument()) + " to request: "
-                                + XmlUtil.toString(getMessage.getDocument()));
+                checkState(!NetconfMessageUtil.isErrorMessage(result),
+                    "Received error response: " + XmlUtil.toString(result.getDocument()) + " to request: "
+                        + XmlUtil.toString(getConfigMessage.getDocument()));
 
-                netconfClient.close();
                 LOG.info("Client with session id {}: ended", sessionId.getValue());
             } catch (final Exception e) {
                 throw new IllegalStateException(Thread.currentThread().getName(), e);
             }
-        }
-
-        private NetconfClientConfiguration getClientConfig() {
-            return NetconfClientConfigurationBuilder.create()
-                .withAddress(NETCONF_ADDRESS)
-                .withAdditionalHeader(
-                    new NetconfHelloMessageAdditionalHeader("uname", "10.10.10.1", "830", "tcp", "client"))
-                .withSessionListener(new SimpleNetconfClientSessionListener())
-                .build();
         }
     }
 }
