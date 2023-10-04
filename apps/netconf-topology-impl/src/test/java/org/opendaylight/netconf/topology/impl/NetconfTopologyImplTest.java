@@ -17,11 +17,11 @@ import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import java.util.HashSet;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -33,7 +33,7 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemas;
@@ -61,13 +61,13 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfTopologyImplTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfTopologyImplTest {
     private static final NodeId NODE_ID = new NodeId("testing-node");
     private static final String TOPOLOGY_ID = "testing-topology";
 
     @Mock
-    private NetconfClientDispatcher mockedClientDispatcher;
+    private NetconfClientFactory mockedClientFactory;
     @Mock
     private EventExecutor mockedEventExecutor;
     @Mock
@@ -92,13 +92,13 @@ public class NetconfTopologyImplTest {
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void beforeEach() {
         doReturn(MoreExecutors.newDirectExecutorService()).when(mockedProcessingExecutor).getExecutor();
         doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
 
-        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
+        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientFactory, mockedEventExecutor,
             mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker, mountPointService,
             encryptionService, builderFactory, rpcProviderService);
         //verify initialization of topology
@@ -110,7 +110,7 @@ public class NetconfTopologyImplTest {
     }
 
     @Test
-    public void testOnDataTreeChange() {
+    void testOnDataTreeChange() {
         final DataObjectModification<Node> newNode = mock(DataObjectModification.class);
         doReturn(DataObjectModification.ModificationType.WRITE).when(newNode).getModificationType();
 
@@ -153,7 +153,7 @@ public class NetconfTopologyImplTest {
         verify(spyTopology, times(2)).ensureNode(nn.build());
     }
 
-    public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
+    private static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
         private static final BaseNetconfSchemas BASE_SCHEMAS;
 
         static {
@@ -164,14 +164,14 @@ public class NetconfTopologyImplTest {
             }
         }
 
-        public TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+        TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory,
                 final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                 final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
                 final DataBroker dataBroker, final DOMMountPointService mountPointService,
                 final AAAEncryptionService encryptionService,
                 final NetconfClientConfigurationBuilderFactory builderFactory,
                 final RpcProviderService rpcProviderService) {
-            super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
+            super(topologyId, clientFactory, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, builderFactory,
                 rpcProviderService, BASE_SCHEMAS);
         }
