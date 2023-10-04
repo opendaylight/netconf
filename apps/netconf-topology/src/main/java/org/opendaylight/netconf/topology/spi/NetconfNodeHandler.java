@@ -23,7 +23,7 @@ import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
 import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
@@ -41,6 +41,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
@@ -59,8 +60,9 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeHandler.class);
 
     private final @NonNull List<SchemaSourceRegistration<?>> yanglibRegistrations;
-    private final @NonNull NetconfClientDispatcher clientDispatcher;
+    private final @Nullable NetconfClientConfiguration clientConfig;
     private final @NonNull NetconfDeviceCommunicator communicator;
+    private final @NonNull NetconfClientFactory clientFactory;
     private final @NonNull RemoteDeviceHandler delegate;
     private final @NonNull EventExecutor eventExecutor;
     private final @NonNull RemoteDeviceId deviceId;
@@ -69,7 +71,6 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final int minSleep;
     private final double sleepFactor;
 
-    private @Nullable NetconfClientConfiguration clientConfig;
     @GuardedBy("this")
     private long attempts;
     @GuardedBy("this")
@@ -78,14 +79,14 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private Future<?> currentTask;
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public NetconfNodeHandler(final NetconfClientDispatcher clientDispatcher, final EventExecutor eventExecutor,
+    public NetconfNodeHandler(final NetconfClientFactory clientFactory, final EventExecutor eventExecutor,
             final ScheduledExecutorService keepaliveExecutor, final BaseNetconfSchemas baseSchemas,
             final SchemaResourceManager schemaManager, final Executor processingExecutor,
             final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
-        this.clientDispatcher = requireNonNull(clientDispatcher);
+        this.clientFactory = requireNonNull(clientFactory);
         this.eventExecutor = requireNonNull(eventExecutor);
         this.delegate = requireNonNull(delegate);
         this.deviceId = requireNonNull(deviceId);
@@ -143,15 +144,17 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             keepAliveFacade.setListener(communicator);
         }
         // FIXME: move this heavy logic out of constructor
+        NetconfClientConfiguration cfg;
         try {
-            clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
+            cfg = builderFactory.createClientConfigurationBuilder(nodeId, node)
                 .withSessionListener(communicator)
                 .build();
         } catch (final Exception exception) {
             LOG.warn("Error initialization configuration for device {}, using null instead.", deviceId, exception);
             delegate.onDeviceFailed(exception);
-            clientConfig = null;
+            cfg = null;
         }
+        clientConfig = cfg;
     }
 
     public synchronized void connect() {
@@ -166,8 +169,12 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     @Holding("this")
     private void lockedConnect() {
-        currentTask = clientDispatcher.createClient(clientConfig);
-        currentTask.addListener(this::connectComplete);
+        try {
+            currentTask = clientFactory.createClient(clientConfig);
+            currentTask.addListener(this::connectComplete);
+        } catch (UnsupportedConfigurationException e) {
+            delegate.onDeviceFailed(e);
+        }
     }
 
     private void connectComplete(final Future<?> future) {
