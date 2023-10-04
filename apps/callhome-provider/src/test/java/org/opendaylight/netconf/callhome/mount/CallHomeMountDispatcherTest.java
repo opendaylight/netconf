@@ -46,7 +46,7 @@ public class CallHomeMountDispatcherTest {
     private ThreadPool mockProcessingExecutor;
     private SchemaResourceManager mockSchemaRepoProvider;
 
-    private CallHomeMountDispatcher instance;
+    private CallHomeMountFactory instance;
     private DataBroker mockDataBroker;
     private DOMMountPointService mockMount;
 
@@ -71,7 +71,7 @@ public class CallHomeMountDispatcherTest {
         mockBuilderFactory = mock(NetconfClientConfigurationBuilderFactory .class);
         mockBaseSchemas = mock(BaseNetconfSchemas.class);
 
-        instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
+        instance = new CallHomeMountFactory(topologyId, mockExecutor, mockKeepAlive,
                 mockProcessingExecutor, mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount,
                 mockBuilderFactory) {
             @Override
