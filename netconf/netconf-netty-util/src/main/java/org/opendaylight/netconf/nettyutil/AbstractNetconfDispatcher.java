@@ -101,7 +101,6 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
             final Class<? extends ServerChannel> channelClass, final ChannelPipelineInitializer<C, S> initializer) {
         final ServerBootstrap b = new ServerBootstrap();
         b.childHandler(new ChannelInitializer<C>() {
-
             @Override
             protected void initChannel(final C ch) {
                 initializer.initializeChannel(ch, new DefaultPromise<>(executor));
@@ -109,7 +108,7 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
         });
 
         b.option(ChannelOption.SO_BACKLOG, 128);
-        if (LocalServerChannel.class.equals(channelClass) == false) {
+        if (!LocalServerChannel.class.equals(channelClass)) {
             // makes no sense for LocalServer and produces warning
             b.childOption(ChannelOption.SO_KEEPALIVE, true);
             b.childOption(ChannelOption.TCP_NODELAY , true);
