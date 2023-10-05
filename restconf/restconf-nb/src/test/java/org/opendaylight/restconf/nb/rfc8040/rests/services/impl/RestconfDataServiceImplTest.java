@@ -7,12 +7,13 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -118,7 +119,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     @Mock
     private AsyncResponse asyncResponse;
     @Captor
-    private ArgumentCaptor<PatchStatusContext> patchStatus;
+    private ArgumentCaptor<Response> responseCaptor;
 
     private RestconfDataServiceImpl dataService;
 
@@ -418,9 +419,12 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
-        doReturn(true).when(asyncResponse).resume(patchStatus.capture());
+        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
         dataService.yangPatchData(JUKEBOX_SCHEMA, patch, null, asyncResponse);
-        final var status = patchStatus.getValue();
+        final var response = responseCaptor.getValue();
+        assertEquals(200, response.getStatus());
+        final var status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
+
         assertTrue(status.ok());
         assertEquals(3, status.editCollection().size());
         assertEquals("replace data", status.editCollection().get(1).getEditId());
@@ -438,9 +442,12 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
 
-        doReturn(true).when(asyncResponse).resume(patchStatus.capture());
+        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
         dataService.yangPatchData(JUKEBOX_SCHEMA, patch, mountPoint, asyncResponse);
-        final var status = patchStatus.getValue();
+        final var response = responseCaptor.getValue();
+        assertEquals(200, response.getStatus());
+        final var status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
+
         assertTrue(status.ok());
         assertEquals(3, status.editCollection().size());
         assertNull(status.globalErrors());
@@ -460,9 +467,11 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(readWrite).cancel();
 
-        doReturn(true).when(asyncResponse).resume(patchStatus.capture());
+        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
         dataService.yangPatchData(JUKEBOX_SCHEMA, patch, null, asyncResponse);
-        final var status = patchStatus.getValue();
+        final var response = responseCaptor.getValue();
+        assertEquals(200, response.getStatus());
+        final var status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
 
         assertFalse(status.ok());
         assertEquals(3, status.editCollection().size());

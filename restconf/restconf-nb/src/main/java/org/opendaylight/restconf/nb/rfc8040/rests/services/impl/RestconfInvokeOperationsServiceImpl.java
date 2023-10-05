@@ -9,9 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
@@ -147,24 +144,11 @@ public final class RestconfInvokeOperationsServiceImpl {
                     ErrorTag.MALFORMED_MESSAGE, e);
         }
 
-        Futures.addCallback(hackInvokeRpc(databind, reqPath, uriInfo, input), new FutureCallback<>() {
-            @Override
-            public void onSuccess(final Optional<ContainerNode> result) {
-                if (result.isPresent()) {
-                    final var output = result.orElseThrow();
-                    if (!output.isEmpty()) {
-                        ar.resume(Response.ok().entity(new NormalizedNodePayload(reqPath.inference(), output)).build());
-                        return;
-                    }
-                }
-                ar.resume(Response.noContent().build());
-            }
-
-            @Override
-            public void onFailure(final Throwable failure) {
-                ar.resume(failure);
-            }
-        }, MoreExecutors.directExecutor());
+        hackInvokeRpc(databind, reqPath, uriInfo, input).addCallback(new JaxRsRestconfCallback<>(ar,
+            result -> result
+                .filter(output -> !output.isEmpty())
+                .map(output -> Response.ok().entity(new NormalizedNodePayload(reqPath.inference(), output)).build())
+                .orElseGet(() -> Response.noContent().build())));
     }
 
     private RestconfFuture<Optional<ContainerNode>> hackInvokeRpc(final DatabindContext localDatabind,
