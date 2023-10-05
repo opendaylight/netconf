@@ -17,7 +17,6 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
@@ -88,7 +87,6 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
-import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -540,17 +538,8 @@ public final class RestconfDataServiceImpl {
         final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
         final var strategy = server.getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
 
-        Futures.addCallback(strategy.delete(reqPath.getInstanceIdentifier()), new FutureCallback<>() {
-            @Override
-            public void onSuccess(final Empty result) {
-                ar.resume(Response.noContent().build());
-            }
-
-            @Override
-            public void onFailure(final Throwable failure) {
-                ar.resume(failure);
-            }
-        }, MoreExecutors.directExecutor());
+        strategy.delete(reqPath.getInstanceIdentifier()).addCallback(
+            new JaxRsRestconfCallback<>(ar, ignored -> Response.noContent().build()));
     }
 
     /**
@@ -669,19 +658,8 @@ public final class RestconfDataServiceImpl {
     private void plainPatchData(final InstanceIdentifierContext reqPath, final ResourceBody body,
             final AsyncResponse ar) {
         final var req = bindResourceRequest(reqPath, body);
-        final var future = req.strategy().merge(req.path(), req.data());
-
-        Futures.addCallback(future, new FutureCallback<>() {
-            @Override
-            public void onSuccess(final Empty result) {
-                ar.resume(Response.ok().build());
-            }
-
-            @Override
-            public void onFailure(final Throwable failure) {
-                ar.resume(failure);
-            }
-        }, MoreExecutors.directExecutor());
+        req.strategy().merge(req.path(), req.data()).addCallback(
+            new JaxRsRestconfCallback<>(ar, ignored -> Response.ok().build()));
     }
 
     private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
@@ -796,18 +774,8 @@ public final class RestconfDataServiceImpl {
     @VisibleForTesting
     void yangPatchData(final @NonNull EffectiveModelContext modelContext,
             final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint, final AsyncResponse ar) {
-        Futures.addCallback(server.getRestconfStrategy(modelContext, mountPoint).patchData(patch),
-            new FutureCallback<>() {
-                @Override
-                public void onSuccess(final PatchStatusContext result) {
-                    ar.resume(result);
-                }
-
-                @Override
-                public void onFailure(final Throwable cause) {
-                    ar.resume(cause);
-                }
-        }, MoreExecutors.directExecutor());
+        server.getRestconfStrategy(modelContext, mountPoint).patchData(patch)
+            .addCallback(new JaxRsRestconfCallback<>(ar, status -> Response.ok().entity(status).build()));
     }
 
     private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,

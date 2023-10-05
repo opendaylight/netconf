@@ -11,7 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.AbstractFuture;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 
@@ -41,6 +43,10 @@ public sealed class RestconfFuture<V> extends AbstractFuture<@NonNull V> permits
     @Override
     public final boolean cancel(final boolean mayInterruptIfRunning) {
         return false;
+    }
+
+    public final void addCallback(final RestconfCallback<? super V> callback) {
+        Futures.addCallback(this, callback, MoreExecutors.directExecutor());
     }
 
     /**
