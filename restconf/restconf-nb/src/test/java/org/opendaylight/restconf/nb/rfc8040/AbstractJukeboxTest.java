@@ -17,6 +17,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -30,6 +31,12 @@ public abstract class AbstractJukeboxTest {
     protected static final QName PLAYER_QNAME = QName.create(JUKEBOX_QNAME, "player");
     // container library
     protected static final QName LIBRARY_QNAME = QName.create(JUKEBOX_QNAME, "library");
+    // list song
+    protected static final QName SONG_QNAME = QName.create(JUKEBOX_QNAME, "song");
+    // leaf id
+    protected static final QName SONG_ID_QNAME = QName.create(JUKEBOX_QNAME, "id");
+    // leaf index
+    protected static final QName SONG_INDEX_QNAME = QName.create(JUKEBOX_QNAME, "index");
     // list artist
     protected static final QName ARTIST_QNAME = QName.create(JUKEBOX_QNAME, "artist");
     // list album
@@ -65,6 +72,28 @@ public abstract class AbstractJukeboxTest {
         .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
         .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
         .build();
+    protected static final MapEntryNode SONG1 = Builders.mapEntryBuilder()
+        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
+            "1"))
+        .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "A"))
+        .build();
+    protected static final MapEntryNode SONG2 = Builders.mapEntryBuilder()
+        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
+            "2"))
+        .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "B"))
+        .build();
+    protected static final SystemMapNode PLAYLIST_WITH_SONGS = Builders.mapBuilder()
+        .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
+        .withChild(Builders.mapEntryBuilder()
+            .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME,
+                "0"))
+                .withChild(Builders.orderedMapBuilder()
+                    .withNodeIdentifier(new NodeIdentifier(SONG_QNAME))
+                    .withChild(SONG1)
+                    .withChild(SONG2)
+                    .build())
+                .build())
+            .build();
 
     protected static EffectiveModelContext JUKEBOX_SCHEMA;
 

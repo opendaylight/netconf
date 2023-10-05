@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -484,5 +485,109 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         assertFalse(status.editCollection().get(2).getEditErrors().isEmpty());
         final String errorMessage = status.editCollection().get(2).getEditErrors().get(0).getErrorMessage();
         assertEquals("Data does not exist", errorMessage);
+    }
+
+    @Test
+    public void testPutDataWithInsertLast() {
+        // Mocking the query parameters to include 'insert=last'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("last"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        final var response = dataService.putDataJSON("example-jukebox:jukebox/playlist=0/song=3", uriInfo,
+            stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3"
+                }
+              ]
+            }"""));
+        assertNotNull(response);
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testPutDataWithInsertFirst() {
+        // Mocking the query parameters to include 'insert=first'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("first"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        // Mocking existed playlist with two songs in DS
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(readWrite)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        final var response = dataService.putDataJSON("example-jukebox:jukebox/playlist=0/song=3", uriInfo,
+            stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3"
+                }
+              ]
+            }"""));
+        assertNotNull(response);
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testPutDataWithInsertBefore() {
+        // Mocking the query parameters to include 'insert=before' and 'point=example-jukebox:jukebox/playlist=0/song=2'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("before"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=2"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        // Mocking existed playlist with two songs in DS
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(readWrite)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        final var response = dataService.putDataJSON("example-jukebox:jukebox/playlist=0/song=3", uriInfo,
+            stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3",
+                   "id" = "C"
+                }
+              ]
+            }"""));
+        assertNotNull(response);
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testPutDataWithInsertAfter() {
+        // Mocking the query parameters to include 'insert=after' and 'point=example-jukebox:jukebox/playlist=0/song=1'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("after"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=1"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(readWrite)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        final var response = dataService.putDataJSON("example-jukebox:jukebox/playlist=0/song=3", uriInfo,
+            stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3",
+                   "id" = "C"
+                }
+              ]
+            }"""));
+        assertNotNull(response);
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 }
