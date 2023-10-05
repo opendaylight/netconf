@@ -14,6 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.buildKeyManagerFactory;
+import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.buildTrustManagerFactory;
+import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.newKeyStore;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.EC_ALGORITHM;
 import static org.opendaylight.netconf.transport.tls.KeyUtils.RSA_ALGORITHM;
 import static org.opendaylight.netconf.transport.tls.TestUtils.buildEndEntityCertWithKeyGrouping;
@@ -21,18 +24,25 @@ import static org.opendaylight.netconf.transport.tls.TestUtils.buildInlineOrTrus
 import static org.opendaylight.netconf.transport.tls.TestUtils.generateX509CertData;
 import static org.opendaylight.netconf.transport.tls.TestUtils.isRSA;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
+import io.netty.handler.ssl.ClientAuth;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -165,17 +175,48 @@ class TlsClientServerTest {
         when(tlsServerConfig.getServerIdentity()).thenReturn(serverIdentity);
         when(tlsServerConfig.getClientAuthentication()).thenReturn(clientAuth);
 
-        integrationTest();
+        integrationTest(
+            TLSServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
+                tcpServerConfig, tlsServerConfig),
+            TLSClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
+                tcpClientConfig, tlsClientConfig)
+        );
     }
 
-    private void integrationTest() throws Exception {
+    @Test
+    @DisplayName("External SslHandlerFactory integration")
+    void sslHandlerFactory() throws Exception {
+
+        final var serverKs = buildKeystoreWithGeneratedCert(RSA_ALGORITHM);
+        final var clientKs = buildKeystoreWithGeneratedCert(EC_ALGORITHM);
+        final var serverContext = SslContextBuilder.forServer(buildKeyManagerFactory(serverKs))
+            .clientAuth(ClientAuth.REQUIRE).trustManager(buildTrustManagerFactory(clientKs)).build();
+        final var clientContext = SslContextBuilder.forClient().keyManager(buildKeyManagerFactory(clientKs))
+            .trustManager(buildTrustManagerFactory(serverKs)).build();
+
+        integrationTest(
+            TLSServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
+                tcpServerConfig, channel -> serverContext.newHandler(channel.alloc())),
+            TLSClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
+                tcpClientConfig, channel -> clientContext.newHandler(channel.alloc()))
+        );
+    }
+
+    private static KeyStore buildKeystoreWithGeneratedCert(final String algorithm) throws Exception {
+        final var data = generateX509CertData(algorithm);
+        final var ret = newKeyStore();
+        ret.setCertificateEntry("certificate", data.certificate());
+        ret.setKeyEntry("key", data.keyPair().getPrivate(), new char[0], new Certificate[]{data.certificate()});
+        return ret;
+    }
+
+    private void integrationTest(final ListenableFuture<TLSServer> serverFuture,
+            final ListenableFuture<TLSClient> clientFuture) throws Exception {
         // start server
-        final var server = TLSServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
-                tcpServerConfig, tlsServerConfig).get(2, TimeUnit.SECONDS);
+        final var server = serverFuture.get(2, TimeUnit.SECONDS);
         try {
             // connect with client
-            final var client = TLSClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
-                    tcpClientConfig, tlsClientConfig).get(2, TimeUnit.SECONDS);
+            final var client = clientFuture.get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(500))
                         .onTransportChannelEstablished(serverTransportChannelCaptor.capture());

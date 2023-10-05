@@ -97,17 +97,21 @@ public abstract sealed class TLSTransportStack extends AbstractOverlayTransportS
                     .put(TlsEcdheRsaWithChacha20Poly1305Sha256.VALUE, "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256")
                     .build();
 
-    private volatile @NonNull SslContext sslContext;
+    private final SslHandlerFactory factory;
 
     TLSTransportStack(final TransportChannelListener listener, final SslContext sslContext) {
+        this(listener, channel -> sslContext.newHandler(channel.alloc()));
+    }
+
+    TLSTransportStack(final TransportChannelListener listener, final SslHandlerFactory factory) {
         super(listener);
-        this.sslContext = requireNonNull(sslContext);
+        this.factory = requireNonNull(factory);
     }
 
     @Override
     protected final void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
         final var channel = underlayChannel.channel();
-        final var sslHandler = sslContext.newHandler(channel.alloc());
+        final var sslHandler = factory.createSslHandler(channel);
 
         channel.pipeline().addLast(sslHandler);
         sslHandler.handshakeFuture().addListener(future -> {
@@ -119,10 +123,6 @@ public abstract sealed class TLSTransportStack extends AbstractOverlayTransportS
                 addTransportChannel(new TLSTransportChannel(underlayChannel));
             }
         });
-    }
-
-    final void setSslContext(final SslContext sslContext) {
-        this.sslContext = requireNonNull(sslContext);
     }
 
     static KeyManagerFactory newKeyManager(

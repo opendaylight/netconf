@@ -110,7 +110,7 @@ public final class TestUtils {
         final var certificate = generateCertificate(keyPair, isRSA(algorithm) ? "SHA256withRSA" : "SHA256withECDSA");
         final var publicKeyBytes = keyPair.getPublic().getEncoded();
         final var privateKeyBytes = keyPair.getPrivate().getEncoded();
-        return new X509CertData(certificate.getEncoded(), publicKeyBytes, privateKeyBytes,
+        return new X509CertData(certificate, keyPair, certificate.getEncoded(), publicKeyBytes, privateKeyBytes,
                 OpenSSHPublicKeyUtil.encodePublicKey(PublicKeyFactory.createKey(publicKeyBytes)));
     }
 
@@ -133,6 +133,7 @@ public final class TestUtils {
         return KeyUtils.RSA_ALGORITHM.equals(algorithm);
     }
 
-    public record X509CertData(byte[] certBytes, byte[] publicKey, byte[] privateKey, byte[] sshPublicKey) {
+    public record X509CertData(X509Certificate certificate, KeyPair keyPair, byte[] certBytes, byte[] publicKey,
+        byte[] privateKey, byte[] sshPublicKey) {
     }
 }
