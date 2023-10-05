@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3559f8fd_7609aeb1",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSession.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-05T14:02:37Z",
+      "side": 1,
+      "message": "this is a hack and a layering violation -- this code should know absolutely nothing about the underlying channel.\n\nthe problem should be solved by either making EmbeddedChannel work seamlessly with containing event loop, or eliminating the EmbeddedChannel completely",
+      "range": {
+        "startLine": 96,
+        "startChar": 31,
+        "endLine": 96,
+        "endChar": 46
+      },
+      "revId": "0081b521c2ce08060c60f71b10ee8fb0d641e74e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
