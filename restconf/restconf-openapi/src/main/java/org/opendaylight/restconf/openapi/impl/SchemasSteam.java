@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,34 +16,27 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.List;
-import java.util.Map;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
-import org.opendaylight.restconf.openapi.model.Info;
-import org.opendaylight.restconf.openapi.model.InfoEntity;
-import org.opendaylight.restconf.openapi.model.OpenApiVersionEntity;
-import org.opendaylight.restconf.openapi.model.Server;
-import org.opendaylight.restconf.openapi.model.ServerEntity;
-import org.opendaylight.restconf.openapi.model.ServersEntity;
+import org.opendaylight.restconf.openapi.model.SchemaEntity;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.Module;
 
-public class OpenApiInputStream extends InputStream {
-    private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    private final JsonGenerator generator = new JsonFactoryBuilder().build().createGenerator(stream);
+public class SchemasSteam extends InputStream {
+    private final ByteArrayOutputStream stream;
+    private final JsonGenerator generator;
     private final Deque<InputStream> stack = new ArrayDeque<>();
 
     private Reader reader;
-
     private boolean eof;
 
-    public OpenApiInputStream(final EffectiveModelContext context, final String openApiVersion, final Info info,
-            final List<Server> servers, final List<Map<String, List<String>>> security) throws IOException {
-        final OpenApiBodyWriter writer = new OpenApiBodyWriter(generator, stream);
-        stack.add(new OpenApiVersionStream(new OpenApiVersionEntity(), writer));
-        stack.add(new InfoStream(new InfoEntity(info.version(), info.title(), info.description()), writer));
-        stack.add(new ServersStream(new ServersEntity(List.of(new ServerEntity(servers.iterator().next().url()))), writer));
-        stack.add(new PathsSteam(context, writer, generator, stream));
-        stack.add(new SchemasSteam(context, writer, generator, stream));
+    public SchemasSteam(final EffectiveModelContext context, final OpenApiBodyWriter writer,
+            final JsonGenerator generator, final ByteArrayOutputStream stream) {
+        this.generator = generator;
+        this.stream = stream;
+
+        for (final var module : context.getModules()) {
+            stack.add(new SchemaStream(toComponents(module), writer));
+        }
     }
 
     @Override
@@ -53,7 +45,8 @@ public class OpenApiInputStream extends InputStream {
             return -1;
         }
         if (reader == null) {
-            generator.writeStartObject();
+            generator.writeObjectFieldStart("components");
+            generator.writeObjectFieldStart("schemas");
             generator.flush();
             reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()));
             stream.reset();
@@ -62,6 +55,7 @@ public class OpenApiInputStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (stack.isEmpty()) {
+                generator.writeEndObject();
                 generator.writeEndObject();
                 generator.flush();
                 reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()));
@@ -74,5 +68,22 @@ public class OpenApiInputStream extends InputStream {
         }
 
         return read;
+    }
+
+    private static Deque<SchemaEntity> toComponents(final Module module) {
+        final var result = new ArrayDeque<SchemaEntity>();
+        for (final var rpc : module.getRpcs()) {
+            final var moduleName = module.getName();
+            final var rpcName = rpc.getQName().getLocalName();
+            final var input = new SchemaEntity(rpc.getInput(), moduleName + "_" + rpcName + "_input", "object");
+            result.add(input);
+            final var output = new SchemaEntity(rpc.getOutput(), moduleName + "_" + rpcName + "_output", "object");
+            result.add(output);
+        }
+
+        // actions
+        // child nodes
+        // etc.
+        return result;
     }
 }
