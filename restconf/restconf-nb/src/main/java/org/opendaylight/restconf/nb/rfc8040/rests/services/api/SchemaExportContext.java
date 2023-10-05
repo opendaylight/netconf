@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -20,7 +19,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
  */
 public record SchemaExportContext(
     @NonNull EffectiveModelContext schemaContext,
-    @Nullable Module module,
+    @NonNull Module module,
     @NonNull DOMYangTextSourceProvider sourceProvider) {
 
     public SchemaExportContext {
