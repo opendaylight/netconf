@@ -22,6 +22,52 @@
       },
       "revId": "02472a46a92a6ccf52f5be3fa2cbe85c6ddb18dc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3312f77e_d5188b23",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-05T21:33:19Z",
+      "side": 1,
+      "message": "add asserts for the details now that it is not a generic exception",
+      "range": {
+        "startLine": 409,
+        "startChar": 21,
+        "endLine": 409,
+        "endChar": 48
+      },
+      "revId": "02472a46a92a6ccf52f5be3fa2cbe85c6ddb18dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e11685d1_de6e9cc0",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-05T21:33:19Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 458,
+        "startChar": 21,
+        "endLine": 458,
+        "endChar": 48
+      },
+      "revId": "02472a46a92a6ccf52f5be3fa2cbe85c6ddb18dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
