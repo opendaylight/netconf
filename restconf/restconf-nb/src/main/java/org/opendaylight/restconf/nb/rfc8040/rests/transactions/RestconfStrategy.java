@@ -418,7 +418,7 @@ public abstract class RestconfStrategy {
      * @param patch Patch context to be processed
      * @return {@link PatchStatusContext}
      */
-    public final @NonNull PatchStatusContext patchData(final PatchContext patch) {
+    public final @NonNull RestconfFuture<PatchStatusContext> patchData(final PatchContext patch) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var tx = prepareWriteExecution();
 
@@ -487,21 +487,29 @@ public abstract class RestconfStrategy {
             }
         }
 
-        // if no errors then submit transaction, otherwise cancel
-        final var patchId = patch.patchId();
-        if (noError) {
-            try {
-                TransactionUtil.syncCommit(tx.commit(), "PATCH", null);
-            } catch (RestconfDocumentedException e) {
-                // if errors occurred during transaction commit then patch failed and global errors are reported
-                return new PatchStatusContext(modelContext, patchId, List.copyOf(editCollection), false, e.getErrors());
+        final var ret = new SettableRestconfFuture<PatchStatusContext>();
+        // We have errors
+        if (!noError) {
+            tx.cancel();
+            ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false, null));
+            return ret;
+        }
+
+        Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), true, null));
             }
 
-            return new PatchStatusContext(modelContext, patchId, List.copyOf(editCollection), true, null);
-        } else {
-            tx.cancel();
-            return new PatchStatusContext(modelContext, patchId, List.copyOf(editCollection), false, null);
-        }
+            @Override
+            public void onFailure(final Throwable cause) {
+                // if errors occurred during transaction commit then patch failed and global errors are reported
+                ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false,
+                    TransactionUtil.decodeException(cause, "PATCH", null).getErrors()));
+            }
+        }, MoreExecutors.directExecutor());
+
+        return ret;
     }
 
     private void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,

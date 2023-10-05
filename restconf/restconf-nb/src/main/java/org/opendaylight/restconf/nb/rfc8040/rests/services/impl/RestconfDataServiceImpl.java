@@ -701,7 +701,7 @@ public final class RestconfDataServiceImpl {
      *
      * @param identifier path to target
      * @param body YANG Patch body
-     * @return {@link PatchStatusContext}
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
     @Path("/data/{identifier:.+}")
@@ -710,10 +710,10 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchDataXML(@Encoded @PathParam("identifier") final String identifier,
-            final InputStream body) {
+    public void yangPatchDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            return yangPatchData(identifier, xmlBody);
+            yangPatchData(identifier, xmlBody, ar);
         }
     }
 
@@ -722,7 +722,7 @@ public final class RestconfDataServiceImpl {
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param body YANG Patch body
-     * @return {@link PatchStatusContext}
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
     @Path("/data")
@@ -731,9 +731,9 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchDataXML(final InputStream body) {
+    public void yangPatchDataXML(final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            return yangPatchData(xmlBody);
+            yangPatchData(xmlBody, ar);
         }
     }
 
@@ -743,7 +743,7 @@ public final class RestconfDataServiceImpl {
      *
      * @param identifier path to target
      * @param body YANG Patch body
-     * @return {@link PatchStatusContext}
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
     @Path("/data/{identifier:.+}")
@@ -752,10 +752,10 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchDataJSON(@Encoded @PathParam("identifier") final String identifier,
-            final InputStream body) {
+    public void yangPatchDataJSON(@Encoded @PathParam("identifier") final String identifier,
+            final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            return yangPatchData(identifier, jsonBody);
+            yangPatchData(identifier, jsonBody, ar);
         }
     }
 
@@ -764,7 +764,7 @@ public final class RestconfDataServiceImpl {
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param body YANG Patch body
-     * @return {@link PatchStatusContext}
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
     @Path("/data")
@@ -773,29 +773,41 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public PatchStatusContext yangPatchDataJSON(final InputStream body) {
+    public void yangPatchDataJSON(final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            return yangPatchData(jsonBody);
+            yangPatchData(jsonBody, ar);
         }
     }
 
-    private PatchStatusContext yangPatchData(final @NonNull PatchBody body) {
+    private void yangPatchData(final @NonNull PatchBody body, final AsyncResponse ar) {
         final var context = databindProvider.currentContext().modelContext();
-        return yangPatchData(context, parsePatchBody(context, YangInstanceIdentifier.of(), body), null);
+        yangPatchData(context, parsePatchBody(context, YangInstanceIdentifier.of(), body), null, ar);
     }
 
-    private PatchStatusContext yangPatchData(final String identifier, final @NonNull PatchBody body) {
+    private void yangPatchData(final String identifier, final @NonNull PatchBody body,
+            final AsyncResponse ar) {
         final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
         final var modelContext = reqPath.getSchemaContext();
-        return yangPatchData(modelContext, parsePatchBody(modelContext, reqPath.getInstanceIdentifier(), body),
-            reqPath.getMountPoint());
+        yangPatchData(modelContext, parsePatchBody(modelContext, reqPath.getInstanceIdentifier(), body),
+            reqPath.getMountPoint(), ar);
     }
 
 
     @VisibleForTesting
-    @NonNull PatchStatusContext yangPatchData(final @NonNull EffectiveModelContext modelContext,
-            final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint) {
-        return server.getRestconfStrategy(modelContext, mountPoint).patchData(patch);
+    void yangPatchData(final @NonNull EffectiveModelContext modelContext,
+            final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint, final AsyncResponse ar) {
+        Futures.addCallback(server.getRestconfStrategy(modelContext, mountPoint).patchData(patch),
+            new FutureCallback<>() {
+                @Override
+                public void onSuccess(final PatchStatusContext result) {
+                    ar.resume(result);
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    ar.resume(cause);
+                }
+        }, MoreExecutors.directExecutor());
     }
 
     private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,
