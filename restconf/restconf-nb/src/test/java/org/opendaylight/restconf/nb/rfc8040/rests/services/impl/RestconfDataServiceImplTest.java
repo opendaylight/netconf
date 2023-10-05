@@ -15,9 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
@@ -68,12 +70,14 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -481,5 +485,117 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         assertFalse(status.editCollection().get(2).getEditErrors().isEmpty());
         final String errorMessage = status.editCollection().get(2).getEditErrors().get(0).getErrorMessage();
         assertEquals("Data does not exist", errorMessage);
+    }
+
+    @Test
+    public void testPutDataWithInsertLast() {
+        // Mocking the query parameters to include 'insert=last'
+        final MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>();
+        queryParams.put("insert", List.of("last"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        final var response = dataService.putDataJSON("example-jukebox:jukebox/playlist=0/song=3", uriInfo,
+            stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3"
+                }
+              ]
+            }"""));
+        assertNotNull(response);
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testPutDataWithInsertFirst() {
+        // Mocking the query parameters to include 'insert=last'
+        final MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>();
+        queryParams.put("insert", List.of("first"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateTrueFluentFuture()).when(readWrite)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(readWrite)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateTrueFluentFuture()).when(read)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        final var response = dataService.putDataJSON("example-jukebox:jukebox/playlist=0/song=3", uriInfo,
+            stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3"
+                }
+              ]
+            }"""));
+        assertNotNull(response);
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testPutDataWithInsertBefore() {
+        // Mocking the query parameters to include 'insert=last'
+        final MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>();
+        queryParams.put("insert", List.of("before"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=2"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateTrueFluentFuture()).when(readWrite)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(readWrite)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateTrueFluentFuture()).when(read)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        final var response = dataService.putDataJSON("example-jukebox:jukebox/playlist=0/song=3", uriInfo,
+            stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3"
+                }
+              ]
+            }"""));
+        assertNotNull(response);
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testPutDataWithInsertAfter() {
+        // Mocking the query parameters to include 'insert=last'
+        final MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>();
+        queryParams.put("insert", List.of("after"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=1"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateTrueFluentFuture()).when(readWrite)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(readWrite)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateTrueFluentFuture()).when(read)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        final var response = dataService.putDataJSON("example-jukebox:jukebox/playlist=0/song=3", uriInfo,
+            stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3"
+                }
+              ]
+            }"""));
+        assertNotNull(response);
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
     }
 }
