@@ -58,7 +58,7 @@ public final class SchemaEntity extends OpenApiEntity {
     }
 
     @Nullable String description() {
-        return value.getDescription().orElse("");
+        return value.getDescription().orElse(null);
     }
 
     @Nullable String reference() {
