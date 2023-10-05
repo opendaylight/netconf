@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -427,17 +428,14 @@ public class ParserIdentifierTest {
 
     /**
      * Test of getting <code>SchemaExportContext</code> when desired module is not found.
-     * <code>SchemaExportContext</code> should be created but module should be set to <code>null</code>.
+     * <code>SchemaExportContext</code> should not be created and exception is thrown.
      */
     @Test
     public void toSchemaExportContextFromIdentifierNotFoundTest() {
-        final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
+        assertThrows(NoSuchElementException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT,
                 "not-existing-module" + "/" + "2016-01-01",
-                null, sourceProvider);
-
-        assertNotNull("Export context should be parsed", exportContext);
-        assertNull("Not-existing module should be null", exportContext.getModule());
+                null, sourceProvider));
     }
 
     /**
@@ -479,17 +477,14 @@ public class ParserIdentifierTest {
 
     /**
      * Negative test of getting <code>SchemaExportContext</code> when desired module is not found behind mount point.
-     * <code>SchemaExportContext</code> should be still created but module should be set to <code>null</code>.
+     * <code>SchemaExportContext</code> should not be created and exception is thrown.
      */
     @Test
     public void toSchemaExportContextFromIdentifierMountPointNotFoundTest() {
-        final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
+        assertThrows(NoSuchElementException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT,
                 MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
-                mountPointService, sourceProvider);
-
-        assertNotNull("Export context should be parsed", exportContext);
-        assertNull("Not-existing module should be null", exportContext.getModule());
+                mountPointService, sourceProvider));
     }
 
     /**
