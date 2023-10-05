@@ -186,7 +186,7 @@ public final class ParserIdentifier {
         if (!Iterables.contains(pathComponents, RestconfConstants.MOUNT)) {
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
-            final Module module = schemaContext.findModule(moduleName, revision).orElseThrow();
+            final Module module = coerceModule(schemaContext, moduleName, revision, null);
             return new SchemaExportContext(schemaContext, module, sourceProvider);
         } else {
             final StringBuilder pathBuilder = new StringBuilder();
@@ -209,7 +209,7 @@ public final class ParserIdentifier {
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
             final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
-            final Module module = context.findModule(moduleName, revision).orElseThrow();
+            final Module module = coerceModule(context, moduleName, revision, point.getMountPoint());
             return new SchemaExportContext(context, module, sourceProvider);
         }
     }
@@ -253,6 +253,17 @@ public final class ParserIdentifier {
             "Supplied name has not expected identifier format.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
 
         return name;
+    }
+
+    private static Module coerceModule(final EffectiveModelContext context, final String moduleName,
+            final Revision revision, final DOMMountPoint mountPoint) {
+        final var module = context.findModule(moduleName, revision);
+        if (module.isEmpty()) {
+            final var msg = "Module %s %s cannot be found on %s.".formatted(moduleName, revision,
+                mountPoint == null ? "controller" : mountPoint.getIdentifier());
+            throw new RestconfDocumentedException(msg, ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+        }
+        return module.orElseThrow();
     }
 
     private static EffectiveModelContext coerceModelContext(final DOMMountPoint mountPoint) {
