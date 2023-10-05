@@ -9,10 +9,14 @@ package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -30,6 +34,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @ExtendWith(MockitoExtension.class)
 class RestconfDataPutTest extends AbstractRestconfTest {
@@ -42,7 +47,6 @@ class RestconfDataPutTest extends AbstractRestconfTest {
 
     @BeforeEach
     void beforeEach() {
-        doReturn(queryParamenters).when(uriInfo).getQueryParameters();
         doReturn(readTx).when(dataBroker).newReadOnlyTransaction();
         doReturn(rwTx).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(rwTx).commit();
@@ -50,6 +54,7 @@ class RestconfDataPutTest extends AbstractRestconfTest {
 
     @Test
     void testPutData() {
+        doReturn(queryParamenters).when(uriInfo).getQueryParameters();
         doReturn(immediateTrueFluentFuture()).when(readTx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(rwTx).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
 
@@ -66,6 +71,7 @@ class RestconfDataPutTest extends AbstractRestconfTest {
 
     @Test
     void testPutDataWithMountPoint() {
+        doReturn(queryParamenters).when(uriInfo).getQueryParameters();
         doReturn(immediateTrueFluentFuture()).when(readTx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(rwTx).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
@@ -82,5 +88,101 @@ class RestconfDataPutTest extends AbstractRestconfTest {
                 <gap>0.2</gap>
               </player>
             </jukebox>"""), ar)));
+    }
+
+    @Test
+    public void testPutDataWithInsertLast() {
+        // Mocking the query parameters to include 'insert=last'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("last"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(readTx)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        assertNull(assertEntity(201, ar -> restconf.dataJsonPUT(
+            "example-jukebox:jukebox/playlist=0/song=3", uriInfo, stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3"
+                }
+              ]
+            }"""), ar)));
+    }
+
+    @Test
+    public void testPutDataWithInsertFirst() {
+        // Mocking the query parameters to include 'insert=first'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("first"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(readTx)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        // Mocking existed playlist with two songs in DS
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(rwTx)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        assertNull(assertEntity(201, ar -> restconf.dataJsonPUT(
+            "example-jukebox:jukebox/playlist=0/song=3", uriInfo, stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3"
+                }
+              ]
+            }"""), ar)));
+    }
+
+    @Test
+    public void testPutDataWithInsertBefore() {
+        // Mocking the query parameters to include 'insert=before' and 'point=example-jukebox:jukebox/playlist=0/song=2'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("before"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=2"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(readTx)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        // Mocking existed playlist with two songs in DS
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(rwTx)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        assertNull(assertEntity(201, ar -> restconf.dataJsonPUT(
+            "example-jukebox:jukebox/playlist=0/song=3", uriInfo, stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3",
+                   "id" = "C"
+                }
+              ]
+            }"""), ar)));
+    }
+
+    @Test
+    public void testPutDataWithInsertAfter() {
+        // Mocking the query parameters to include 'insert=after' and 'point=example-jukebox:jukebox/playlist=0/song=1'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("after"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=1"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(readTx)
+            .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(rwTx)
+            .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        assertNull(assertEntity(201, ar -> restconf.dataJsonPUT(
+            "example-jukebox:jukebox/playlist=0/song=3", uriInfo, stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3",
+                   "id" = "C"
+                }
+              ]
+            }"""), ar)));
     }
 }
