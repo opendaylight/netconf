@@ -9,11 +9,11 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
+import java.util.NoSuchElementException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -129,12 +129,8 @@ public class RestconfSchemaServiceTest {
         // prepare conditions - return not-mount point schema context
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
 
-        // make test
-        final SchemaExportContext exportContext = schemaService.getSchema(NOT_EXISTING_MODULE);
-
         // verify
-        assertNotNull("Export context should not be null", exportContext);
-        assertNull("Not-existing module should not be found", exportContext.module());
+        assertThrows(NoSuchElementException.class, () -> schemaService.getSchema(NOT_EXISTING_MODULE));
     }
 
     /**
@@ -169,12 +165,8 @@ public class RestconfSchemaServiceTest {
         // prepare conditions - return schema context with mount points
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
-        // make test
-        final SchemaExportContext exportContext = schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE);
-
         // verify
-        assertNotNull("Export context should not be null", exportContext);
-        assertNull("Not-existing module should not be found", exportContext.module());
+        assertThrows(NoSuchElementException.class, () -> schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE));
     }
 
     /**

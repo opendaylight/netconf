@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -406,13 +407,10 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierNotFoundTest() {
-        final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
+        assertThrows(NoSuchElementException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT,
                 "not-existing-module" + "/" + "2016-01-01",
-                null, sourceProvider);
-
-        assertNotNull("Export context should be parsed", exportContext);
-        assertNull("Not-existing module should be null", exportContext.module());
+                null, sourceProvider));
     }
 
     /**
@@ -458,13 +456,10 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierMountPointNotFoundTest() {
-        final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
+        assertThrows(NoSuchElementException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT,
                 MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
-                mountPointService, sourceProvider);
-
-        assertNotNull("Export context should be parsed", exportContext);
-        assertNull("Not-existing module should be null", exportContext.module());
+                mountPointService, sourceProvider));
     }
 
     /**
