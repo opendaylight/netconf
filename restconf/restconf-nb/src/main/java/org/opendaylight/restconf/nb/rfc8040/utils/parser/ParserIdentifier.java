@@ -192,7 +192,8 @@ public final class ParserIdentifier {
         if (!Iterables.contains(pathComponents, MOUNT)) {
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
-            final Module module = schemaContext.findModule(moduleName, revision).orElseThrow();
+            final Module module = schemaContext.findModule(moduleName, revision)
+                .orElseThrow(() -> throwRestconfDocumentedException(moduleName));
             return new SchemaExportContext(schemaContext, module, sourceProvider);
         } else {
             final StringBuilder pathBuilder = new StringBuilder();
@@ -215,9 +216,15 @@ public final class ParserIdentifier {
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
             final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
-            final Module module = context.findModule(moduleName, revision).orElseThrow();
+            final Module module = context.findModule(moduleName, revision)
+                .orElseThrow(() -> throwRestconfDocumentedException(moduleName));
             return new SchemaExportContext(context, module, sourceProvider);
         }
+    }
+
+    private static RestconfDocumentedException throwRestconfDocumentedException(String moduleName) {
+        return new RestconfDocumentedException("Module " + moduleName + " cannot be found in model "
+            + "context of controller/device", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
     }
 
     /**
