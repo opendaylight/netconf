@@ -140,7 +140,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             final var cause = conflict.cause();
             if (cause == null) {
                 throw new RestconfDocumentedException("Data already exists",
-                    ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, conflict.path());
+                    ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
             }
             throw new RestconfDocumentedException("Could not determine the existence of path " + conflict.path(), cause,
                 cause.getErrorList());
