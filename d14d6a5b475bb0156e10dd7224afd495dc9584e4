@@ -16,6 +16,24 @@
       "message": "Just `orElseThrow`",
       "revId": "d14d6a5b475bb0156e10dd7224afd495dc9584e4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31d0bbe5_9749399e",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-05T16:06:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d23d59e_f47f80b2",
+      "revId": "d14d6a5b475bb0156e10dd7224afd495dc9584e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
