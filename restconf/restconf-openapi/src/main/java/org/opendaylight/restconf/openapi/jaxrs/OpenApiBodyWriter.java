@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.openapi.jaxrs;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -26,9 +27,11 @@ import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 @Produces(MediaType.APPLICATION_JSON)
 public final class OpenApiBodyWriter implements MessageBodyWriter<OpenApiEntity> {
     private final JsonGenerator generator;
+    private final ByteArrayOutputStream stream;
 
-    public OpenApiBodyWriter(final JsonGenerator generator) {
+    public OpenApiBodyWriter(final JsonGenerator generator, final ByteArrayOutputStream stream) {
         this.generator = generator;
+        this.stream = stream;
     }
 
     @Override
@@ -42,5 +45,12 @@ public final class OpenApiBodyWriter implements MessageBodyWriter<OpenApiEntity>
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
         t.generate(generator);
+        generator.flush();
+    }
+
+    public byte[] readFrom() {
+        final var bytes = stream.toByteArray();
+        stream.reset();
+        return bytes;
     }
 }
