@@ -7,15 +7,32 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 
+<<<<<<< HEAD   (666091 Fix RPC XML payload missing namespace)
+=======
+import static java.util.Objects.requireNonNull;
+
+import org.eclipse.jdt.annotation.NonNull;
+>>>>>>> CHANGE (820f7a Throw exception when module cannot be found)
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
+<<<<<<< HEAD   (666091 Fix RPC XML payload missing namespace)
 public final class SchemaExportContext {
     private final EffectiveModelContext schemaContext;
     private final Module module;
     private final DOMYangTextSourceProvider sourceProvider;
+=======
+/**
+ * Holder of schema export context.
+ */
+public record SchemaExportContext(
+    @NonNull EffectiveModelContext schemaContext,
+    @NonNull Module module,
+    @NonNull DOMYangTextSourceProvider sourceProvider) {
+>>>>>>> CHANGE (820f7a Throw exception when module cannot be found)
 
+<<<<<<< HEAD   (666091 Fix RPC XML payload missing namespace)
     public SchemaExportContext(final EffectiveModelContext schemaContext, final Module module,
                                final DOMYangTextSourceProvider sourceProvider) {
         this.schemaContext = schemaContext;
@@ -33,5 +50,11 @@ public final class SchemaExportContext {
 
     public DOMYangTextSourceProvider getSourceProvider() {
         return sourceProvider;
+=======
+    public SchemaExportContext {
+        requireNonNull(schemaContext);
+        requireNonNull(module);
+        requireNonNull(sourceProvider);
+>>>>>>> CHANGE (820f7a Throw exception when module cannot be found)
     }
 }
