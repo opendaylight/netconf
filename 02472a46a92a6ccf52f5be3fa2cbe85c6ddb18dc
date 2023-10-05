@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "780dd7a8_f9443e22",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-05T21:32:00Z",
+      "side": 1,
+      "message": "duplicate code: should be hosted in a separate method",
+      "range": {
+        "startLine": 196,
+        "startChar": 28,
+        "endLine": 197,
+        "endChar": 101
+      },
+      "revId": "02472a46a92a6ccf52f5be3fa2cbe85c6ddb18dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
