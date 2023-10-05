@@ -11,14 +11,15 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.ExistenceCheck.Conflict;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.ExistenceCheck.Result;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -79,7 +80,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             ensureParentsByMerge(path);
 
             final var children = ((DistinctNodeContainer<?, ?>) data).body();
-            final var check = BatchedExistenceCheck.start(verifyNotNull(rwTx), CONFIGURATION, path, children);
+            final var check = ExistenceCheck.start(verifyNotNull(rwTx), CONFIGURATION, path, false, children);
 
             for (var child : children) {
                 final var childPath = path.node(child.name());
@@ -123,23 +124,26 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
         return verifyNotNull(rwTx).read(CONFIGURATION, path);
     }
 
-    private static void checkExistence(final YangInstanceIdentifier path, final BatchedExistenceCheck check) {
-        final Map.Entry<YangInstanceIdentifier, ReadFailedException> failure;
+    private static void checkExistence(final YangInstanceIdentifier path,
+            final ListenableFuture<@NonNull Result> future) {
+        final Result result;
         try {
-            failure = check.getFailure();
+            result = future.get();
+        } catch (ExecutionException e) {
+            // This should never happen
+            throw new IllegalStateException(e);
         } catch (InterruptedException e) {
             throw new RestconfDocumentedException("Could not determine the existence of path " + path, e);
         }
 
-        if (failure != null) {
-            final ReadFailedException e = failure.getValue();
-            if (e == null) {
+        if (result instanceof Conflict conflict) {
+            final var cause = conflict.cause();
+            if (cause == null) {
                 throw new RestconfDocumentedException("Data already exists",
-                    ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, failure.getKey());
+                    ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, conflict.path());
             }
-
-            throw new RestconfDocumentedException(
-                "Could not determine the existence of path " + failure.getKey(), e, e.getErrorList());
+            throw new RestconfDocumentedException("Could not determine the existence of path " + conflict.path(), cause,
+                cause.getErrorList());
         }
     }
 }
