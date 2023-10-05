@@ -7,18 +7,16 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import java.util.Iterator;
-import org.opendaylight.restconf.openapi.model.OpenApiEntity;
+import java.io.IOException;
+import java.io.InputStream;
+import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 
-public class OpenApiSnippet implements Iterable<OpenApiEntity> {
-    private final OpenApiEntity entity;
-
-    public OpenApiSnippet(final OpenApiEntity entity) {
-        this.entity = entity;
+public final class SecuritySchemesStream extends InputStream {
+    public SecuritySchemesStream(final OpenApiBodyWriter writer) {
     }
 
     @Override
-    public Iterator<OpenApiEntity> iterator() {
-        return null;
+    public int read() throws IOException {
+        return -1;
     }
 }
