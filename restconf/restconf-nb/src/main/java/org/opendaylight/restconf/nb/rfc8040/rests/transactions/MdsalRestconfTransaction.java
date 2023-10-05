@@ -12,14 +12,12 @@ import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATI
 
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.ExistenceCheck.Conflict;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.ExistenceCheck.Result;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -80,14 +78,21 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             ensureParentsByMerge(path);
 
             final var children = ((DistinctNodeContainer<?, ?>) data).body();
+
+            // Fire off an existence check
             final var check = ExistenceCheck.start(verifyNotNull(rwTx), CONFIGURATION, path, false, children);
 
+            // ... and perform any put() operations, which happen-after existence check
             for (var child : children) {
                 final var childPath = path.node(child.name());
                 verifyNotNull(rwTx).put(CONFIGURATION, childPath, child);
             }
+
             // ... finally collect existence checks and abort the transaction if any of them failed.
-            checkExistence(path, check);
+            if (check.getOrThrow() instanceof Conflict) {
+                throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
+                    path);
+            }
         } else {
             RestconfStrategy.checkItemDoesNotExists(verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
             ensureParentsByMerge(path);
@@ -122,28 +127,5 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     @Override
     ListenableFuture<Optional<NormalizedNode>> read(final YangInstanceIdentifier path) {
         return verifyNotNull(rwTx).read(CONFIGURATION, path);
-    }
-
-    private static void checkExistence(final YangInstanceIdentifier path,
-            final ListenableFuture<@NonNull Result> future) {
-        final Result result;
-        try {
-            result = future.get();
-        } catch (ExecutionException e) {
-            // This should never happen
-            throw new IllegalStateException(e);
-        } catch (InterruptedException e) {
-            throw new RestconfDocumentedException("Could not determine the existence of path " + path, e);
-        }
-
-        if (result instanceof Conflict conflict) {
-            final var cause = conflict.cause();
-            if (cause == null) {
-                throw new RestconfDocumentedException("Data already exists",
-                    ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
-            }
-            throw new RestconfDocumentedException("Could not determine the existence of path " + conflict.path(), cause,
-                cause.getErrorList());
-        }
     }
 }

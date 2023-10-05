@@ -10,18 +10,18 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -30,7 +30,7 @@ final class ExistenceCheck {
         // Nothing else
     }
 
-    record Conflict(@NonNull YangInstanceIdentifier path, @Nullable ReadFailedException cause) implements Result {
+    record Conflict(@NonNull YangInstanceIdentifier path) implements Result {
         Conflict {
             requireNonNull(path);
         }
@@ -46,7 +46,7 @@ final class ExistenceCheck {
     private static final AtomicIntegerFieldUpdater<ExistenceCheck> UPDATER =
         AtomicIntegerFieldUpdater.newUpdater(ExistenceCheck.class, "outstanding");
 
-    private final SettableFuture<@NonNull Result> future = SettableFuture.create();
+    private final SettableRestconfFuture<Result> future = new SettableRestconfFuture<>();
 
     @SuppressWarnings("unused")
     private volatile int outstanding;
@@ -55,7 +55,7 @@ final class ExistenceCheck {
         outstanding = total;
     }
 
-    static ListenableFuture<@NonNull Result> start(final DOMDataTreeReadOperations tx,
+    static RestconfFuture<Result> start(final DOMDataTreeReadOperations tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier parentPath, final boolean expected,
             final Collection<? extends NormalizedNode> children) {
         final var ret = new ExistenceCheck(children.size());
@@ -70,8 +70,8 @@ final class ExistenceCheck {
                 @Override
                 @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
                 public void onFailure(final Throwable throwable) {
-                    ret.complete(path, ReadFailedException.MAPPER.apply(
-                        throwable instanceof Exception ex ? ex : new ExecutionException(throwable)));
+                    ret.complete(parentPath, ReadFailedException.MAPPER.apply(
+                        throwable instanceof Exception ex ? ex :  new ExecutionException(throwable)));
                 }
             }, MoreExecutors.directExecutor());
         }
@@ -81,7 +81,7 @@ final class ExistenceCheck {
     private void complete(final YangInstanceIdentifier path, final boolean expected, final boolean present) {
         final int count = UPDATER.decrementAndGet(this);
         if (expected != present) {
-            future.set(new Conflict(path, null));
+            future.set(new Conflict(path));
         } else if (count == 0) {
             future.set(Success.INSTANCE);
         }
@@ -89,6 +89,7 @@ final class ExistenceCheck {
 
     private void complete(final YangInstanceIdentifier path, final ReadFailedException cause) {
         UPDATER.decrementAndGet(this);
-        future.set(new Conflict(path, cause));
+        future.setFailure(new RestconfDocumentedException("Could not determine the existence of path " + path, cause,
+            cause.getErrorList()));
     }
 }
