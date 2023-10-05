@@ -26,6 +26,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "35928022_494e7032",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfSchemaServiceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-05T21:33:49Z",
+      "side": 1,
+      "message": "more asserts also in this class",
+      "range": {
+        "startLine": 132,
+        "startChar": 21,
+        "endLine": 132,
+        "endChar": 48
+      },
+      "revId": "02472a46a92a6ccf52f5be3fa2cbe85c6ddb18dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3312f77e_d5188b23",
         "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifierTest.java",
         "patchSetId": 4
