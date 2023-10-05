@@ -14,7 +14,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
@@ -25,7 +25,7 @@ import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
-final class ExistenceCheck {
+final class ExistenceCheck implements FutureCallback<Boolean> {
     sealed interface Result {
         // Nothing else
     }
@@ -43,53 +43,62 @@ final class ExistenceCheck {
         static final @NonNull Success INSTANCE = new Success();
     }
 
-    private static final AtomicIntegerFieldUpdater<ExistenceCheck> UPDATER =
-        AtomicIntegerFieldUpdater.newUpdater(ExistenceCheck.class, "outstanding");
+    private final SettableRestconfFuture<Result> future;
+    private final AtomicInteger counter;
+    private final @NonNull YangInstanceIdentifier parentPath;
+    private final @NonNull YangInstanceIdentifier path;
+    private final boolean expected;
 
-    private final SettableRestconfFuture<Result> future = new SettableRestconfFuture<>();
-
-    @SuppressWarnings("unused")
-    private volatile int outstanding;
-
-    private ExistenceCheck(final int total) {
-        outstanding = total;
+    private ExistenceCheck(final SettableRestconfFuture<Result> future, final AtomicInteger counter,
+            final YangInstanceIdentifier parentPath, final YangInstanceIdentifier path, final boolean expected) {
+        this.future = requireNonNull(future);
+        this.counter = requireNonNull(counter);
+        this.parentPath = requireNonNull(parentPath);
+        this.path = requireNonNull(path);
+        this.expected = expected;
     }
 
     static RestconfFuture<Result> start(final DOMDataTreeReadOperations tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier parentPath, final boolean expected,
-            final Collection<? extends NormalizedNode> children) {
-        final var ret = new ExistenceCheck(children.size());
+            final Collection<? extends @NonNull NormalizedNode> children) {
+        final var future = new SettableRestconfFuture<Result>();
+        final var counter = new AtomicInteger(children.size());
+
         for (var child : children) {
             final var path = parentPath.node(child.name());
-            tx.exists(datastore, path).addCallback(new FutureCallback<Boolean>() {
-                @Override
-                public void onSuccess(final Boolean result) {
-                    ret.complete(path, expected, result);
-                }
-
-                @Override
-                @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
-                public void onFailure(final Throwable throwable) {
-                    ret.complete(parentPath, ReadFailedException.MAPPER.apply(
-                        throwable instanceof Exception ex ? ex :  new ExecutionException(throwable)));
-                }
-            }, MoreExecutors.directExecutor());
+            tx.exists(datastore, path).addCallback(new ExistenceCheck(future, counter, parentPath, path, expected),
+                MoreExecutors.directExecutor());
         }
-        return ret.future;
+        return future;
     }
 
-    private void complete(final YangInstanceIdentifier path, final boolean expected, final boolean present) {
-        final int count = UPDATER.decrementAndGet(this);
-        if (expected != present) {
+    @Override
+    public void onSuccess(final Boolean result) {
+        if (expected != result) {
+            // This is okay to race with onFailure(): we either report this or failure, the end result is failure,
+            // though slightly different. This a result of datastore timing, hence there is nothing we can do about it.
             future.set(new Conflict(path));
-        } else if (count == 0) {
+            // Failure is set first, before a parallel success can see counter being 0, hence we win
+            counter.decrementAndGet();
+            return;
+        }
+
+        final int count = counter.decrementAndGet();
+        if (count == 0) {
+            // Everything else was a success, we ware done.
             future.set(Success.INSTANCE);
         }
     }
 
-    private void complete(final YangInstanceIdentifier path, final ReadFailedException cause) {
-        UPDATER.decrementAndGet(this);
-        future.setFailure(new RestconfDocumentedException("Could not determine the existence of path " + path, cause,
-            cause.getErrorList()));
+    @Override
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
+    public void onFailure(final Throwable throwable) {
+        final var cause = ReadFailedException.MAPPER.apply(throwable instanceof Exception ex ? ex
+            : new ExecutionException(throwable));
+        // We are not decrementing the counter here to ensure onSuccess() does not attempt to set success. Failure paths
+        // are okay -- they differ only in what we report. We rely on SettableFuture's synchronization faculties to
+        // reconcile any conflict with onSuccess() failure path.
+        future.setFailure(new RestconfDocumentedException("Could not determine the existence of path " + parentPath,
+            cause, cause.getErrorList()));
     }
 }
