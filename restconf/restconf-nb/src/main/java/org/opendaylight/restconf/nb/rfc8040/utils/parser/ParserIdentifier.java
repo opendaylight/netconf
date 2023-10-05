@@ -186,7 +186,7 @@ public final class ParserIdentifier {
         if (!Iterables.contains(pathComponents, RestconfConstants.MOUNT)) {
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
-            final Module module = schemaContext.findModule(moduleName, revision).orElse(null);
+            final Module module = schemaContext.findModule(moduleName, revision).orElseThrow();
             return new SchemaExportContext(schemaContext, module, sourceProvider);
         } else {
             final StringBuilder pathBuilder = new StringBuilder();
@@ -209,7 +209,7 @@ public final class ParserIdentifier {
             final String moduleName = validateAndGetModulName(componentIter);
             final Revision revision = validateAndGetRevision(componentIter);
             final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
-            final Module module = context.findModule(moduleName, revision).orElse(null);
+            final Module module = context.findModule(moduleName, revision).orElseThrow();
             return new SchemaExportContext(context, module, sourceProvider);
         }
     }
