@@ -19,7 +19,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 final class ThreadLocalTransformers {
     private static final TransformerFactory FACTORY = TransformerFactory.newInstance();
 
-    private static final ThreadLocal<Transformer> DEFAULT_TRANSFORMER = new ThreadLocal<Transformer>() {
+    private static final ThreadLocal<Transformer> DEFAULT_TRANSFORMER = new ThreadLocal<>() {
         @Override
         protected Transformer initialValue() {
             return createTransformer();
@@ -31,7 +31,7 @@ final class ThreadLocalTransformers {
         }
     };
 
-    private static final ThreadLocal<Transformer> PRETTY_TRANSFORMER = new ThreadLocal<Transformer>() {
+    private static final ThreadLocal<Transformer> PRETTY_TRANSFORMER = new ThreadLocal<>() {
         @Override
         protected Transformer initialValue() {
             final Transformer ret = createTransformer();
