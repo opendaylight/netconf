@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -432,10 +431,13 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierNotFoundTest() {
-        assertThrows(NoSuchElementException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
+        final var ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT,
                 "not-existing-module" + "/" + "2016-01-01",
                 null, sourceProvider));
+        assertEquals("Not expected error tag", ErrorTag.DATA_MISSING, ex.getErrors().get(0).getErrorTag());
+        assertEquals("Not expected error type", ErrorType.APPLICATION, ex.getErrors().get(0).getErrorType());
     }
 
     /**
@@ -481,17 +483,13 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierMountPointNotFoundTest() {
-        assertThrows(NoSuchElementException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
+        final var ex = assertThrows(RestconfDocumentedException.class,
+            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
                 SCHEMA_CONTEXT,
                 MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
-<<<<<<< HEAD   (14a6d8 Bump versions to 5.0.9-SNAPSHOT)
-                mountPointService, sourceProvider);
-
-        assertNotNull("Export context should be parsed", exportContext);
-        assertNull("Not-existing module should be null", exportContext.getModule());
-=======
                 mountPointService, sourceProvider));
->>>>>>> CHANGE (820f7a Throw exception when module cannot be found)
+        assertEquals("Not expected error tag", ErrorTag.DATA_MISSING, ex.getErrors().get(0).getErrorTag());
+        assertEquals("Not expected error type", ErrorType.APPLICATION, ex.getErrors().get(0).getErrorType());
     }
 
     /**
