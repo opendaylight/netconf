@@ -32,10 +32,21 @@ public final class TLSClient extends TLSTransportStack {
         super(listener, sslContext);
     }
 
+    private TLSClient(final TransportChannelListener listener, final SslHandlerFactory factory) {
+        super(listener, factory);
+    }
+
     public static @NonNull ListenableFuture<TLSClient> connect(final TransportChannelListener listener,
             final Bootstrap bootstrap, final TcpClientGrouping connectParams, final TlsClientGrouping clientParams)
-            throws UnsupportedConfigurationException {
+                throws UnsupportedConfigurationException {
         final var client = newClient(listener, clientParams);
+        return transformUnderlay(client, TCPClient.connect(client.asListener(), bootstrap, connectParams));
+    }
+
+    public static @NonNull ListenableFuture<TLSClient> connect(final TransportChannelListener listener,
+            final Bootstrap bootstrap, final TcpClientGrouping connectParams, final SslHandlerFactory factory)
+                throws UnsupportedConfigurationException {
+        final var client = new TLSClient(listener, factory);
         return transformUnderlay(client, TCPClient.connect(client.asListener(), bootstrap, connectParams));
     }
 
