@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.io.FileNotFoundException;
-import java.util.NoSuchElementException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -133,7 +132,10 @@ public class RestconfSchemaServiceTest {
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
 
         // make test & verify
-        assertThrows(NoSuchElementException.class, () -> schemaService.getSchema(NOT_EXISTING_MODULE));
+        final var ex = assertThrows(RestconfDocumentedException.class, () ->
+            schemaService.getSchema(NOT_EXISTING_MODULE));
+        assertEquals("Not expected error tag", ErrorTag.DATA_MISSING, ex.getErrors().get(0).getErrorTag());
+        assertEquals("Not expected error type", ErrorType.APPLICATION, ex.getErrors().get(0).getErrorType());
     }
 
     /**
@@ -169,7 +171,10 @@ public class RestconfSchemaServiceTest {
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
         // make test & verify
-        assertThrows(NoSuchElementException.class, () -> schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE));
+        final var ex = assertThrows(RestconfDocumentedException.class, () ->
+            schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE));
+        assertEquals("Not expected error tag", ErrorTag.DATA_MISSING, ex.getErrors().get(0).getErrorTag());
+        assertEquals("Not expected error type", ErrorType.APPLICATION, ex.getErrors().get(0).getErrorType());
     }
 
     /**
