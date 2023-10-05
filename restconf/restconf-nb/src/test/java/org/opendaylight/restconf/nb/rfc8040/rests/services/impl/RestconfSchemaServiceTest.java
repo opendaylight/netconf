@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import java.util.NoSuchElementException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -130,7 +129,7 @@ public class RestconfSchemaServiceTest {
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
 
         // verify
-        assertThrows(NoSuchElementException.class, () -> schemaService.getSchema(NOT_EXISTING_MODULE));
+        assertThrows(RestconfDocumentedException.class, () -> schemaService.getSchema(NOT_EXISTING_MODULE));
     }
 
     /**
@@ -166,7 +165,8 @@ public class RestconfSchemaServiceTest {
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
         // verify
-        assertThrows(NoSuchElementException.class, () -> schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE));
+        assertThrows(RestconfDocumentedException.class,
+            () -> schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE));
     }
 
     /**
