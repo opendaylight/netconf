@@ -35,5 +35,6 @@ public final class InfoEntity extends OpenApiEntity {
             generator.writeStringField("description", description);
         }
         generator.writeEndObject();
+        generator.flush();
     }
 }

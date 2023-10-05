@@ -42,5 +42,6 @@ public final class OpenApiBodyWriter implements MessageBodyWriter<OpenApiEntity>
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
         t.generate(generator);
+        generator.flush();
     }
 }

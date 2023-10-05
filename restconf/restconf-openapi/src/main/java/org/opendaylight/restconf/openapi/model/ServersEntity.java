@@ -26,5 +26,6 @@ public final class ServersEntity extends OpenApiEntity {
             server.generate(generator);
         }
         generator.writeEndArray();
+        generator.flush();
     }
 }

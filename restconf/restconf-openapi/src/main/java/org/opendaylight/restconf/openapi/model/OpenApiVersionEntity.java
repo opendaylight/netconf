@@ -15,5 +15,6 @@ public final class OpenApiVersionEntity extends OpenApiEntity {
     @Override
     public void generate(@NonNull JsonGenerator generator) throws IOException {
         generator.writeStringField("openapi", "3.0.3");
+        generator.flush();
     }
 }

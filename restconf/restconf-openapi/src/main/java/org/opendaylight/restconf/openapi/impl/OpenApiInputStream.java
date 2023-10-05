@@ -20,6 +20,8 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import javax.ws.rs.OPTIONS;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.Info;
 import org.opendaylight.restconf.openapi.model.InfoEntity;
@@ -35,12 +37,8 @@ public class OpenApiInputStream extends InputStream {
     private final JsonGenerator generator;
     private final OpenApiBodyWriter writer;
 
-    private final Deque<OpenApiEntity> stack = new ArrayDeque<>();
-    private final EffectiveModelContext context;
+    private final Deque<InputStream> stack = new ArrayDeque<>();
     private final Iterator<Deque<OpenApiEntity>> componentsIterator;
-
-    private boolean components;
-    private boolean eof;
 
     private Reader reader;
 
@@ -50,19 +48,14 @@ public class OpenApiInputStream extends InputStream {
         generator = new JsonFactoryBuilder().build().createGenerator(stream);
         writer = new OpenApiBodyWriter(generator);
 
-        this.context = context;
         this.componentsIterator = new OpenApiModelComponentSnippet(context).iterator();
-        stack.add(new OpenApiVersionEntity());
-        stack.add(new InfoEntity(info.version(), info.title(), info.description()));
-        stack.add(new ServersEntity(List.of(new ServerEntity(servers.iterator().next().url()))));
+        stack.add(new OpenApiVersionStream(new OpenApiVersionEntity(), writer));
+        stack.add(new InfoStream(new InfoEntity(info.version(), info.title(), info.description()), writer));
+        stack.add(new ServersStream(new ServersEntity(List.of(new ServerEntity(servers.iterator().next().url()))), writer));
     }
 
     @Override
     public int read() throws IOException {
-        if (eof) {
-            return -1;
-        }
-
         if (reader == null) {
             generator.writeStartObject();
             generator.flush();
@@ -73,35 +66,12 @@ public class OpenApiInputStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (stack.isEmpty()) {
-                if (!components) {
-                    components = true;
-                    generator.writeObjectFieldStart("components");
-                    generator.writeObjectFieldStart("schemas");
-                    generator.flush();
-                    reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()));
-                    stream.reset();
-                    return reader.read();
-                }
-                if (componentsIterator.hasNext()) {
-                    stack.addAll(componentsIterator.next());
-                    continue;
-                }
-                eof = true;
-                reader = new InputStreamReader(new ByteArrayInputStream(new byte[] { '}', '}', '}' }));
-                return reader.read();
+                return -1;
             }
-            reader = new InputStreamReader(new ByteArrayInputStream(writeNextEntity(stack.pop())));
+            reader = new InputStreamReader(stack.pop());
             read = reader.read();
         }
 
         return read;
-    }
-
-    private byte[] writeNextEntity(final OpenApiEntity entity) throws IOException {
-        writer.writeTo(entity, null, null, null, null, null, stream);
-        generator.flush();
-        final var bytes = stream.toByteArray();
-        stream.reset();
-        return bytes;
     }
 }
