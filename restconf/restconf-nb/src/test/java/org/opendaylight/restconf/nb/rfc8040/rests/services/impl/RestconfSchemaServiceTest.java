@@ -9,11 +9,15 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
+<<<<<<< HEAD   (396534 Clarify NotificationQueryParams checks)
 import java.io.FileNotFoundException;
+=======
+import com.google.common.collect.ImmutableClassToInstanceMap;
+import java.util.NoSuchElementException;
+>>>>>>> CHANGE (820f7a Throw exception when module cannot be found)
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -125,20 +129,25 @@ public class RestconfSchemaServiceTest {
     }
 
     /**
-     * Get schema with identifier of not-existing module. <code>SchemaExportContext</code> is still created, but module
-     * should be set to <code>null</code>.
+     * Get schema with identifier of not-existing module. Trying to create <code>SchemaExportContext</code> with
+     * not-existing module should result in error.
      */
     @Test
     public void getSchemaForNotExistingModuleTest() {
         // prepare conditions - return not-mount point schema context
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT);
 
+<<<<<<< HEAD   (396534 Clarify NotificationQueryParams checks)
         // make test
         final SchemaExportContext exportContext = schemaService.getSchema(NOT_EXISTING_MODULE);
 
         // verify
         assertNotNull("Export context should not be null", exportContext);
         assertNull("Not-existing module should not be found", exportContext.getModule());
+=======
+        // make test & verify
+        assertThrows(NoSuchElementException.class, () -> schemaService.getSchema(NOT_EXISTING_MODULE));
+>>>>>>> CHANGE (820f7a Throw exception when module cannot be found)
     }
 
     /**
@@ -165,20 +174,25 @@ public class RestconfSchemaServiceTest {
     }
 
     /**
-     * Get schema with identifier of not-existing module behind mount point. <code>SchemaExportContext</code> is still
-     * created, but module should be set to <code>null</code>.
+     * Get schema with identifier of not-existing module behind mount point. Trying to create
+     * <code>SchemaExportContext</code> with not-existing module behind mount point should result in error.
      */
     @Test
     public void getSchemaForNotExistingModuleMountPointTest() {
         // prepare conditions - return schema context with mount points
         when(this.mockContextHandler.get()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
+<<<<<<< HEAD   (396534 Clarify NotificationQueryParams checks)
         // make test
         final SchemaExportContext exportContext = schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE);
 
         // verify
         assertNotNull("Export context should not be null", exportContext);
         assertNull("Not-existing module should not be found", exportContext.getModule());
+=======
+        // make test & verify
+        assertThrows(NoSuchElementException.class, () -> schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE));
+>>>>>>> CHANGE (820f7a Throw exception when module cannot be found)
     }
 
     /**
