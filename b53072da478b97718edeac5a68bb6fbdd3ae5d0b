@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b63db87d_307de8ea",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-06T13:53:01Z",
+      "side": 1,
+      "message": "Move it before Signed-off-by",
+      "revId": "b53072da478b97718edeac5a68bb6fbdd3ae5d0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9162b5f9_f230a211",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/TLSClient.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-06T13:53:01Z",
+      "side": 1,
+      "message": "8 spaces",
+      "range": {
+        "startLine": 47,
+        "startChar": 4,
+        "endLine": 47,
+        "endChar": 8
+      },
+      "revId": "b53072da478b97718edeac5a68bb6fbdd3ae5d0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed446ab3_2c5a3fc1",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/TLSClient.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-06T13:53:01Z",
+      "side": 1,
+      "message": "Here too",
+      "range": {
+        "startLine": 48,
+        "startChar": 4,
+        "endLine": 48,
+        "endChar": 8
+      },
+      "revId": "b53072da478b97718edeac5a68bb6fbdd3ae5d0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e42da8f_5ebc3c8e",
+        "filename": "transport/transport-tls/src/test/java/org/opendaylight/netconf/transport/tls/TlsClientServerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-06T13:53:01Z",
+      "side": 1,
+      "message": "final?",
+      "range": {
+        "startLine": 207,
+        "startChar": 8,
+        "endLine": 207,
+        "endChar": 11
+      },
+      "revId": "b53072da478b97718edeac5a68bb6fbdd3ae5d0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
