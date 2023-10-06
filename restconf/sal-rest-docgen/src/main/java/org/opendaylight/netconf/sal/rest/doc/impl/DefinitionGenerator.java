@@ -318,6 +318,7 @@ public class DefinitionGenerator {
             childSchema.put(TYPE_KEY, OBJECT_TYPE);
             final ObjectNode xml = JsonNodeFactory.instance.objectNode();
             xml.put(NAME_KEY, isInput ? INPUT : OUTPUT);
+            xml.put("namespace", container.getQName().getNamespace().toString());
             childSchema.set(XML_KEY, xml);
             childSchema.put(TITLE_KEY, filename);
             final String discriminator =
