@@ -97,8 +97,8 @@ public final class OpenApiGeneratorRFC8040Test {
                 "/rests/data/toaster2:lst/cont1/cont11",
                 "/rests/data/toaster2:lst/cont1/lst11",
                 "/rests/data/toaster2:lst/lst1={key1},{key2}");
-        final List<String> configPathsForPost = List.of("/rests/data/toaster2:lst/cont1",
-                "/rests/data/toaster2:lst/cont1/cont11");
+        final String configPathForPostCont = "/rests/data/toaster2:lst/cont1";
+        final String configPathForPostLeaf = "/rests/data/toaster2:lst/cont1/cont11";
 
         final OpenApiObject doc = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
 
@@ -110,10 +110,12 @@ public final class OpenApiGeneratorRFC8040Test {
             assertNotNull(node.patch());
         }
 
-        for (final String path : configPathsForPost) {
-            final Path node = doc.paths().get(path);
-            assertNotNull(node.post());
-        }
+        final Path node = doc.paths().get(configPathForPostCont);
+        assertNotNull(node.post());
+
+        // Assert we do not generate post for container which contains only leafs.
+        final Path nodeLeaf = doc.paths().get(configPathForPostLeaf);
+        assertNull(nodeLeaf.post());
     }
 
     /**
@@ -356,8 +358,6 @@ public final class OpenApiGeneratorRFC8040Test {
 
         assertEquals(Set.of("/rests/data", "/rests/data/my-yang:data"), doc.paths().keySet());
         final var JsonNodeMyYangData = doc.paths().get("/rests/data/my-yang:data");
-        verifyRequestRef(JsonNodeMyYangData.post(), "#/components/schemas/my-yang_config_data",
-                "#/components/schemas/my-yang_config_data");
         verifyRequestRef(JsonNodeMyYangData.put(), "#/components/schemas/my-yang_config_data_TOP",
                 "#/components/schemas/my-yang_config_data");
         verifyRequestRef(JsonNodeMyYangData.get(), "#/components/schemas/my-yang_data_TOP",
@@ -393,9 +393,6 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final var jsonNodeSlotInfo = doc.paths().get(
                 "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
-        verifyRequestRef(jsonNodeSlotInfo.post(),
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo",
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
         verifyRequestRef(jsonNodeSlotInfo.put(),
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
