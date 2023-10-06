@@ -94,8 +94,8 @@ public final class OpenApiGeneratorRFC8040Test {
                 "/rests/data/toaster2:lst={lf1}/cont1/cont11",
                 "/rests/data/toaster2:lst={lf1}/cont1/lst11={lf111}",
                 "/rests/data/toaster2:lst={lf1}/lst1={key1},{key2}");
-        final List<String> configPathsForPost = List.of("/rests/data/toaster2:lst={lf1}/cont1",
-                "/rests/data/toaster2:lst={lf1}/cont1/cont11");
+        final String configPathForPostCont = "/rests/data/toaster2:lst={lf1}/cont1";
+        final String configPathForPostLeaf = "/rests/data/toaster2:lst={lf1}/cont1/cont11";
 
         final OpenApiObject doc = generator.getApiDeclaration(TOASTER_2, REVISION_DATE, uriInfo);
 
@@ -107,10 +107,12 @@ public final class OpenApiGeneratorRFC8040Test {
             assertNotNull(node.patch());
         }
 
-        for (final String path : configPathsForPost) {
-            final Path node = doc.paths().get(path);
-            assertNotNull(node.post());
-        }
+        final Path node = doc.paths().get(configPathForPostCont);
+        assertNotNull(node.post());
+
+        // Assert we do not generate post for container which contains only leafs.
+        final Path nodeLeaf = doc.paths().get(configPathForPostLeaf);
+        assertNull(nodeLeaf.post());
     }
 
     /**
@@ -316,8 +318,6 @@ public final class OpenApiGeneratorRFC8040Test {
 
         assertEquals(Set.of("/rests/data", "/rests/data/my-yang:data"), doc.paths().keySet());
         final var JsonNodeMyYangData = doc.paths().get("/rests/data/my-yang:data");
-        verifyPostDataRequestRef(JsonNodeMyYangData.post(), "#/components/schemas/my-yang_data",
-            "#/components/schemas/my-yang_data");
         verifyRequestRef(JsonNodeMyYangData.put(), "#/components/schemas/my-yang_data", CONTAINER);
         verifyRequestRef(JsonNodeMyYangData.get(), "#/components/schemas/my-yang_data", CONTAINER);
 
@@ -343,8 +343,6 @@ public final class OpenApiGeneratorRFC8040Test {
 
         final var jsonNodeSlotInfo = doc.paths().get(
             "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
-        verifyPostDataRequestRef(jsonNodeSlotInfo.post(), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
-            "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo");
         verifyRequestRef(jsonNodeSlotInfo.put(), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
             CONTAINER);
         verifyRequestRef(jsonNodeSlotInfo.get(), "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
@@ -444,23 +442,12 @@ public final class OpenApiGeneratorRFC8040Test {
     }
 
     /**
-     *  Test JSON and XML references for request operation.
+     * Test we do not generate operations fo model which contains only leafs.
      */
-    private static void verifyPostDataRequestRef(final Operation operation, final String expectedJsonRef,
-            final String expectedXmlRef) {
-        final Map<String, MediaTypeObject> postContent;
-        if (operation.requestBody() != null) {
-            postContent = operation.requestBody().content();
-        } else {
-            postContent = operation.responses().get("200").content();
-        }
-        assertNotNull(postContent);
-        final var postJsonRef = postContent.get("application/json").schema().ref();
-        assertNotNull(postJsonRef);
-        assertEquals(expectedJsonRef, postJsonRef);
-        final var postXmlRef = postContent.get("application/xml").schema().ref();
-        assertNotNull(postXmlRef);
-        assertEquals(expectedXmlRef, postXmlRef);
+    @Test
+    public void testModelContainsOnlyLeafs() {
+        final OpenApiObject doc = generator.getApiDeclaration("opflex", "2014-05-28", uriInfo);
+        assertTrue(doc.paths().isEmpty());
     }
 
     private static void verifyRequestRef(final Operation operation, final String expectedRef, final String nodeType) {
