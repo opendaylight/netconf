@@ -269,7 +269,7 @@ public final class ParserIdentifier {
 
     private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
         return mountPoint.getService(DOMSchemaService.class)
-            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .map(DOMSchemaService::getGlobalContext)
             .orElse(null);
     }
 }
