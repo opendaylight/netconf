@@ -320,12 +320,22 @@ public abstract class BaseYangOpenApiGenerator {
             operationsBuilder.delete(delete);
 
             if (!(node instanceof ListSchemaNode)) {
-                final Operation post = buildPost(node, parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
-                operationsBuilder.post(post);
+                final var childNode = getListOrContainerChildNode(node);
+                // we have to ensure that we are able to create POST payload containing the first container/list child
+                if (childNode != null) {
+                    final Operation post = buildPost(childNode, parentName, nodeName, discriminator, moduleName,
+                        deviceName, node.getDescription().orElse(""), pathParams);
+                    operationsBuilder.post(post);
+                }
             }
         }
         return operationsBuilder.build();
+    }
+
+    private static DataSchemaNode getListOrContainerChildNode(final DataSchemaNode node) {
+        return ((DataNodeContainer) node).getChildNodes().stream()
+            .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
+            .findFirst().orElse(null);
     }
 
     private static String createPath(final DataSchemaNode schemaNode, final List<Parameter> pathParams,
