@@ -461,6 +461,60 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     }
 
     /**
+     * Test that checks if namespace for rpc is present.
+     */
+    @Test
+    public void testRpcNamespace() {
+        final var doc = (OpenApiObject) generator.getApiDeclaration(NAME_2, REVISION_DATE, URI_INFO,
+            OAversion.V3_0);
+        assertNotNull(doc);
+        final var path = doc.getPaths().get("/rests/operations/toaster:cancel-toast");
+        assertNotNull(path);
+        final var post = path.get("post");
+        assertNotNull(post);
+        final var requestBody = post.get("requestBody");
+        assertNotNull(requestBody);
+        final var content = requestBody.get("content");
+        assertNotNull(content);
+        final var application = content.get("application/xml");
+        assertNotNull(application);
+        final var schema = application.get("schema");
+        assertNotNull(schema);
+        final var xml = schema.get("xml");
+        assertNotNull(xml);
+        final var namespace = xml.get("namespace");
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace.asText());
+    }
+
+    /**
+     * Test that checks if namespace for actions is present.
+     */
+    @Test
+    public void testActionsNamespace() {
+        final var doc = (OpenApiObject) generator.getApiDeclaration("action-types", null, URI_INFO,
+            OAversion.V3_0);
+        assertNotNull(doc);
+        final var path = doc.getPaths().get("/rests/operations/action-types:multi-container/inner-container/action");
+        assertNotNull(path);
+        final var post = path.get("post");
+        assertNotNull(post);
+        final var requestBody = post.get("requestBody");
+        assertNotNull(requestBody);
+        final var content = requestBody.get("content");
+        assertNotNull(content);
+        final var application = content.get("application/xml");
+        assertNotNull(application);
+        final var schema = application.get("schema");
+        assertNotNull(schema);
+        final var xml = schema.get("xml");
+        assertNotNull(xml);
+        final var namespace = xml.get("namespace");
+        assertNotNull(namespace);
+        assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace.asText());
+    }
+
+    /**
      *  Test JSON and XML references for request operation.
      */
     private static void verifyRequestRef(final JsonNode path, final String expectedJsonRef,
