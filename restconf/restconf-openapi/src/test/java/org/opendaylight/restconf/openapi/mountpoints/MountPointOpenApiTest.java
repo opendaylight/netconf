@@ -161,7 +161,7 @@ public final class MountPointOpenApiTest {
         }
 
         assertEquals("Unexpected GET paths size", 60, getOperations.size());
-        assertEquals("Unexpected POST paths size", 33, postOperations.size());
+        assertEquals("Unexpected POST paths size", 15, postOperations.size());
         assertEquals("Unexpected PUT paths size", 58, putOperations.size());
         assertEquals("Unexpected PATCH paths size", 58, patchOperations.size());
         assertEquals("Unexpected DELETE paths size", 58, deleteOperations.size());
@@ -424,7 +424,7 @@ public final class MountPointOpenApiTest {
         final var path =
             paths.get("/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/mandatory-container");
         assertNotNull(path);
-        final var requestBody = path.post().requestBody().get("content");
+        final var requestBody = path.put().requestBody().get("content");
         assertNotNull(requestBody);
         final var jsonRef = requestBody.get("application/json").get("schema").get("$ref");
         assertNotNull(jsonRef);
@@ -437,7 +437,9 @@ public final class MountPointOpenApiTest {
         assertNotNull(minItems);
         final var listOfExamples = ((ArrayNode) schema.properties().get("leaf-list-with-min-elements").get("example"));
         assertNotNull(listOfExamples);
-        assertEquals(jsonRef, xmlRef);
+        assertEquals("#/components/schemas/mandatory-test_root-container_config_mandatory-container", xmlRef.asText());
+        assertEquals("#/components/schemas/mandatory-test_root-container_config_mandatory-container_TOP", jsonRef
+            .asText());
         assertEquals(listOfExamples.size(), minItems.intValue());
     }
 }
