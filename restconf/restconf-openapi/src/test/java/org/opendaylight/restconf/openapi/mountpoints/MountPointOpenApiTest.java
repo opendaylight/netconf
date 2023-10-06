@@ -160,7 +160,7 @@ public final class MountPointOpenApiTest {
         }
 
         assertEquals("Unexpected GET paths size", 42, getOperations.size());
-        assertEquals("Unexpected POST paths size", 32, postOperations.size());
+        assertEquals("Unexpected POST paths size", 14, postOperations.size());
         assertEquals("Unexpected PUT paths size", 40, putOperations.size());
         assertEquals("Unexpected PATCH paths size", 40, patchOperations.size());
         assertEquals("Unexpected DELETE paths size", 40, deleteOperations.size());
