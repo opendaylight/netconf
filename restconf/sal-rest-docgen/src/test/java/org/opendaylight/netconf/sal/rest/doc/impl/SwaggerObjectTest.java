@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -40,5 +41,43 @@ public final class SwaggerObjectTest extends AbstractApiDocTest {
         final ObjectNode jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
             ApiDocServiceImpl.OAversion.V2_0, true);
         assertNotNull(jsonObject);
+    }
+
+    /**
+     * Test that checks if namespace for rpc is present.
+     */
+    @Test
+    public void testRpcNamespace() throws Exception {
+        final var module = CONTEXT.findModule("toaster", Revision.of("2009-11-20")).orElseThrow();
+        final var generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
+            ApiDocServiceImpl.OAversion.V2_0, true);
+        assertNotNull(jsonObject);
+        final var schema = jsonObject.get("toaster_make-toast_input");
+        assertNotNull(schema);
+        final var xml = schema.get("xml");
+        assertNotNull(xml);
+        final var namespace = xml.get("namespace");
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace.asText());
+    }
+
+    /**
+     * Test that checks if namespace for actions is present.
+     */
+    @Test
+    public void testActionsNamespace() throws IOException {
+        final var module = CONTEXT.findModule("action-types").orElseThrow();
+        final var generator = new DefinitionGenerator();
+        final var jsonObject = generator.convertToJsonSchema(module, CONTEXT, new DefinitionNames(),
+            ApiDocServiceImpl.OAversion.V2_0, true);
+        assertNotNull(jsonObject);
+        final var schema = jsonObject.get("action-types_container-action_input");
+        assertNotNull(schema);
+        final var xml = schema.get("xml");
+        assertNotNull(xml);
+        final var namespace = xml.get("namespace");
+        assertNotNull(namespace);
+        assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace.asText());
     }
 }
