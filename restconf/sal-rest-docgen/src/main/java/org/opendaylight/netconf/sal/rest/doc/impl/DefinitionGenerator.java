@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import javax.print.attribute.standard.MediaSize;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -318,6 +319,7 @@ public class DefinitionGenerator {
             childSchema.put(TYPE_KEY, OBJECT_TYPE);
             final ObjectNode xml = JsonNodeFactory.instance.objectNode();
             xml.put(NAME_KEY, isInput ? INPUT : OUTPUT);
+            xml.put(NAMESPACE_KEY, container.getQName().getNamespace().toString());
             childSchema.set(XML_KEY, xml);
             childSchema.put(TITLE_KEY, filename);
             final String discriminator =
