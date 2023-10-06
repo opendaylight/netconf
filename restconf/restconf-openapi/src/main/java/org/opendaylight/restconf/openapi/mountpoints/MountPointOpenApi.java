@@ -156,7 +156,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         checkState(mountService != null);
         return mountService.getMountPoint(id)
             .flatMap(mountPoint -> mountPoint.getService(DOMSchemaService.class))
-            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .map(DOMSchemaService::getGlobalContext)
             .orElse(null);
     }
 
