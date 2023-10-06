@@ -238,4 +238,60 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         // verify that the filtered set (from openapi for all modules) is the same as the set from openapi for toaster
         assertEquals(toasterPathsFromToaster, toasterPathsFromAll);
     }
+
+    /**
+     * Test that checks if namespace for rpc is present.
+     */
+    @Test
+    public void testRpcNamespace() {
+        swagger.onMountPointCreated(INSTANCE_ID);
+        final OpenApiObject openApiToaster = (OpenApiObject) swagger.getMountPointApi(uriDeviceToaster, DEVICE_ID,
+            TOASTER, TOASTER_REVISION, OAversion.V3_0);
+        final var path = openApiToaster
+            .getPaths().get("/rests/operations/nodes/node=123/yang-ext:mount/toaster:cancel-toast");
+        assertNotNull(path);
+        final var post = path.get("post");
+        assertNotNull(post);
+        final var requestBody = post.get("requestBody");
+        assertNotNull(requestBody);
+        final var content = requestBody.get("content");
+        assertNotNull(content);
+        final var application = content.get("application/xml");
+        assertNotNull(application);
+        final var schema = application.get("schema");
+        assertNotNull(schema);
+        final var xml = schema.get("xml");
+        assertNotNull(xml);
+        final var namespace = xml.get("namespace");
+        assertNotNull(namespace);
+        assertEquals("http://netconfcentral.org/ns/toaster", namespace.asText());
+    }
+
+    /**
+     * Test that checks if namespace for actions is present.
+     */
+    @Test
+    public void testActionsNamespace() {
+        swagger.onMountPointCreated(INSTANCE_ID);
+        final var openApiAll = (OpenApiObject) swagger.getMountPointApi(uriDeviceAll, DEVICE_ID,
+            Optional.empty(), OAversion.V3_0);
+        final var path = openApiAll.getPaths().get(
+            "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action");
+        assertNotNull(path);
+        final var post = path.get("post");
+        assertNotNull(post);
+        final var requestBody = post.get("requestBody");
+        assertNotNull(requestBody);
+        final var content = requestBody.get("content");
+        assertNotNull(content);
+        final var application = content.get("application/xml");
+        assertNotNull(application);
+        final var schema = application.get("schema");
+        assertNotNull(schema);
+        final var xml = schema.get("xml");
+        assertNotNull(xml);
+        final var namespace = xml.get("namespace");
+        assertNotNull(namespace);
+        assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace.asText());
+    }
 }
