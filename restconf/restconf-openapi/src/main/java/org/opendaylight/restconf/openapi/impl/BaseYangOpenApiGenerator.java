@@ -384,13 +384,23 @@ public abstract class BaseYangOpenApiGenerator {
             final Operation delete = buildDelete(node, moduleName, deviceName, pathParams);
             operationsBuilder.delete(delete);
 
-            if (!(node instanceof ListSchemaNode)) {
-                final Operation post = buildPost(node, parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
-                operationsBuilder.post(post);
+            if (node instanceof ContainerSchemaNode container) {
+                final var childNode = getListOrContainerChildNode(container);
+                // we have to ensure that we are able to create POST payload containing the first container/list child
+                if (childNode != null) {
+                    final Operation post = buildPost(childNode, parentName, nodeName, discriminator, moduleName,
+                        deviceName, node.getDescription().orElse(""), pathParams);
+                    operationsBuilder.post(post);
+                }
             }
         }
         return operationsBuilder.build();
+    }
+
+    private static <T extends DataNodeContainer> DataSchemaNode getListOrContainerChildNode(final T node) {
+        return node.getChildNodes().stream()
+            .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
+            .findFirst().orElse(null);
     }
 
     private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams, final String localName) {
@@ -413,7 +423,6 @@ public abstract class BaseYangOpenApiGenerator {
 
                 final String pathParamIdentifier = prefix + "{" + paramName + "}";
                 prefix = ",";
-
                 path.append(pathParamIdentifier);
 
                 final ObjectNode pathParam = JsonNodeFactory.instance.objectNode();

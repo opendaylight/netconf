@@ -23,8 +23,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.restconf.openapi.model.Operation;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -63,14 +61,13 @@ public final class OperationBuilder {
 
     }
 
-    public static Operation buildPost(final DataSchemaNode node, final String parentName, final String nodeName,
+    public static Operation buildPost(final DataSchemaNode childNode, final String parentName, final String nodeName,
             final String discriminator, final String moduleName, final Optional<String> deviceName,
             final String description, final ArrayNode pathParams) {
         final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final ObjectNode requestBody;
-        final DataSchemaNode childNode = getListOrContainerChildNode(Optional.ofNullable(node));
 
         final List<String> nameElements = new ArrayList<>();
         if (childNode != null && childNode.isConfiguration()) {
@@ -402,11 +399,5 @@ public final class OperationBuilder {
         final ObjectNode schema = JsonNodeFactory.instance.objectNode();
         parameter.set(SCHEMA_KEY, schema);
         return schema;
-    }
-
-    private static DataSchemaNode getListOrContainerChildNode(final Optional<DataSchemaNode> node) {
-        return node.flatMap(schemaNode -> ((DataNodeContainer) schemaNode).getChildNodes().stream()
-            .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
-            .findFirst()).orElse(null);
     }
 }
