@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
-import java.util.Optional;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -269,7 +268,7 @@ public final class ParserIdentifier {
 
     private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
         return mountPoint.getService(DOMSchemaService.class)
-            .flatMap(svc -> Optional.ofNullable(svc.getGlobalContext()))
+            .map(DOMSchemaService::getGlobalContext)
             .orElse(null);
     }
 }
