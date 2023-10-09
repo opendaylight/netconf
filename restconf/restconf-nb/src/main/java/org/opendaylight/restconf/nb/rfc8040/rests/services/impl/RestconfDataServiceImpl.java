@@ -482,13 +482,13 @@ public final class RestconfDataServiceImpl {
         }
     }
 
-    private Response postData(final ChildBody body, final UriInfo uriInfo) {
-        return postData(Inference.ofDataTreePath(databindProvider.currentContext().modelContext()),
-            YangInstanceIdentifier.of(), body, uriInfo, null);
+    private void postData(final ChildBody body, final UriInfo uriInfo, final AsyncResponse ar) {
+        postData(Inference.ofDataTreePath(databindProvider.currentContext().modelContext()),
+            YangInstanceIdentifier.of(), body, uriInfo, null, ar);
     }
 
-    private Response postData(final Inference inference, final YangInstanceIdentifier parentPath, final ChildBody body,
-            final UriInfo uriInfo, final @Nullable DOMMountPoint mountPoint) {
+    private void postData(final Inference inference, final YangInstanceIdentifier parentPath, final ChildBody body,
+            final UriInfo uriInfo, final @Nullable DOMMountPoint mountPoint, final AsyncResponse ar) {
         final var modelContext = inference.getEffectiveModelContext();
         final var insert = QueryParams.parseInsert(modelContext, uriInfo);
         final var strategy = server.getRestconfStrategy(modelContext, mountPoint);
@@ -501,7 +501,7 @@ public final class RestconfDataServiceImpl {
         }
 
         strategy.postData(path, data, insert);
-        return Response.created(resolveLocation(uriInfo, path, modelContext, data)).build();
+        ar.resume(Response.created(resolveLocation(uriInfo, path, modelContext, data)).build());
     }
 
     /**

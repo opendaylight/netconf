@@ -357,7 +357,7 @@ public abstract class RestconfStrategy {
      * @param data    data
      * @param insert  {@link Insert}
      */
-    public final void postData(final YangInstanceIdentifier path, final NormalizedNode data,
+    public final RestconfFuture<Empty> postData(final YangInstanceIdentifier path, final NormalizedNode data,
             final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
