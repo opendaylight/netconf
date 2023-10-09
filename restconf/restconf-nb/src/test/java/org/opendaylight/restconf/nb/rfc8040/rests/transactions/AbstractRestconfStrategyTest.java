@@ -258,11 +258,12 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     @Test
     public final void testPostDataFail() {
         final var domException = new DOMException((short) 414, "Post request failed");
-
-        RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> testPostDataFailStrategy(domException).postData(JUKEBOX_IID, EMPTY_JUKEBOX, null));
-        assertEquals(1, ex.getErrors().size());
-        assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
+        final var future = testPostDataFailStrategy(domException).postData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
+        final var cause = assertThrows(ExecutionException.class, () -> Futures.getDone(future)).getCause();
+        assertThat(cause, instanceOf(RestconfDocumentedException.class));
+        final var errors = ((RestconfDocumentedException) cause).getErrors();
+        assertEquals(1, errors.size());
+        assertThat(errors.get(0).getErrorInfo(), containsString(domException.getMessage()));
     }
 
     abstract @NonNull RestconfStrategy testPostDataFailStrategy(DOMException domException);
