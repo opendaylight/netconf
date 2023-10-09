@@ -356,8 +356,9 @@ public abstract class RestconfStrategy {
      * @param path    path
      * @param data    data
      * @param insert  {@link Insert}
+     * @return A {@link RestconfFuture}
      */
-    public final void postData(final YangInstanceIdentifier path, final NormalizedNode data,
+    public final RestconfFuture<Empty> postData(final YangInstanceIdentifier path, final NormalizedNode data,
             final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
@@ -367,7 +368,23 @@ public abstract class RestconfStrategy {
         } else {
             future = createAndCommit(prepareWriteExecution(), path, data);
         }
+        final var ret = new SettableRestconfFuture<Empty>();
+
+        Futures.addCallback(future, new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onFailure(final Throwable t) {
+                // TODO Auto-generated method stub
+            }
+        }, MoreExecutors.directExecutor());
+
         TransactionUtil.syncCommit(future, "POST", path);
+
+        return ret;
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
