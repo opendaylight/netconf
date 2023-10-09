@@ -335,11 +335,14 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
             Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME)).build());
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
-        final var response = dataService.postDataJSON(new ByteArrayInputStream("""
+        final var captor = ArgumentCaptor.forClass(Response.class);
+        doReturn(true).when(asyncResponse).resume(captor.capture());
+        dataService.postDataJSON(stringInputStream("""
             {
               "example-jukebox:jukebox" : {
               }
-            }""".getBytes(StandardCharsets.UTF_8)), uriInfo);
+            }"""), uriInfo, asyncResponse);
+        final var response = captor.getValue();
         assertEquals(201, response.getStatus());
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox"), response.getLocation());
     }
@@ -352,14 +355,16 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
-        final var response = dataService.postDataJSON("example-jukebox:jukebox", new ByteArrayInputStream("""
+        final var captor = ArgumentCaptor.forClass(Response.class);
+        doReturn(true).when(asyncResponse).resume(captor.capture());
+        dataService.postDataJSON("example-jukebox:jukebox", stringInputStream("""
             {
               "example-jukebox:playlist" : {
                 "name" : "name of band",
                 "description" : "band description"
               }
-            }""".getBytes(StandardCharsets.UTF_8)),
-            uriInfo);
+            }"""), uriInfo, asyncResponse);
+        final var response = captor.getValue();
         assertEquals(201, response.getStatus());
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
             response.getLocation());

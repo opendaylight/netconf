@@ -14,8 +14,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 import com.google.common.util.concurrent.Futures;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
@@ -47,6 +51,10 @@ public class Netconf799Test extends AbstractInstanceIdentifierTest {
     private DOMMountPointService mountPointService;
     @Mock
     private RestconfStreamsSubscriptionService restconfStreamSubService;
+    @Mock
+    private AsyncResponse asyncResponse;
+    @Captor
+    private ArgumentCaptor<Response> captor;
 
     @Test
     public void testInvokeAction() {
@@ -58,13 +66,15 @@ public class Netconf799Test extends AbstractInstanceIdentifierTest {
             new MdsalRestconfServer(dataBroker, rpcService, mountPointService), dataBroker, restconfStreamSubService,
             actionService, new ListenersBroker(), new StreamsConfiguration(0, 1, 0, false));
 
-        final var response = dataService.postDataJSON("instance-identifier-module:cont/cont1/reset",
+        doReturn(true).when(asyncResponse).resume(captor.capture());
+        dataService.postDataJSON("instance-identifier-module:cont/cont1/reset",
             stringInputStream("""
             {
               "instance-identifier-module:input": {
                 "delay": 600
               }
-            }"""), null);
+            }"""), null, asyncResponse);
+        final var response = captor.getValue();
         assertEquals(204, response.getStatus());
         assertNull(response.getEntity());
     }
