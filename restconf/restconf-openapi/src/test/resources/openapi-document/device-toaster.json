@@ -312,25 +312,20 @@
   },
   "components": {
     "schemas": {
-      "hash-brown": {
-        "enum": [
-          "hash-brown"
-        ],
-        "description": "Hash browned potatos.",
-        "title": "hash-brown",
-        "type": "string"
-      },
       "toaster_make-toast_input": {
         "properties": {
+          "toasterToastType": {
+            "default": "wheat-bread",
+            "description": "This variable informs the toaster of the type of\nmaterial that is being toasted. The toaster\nuses this information, combined with\ntoasterDoneness, to compute for how\nlong the material must be toasted to achieve\nthe required doneness.",
+            "type": "string",
+            "example": "toast-type"
+          },
           "toasterDoneness": {
             "default": 5,
             "description": "This variable controls how well-done is the\nensuing toast. It should be on a scale of 1 to 10.\nToast made at 10 generally is considered unfit\nfor human consumption; toast made at 1 is warmed\nlightly.",
             "type": "integer",
             "example": 1,
             "format": "int64"
-          },
-          "toasterToastType": {
-            "$ref": "#/components/schemas/toast-type"
           }
         },
         "xml": {
@@ -339,20 +334,6 @@
         },
         "title": "toaster_make-toast_input",
         "type": "object"
-      },
-      "toast-type": {
-        "enum": [
-          "toast-type",
-          "wonder-bread",
-          "frozen-waffle",
-          "frozen-bagel",
-          "hash-brown",
-          "white-bread",
-          "wheat-bread"
-        ],
-        "description": "Base for all bread types supported by the toaster.\nNew bread types not listed here nay be added in the\nfuture.",
-        "title": "toast-type",
-        "type": "string"
       },
       "toaster_module": {
         "properties": {
@@ -363,14 +344,6 @@
         "description": "YANG version of the TOASTER-MIB.",
         "title": "toaster_module",
         "type": "object"
-      },
-      "frozen-bagel": {
-        "enum": [
-          "frozen-bagel"
-        ],
-        "description": "Frozen bagel.",
-        "title": "frozen-bagel",
-        "type": "string"
       },
       "toaster_restock-toaster_input": {
         "properties": {
@@ -387,38 +360,6 @@
         },
         "title": "toaster_restock-toaster_input",
         "type": "object"
-      },
-      "frozen-waffle": {
-        "enum": [
-          "frozen-waffle"
-        ],
-        "description": "Frozen waffle.",
-        "title": "frozen-waffle",
-        "type": "string"
-      },
-      "white-bread": {
-        "enum": [
-          "white-bread"
-        ],
-        "description": "White bread.",
-        "title": "white-bread",
-        "type": "string"
-      },
-      "wheat-bread": {
-        "enum": [
-          "wheat-bread"
-        ],
-        "description": "Wheat bread.",
-        "title": "wheat-bread",
-        "type": "string"
-      },
-      "wonder-bread": {
-        "enum": [
-          "wonder-bread"
-        ],
-        "description": "Wonder bread.",
-        "title": "wonder-bread",
-        "type": "string"
       },
       "toaster_toaster": {
         "properties": {
