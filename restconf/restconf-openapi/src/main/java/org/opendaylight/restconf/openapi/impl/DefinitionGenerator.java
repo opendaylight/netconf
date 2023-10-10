@@ -143,18 +143,19 @@ public class DefinitionGenerator {
      * @return {@link Map} containing data used for creating examples and definitions in OpenAPI documentation
      * @throws IOException if I/O operation fails
      */
+<<<<<<< HEAD   (4a5aa3 Bump upstreams)
     public Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
             final Map<String, Schema> definitions, final DefinitionNames definitionNames,
             final boolean isForSingleModule) throws IOException {
         topLevelModule = module;
 
         processIdentities(module, definitions, definitionNames, schemaContext);
+=======
+    private static Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
+            final Map<String, Schema> definitions, final DefinitionNames definitionNames) throws IOException {
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
         processContainersAndLists(module, definitions, definitionNames, schemaContext);
         processRPCs(module, definitions, definitionNames, schemaContext);
-
-        if (isForSingleModule) {
-            processModule(module, definitions, definitionNames, schemaContext);
-        }
 
         return definitions;
     }
@@ -166,6 +167,7 @@ public class DefinitionGenerator {
         if (isForSingleModule) {
             definitionNames.addUnlinkedName(module.getName() + MODULE_NAME_SUFFIX);
         }
+<<<<<<< HEAD   (4a5aa3 Bump upstreams)
         return convertToSchemas(module, schemaContext, definitions, definitionNames, isForSingleModule);
     }
 
@@ -228,6 +230,9 @@ public class DefinitionGenerator {
             .required(required.size() > 0 ? required : null);
 
         definitions.put(definitionName, definitionBuilder.build());
+=======
+        return convertToSchemas(module, schemaContext, definitions, definitionNames);
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
     }
 
     private static boolean isSchemaNodeMandatory(final DataSchemaNode node) {

@@ -61,6 +61,7 @@ public final class OperationBuilder {
 
     }
 
+<<<<<<< HEAD   (4a5aa3 Bump upstreams)
     public static Operation buildPost(final DataSchemaNode childNode, final String parentName, final String nodeName,
             final String discriminator, final String moduleName, final Optional<String> deviceName,
             final String description, final ArrayNode pathParams) {
@@ -69,8 +70,24 @@ public final class OperationBuilder {
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final ObjectNode requestBody;
 
+=======
+    public static Operation buildPost(final @NonNull DataSchemaNode childNode, final String parentName,
+            final String nodeName, final String discriminator, final String moduleName,
+            final @NonNull String deviceName, final String description, final List<Parameter> pathParams) {
+        final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
+        final List<String> tags = List.of(deviceName + " " + moduleName);
+        final List<Parameter> parameters = new ArrayList<>(pathParams);
+        final RequestBody requestBody;
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
         final List<String> nameElements = new ArrayList<>();
+<<<<<<< HEAD   (4a5aa3 Bump upstreams)
         if (childNode != null && childNode.isConfiguration()) {
+=======
+        if (parentName != null) {
+            nameElements.add(parentName);
+        }
+        if (childNode.isConfiguration()) {
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
             final String childNodeName = childNode.getQName().getLocalName();
             if (parentName != null) {
                 nameElements.add(parentName);

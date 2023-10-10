@@ -43,6 +43,7 @@ public final class OpenApiGeneratorRFC8040Test {
     private static final String TOASTER_2 = "toaster2";
     private static final String REVISION_DATE = "2009-11-20";
     private static final String MANDATORY_TEST = "mandatory-test";
+<<<<<<< HEAD   (4a5aa3 Bump upstreams)
     private static final String CONFIG_ROOT_CONTAINER = "mandatory-test_config_root-container";
     private static final String ROOT_CONTAINER = "mandatory-test_root-container";
     private static final String CONFIG_MANDATORY_CONTAINER = "mandatory-test_root-container_config_mandatory-container";
@@ -50,6 +51,11 @@ public final class OpenApiGeneratorRFC8040Test {
     private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_config_mandatory-list";
     private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
     private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
+=======
+    private static final String CONFIG_ROOT_CONTAINER = "mandatory-test_root-container";
+    private static final String CONFIG_MANDATORY_CONTAINER = "mandatory-test_root-container_mandatory-container";
+    private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
     private static final String CONTAINER = "container";
     private static final String LIST = "list";
 
@@ -253,10 +259,13 @@ public final class OpenApiGeneratorRFC8040Test {
         verifyRequiredField(schemas.get(MANDATORY_LIST), reqMandatoryListElements);
         containersWithRequired.add(MANDATORY_LIST);
 
+<<<<<<< HEAD   (4a5aa3 Bump upstreams)
         final var testModuleMandatoryArray = Set.of("root-container", "root-mandatory-list");
         verifyRequiredField(schemas.get(MANDATORY_TEST_MODULE), testModuleMandatoryArray);
         containersWithRequired.add(MANDATORY_TEST_MODULE);
 
+=======
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
         verifyThatOthersNodeDoesNotHaveRequiredField(containersWithRequired, schemas);
     }
 
@@ -383,12 +392,19 @@ public final class OpenApiGeneratorRFC8040Test {
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
+<<<<<<< HEAD   (4a5aa3 Bump upstreams)
         assertEquals(5, definitions.size());
         assertTrue(definitions.containsKey("my-yang_config_data"));
         assertTrue(definitions.containsKey("my-yang_config_data_TOP"));
+=======
+        assertEquals(1, definitions.size());
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
         assertTrue(definitions.containsKey("my-yang_data"));
+<<<<<<< HEAD   (4a5aa3 Bump upstreams)
         assertTrue(definitions.containsKey("my-yang_data_TOP"));
         assertTrue(definitions.containsKey("my-yang_module"));
+=======
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
     }
 
     @Test
@@ -447,7 +463,11 @@ public final class OpenApiGeneratorRFC8040Test {
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
+<<<<<<< HEAD   (4a5aa3 Bump upstreams)
         assertEquals(44, definitions.size());
+=======
+        assertEquals(10, definitions.size());
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
     }
 
     /**
@@ -504,6 +524,7 @@ public final class OpenApiGeneratorRFC8040Test {
         assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace.asText());
     }
 
+<<<<<<< HEAD   (4a5aa3 Bump upstreams)
     /**
      *  Test JSON and XML references for request operation.
      */
@@ -556,6 +577,10 @@ public final class OpenApiGeneratorRFC8040Test {
     private static void verifyPostRequestRef(final Operation operation, final String expectedJsonRef,
         final String expectedXmlRef, String nodeType) {
         final JsonNode postContent;
+=======
+    private static void verifyRequestRef(final Operation operation, final String expectedRef, final String nodeType) {
+        final Map<String, MediaTypeObject> postContent;
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
         if (operation.requestBody() != null) {
             postContent = operation.requestBody().get("content");
         } else {
