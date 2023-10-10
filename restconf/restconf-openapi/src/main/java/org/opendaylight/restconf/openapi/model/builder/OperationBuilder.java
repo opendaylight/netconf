@@ -70,18 +70,16 @@ public final class OperationBuilder {
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final ObjectNode requestBody;
-        final DataSchemaNode childNode = getListOrContainerChildNode(Optional.ofNullable(node));
-
         final List<String> nameElements = new ArrayList<>();
-        if (childNode != null && childNode.isConfiguration()) {
-            final String childNodeName = childNode.getQName().getLocalName();
+        if (node.isConfiguration()) {
+            final String childNodeName = node.getQName().getLocalName();
             if (parentName != null) {
                 nameElements.add(parentName);
             }
             nameElements.add(nodeName + CONFIG);
             nameElements.add(childNodeName + discriminator);
             final String childDefName = String.join("_", nameElements);
-            requestBody = createPostRequestBodyParameter(childNode, childDefName, childNodeName);
+            requestBody = createPostRequestBodyParameter(node, childDefName, childNodeName);
         } else {
             if (parentName != null) {
                 nameElements.add(parentName + CONFIG);
