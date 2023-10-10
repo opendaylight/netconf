@@ -52,6 +52,7 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
@@ -353,9 +354,11 @@ public abstract class BaseYangOpenApiGenerator {
 
                 final String description = listSchemaNode.findDataChildByName(listKey)
                     .flatMap(DataSchemaNode::getDescription).orElse(null);
+                final String keyLeafType = ((LeafSchemaNode) listSchemaNode.dataChildByName(listKey)).getType()
+                    .getQName().getLocalName();
                 pathParams.add(new Parameter.Builder()
                     .name(paramName)
-                    .schema(new Schema.Builder().type("string").build())
+                    .schema(new Schema.Builder().type(getAllowedType(keyLeafType)).build())
                     .in("path")
                     .required(true)
                     .description(description)
@@ -363,6 +366,26 @@ public abstract class BaseYangOpenApiGenerator {
             }
         }
         return path.toString();
+    }
+
+    public static String getAllowedType(final String keyLeafType) {
+        final var integerList = List.of("uint64", "uint32", "uint16", "uint8", "int64", "int32", "int16", "int8");
+        final var booleanType = "boolean";
+        if (integerList.contains(keyLeafType)) {
+            return  "integer";
+        } else {
+            switch (keyLeafType) {
+                case booleanType -> {
+                    return booleanType;
+                }
+                case "decimal64" -> {
+                    return "number";
+                }
+                default -> {
+                    return "string";
+                }
+            }
+        }
     }
 
     public static SortedSet<Module> getSortedModules(final EffectiveModelContext schemaContext) {

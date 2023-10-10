@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.DocGenTestHelper;
+import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.restconf.openapi.impl.MountPointOpenApiGeneratorRFC8040;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
@@ -144,7 +145,7 @@ public final class MountPointOpenApiTest {
         final Map<String, Path> paths = mountPointApi.paths();
         assertNotNull(paths);
 
-        assertEquals("Unexpected api list size", 50, paths.size());
+        assertEquals("Unexpected api list size", 68, paths.size());
 
         final List<Operation> getOperations = new ArrayList<>();
         final List<Operation> postOperations = new ArrayList<>();
@@ -160,11 +161,11 @@ public final class MountPointOpenApiTest {
             Optional.ofNullable(path.getValue().delete()).ifPresent(deleteOperations::add);
         }
 
-        assertEquals("Unexpected GET paths size", 42, getOperations.size());
-        assertEquals("Unexpected POST paths size", 32, postOperations.size());
-        assertEquals("Unexpected PUT paths size", 40, putOperations.size());
-        assertEquals("Unexpected PATCH paths size", 40, patchOperations.size());
-        assertEquals("Unexpected DELETE paths size", 40, deleteOperations.size());
+        assertEquals("Unexpected GET paths size", 60, getOperations.size());
+        assertEquals("Unexpected POST paths size", 33, postOperations.size());
+        assertEquals("Unexpected PUT paths size", 58, putOperations.size());
+        assertEquals("Unexpected PATCH paths size", 58, patchOperations.size());
+        assertEquals("Unexpected DELETE paths size", 58, deleteOperations.size());
     }
 
     /**
@@ -250,6 +251,27 @@ public final class MountPointOpenApiTest {
         var pathToList5 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
         assertTrue(mountPointApi.paths().containsKey(pathToList5));
         assertEquals(List.of("name"), getPathGetParameters(mountPointApi.paths(), pathToList5));
+    }
+
+    /**
+     * Test that request parameters are correctly typed.
+     */
+    @Test
+    public void testParametersTypesForMountPointApi() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+        final var doc = openApi.getMountPointApi(mockInfo, 1L, null);
+        final var pathToContainer = "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/";
+        final var listOfTypes = List.of("decimal64", "uint64", "uint32", "uint16", "uint8", "int64", "int32", "int16",
+            "int8", "enumeration", "boolean", "bits", "binary", "string", "empty", "instance-identifier", "union");
+
+        for (final var type: listOfTypes) {
+            final var typeKey = type + "-key";
+            final var path = pathToContainer + type + "={" + typeKey + "}";
+            assertTrue(doc.paths().containsKey(path));
+            assertEquals(doc.paths().get(path).get().parameters().get(0).schema().type(),
+                BaseYangOpenApiGenerator.getAllowedType(type));
+        }
     }
 
     /**

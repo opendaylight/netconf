@@ -1,0 +1,177 @@
+module typed-params {
+
+    yang-version 1.1;
+    namespace "urn:typed-params";
+    prefix "tparams";
+
+    identity identity-type {
+        description "Identity for testing";
+    }
+
+    container typed {
+        list string {
+            key string-key;
+            leaf string-key {
+                type string;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list binary {
+            key binary-key;
+            leaf binary-key {
+                type binary;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list bits {
+            key bits-key;
+            leaf bits-key {
+                type bits {
+                    bit UP;
+                }
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list boolean {
+            key boolean-key;
+            leaf boolean-key {
+                type boolean;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list empty {
+            key empty-key;
+            leaf empty-key {
+                type empty;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list enumeration {
+            key enumeration-key;
+            leaf enumeration-key {
+                type enumeration {
+                    enum first;
+                    enum second;
+                    enum third;
+                }
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list instance-identifier {
+            key instance-identifier-key;
+            leaf instance-identifier-key {
+                type instance-identifier;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list int8 {
+            key int8-key;
+            leaf int8-key {
+                type int8;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list int16 {
+            key int16-key;
+            leaf int16-key {
+                type int16;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list int32 {
+            key int32-key;
+            leaf int32-key {
+                type int32;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list int64 {
+            key int64-key;
+            leaf int64-key {
+                type int64;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list uint8 {
+            key uint8-key;
+            leaf uint8-key {
+                type uint8;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list uint16 {
+            key uint16-key;
+            leaf uint16-key {
+                type uint16;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list uint32 {
+            key uint32-key;
+            leaf uint32-key {
+                type uint32;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list uint64 {
+            key uint64-key;
+            leaf uint64-key {
+                type uint64;
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list decimal64 {
+            key decimal64-key;
+            leaf decimal64-key {
+                type decimal64 {
+                    fraction-digits 2;
+                }
+            }
+            leaf value {
+                type string;
+            }
+        }
+        list union {
+            key union-key;
+            leaf union-key {
+                type union {
+                    type int32;
+                    type string;
+                }
+            }
+            leaf value {
+                type string;
+            }
+        }
+    }
+}
