@@ -21,6 +21,7 @@ import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
@@ -72,23 +73,30 @@ public final class OperationBuilder {
 
     }
 
-    public static ObjectNode buildPost(final DataSchemaNode childNode, final String parentName, final String nodeName,
-                                       final String discriminator, final String moduleName,
-                                       final Optional<String> deviceName, final String description,
-                                       final ArrayNode pathParams, final OAversion oaversion) {
+    public static ObjectNode buildPost(final @NonNull DataSchemaNode childNode, final String parentName,
+            final String nodeName, final String discriminator, final String moduleName,
+            final Optional<String> deviceName, final String description, final ArrayNode pathParams,
+            final OAversion oaversion) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
-        final String cleanDefName = parentName + CONFIG + "_" + nodeName;
+        String cleanDefName = parentName + CONFIG + "_" + nodeName;
+        if (nodeName != null) {
+            cleanDefName = String.join("_", cleanDefName, nodeName);
+        }
         final String defName = cleanDefName + discriminator;
         final String xmlDefName = cleanDefName + discriminator;
         ref.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
-        if (childNode != null && childNode.isConfiguration()) {
+        if (childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
-            final String cleanChildDefName = parentName + "_" + nodeName + CONFIG + "_" + childNodeName;
+            String cleanChildDefName = parentName;
+            if (nodeName != null) {
+                cleanChildDefName = String.join("_", cleanChildDefName, nodeName);
+            }
+            cleanChildDefName += CONFIG + "_" + childNodeName;
             final String childDefName = cleanChildDefName + discriminator;
             final String childXmlDefName = cleanChildDefName + discriminator;
             insertPostRequestBodyParameter(childNode, parameters, value, childDefName, childXmlDefName, childNodeName,
