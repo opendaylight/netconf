@@ -326,10 +326,11 @@ public abstract class BaseYangSwaggerGenerator {
 
     private static void addRootPostLink(final Module module, final Optional<String> deviceName,
             final ArrayNode pathParams, final String resourcePath, final ObjectNode paths, final OAversion oaversion) {
-        if (containsListOrContainer(module.getChildNodes())) {
+        final var childNode = getListOrContainerChildNode(module);
+        if (childNode != null) {
             final ObjectNode post = JsonNodeFactory.instance.objectNode();
             final String moduleName = module.getName();
-            post.set("post", buildPost(null, moduleName, "module", "", moduleName, deviceName,
+            post.set("post", buildPost(childNode, moduleName, null, "", moduleName, deviceName,
                     module.getDescription().orElse(""), pathParams, oaversion));
             paths.set(resourcePath, post);
         }
