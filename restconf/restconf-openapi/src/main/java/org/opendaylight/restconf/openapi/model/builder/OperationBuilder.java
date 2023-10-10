@@ -68,9 +68,8 @@ public final class OperationBuilder {
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final ObjectNode requestBody;
-
         final List<String> nameElements = new ArrayList<>();
-        if (childNode != null && childNode.isConfiguration()) {
+        if (childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
             if (parentName != null) {
                 nameElements.add(parentName);

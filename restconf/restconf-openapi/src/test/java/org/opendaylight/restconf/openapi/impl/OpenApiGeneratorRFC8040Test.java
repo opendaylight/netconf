@@ -253,10 +253,6 @@ public final class OpenApiGeneratorRFC8040Test {
         verifyRequiredField(schemas.get(MANDATORY_LIST), reqMandatoryListElements);
         containersWithRequired.add(MANDATORY_LIST);
 
-        final var testModuleMandatoryArray = Set.of("root-container", "root-mandatory-list");
-        verifyRequiredField(schemas.get(MANDATORY_TEST_MODULE), testModuleMandatoryArray);
-        containersWithRequired.add(MANDATORY_TEST_MODULE);
-
         verifyThatOthersNodeDoesNotHaveRequiredField(containersWithRequired, schemas);
     }
 
@@ -383,12 +379,11 @@ public final class OpenApiGeneratorRFC8040Test {
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
-        assertEquals(5, definitions.size());
+        assertEquals(4, definitions.size());
         assertTrue(definitions.containsKey("my-yang_config_data"));
         assertTrue(definitions.containsKey("my-yang_config_data_TOP"));
         assertTrue(definitions.containsKey("my-yang_data"));
         assertTrue(definitions.containsKey("my-yang_data_TOP"));
-        assertTrue(definitions.containsKey("my-yang_module"));
     }
 
     @Test
@@ -447,7 +442,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
-        assertEquals(44, definitions.size());
+        assertEquals(43, definitions.size());
     }
 
     /**
