@@ -326,6 +326,22 @@ public final class OpenApiGeneratorRFC8040Test {
     }
 
     /**
+     * Test that request parameters are correctly typed.
+     */
+    @Test
+    public void testParametersTypes() {
+        final var doc = generator.getApiDeclaration("typed-params", "2023-10-24", uriInfo);
+        final var pathToContainer = "/rests/data/typed-params:typed/";
+        final var integerTypes = List.of("uint64", "uint32", "uint16", "uint8", "int64", "int32", "int16", "int8");
+        for (final var type: integerTypes) {
+            final var typeKey = type + "-key";
+            final var path = pathToContainer + type + "={" + typeKey + "}";
+            assertTrue(doc.paths().containsKey(path));
+            assertEquals("integer", doc.paths().get(path).get().parameters().get(0).schema().type());
+        }
+    }
+
+    /**
      * Test that request for actions is correct and has parameters.
      */
     @Test
