@@ -9,11 +9,13 @@ package org.opendaylight.restconf.openapi.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -177,5 +179,33 @@ public final class DefinitionGeneratorTest {
         final var namespace = xml.namespace();
         assertNotNull(namespace);
         assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace);
+    }
+
+    /**
+     *  This test is designed to verify if yang Identity is used correctly as string value
+     *  and no extra schemas are generated.
+     */
+    @Test
+    public void testIdentity() throws IOException {
+        final var module = context.findModule("toaster", Revision.of("2009-11-20")).orElseThrow();
+        final var schemas = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
+        assertNotNull(schemas);
+
+        // correct number of schemas generated
+        assertEquals(3, schemas.size());
+        final var makeToast = schemas.get("toaster_make-toast_input").properties().get("toasterToastType");
+
+        assertEquals("wheat-bread", makeToast.defaultValue().toString());
+        assertEquals("toast-type", makeToast.example().toString());
+        assertEquals("string", makeToast.type());
+        assertEquals("""
+                This variable informs the toaster of the type of
+                      material that is being toasted. The toaster
+                      uses this information, combined with
+                      toasterDoneness, to compute for how
+                      long the material must be toasted to achieve
+                      the required doneness.""", makeToast.description());
+        assertTrue(makeToast.enums().containsAll(Set.of("toast-type","white-bread", "wheat-bread", "frozen-waffle",
+            "hash-brown", "frozen-bagel", "wonder-bread")));
     }
 }
