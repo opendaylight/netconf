@@ -45,7 +45,6 @@ public final class OpenApiGeneratorRFC8040Test {
     private static final String CONFIG_ROOT_CONTAINER = "mandatory-test_root-container";
     private static final String CONFIG_MANDATORY_CONTAINER = "mandatory-test_root-container_mandatory-container";
     private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
-    private static final String MANDATORY_TEST_MODULE = "mandatory-test_module";
     private static final String CONTAINER = "container";
     private static final String LIST = "list";
 
@@ -212,10 +211,6 @@ public final class OpenApiGeneratorRFC8040Test {
         verifyRequiredField(schemas.get(CONFIG_MANDATORY_LIST), reqMandatoryListElements);
         containersWithRequired.add(CONFIG_MANDATORY_LIST);
 
-        final var testModuleMandatoryArray = List.of("root-container", "root-mandatory-list");
-        verifyRequiredField(schemas.get(MANDATORY_TEST_MODULE), testModuleMandatoryArray);
-        containersWithRequired.add(MANDATORY_TEST_MODULE);
-
         verifyThatOthersNodeDoesNotHaveRequiredField(containersWithRequired, schemas);
     }
 
@@ -323,9 +318,8 @@ public final class OpenApiGeneratorRFC8040Test {
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
-        assertEquals(2, definitions.size());
+        assertEquals(1, definitions.size());
         assertTrue(definitions.containsKey("my-yang_data"));
-        assertTrue(definitions.containsKey("my-yang_module"));
     }
 
     @Test
@@ -371,7 +365,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
-        assertEquals(11, definitions.size());
+        assertEquals(10, definitions.size());
     }
 
     /**
@@ -439,26 +433,6 @@ public final class OpenApiGeneratorRFC8040Test {
         final var namespace = xml.namespace();
         assertNotNull(namespace);
         assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace);
-    }
-
-    /**
-     *  Test JSON and XML references for request operation.
-     */
-    private static void verifyPostDataRequestRef(final Operation operation, final String expectedJsonRef,
-            final String expectedXmlRef) {
-        final Map<String, MediaTypeObject> postContent;
-        if (operation.requestBody() != null) {
-            postContent = operation.requestBody().content();
-        } else {
-            postContent = operation.responses().get("200").content();
-        }
-        assertNotNull(postContent);
-        final var postJsonRef = postContent.get("application/json").schema().ref();
-        assertNotNull(postJsonRef);
-        assertEquals(expectedJsonRef, postJsonRef);
-        final var postXmlRef = postContent.get("application/xml").schema().ref();
-        assertNotNull(postXmlRef);
-        assertEquals(expectedXmlRef, postXmlRef);
     }
 
     private static void verifyRequestRef(final Operation operation, final String expectedRef, final String nodeType) {
