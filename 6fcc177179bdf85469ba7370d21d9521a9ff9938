@@ -16,6 +16,24 @@
       "message": "I think you should use NAMESPACE_KEY here as it\u0027s defined",
       "revId": "6fcc177179bdf85469ba7370d21d9521a9ff9938",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d1d9c2b_8d3022c2",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-10T11:40:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4277b016_458d3d90",
+      "revId": "6fcc177179bdf85469ba7370d21d9521a9ff9938",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
