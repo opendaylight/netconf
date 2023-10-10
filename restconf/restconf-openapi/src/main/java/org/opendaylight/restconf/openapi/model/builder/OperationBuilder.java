@@ -30,8 +30,6 @@ import org.opendaylight.restconf.openapi.model.RequestBody;
 import org.opendaylight.restconf.openapi.model.ResponseObject;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.restconf.openapi.model.Xml;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -55,14 +53,13 @@ public final class OperationBuilder {
         // Hidden on purpose
     }
 
-    public static Operation buildPost(final DataSchemaNode node, final String parentName, final String nodeName,
+    public static Operation buildPost(final DataSchemaNode childNode, final String parentName, final String nodeName,
             final String discriminator, final String moduleName, final @NonNull String deviceName,
             final String description, final List<Parameter> pathParams) {
         final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final RequestBody requestBody;
-        final DataSchemaNode childNode = node == null ? null : getListOrContainerChildNode(node);
         final List<String> nameElements = new ArrayList<>();
         if (parentName != null) {
             nameElements.add(parentName);
@@ -357,11 +354,5 @@ public final class OperationBuilder {
             .content(content)
             .description(description)
             .build();
-    }
-
-    private static DataSchemaNode getListOrContainerChildNode(final DataSchemaNode node) {
-        return ((DataNodeContainer) node).getChildNodes().stream()
-            .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
-            .findFirst().orElse(null);
     }
 }

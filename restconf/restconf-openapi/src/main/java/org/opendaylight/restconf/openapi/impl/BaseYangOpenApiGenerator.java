@@ -238,11 +238,11 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static void addRootPostLink(final Module module, final String deviceName,
             final List<Parameter> pathParams, final String resourcePath, final Map<String, Path> paths) {
-        if (containsListOrContainer(module.getChildNodes())) {
+        final var firstNode = getListOrContainer(module.getChildNodes());
+        if (firstNode != null) {
             final String moduleName = module.getName();
-            final String name = moduleName + MODULE_NAME_SUFFIX;
             paths.put(resourcePath, new Path.Builder()
-                .post(buildPost(null, null, name, "", moduleName, deviceName,
+                .post(buildPost(firstNode, null, moduleName, "", moduleName, deviceName,
                     module.getDescription().orElse(""), pathParams))
                 .build());
         }
@@ -298,6 +298,15 @@ public abstract class BaseYangOpenApiGenerator {
         return false;
     }
 
+    private static DataSchemaNode getListOrContainer(final Iterable<? extends DataSchemaNode> nodes) {
+        for (final DataSchemaNode child : nodes) {
+            if (child instanceof ListSchemaNode || child instanceof ContainerSchemaNode) {
+                return child;
+            }
+        }
+        return null;
+    }
+
     private static Path operations(final DataSchemaNode node, final String moduleName,
             final String deviceName, final List<Parameter> pathParams, final boolean isConfig, final String parentName,
             final DefinitionNames definitionNames, final String fullName) {
@@ -320,8 +329,8 @@ public abstract class BaseYangOpenApiGenerator {
             operationsBuilder.delete(delete);
 
             if (!(node instanceof ListSchemaNode)) {
-                final Operation post = buildPost(node, parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams);
+                final Operation post = buildPost(getListOrContainerChildNode(node), parentName, nodeName, discriminator,
+                    moduleName, deviceName, node.getDescription().orElse(""), pathParams);
                 operationsBuilder.post(post);
             }
         }
@@ -390,5 +399,11 @@ public abstract class BaseYangOpenApiGenerator {
         return new Path.Builder()
             .post(buildPostOperation(operDef, moduleName, deviceName, parentName, definitionNames, parentPathParams))
             .build();
+    }
+
+    private static DataSchemaNode getListOrContainerChildNode(final DataSchemaNode node) {
+        return ((DataNodeContainer) node).getChildNodes().stream()
+            .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
+            .findFirst().orElse(null);
     }
 }
