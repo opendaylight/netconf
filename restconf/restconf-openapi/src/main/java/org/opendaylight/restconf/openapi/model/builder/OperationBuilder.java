@@ -21,6 +21,7 @@ import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -61,16 +62,16 @@ public final class OperationBuilder {
 
     }
 
-    public static Operation buildPost(final DataSchemaNode childNode, final String parentName, final String nodeName,
-            final String discriminator, final String moduleName, final Optional<String> deviceName,
-            final String description, final ArrayNode pathParams) {
+    public static Operation buildPost(final @NonNull DataSchemaNode childNode, final String parentName,
+            final String nodeName, final String discriminator, final String moduleName,
+            final Optional<String> deviceName, final String description, final ArrayNode pathParams) {
         final var summary = buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName);
         final ArrayNode tags = buildTagsValue(deviceName, moduleName);
         final ArrayNode parameters = JsonNodeFactory.instance.arrayNode().addAll(pathParams);
         final ObjectNode requestBody;
 
         final List<String> nameElements = new ArrayList<>();
-        if (childNode != null && childNode.isConfiguration()) {
+        if (childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
             if (parentName != null) {
                 nameElements.add(parentName);
