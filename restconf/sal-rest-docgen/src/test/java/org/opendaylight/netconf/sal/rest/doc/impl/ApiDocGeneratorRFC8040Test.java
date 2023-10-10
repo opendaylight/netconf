@@ -289,6 +289,24 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     }
 
     /**
+     * Test that request parameters are correctly typed.
+     */
+    @Test
+    public void testParametersTypes() {
+        final var doc = (OpenApiObject) generator.getApiDeclaration("typed-params", "2023-10-24", URI_INFO,
+            OAversion.V3_0);
+        final var pathToContainer = "/rests/data/typed-params:typed/";
+        final var integerTypes = List.of("uint64", "uint32", "uint16", "uint8", "int64", "int32", "int16", "int8");
+        for (final var type: integerTypes) {
+            final var typeKey = type + "-key";
+            final var path = pathToContainer + type + "={" + typeKey + "}";
+            assertTrue(doc.getPaths().has(path));
+            assertEquals("integer", doc.getPaths().get(path).get("get").get("parameters").get(0).get("schema")
+                .get("type").textValue());
+        }
+    }
+
+    /**
      * Test that request for actions is correct and has parameters.
      */
     @Test
