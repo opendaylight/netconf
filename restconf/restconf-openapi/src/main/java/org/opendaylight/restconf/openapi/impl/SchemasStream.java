@@ -54,8 +54,9 @@ public final class SchemasStream extends InputStream {
     private boolean eos;
 
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
-            final JsonGenerator generator, final ByteArrayOutputStream stream) {
-        iterator = context.getModules().iterator();
+            final JsonGenerator generator, final ByteArrayOutputStream stream,
+            final Iterator<? extends Module> iterator) {
+        this.iterator = iterator;
         this.context = context;
         this.writer = writer;
         this.generator = generator;
