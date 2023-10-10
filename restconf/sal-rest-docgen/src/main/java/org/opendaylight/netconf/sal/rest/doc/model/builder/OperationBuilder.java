@@ -16,11 +16,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
@@ -72,29 +74,36 @@ public final class OperationBuilder {
 
     }
 
-    public static ObjectNode buildPost(final DataSchemaNode childNode, final String parentName, final String nodeName,
-                                       final String discriminator, final String moduleName,
-                                       final Optional<String> deviceName, final String description,
-                                       final ArrayNode pathParams, final OAversion oaversion) {
+    public static ObjectNode buildPost(final @NonNull DataSchemaNode childNode, final String parentName,
+            final String nodeName, final String discriminator, final String moduleName,
+            final Optional<String> deviceName, final String description, final ArrayNode pathParams,
+            final OAversion oaversion) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
         value.put(DESCRIPTION_KEY, description);
         value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
         value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
         final ArrayNode parameters = JsonUtil.copy(pathParams);
         final ObjectNode ref = JsonNodeFactory.instance.objectNode();
-        final String cleanDefName = parentName + CONFIG + "_" + nodeName;
-        final String defName = cleanDefName + discriminator;
-        final String xmlDefName = cleanDefName + discriminator;
+        final List<String> elements = new ArrayList<>();
+        if (parentName != null) {
+            elements.add(parentName + CONFIG);
+        }
+        elements.add(nodeName);
+        final String defName = String.join("_", elements) + discriminator;
         ref.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
-        if (childNode != null && childNode.isConfiguration()) {
+        if (childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
-            final String cleanChildDefName = parentName + "_" + nodeName + CONFIG + "_" + childNodeName;
-            final String childDefName = cleanChildDefName + discriminator;
-            final String childXmlDefName = cleanChildDefName + discriminator;
-            insertPostRequestBodyParameter(childNode, parameters, value, childDefName, childXmlDefName, childNodeName,
+            final List<String> configElements = new ArrayList<>();
+            if (parentName != null) {
+                configElements.add(parentName);
+            }
+            configElements.add(nodeName + CONFIG);
+            configElements.add(childNodeName);
+            final String childDefName = String.join("_", configElements) + discriminator;
+            insertPostRequestBodyParameter(childNode, parameters, value, childDefName, childDefName, childNodeName,
                 oaversion);
         } else {
-            insertRequestBodyParameter(parameters, value, defName, xmlDefName, nodeName + CONFIG, oaversion);
+            insertRequestBodyParameter(parameters, value, defName, defName, nodeName + CONFIG, oaversion);
         }
         value.set(PARAMETERS_KEY, parameters);
 
