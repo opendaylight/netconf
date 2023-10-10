@@ -286,16 +286,21 @@
         ],
         "parameters": [],
         "requestBody": {
-          "description": "toaster_module",
+          "description": "toaster",
           "content": {
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/toaster_module"
+                "$ref": "#/components/schemas/toaster_toaster"
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/toaster_module"
+                "properties":{
+                  "toaster":{
+                    "$ref":"#/components/schemas/toaster_toaster",
+                    "type":"object"
+                  }
+                }
               }
             }
           }
@@ -306,7 +311,7 @@
           }
         },
         "description": "YANG version of the TOASTER-MIB.\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
-        "summary": "POST - 123 - toaster - toaster_module"
+        "summary": "POST - 123 - toaster - toaster"
       }
     }
   },
@@ -353,16 +358,6 @@
         "description": "Base for all bread types supported by the toaster.\nNew bread types not listed here nay be added in the\nfuture.",
         "title": "toast-type",
         "type": "string"
-      },
-      "toaster_module": {
-        "properties": {
-          "toaster": {
-            "$ref": "#/components/schemas/toaster_toaster"
-          }
-        },
-        "description": "YANG version of the TOASTER-MIB.",
-        "title": "toaster_module",
-        "type": "object"
       },
       "frozen-bagel": {
         "enum": [
