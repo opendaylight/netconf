@@ -10,6 +10,7 @@ package org.opendaylight.restconf.openapi.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -20,7 +21,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.restconf.openapi.model.MountPointInstance;
-import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -69,9 +69,13 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public Response getAllModulesDoc(final UriInfo uriInfo) {
-        final DefinitionNames definitionNames = new DefinitionNames();
-        final OpenApiObject doc = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, definitionNames);
-        return Response.ok(doc).build();
+        final OpenApiInputStream stream;
+        try {
+            stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Response.ok(stream).build();
     }
 
     /**
@@ -79,9 +83,13 @@ public final class OpenApiServiceImpl implements OpenApiService {
      */
     @Override
     public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
-        return Response.ok(
-            openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo))
-            .build();
+        final OpenApiInputStream stream;
+        try {
+            stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Response.ok(stream).build();
     }
 
     /**
@@ -103,17 +111,26 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public Response getMountDocByModule(final String instanceNum, final String module,
-                                                     final String revision, final UriInfo uriInfo) {
-        final OpenApiObject api = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
-            module, revision);
-        return Response.ok(api).build();
+            final String revision, final UriInfo uriInfo) {
+        final OpenApiInputStream stream;
+        try {
+            stream = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
+                module, revision);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Response.ok(stream).build();
     }
 
     @Override
     public Response getMountDoc(final String instanceNum, final UriInfo uriInfo) {
         final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
-        final OpenApiObject api = mountPointOpenApiRFC8040.getMountPointApi(uriInfo,
-                Long.parseLong(instanceNum), stringPageNum);
-        return Response.ok(api).build();
+        final OpenApiInputStream stream;
+        try {
+            stream = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), stringPageNum);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Response.ok(stream).build();
     }
 }
