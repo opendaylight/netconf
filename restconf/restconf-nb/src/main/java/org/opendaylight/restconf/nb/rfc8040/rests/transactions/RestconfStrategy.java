@@ -241,8 +241,8 @@ public abstract class RestconfStrategy {
      * @param insert  {@link Insert}
      * @return A {@link CreateOrReplaceResult}
      */
-    public final @NonNull CreateOrReplaceResult putData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final @Nullable Insert insert) {
+    public final RestconfFuture<CreateOrReplaceResult> putData(final YangInstanceIdentifier path,
+            final NormalizedNode data, final @Nullable Insert insert) {
         final var exists = TransactionUtil.syncAccess(exists(path), path);
 
         final ListenableFuture<? extends CommitInfo> commitFuture;
@@ -254,8 +254,21 @@ public abstract class RestconfStrategy {
             commitFuture = replaceAndCommit(prepareWriteExecution(), path, data);
         }
 
-        TransactionUtil.syncCommit(commitFuture, "PUT", path);
-        return exists ? CreateOrReplaceResult.REPLACED : CreateOrReplaceResult.CREATED;
+        final var ret = new SettableRestconfFuture<CreateOrReplaceResult>();
+
+        Futures.addCallback(commitFuture, new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                ret.set(exists ? CreateOrReplaceResult.REPLACED : CreateOrReplaceResult.CREATED);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                ret.setFailure(TransactionUtil.decodeException(cause, "PUT", path));
+            }
+        }, MoreExecutors.directExecutor());
+
+        return ret;
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPut(final YangInstanceIdentifier path,

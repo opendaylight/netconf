@@ -11,7 +11,6 @@ import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -53,45 +52,13 @@ final class TransactionUtil {
         }
     }
 
-    /**
-     * Synchronize commit future, translating any failure to a {@link RestconfDocumentedException}.
-     *
-     * @param future Commit future
-     * @param txType Transaction type name
-     * @param path Modified path
-     * @throws RestconfDocumentedException if commit fails
-     */
-    static void syncCommit(final ListenableFuture<? extends CommitInfo> future, final String txType,
+    static @NonNull RestconfDocumentedException decodeException(final Throwable ex, final String txType,
             final YangInstanceIdentifier path) {
-        try {
-            future.get();
-        } catch (InterruptedException e) {
-            LOG.warn("Transaction({}) FAILED!", txType, e);
-            throw new RestconfDocumentedException("Transaction failed", e);
-        } catch (ExecutionException e) {
-            LOG.warn("Transaction({}) FAILED!", txType, e);
-            throw decodeException(e, txType, path);
-        }
-        LOG.trace("Transaction({}) SUCCESSFUL", txType);
-    }
-
-    static @NonNull RestconfDocumentedException decodeException(final Throwable throwable,
-            final String txType, final YangInstanceIdentifier path) {
-        return decodeException(throwable, throwable, txType, path);
-    }
-
-    private static @NonNull RestconfDocumentedException decodeException(final ExecutionException ex,
-            final String txType, final YangInstanceIdentifier path) {
-        return decodeException(ex, ex.getCause(), txType, path);
-    }
-
-    private static @NonNull RestconfDocumentedException decodeException(final Throwable ex, final Throwable cause,
-            final String txType, final YangInstanceIdentifier path) {
-        if (cause instanceof TransactionCommitFailedException) {
+        if (ex instanceof TransactionCommitFailedException) {
             // If device send some error message we want this message to get to client and not just to throw it away
             // or override it with new generic message. We search for NetconfDocumentedException that was send from
             // netconfSB and we create RestconfDocumentedException accordingly.
-            for (var error : Throwables.getCausalChain(cause)) {
+            for (var error : Throwables.getCausalChain(ex)) {
                 if (error instanceof DocumentedException documentedError) {
                     final ErrorTag errorTag = documentedError.getErrorTag();
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {

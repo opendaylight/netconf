@@ -297,7 +297,7 @@ public final class RestconfDataServiceImpl {
      *
      * @param uriInfo request URI information
      * @param body data node for put to config DS
-     * @return {@link Response}
+     * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PUT
     @Path("/data")
@@ -305,9 +305,9 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public Response putDataJSON(@Context final UriInfo uriInfo, final InputStream body) {
+    public void putDataJSON(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            return putData(null, uriInfo, jsonBody);
+            putData(null, uriInfo, jsonBody, ar);
         }
     }
 
@@ -317,7 +317,7 @@ public final class RestconfDataServiceImpl {
      * @param identifier path to target
      * @param uriInfo request URI information
      * @param body data node for put to config DS
-     * @return {@link Response}
+     * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PUT
     @Path("/data/{identifier:.+}")
@@ -325,10 +325,10 @@ public final class RestconfDataServiceImpl {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public Response putDataJSON(@Encoded @PathParam("identifier") final String identifier,
-            @Context final UriInfo uriInfo, final InputStream body) {
+    public void putDataJSON(@Encoded @PathParam("identifier") final String identifier,
+            @Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            return putData(identifier, uriInfo, jsonBody);
+            putData(identifier, uriInfo, jsonBody, ar);
         }
     }
 
@@ -337,7 +337,7 @@ public final class RestconfDataServiceImpl {
      *
      * @param uriInfo request URI information
      * @param body data node for put to config DS
-     * @return {@link Response}
+     * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PUT
     @Path("/data")
@@ -346,9 +346,9 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response putDataXML(@Context final UriInfo uriInfo, final InputStream body) {
+    public void putDataXML(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            return putData(null, uriInfo, xmlBody);
+            putData(null, uriInfo, xmlBody, ar);
         }
     }
 
@@ -358,7 +358,7 @@ public final class RestconfDataServiceImpl {
      * @param identifier path to target
      * @param uriInfo request URI information
      * @param body data node for put to config DS
-     * @return {@link Response}
+     * @param ar {@link AsyncResponse} which needs to be completed
      */
     @PUT
     @Path("/data/{identifier:.+}")
@@ -367,24 +367,25 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response putDataXML(@Encoded @PathParam("identifier") final String identifier,
-            @Context final UriInfo uriInfo, final InputStream body) {
+    public void putDataXML(@Encoded @PathParam("identifier") final String identifier,
+            @Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            return putData(identifier, uriInfo, xmlBody);
+            putData(identifier, uriInfo, xmlBody, ar);
         }
     }
 
-    private Response putData(final @Nullable String identifier, final UriInfo uriInfo, final ResourceBody body) {
+    private void putData(final @Nullable String identifier, final UriInfo uriInfo, final ResourceBody body,
+            final AsyncResponse ar) {
         final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
         final var insert = QueryParams.parseInsert(reqPath.getSchemaContext(), uriInfo);
         final var req = bindResourceRequest(reqPath, body);
 
-        return switch (
-            req.strategy().putData(req.path(), req.data(), insert)) {
-            // Note: no Location header, as it matches the request path
-            case CREATED -> Response.status(Status.CREATED).build();
-            case REPLACED -> Response.noContent().build();
-        };
+        req.strategy().putData(req.path(), req.data(), insert).addCallback(new JaxRsRestconfCallback<>(ar,
+            status -> switch (status) {
+                // Note: no Location header, as it matches the request path
+                case CREATED -> Response.status(Status.CREATED).build();
+                case REPLACED -> Response.noContent().build();
+            }));
     }
 
     /**
