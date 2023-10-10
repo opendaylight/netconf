@@ -49,9 +49,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String CONFIG_MANDATORY_CONTAINER = "mandatory-test_root-container_config_mandatory-container";
     private static final String MANDATORY_CONTAINER = "mandatory-test_root-container_mandatory-container";
     private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_config_mandatory-list";
-    private static final String CONFIG_MANDATORY_LIST_POST = "mandatory-test_root-container_config_mandatory-list_post";
     private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
-    private static final String MANDATORY_TEST_MODULE = "mandatory-test_config_module";
     private static final String CHOICE_TEST_MODULE = "choice-test";
     private static final String PROPERTIES = "properties";
     private static final String CONTAINER = "container";
@@ -214,10 +212,6 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         verifyRequiredField(definitions.get(MANDATORY_LIST), reqMandatoryListElements);
         containersWithRequired.add(MANDATORY_LIST);
 
-        final var testModuleMandatoryArray = Set.of("root-container", "root-mandatory-list");
-        verifyRequiredField(definitions.get(MANDATORY_TEST_MODULE), testModuleMandatoryArray);
-        containersWithRequired.add(MANDATORY_TEST_MODULE);
-
         verifyThatPropertyDoesNotHaveRequired(containersWithRequired, definitions);
     }
 
@@ -346,12 +340,11 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(5, definitions.size());
+        assertEquals(4, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
         assertTrue(definitions.has("my-yang_config_data_TOP"));
         assertTrue(definitions.has("my-yang_data"));
         assertTrue(definitions.has("my-yang_data_TOP"));
-        assertTrue(definitions.has("my-yang_config_module"));
     }
 
     @Test
@@ -411,7 +404,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertEquals(2, xmlSchema.size());
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(44, definitions.size());
+        assertEquals(43, definitions.size());
     }
 
     /**
@@ -422,11 +415,11 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var document = (OpenApiObject) generator.getApiDeclaration(NAME, REVISION_DATE, URI_INFO,
             ApiDocServiceImpl.OAversion.V3_0);
         assertNotNull(document);
-        final var expectedSchema = "toaster2_config_module";
+        final var expectedSchema = "toaster2_config_toaster";
         // verify schema reference itself
-        verifyRequestRef(document.getPaths().path("/rests/data").path("post"),
+        verifyPostRequestRef(document.getPaths().path("/rests/data").path("post"),
                 getAppropriateModelPrefix(ApiDocServiceImpl.OAversion.V3_0) + expectedSchema,
-                getAppropriateModelPrefix(ApiDocServiceImpl.OAversion.V3_0) + expectedSchema);
+                getAppropriateModelPrefix(ApiDocServiceImpl.OAversion.V3_0) + expectedSchema, CONTAINER);
         // verify existence of the schemas being referenced
         assertTrue("The expected referenced schema (" + expectedSchema + ") is not created",
                 document.getComponents().getSchemas().has(expectedSchema));
