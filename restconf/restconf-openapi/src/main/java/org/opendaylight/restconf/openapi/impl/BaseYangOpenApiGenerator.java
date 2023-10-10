@@ -59,10 +59,21 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.BooleanTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.DecimalTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.Int16TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.Int32TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.Int64TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.Int8TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.Uint16TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.Uint32TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.Uint64TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.Uint8TypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -411,7 +422,7 @@ public abstract class BaseYangOpenApiGenerator {
 
                 final ObjectNode typeParent = getTypeParentNode(pathParam);
 
-                typeParent.put("type", "string");
+                typeParent.put("type", getAllowedType((ListSchemaNode) schemaNode, listKey));
                 pathParam.put("in", "path");
                 pathParam.put("required", true);
 
@@ -420,6 +431,49 @@ public abstract class BaseYangOpenApiGenerator {
         }
         return path.toString();
     }
+
+    private static String getAllowedType(final ListSchemaNode list, final QName key) {
+        final var keyType = ((LeafSchemaNode) list.getDataChildByName(key)).getType();
+
+        // see: https://datatracker.ietf.org/doc/html/rfc7950#section-4.2.4
+        // see: https://swagger.io/docs/specification/data-models/data-types/
+        // TODO: Java 21 use pattern matching for switch
+        if (keyType instanceof Int8TypeDefinition) {
+            return "integer";
+        }
+        if (keyType instanceof Int16TypeDefinition) {
+            return "integer";
+        }
+        if (keyType instanceof Int32TypeDefinition) {
+            return "integer";
+        }
+        if (keyType instanceof Int64TypeDefinition) {
+            return "integer";
+        }
+        if (keyType instanceof Uint8TypeDefinition) {
+            return "integer";
+        }
+        if (keyType instanceof Uint16TypeDefinition) {
+            return "integer";
+        }
+        if (keyType instanceof Uint32TypeDefinition) {
+            return "integer";
+        }
+        if (keyType instanceof Uint64TypeDefinition) {
+            return "integer";
+        }
+
+        if (keyType instanceof DecimalTypeDefinition) {
+            return "number";
+        }
+
+        if (keyType instanceof BooleanTypeDefinition) {
+            return "boolean";
+        }
+
+        return "string";
+    }
+
 
     public SortedSet<Module> getSortedModules(final EffectiveModelContext schemaContext) {
         if (schemaContext == null) {
