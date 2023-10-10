@@ -17,18 +17,18 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
-import org.opendaylight.restconf.openapi.model.Info;
 import org.opendaylight.restconf.openapi.model.InfoEntity;
 import org.opendaylight.restconf.openapi.model.OpenApiVersionEntity;
 import org.opendaylight.restconf.openapi.model.SecurityEntity;
-import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.restconf.openapi.model.ServerEntity;
 import org.opendaylight.restconf.openapi.model.ServersEntity;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.Module;
 
 public final class OpenApiInputStream extends InputStream {
     private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -39,18 +39,17 @@ public final class OpenApiInputStream extends InputStream {
 
     private boolean eof;
 
-    public OpenApiInputStream(final EffectiveModelContext context, final String openApiVersion, final Info info,
-            final List<Server> servers, final List<Map<String, List<String>>> security, final String deviceName,
-            final String urlPrefix, final boolean isForSingleModule, final boolean includeDataStore)
+    public OpenApiInputStream(final EffectiveModelContext context, final String title, final String url,
+            final List<Map<String, List<String>>> security, final String deviceName, final String urlPrefix,
+            final boolean isForSingleModule, final boolean includeDataStore, final Collection<? extends Module> modules)
             throws IOException {
         final OpenApiBodyWriter writer = new OpenApiBodyWriter(generator, stream);
         stack.add(new OpenApiVersionStream(new OpenApiVersionEntity(), writer));
-        stack.add(new InfoStream(new InfoEntity(info.version(), info.title(), info.description()), writer));
-        stack.add(new ServersStream(new ServersEntity(
-            List.of(new ServerEntity(servers.iterator().next().url()))), writer));
+        stack.add(new InfoStream(new InfoEntity(title), writer));
+        stack.add(new ServersStream(new ServersEntity(List.of(new ServerEntity(url))), writer));
         stack.add(new PathsStream(context, writer, generator, stream, deviceName, urlPrefix, isForSingleModule,
-            includeDataStore));
-        stack.add(new SchemasStream(context, writer, generator, stream));
+            includeDataStore, modules.iterator()));
+        stack.add(new SchemasStream(context, writer, generator, stream, modules.iterator()));
         stack.add(new SecurityStream(writer, new SecurityEntity(security)));
     }
 
