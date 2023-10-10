@@ -22,6 +22,7 @@ import static org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl.DEFAULT_
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_TEMPLATE;
 
 import com.google.common.collect.Range;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +38,9 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
+import org.opendaylight.restconf.openapi.impl.OpenApiInputStream;
 import org.opendaylight.restconf.openapi.model.Components;
 import org.opendaylight.restconf.openapi.model.Info;
-import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.ResponseObject;
@@ -159,8 +160,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             .orElse(null);
     }
 
-    public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
-            final String revision) {
+    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
+            final String revision) throws IOException  {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -171,12 +172,13 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         }
 
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
-            return generateDataStoreOpenApi(uriInfo, urlPrefix, deviceName);
+            return generateDataStoreOpenApi(context, uriInfo, urlPrefix, deviceName);
         }
         return openApiGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix, deviceName);
     }
 
-    public OpenApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final @Nullable String strPageNum) {
+    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final @Nullable String strPageNum)
+            throws IOException {
         final var iid = getInstanceId(id);
         final var context = getSchemaContext(iid);
         final var urlPrefix = getYangMountUrl(iid);
@@ -220,7 +222,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         if (includeDataStore) {
             paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
         }
-        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
+        return new OpenApiInputStream(context, OPEN_API_VERSION, info, servers, SECURITY);
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -228,15 +230,15 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private OpenApiObject generateDataStoreOpenApi(final UriInfo uriInfo, final String context,
-            final String deviceName) {
+    private OpenApiInputStream generateDataStoreOpenApi(EffectiveModelContext modelContext,
+            final UriInfo uriInfo, final String context, final String deviceName) throws IOException {
         final var info = new Info(API_VERSION, context, DESCRIPTION);
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
         final var components = new Components(new HashMap<>(), Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
         final var paths = getDataStoreApiPaths(context, deviceName);
-        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
+        return new OpenApiInputStream(modelContext, OPEN_API_VERSION, info, servers, SECURITY);
     }
 
     private Map<String, Path> getDataStoreApiPaths(final String context, final String deviceName) {

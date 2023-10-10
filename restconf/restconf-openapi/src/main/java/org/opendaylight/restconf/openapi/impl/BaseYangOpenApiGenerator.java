@@ -38,7 +38,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.model.Components;
 import org.opendaylight.restconf.openapi.model.Info;
-import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Path;
@@ -95,24 +94,14 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiObject getControllerModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
+    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo) throws IOException {
         final var context = requireNonNull(schemaService.getGlobalContext());
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
         final var title = "Controller modules of RESTCONF";
         final var info = new Info(API_VERSION, title, DESCRIPTION);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
-
-        final var paths = new HashMap<String, Path>();
-        final var schemas = new HashMap<String, Schema>();
-        for (final var module : getSortedModules(context)) {
-            LOG.debug("Working on [{},{}]...", module.getName(), module.getQNameModule().getRevision().orElse(null));
-            schemas.putAll(getSchemas(module, context, definitionNames, false));
-            paths.putAll(getPaths(module, "", CONTROLLER_RESOURCE_NAME, context, definitionNames, false));
-        }
-
-        final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
-        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
+        return new OpenApiInputStream(context, OPEN_API_VERSION, info, servers, SECURITY);
     }
 
     public static Set<Module> filterByRange(final SortedSet<Module> modules, final Range<Integer> range) {
@@ -143,14 +132,16 @@ public abstract class BaseYangOpenApiGenerator {
         }
     }
 
-    public OpenApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
+    public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo)
+            throws IOException {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
         return getApiDeclaration(module, revision, uriInfo, schemaContext, "", CONTROLLER_RESOURCE_NAME);
     }
 
-    public OpenApiObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
-            final EffectiveModelContext schemaContext, final String context, final @NonNull String deviceName) {
+    public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
+            final EffectiveModelContext schemaContext, final String context, final @NonNull String deviceName)
+            throws IOException {
         final Optional<Revision> rev;
 
         try {
@@ -171,7 +162,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var schemas = getSchemas(module, schemaContext, definitionNames, true);
         final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
         final var paths = getPaths(module, context, deviceName, schemaContext, definitionNames, true);
-        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
+        return new OpenApiInputStream(schemaContext, OPEN_API_VERSION, info, servers, SECURITY);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
