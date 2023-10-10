@@ -70,7 +70,7 @@ public final class OperationBuilder {
         final ObjectNode requestBody;
 
         final List<String> nameElements = new ArrayList<>();
-        if (childNode != null && childNode.isConfiguration()) {
+        if (childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
             if (parentName != null) {
                 nameElements.add(parentName);
