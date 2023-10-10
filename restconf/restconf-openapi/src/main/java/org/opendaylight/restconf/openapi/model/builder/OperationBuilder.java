@@ -59,6 +59,7 @@ public final class OperationBuilder {
         }
     }
 
+<<<<<<< HEAD   (74e35c Remove synchronization locking)
     private OperationBuilder() {
 
     }
@@ -72,8 +73,24 @@ public final class OperationBuilder {
         final ObjectNode requestBody;
         final DataSchemaNode childNode = getListOrContainerChildNode(Optional.ofNullable(node));
 
+=======
+    public static Operation buildPost(final @NonNull DataSchemaNode childNode, final String parentName,
+            final String nodeName, final String discriminator, final String moduleName,
+            final @NonNull String deviceName, final String description, final List<Parameter> pathParams) {
+        final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
+        final List<String> tags = List.of(deviceName + " " + moduleName);
+        final List<Parameter> parameters = new ArrayList<>(pathParams);
+        final RequestBody requestBody;
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
         final List<String> nameElements = new ArrayList<>();
+<<<<<<< HEAD   (74e35c Remove synchronization locking)
         if (childNode != null && childNode.isConfiguration()) {
+=======
+        if (parentName != null) {
+            nameElements.add(parentName);
+        }
+        if (childNode.isConfiguration()) {
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
             final String childNodeName = childNode.getQName().getLocalName();
             if (parentName != null) {
                 nameElements.add(parentName);

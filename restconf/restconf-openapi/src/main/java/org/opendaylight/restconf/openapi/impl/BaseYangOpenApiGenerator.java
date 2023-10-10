@@ -275,15 +275,29 @@ public abstract class BaseYangOpenApiGenerator {
         return docBuilder.build();
     }
 
+<<<<<<< HEAD   (74e35c Remove synchronization locking)
     private static void addRootPostLink(final Module module, final Optional<String> deviceName,
             final ArrayNode pathParams, final String resourcePath, final Map<String, Path> paths) {
         if (containsListOrContainer(module.getChildNodes())) {
+=======
+    private static void addRootPostLink(final Module module, final String deviceName,
+            final List<Parameter> pathParams, final String resourcePath, final Map<String, Path> paths) {
+        final var childNode = getListOrContainerChildNode(module);
+        if (childNode != null) {
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
             final String moduleName = module.getName();
+<<<<<<< HEAD   (74e35c Remove synchronization locking)
             final String name = moduleName + MODULE_NAME_SUFFIX;
             final var postBuilder = new Path.Builder();
             postBuilder.post(buildPost(null, null, name, "", moduleName, deviceName,
                     module.getDescription().orElse(""), pathParams));
             paths.put(resourcePath, postBuilder.build());
+=======
+            paths.put(resourcePath, new Path.Builder()
+                .post(buildPost(childNode, null, moduleName, "", moduleName, deviceName,
+                    module.getDescription().orElse(""), pathParams))
+                .build());
+>>>>>>> CHANGE (1f6754 Fix module's root POST request payload)
         }
     }
 
