@@ -292,6 +292,24 @@ public final class OpenApiGeneratorRFC8040Test {
     }
 
     /**
+     * Test that request parameters are correctly typed.
+     */
+    @Test
+    public void testParametersTypes() {
+        final var doc = generator.getApiDeclaration("typed-params", null, uriInfo);
+        final var pathToContainer = "/rests/data/typed-params:typed/";
+        final var listOfTypes = List.of("decimal64", "uint64", "uint32", "uint16", "uint8", "int64", "int32", "int16",
+            "int8", "enumeration", "boolean", "bits", "binary", "string", "empty", "instance-identifier", "union");
+        for (final var type: listOfTypes) {
+            final var typeKey = type + "-key";
+            final var path = pathToContainer + type + "={" + typeKey + "}";
+            assertTrue(doc.paths().containsKey(path));
+            assertEquals(doc.paths().get(path).get().parameters().get(0).schema().type(),
+                BaseYangOpenApiGenerator.getAllowedType(type));
+        }
+    }
+
+    /**
      * Test that request for actions is correct and has parameters.
      */
     @Test
