@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.api;
 
+import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -28,7 +29,7 @@ public interface OpenApiService {
     @GET
     @Path("/single")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getAllModulesDoc(@Context UriInfo uriInfo);
+    Response getAllModulesDoc(@Context UriInfo uriInfo) throws IOException;
 
     /**
      * Generates Swagger compliant document listing APIs for module.
@@ -37,7 +38,7 @@ public interface OpenApiService {
     @Path("/{module}({revision})")
     @Produces(MediaType.APPLICATION_JSON)
     Response getDocByModule(@PathParam("module") String module, @PathParam("revision") String revision,
-                            @Context UriInfo uriInfo);
+                            @Context UriInfo uriInfo) throws IOException;
 
     /**
      * Redirects to embedded swagger ui.
@@ -65,7 +66,7 @@ public interface OpenApiService {
     @Produces(MediaType.APPLICATION_JSON)
     Response getMountDocByModule(@PathParam("instance") String instanceNum,
                                  @PathParam("module") String module, @PathParam("revision") String revision,
-                                 @Context UriInfo uriInfo);
+                                 @Context UriInfo uriInfo) throws IOException;
 
     /**
      * Generates Swagger compliant document listing APIs for all modules of mount point.
@@ -73,5 +74,5 @@ public interface OpenApiService {
     @GET
     @Path("/mounts/{instance}")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo);
+    Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo) throws IOException;
 }
