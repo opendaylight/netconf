@@ -373,7 +373,7 @@ public final class OpenApiGeneratorRFC8040Test {
 
         // Test `components/schemas` objects
         final var definitions = doc.components().schemas();
-        assertEquals(18, definitions.size());
+        assertEquals(11, definitions.size());
     }
 
     /**
