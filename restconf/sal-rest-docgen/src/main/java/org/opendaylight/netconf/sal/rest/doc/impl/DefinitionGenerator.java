@@ -139,17 +139,13 @@ public class DefinitionGenerator {
 
 
     public ObjectNode convertToJsonSchema(final Module module, final EffectiveModelContext schemaContext,
-            final ObjectNode definitions, final DefinitionNames definitionNames,  final OAversion oaversion,
-            final boolean isForSingleModule) throws IOException {
+            final ObjectNode definitions, final DefinitionNames definitionNames, final OAversion oaversion)
+            throws IOException {
         topLevelModule = module;
 
         processIdentities(module, definitions, definitionNames, schemaContext);
         processContainersAndLists(module, definitions, definitionNames, schemaContext, oaversion);
         processRPCs(module, definitions, definitionNames, schemaContext, oaversion);
-
-        if (isForSingleModule) {
-            processModule(module, definitions, definitionNames, schemaContext, oaversion);
-        }
 
         return definitions;
     }
@@ -161,68 +157,7 @@ public class DefinitionGenerator {
         if (isForSingleModule) {
             definitionNames.addUnlinkedName(module.getName() + CONFIG + MODULE_NAME_SUFFIX);
         }
-        return convertToJsonSchema(module, schemaContext, definitions, definitionNames, oaversion, isForSingleModule);
-    }
-
-    private void processModule(final Module module, final ObjectNode definitions, final DefinitionNames definitionNames,
-            final EffectiveModelContext schemaContext, final OAversion oaversion) {
-        final ObjectNode definition = JsonNodeFactory.instance.objectNode();
-        final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-        final ArrayNode required = JsonNodeFactory.instance.arrayNode();
-        final String moduleName = module.getName();
-        final String definitionName = moduleName + CONFIG + MODULE_NAME_SUFFIX;
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
-        for (final DataSchemaNode node : module.getChildNodes()) {
-            stack.enterSchemaTree(node.getQName());
-            final String localName = node.getQName().getLocalName();
-            if (node.isConfiguration()) {
-                if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
-                    if (isSchemaNodeMandatory(node)) {
-                        required.add(localName);
-                    }
-                    for (final DataSchemaNode childNode : ((DataNodeContainer) node).getChildNodes()) {
-                        final ObjectNode childNodeProperties = JsonNodeFactory.instance.objectNode();
-
-                        final String ref = getAppropriateModelPrefix(oaversion)
-                                + moduleName + CONFIG
-                                + "_" + localName
-                                + definitionNames.getDiscriminator(node);
-
-                        if (node instanceof ListSchemaNode) {
-                            childNodeProperties.put(TYPE_KEY, ARRAY_TYPE);
-                            final ObjectNode items = JsonNodeFactory.instance.objectNode();
-                            items.put(REF_KEY, ref);
-                            childNodeProperties.set(ITEMS_KEY, items);
-                            childNodeProperties.put(DESCRIPTION_KEY, childNode.getDescription().orElse(""));
-                            childNodeProperties.put(TITLE_KEY, localName + CONFIG);
-                        } else {
-                         /*
-                            Description can't be added, because nothing allowed alongside $ref.
-                            allOf is not an option, because ServiceNow can't parse it.
-                          */
-                            childNodeProperties.put(REF_KEY, ref);
-                        }
-                        //add module name prefix to property name, when ServiceNow can process colons
-                        properties.set(localName, childNodeProperties);
-                    }
-                } else if (node instanceof LeafSchemaNode) {
-                    /*
-                        Add module name prefix to property name, when ServiceNow can process colons(second parameter
-                        of processLeafNode).
-                     */
-                    processLeafNode((LeafSchemaNode) node, localName, properties, required, stack,
-                            definitions, definitionNames, oaversion);
-                }
-            }
-            stack.exit();
-        }
-        definition.put(TITLE_KEY, definitionName);
-        definition.put(TYPE_KEY, OBJECT_TYPE);
-        definition.set(PROPERTIES_KEY, properties);
-        definition.put(DESCRIPTION_KEY, module.getDescription().orElse(""));
-        setRequiredIfNotEmpty(definition, required);
-
-        definitions.set(definitionName, definition);
+        return convertToJsonSchema(module, schemaContext, definitions, definitionNames, oaversion);
     }
 
     private static boolean isSchemaNodeMandatory(final DataSchemaNode node) {

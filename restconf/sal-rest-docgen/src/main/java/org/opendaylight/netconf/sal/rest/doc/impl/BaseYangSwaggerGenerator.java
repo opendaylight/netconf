@@ -14,6 +14,7 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPost;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPostOperation;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildPut;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getListOrContainerChildNode;
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getTypeParentNode;
 import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
@@ -315,10 +316,11 @@ public abstract class BaseYangSwaggerGenerator {
 
     private static void addRootPostLink(final Module module, final Optional<String> deviceName,
             final ArrayNode pathParams, final String resourcePath, final ObjectNode paths, final OAversion oaversion) {
-        if (containsListOrContainer(module.getChildNodes())) {
+        final var childNode = getListOrContainerChildNode(module);
+        if (childNode != null) {
             final ObjectNode post = JsonNodeFactory.instance.objectNode();
             final String moduleName = module.getName();
-            post.set("post", buildPost(null, moduleName, "module", "", moduleName, deviceName,
+            post.set("post", buildPost(childNode, moduleName, null, "", moduleName, deviceName,
                     module.getDescription().orElse(""), pathParams, oaversion));
             paths.set(resourcePath, post);
         }
@@ -445,8 +447,14 @@ public abstract class BaseYangSwaggerGenerator {
             final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams, oaversion);
             operations.put("delete", delete);
 
-            operations.put("post", buildPost(node, parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams, oaversion));
+            if (node instanceof ContainerSchemaNode container) {
+                final var childNode = getListOrContainerChildNode(container);
+                // we have to ensure that we are able to create POST payload containing the first container/list child
+                if (childNode != null) {
+                    operations.put("post", buildPost(childNode, parentName, nodeName, discriminator, moduleName,
+                        deviceName, node.getDescription().orElse(""), pathParams, oaversion));
+                }
+            }
         }
         return operations;
     }

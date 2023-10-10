@@ -50,9 +50,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String CONFIG_MANDATORY_CONTAINER = "mandatory-test_root-container_config_mandatory-container";
     private static final String MANDATORY_CONTAINER = "mandatory-test_root-container_mandatory-container";
     private static final String CONFIG_MANDATORY_LIST = "mandatory-test_root-container_config_mandatory-list";
-    private static final String CONFIG_MANDATORY_LIST_POST = "mandatory-test_root-container_config_mandatory-list_post";
     private static final String MANDATORY_LIST = "mandatory-test_root-container_mandatory-list";
-    private static final String MANDATORY_TEST_MODULE = "mandatory-test_config_module";
     private static final String CONTAINER = "container";
     private static final String LIST = "list";
 
@@ -100,7 +98,6 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
             assertFalse(node.path("get").isMissingNode());
             assertFalse(node.path("put").isMissingNode());
             assertFalse(node.path("delete").isMissingNode());
-            assertFalse(node.path("post").isMissingNode());
             assertFalse(node.path("patch").isMissingNode());
         }
     }
@@ -223,10 +220,6 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         verifyRequiredField(definitions.get(MANDATORY_LIST), reqMandatoryListElements);
         containersWithRequired.add(MANDATORY_LIST);
 
-        final var testModuleMandatoryArray = Set.of("root-container", "root-mandatory-list");
-        verifyRequiredField(definitions.get(MANDATORY_TEST_MODULE), testModuleMandatoryArray);
-        containersWithRequired.add(MANDATORY_TEST_MODULE);
-
         verifyThatPropertyDoesNotHaveRequired(containersWithRequired, definitions);
     }
 
@@ -243,23 +236,23 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         var pathToList1 = "/rests/data/path-params-test:cont/list1={name}";
         assertTrue(doc.getPaths().has(pathToList1));
-        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList1));
+        assertEquals(List.of("name"), getGetPathParameters(doc.getPaths(), pathToList1));
 
         var pathToList2 = "/rests/data/path-params-test:cont/list1={name}/list2={name1}";
         assertTrue(doc.getPaths().has(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathParameters(doc.getPaths(), pathToList2));
+        assertEquals(List.of("name", "name1"), getGetPathParameters(doc.getPaths(), pathToList2));
 
         var pathToList3 = "/rests/data/path-params-test:cont/list3={name}";
         assertTrue(doc.getPaths().has(pathToList3));
-        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList3));
+        assertEquals(List.of("name"), getGetPathParameters(doc.getPaths(), pathToList3));
 
         var pathToList4 = "/rests/data/path-params-test:cont/list1={name}/list4={name1}";
         assertTrue(doc.getPaths().has(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(doc.getPaths(), pathToList4));
+        assertEquals(List.of("name", "name1"), getGetPathParameters(doc.getPaths(), pathToList4));
 
         var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
         assertTrue(doc.getPaths().has(pathToList4));
-        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList5));
+        assertEquals(List.of("name"), getGetPathParameters(doc.getPaths(), pathToList5));
     }
 
     private static void verifyThatPropertyDoesNotHaveRequired(final List<String> expected,
@@ -313,9 +306,6 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertEquals(List.of("/rests/data", "/rests/data/my-yang:data"),
                 ImmutableList.copyOf(doc.getPaths().fieldNames()));
         final var JsonNodeMyYangData = doc.getPaths().get("/rests/data/my-yang:data");
-        verifyRequestRef(JsonNodeMyYangData.path("post"),
-                "#/components/schemas/my-yang_config_data",
-                "#/components/schemas/my-yang_config_data");
         verifyRequestRef(JsonNodeMyYangData.path("put"), "#/components/schemas/my-yang_config_data_TOP",
                 "#/components/schemas/my-yang_config_data");
         verifyRequestRef(JsonNodeMyYangData.path("get"), "#/components/schemas/my-yang_data_TOP",
@@ -323,12 +313,11 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(5, definitions.size());
+        assertEquals(4, definitions.size());
         assertTrue(definitions.has("my-yang_config_data"));
         assertTrue(definitions.has("my-yang_config_data_TOP"));
         assertTrue(definitions.has("my-yang_data"));
         assertTrue(definitions.has("my-yang_data_TOP"));
-        assertTrue(definitions.has("my-yang_config_module"));
     }
 
     @Test
@@ -345,9 +334,6 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 "#/components/schemas/toaster2_toaster");
 
         final var jsonNodeToasterSlot = doc.getPaths().get("/rests/data/toaster2:toaster/toasterSlot={slotId}");
-        verifyPostRequestRef(jsonNodeToasterSlot.path("post"),
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo",
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo", CONTAINER);
         verifyRequestRef(jsonNodeToasterSlot.path("put"),
                 "#/components/schemas/toaster2_toaster_config_toasterSlot_TOP",
                 "#/components/schemas/toaster2_toaster_config_toasterSlot");
@@ -356,9 +342,6 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         final var jsonNodeSlotInfo = doc.getPaths().get(
                 "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
-        verifyRequestRef(jsonNodeSlotInfo.path("post"),
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo",
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
         verifyRequestRef(jsonNodeSlotInfo.path("put"),
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
@@ -366,16 +349,12 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo");
 
         final var jsonNodeLst = doc.getPaths().get("/rests/data/toaster2:lst");
-        verifyPostRequestRef(jsonNodeLst.path("post"), "#/components/schemas/toaster2_lst_config_cont1",
-                "#/components/schemas/toaster2_lst_config_cont1", CONTAINER);
         verifyRequestRef(jsonNodeLst.path("put"), "#/components/schemas/toaster2_config_lst_TOP",
                 "#/components/schemas/toaster2_config_lst");
         verifyRequestRef(jsonNodeLst.path("get"), "#/components/schemas/toaster2_lst_TOP",
                 "#/components/schemas/toaster2_lst");
 
         final var jsonNodeLst1 = doc.getPaths().get("/rests/data/toaster2:lst/lst1={key1},{key2}");
-        verifyRequestRef(jsonNodeLst1.path("post"), "#/components/schemas/toaster2_lst_config_lst1",
-                "#/components/schemas/toaster2_lst_config_lst1");
         verifyRequestRef(jsonNodeLst1.path("put"), "#/components/schemas/toaster2_lst_config_lst1_TOP",
                 "#/components/schemas/toaster2_lst_config_lst1");
         verifyRequestRef(jsonNodeLst1.path("get"), "#/components/schemas/toaster2_lst_lst1_TOP",
@@ -398,7 +377,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertEquals(2, xmlSchema.size());
         // Test `components/schemas` objects
         final var definitions = doc.getComponents().getSchemas();
-        assertEquals(44, definitions.size());
+        assertEquals(43, definitions.size());
     }
 
     /**
@@ -408,11 +387,11 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     public void testRootPostSchemaReference() {
         final var document = (OpenApiObject) generator.getApiDeclaration(NAME, REVISION_DATE, URI_INFO, OAversion.V3_0);
         assertNotNull(document);
-        final var expectedSchema = "toaster2_config_module";
+        final var expectedSchema = "toaster2_config_toaster";
         // verify schema reference itself
-        verifyRequestRef(document.getPaths().path("/rests/data").path("post"),
+        verifyPostRequestRef(document.getPaths().path("/rests/data").path("post"),
                 getAppropriateModelPrefix(OAversion.V3_0) + expectedSchema,
-                getAppropriateModelPrefix(OAversion.V3_0) + expectedSchema);
+                getAppropriateModelPrefix(OAversion.V3_0) + expectedSchema, CONTAINER);
         // verify existence of the schemas being referenced
         assertTrue("The expected referenced schema (" + expectedSchema + ") is not created",
                 document.getComponents().getSchemas().has(expectedSchema));
