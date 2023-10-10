@@ -192,7 +192,7 @@ public final class DefinitionGeneratorTest {
         assertNotNull(schemas);
 
         // correct number of schemas generated
-        assertEquals(3, schemas.size());
+        assertEquals(2, schemas.size());
         final var makeToast = schemas.get("toaster_make-toast_input").properties().get("toasterToastType");
 
         assertEquals("wheat-bread", makeToast.defaultValue().toString());

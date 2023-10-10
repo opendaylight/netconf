@@ -53,9 +53,9 @@ public final class OperationBuilder {
         // Hidden on purpose
     }
 
-    public static Operation buildPost(final DataSchemaNode childNode, final String parentName, final String nodeName,
-            final String discriminator, final String moduleName, final @NonNull String deviceName,
-            final String description, final List<Parameter> pathParams) {
+    public static Operation buildPost(final @NonNull DataSchemaNode childNode, final String parentName,
+            final String nodeName, final String discriminator, final String moduleName,
+            final @NonNull String deviceName, final String description, final List<Parameter> pathParams) {
         final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
         final List<String> tags = List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
@@ -64,7 +64,7 @@ public final class OperationBuilder {
         if (parentName != null) {
             nameElements.add(parentName);
         }
-        if (childNode != null && childNode.isConfiguration()) {
+        if (childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
             nameElements.add(nodeName);
             nameElements.add(childNodeName + discriminator);

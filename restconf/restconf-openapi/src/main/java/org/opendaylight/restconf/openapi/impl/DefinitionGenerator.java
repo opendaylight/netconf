@@ -122,14 +122,9 @@ public final class DefinitionGenerator {
      * @throws IOException if I/O operation fails
      */
     private static Map<String, Schema> convertToSchemas(final Module module, final EffectiveModelContext schemaContext,
-            final Map<String, Schema> definitions, final DefinitionNames definitionNames,
-            final boolean isForSingleModule) throws IOException {
+            final Map<String, Schema> definitions, final DefinitionNames definitionNames) throws IOException {
         processContainersAndLists(module, definitions, definitionNames, schemaContext);
         processRPCs(module, definitions, definitionNames, schemaContext);
-
-        if (isForSingleModule) {
-            processModule(module, definitions, definitionNames, schemaContext);
-        }
 
         return definitions;
     }
@@ -141,68 +136,7 @@ public final class DefinitionGenerator {
         if (isForSingleModule) {
             definitionNames.addUnlinkedName(module.getName() + MODULE_NAME_SUFFIX);
         }
-        return convertToSchemas(module, schemaContext, definitions, definitionNames, isForSingleModule);
-    }
-
-    private static void processModule(final Module module, final Map<String, Schema> definitions,
-            final DefinitionNames definitionNames, final EffectiveModelContext schemaContext) {
-        final Map<String, Property> properties = new HashMap<>();
-        final List<String> required = new ArrayList<>();
-        final String moduleName = module.getName();
-        final String definitionName = moduleName + MODULE_NAME_SUFFIX;
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(schemaContext);
-        for (final DataSchemaNode node : module.getChildNodes()) {
-            stack.enterSchemaTree(node.getQName());
-            final String localName = node.getQName().getLocalName();
-            if (node.isConfiguration()) {
-                if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
-                    if (isSchemaNodeMandatory(node)) {
-                        required.add(localName);
-                    }
-                    for (final DataSchemaNode childNode : ((DataNodeContainer) node).getChildNodes()) {
-                        final Property.Builder childNodeProperty = new Property.Builder();
-
-                        final String ref = COMPONENTS_PREFIX
-                                + moduleName
-                                + "_" + localName
-                                + definitionNames.getDiscriminator(node);
-
-                        if (node instanceof ListSchemaNode) {
-                            childNodeProperty.type(ARRAY_TYPE);
-                            final Property items = new Property.Builder().ref(ref).build();
-                            childNodeProperty.items(items);
-                            childNodeProperty.description(childNode.getDescription().orElse(""));
-                            childNodeProperty.title(localName);
-                        } else {
-                         /*
-                            Description can't be added, because nothing allowed alongside $ref.
-                            allOf is not an option, because ServiceNow can't parse it.
-                          */
-                            childNodeProperty.ref(ref);
-                        }
-                        //add module name prefix to property name, when ServiceNow can process colons
-                        properties.put(localName, childNodeProperty.build());
-                    }
-                } else if (node instanceof LeafSchemaNode) {
-                    /*
-                        Add module name prefix to property name, when ServiceNow can process colons(second parameter
-                        of processLeafNode).
-                     */
-                    final Property leafNode = processLeafNode((LeafSchemaNode) node, localName, required, stack,
-                            module.getNamespace());
-                    properties.put(localName, leafNode);
-                }
-            }
-            stack.exit();
-        }
-        final Schema.Builder definitionBuilder = new Schema.Builder()
-            .title(definitionName)
-            .type(OBJECT_TYPE)
-            .properties(properties)
-            .description(module.getDescription().orElse(""))
-            .required(required.size() > 0 ? required : null);
-
-        definitions.put(definitionName, definitionBuilder.build());
+        return convertToSchemas(module, schemaContext, definitions, definitionNames);
     }
 
     private static boolean isSchemaNodeMandatory(final DataSchemaNode node) {
