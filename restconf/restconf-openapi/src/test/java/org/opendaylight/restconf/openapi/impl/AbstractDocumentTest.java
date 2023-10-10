@@ -7,16 +7,20 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
 import java.util.Optional;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.internal.util.collection.ImmutableMultivaluedMap;
+import org.mockito.ArgumentCaptor;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.openapi.DocGenTestHelper;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -61,7 +65,7 @@ public abstract class AbstractDocumentTest {
     }
 
     protected static String getAllModulesDoc() throws Exception {
-        final var getAllController = DocGenTestHelper.createMockUriInfo(URI + "single");
+        final var getAllController = createMockUriInfo(URI + "single");
         final var controllerDocAll = openApiService.getAllModulesDoc(getAllController).getEntity();
 
         return MAPPER.writeValueAsString(controllerDocAll);
@@ -72,7 +76,7 @@ public abstract class AbstractDocumentTest {
         if (revision != null) {
             uri = uri + "(" + revision + ")";
         }
-        final var getModuleController = DocGenTestHelper.createMockUriInfo(uri);
+        final var getModuleController = createMockUriInfo(uri);
         final var controllerDocModule = openApiService.getDocByModule(moduleName, revision, getModuleController);
 
         return MAPPER.writeValueAsString(controllerDocModule.getEntity());
@@ -80,7 +84,7 @@ public abstract class AbstractDocumentTest {
 
 
     protected static String getMountDoc() throws Exception {
-        final var getAllDevice = DocGenTestHelper.createMockUriInfo(URI + "mounts/1");
+        final var getAllDevice = createMockUriInfo(URI + "mounts/1");
         when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
         final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice);
 
@@ -89,9 +93,25 @@ public abstract class AbstractDocumentTest {
 
 
     protected static String getMountDocByModule(final String moduleName, final String revision) throws Exception {
-        final var getToasterDevice = DocGenTestHelper.createMockUriInfo(URI + "mounts/1/" + moduleName);
-        final var deviceDocToaster = openApiService.getMountDocByModule("1", moduleName, revision, getToasterDevice);
+        final var getDevice = createMockUriInfo(URI + "mounts/1/" + moduleName);
+        final var deviceDoc = openApiService.getMountDocByModule("1", moduleName, revision, getDevice);
 
-        return MAPPER.writeValueAsString(deviceDocToaster.getEntity());
+        return MAPPER.writeValueAsString(deviceDoc.getEntity());
+    }
+
+    public static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
+        final java.net.URI uri = new URI(urlPrefix);
+        final UriBuilder mockBuilder = mock(UriBuilder.class);
+
+        final ArgumentCaptor<String> subStringCapture = ArgumentCaptor.forClass(String.class);
+        when(mockBuilder.path(subStringCapture.capture())).thenReturn(mockBuilder);
+        when(mockBuilder.build()).then(invocation -> java.net.URI.create(uri + "/" + subStringCapture.getValue()));
+
+        final UriInfo info = mock(UriInfo.class);
+        when(info.getRequestUriBuilder()).thenReturn(mockBuilder);
+        when(mockBuilder.replaceQuery(any())).thenReturn(mockBuilder);
+        when(info.getBaseUri()).thenReturn(uri);
+
+        return info;
     }
 }
