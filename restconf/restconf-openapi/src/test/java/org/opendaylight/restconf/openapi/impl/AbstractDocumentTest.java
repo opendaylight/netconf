@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -68,7 +69,8 @@ public abstract class AbstractDocumentTest {
         final var getAllController = createMockUriInfo(URI + "single");
         final var controllerDocAll = openApiService.getAllModulesDoc(getAllController).getEntity();
 
-        return MAPPER.writeValueAsString(controllerDocAll);
+        return new String(((OpenApiInputStream) controllerDocAll).readAllBytes(),
+            StandardCharsets.UTF_8);
     }
 
     protected static String getDocByModule(final String moduleName, final String revision) throws Exception {
@@ -79,7 +81,8 @@ public abstract class AbstractDocumentTest {
         final var getModuleController = createMockUriInfo(uri);
         final var controllerDocModule = openApiService.getDocByModule(moduleName, revision, getModuleController);
 
-        return MAPPER.writeValueAsString(controllerDocModule.getEntity());
+        return new String(((OpenApiInputStream) controllerDocModule.getEntity()).readAllBytes(),
+            StandardCharsets.UTF_8);
     }
 
 
@@ -88,7 +91,8 @@ public abstract class AbstractDocumentTest {
         when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
         final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice);
 
-        return MAPPER.writeValueAsString(deviceDocAll.getEntity());
+        return new String(((OpenApiInputStream) deviceDocAll.getEntity()).readAllBytes(),
+            StandardCharsets.UTF_8);
     }
 
 
@@ -96,7 +100,8 @@ public abstract class AbstractDocumentTest {
         final var getDevice = createMockUriInfo(URI + "mounts/1/" + moduleName);
         final var deviceDoc = openApiService.getMountDocByModule("1", moduleName, revision, getDevice);
 
-        return MAPPER.writeValueAsString(deviceDoc.getEntity());
+        return new String(((OpenApiInputStream) deviceDoc.getEntity()).readAllBytes(),
+            StandardCharsets.UTF_8);
     }
 
     public static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
