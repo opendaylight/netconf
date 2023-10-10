@@ -18,14 +18,12 @@ import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolveFullN
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Range;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,15 +34,10 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.openapi.model.Components;
-import org.opendaylight.restconf.openapi.model.Info;
-import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Path;
 import org.opendaylight.restconf.openapi.model.Schema;
-import org.opendaylight.restconf.openapi.model.Server;
-import org.opendaylight.restconf.openapi.model.security.Http;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
@@ -74,20 +67,9 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseYangOpenApiGenerator.class);
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
-
-    public static final String API_VERSION = "1.0.0";
-    public static final String OPEN_API_VERSION = "3.0.3";
     public static final String BASE_PATH = "/";
     public static final String MODULE_NAME_SUFFIX = "_module";
-    public static final String BASIC_AUTH_NAME = "basicAuth";
-    public static final Http OPEN_API_BASIC_AUTH = new Http("basic", null, null);
-    public static final List<Map<String, List<String>>> SECURITY = List.of(Map.of(BASIC_AUTH_NAME, List.of()));
-    public static final String DESCRIPTION = """
-        We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).
-        For operational data we only provide GET API.\n
-        For majority of request you can see only config data in examples. That is because we can show only one example
-        per request. The exception when you can see operational data in example is when data are representing
-        operational (config false) container with no config data in it.""";
+    public static final List<Map<String, List<String>>> SECURITY = List.of(Map.of("basicAuth", List.of()));
 
     private final DOMSchemaService schemaService;
 
@@ -95,62 +77,27 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiObject getControllerModulesDoc(final UriInfo uriInfo, final DefinitionNames definitionNames) {
+    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo) throws IOException {
         final var context = requireNonNull(schemaService.getGlobalContext());
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
         final var title = "Controller modules of RESTCONF";
-        final var info = new Info(API_VERSION, title, DESCRIPTION);
-        final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
-
-        final var paths = new HashMap<String, Path>();
-        final var schemas = new HashMap<String, Schema>();
-        for (final var module : getSortedModules(context)) {
-            LOG.debug("Working on [{},{}]...", module.getName(), module.getQNameModule().getRevision().orElse(null));
-            schemas.putAll(getSchemas(module, context, definitionNames, false));
-            paths.putAll(getPaths(module, "", CONTROLLER_RESOURCE_NAME, context, definitionNames, false));
-        }
-
-        final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
-        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
+        final var url = schema + "://" + host + BASE_PATH;
+        final var modules = context.getModules();
+        return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
+            modules);
     }
 
-    public static Set<Module> filterByRange(final SortedSet<Module> modules, final Range<Integer> range) {
-        if (range.equals(Range.all())) {
-            return modules;
-        }
-        final int begin = range.lowerEndpoint();
-        final int end = range.upperEndpoint();
-
-        Module firstModule = null;
-
-        final Iterator<Module> iterator = modules.iterator();
-        int counter = 0;
-        while (iterator.hasNext() && counter < end) {
-            final Module module = iterator.next();
-            if (containsListOrContainer(module.getChildNodes()) || !module.getRpcs().isEmpty()) {
-                if (counter == begin) {
-                    firstModule = module;
-                }
-                counter++;
-            }
-        }
-
-        if (iterator.hasNext()) {
-            return modules.subSet(firstModule, iterator.next());
-        } else {
-            return modules.tailSet(firstModule);
-        }
-    }
-
-    public OpenApiObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
+    public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo)
+            throws IOException {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
         return getApiDeclaration(module, revision, uriInfo, schemaContext, "", CONTROLLER_RESOURCE_NAME);
     }
 
-    public OpenApiObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
-            final EffectiveModelContext schemaContext, final String context, final @NonNull String deviceName) {
+    public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
+            final EffectiveModelContext schemaContext, final String urlPrefix, final @NonNull String deviceName)
+            throws IOException {
         final Optional<Revision> rev;
 
         try {
@@ -165,13 +112,11 @@ public abstract class BaseYangOpenApiGenerator {
 
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
-        final var info = new Info(API_VERSION, module.getName(), DESCRIPTION);
-        final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
-        final var definitionNames = new DefinitionNames();
-        final var schemas = getSchemas(module, schemaContext, definitionNames, true);
-        final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
-        final var paths = getPaths(module, context, deviceName, schemaContext, definitionNames, true);
-        return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
+        final var title = module.getName();
+        final var url = schema + "://" + host + BASE_PATH;
+        final var modules = List.of(module);
+        return new OpenApiInputStream(schemaContext, title, url, SECURITY,  deviceName, urlPrefix, true, false,
+            modules);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -298,15 +243,6 @@ public abstract class BaseYangOpenApiGenerator {
                 pathParams.addAll(parentPathParams);
             }
         }
-    }
-
-    private static boolean containsListOrContainer(final Iterable<? extends DataSchemaNode> nodes) {
-        for (final DataSchemaNode child : nodes) {
-            if (child instanceof ListSchemaNode || child instanceof ContainerSchemaNode) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private static Path operations(final DataSchemaNode node, final String moduleName,
