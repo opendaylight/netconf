@@ -35,7 +35,24 @@ public abstract class AbstractApiDocTest {
     protected static List<String> getPathPostParameters(final ObjectNode paths, final String path) {
         final var params = new ArrayList<String>();
         paths.get(path).get("post").get("parameters").elements()
-            .forEachRemaining(p -> params.add(p.get("name").asText()));
+                .forEachRemaining(p -> {
+                    final String name = p.get("name").asText();
+                    if (!"content".equals(name)) {
+                        params.add(name);
+                    }
+                });
+        return params;
+    }
+
+    protected static List<String> getGetPathParameters(final ObjectNode paths, final String path) {
+        final var params = new ArrayList<String>();
+        paths.get(path).get("get").get("parameters").elements()
+            .forEachRemaining(p -> {
+                final String name = p.get("name").asText();
+                if (!"content".equals(name)) {
+                    params.add(name);
+                }
+            });
         return params;
     }
 
