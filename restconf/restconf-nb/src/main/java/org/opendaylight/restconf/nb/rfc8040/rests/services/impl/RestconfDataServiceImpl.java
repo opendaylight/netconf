@@ -83,12 +83,14 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.CreateOrReplaceResult;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -380,12 +382,16 @@ public final class RestconfDataServiceImpl {
         final var insert = QueryParams.parseInsert(reqPath.getSchemaContext(), uriInfo);
         final var req = bindResourceRequest(reqPath, body);
 
-        req.strategy().putData(req.path(), req.data(), insert).addCallback(new JaxRsRestconfCallback<>(ar,
-            status -> switch (status) {
-                // Note: no Location header, as it matches the request path
-                case CREATED -> Response.status(Status.CREATED).build();
-                case REPLACED -> Response.noContent().build();
-            }));
+        req.strategy().putData(req.path(), req.data(), insert).addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final CreateOrReplaceResult result) {
+                return switch (result) {
+                    // Note: no Location header, as it matches the request path
+                    case CREATED -> Response.status(Status.CREATED).build();
+                    case REPLACED -> Response.noContent().build();
+                };
+            }
+        });
     }
 
     /**
@@ -501,8 +507,12 @@ public final class RestconfDataServiceImpl {
         final var data = payload.body();
         final var path = concat(parentPath, payload.prefix());
 
-        strategy.postData(path, data, insert).addCallback(new JaxRsRestconfCallback<>(ar,
-            ignored -> Response.created(resolveLocation(uriInfo, path, modelContext, data)).build()));
+        strategy.postData(path, data, insert).addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final Empty result) {
+                return Response.created(resolveLocation(uriInfo, path, modelContext, data)).build();
+            }
+        });
     }
 
     private static YangInstanceIdentifier concat(final YangInstanceIdentifier parent, final List<PathArgument> args) {
@@ -547,8 +557,12 @@ public final class RestconfDataServiceImpl {
         final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
         final var strategy = server.getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
 
-        strategy.delete(reqPath.getInstanceIdentifier()).addCallback(
-            new JaxRsRestconfCallback<>(ar, ignored -> Response.noContent().build()));
+        strategy.delete(reqPath.getInstanceIdentifier()).addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final Empty result) {
+                return Response.noContent().build();
+            }
+        });
     }
 
     /**
@@ -667,8 +681,12 @@ public final class RestconfDataServiceImpl {
     private void plainPatchData(final InstanceIdentifierContext reqPath, final ResourceBody body,
             final AsyncResponse ar) {
         final var req = bindResourceRequest(reqPath, body);
-        req.strategy().merge(req.path(), req.data()).addCallback(
-            new JaxRsRestconfCallback<>(ar, ignored -> Response.ok().build()));
+        req.strategy().merge(req.path(), req.data()).addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final Empty result) {
+                return Response.ok().build();
+            }
+        });
     }
 
     private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
@@ -784,7 +802,12 @@ public final class RestconfDataServiceImpl {
     void yangPatchData(final @NonNull EffectiveModelContext modelContext,
             final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint, final AsyncResponse ar) {
         server.getRestconfStrategy(modelContext, mountPoint).patchData(patch)
-            .addCallback(new JaxRsRestconfCallback<>(ar, status -> Response.ok().entity(status).build()));
+            .addCallback(new JaxRsRestconfCallback<>(ar) {
+                @Override
+                Response transform(final PatchStatusContext result) {
+                    return Response.ok().entity(result).build();
+                }
+            });
     }
 
     private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,
@@ -822,11 +845,14 @@ public final class RestconfDataServiceImpl {
         final var response = mountPoint != null ? invokeAction(input, schemaPath, yangIIdContext, mountPoint)
             : invokeAction(input, schemaPath, yangIIdContext, actionService);
 
-        response.addCallback(new JaxRsRestconfCallback<>(ar, result -> {
-            final var output = result.getOutput().orElse(null);
-            return output == null || output.isEmpty() ? Response.status(Status.NO_CONTENT).build()
-                : Response.status(Status.OK).entity(new NormalizedNodePayload(inference, output)).build();
-        }));
+        response.addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final DOMActionResult result) {
+                final var output = result.getOutput().orElse(null);
+                return output == null || output.isEmpty() ? Response.status(Status.NO_CONTENT).build()
+                    : Response.status(Status.OK).entity(new NormalizedNodePayload(inference, output)).build();
+            }
+        });
     }
 
     /**
