@@ -144,11 +144,16 @@ public final class RestconfInvokeOperationsServiceImpl {
                     ErrorTag.MALFORMED_MESSAGE, e);
         }
 
-        hackInvokeRpc(databind, reqPath, uriInfo, input).addCallback(new JaxRsRestconfCallback<>(ar,
-            result -> result
-                .filter(output -> !output.isEmpty())
-                .map(output -> Response.ok().entity(new NormalizedNodePayload(reqPath.inference(), output)).build())
-                .orElseGet(() -> Response.noContent().build())));
+        hackInvokeRpc(databind, reqPath, uriInfo, input).addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final Optional<ContainerNode> result) {
+                return result
+                    .filter(output -> !output.isEmpty())
+                    .map(output -> Response.ok().entity(new NormalizedNodePayload(reqPath.inference(), output)).build())
+                    .orElseGet(() -> Response.noContent().build());
+            }
+        });
+
     }
 
     private RestconfFuture<Optional<ContainerNode>> hackInvokeRpc(final DatabindContext localDatabind,

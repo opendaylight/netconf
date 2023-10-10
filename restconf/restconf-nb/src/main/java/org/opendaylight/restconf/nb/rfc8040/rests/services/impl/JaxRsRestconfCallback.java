@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.function.Function;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import org.opendaylight.restconf.common.errors.RestconfCallback;
@@ -20,22 +19,22 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
  *
  * @param <V> value type
  */
-final class JaxRsRestconfCallback<V> extends RestconfCallback<V> {
-    private final Function<V, Response> transform;
+abstract class JaxRsRestconfCallback<V> extends RestconfCallback<V> {
     private final AsyncResponse ar;
 
-    JaxRsRestconfCallback(final AsyncResponse ar, final Function<V, Response> transform) {
+    JaxRsRestconfCallback(final AsyncResponse ar) {
         this.ar = requireNonNull(ar);
-        this.transform = requireNonNull(transform);
     }
 
     @Override
-    public void onSuccess(final V result) {
-        ar.resume(transform.apply(result));
+    public final void onSuccess(final V result) {
+        ar.resume(transform(result));
     }
 
     @Override
-    protected void onFailure(final RestconfDocumentedException failure) {
+    protected final void onFailure(final RestconfDocumentedException failure) {
         ar.resume(failure);
     }
+
+    abstract Response transform(V result);
 }
