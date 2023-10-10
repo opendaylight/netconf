@@ -277,14 +277,20 @@ public abstract class BaseYangOpenApiGenerator {
 
     private static void addRootPostLink(final Module module, final Optional<String> deviceName,
             final ArrayNode pathParams, final String resourcePath, final Map<String, Path> paths) {
-        if (containsListOrContainer(module.getChildNodes())) {
+        final var childNode = getListOrContainerChildNode(module);
+        if (childNode != null) {
             final String moduleName = module.getName();
-            final String name = moduleName + MODULE_NAME_SUFFIX;
-            final var postBuilder = new Path.Builder();
-            postBuilder.post(buildPost(null, null, name, "", moduleName, deviceName,
-                    module.getDescription().orElse(""), pathParams));
-            paths.put(resourcePath, postBuilder.build());
+            paths.put(resourcePath, new Path.Builder()
+                .post(buildPost(childNode, null, moduleName, "", moduleName, deviceName,
+                    module.getDescription().orElse(""), pathParams))
+                .build());
         }
+    }
+
+    private static <T extends DataNodeContainer> DataSchemaNode getListOrContainerChildNode(final T node) {
+        return node.getChildNodes().stream()
+            .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
+            .findFirst().orElse(null);
     }
 
     public OpenApiObject.Builder createOpenApiObjectBuilder(final String schema, final String host,
