@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0eee7bfd_ed0e9f55",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-10T11:20:26Z",
+      "side": 1,
+      "message": "I think you should use NAMESPACE_KEY here as it\u0027s defined",
+      "revId": "a05cec1a53fc16a21439694acb25ee70d440e91a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
