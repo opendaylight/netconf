@@ -76,8 +76,9 @@ public final class PathsStream extends InputStream {
 
     public PathsStream(final EffectiveModelContext schemaContext, final OpenApiBodyWriter writer,
             final JsonGenerator generator, final ByteArrayOutputStream stream, final String deviceName,
-            final String urlPrefix, final boolean isForSingleModule, final boolean includeDataStore) {
-        iterator = schemaContext.getModules().iterator();
+            final String urlPrefix, final boolean isForSingleModule, final boolean includeDataStore,
+            final Iterator<? extends Module> iterator) {
+        this.iterator = iterator;
         this.generator = generator;
         this.writer = writer;
         this.stream = stream;
