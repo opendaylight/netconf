@@ -17,6 +17,23 @@
       "message": "recheck",
       "revId": "1a3587f8d12d55b5630fa3bdae959639f4aba08e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cffe3eba_7ddc2705",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-11T14:23:25Z",
+      "side": 1,
+      "message": "IMO we can rework this to be boolean by checking the state.",
+      "revId": "1a3587f8d12d55b5630fa3bdae959639f4aba08e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
