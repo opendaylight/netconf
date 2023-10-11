@@ -40,7 +40,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -120,9 +121,11 @@ class NetconfTopologyImplTest {
                 .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
                 .setKeepaliveDelay(Uint32.valueOf(1000))
                 .setTcpOnly(true)
-                .setCredentials(new LoginPasswordBuilder()
-                    .setUsername("testuser")
-                    .setPassword("testpassword")
+                .setCredentials(new LoginPwUnencryptedBuilder()
+                    .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                        .setUsername("testuser")
+                        .setPassword("testpassword")
+                        .build())
                     .build())
                 .build())
             .build();
