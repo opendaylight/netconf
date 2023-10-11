@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff7563f4_95a397c8",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/DefaultNetconfClientConfigurationBuilderFactory.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-11T13:25:25Z",
+      "side": 1,
+      "message": "I would preserve original logic from requireNonNull().",
+      "revId": "3e08012af66277689b31cb8149d2e6fe63b9a765",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fa0a02d_757d1365",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-11T13:25:25Z",
+      "side": 1,
+      "message": "Please move this to original place.",
+      "revId": "3e08012af66277689b31cb8149d2e6fe63b9a765",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf40951a_0ce26128",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-11T13:25:25Z",
+      "side": 1,
+      "message": "Why IAE exception?",
+      "revId": "3e08012af66277689b31cb8149d2e6fe63b9a765",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04989b44_c68ef188",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-11T13:25:25Z",
+      "side": 1,
+      "message": "IMO we should log that we are skipping connection attempt.",
+      "revId": "3e08012af66277689b31cb8149d2e6fe63b9a765",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
