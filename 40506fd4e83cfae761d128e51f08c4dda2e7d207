@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4caa33d9_d88580d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-11T13:04:21Z",
+      "side": 1,
+      "message": "I\u0027m getting errors like this one:\n\nStructural error at paths./rests/data/network-topology:network-topology/topology\u003dtopology-netconf/node\u003d17830-sim-device/yang-ext:mount/typed-params:typed/bits\u003d{bits-key}.get.parameters.0.schema.type\nshould be equal to one of the allowed values\nallowedValues: array, boolean, integer, number, object, string\n\nWhen I try to validate OpenApi generated for device with typed-params.yang",
+      "revId": "40506fd4e83cfae761d128e51f08c4dda2e7d207",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
