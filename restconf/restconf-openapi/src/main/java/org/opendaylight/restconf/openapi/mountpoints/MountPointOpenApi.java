@@ -218,7 +218,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         }
         final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
         if (includeDataStore) {
-            paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
+            paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName, paths, true));
         }
         return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
@@ -235,21 +235,44 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
         final var components = new Components(new HashMap<>(), Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
-        final var paths = getDataStoreApiPaths(context, deviceName);
+        final var paths = getDataStoreApiPaths(context, deviceName, null, false);
         return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
 
-    private Map<String, Path> getDataStoreApiPaths(final String context, final String deviceName) {
+    private Map<String, Path> getDataStoreApiPaths(final String urlPrefix, final String deviceName,
+            final Map<String, Path> paths, final boolean isMountPointApi) {
         final var dataBuilder = new Path.Builder();
         dataBuilder.get(createGetPathItem("data",
                 "Queries the config (startup) datastore on the mounted hosted.", deviceName));
+        if (isMountPointApi) {
+            final Operation chosenPost = paths.get(paths.keySet().stream()
+                    .filter(x -> x.contains("/rests/data/") && paths.get(x).post() != null)
+                    .findFirst().get())
+                .post();
+            final Operation post = new Operation.Builder()
+                .deprecated(chosenPost.deprecated())
+                .tags(List.of(deviceName + " POST root"))
+                .parameters(chosenPost.parameters())
+                .security(chosenPost.security())
+                .servers(chosenPost.servers())
+                .callbacks(chosenPost.callbacks())
+                .externalDocs(chosenPost.externalDocs())
+                .requestBody(chosenPost.requestBody())
+                .responses(chosenPost.responses())
+                .description(chosenPost.description())
+                .operationId(chosenPost.operationId())
+                .summary(SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, "datastore", "data"))
+                .build();
+
+            dataBuilder.post(post);
+        }
 
         final var operationsBuilder = new Path.Builder();
         operationsBuilder.get(createGetPathItem("operations",
                 "Queries the available operations (RPC calls) on the mounted hosted.", deviceName));
 
-        return Map.of(openApiGenerator.getResourcePath("data", context), dataBuilder.build(),
-            openApiGenerator.getResourcePath("operations", context), operationsBuilder.build());
+        return Map.of(openApiGenerator.getResourcePath("data", urlPrefix), dataBuilder.build(),
+            openApiGenerator.getResourcePath("operations", urlPrefix), operationsBuilder.build());
     }
 
     private static Operation createGetPathItem(final String resourceType, final String description,
