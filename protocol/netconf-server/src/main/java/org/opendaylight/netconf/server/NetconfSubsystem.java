@@ -89,7 +89,10 @@ final class NetconfSubsystem extends AbstractCommandSupport
 
     @Override
     public int data(final ChannelSession channel, final byte[] buf, final int start, final int len) {
-        innerChannel.writeInbound(Unpooled.copiedBuffer(buf, start, len));
+        // Do not propagate empty invocations
+        if (len != 0) {
+            innerChannel.writeInbound(Unpooled.copiedBuffer(buf, start, len));
+        }
         return len;
     }
 
