@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3de4dfae_c0ba5816",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-12T14:40:11Z",
+      "side": 1,
+      "message": "This is that occasion.",
+      "parentUuid": "9905790d_d51131d0",
+      "revId": "510c4d00bc51b2fcb2fb17206f0862ff3fcd4f11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f471a7bd_29fd38af",

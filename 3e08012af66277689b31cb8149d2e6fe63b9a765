@@ -71,6 +71,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "553d8aa2_944513db",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/DefaultNetconfClientConfigurationBuilderFactory.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-12T14:40:11Z",
+      "side": 1,
+      "message": "No, according to the task we are catching any Exception.",
+      "parentUuid": "555f3952_7fbae4a5",
+      "revId": "3e08012af66277689b31cb8149d2e6fe63b9a765",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8fa0a02d_757d1365",
@@ -106,6 +124,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fd27126_dcbfce92",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-12T14:40:11Z",
+      "side": 1,
+      "message": "ACK",
+      "parentUuid": "d6f4d583_d4ac4fa0",
+      "revId": "3e08012af66277689b31cb8149d2e6fe63b9a765",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cf40951a_0ce26128",
@@ -137,6 +173,24 @@
       "side": 1,
       "message": "builderFactory can potentially throw IllegalArgumentException. Catching NullPointerException produce DCN_NULLPOINTER_EXCEPTION from maven.",
       "parentUuid": "cf40951a_0ce26128",
+      "revId": "3e08012af66277689b31cb8149d2e6fe63b9a765",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2ad5919_53666806",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-12T14:40:11Z",
+      "side": 1,
+      "message": "We are catching *Exception caused by various reasons. In this case we have to suppress checkstyle.",
+      "parentUuid": "d9cd7349_a7b71512",
       "revId": "3e08012af66277689b31cb8149d2e6fe63b9a765",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
