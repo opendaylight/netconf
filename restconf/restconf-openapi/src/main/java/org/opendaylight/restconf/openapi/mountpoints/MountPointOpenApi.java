@@ -218,7 +218,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         }
         final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
         if (includeDataStore) {
-            paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
+            paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName, paths, true));
         }
         return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
@@ -235,14 +235,23 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var servers = List.of(new Server(schema + "://" + host + BASE_PATH));
         final var components = new Components(new HashMap<>(), Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
-        final var paths = getDataStoreApiPaths(context, deviceName);
+        final var paths = getDataStoreApiPaths(context, deviceName, null, false);
         return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
     }
 
-    private Map<String, Path> getDataStoreApiPaths(final String context, final String deviceName) {
+    private Map<String, Path> getDataStoreApiPaths(final String context, final String deviceName,
+            final Map<String, Path> paths, final boolean isMountPointApi) {
         final var dataBuilder = new Path.Builder();
         dataBuilder.get(createGetPathItem("data",
                 "Queries the config (startup) datastore on the mounted hosted.", deviceName));
+        if (isMountPointApi) {
+            final var postOperation = paths.get(paths.keySet().stream()
+                    .filter(x -> isValidPath(x, paths))
+                    .findFirst().orElseThrow())
+                .post();
+
+            dataBuilder.post(mapPostRequest(deviceName, postOperation));
+        }
 
         final var operationsBuilder = new Path.Builder();
         operationsBuilder.get(createGetPathItem("operations",
@@ -252,10 +261,27 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             openApiGenerator.getResourcePath("operations", context), operationsBuilder.build());
     }
 
+    private static Operation mapPostRequest(final String deviceName, final Operation postOperation) {
+        return new Operation.Builder()
+            .deprecated(postOperation.deprecated())
+            .tags(List.of(deviceName + " root"))
+            .parameters(postOperation.parameters())
+            .security(postOperation.security())
+            .servers(postOperation.servers())
+            .callbacks(postOperation.callbacks())
+            .externalDocs(postOperation.externalDocs())
+            .requestBody(postOperation.requestBody())
+            .responses(postOperation.responses())
+            .description(postOperation.description())
+            .operationId(postOperation.operationId())
+            .summary(SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, "datastore", "data"))
+            .build();
+    }
+
     private static Operation createGetPathItem(final String resourceType, final String description,
             final String deviceName) {
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.GET, deviceName, "datastore", resourceType);
-        final List<String> tags = List.of(deviceName + " GET root");
+        final List<String> tags = List.of(deviceName + " root");
         final ResponseObject okResponse = new ResponseObject.Builder()
             .description(Response.Status.OK.getReasonPhrase())
             .build();
@@ -284,5 +310,11 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             final Long id = instanceIdToLongId.remove(path);
             longIdToInstanceId.remove(id);
         }
+    }
+
+    private static boolean isValidPath(String path, Map<String, Path> paths) {
+        return path.contains("/rests/data/")
+            && paths.get(path).post() != null
+            && paths.get(path).post().parameters().isEmpty();
     }
 }
