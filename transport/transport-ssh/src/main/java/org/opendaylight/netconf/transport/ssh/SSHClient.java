@@ -28,7 +28,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
 public final class SSHClient extends SSHTransportStack {
     private SSHClient(final TransportChannelListener listener, final TransportSshClient sshClient) {
         super(listener, sshClient, sshClient.getSessionFactory());
-        sshClient.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
     }
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
