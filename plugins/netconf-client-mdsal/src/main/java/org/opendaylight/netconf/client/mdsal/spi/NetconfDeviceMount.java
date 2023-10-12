@@ -53,18 +53,20 @@ public class NetconfDeviceMount implements AutoCloseable {
 
     public void onDeviceConnected(final EffectiveModelContext initialCtx,
             final RemoteDeviceServices services, final DOMDataBroker broker,
-            final NetconfDataTreeService dataTreeService) {
-        onDeviceConnected(initialCtx, services, new NetconfDeviceNotificationService(), broker, dataTreeService);
+            final NetconfDataTreeService dataTreeService, final DOMSchemaService domSchemaService) {
+        onDeviceConnected(initialCtx, services, new NetconfDeviceNotificationService(), broker, dataTreeService,
+            domSchemaService);
     }
 
     public synchronized void onDeviceConnected(final EffectiveModelContext initialCtx,
             final RemoteDeviceServices services, final NetconfDeviceNotificationService newNotificationService,
-            final DOMDataBroker broker, final NetconfDataTreeService dataTreeService) {
+            final DOMDataBroker broker, final NetconfDataTreeService dataTreeService,
+            final DOMSchemaService domSchemaService) {
         requireNonNull(mountService, "Closed");
         checkState(topologyRegistration == null, "Already initialized");
 
         final var mountBuilder = mountService.createMountPoint(mountPath);
-        mountBuilder.addService(DOMSchemaService.class, FixedDOMSchemaService.of(() -> initialCtx));
+        mountBuilder.addService(DOMSchemaService.class, domSchemaService);
 
         final var rpcs = services.rpcs();
         mountBuilder.addService(NetconfRpcService.class, rpcs);

@@ -10,6 +10,7 @@ package org.opendaylight.netconf.client.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -18,10 +19,12 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  */
 public record NetconfDeviceSchema(
     @NonNull NetconfDeviceCapabilities capabilities,
-    @NonNull MountPointContext mountContext) {
+    @NonNull MountPointContext mountContext,
+    @NonNull DOMSchemaService sourceProvider) {
 
     public NetconfDeviceSchema {
         requireNonNull(capabilities);
         requireNonNull(mountContext);
+        requireNonNull(sourceProvider);
     }
 }
