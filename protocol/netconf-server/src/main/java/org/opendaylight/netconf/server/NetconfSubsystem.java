@@ -13,7 +13,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
-import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -70,7 +69,7 @@ final class NetconfSubsystem extends AbstractCommandSupport
             });
 
         // NETCONF protocol handlers
-        channelInitializer.initialize(innerChannel, new DefaultPromise<>(GlobalEventExecutor.INSTANCE));
+        channelInitializer.initialize(innerChannel, GlobalEventExecutor.INSTANCE.newPromise());
         // trigger negotiation flow
         innerChannel.pipeline().fireChannelActive();
         // set additional info for upcoming netconf session
