@@ -33,7 +33,8 @@ import org.opendaylight.netconf.shaded.sshd.server.command.AsyncCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class NetconfSubsystem extends AbstractCommandSupport implements AsyncCommand, ChannelSessionAware {
+final class NetconfSubsystem extends AbstractCommandSupport
+        implements AsyncCommand, ChannelSessionAware, ChannelDataReceiver {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSubsystem.class);
 
     private final EmbeddedChannel innerChannel = new EmbeddedChannel();
@@ -120,18 +121,18 @@ final class NetconfSubsystem extends AbstractCommandSupport implements AsyncComm
          * NOTE: The channel data receiver require to be set within current method, so it could be handled
          * with subsequent logic of ChannelSession#prepareChannelCommand() where this method is executed from.
          */
-        channelSession.setDataReceiver(new ChannelDataReceiver() {
-            @Override
-            public int data(final ChannelSession channel, final byte[] buf, final int start, final int len) {
-                innerChannel.writeInbound(Unpooled.copiedBuffer(buf, start, len));
-                return len;
-            }
+        channelSession.setDataReceiver(this);
+    }
 
-            @Override
-            public void close() {
-                innerChannel.close();
-            }
-        });
+    @Override
+    public int data(final ChannelSession channel, final byte[] buf, final int start, final int len) {
+        innerChannel.writeInbound(Unpooled.copiedBuffer(buf, start, len));
+        return len;
+    }
+
+    @Override
+    public void close() {
+        innerChannel.close();
     }
 
     @Override
