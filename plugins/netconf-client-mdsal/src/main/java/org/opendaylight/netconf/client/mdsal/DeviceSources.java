@@ -44,6 +44,10 @@ final class DeviceSources {
         return providedSources;
     }
 
+    public SchemaSourceProvider<YangTextSchemaSource> sourceProvider() {
+        return sourceProvider;
+    }
+
     List<SourceIdentifier> getRequiredSources() {
         return requiredSources.stream().map(DeviceSources::toSourceId).collect(Collectors.toList());
     }

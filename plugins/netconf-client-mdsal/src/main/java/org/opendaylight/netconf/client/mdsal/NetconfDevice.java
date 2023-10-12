@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
@@ -71,6 +72,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,7 +156,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             // Potentially acquire mount point list and interpret it
             Futures.transformAsync(futureSchema,
                 result -> Futures.transform(createMountPointContext(result.modelContext(), baseSchema, listener),
-                    mount -> new NetconfDeviceSchema(result.capabilities(), mount), processingExecutor),
+                    mount -> new NetconfDeviceSchema(result.capabilities(), mount,
+                        FixedDOMSchemaService.of(mount, result.sourceProvider())), processingExecutor),
                 processingExecutor),
             new FutureCallback<>() {
                 @Override
@@ -363,11 +366,13 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
      */
     private record SchemaResult(
         @NonNull NetconfDeviceCapabilities capabilities,
-        @NonNull EffectiveModelContext modelContext) {
+        @NonNull EffectiveModelContext modelContext,
+        @NonNull SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
 
         SchemaResult {
             requireNonNull(capabilities);
             requireNonNull(modelContext);
+            requireNonNull(sourceProvider);
         }
     }
 
@@ -436,7 +441,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
 
             resultFuture.set(new SchemaResult(new NetconfDeviceCapabilities(ImmutableMap.copyOf(unresolvedCapabilites),
-                ImmutableSet.copyOf(resolvedCapabilities), ImmutableSet.copyOf(nonModuleBasedCapabilities)), result));
+                ImmutableSet.copyOf(resolvedCapabilities), ImmutableSet.copyOf(nonModuleBasedCapabilities)), result,
+                deviceSources.sourceProvider()));
         }
 
         @Override
