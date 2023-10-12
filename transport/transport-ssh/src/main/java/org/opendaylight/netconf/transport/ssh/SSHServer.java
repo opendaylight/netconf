@@ -29,7 +29,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
 public final class SSHServer extends SSHTransportStack {
     private SSHServer(final TransportChannelListener listener, final TransportSshServer sshServer) {
         super(listener, sshServer, sshServer.getSessionFactory());
-        sshServer.addSessionListener(new UserAuthSessionListener(sessionAuthHandlers, sessions));
     }
 
     static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
