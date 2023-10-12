@@ -24,6 +24,7 @@ import org.opendaylight.netconf.shaded.sshd.server.channel.ChannelSession;
 import org.opendaylight.netconf.shaded.sshd.server.channel.ChannelSessionAware;
 import org.opendaylight.netconf.shaded.sshd.server.command.AbstractCommandSupport;
 import org.opendaylight.netconf.shaded.sshd.server.command.AsyncCommand;
+import org.opendaylight.netconf.transport.ssh.OutboundChannelHandler;
 
 final class NetconfSubsystem extends AbstractCommandSupport
         implements AsyncCommand, ChannelSessionAware, ChannelDataReceiver {
@@ -58,7 +59,7 @@ final class NetconfSubsystem extends AbstractCommandSupport
          * serve NETCONF over SSH.
          */
         // outbound packet handler, adding fist means it will be invoked last because of flow direction
-        innerChannel.pipeline().addFirst(new NetconfSubsystemOutboundChannelHandler(out));
+        innerChannel.pipeline().addFirst(new OutboundChannelHandler(out));
 
         // inner channel termination handler
         innerChannel.pipeline().addLast(
