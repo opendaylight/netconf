@@ -16,7 +16,6 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
-import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
@@ -63,24 +62,24 @@ public final class SSHTransportStackFactory implements AutoCloseable {
             .listen(newServerBootstrap(), listenParams);
     }
 
-    public @NonNull ListenableFuture<SSHServer> connectServer(final TransportChannelListener listener,
-            final SubsystemFactory subsystemFactory, final TcpClientGrouping connectParams,
+    public @NonNull ListenableFuture<SSHServer> connectServer(final String subsystem,
+            final TransportChannelListener listener, final TcpClientGrouping connectParams,
             final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
-        return SSHServer.of(ioServiceFactory, group, listener, subsystemFactory, requireNonNull(serverParams), null)
+        return SSHServer.of(ioServiceFactory, group, subsystem, listener, requireNonNull(serverParams), null)
             .connect(newBootstrap(), connectParams);
     }
 
-    public @NonNull ListenableFuture<SSHServer> listenServer(final TransportChannelListener listener,
-            final SubsystemFactory subsystemFactory, final TcpServerGrouping connectParams,
+    public @NonNull ListenableFuture<SSHServer> listenServer(final String subsystem,
+            final TransportChannelListener listener, final TcpServerGrouping connectParams,
             final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
-        return listenServer(listener, subsystemFactory, connectParams, requireNonNull(serverParams), null);
+        return listenServer(subsystem, listener, connectParams, requireNonNull(serverParams), null);
     }
 
     /**
      * Builds and starts SSH Server.
      *
      * @param listener server channel listener, required
-     * @param subsystemFactory A {@link SubsystemFactory} for the hosted subsystem
+     * @param subssytem bound subsystem name
      * @param listenParams TCP transport configuration, required
      * @param serverParams SSH overlay configuration, optional if configurator is defined, required otherwise
      * @param configurator server factory manager configurator, optional if serverParams is defined, required otherwise
@@ -89,13 +88,13 @@ public final class SSHTransportStackFactory implements AutoCloseable {
      * @throws NullPointerException if any of required parameters is null
      * @throws IllegalArgumentException if both configurator and serverParams are null
      */
-    public @NonNull ListenableFuture<SSHServer> listenServer(final TransportChannelListener listener,
-            final SubsystemFactory subsystemFactory, final TcpServerGrouping listenParams,
+    public @NonNull ListenableFuture<SSHServer> listenServer(final String subsystem,
+            final TransportChannelListener listener, final TcpServerGrouping listenParams,
             final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
-                    throws UnsupportedConfigurationException {
+                throws UnsupportedConfigurationException {
         checkArgument(serverParams != null || configurator != null,
             "Neither server parameters nor factory configurator is defined");
-        return SSHServer.of(ioServiceFactory, group, listener, subsystemFactory, serverParams, configurator)
+        return SSHServer.of(ioServiceFactory, group, subsystem, listener, serverParams, configurator)
             .listen(newServerBootstrap(), listenParams);
     }
 
