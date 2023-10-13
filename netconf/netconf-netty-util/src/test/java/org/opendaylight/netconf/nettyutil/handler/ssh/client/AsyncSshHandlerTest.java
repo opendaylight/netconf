@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
@@ -170,7 +171,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final NettyAwareChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -192,7 +193,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final NettyAwareChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -223,7 +224,7 @@ public class AsyncSshHandlerTest {
             }
         }, MoreExecutors.directExecutor());
 
-        final NettyAwareChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -245,7 +246,7 @@ public class AsyncSshHandlerTest {
         final IoOutputStream asyncIn = getMockedIoOutputStream();
         final IoWriteFuture ioWriteFuture = asyncIn.writeBuffer(new ByteArrayBuffer());
 
-        final NettyAwareChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -292,7 +293,7 @@ public class AsyncSshHandlerTest {
         final IoOutputStream asyncIn = getMockedIoOutputStream();
         final IoWriteFuture ioWriteFuture = asyncIn.writeBuffer(new ByteArrayBuffer());
 
-        final NettyAwareChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -324,7 +325,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final NettyAwareChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -360,7 +361,7 @@ public class AsyncSshHandlerTest {
         return connectFuture;
     }
 
-    private static NettyAwareClientSession getMockedSshSession(final NettyAwareChannelSubsystem subsystemChannel)
+    private static NettyAwareClientSession getMockedSshSession(final ChannelSubsystem subsystemChannel)
             throws IOException {
         final NettyAwareClientSession sshSession = mock(NettyAwareClientSession.class);
 
@@ -368,7 +369,7 @@ public class AsyncSshHandlerTest {
         doReturn(false).when(sshSession).isClosed();
         doReturn(false).when(sshSession).isClosing();
         final CloseFuture closeFuture = mock(CloseFuture.class);
-        Futures.addCallback(stubAddListener(closeFuture), new SuccessFutureListener<CloseFuture>() {
+        Futures.addCallback(stubAddListener(closeFuture), new SuccessFutureListener<>() {
             @Override
             public void onSuccess(final SshFutureListener<CloseFuture> result) {
                 doReturn(true).when(closeFuture).isClosed();
@@ -383,9 +384,9 @@ public class AsyncSshHandlerTest {
         return sshSession;
     }
 
-    private NettyAwareChannelSubsystem getMockedSubsystemChannel(final IoInputStream asyncOut,
+    private ChannelSubsystem getMockedSubsystemChannel(final IoInputStream asyncOut,
                                                        final IoOutputStream asyncIn) throws IOException {
-        final NettyAwareChannelSubsystem subsystemChannel = mock(NettyAwareChannelSubsystem.class);
+        final ChannelSubsystem subsystemChannel = mock(ChannelSubsystem.class);
 
         doNothing().when(subsystemChannel).setStreaming(any(ClientChannel.Streaming.class));
         final OpenFuture openFuture = mock(OpenFuture.class);
@@ -400,7 +401,7 @@ public class AsyncSshHandlerTest {
         doReturn(openFuture).when(subsystemChannel).open();
         doReturn(asyncIn).when(subsystemChannel).getAsyncIn();
         doNothing().when(subsystemChannel).onClose(any());
-        doNothing().when(subsystemChannel).close();
+        doReturn(null).when(subsystemChannel).close(false);
         return subsystemChannel;
     }
 
@@ -441,7 +442,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final NettyAwareChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 

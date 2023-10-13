@@ -15,13 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract base class for {@link NettyAwareChannelSubsystem} and {@link NettyPipelineAwareChannelSubsystem}.
+ * Abstract base class for {@link ChannelSubsystem}s backed by a Netty {@link ChannelHandlerContext}.
  */
-abstract sealed class AbstractNettyChannelSubsystem extends ChannelSubsystem
-        permits NettyAwareChannelSubsystem, NettyPipelineAwareChannelSubsystem {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractNettyChannelSubsystem.class);
+abstract class NettyChannelSubsystem extends ChannelSubsystem {
+    private static final Logger LOG = LoggerFactory.getLogger(NettyChannelSubsystem.class);
 
-    AbstractNettyChannelSubsystem(final String subsystem) {
+    NettyChannelSubsystem(final String subsystem) {
         super(subsystem);
     }
 

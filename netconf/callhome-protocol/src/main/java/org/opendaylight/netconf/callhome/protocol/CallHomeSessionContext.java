@@ -29,7 +29,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerWriter;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientSessionImpl;
-import org.opendaylight.netconf.nettyutil.handler.ssh.client.NettyPipelineAwareChannelSubsystem;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
@@ -133,7 +133,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         LOG.info("Activating Netconf channel for {} with {}", getRemoteAddress(), listener);
         final Promise<NetconfClientSession> activationPromise = newSessionPromise();
         factory.getChannelInitializer(listener).initialize(nettyChannel, activationPromise);
-        ((NettyPipelineAwareChannelSubsystem)netconfChannel).onClose(nettyChannel::doNettyDisconnect);
+        ((ChannelSubsystem) netconfChannel).onClose(nettyChannel::doNettyDisconnect);
         factory.getNettyGroup().register(nettyChannel).awaitUninterruptibly(500);
         return activationPromise;
     }
@@ -216,7 +216,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
 
         SshWriteAsyncHandlerAdapter(final ClientChannel sshChannel) {
             this.sshChannel = sshChannel;
-            this.sshWriteAsyncHandler = new AsyncSshHandlerWriter(sshChannel.getAsyncIn());
+            sshWriteAsyncHandler = new AsyncSshHandlerWriter(sshChannel.getAsyncIn());
         }
 
         @Override
