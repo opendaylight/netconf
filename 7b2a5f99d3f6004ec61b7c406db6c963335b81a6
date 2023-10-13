@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c60c7ea_bd728edd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-13T13:16:51Z",
+      "side": 1,
+      "message": "Where is a change to `SchemaExportContext`?",
+      "revId": "7b2a5f99d3f6004ec61b7c406db6c963335b81a6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
