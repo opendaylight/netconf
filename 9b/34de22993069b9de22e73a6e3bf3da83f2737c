@@ -1,0 +1,7 @@
+Code-Review+2: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Verified+1: jenkins-releng ODL
+Submitted-by: Ivan Hrasko <ivan.hrasko@pantheon.tech>
+Submitted-at: Fri, 13 Oct 2023 12:55:15 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/107688
+Project: netconf
+Branch: refs/heads/master
