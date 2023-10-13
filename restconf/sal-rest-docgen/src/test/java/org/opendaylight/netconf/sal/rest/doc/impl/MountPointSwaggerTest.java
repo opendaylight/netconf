@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -293,5 +294,37 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         final var namespace = xml.get("namespace");
         assertNotNull(namespace);
         assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace.asText());
+    }
+
+    /**
+     * Test that number of elements in payload is correct.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testLeafListWithMinElementsPayloadOnMountPoint() {
+        swagger.onMountPointCreated(INSTANCE_ID);
+        final var mountPointApi = (OpenApiObject) swagger.getMountPointApi(uriDeviceAll, 1L, Optional.empty(),
+            OAversion.V3_0);
+        assertNotNull(mountPointApi);
+        final var paths = mountPointApi.getPaths();
+        final var path =
+            paths.get("/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/mandatory-container");
+        assertNotNull(path);
+        final var requestBody = path.get("post").get("requestBody").get("content");
+        assertNotNull(requestBody);
+        final var jsonRef = requestBody.get("application/json").get("schema").get("$ref");
+        assertNotNull(jsonRef);
+        final var xmlRef = requestBody.get("application/xml").get("schema").get("$ref");
+        assertNotNull(xmlRef);
+        final var schema =
+            mountPointApi.getComponents().getSchemas().get("mandatory-test_root-container_mandatory-container");
+        assertNotNull(schema);
+        final var minItems = schema.get("properties").get("leaf-list-with-min-elements").get("minItems");
+        assertNotNull(minItems);
+        final var listOfExamples = ((ArrayNode) schema.get("properties").get("leaf-list-with-min-elements")
+            .get("example"));
+        assertNotNull(listOfExamples);
+        assertEquals(jsonRef, xmlRef);
+        assertEquals(listOfExamples.size(), minItems.intValue());
     }
 }

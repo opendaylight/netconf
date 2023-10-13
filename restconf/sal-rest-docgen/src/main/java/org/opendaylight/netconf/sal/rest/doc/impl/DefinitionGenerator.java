@@ -539,6 +539,14 @@ public class DefinitionGenerator {
         processTypeDef(listNode.getType(), listNode, itemsVal, stack, definitions, definitionNames, oaversion);
         props.set(ITEMS_KEY, itemsVal);
 
+        if (itemsVal.get(DEFAULT_KEY) != null && props.get(MIN_ITEMS) != null) {
+            final ArrayNode listOfExamples = JsonNodeFactory.instance.arrayNode();
+            for (int i = 0; i < props.get(MIN_ITEMS).asInt(); i++) {
+                listOfExamples.add(itemsVal.get(DEFAULT_KEY));
+            }
+            props.put("example", listOfExamples);
+        }
+
         props.put(DESCRIPTION_KEY, listNode.getDescription().orElse(""));
 
         return props;
