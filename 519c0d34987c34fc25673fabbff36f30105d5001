@@ -116,6 +116,30 @@
       },
       "revId": "519c0d34987c34fc25673fabbff36f30105d5001",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b69e108e_7d7203e6",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-10-13T08:33:12Z",
+      "side": 1,
+      "message": "I followed the description https://pantheontech.atlassian.net/browse/ODLC-482, used the same logic as in NetconfTopologyImpl",
+      "parentUuid": "19ff62f1_51da1882",
+      "range": {
+        "startLine": 70,
+        "startChar": 5,
+        "endLine": 70,
+        "endChar": 23
+      },
+      "revId": "519c0d34987c34fc25673fabbff36f30105d5001",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
