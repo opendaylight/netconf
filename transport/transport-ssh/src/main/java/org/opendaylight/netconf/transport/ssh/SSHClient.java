@@ -11,7 +11,10 @@ import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
+import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
@@ -49,5 +52,19 @@ public final class SSHClient extends SSHTransportStack {
     @NonNull ListenableFuture<SSHClient> listen(final ServerBootstrap bootstrap, final TcpServerGrouping listenParams)
             throws UnsupportedConfigurationException {
         return transformUnderlay(this, TCPServer.listen(asListener(), bootstrap, listenParams));
+    }
+
+    @Override
+    void onKeyEstablished(final Session session) throws IOException {
+        if (!(session instanceof ClientSession clientSession)) {
+            throw new IOException("Unexpected session " + session);
+        }
+
+        // server key is accepted, trigger authentication flow
+        clientSession.auth().addListener(future -> {
+            if (!future.isSuccess()) {
+                deleteSession(session);
+            }
+        });
     }
 }

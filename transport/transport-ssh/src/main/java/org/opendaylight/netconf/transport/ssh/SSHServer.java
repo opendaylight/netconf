@@ -12,6 +12,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -49,5 +50,10 @@ public final class SSHServer extends SSHTransportStack {
     @NonNull ListenableFuture<SSHServer> listen(final ServerBootstrap bootstrap, final TcpServerGrouping connectParams)
             throws UnsupportedConfigurationException {
         return transformUnderlay(this, TCPServer.listen(asListener(), bootstrap, connectParams));
+    }
+
+    @Override
+    void onKeyEstablished(final Session session) {
+        // No-op
     }
 }

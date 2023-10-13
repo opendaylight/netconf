@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
@@ -82,25 +81,30 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     @Override
     public final void sessionEvent(final Session session, final Event event) {
-        if (Event.KeyEstablished == event && session instanceof ClientSession clientSession) {
-            // server key is accepted, trigger authentication flow
-            try {
-                clientSession.auth().addListener(future -> {
-                    if (!future.isSuccess()) {
-                        deleteSession(session);
-                    }
-                });
-            } catch (IOException e) {
-                sessionException(session, e);
-            }
-        }
-        if (Event.Authenticated == event) {
-            // auth success
-            completeAuth(idOf(session), underlay -> addTransportChannel(new SSHTransportChannel(underlay)));
+        switch (event) {
+            case Authenticated:
+                onAuthenticated(session);
+                break;
+            case KeyEstablished:
+                try {
+                    onKeyEstablished(session);
+                } catch (IOException e) {
+                    sessionException(session, e);
+                }
+                break;
+            default:
+                // No-op
         }
     }
 
-    private void deleteSession(final Session session) {
+    abstract void onKeyEstablished(Session session) throws IOException;
+
+    private void onAuthenticated(final Session session) {
+        // auth success
+        completeAuth(idOf(session), underlay -> addTransportChannel(new SSHTransportChannel(underlay)));
+    }
+
+    final void deleteSession(final Session session) {
         final var id = idOf(session);
         sessions.remove(id);
         // auth failure, close underlay if any
