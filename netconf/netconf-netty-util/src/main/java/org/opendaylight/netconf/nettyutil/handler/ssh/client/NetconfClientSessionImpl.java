@@ -12,16 +12,16 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import java.io.IOException;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
-import org.opendaylight.netconf.shaded.sshd.common.session.ConnectionService;
 
 /**
  * A {@link ClientSessionImpl} which additionally allows creation of NETCONF subsystem channel, which is routed to
  * a particular {@link ChannelHandlerContext}.
  */
 @Beta
-public class NetconfClientSessionImpl extends ClientSessionImpl implements NettyAwareClientSession {
+public final class NetconfClientSessionImpl extends ClientSessionImpl implements NettyAwareClientSession {
     public NetconfClientSessionImpl(final ClientFactoryManager client, final IoSession ioSession) throws Exception {
         super(client, ioSession);
     }
@@ -29,24 +29,21 @@ public class NetconfClientSessionImpl extends ClientSessionImpl implements Netty
     @Override
     public NettyAwareChannelSubsystem createSubsystemChannel(final String subsystem, final ChannelHandlerContext ctx)
             throws IOException {
-        final NettyAwareChannelSubsystem channel = new NettyAwareChannelSubsystem(subsystem, ctx);
-        final ConnectionService service = getConnectionService();
-        final long id = service.registerChannel(channel);
-        if (log.isDebugEnabled()) {
-            log.debug("createSubsystemChannel({})[{}] created id={}", this, channel.getSubsystem(), id);
-        }
-        return channel;
+        return registerSubsystem(new NettyAwareChannelSubsystem(subsystem, ctx));
     }
 
     @Override
     public NettyPipelineAwareChannelSubsystem createSubsystemChannel(final String subsystem,
             final ChannelPipeline pipeline) throws IOException {
-        final NettyPipelineAwareChannelSubsystem channel = new NettyPipelineAwareChannelSubsystem(subsystem, pipeline);
-        final ConnectionService service = getConnectionService();
-        final long id = service.registerChannel(channel);
+        return registerSubsystem(new NettyPipelineAwareChannelSubsystem(subsystem, pipeline));
+    }
+
+    private <T extends ChannelSubsystem> T registerSubsystem(final T subsystem) throws IOException {
+        final var service = getConnectionService();
+        final var id = service.registerChannel(subsystem);
         if (log.isDebugEnabled()) {
-            log.debug("createSubsystemChannel({})[{}] created id={}", this, channel.getSubsystem(), id);
+            log.debug("createSubsystemChannel({})[{}] created id={}", this, subsystem.getSubsystem(), id);
         }
-        return channel;
+        return subsystem;
     }
 }
