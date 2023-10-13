@@ -21,7 +21,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -68,7 +67,6 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.netconf.nettyutil.NeverReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
@@ -383,14 +381,12 @@ public class ConcurrentClientsTest {
         }
 
         private NetconfClientConfiguration getClientConfig() {
-            final NetconfClientConfigurationBuilder b = NetconfClientConfigurationBuilder.create();
-            b.withAddress(NETCONF_ADDRESS);
-            b.withAdditionalHeader(new NetconfHelloMessageAdditionalHeader("uname", "10.10.10.1", "830", "tcp",
-                    "client"));
-            b.withSessionListener(new SimpleNetconfClientSessionListener());
-            b.withReconnectStrategy(new NeverReconnectStrategy(GlobalEventExecutor.INSTANCE,
-                    NetconfClientConfigurationBuilder.DEFAULT_CONNECTION_TIMEOUT_MILLIS));
-            return b.build();
+            return NetconfClientConfigurationBuilder.create()
+                .withAddress(NETCONF_ADDRESS)
+                .withAdditionalHeader(
+                    new NetconfHelloMessageAdditionalHeader("uname", "10.10.10.1", "830", "tcp", "client"))
+                .withSessionListener(new SimpleNetconfClientSessionListener())
+                .build();
         }
     }
 }

@@ -33,7 +33,6 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
@@ -94,13 +93,11 @@ public class CallHomeMountDispatcherTest {
                 NetconfClientConfiguration.NetconfClientProtocol.SSH;
         final NetconfHelloMessageAdditionalHeader additionalHeader = mock(NetconfHelloMessageAdditionalHeader.class);
         final NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-        final ReconnectStrategy reconnectStrategy = mock(ReconnectStrategy.class);
         final AuthenticationHandler authHandler = mock(AuthenticationHandler.class);
 
         return NetconfClientConfigurationBuilder.create().withProtocol(protocol).withAddress(address)
-                .withConnectionTimeoutMillis(0).withAdditionalHeader(additionalHeader)
-                .withSessionListener(sessionListener).withReconnectStrategy(reconnectStrategy)
-                .withAuthHandler(authHandler).build();
+            .withConnectionTimeoutMillis(0).withAdditionalHeader(additionalHeader)
+            .withSessionListener(sessionListener).withAuthHandler(authHandler).build();
     }
 
     @Test

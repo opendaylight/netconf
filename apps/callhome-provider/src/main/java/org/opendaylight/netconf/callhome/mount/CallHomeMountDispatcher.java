@@ -26,8 +26,6 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
-import org.opendaylight.netconf.nettyutil.ReconnectFuture;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
@@ -91,11 +89,6 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     @Override
     public Future<NetconfClientSession> createClient(final NetconfClientConfiguration clientConfiguration) {
         return activateChannel(clientConfiguration);
-    }
-
-    @Override
-    public ReconnectFuture createReconnectingClient(final NetconfReconnectingClientConfiguration clientConfiguration) {
-        return new SingleReconnectFuture(eventExecutor, activateChannel(clientConfiguration));
     }
 
     private Future<NetconfClientSession> activateChannel(final NetconfClientConfiguration conf) {

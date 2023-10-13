@@ -118,12 +118,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             rpcReg.close();
             rpcReg = null;
         }
-
-        // close all existing connectors, delete whole topology in datastore?
-        for (final NetconfConnectorDTO connectorDTO : activeConnectors.values()) {
-            connectorDTO.close();
-        }
-        activeConnectors.clear();
+        deleteAllNodes();
 
         if (dtclReg != null) {
             dtclReg.close();

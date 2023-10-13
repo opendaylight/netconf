@@ -18,7 +18,6 @@ import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -35,8 +34,6 @@ public class NetconfClientConfiguration {
     private final NetconfHelloMessageAdditionalHeader additionalHeader;
     private final NetconfClientSessionListener sessionListener;
 
-    private final ReconnectStrategy reconnectStrategy;
-
     private final AuthenticationHandler authHandler;
     private final SslHandlerFactory sslHandlerFactory;
     private final NetconfSshClient sshClient;
@@ -49,7 +46,7 @@ public class NetconfClientConfiguration {
                                final Long connectionTimeoutMillis,
                                final NetconfHelloMessageAdditionalHeader additionalHeader,
                                final NetconfClientSessionListener sessionListener,
-                               final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler,
+                               final AuthenticationHandler authHandler,
                                final SslHandlerFactory sslHandlerFactory, final NetconfSshClient sshClient,
                                final List<Uri> odlHelloCapabilities, final @NonNegative int maximumIncomingChunkSize,
                                final String name) {
@@ -58,7 +55,6 @@ public class NetconfClientConfiguration {
         this.additionalHeader = additionalHeader;
         this.sessionListener = sessionListener;
         clientProtocol = protocol;
-        this.reconnectStrategy = reconnectStrategy;
         this.authHandler = authHandler;
         this.sslHandlerFactory = sslHandlerFactory;
         this.sshClient = sshClient;
@@ -86,11 +82,6 @@ public class NetconfClientConfiguration {
 
     public final NetconfClientSessionListener getSessionListener() {
         return sessionListener;
-    }
-
-    @Deprecated(forRemoval = true)
-    public final ReconnectStrategy getReconnectStrategy() {
-        return reconnectStrategy;
     }
 
     public final AuthenticationHandler getAuthHandler() {
@@ -148,7 +139,6 @@ public class NetconfClientConfiguration {
         requireNonNull(clientProtocol, "clientProtocol");
         requireNonNull(connectionTimeoutMillis, "connectionTimeoutMillis");
         requireNonNull(sessionListener, "sessionListener");
-        requireNonNull(reconnectStrategy, "reconnectStrategy");
     }
 
     @Override
@@ -162,7 +152,6 @@ public class NetconfClientConfiguration {
                 .add("connectionTimeoutMillis", connectionTimeoutMillis)
                 .add("additionalHeader", additionalHeader)
                 .add("sessionListener", sessionListener)
-                .add("reconnectStrategy", reconnectStrategy)
                 .add("clientProtocol", clientProtocol)
                 .add("authHandler", authHandler)
                 .add("sslHandlerFactory", sslHandlerFactory);
