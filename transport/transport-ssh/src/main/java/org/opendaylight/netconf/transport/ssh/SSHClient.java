@@ -89,11 +89,7 @@ public final class SSHClient extends SSHTransportStack {
         final var sessionId = sessionId(session);
         LOG.debug("Opening \"{}\" subsystem on session {}", subsystem, sessionId);
 
-        final var underlay = underlayOf(sessionId);
-        if (underlay == null) {
-            throw new IOException("Cannot find underlay for " + session);
-        }
-
+        final var underlay = getUnderlayOf(sessionId);
         final var clientSession = cast(session);
         final var channel = clientSession.createSubsystemChannel(subsystem);
         channel.onClose(() -> clientSession.close(true));
@@ -102,8 +98,7 @@ public final class SSHClient extends SSHTransportStack {
 
     private void onSubsystemOpenComplete(final OpenFuture future, final Long sessionId) {
         if (future.isOpened()) {
-            LOG.debug("Established transport on session {}", sessionId);
-            completeUnderlay(sessionId, underlay -> addTransportChannel(new SSHTransportChannel(underlay)));
+            transportEstablished(sessionId);
         } else {
             LOG.error("Failed to establish transport on session {}", sessionId, future.getException());
             deleteSession(sessionId);
@@ -111,9 +106,6 @@ public final class SSHClient extends SSHTransportStack {
     }
 
     private static TransportClientSession cast(final Session session) throws IOException {
-        if (session instanceof TransportClientSession clientSession) {
-            return clientSession;
-        }
-        throw new IOException("Unexpected session " + session);
+        return TransportUtils.checkCast(TransportClientSession.class, session);
     }
 }

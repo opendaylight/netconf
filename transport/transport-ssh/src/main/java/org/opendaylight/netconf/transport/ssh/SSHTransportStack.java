@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.SshConstants;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
@@ -146,8 +146,12 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     abstract void onAuthenticated(Session session) throws IOException;
 
-    final @Nullable TransportChannel underlayOf(final Long sessionId) {
-        return underlays.get(sessionId);
+    final @NonNull TransportChannel getUnderlayOf(final Long sessionId) throws IOException {
+        final var ret = underlays.get(sessionId);
+        if (ret == null) {
+            throw new IOException("Cannot find underlay for " + sessionId);
+        }
+        return ret;
     }
 
     final void deleteSession(final Long sessionId) {
@@ -156,7 +160,15 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
         completeUnderlay(sessionId, underlay -> underlay.channel().close());
     }
 
-    final void completeUnderlay(final Long sessionId, final Consumer<TransportChannel> action) {
+    // FIXME: this should be an assertion, the channel should just be there
+    final void transportEstablished(final Long sessionId) {
+        completeUnderlay(sessionId, underlay -> {
+            LOG.debug("Established transport on session {}", sessionId);
+            addTransportChannel(new SSHTransportChannel(underlay));
+        });
+    }
+
+    private void completeUnderlay(final Long sessionId, final Consumer<TransportChannel> action) {
         final var removed = underlays.remove(sessionId);
         if (removed != null) {
             action.accept(removed);
