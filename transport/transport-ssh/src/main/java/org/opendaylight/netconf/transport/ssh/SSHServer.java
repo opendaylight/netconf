@@ -7,14 +7,19 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
+import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
-import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -23,6 +28,7 @@ import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,18 +38,22 @@ import org.slf4j.LoggerFactory;
 public final class SSHServer extends SSHTransportStack {
     private static final Logger LOG = LoggerFactory.getLogger(SSHServer.class);
 
-    private SSHServer(final TransportChannelListener listener, final TransportSshServer sshServer) {
+    private final String subsystem;
+
+    private SSHServer(final String subsystem, final TransportChannelListener listener,
+            final TransportSshServer sshServer) {
         super(listener, sshServer, sshServer.getSessionFactory());
+        this.subsystem = requireNonNull(subsystem);
     }
 
     static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
-            final TransportChannelListener listener, final SubsystemFactory subsystemFactory,
-            final SshServerGrouping serverParams, final ServerFactoryManagerConfigurator configurator)
-                throws UnsupportedConfigurationException {
-        return new SSHServer(listener, new TransportSshServer.Builder(ioServiceFactory, group, subsystemFactory)
-            .serverParams(serverParams)
-            .configurator(configurator)
-            .buildChecked());
+            final String subsystem, final TransportChannelListener listener, final SshServerGrouping serverParams,
+            final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
+        return new SSHServer(subsystem, listener,
+            new TransportSshServer.Builder(ioServiceFactory, group)
+                .serverParams(serverParams)
+                .configurator(configurator)
+                .buildChecked());
     }
 
     @NonNull ListenableFuture<SSHServer> connect(final Bootstrap bootstrap, final TcpClientGrouping connectParams)
@@ -62,10 +72,27 @@ public final class SSHServer extends SSHTransportStack {
     }
 
     @Override
-    void onAuthenticated(final Session session) {
+    void onAuthenticated(final Session session) throws IOException {
         final var sessionId = sessionId(session);
-        LOG.debug("Established transport on session {}", sessionId);
-        // FIXME: we should wait for the subsystem to be created and then finish
-        completeUnderlay(sessionId, underlay -> addTransportChannel(new SSHTransportChannel(underlay)));
+        LOG.debug("Awaiting \"{}\" subsystem on session {}", subsystem, sessionId);
+
+        Futures.addCallback(cast(session).attachUnderlay(subsystem, getUnderlayOf(sessionId)), new FutureCallback<>() {
+            @Override
+            public void onSuccess(final Empty result) {
+                // Note: we re-validating the underlay ... we may need to refactor state management to make this
+                //       non-awkward
+                transportEstablished(sessionId);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.debug("Transport on session {} failed", sessionId, cause);
+                deleteSession(sessionId);
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
+    private static TransportServerSession cast(final Session session) throws IOException {
+        return TransportUtils.checkCast(TransportServerSession.class, session);
     }
 }
