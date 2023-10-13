@@ -20,6 +20,8 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getAppropriateModelPrefix;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
@@ -489,6 +491,33 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var namespace = xml.get("namespace");
         assertNotNull(namespace);
         assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace.asText());
+    }
+
+    /**
+     * Test that number of elements in payload is correct.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testLeafListWithMinElementsPayload() {
+        final var doc = (OpenApiObject) generator.getApiDeclaration(MANDATORY_TEST, null, URI_INFO,
+            ApiDocServiceImpl.OAversion.V3_0);
+        assertNotNull(doc);
+        final var paths = doc.getPaths();
+        final var path = paths.path("/rests/data/mandatory-test:root-container/mandatory-container");
+        final var requestBody = path.path("post").path("requestBody").path("content");
+        final var jsonRef = requestBody.path("application/json").path("schema").path("$ref");
+        final var xmlRef = requestBody.path("application/xml").path("schema").path("$ref");
+        final var schema = doc.getComponents().getSchemas().path("mandatory-test_root-container_mandatory-container");
+        final var minItems = schema.path("properties").path("leaf-list-with-min-elements").path("minItems");
+        final var listOfExamples = ((ArrayNode) schema.path("properties").path("leaf-list-with-min-elements")
+            .path("example"));
+        final var expectedListOfExamples = JsonNodeFactory.instance.arrayNode()
+            .add("Some leaf-list-with-min-elements")
+            .add("Some leaf-list-with-min-elements");
+        assertFalse(listOfExamples.isMissingNode());
+        assertEquals(xmlRef, jsonRef);
+        assertEquals(2, minItems.intValue());
+        assertEquals(expectedListOfExamples, listOfExamples);
     }
 
     /**
