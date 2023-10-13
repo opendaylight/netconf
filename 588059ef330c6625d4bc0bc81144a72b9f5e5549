@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "195612d1_7fb0ee92",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 14
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-10-13T13:55:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00a0064e_85142f94",
+      "revId": "588059ef330c6625d4bc0bc81144a72b9f5e5549",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b72d4d7_016be6b6",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-10-13T11:01:30Z",
       "side": 1,
       "message": "Delete this line.",
+      "revId": "588059ef330c6625d4bc0bc81144a72b9f5e5549",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81faa13c_d78c2c1e",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-10-13T13:55:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "451f8b4a_7871a5b2",
       "revId": "588059ef330c6625d4bc0bc81144a72b9f5e5549",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
