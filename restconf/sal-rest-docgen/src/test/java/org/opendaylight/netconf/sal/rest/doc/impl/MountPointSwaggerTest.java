@@ -8,12 +8,14 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -320,5 +322,31 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         final var namespace = xml.get("namespace");
         assertNotNull(namespace);
         assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace.asText());
+    }
+
+    /**
+     * Test that number of elements in payload is correct.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testLeafListWithMinElementsPayloadOnMountPoint() {
+        swagger.onMountPointCreated(INSTANCE_ID);
+        final var mountPointApi = (OpenApiObject) swagger.getMountPointApi(uriDeviceAll, 1L, Optional.empty(),
+            OAversion.V3_0);
+        assertNotNull(mountPointApi);
+        final var paths = mountPointApi.getPaths();
+        final var path =
+            paths.path("/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/mandatory-container");
+        final var requestBody = path.path("post").path("requestBody").path("content");
+        final var jsonRef = requestBody.path("application/json").path("schema").path("$ref");
+        final var xmlRef = requestBody.path("application/xml").path("schema").path("$ref");
+        final var schema =
+            mountPointApi.getComponents().getSchemas().path("mandatory-test_root-container_mandatory-container");
+        final var minItems = schema.path("properties").path("leaf-list-with-min-elements").path("minItems");
+        final var listOfExamples = ((ArrayNode) schema.path("properties").path("leaf-list-with-min-elements")
+            .path("example"));
+        assertFalse(listOfExamples.isMissingNode());
+        assertEquals(jsonRef, xmlRef);
+        assertEquals(listOfExamples.size(), minItems.intValue());
     }
 }
