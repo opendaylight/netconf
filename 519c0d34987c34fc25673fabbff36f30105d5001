@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "50cca8b9_1bff652c",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-13T09:14:02Z",
+      "side": 1,
+      "message": "IMO we should have RPC implementation as it is and use this listener for cases user uses POST, PUT, PATCH, ... operations",
+      "parentUuid": "2de6933f_7bf94446",
+      "range": {
+        "startLine": 50,
+        "startChar": 94,
+        "endLine": 50,
+        "endChar": 112
+      },
+      "revId": "519c0d34987c34fc25673fabbff36f30105d5001",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0cf1eaec_6c67629b",
         "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
         "patchSetId": 11
