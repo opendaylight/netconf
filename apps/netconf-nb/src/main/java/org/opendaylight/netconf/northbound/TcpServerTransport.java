@@ -8,8 +8,8 @@
 package org.opendaylight.netconf.northbound;
 
 import java.util.concurrent.ExecutionException;
-import org.opendaylight.netconf.server.BaseServerTransport;
 import org.opendaylight.netconf.server.ServerChannelInitializer;
+import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component(service = {}, configurationPid = "org.opendaylight.netconf.tcp", enabled = false)
 @Designate(ocd = TcpServerTransport.Configuration.class)
-public final class TcpServerTransport extends BaseServerTransport implements AutoCloseable {
+public final class TcpServerTransport implements AutoCloseable {
     @ObjectClassDefinition
     public @interface Configuration {
         @AttributeDefinition
@@ -58,13 +58,12 @@ public final class TcpServerTransport extends BaseServerTransport implements Aut
 
     public TcpServerTransport(final TransportFactoryHolder factoryHolder, final ServerChannelInitializer initializer,
             final TcpServerGrouping listenParams) {
-        super(initializer);
-
         final var localAddr = listenParams.requireLocalAddress().stringValue();
         final var localPort = listenParams.requireLocalPort().getValue();
 
         try {
-            tcpServer = TCPServer.listen(this, factoryHolder.factory().newServerBootstrap(), listenParams).get();
+            tcpServer = TCPServer.listen(new ServerTransportInitializer(initializer),
+                factoryHolder.factory().newServerBootstrap(), listenParams).get();
         } catch (UnsupportedConfigurationException | ExecutionException | InterruptedException e) {
             LOG.warn("Could not start TCP NETCONF server at {}:{}", localAddr, localPort, e);
             throw new IllegalStateException("Could not start TCP NETCONF server", e);

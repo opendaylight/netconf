@@ -10,7 +10,6 @@ package org.opendaylight.netconf.transport.ssh;
 import com.google.errorprone.annotations.DoNotCall;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import java.io.IOException;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
@@ -24,7 +23,7 @@ import org.slf4j.LoggerFactory;
 final class TransportClientSubsystem extends ChannelSubsystem {
     private static final Logger LOG = LoggerFactory.getLogger(TransportClientSubsystem.class);
 
-    private ChannelHandlerContext pipelineHead;
+    private ChannelHandlerContext head;
 
     TransportClientSubsystem(final String subsystem) {
         super(subsystem);
@@ -46,27 +45,11 @@ final class TransportClientSubsystem extends ChannelSubsystem {
     }
 
     private void onOpenComplete(final OpenFuture future, final TransportChannel underlay) {
-        if (!future.isOpened()) {
+        if (future.isOpened()) {
+            head = TransportUtils.attachUnderlay(getAsyncIn(), underlay, this::close);
+        } else {
             LOG.debug("Failed to open client subsystem \"{}\"", getSubsystem(), future.getException());
-            return;
         }
-
-        // Note that there may be multiple handlers already present on the channel, hence we are attaching last, but
-        // from the logical perspective we are the head handlers.
-        final var pipeline = underlay.channel().pipeline();
-
-        // - install outbound packet handler, i.e. moving bytes from the channel into SSHD's pipeline
-        pipeline.addLast(new OutboundChannelHandler(getAsyncIn()));
-        // - remember the context of this handler, we will be using it to issue writes into the channel
-        pipelineHead = pipeline.lastContext();
-
-        // - install inner channel termination handler
-        pipeline.addLast(new ChannelInboundHandlerAdapter() {
-            @Override
-            public void channelInactive(final ChannelHandlerContext ctx) throws IOException {
-                close();
-            }
-        });
     }
 
     @Override
@@ -79,7 +62,7 @@ final class TransportClientSubsystem extends ChannelSubsystem {
         final int reqLen = (int) len;
         if (reqLen > 0) {
             LOG.debug("Forwarding {} bytes of data", reqLen);
-            pipelineHead.fireChannelRead(Unpooled.copiedBuffer(data, off, reqLen));
+            head.fireChannelRead(Unpooled.copiedBuffer(data, off, reqLen));
             getLocalWindow().release(reqLen);
         }
     }

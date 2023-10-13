@@ -15,6 +15,7 @@ import com.google.errorprone.annotations.DoNotCall;
 import io.netty.channel.EventLoopGroup;
 import java.security.PublicKey;
 import java.util.List;
+import org.opendaylight.netconf.shaded.sshd.common.channel.ChannelFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.server.ServerBuilder;
@@ -23,7 +24,7 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.UserAuthFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.hostbased.UserAuthHostBasedFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
-import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
+import org.opendaylight.netconf.shaded.sshd.server.forward.DirectTcpipFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.ssh.server.grouping.ClientAuthentication;
@@ -68,20 +69,21 @@ final class TransportSshServer extends SshServer {
      * {@code ietf-netconf-server.yang} configuration.
      */
     static final class Builder extends ServerBuilder {
+        private static final List<ChannelFactory> CHANNEL_FACTORIES = List.of(
+            TransportChannelSessionFactory.INSTANCE,
+            DirectTcpipFactory.INSTANCE);
+
         private final NettyIoServiceFactoryFactory ioServiceFactory;
         private final EventLoopGroup group;
-        private final SubsystemFactory subsystemFactory;
 
         private ServerFactoryManagerConfigurator configurator;
         private ClientAuthentication clientAuthentication;
         private ServerIdentity serverIdentity;
         private Keepalives keepAlives;
 
-        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
-                final SubsystemFactory subsystemFactory) {
+        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group) {
             this.ioServiceFactory = requireNonNull(ioServiceFactory);
             this.group = requireNonNull(group);
-            this.subsystemFactory = requireNonNull(subsystemFactory);
         }
 
         Builder serverParams(final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
@@ -144,7 +146,6 @@ final class TransportSshServer extends SshServer {
                 configurator.configureServerFactoryManager(ret);
             }
 
-            ret.setSubsystemFactories(List.of(subsystemFactory));
             ret.setIoServiceFactoryFactory(ioServiceFactory);
             ret.setScheduledExecutorService(group);
 
@@ -154,12 +155,15 @@ final class TransportSshServer extends SshServer {
                 throw new UnsupportedConfigurationException("Inconsistent client configuration", e);
             }
 
-            ret.setSessionFactory(ret.createSessionFactory());
+            ret.setSessionFactory(new TransportServerSessionFactory(ret));
             return ret;
         }
 
         @Override
         protected ServerBuilder fillWithDefaultValues() {
+            if (channelFactories == null) {
+                channelFactories = CHANNEL_FACTORIES;
+            }
             if (factory == null) {
                 factory = TransportSshServer::new;
             }

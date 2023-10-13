@@ -11,9 +11,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.netconf.auth.AuthProvider;
-import org.opendaylight.netconf.server.BaseTransportChannelListener;
-import org.opendaylight.netconf.server.NetconfSubsystemFactory;
 import org.opendaylight.netconf.server.ServerChannelInitializer;
+import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -38,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 @Component(service = { }, configurationPid = "org.opendaylight.netconf.ssh")
 @Designate(ocd = SshServerTransport.Configuration.class)
-public final class SshServerTransport extends BaseTransportChannelListener implements AutoCloseable {
+public final class SshServerTransport implements AutoCloseable {
     @ObjectClassDefinition
     public @interface Configuration {
         @AttributeDefinition
@@ -68,7 +67,7 @@ public final class SshServerTransport extends BaseTransportChannelListener imple
         final var localPort = listenParams.requireLocalPort().getValue();
 
         try {
-            sshServer = factoryHolder.factory().listenServer(this, new NetconfSubsystemFactory(initializer),
+            sshServer = factoryHolder.factory().listenServer("netconf", new ServerTransportInitializer(initializer),
                 listenParams, null, factoryMgr -> {
                     factoryMgr.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
                     factoryMgr.setPasswordAuthenticator(
