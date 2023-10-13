@@ -73,13 +73,16 @@ final class TransportSshClient extends SshClient {
     static final class Builder extends ClientBuilder {
         private final NettyIoServiceFactoryFactory ioServiceFactory;
         private final EventLoopGroup group;
+        private final String subsystemName;
 
         private Keepalives keepAlives;
         private ClientIdentity clientIdentity;
 
-        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group) {
+        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
+                final String subsystemName) {
             this.ioServiceFactory = requireNonNull(ioServiceFactory);
             this.group = requireNonNull(group);
+            this.subsystemName = requireNonNull(subsystemName);
         }
 
         Builder transportParams(final TransportParamsGrouping params) throws UnsupportedConfigurationException {

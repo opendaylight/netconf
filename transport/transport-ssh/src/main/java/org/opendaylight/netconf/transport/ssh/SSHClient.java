@@ -31,9 +31,9 @@ public final class SSHClient extends SSHTransportStack {
     }
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
-            final TransportChannelListener listener, final SshClientGrouping clientParams)
+            final String subsystem, final TransportChannelListener listener, final SshClientGrouping clientParams)
                 throws UnsupportedConfigurationException {
-        return new SSHClient(listener, new TransportSshClient.Builder(ioServiceFactory, group)
+        return new SSHClient(listener, new TransportSshClient.Builder(ioServiceFactory, group, subsystem)
             .transportParams(clientParams.getTransportParams())
             .keepAlives(clientParams.getKeepalives())
             .clientIdentity(clientParams.getClientIdentity())
