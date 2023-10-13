@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.netconf.server.api.NetconfServerFactory;
-import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
@@ -21,8 +20,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
 
 public final class NetconfServerFactoryImpl implements NetconfServerFactory {
-    private static final TransportChannelListener EMPTY_LISTENER = new BaseTransportChannelListener();
-
     private final SSHTransportStackFactory factory;
     private final ServerChannelInitializer channelInitializer;
 
@@ -42,7 +39,7 @@ public final class NetconfServerFactoryImpl implements NetconfServerFactory {
     public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
             final SshServerGrouping sshParams, final ServerFactoryManagerConfigurator configurator)
                 throws UnsupportedConfigurationException {
-        return factory.listenServer(EMPTY_LISTENER, new NetconfSubsystemFactory(channelInitializer), tcpParams,
-            sshParams, configurator);
+        return factory.listenServer("netconf", new BaseServerTransport(channelInitializer), tcpParams, sshParams,
+            configurator);
     }
 }
