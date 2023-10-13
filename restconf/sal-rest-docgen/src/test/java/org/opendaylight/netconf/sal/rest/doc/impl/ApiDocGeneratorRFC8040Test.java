@@ -20,6 +20,7 @@ import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuild
 import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.getAppropriateModelPrefix;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
@@ -512,6 +513,35 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         final var namespace = xml.get("namespace");
         assertNotNull(namespace);
         assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace.asText());
+    }
+
+    /**
+     * Test that number of elements in payload is correct.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testLeafListWithMinElementsPayload() {
+        final var doc = (OpenApiObject) generator.getApiDeclaration(MANDATORY_TEST, null, URI_INFO,
+            OAversion.V3_0);
+        assertNotNull(doc);
+        final var paths = doc.getPaths();
+        final var path = paths.get("/rests/data/mandatory-test:root-container/mandatory-container");
+        assertNotNull(path);
+        final var requestBody = path.get("post").get("requestBody").get("content");
+        assertNotNull(requestBody);
+        final var jsonRef = requestBody.get("application/json").get("schema").get("$ref");
+        assertNotNull(jsonRef);
+        final var xmlRef = requestBody.get("application/xml").get("schema").get("$ref");
+        assertNotNull(xmlRef);
+        final var schema = doc.getComponents().getSchemas().get("mandatory-test_root-container_mandatory-container");
+        assertNotNull(schema);
+        final var minItems = schema.get("properties").get("leaf-list-with-min-elements").get("minItems");
+        assertNotNull(minItems);
+        final var listOfExamples = ((ArrayNode) schema.get("properties").get("leaf-list-with-min-elements")
+            .get("default"));
+        assertNotNull(listOfExamples);
+        assertEquals(xmlRef, jsonRef);
+        assertEquals(listOfExamples.size(), minItems.intValue());
     }
 
     /**
