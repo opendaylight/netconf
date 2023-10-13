@@ -16,6 +16,24 @@
       "message": "Where is a change to `SchemaExportContext`?",
       "revId": "a2ab7371914863f63ff20c037b9582376de6b690",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5942c2f2_9594983f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-13T14:24:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "448603a7_76054725",
+      "revId": "a2ab7371914863f63ff20c037b9582376de6b690",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
