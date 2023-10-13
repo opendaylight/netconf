@@ -390,4 +390,36 @@ public final class MountPointOpenApiTest {
         assertNotNull(namespace);
         assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace);
     }
+
+    /**
+     * Test that number of elements in payload is correct.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testLeafListWithMinElementsPayloadOnMountPoint() throws Exception {
+        final var mockInfo = DocGenTestHelper.createMockUriInfo(HTTP_URL);
+        openApi.onMountPointCreated(INSTANCE_ID);
+        final var mountPointApi = openApi.getMountPointApi(mockInfo, 1L, null);
+        assertNotNull(mountPointApi);
+        final var paths = mountPointApi.paths();
+        final var path =
+            paths.get("/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/mandatory-container");
+        assertNotNull(path);
+        final var requestBody = path.put().requestBody().content();
+        assertNotNull(requestBody);
+        final var jsonRef = requestBody.get("application/json").schema().properties()
+            .get("mandatory-test:mandatory-container").ref();
+        assertNotNull(jsonRef);
+        final var xmlRef = requestBody.get("application/xml").schema().ref();
+        assertNotNull(xmlRef);
+        final var schema =
+            mountPointApi.components().schemas().get("mandatory-test_root-container_mandatory-container");
+        assertNotNull(schema);
+        final var minItems = schema.properties().get("leaf-list-with-min-elements").minItems();
+        assertNotNull(minItems);
+        final var listOfExamples = ((List<String>) schema.properties().get("leaf-list-with-min-elements").example());
+        assertNotNull(listOfExamples);
+        assertEquals(jsonRef, xmlRef);
+        assertEquals(listOfExamples.size(), minItems.intValue());
+    }
 }

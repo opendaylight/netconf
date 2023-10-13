@@ -465,7 +465,17 @@ public final class DefinitionGenerator {
 
         processTypeDef(listNode.getType(), listNode, itemsVal, stack);
 
-        props.items(itemsVal.build());
+        final Property itemsValue = itemsVal.build();
+        final Property propsValue = props.build();
+        props.items(itemsValue);
+
+        if (itemsValue.example() != null && propsValue.minItems() != null) {
+            final List<Object> listOfExamples = new ArrayList<>();
+            for (int i = 0; i < propsValue.minItems(); i++) {
+                listOfExamples.add(itemsValue.example());
+            }
+            props.example(listOfExamples);
+        }
         props.description(listNode.getDescription().orElse(""));
 
         return props.build();
