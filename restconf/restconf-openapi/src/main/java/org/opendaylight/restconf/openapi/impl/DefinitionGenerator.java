@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import org.opendaylight.restconf.openapi.model.Property;
 import org.opendaylight.restconf.openapi.model.Schema;
@@ -494,19 +495,31 @@ public final class DefinitionGenerator {
 
         final Property.Builder itemsVal = new Property.Builder();
         final Optional<ElementCountConstraint> optConstraint = listNode.getElementCountConstraint();
-        optConstraint.ifPresent(elementCountConstraint -> processElementCount(elementCountConstraint, props));
+        final AtomicInteger minItems = new AtomicInteger(0);
+        optConstraint.ifPresent(elementCountConstraint -> processElementCount(elementCountConstraint, props, minItems));
 
         processTypeDef(listNode.getType(), listNode, itemsVal, stack, definitions, definitionNames, module);
 
-        props.items(itemsVal.build());
+        final Property itemsValue = itemsVal.build();
+        props.items(itemsValue);
+
+        if (itemsValue.example() != null) {
+            final List<Object> listOfExamples = new ArrayList<>();
+            for (int i = 0; i < minItems.get(); i++) {
+                listOfExamples.add(itemsValue.example());
+            }
+            props.example(listOfExamples);
+        }
         props.description(listNode.getDescription().orElse(""));
 
         return props.build();
     }
 
-    private static void processElementCount(final ElementCountConstraint constraint, final Property.Builder props) {
+    private static void processElementCount(final ElementCountConstraint constraint, final Property.Builder props,
+            final AtomicInteger minItems) {
         final Integer minElements = constraint.getMinElements();
         if (minElements != null) {
+            minItems.set(minElements);
             props.minItems(minElements);
         }
         final Integer maxElements = constraint.getMaxElements();
