@@ -47,6 +47,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "311263fb_dd978174",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-10-13T07:59:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0cf1eaec_6c67629b",
+      "range": {
+        "startLine": 61,
+        "startChar": 12,
+        "endLine": 61,
+        "endChar": 32
+      },
+      "revId": "519c0d34987c34fc25673fabbff36f30105d5001",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "224a657d_6df4474d",
@@ -60,6 +84,30 @@
       "writtenOn": "2023-10-12T14:13:51Z",
       "side": 1,
       "message": "make the component final instead",
+      "range": {
+        "startLine": 70,
+        "startChar": 5,
+        "endLine": 70,
+        "endChar": 23
+      },
+      "revId": "519c0d34987c34fc25673fabbff36f30105d5001",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19ff62f1_51da1882",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/EncryptedPasswordChangeListener.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-10-13T07:59:15Z",
+      "side": 1,
+      "message": "Cannot make register final as we assign it to null in close()",
+      "parentUuid": "224a657d_6df4474d",
       "range": {
         "startLine": 70,
         "startChar": 5,
