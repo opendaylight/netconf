@@ -15,7 +15,6 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 import io.netty.handler.ssl.SslContextBuilder;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -30,7 +29,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -48,10 +46,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.shaded.sshd.server.channel.ChannelSession;
-import org.opendaylight.netconf.shaded.sshd.server.command.AbstractCommandSupport;
-import org.opendaylight.netconf.shaded.sshd.server.command.Command;
-import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
@@ -100,8 +94,6 @@ class NetconfClientFactoryImplTest {
     private TransportChannelListener serverTransportListener;
     @Mock
     private SshServerGrouping sshServerParams;
-    @Mock
-    private Consumer<Boolean> subsystemFlag;
 
     private NetconfClientFactory factory;
     private TcpServerGrouping tcpServerParams;
@@ -214,9 +206,8 @@ class NetconfClientFactoryImplTest {
         doReturn(null).when(sshServerParams).getTransportParams();
         doReturn(null).when(sshServerParams).getKeepalives();
 
-        final var server = serverTransportFactory.listenServer(serverTransportListener,
-            getNetconfSubsystemFactory(subsystemFlag), tcpServerParams, sshServerParams
-        ).get(10, TimeUnit.SECONDS);
+        final var server = serverTransportFactory.listenServer("netconf", serverTransportListener, tcpServerParams,
+            sshServerParams).get(10, TimeUnit.SECONDS);
 
         try {
             final var clientConfig = NetconfClientConfigurationBuilder.create()
@@ -234,7 +225,6 @@ class NetconfClientFactoryImplTest {
             assertNotNull(factory.createClient(clientConfig));
             verify(serverTransportListener, timeout(10_000L))
                 .onTransportChannelEstablished(any(TransportChannel.class));
-            verify(subsystemFlag, timeout(1000)).accept(Boolean.TRUE);
         } finally {
             server.shutdown().get(1, TimeUnit.SECONDS);
         }
@@ -267,25 +257,5 @@ class NetconfClientFactoryImplTest {
         return new ClientAuthenticationBuilder().setUsers(
             new UsersBuilder().setUser(Map.of(user.key(), user)).build()
         ).build();
-    }
-
-    private static SubsystemFactory getNetconfSubsystemFactory(final Consumer<Boolean> initiated) {
-        return new SubsystemFactory() {
-            @Override
-            public String getName() {
-                return "netconf";
-            }
-
-            @Override
-            public Command createSubsystem(ChannelSession channel) throws IOException {
-                return new AbstractCommandSupport(getName(), null) {
-                    @Override
-                    public void run() {
-                        // indicate server subsystem is initiated
-                        initiated.accept(Boolean.TRUE);
-                    }
-                };
-            }
-        };
     }
 }

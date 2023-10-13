@@ -24,13 +24,12 @@ import org.slf4j.LoggerFactory;
  * A ChannelOutboundHandler responsible for redirecting whatever bytes need to be written out on the Netty channel so
  * that they pass into SSHD's output.
  */
-// FIXME: NETCONF-1106: hide this class if possible
-public final class OutboundChannelHandler extends ChannelOutboundHandlerAdapter {
+final class OutboundChannelHandler extends ChannelOutboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(OutboundChannelHandler.class);
 
     private final IoOutputStream out;
 
-    public OutboundChannelHandler(final IoOutputStream out) {
+    OutboundChannelHandler(final IoOutputStream out) {
         this.out = requireNonNull(out);
     }
 
