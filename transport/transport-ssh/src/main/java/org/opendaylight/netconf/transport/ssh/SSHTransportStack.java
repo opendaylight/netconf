@@ -29,15 +29,13 @@ import org.opendaylight.netconf.transport.api.TransportStack;
  */
 public abstract sealed class SSHTransportStack extends AbstractOverlayTransportStack<SSHTransportChannel>
         implements SessionListener permits SSHClient, SSHServer {
-    private final TransportIoService ioService;
-
     private final Map<Long, TransportChannel> unauthUnderlays = new ConcurrentHashMap<>();
     private final Map<Long, Session> sessions = new ConcurrentHashMap<>();
+    private final TransportIoService ioService;
 
-    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
-        justification = """
-            SessionListener has default implementations which we do not care about. We have all subclasses in this
-            package and neither of them has additional state""")
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = """
+        SessionListener has default implementations which we do not care about. We have all subclasses in this package
+        and neither of them has additional state""")
     SSHTransportStack(final TransportChannelListener listener, final FactoryManager factoryManager,
             final IoHandler handler) {
         super(listener);
