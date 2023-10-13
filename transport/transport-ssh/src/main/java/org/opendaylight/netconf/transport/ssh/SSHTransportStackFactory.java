@@ -49,16 +49,18 @@ public final class SSHTransportStackFactory implements AutoCloseable {
             NettyTransportSupport.newEventLoopGroup(parentGroupName, parentGroupThreads));
     }
 
-    public @NonNull ListenableFuture<SSHClient> connectClient(final TransportChannelListener listener,
-            final TcpClientGrouping connectParams, final SshClientGrouping clientParams)
-                throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, listener, clientParams).connect(newBootstrap(), connectParams);
+    public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
+            final TransportChannelListener listener, final TcpClientGrouping connectParams,
+            final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams)
+            .connect(newBootstrap(), connectParams);
     }
 
-    public @NonNull ListenableFuture<SSHClient> listenClient(final TransportChannelListener listener,
-            final TcpServerGrouping listenParams, final SshClientGrouping clientParams)
-                throws UnsupportedConfigurationException {
-        return SSHClient.of(ioServiceFactory, group, listener, clientParams).listen(newServerBootstrap(), listenParams);
+    public @NonNull ListenableFuture<SSHClient> listenClient(final String subsystem,
+            final TransportChannelListener listener, final TcpServerGrouping listenParams,
+            final SshClientGrouping clientParams) throws UnsupportedConfigurationException {
+        return SSHClient.of(ioServiceFactory, group, subsystem, listener, clientParams)
+            .listen(newServerBootstrap(), listenParams);
     }
 
     public @NonNull ListenableFuture<SSHServer> connectServer(final TransportChannelListener listener,

@@ -153,7 +153,7 @@ class NetconfServerFactoryImplTest {
         throws Exception {
         final var server = serverFuture.get(2, TimeUnit.SECONDS);
         try {
-            final var client = FACTORY.connectClient(clientListener, tcpClientParams, sshClientParams)
+            final var client = FACTORY.connectClient("netconf", clientListener, tcpClientParams, sshClientParams)
                 .get(2, TimeUnit.SECONDS);
             try {
                 // FIXME commented line requires netconf client to trigger netconf subsystem initialization on server
