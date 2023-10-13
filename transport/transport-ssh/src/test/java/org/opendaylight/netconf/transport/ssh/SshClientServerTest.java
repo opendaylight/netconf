@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,6 +55,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
+import org.opendaylight.netconf.shaded.sshd.server.command.Command;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
 import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
@@ -96,6 +99,8 @@ public class SshClientServerTest {
     private TransportChannelListener serverListener;
     @Mock
     private SubsystemFactory subsystemFactory;
+    @Mock
+    private Command subsystem;
 
     @Captor
     ArgumentCaptor<TransportChannel> clientTransportChannelCaptor;
@@ -132,6 +137,9 @@ public class SshClientServerTest {
         when(tcpClientConfig.requireRemoteAddress()).thenCallRealMethod();
         when(tcpClientConfig.getRemotePort()).thenReturn(localPort);
         when(tcpClientConfig.requireRemotePort()).thenCallRealMethod();
+
+        doReturn("subsystem").when(subsystemFactory).getName();
+        doReturn(subsystem).when(subsystemFactory).createSubsystem(any());
     }
 
     @ParameterizedTest(name = "SSH Server Host Key Verification -- {0}")
@@ -224,7 +232,7 @@ public class SshClientServerTest {
             .get(2, TimeUnit.SECONDS);
         try {
             // connect with client
-            final var client = FACTORY.connectClient(clientListener, tcpClientConfig, sshClientConfig)
+            final var client = FACTORY.connectClient("subsystem", clientListener, tcpClientConfig, sshClientConfig)
                 .get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(10_000))
@@ -266,7 +274,7 @@ public class SshClientServerTest {
                 factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
             }).get(2, TimeUnit.SECONDS);
         try {
-            final var client = FACTORY.connectClient(clientListener, tcpClientConfig, sshClientConfig)
+            final var client = FACTORY.connectClient("subsystem", clientListener, tcpClientConfig, sshClientConfig)
                 .get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(10_000))
