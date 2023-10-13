@@ -7,10 +7,15 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.jdt.annotation.Nullable;
@@ -19,6 +24,7 @@ import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.NamedFactory;
 import org.opendaylight.netconf.shaded.sshd.common.cipher.BuiltinCiphers;
 import org.opendaylight.netconf.shaded.sshd.common.cipher.Cipher;
+import org.opendaylight.netconf.shaded.sshd.common.io.IoOutputStream;
 import org.opendaylight.netconf.shaded.sshd.common.kex.BuiltinDHFactories;
 import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchangeFactory;
 import org.opendaylight.netconf.shaded.sshd.common.mac.BuiltinMacs;
@@ -26,6 +32,7 @@ import org.opendaylight.netconf.shaded.sshd.common.mac.Mac;
 import org.opendaylight.netconf.shaded.sshd.common.signature.BuiltinSignatures;
 import org.opendaylight.netconf.shaded.sshd.common.signature.Signature;
 import org.opendaylight.netconf.shaded.sshd.server.ServerBuilder;
+import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev220616.EcdsaSha2Nistp256;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.ssh._public.key.algs.rev220616.EcdsaSha2Nistp384;
@@ -265,5 +272,41 @@ final class TransportUtils {
             builder.add(mapped);
         }
         return builder.build();
+    }
+
+    static <T> T checkCast(final Class<T> clazz, final Object obj) throws IOException {
+        try {
+            return clazz.cast(requireNonNull(obj));
+        } catch (ClassCastException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @FunctionalInterface
+    interface ChannelInactive {
+
+        void onChannelInactive() throws Exception;
+    }
+
+    static ChannelHandlerContext attachUnderlay(final IoOutputStream out, final TransportChannel underlay,
+            final ChannelInactive inactive) {
+        // Note that there may be multiple handlers already present on the channel, hence we are attaching last, but
+        // from the logical perspective we are the head handlers.
+        final var pipeline = underlay.channel().pipeline();
+
+        // - install outbound packet handler, i.e. moving bytes from the channel into SSHD's pipeline
+        pipeline.addLast(new OutboundChannelHandler(out));
+        // - remember the context of this handler, we will be using it to issue writes into the channel
+        final var head = pipeline.lastContext();
+
+        // - install inner channel termination handler
+        pipeline.addLast(new ChannelInboundHandlerAdapter() {
+            @Override
+            public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+                inactive.onChannelInactive();
+            }
+        });
+
+        return head;
     }
 }
