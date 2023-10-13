@@ -23,11 +23,15 @@ import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link TransportStack} acting as an SSH server.
  */
 public final class SSHServer extends SSHTransportStack {
+    private static final Logger LOG = LoggerFactory.getLogger(SSHServer.class);
+
     private SSHServer(final TransportChannelListener listener, final TransportSshServer sshServer) {
         super(listener, sshServer, sshServer.getSessionFactory());
     }
@@ -55,5 +59,13 @@ public final class SSHServer extends SSHTransportStack {
     @Override
     void onKeyEstablished(final Session session) {
         // No-op
+    }
+
+    @Override
+    void onAuthenticated(final Session session) {
+        final var sessionId = sessionId(session);
+        LOG.debug("Established transport on session {}", sessionId);
+        // FIXME: we should wait for the subsystem to be created and then finish
+        completeUnderlay(sessionId, underlay -> addTransportChannel(new SSHTransportChannel(underlay)));
     }
 }
