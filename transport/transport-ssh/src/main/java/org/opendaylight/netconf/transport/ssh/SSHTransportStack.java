@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
@@ -82,22 +83,40 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     @Override
     public final void sessionEvent(final Session session, final Event event) {
-        if (Event.KeyEstablished == event && session instanceof ClientSession clientSession) {
+        switch (event) {
+            case Authenticated:
+                onAuthenticated(session);
+                break;
+            case KeyEstablished:
+                onKeyEstablished(session);
+                break;
+            default:
+                // No-op
+        }
+    }
+
+    private void onKeyEstablished(final Session session) {
+        if (session instanceof ClientSession clientSession) {
             // server key is accepted, trigger authentication flow
+            final AuthFuture authFuture;
             try {
-                clientSession.auth().addListener(future -> {
-                    if (!future.isSuccess()) {
-                        deleteSession(session);
-                    }
-                });
+                authFuture = clientSession.auth();
             } catch (IOException e) {
                 sessionException(session, e);
+                return;
             }
+
+            authFuture.addListener(future -> {
+                if (!future.isSuccess()) {
+                    deleteSession(session);
+                }
+            });
         }
-        if (Event.Authenticated == event) {
-            // auth success
-            completeAuth(idOf(session), underlay -> addTransportChannel(new SSHTransportChannel(underlay)));
-        }
+    }
+
+    private void onAuthenticated(final Session session) {
+        // auth success
+        completeAuth(idOf(session), underlay -> addTransportChannel(new SSHTransportChannel(underlay)));
     }
 
     private void deleteSession(final Session session) {
