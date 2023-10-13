@@ -17,7 +17,7 @@ import io.netty.channel.ChannelPipeline;
  * {@link ChannelPipeline}.
  */
 // Non-final for testing
-public non-sealed class NettyPipelineAwareChannelSubsystem extends AbstractNettyChannelSubsystem {
+non-sealed class NettyPipelineAwareChannelSubsystem extends AbstractNettyChannelSubsystem {
     private final ChannelPipeline pipeline;
 
     NettyPipelineAwareChannelSubsystem(final String subsystem, final ChannelPipeline pipeline) {

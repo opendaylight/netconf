@@ -400,7 +400,7 @@ public class AsyncSshHandlerTest {
         doReturn(openFuture).when(subsystemChannel).open();
         doReturn(asyncIn).when(subsystemChannel).getAsyncIn();
         doNothing().when(subsystemChannel).onClose(any());
-        doNothing().when(subsystemChannel).close();
+        doReturn(null).when(subsystemChannel).close(false);
         return subsystemChannel;
     }
 

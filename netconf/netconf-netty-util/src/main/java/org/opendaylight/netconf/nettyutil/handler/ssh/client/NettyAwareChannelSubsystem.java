@@ -16,7 +16,7 @@ import io.netty.channel.ChannelHandlerContext;
  * {@link ChannelHandlerContext}.
  */
 // Non-final for testing
-public non-sealed class NettyAwareChannelSubsystem extends AbstractNettyChannelSubsystem {
+non-sealed class NettyAwareChannelSubsystem extends AbstractNettyChannelSubsystem {
     private final ChannelHandlerContext ctx;
 
     NettyAwareChannelSubsystem(final String subsystem, final ChannelHandlerContext ctx) {

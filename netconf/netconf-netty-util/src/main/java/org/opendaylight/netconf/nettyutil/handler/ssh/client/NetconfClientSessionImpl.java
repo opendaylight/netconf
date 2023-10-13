@@ -27,18 +27,18 @@ public final class NetconfClientSessionImpl extends ClientSessionImpl implements
     }
 
     @Override
-    public NettyAwareChannelSubsystem createSubsystemChannel(final String subsystem, final ChannelHandlerContext ctx)
+    public ChannelSubsystem createSubsystemChannel(final String subsystem, final ChannelHandlerContext ctx)
             throws IOException {
         return registerSubsystem(new NettyAwareChannelSubsystem(subsystem, ctx));
     }
 
     @Override
-    public NettyPipelineAwareChannelSubsystem createSubsystemChannel(final String subsystem,
+    public ChannelSubsystem createSubsystemChannel(final String subsystem,
             final ChannelPipeline pipeline) throws IOException {
         return registerSubsystem(new NettyPipelineAwareChannelSubsystem(subsystem, pipeline));
     }
 
-    private <T extends ChannelSubsystem> T registerSubsystem(final T subsystem) throws IOException {
+    private ChannelSubsystem registerSubsystem(final ChannelSubsystem subsystem) throws IOException {
         final var service = getConnectionService();
         final var id = service.registerChannel(subsystem);
         if (log.isDebugEnabled()) {
