@@ -32,7 +32,7 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext.Factory
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfClientSessionImpl;
-import org.opendaylight.netconf.nettyutil.handler.ssh.client.NettyPipelineAwareChannelSubsystem;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.common.AttributeRepository.AttributeKey;
@@ -118,7 +118,7 @@ public class CallHomeSessionContextTest {
     public void creatingAChannelSuccessfullyShouldResultInAnAttachedListener() throws Exception {
         // given
         final var mockFuture = mock(OpenFuture.class);
-        final var mockChannelSubsystem = mock(NettyPipelineAwareChannelSubsystem.class);
+        final var mockChannelSubsystem = mock(ChannelSubsystem.class);
         doReturn(mockFuture).when(mockChannelSubsystem).open();
         doReturn(mockChannelSubsystem).when(mockSession).createSubsystemChannel(anyString(),
             any(DefaultChannelPipeline.class));

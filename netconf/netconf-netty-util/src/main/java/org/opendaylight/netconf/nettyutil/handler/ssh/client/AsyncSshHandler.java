@@ -25,6 +25,7 @@ import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
@@ -80,7 +81,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private ChannelPromise connectPromise;
 
     private AsyncSshHandlerWriter sshWriteAsyncHandler;
-    private NettyAwareChannelSubsystem channel;
+    private ChannelSubsystem channel;
     private ClientSession session;
     private FutureListener<Object> negotiationFutureListener;
 
@@ -312,9 +313,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         }
 
         if (channel != null) {
-            //TODO: see if calling just close() is sufficient
-            //channel.close(false);
-            channel.close();
+            channel.close(false);
             channel = null;
         }
         promise.setSuccess();

@@ -11,6 +11,7 @@ import com.google.common.annotations.Beta;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import java.io.IOException;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 
 /**
@@ -25,10 +26,10 @@ public interface NettyAwareClientSession extends ClientSession {
      *
      * @param subsystem The subsystem name
      * @param ctx Context to which to route data to
-     * @return The created {@link NettyAwareChannelSubsystem}
+     * @return The created {@link ChannelSubsystem}
      * @throws IOException If failed to create the requested channel
      */
-    NettyAwareChannelSubsystem createSubsystemChannel(String subsystem, ChannelHandlerContext ctx) throws IOException;
+    ChannelSubsystem createSubsystemChannel(String subsystem, ChannelHandlerContext ctx) throws IOException;
 
     /**
      * Allocate a channel to the specified subsystem. Incoming data on the channel will be routed to the
@@ -36,9 +37,8 @@ public interface NettyAwareClientSession extends ClientSession {
      *
      * @param subsystem The subsystem name
      * @param pipeline ChannelPipeline to which to route data to
-     * @return The created {@link NettyPipelineAwareChannelSubsystem}
+     * @return The created {@link ChannelSubsystem}
      * @throws IOException If failed to create the requested channel
      */
-    NettyPipelineAwareChannelSubsystem createSubsystemChannel(String subsystem, ChannelPipeline pipeline)
-            throws IOException;
+    ChannelSubsystem createSubsystemChannel(String subsystem, ChannelPipeline pipeline) throws IOException;
 }
