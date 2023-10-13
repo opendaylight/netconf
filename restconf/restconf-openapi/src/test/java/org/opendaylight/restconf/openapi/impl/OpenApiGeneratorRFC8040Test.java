@@ -488,11 +488,43 @@ public final class OpenApiGeneratorRFC8040Test {
     }
 
     /**
+<<<<<<< HEAD   (aa470a Set default for instance-identifier type)
      *  Test JSON and XML references for request operation.
      */
     private static void verifyRequestRef(final Operation operation, final String expectedJsonRef,
             final String expectedXmlRef) {
         final JsonNode postContent;
+=======
+     * Test that number of elements in payload is correct.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testLeafListWithMinElementsPayload() {
+        final var doc = generator.getApiDeclaration(MANDATORY_TEST, null, uriInfo);
+        assertNotNull(doc);
+        final var paths = doc.paths();
+        final var path = paths.get("/rests/data/mandatory-test:root-container/mandatory-container");
+        assertNotNull(path);
+        final var requestBody = path.put().requestBody().content();
+        assertNotNull(requestBody);
+        final var jsonRef = requestBody.get("application/json").schema().properties()
+            .get("mandatory-test:mandatory-container").ref();
+        assertNotNull(jsonRef);
+        final var xmlRef = requestBody.get("application/xml").schema().ref();
+        assertNotNull(xmlRef);
+        final var schema = doc.components().schemas().get("mandatory-test_root-container_mandatory-container");
+        assertNotNull(schema);
+        final var minItems = schema.properties().get("leaf-list-with-min-elements").minItems();
+        assertNotNull(minItems);
+        final var listOfExamples = ((List<String>) schema.properties().get("leaf-list-with-min-elements").example());
+        assertNotNull(listOfExamples);
+        assertEquals(jsonRef, xmlRef);
+        assertEquals(listOfExamples.size(), minItems.intValue());
+    }
+
+    private static void verifyRequestRef(final Operation operation, final String expectedRef, final String nodeType) {
+        final Map<String, MediaTypeObject> postContent;
+>>>>>>> CHANGE (1c1ab4 OpenApi: Fix 'min-elements' for XML Leaf-List)
         if (operation.requestBody() != null) {
             postContent = operation.requestBody().get("content");
         } else {

@@ -378,6 +378,262 @@ public class DefinitionGenerator {
             final String name = idName + discriminator;
             definitions.put(name, identityObj);
         }
+<<<<<<< HEAD   (aa470a Set default for instance-identifier type)
+=======
+        parentNodeBuilder.properties(properties).required(required.size() > 0 ? required : null);
+        return properties;
+    }
+
+    private static Map<String, Property> processChoiceNodeRecursively(final String parentName,
+            final Map<String, Schema> definitions, final DefinitionNames definitionNames, final boolean isConfig,
+            final SchemaInferenceStack stack, final List<String> required, final ChoiceSchemaNode choice,
+            final Module module) throws IOException {
+        if (!choice.getCases().isEmpty()) {
+            final var properties = new HashMap<String, Property>();
+            final var caseSchemaNode = choice.getDefaultCase().orElse(choice.getCases().stream()
+                .findFirst().orElseThrow());
+            stack.enterSchemaTree(caseSchemaNode.getQName());
+            for (final var childNode : caseSchemaNode.getChildNodes()) {
+                if (childNode instanceof ChoiceSchemaNode childChoice) {
+                    final var isChildConfig = isConfig && childNode.isConfiguration();
+                    stack.enterSchemaTree(childNode.getQName());
+                    final var childProperties = processChoiceNodeRecursively(parentName, definitions, definitionNames,
+                        isChildConfig, stack, required, childChoice, module);
+                    properties.putAll(childProperties);
+                    stack.exit();
+                } else {
+                    final var property = processChildNode(childNode, parentName, definitions, definitionNames, stack,
+                        required, module, isConfig);
+                    if (property != null) {
+                        properties.put(childNode.getQName().getLocalName(), property);
+                    }
+                }
+            }
+            stack.exit();
+            return properties;
+        }
+        return Map.of();
+    }
+
+    private static Property processChildNode(final DataSchemaNode node, final String parentName,
+            final Map<String, Schema> definitions, final DefinitionNames definitionNames,
+            final SchemaInferenceStack stack, final List<String> required, final Module module,
+            final boolean isParentConfig) throws IOException {
+        final XMLNamespace parentNamespace = stack.toSchemaNodeIdentifier().lastNodeIdentifier().getNamespace();
+        stack.enterSchemaTree(node.getQName());
+        /*
+            Add module name prefix to property name, when needed, when ServiceNow can process colons,
+            use RestDocGenUtil#resolveNodesName for creating property name
+         */
+        final String name = node.getQName().getLocalName();
+        /*
+            If the parent is operational, then current node is also operational and should be added as a child
+            even if node.isConfiguration()==true.
+            If the parent is configuration, then current node should be added as a child only if
+            node.isConfiguration()==true.
+        */
+        final boolean shouldBeAddedAsChild = !isParentConfig || node.isConfiguration();
+        Property property = null;
+        if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
+            final Property dataNodeContainer = processDataNodeContainer((DataNodeContainer) node, parentName,
+                definitions, definitionNames, stack, module, isParentConfig);
+            if (shouldBeAddedAsChild) {
+                if (isSchemaNodeMandatory(node)) {
+                    required.add(name);
+                }
+                property = dataNodeContainer;
+            }
+            processActionNodeContainer(node, parentName, definitions, definitionNames, stack, module);
+        } else if (shouldBeAddedAsChild) {
+            if (node instanceof LeafSchemaNode leaf) {
+                property = processLeafNode(leaf, name, required, stack, parentNamespace);
+            } else if (node instanceof AnyxmlSchemaNode || node instanceof AnydataSchemaNode) {
+                property = processUnknownDataSchemaNode(node, name, required, parentNamespace);
+            } else if (node instanceof LeafListSchemaNode leafList) {
+                if (isSchemaNodeMandatory(node)) {
+                    required.add(name);
+                }
+                property = processLeafListNode(leafList, stack);
+            } else {
+                throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
+            }
+        }
+        stack.exit();
+        return property;
+    }
+
+    private static Property processLeafListNode(final LeafListSchemaNode listNode,
+            final SchemaInferenceStack stack) {
+        final Property.Builder props = new Property.Builder();
+        props.type(ARRAY_TYPE);
+
+        final Property.Builder itemsVal = new Property.Builder();
+        final Optional<ElementCountConstraint> optConstraint = listNode.getElementCountConstraint();
+        optConstraint.ifPresent(elementCountConstraint -> processElementCount(elementCountConstraint, props));
+
+        processTypeDef(listNode.getType(), listNode, itemsVal, stack);
+
+        final Property itemsValue = itemsVal.build();
+        final Property propsValue = props.build();
+        props.items(itemsValue);
+
+        if (itemsValue.example() != null && propsValue.minItems() != null) {
+            final List<Object> listOfExamples = new ArrayList<>();
+            for (int i = 0; i < propsValue.minItems(); i++) {
+                listOfExamples.add(itemsValue.example());
+            }
+            props.example(listOfExamples);
+        }
+        props.description(listNode.getDescription().orElse(""));
+
+        return props.build();
+    }
+
+    private static void processElementCount(final ElementCountConstraint constraint, final Property.Builder props) {
+        final Integer minElements = constraint.getMinElements();
+        if (minElements != null) {
+            props.minItems(minElements);
+        }
+        final Integer maxElements = constraint.getMaxElements();
+        if (maxElements != null) {
+            props.maxItems(maxElements);
+        }
+    }
+
+    private static void processMandatory(final MandatoryAware node, final String nodeName,
+            final List<String> required) {
+        if (node.isMandatory()) {
+            required.add(nodeName);
+        }
+    }
+
+    private static Property processLeafNode(final LeafSchemaNode leafNode, final String jsonLeafName,
+            final List<String> required, final SchemaInferenceStack stack, final XMLNamespace parentNamespace) {
+        final Property.Builder property = new Property.Builder();
+
+        final String leafDescription = leafNode.getDescription().orElse("");
+        property.description(leafDescription);
+
+        processTypeDef(leafNode.getType(), leafNode, property, stack);
+        if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
+            // If the parent is not from the same model, define the child XML namespace.
+            property.xml(buildXmlParameter(leafNode));
+        }
+        processMandatory(leafNode, jsonLeafName, required);
+        return property.build();
+    }
+
+    private static Property processUnknownDataSchemaNode(final DataSchemaNode leafNode, final String name,
+            final List<String> required, final XMLNamespace parentNamespace) {
+        assert (leafNode instanceof AnydataSchemaNode || leafNode instanceof AnyxmlSchemaNode);
+
+        final Property.Builder property = new Property.Builder();
+
+        final String leafDescription = leafNode.getDescription().orElse("");
+        property.description(leafDescription);
+
+        final String localName = leafNode.getQName().getLocalName();
+        property.example(String.format("<%s> ... </%s>", localName, localName));
+        property.type(STRING_TYPE);
+        if (!leafNode.getQName().getNamespace().equals(parentNamespace)) {
+            // If the parent is not from the same model, define the child XML namespace.
+            property.xml(buildXmlParameter(leafNode));
+        }
+        processMandatory((MandatoryAware) leafNode, name, required);
+        return property.build();
+    }
+
+    private static String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
+            final Property.Builder property, final SchemaInferenceStack stack) {
+        final String jsonType;
+        if (leafTypeDef instanceof BinaryTypeDefinition binaryType) {
+            jsonType = processBinaryType(binaryType, property);
+        } else if (leafTypeDef instanceof BitsTypeDefinition bitsType) {
+            jsonType = processBitsType(bitsType, property);
+        } else if (leafTypeDef instanceof EnumTypeDefinition enumType) {
+            jsonType = processEnumType(enumType, property);
+        } else if (leafTypeDef instanceof IdentityrefTypeDefinition identityrefType) {
+            jsonType = processIdentityRefType(identityrefType, property, stack.getEffectiveModelContext());
+        } else if (leafTypeDef instanceof StringTypeDefinition stringType) {
+            jsonType = processStringType(stringType, property, node.getQName().getLocalName());
+        } else if (leafTypeDef instanceof UnionTypeDefinition unionType) {
+            jsonType = processTypeDef(unionType.getTypes().iterator().next(), node, property, stack);
+        } else if (leafTypeDef instanceof EmptyTypeDefinition) {
+            jsonType = OBJECT_TYPE;
+        } else if (leafTypeDef instanceof LeafrefTypeDefinition leafrefType) {
+            return processTypeDef(stack.resolveLeafref(leafrefType), node, property, stack);
+        } else if (leafTypeDef instanceof BooleanTypeDefinition) {
+            jsonType = BOOLEAN_TYPE;
+            leafTypeDef.getDefaultValue().ifPresent(v -> property.defaultValue(Boolean.valueOf((String) v)));
+            property.example(true);
+        } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) {
+            jsonType = processNumberType(rangeRestrictedType, property);
+        } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition instanceIdentifierType) {
+            jsonType = processInstanceIdentifierType(instanceIdentifierType, node, property,
+                stack.getEffectiveModelContext());
+        } else {
+            jsonType = STRING_TYPE;
+        }
+        if (TYPE_KEY != null && jsonType != null) {
+            property.type(jsonType);
+        }
+
+        if (leafTypeDef.getDefaultValue().isPresent()) {
+            final Object defaultValue = leafTypeDef.getDefaultValue().orElseThrow();
+            if (defaultValue instanceof String stringDefaultValue) {
+                if (leafTypeDef instanceof BooleanTypeDefinition) {
+                    property.defaultValue(Boolean.valueOf(stringDefaultValue));
+                } else if (leafTypeDef instanceof DecimalTypeDefinition
+                        || leafTypeDef instanceof Uint64TypeDefinition) {
+                    property.defaultValue(new BigDecimal(stringDefaultValue));
+                } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestrictedType) {
+                    //uint8,16,32 int8,16,32,64
+                    if (isHexadecimalOrOctal(rangeRestrictedType)) {
+                        property.defaultValue(stringDefaultValue);
+                    } else {
+                        property.defaultValue(Long.valueOf(stringDefaultValue));
+                    }
+                } else {
+                    property.defaultValue(stringDefaultValue);
+                }
+            } else {
+                //we should never get here. getDefaultValue always gives us string
+                property.defaultValue(defaultValue.toString());
+            }
+        }
+        return jsonType;
+    }
+
+    private static String processBinaryType(final BinaryTypeDefinition definition, final Property.Builder property) {
+        definition.getDefaultValue().ifPresent(property::defaultValue);
+        property.format("byte");
+        return STRING_TYPE;
+    }
+
+    private static String processEnumType(final EnumTypeDefinition enumLeafType, final Property.Builder property) {
+        final List<EnumPair> enumPairs = enumLeafType.getValues();
+        final List<String> enumNames = enumPairs.stream()
+            .map(EnumPair::getName)
+            .toList();
+
+        property.enums(enumNames);
+        enumLeafType.getDefaultValue().ifPresent(property::defaultValue);
+        property.example(enumLeafType.getValues().iterator().next().getName());
+        return STRING_TYPE;
+    }
+
+    private static String processIdentityRefType(final IdentityrefTypeDefinition leafTypeDef,
+            final Property.Builder property, final EffectiveModelContext schemaContext) {
+        final IdentitySchemaNode node = leafTypeDef.getIdentities().iterator().next();
+        property.example(node.getQName().getLocalName());
+        final Collection<? extends IdentitySchemaNode> derivedIds = schemaContext.getDerivedIdentities(node);
+        final List<String> enumPayload = new ArrayList<>();
+        enumPayload.add(node.getQName().getLocalName());
+        populateEnumWithDerived(derivedIds, enumPayload, schemaContext);
+        final List<String> schemaEnum = new ArrayList<>(enumPayload);
+        property.enums(schemaEnum);
+        return STRING_TYPE;
+>>>>>>> CHANGE (1c1ab4 OpenApi: Fix 'min-elements' for XML Leaf-List)
     }
 
     private static void populateEnumWithDerived(final Collection<? extends IdentitySchemaNode> derivedIds,
