@@ -224,7 +224,7 @@ public class SshClientServerTest {
             .get(2, TimeUnit.SECONDS);
         try {
             // connect with client
-            final var client = FACTORY.connectClient(clientListener, tcpClientConfig, sshClientConfig)
+            final var client = FACTORY.connectClient("subsystem", clientListener, tcpClientConfig, sshClientConfig)
                 .get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(10_000))
@@ -266,7 +266,7 @@ public class SshClientServerTest {
                 factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
             }).get(2, TimeUnit.SECONDS);
         try {
-            final var client = FACTORY.connectClient(clientListener, tcpClientConfig, sshClientConfig)
+            final var client = FACTORY.connectClient("subsystem", clientListener, tcpClientConfig, sshClientConfig)
                 .get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(10_000))
