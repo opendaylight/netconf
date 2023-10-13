@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d496ce18_2a1e9149",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImplTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-13T12:31:54Z",
+      "side": 1,
+      "message": "var. In case you need types - move \u003cString, String\u003e part to the right - where you are calling constructor.",
+      "range": {
+        "startLine": 490,
+        "startChar": 14,
+        "endLine": 490,
+        "endChar": 44
+      },
+      "revId": "4917fc9d4982ce5c69a6f94539e8e9d220996a57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2906e684_d0dbfa6b",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImplTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 513,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-13T12:31:54Z",
+      "side": 1,
+      "message": "var",
+      "range": {
+        "startLine": 513,
+        "startChar": 14,
+        "endLine": 513,
+        "endChar": 44
+      },
+      "revId": "4917fc9d4982ce5c69a6f94539e8e9d220996a57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdae68cc_a376c8b7",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImplTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-13T12:31:54Z",
+      "side": 1,
+      "message": "var",
+      "range": {
+        "startLine": 539,
+        "startChar": 14,
+        "endLine": 539,
+        "endChar": 44
+      },
+      "revId": "4917fc9d4982ce5c69a6f94539e8e9d220996a57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "572318d9_571403d4",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImplTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-13T12:31:54Z",
+      "side": 1,
+      "message": "var",
+      "range": {
+        "startLine": 567,
+        "startChar": 14,
+        "endLine": 567,
+        "endChar": 44
+      },
+      "revId": "4917fc9d4982ce5c69a6f94539e8e9d220996a57",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
