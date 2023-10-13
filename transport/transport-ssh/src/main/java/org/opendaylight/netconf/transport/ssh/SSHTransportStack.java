@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.FactoryManager;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
@@ -24,7 +25,20 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
 
 /**
- * An SSH {@link TransportStack}. Instances of this class are built indirectly.
+ * An SSH {@link TransportStack}. Instances of this class are built indirectly. The setup of the Netty channel is quite
+ * weird. We start off with whatever the underlay sets up.
+ *
+ * <p>
+ * We then add {@link TransportIoSession#getHandler()}, which routes data between the socket and
+ * {@link TransportSshClient} (or {@link TransportSshServer}) -- forming the "bottom half" of the channel.
+ *
+ * <p>
+ * The "upper half" of the channel is formed once the corresponding SSH subsystem is established, via
+ * {@link TransportClientSubsystem}, which installs a {@link OutboundChannelHandler}. These two work together:
+ * <ul>
+ *   <li>TransportClientSubsystem pumps bytes inbound from the subsystem towards the tail of the channel pipeline</li>
+ *   <li>OutboundChannelHandler pumps bytes outbound from the tail of channel pipeline into the subsystem</li>
+ * </ul>
  */
 public abstract sealed class SSHTransportStack extends AbstractOverlayTransportStack<SSHTransportChannel>
         implements SessionListener permits SSHClient, SSHServer {
@@ -44,11 +58,13 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     @Override
     protected void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
+        // Acquire underlying channel, create a TransportIoSession and attach its handler to this channel -- which takes
+        // care of routing bytes between the underlay channel and SSHD's network-facing side.
         final var channel = underlayChannel.channel();
         final var ioSession = ioService.createSession(channel.localAddress());
-
         channel.pipeline().addLast(ioSession.getHandler());
-        // authentication triggering and handlers processing is performed by UserAuthSessionListener
+
+        // we now have an attached underlay, but it needs further processing before we expose it to the end user
         unauthUnderlays.put(ioSession.getId(), underlayChannel);
     }
 
@@ -83,7 +99,12 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     public final void sessionEvent(final Session session, final Event event) {
         switch (event) {
             case Authenticated:
-                onAuthenticated(session);
+                // auth success
+                try {
+                    onAuthenticated(session);
+                } catch (IOException e) {
+                    sessionException(session, e);
+                }
                 break;
             case KeyEstablished:
                 try {
@@ -99,19 +120,24 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     abstract void onKeyEstablished(Session session) throws IOException;
 
-    private void onAuthenticated(final Session session) {
-        // auth success
-        completeAuth(idOf(session), underlay -> addTransportChannel(new SSHTransportChannel(underlay)));
+    abstract void onAuthenticated(Session session) throws IOException;
+
+    final @Nullable TransportChannel underlayOf(final Session session) {
+        return unauthUnderlays.get(idOf(session));
     }
 
     final void deleteSession(final Session session) {
         final var id = idOf(session);
         sessions.remove(id);
         // auth failure, close underlay if any
-        completeAuth(id, underlay -> underlay.channel().close());
+        completeUnderlay(id, underlay -> underlay.channel().close());
     }
 
-    private void completeAuth(final Long sessionId, final Consumer<TransportChannel> action) {
+    final void completeUnderlay(final Session session, final Consumer<TransportChannel> action) {
+        completeUnderlay(idOf(session), action);
+    }
+
+    private void completeUnderlay(final Long sessionId, final Consumer<TransportChannel> action) {
         final var removed = unauthUnderlays.remove(sessionId);
         if (removed != null) {
             action.accept(removed);

@@ -7,13 +7,15 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -29,14 +31,18 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
  * A {@link TransportStack} acting as an SSH client.
  */
 public final class SSHClient extends SSHTransportStack {
-    private SSHClient(final TransportChannelListener listener, final TransportSshClient sshClient) {
+    private final String subsystem;
+
+    private SSHClient(final String subsystem, final TransportChannelListener listener,
+            final TransportSshClient sshClient) {
         super(listener, sshClient, sshClient.getSessionFactory());
+        this.subsystem = requireNonNull(subsystem);
     }
 
     static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
-            final TransportChannelListener listener, final SshClientGrouping clientParams)
+            final String subsystem, final TransportChannelListener listener, final SshClientGrouping clientParams)
                 throws UnsupportedConfigurationException {
-        return new SSHClient(listener, new TransportSshClient.Builder(ioServiceFactory, group)
+        return new SSHClient(subsystem, listener, new TransportSshClient.Builder(ioServiceFactory, group)
             .transportParams(clientParams.getTransportParams())
             .keepAlives(clientParams.getKeepalives())
             .clientIdentity(clientParams.getClientIdentity())
@@ -56,15 +62,40 @@ public final class SSHClient extends SSHTransportStack {
 
     @Override
     void onKeyEstablished(final Session session) throws IOException {
-        if (!(session instanceof ClientSession clientSession)) {
-            throw new IOException("Unexpected session " + session);
-        }
-
         // server key is accepted, trigger authentication flow
-        clientSession.auth().addListener(future -> {
+        cast(session).auth().addListener(future -> {
             if (!future.isSuccess()) {
                 deleteSession(session);
             }
         });
+    }
+
+    @Override
+    void onAuthenticated(final Session session) throws IOException {
+        final var clientSession = cast(session);
+
+        final var underlay = underlayOf(clientSession);
+        if (underlay == null) {
+            throw new IOException("Cannot find underlay for " + session);
+        }
+
+        final var channel = clientSession.createSubsystemChannel(subsystem);
+        channel.onClose(() -> clientSession.close(true));
+        channel.open(underlay).addListener(future -> onSubsystemOpenComplete(future, clientSession));
+    }
+
+    private void onSubsystemOpenComplete(final OpenFuture future, final TransportClientSession session) {
+        if (future.isOpened()) {
+            completeUnderlay(session, underlay -> addTransportChannel(new SSHTransportChannel(underlay)));
+        } else {
+            deleteSession(session);
+        }
+    }
+
+    private static TransportClientSession cast(final Session session) throws IOException {
+        if (session instanceof TransportClientSession clientSession) {
+            return clientSession;
+        }
+        throw new IOException("Unexpected session " + session);
     }
 }

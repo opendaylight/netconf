@@ -56,4 +56,10 @@ public final class SSHServer extends SSHTransportStack {
     void onKeyEstablished(final Session session) {
         // No-op
     }
+
+    @Override
+    void onAuthenticated(final Session session) {
+        // FIXME: we should wait for the subsystem to be created and then finish
+        completeUnderlay(session, underlay -> addTransportChannel(new SSHTransportChannel(underlay)));
+    }
 }
