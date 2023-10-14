@@ -198,7 +198,8 @@ final class TransportSshClient extends SshClient {
                 var factory = new UserAuthHostBasedFactory();
                 factory.setClientHostKeys(HostKeyIdentityProvider.wrap(keyPair));
                 factory.setClientUsername(clientIdentity.getUsername());
-                factory.setClientHostname(null); // not provided via config
+                // not provided via config
+                factory.setClientHostname(null);
                 factory.setSignatureFactories(client.getSignatureFactories());
                 authFactoriesListBuilder.add(factory);
             }
