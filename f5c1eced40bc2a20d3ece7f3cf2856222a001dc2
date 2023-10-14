@@ -57,6 +57,30 @@
       },
       "revId": "f5c1eced40bc2a20d3ece7f3cf2856222a001dc2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4825ef9_2ae66727",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/NetconfDeviceSimulator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-14T02:43:11Z",
+      "side": 1,
+      "message": "this is kinda moot.",
+      "parentUuid": "0c2c1994_0591f906",
+      "range": {
+        "startLine": 340,
+        "startChar": 18,
+        "endLine": 340,
+        "endChar": 22
+      },
+      "revId": "f5c1eced40bc2a20d3ece7f3cf2856222a001dc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
