@@ -59,6 +59,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e515aacf_017838f9",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/ConcurrentClientsTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-14T01:28:59Z",
+      "side": 1,
+      "message": "nope, it is just syntactic clutter in for-loops.",
+      "parentUuid": "8878abe3_8c0fa6f2",
+      "range": {
+        "startLine": 215,
+        "startChar": 13,
+        "endLine": 215,
+        "endChar": 16
+      },
+      "revId": "b001f5c745fe8a307881f790be5444f0802cf306",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d386b50_5aab97cb",
