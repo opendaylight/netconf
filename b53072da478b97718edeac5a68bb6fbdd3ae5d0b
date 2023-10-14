@@ -106,6 +106,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6f38bf6_72c1dd62",
+        "filename": "transport/transport-tls/src/main/java/org/opendaylight/netconf/transport/tls/TLSClient.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-14T01:32:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed446ab3_2c5a3fc1",
+      "range": {
+        "startLine": 48,
+        "startChar": 4,
+        "endLine": 48,
+        "endChar": 8
+      },
+      "revId": "b53072da478b97718edeac5a68bb6fbdd3ae5d0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e42da8f_5ebc3c8e",
