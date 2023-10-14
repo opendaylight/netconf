@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
-import com.google.common.annotations.Beta;
 import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.session.SessionFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
@@ -15,7 +14,7 @@ import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
 /**
  * A {@link SessionFactory} which creates {@link NetconfClientSessionImpl}s.
  */
-@Beta
+@Deprecated(since = "7.0.0", forRemoval = true)
 public class NetconfSessionFactory extends SessionFactory {
     public NetconfSessionFactory(final ClientFactoryManager client) {
         super(client);

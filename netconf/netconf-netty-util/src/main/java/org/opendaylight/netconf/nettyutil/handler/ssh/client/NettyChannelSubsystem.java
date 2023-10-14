@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Abstract base class for {@link ChannelSubsystem}s backed by a Netty {@link ChannelHandlerContext}.
  */
+@Deprecated(since = "7.0.0", forRemoval = true)
 abstract class NettyChannelSubsystem extends ChannelSubsystem {
     private static final Logger LOG = LoggerFactory.getLogger(NettyChannelSubsystem.class);
 

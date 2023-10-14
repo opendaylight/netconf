@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * Async Ssh writer. Takes messages(byte arrays) and sends them encrypted to remote server.
  * Also handles pending writes by caching requests until pending state is over.
  */
+@Deprecated(since = "7.0.0", forRemoval = true)
 public final class AsyncSshHandlerWriter implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandlerWriter.class);
     private static final Pattern NON_ASCII = Pattern.compile("([^\\x20-\\x7E\\x0D\\x0A])+");

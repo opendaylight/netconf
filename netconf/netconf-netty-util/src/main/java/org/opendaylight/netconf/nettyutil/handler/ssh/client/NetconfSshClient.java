@@ -7,14 +7,13 @@
  */
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
-import com.google.common.annotations.Beta;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 
 /**
  * An extension to {@link SshClient} which uses {@link NetconfSessionFactory} to create sessions (leading towards
  * {@link NetconfClientSessionImpl}.
  */
-@Beta
+@Deprecated(since = "7.0.0", forRemoval = true)
 public class NetconfSshClient extends SshClient {
     @Override
     protected NetconfSessionFactory createSessionFactory() {

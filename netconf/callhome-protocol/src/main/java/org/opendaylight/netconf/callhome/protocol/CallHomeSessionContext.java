@@ -138,6 +138,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         return activationPromise;
     }
 
+    @Deprecated(since = "7.0.0", forRemoval = true)
     protected MinaSshNettyChannel newMinaSshNettyChannel() {
         return new MinaSshNettyChannel(this, sshSession);
     }

@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * Dispatcher class for creating servers and clients. The idea is to first create servers and clients and the run the
  * start method that will handle sockets in different thread.
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L extends NetconfSessionListener<? super S>> {
     protected interface ChannelPipelineInitializer<C extends Channel, S extends NetconfSession> {
         /**

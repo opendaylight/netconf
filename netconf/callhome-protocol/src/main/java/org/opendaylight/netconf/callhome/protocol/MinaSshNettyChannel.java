@@ -22,6 +22,7 @@ import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated(since = "7.0.0", forRemoval = true)
 // Non-final for testing
 class MinaSshNettyChannel extends AbstractServerChannel {
     private static final Logger LOG = LoggerFactory.getLogger(MinaSshNettyChannel.class);

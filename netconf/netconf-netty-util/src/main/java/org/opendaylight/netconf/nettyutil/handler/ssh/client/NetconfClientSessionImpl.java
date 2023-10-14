@@ -9,7 +9,6 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.Beta;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import java.io.IOException;
@@ -22,7 +21,7 @@ import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
  * A {@link ClientSessionImpl} which additionally allows creation of NETCONF subsystem channel, which is routed to
  * a particular {@link ChannelHandlerContext}.
  */
-@Beta
+@Deprecated(since = "7.0.0", forRemoval = true)
 public final class NetconfClientSessionImpl extends ClientSessionImpl implements NettyAwareClientSession {
     public NetconfClientSessionImpl(final ClientFactoryManager client, final IoSession ioSession) throws Exception {
         super(client, ioSession);
