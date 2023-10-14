@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Netty SSH handler class. Acts as interface between Netty and SSH library.
  */
+@Deprecated(since = "7.0.0", forRemoval = true)
 public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandler.class);
     private static final VarHandle DISCONNECTED;

@@ -30,6 +30,7 @@ import org.opendaylight.netconf.shaded.sshd.common.io.IoReadFuture;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoWriteFuture;
 import org.opendaylight.netconf.shaded.sshd.common.util.buffer.Buffer;
 
+@Deprecated(since = "7.0.0", forRemoval = true)
 public class MinaSshNettyChannelTest {
     private CallHomeSessionContext mockContext;
     private ClientSession mockSession;

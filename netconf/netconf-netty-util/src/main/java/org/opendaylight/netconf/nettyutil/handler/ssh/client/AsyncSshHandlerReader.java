@@ -22,10 +22,9 @@ import org.slf4j.LoggerFactory;
  * Listener on async input stream from SSH session.
  * This listeners schedules reads in a loop until the session is closed or read fails.
  */
+@Deprecated(since = "7.0.0", forRemoval = true)
 public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFuture>, AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandlerReader.class);
-
     private static final int BUFFER_SIZE = 2048;
 
     private final AutoCloseable connectionClosedCallback;

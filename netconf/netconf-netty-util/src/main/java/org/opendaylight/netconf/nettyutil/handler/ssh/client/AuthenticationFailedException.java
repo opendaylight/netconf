@@ -10,7 +10,6 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
-import java.io.Serial;
 import org.opendaylight.netconf.shaded.sshd.common.SshException;
 
 /**
@@ -18,7 +17,7 @@ import org.opendaylight.netconf.shaded.sshd.common.SshException;
  */
 @Beta
 public class AuthenticationFailedException extends SshException {
-    @Serial
+    @java.io.Serial
     private static final long serialVersionUID = 1L;
 
     public AuthenticationFailedException(final String message) {
