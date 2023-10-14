@@ -9,7 +9,6 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
 import static com.google.common.base.Verify.verify;
 
-import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -24,7 +23,7 @@ import org.opendaylight.netconf.shaded.sshd.common.signature.Signature;
 /**
  * A {@link ClientBuilder} which builds {@link NetconfSshClient} instances.
  */
-@Beta
+@Deprecated(since = "7.0.0", forRemoval = true)
 public class NetconfClientBuilder extends ClientBuilder {
     // RFC8332 rsa-sha2-256/rsa-sha2-512 are not a part of Mina's default set of signatures for clients as of 2.5.1.
     // Add them to ensure interop with modern highly-secured devices.

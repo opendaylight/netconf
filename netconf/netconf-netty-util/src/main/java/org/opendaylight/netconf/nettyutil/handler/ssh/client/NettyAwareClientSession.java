@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
-import com.google.common.annotations.Beta;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import java.io.IOException;
@@ -18,7 +17,7 @@ import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
  * A {@link ClientSession} which additionally allows subsystem channels which are forwarded to a particular Netty
  * channel context.
  */
-@Beta
+@Deprecated(since = "7.0.0", forRemoval = true)
 public interface NettyAwareClientSession extends ClientSession {
     /**
      * Allocate a channel to the specified subsystem. Incoming data on the channel will be routed to the
