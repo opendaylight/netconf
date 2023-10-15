@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNull;
@@ -28,7 +29,6 @@ import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
-import org.opendaylight.yangtools.yang.common.Empty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,16 +78,16 @@ public final class SSHServer extends SSHTransportStack {
 
         Futures.addCallback(cast(session).attachUnderlay(subsystem, getUnderlayOf(sessionId)), new FutureCallback<>() {
             @Override
-            public void onSuccess(final Empty result) {
+            public void onSuccess(final ChannelHandlerContext result) {
                 LOG.debug("Established \"{}\" subsystem on session {}", subsystem, sessionId);
                 // Note: we re-validating the underlay ... we may need to refactor state management to make this
                 //       non-awkward
-                transportEstablished(sessionId);
+                transportEstablished(sessionId, result);
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                LOG.debug("Binding to \"{}\" subsystem on session {} failed", sessionId, cause);
+                LOG.debug("Binding to \"{}\" subsystem on session {} failed", subsystem, sessionId, cause);
                 deleteSession(sessionId);
             }
         }, MoreExecutors.directExecutor());
