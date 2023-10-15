@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
@@ -18,13 +19,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoSession;
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSessionImpl;
 import org.opendaylight.netconf.transport.api.TransportChannel;
-import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
  * A {@link ServerSessionImpl}, bound to a backend Netty channel.
  */
 final class TransportServerSession extends ServerSessionImpl {
-    private record State(String subsystem, TransportChannel underlay, SettableFuture<Empty> future) {
+    private record State(String subsystem, TransportChannel underlay, SettableFuture<ChannelHandlerContext> future) {
         State {
             subsystem = requireNonNull(subsystem);
             underlay = requireNonNull(underlay);
@@ -49,7 +49,7 @@ final class TransportServerSession extends ServerSessionImpl {
         super(server, ioSession);
     }
 
-    ListenableFuture<Empty> attachUnderlay(final String subsystem, final TransportChannel underlay) {
+    ListenableFuture<ChannelHandlerContext> attachUnderlay(final String subsystem, final TransportChannel underlay) {
         final var newState = new State(subsystem, underlay, SettableFuture.create());
         final var witness = STATE.compareAndExchange(this, null, newState);
         if (witness != null) {
@@ -62,9 +62,7 @@ final class TransportServerSession extends ServerSessionImpl {
         final var local = (State) STATE.getAndSet(this, null);
         if (local != null) {
             if (subsystem.equals(local.subsystem)) {
-                final var ret = new TransportServerSubsystem(subsystem, local.underlay);
-                local.future.set(Empty.value());
-                return ret;
+                return new TransportServerSubsystem(subsystem, local.underlay, local.future);
             }
             local.future.setException(new IOException("Mismatched subsystem " + subsystem));
         }

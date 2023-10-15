@@ -9,6 +9,7 @@ package org.opendaylight.netconf.transport.ssh;
 
 import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -161,10 +162,12 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     }
 
     // FIXME: this should be an assertion, the channel should just be there
-    final void transportEstablished(final Long sessionId) {
+    final void transportEstablished(final Long sessionId, final ChannelHandlerContext head) {
         completeUnderlay(sessionId, underlay -> {
             LOG.debug("Established transport on session {}", sessionId);
             addTransportChannel(new SSHTransportChannel(underlay));
+            // Make sure any added handlers observe the channel being active
+            head.fireChannelActive();
         });
     }
 

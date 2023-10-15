@@ -7,14 +7,17 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
-import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -93,17 +96,19 @@ public final class SSHClient extends SSHTransportStack {
         final var clientSession = cast(session);
         final var channel = clientSession.createSubsystemChannel(subsystem);
         channel.onClose(() -> clientSession.close(true));
-        channel.open(underlay).addListener(future -> onSubsystemOpenComplete(future, sessionId));
-    }
+        Futures.addCallback(channel.open(underlay), new FutureCallback<>() {
+            @Override
+            public void onSuccess(final ChannelHandlerContext result) {
+                LOG.debug("Opened \"{}\" subsystem on session {}", subsystem, sessionId);
+                transportEstablished(sessionId, result);
+            }
 
-    private void onSubsystemOpenComplete(final OpenFuture future, final Long sessionId) {
-        if (future.isOpened()) {
-            LOG.debug("Opened \"{}\" subsystem on session {}", subsystem, sessionId);
-            transportEstablished(sessionId);
-        } else {
-            LOG.error("Failed to open \"{}\" subsystem on session {}", subsystem, sessionId, future.getException());
-            deleteSession(sessionId);
-        }
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.error("Failed to open \"{}\" subsystem on session {}", subsystem, sessionId, cause);
+                deleteSession(sessionId);
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     private static TransportClientSession cast(final Session session) throws IOException {

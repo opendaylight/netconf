@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import com.google.errorprone.annotations.DoNotCall;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -37,19 +39,21 @@ final class TransportClientSubsystem extends ChannelSubsystem {
         throw new UnsupportedOperationException();
     }
 
-    synchronized OpenFuture open(final TransportChannel underlay) throws IOException {
+    synchronized ListenableFuture<ChannelHandlerContext> open(final TransportChannel underlay) throws IOException {
         LOG.debug("Opening client subsystem \"{}\"", getSubsystem());
-        final var openFuture = super.open();
-        openFuture.addListener(future -> onOpenComplete(future, underlay));
-        return openFuture;
-    }
 
-    private void onOpenComplete(final OpenFuture future, final TransportChannel underlay) {
-        if (future.isOpened()) {
-            head = TransportUtils.attachUnderlay(getAsyncIn(), underlay, this::close);
-        } else {
-            LOG.debug("Failed to open client subsystem \"{}\"", getSubsystem(), future.getException());
-        }
+        final var ret = SettableFuture.<ChannelHandlerContext>create();
+        super.open().addListener(future -> {
+            if (future.isOpened()) {
+                head = TransportUtils.attachUnderlay(getAsyncIn(), underlay, this::close);
+                ret.set(head);
+            } else {
+                final var ex = future.getException();
+                LOG.debug("Failed to open client subsystem \"{}\"", getSubsystem(), ex);
+                ret.setException(ex);
+            }
+        });
+        return ret;
     }
 
     @Override
