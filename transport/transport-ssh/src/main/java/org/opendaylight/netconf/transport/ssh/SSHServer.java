@@ -79,6 +79,7 @@ public final class SSHServer extends SSHTransportStack {
         Futures.addCallback(cast(session).attachUnderlay(subsystem, getUnderlayOf(sessionId)), new FutureCallback<>() {
             @Override
             public void onSuccess(final Empty result) {
+                LOG.debug("Established \"{}\" subsystem on session {}", subsystem, sessionId);
                 // Note: we re-validating the underlay ... we may need to refactor state management to make this
                 //       non-awkward
                 transportEstablished(sessionId);
@@ -86,7 +87,7 @@ public final class SSHServer extends SSHTransportStack {
 
             @Override
             public void onFailure(final Throwable cause) {
-                LOG.debug("Transport on session {} failed", sessionId, cause);
+                LOG.debug("Binding to \"{}\" subsystem on session {} failed", subsystem, sessionId, cause);
                 deleteSession(sessionId);
             }
         }, MoreExecutors.directExecutor());

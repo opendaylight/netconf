@@ -98,9 +98,10 @@ public final class SSHClient extends SSHTransportStack {
 
     private void onSubsystemOpenComplete(final OpenFuture future, final Long sessionId) {
         if (future.isOpened()) {
+            LOG.debug("Opened \"{}\" subsystem on session {}", subsystem, sessionId);
             transportEstablished(sessionId);
         } else {
-            LOG.error("Failed to establish transport on session {}", sessionId, future.getException());
+            LOG.error("Failed to open \"{}\" subsystem on session {}", subsystem, sessionId, future.getException());
             deleteSession(sessionId);
         }
     }
