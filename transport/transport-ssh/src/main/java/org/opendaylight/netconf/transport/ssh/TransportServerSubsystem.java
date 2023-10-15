@@ -7,8 +7,10 @@
  */
 package org.opendaylight.netconf.transport.ssh;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoInputStream;
@@ -28,16 +30,27 @@ final class TransportServerSubsystem extends AbstractCommandSupport
 
     private final TransportChannel underlay;
 
+    private SettableFuture<ChannelHandlerContext> future;
     private ChannelHandlerContext head;
 
-    TransportServerSubsystem(final String name, final TransportChannel underlay) {
+    TransportServerSubsystem(final String name, final TransportChannel underlay,
+            final SettableFuture<ChannelHandlerContext> future) {
         super(name, null);
         this.underlay = requireNonNull(underlay);
+        this.future = requireNonNull(future);
     }
 
     @Override
     public void run() {
-        // not used
+        future.set(verifyNotNull(head, "setIoOutputStream() should have been called"));
+        future = null;
+        // set additional info for upcoming netconf session:
+        //     final var session = getServerSession();
+        //     final var address = (InetSocketAddress) session.getClientAddress();
+        //     final var additionalHeader =  new NetconfHelloMessageAdditionalHeader(session.getUsername(),
+        //         address.getAddress().getHostAddress(), String.valueOf(address.getPort()), "ssh", "client")
+        //         .toFormattedString();
+        //     head.fireChannelRead(Unpooled.wrappedBuffer(additionalHeader.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
@@ -53,25 +66,19 @@ final class TransportServerSubsystem extends AbstractCommandSupport
     @Override
     public void setIoOutputStream(final IoOutputStream out) {
         head = TransportUtils.attachUnderlay(out, underlay, () -> onExit(0));
-            // set additional info for upcoming netconf session
-//            .fireChannelRead(Unpooled.wrappedBuffer(getHelloAdditionalMessageBytes()));
     }
 
     @Override
-    public void setChannelSession(final ChannelSession channelSession) {
-        /*
-         * Inbound packets handler
-         * NOTE: The channel data receiver require to be set within current method, so it could be handled
-         * with subsequent logic of ChannelSession#prepareChannelCommand() where this method is executed from.
-         */
-        channelSession.setDataReceiver(this);
+    public void setChannelSession(final ChannelSession session) {
+        // set ourselves as the handler for inbound packets
+        session.setDataReceiver(this);
     }
 
     @Override
     public int data(final ChannelSession channel, final byte[] buf, final int start, final int len) {
         // Do not propagate empty invocations
         if (len > 0) {
-            LOG.debug("Forwarding {} bytes of data", len);
+            LOG.debug("Forwarding {} bytes of data on {}", len, channel);
             head.fireChannelRead(Unpooled.copiedBuffer(buf, start, len));
         }
         return len;
@@ -81,12 +88,4 @@ final class TransportServerSubsystem extends AbstractCommandSupport
     public void close() {
         // No-op?
     }
-//
-//    private byte[] getHelloAdditionalMessageBytes() {
-//        final var session = getServerSession();
-//        final var address = (InetSocketAddress) session.getClientAddress();
-//        return new NetconfHelloMessageAdditionalHeader(session.getUsername(), address.getAddress().getHostAddress(),
-//            String.valueOf(address.getPort()), "ssh", "client")
-//            .toFormattedString().getBytes(StandardCharsets.UTF_8);
-//    }
 }
