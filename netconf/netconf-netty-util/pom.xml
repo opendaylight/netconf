@@ -65,6 +65,10 @@
       <artifactId>aaa-encrypt-service</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.odlparent</groupId>
+      <artifactId>logging-markers</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>util</artifactId>
     </dependency>
