@@ -8,8 +8,6 @@
 package org.opendaylight.netconf.nettyutil.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,6 +23,7 @@ import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.odlparent.logging.markers.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -42,10 +41,10 @@ import org.xml.sax.SAXException;
 public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfXMLToHelloMessageDecoder.class);
 
-    private static final List<byte[]> POSSIBLE_ENDS = ImmutableList.of(
+    private static final List<byte[]> POSSIBLE_ENDS = List.of(
             new byte[] { ']', '\n' },
             new byte[] { ']', '\r', '\n' });
-    private static final List<byte[]> POSSIBLE_STARTS = ImmutableList.of(
+    private static final List<byte[]> POSSIBLE_STARTS = List.of(
             new byte[] { '[' },
             new byte[] { '\r', '\n', '[' },
             new byte[] { '\n', '[' });
@@ -92,13 +91,15 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
 
             final NetconfMessage message = getNetconfMessage(additionalHeader, doc);
             if (message instanceof HelloMessage) {
-                Preconditions.checkState(!helloReceived,
-                        "Multiple hello messages received, unexpected hello: %s", message);
+                if (helloReceived) {
+                    throw new IllegalStateException("Multiple hello messages received, unexpected hello: " + message);
+                }
                 out.add(message);
                 helloReceived = true;
             // Non hello message, suspend the message and insert into cache
+            } else if (helloReceived) {
+                throw new IllegalStateException("Hello message not received, instead received: " + message);
             } else {
-                Preconditions.checkState(helloReceived, "Hello message not received, instead received: %s", message);
                 LOG.debug("Netconf message received during negotiation, caching {}", message);
                 nonHelloMessages.add(message);
             }
@@ -159,8 +160,8 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
 
     private static void logMessage(final byte[] bytes) {
         if (LOG.isDebugEnabled()) {
-            String string = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(bytes)).toString();
-            LOG.debug("Parsing message \n{}", string);
+            LOG.debug(Markers.confidential(), "Parsing message \n{}",
+                StandardCharsets.UTF_8.decode(ByteBuffer.wrap(bytes)).toString());
         }
     }
 
