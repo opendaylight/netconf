@@ -14,39 +14,34 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.util.concurrent.Promise;
 import org.junit.Test;
-import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 
 public class TcpClientChannelInitializerTest {
     @Test
     public void testInitializeSessionNegotiator() throws Exception {
-        NetconfClientSessionNegotiatorFactory factory = mock(NetconfClientSessionNegotiatorFactory.class);
-        NetconfClientSessionNegotiator sessionNegotiator = mock(NetconfClientSessionNegotiator.class);
+        final var factory = mock(NetconfClientSessionNegotiatorFactory.class);
+        final var sessionNegotiator = mock(NetconfClientSessionNegotiator.class);
         doReturn("").when(sessionNegotiator).toString();
-        doReturn(sessionNegotiator).when(factory).getSessionNegotiator(any(NetconfSessionListenerFactory.class),
-                any(Channel.class), any(Promise.class));
-        NetconfClientSessionListener listener = mock(NetconfClientSessionListener.class);
-        final TcpClientChannelInitializer initializer = new TcpClientChannelInitializer(factory, listener);
-        ChannelPipeline pipeline = mock(ChannelPipeline.class);
+        doReturn(sessionNegotiator).when(factory).getSessionNegotiator(any(), any(), any());
+        final var listener = mock(NetconfClientSessionListener.class);
+        final var initializer = new TcpClientChannelInitializer(factory, listener);
+        final var pipeline = mock(ChannelPipeline.class);
         doReturn(pipeline).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
-        Channel channel = mock(Channel.class);
+        final var channel = mock(Channel.class);
         doReturn(pipeline).when(channel).pipeline();
         doReturn("").when(channel).toString();
 
-        ChannelConfig channelConfig = mock(ChannelConfig.class);
+        final var channelConfig = mock(ChannelConfig.class);
         doReturn(channelConfig).when(channel).config();
         doReturn(1L).when(factory).getConnectionTimeoutMillis();
         doReturn(channelConfig).when(channelConfig).setConnectTimeoutMillis(1);
 
-        Promise<NetconfClientSession> promise = mock(Promise.class);
-        doReturn("").when(promise).toString();
-
-        initializer.initializeSessionNegotiator(channel, promise);
+        initializer.initializeSessionNegotiator(channel, SettableFuture.create());
         verify(pipeline, times(1)).addAfter(anyString(), anyString(), any(ChannelHandler.class));
     }
 }

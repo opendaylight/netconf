@@ -14,10 +14,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.util.concurrent.Promise;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,13 +27,10 @@ import org.opendaylight.netconf.api.NetconfSession;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AbstractChannelInitializerTest {
-
     @Mock
     private Channel channel;
     @Mock
     private ChannelPipeline pipeline;
-    @Mock
-    private Promise<NetconfSession> sessionPromise;
 
     @Before
     public void setUp() throws Exception {
@@ -43,16 +40,14 @@ public class AbstractChannelInitializerTest {
 
     @Test
     public void testInit() throws Exception {
-        final TestingInitializer testingInitializer = new TestingInitializer();
-        testingInitializer.initialize(channel, sessionPromise);
+        final var sessionFuture = SettableFuture.<NetconfSession>create();
+        final var testingInitializer = new AbstractChannelInitializer<>() {
+            @Override
+            protected void initializeSessionNegotiator(final Channel ch, final SettableFuture<NetconfSession> promise) {
+                // nothing
+            }
+        };
+        testingInitializer.initialize(channel, sessionFuture);
         verify(pipeline, times(4)).addLast(anyString(), any(ChannelHandler.class));
     }
-
-    private static final class TestingInitializer extends AbstractChannelInitializer<NetconfSession> {
-
-        @Override
-        protected void initializeSessionNegotiator(final Channel ch, final Promise<NetconfSession> promise) {
-        }
-    }
-
 }

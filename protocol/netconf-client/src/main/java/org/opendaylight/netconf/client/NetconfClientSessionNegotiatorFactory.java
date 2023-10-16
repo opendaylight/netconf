@@ -10,9 +10,9 @@ package org.opendaylight.netconf.client;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.util.Timer;
-import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.index.qual.NonNegative;
@@ -127,7 +127,7 @@ public class NetconfClientSessionNegotiatorFactory
     @Override
     public NetconfClientSessionNegotiator getSessionNegotiator(
             final NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory,
-            final Channel channel, final Promise<NetconfClientSession> promise) {
+            final Channel channel, final SettableFuture<NetconfClientSession> promise) {
         return new NetconfClientSessionNegotiator(
             HelloMessage.createClientHello(clientCapabilities, additionalHeader),
             NetconfStartExiMessageProvider.create(options, START_EXI_MESSAGE_ID), promise, channel, timer,

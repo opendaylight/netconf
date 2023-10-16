@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,7 +21,6 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.util.Timeout;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.Promise;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -84,7 +84,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
 
     private final @NonNegative int maximumIncomingChunkSize;
     private final long connectionTimeoutMillis;
-    private final Promise<S> promise;
+    private final SettableFuture<S> promise;
     private final L sessionListener;
     private final Timer timer;
 
@@ -93,7 +93,7 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     @GuardedBy("this")
     private State state = State.IDLE;
 
-    protected AbstractNetconfSessionNegotiator(final HelloMessage hello, final Promise<S> promise,
+    protected AbstractNetconfSessionNegotiator(final HelloMessage hello, final SettableFuture<S> promise,
                                                final Channel channel, final Timer timer, final L sessionListener,
                                                final long connectionTimeoutMillis,
                                                final @NonNegative int maximumIncomingChunkSize) {
@@ -337,13 +337,13 @@ public abstract class AbstractNetconfSessionNegotiator<S extends AbstractNetconf
     protected final void negotiationSuccessful(final S session) {
         LOG.debug("Negotiation on channel {} successful with session {}", channel, session);
         channel.pipeline().replace(this, "session", session);
-        promise.setSuccess(session);
+        promise.set(session);
     }
 
     protected void negotiationFailed(final Throwable cause) {
         LOG.debug("Negotiation on channel {} failed", channel, cause);
         channel.close();
-        promise.setFailure(cause);
+        promise.setException(cause);
     }
 
     @Override

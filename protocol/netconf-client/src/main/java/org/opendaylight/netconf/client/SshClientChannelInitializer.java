@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.client;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
-import io.netty.util.concurrent.Promise;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
@@ -43,7 +43,7 @@ final class SshClientChannelInitializer extends AbstractClientChannelInitializer
     }
 
     @Override
-    public void initialize(final Channel ch, final Promise<NetconfClientSession> promise) {
+    public void initialize(final Channel ch, final SettableFuture<NetconfClientSession> promise) {
         // ssh handler has to be the first handler in pipeline
         var asyncHandler = AsyncSshHandler.createForNetconfSubsystem(authenticationHandler, promise, sshClient, name);
         ch.pipeline().addFirst(asyncHandler);

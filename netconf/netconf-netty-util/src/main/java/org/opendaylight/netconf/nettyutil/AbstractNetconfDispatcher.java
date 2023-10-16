@@ -9,6 +9,7 @@ package org.opendaylight.netconf.nettyutil;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -22,11 +23,9 @@ import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import org.opendaylight.netconf.api.NetconfSession;
@@ -48,7 +47,7 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
          * @param channel whose pipeline should be defined, also to be passed to {@link NetconfSessionNegotiatorFactory}
          * @param promise to be passed to {@link NetconfSessionNegotiatorFactory}
          */
-        void initializeChannel(C channel, Promise<S> promise);
+        void initializeChannel(C channel, SettableFuture<S> promise);
     }
 
     protected interface PipelineInitializer<S extends NetconfSession>
@@ -101,10 +100,9 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
             final Class<? extends ServerChannel> channelClass, final ChannelPipelineInitializer<C, S> initializer) {
         final ServerBootstrap b = new ServerBootstrap();
         b.childHandler(new ChannelInitializer<C>() {
-
             @Override
             protected void initChannel(final C ch) {
-                initializer.initializeChannel(ch, new DefaultPromise<>(executor));
+                initializer.initializeChannel(ch, SettableFuture.create());
             }
         });
 
@@ -142,18 +140,18 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
      *         as well as session negotiation.
      */
     protected Future<S> createClient(final InetSocketAddress address, final PipelineInitializer<S> initializer) {
-        final Bootstrap b = new Bootstrap();
-        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, b);
-        b.option(ChannelOption.SO_KEEPALIVE, true).handler(
+        final var bootstrap = new Bootstrap();
+        final var p = new NetconfSessionPromise<S>(executor, address, bootstrap);
+        bootstrap.option(ChannelOption.SO_KEEPALIVE, true).handler(
                 new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(final SocketChannel ch) {
-                        initializer.initializeChannel(ch, p);
+                        initializer.initializeChannel(ch, p.toSettableFuture());
                     }
                 });
 
-        setWorkerGroup(b);
-        setChannelFactory(b);
+        setWorkerGroup(bootstrap);
+        setChannelFactory(bootstrap);
 
         p.connect();
         LOG.debug("Client created.");
@@ -168,15 +166,14 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
      */
     protected Future<S> createClient(final InetSocketAddress address, final Bootstrap bootstrap,
             final PipelineInitializer<S> initializer) {
-        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, bootstrap);
+        final var p = new NetconfSessionPromise<S>(executor, address, bootstrap);
 
-        bootstrap.handler(
-                new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(final SocketChannel ch) {
-                        initializer.initializeChannel(ch, p);
-                    }
-                });
+        bootstrap.handler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            protected void initChannel(final SocketChannel ch) {
+                initializer.initializeChannel(ch, p.toSettableFuture());
+            }
+        });
 
         p.connect();
         LOG.debug("Client created.");

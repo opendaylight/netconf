@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.util.Timer;
-import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
@@ -17,7 +17,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 
 final class TestSessionNegotiator
         extends AbstractNetconfSessionNegotiator<TestingNetconfSession, NetconfSessionListener<TestingNetconfSession>> {
-    TestSessionNegotiator(final HelloMessage hello, final Promise<TestingNetconfSession> promise,
+    TestSessionNegotiator(final HelloMessage hello, final SettableFuture<TestingNetconfSession> promise,
             final Channel channel, final Timer timer,
             final NetconfSessionListener<TestingNetconfSession> sessionListener, final long connectionTimeoutMillis) {
         super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis, 16384);

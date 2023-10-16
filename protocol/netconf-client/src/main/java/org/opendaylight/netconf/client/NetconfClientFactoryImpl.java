@@ -103,17 +103,7 @@ public class NetconfClientFactoryImpl implements NetconfClientFactory {
 
         @Override
         public void onTransportChannelEstablished(final TransportChannel channel) {
-            final var nettyChannel = channel.channel();
-            final var promise = nettyChannel.eventLoop().<NetconfClientSession>newPromise();
-            initializer.initialize(nettyChannel, promise);
-            promise.addListener(ignored -> {
-                final var cause = promise.cause();
-                if (cause != null) {
-                    future.setException(cause);
-                } else {
-                    future.set(promise.getNow());
-                }
-            });
+            initializer.initialize(channel.channel(), future);
         }
 
         @Override

@@ -9,6 +9,7 @@ package org.opendaylight.netconf.nettyutil;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -70,6 +71,19 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
     public synchronized Promise<S> setSuccess(final S result) {
         LOG.debug("Promise {} completed", this);
         return super.setSuccess(result);
+    }
+
+    SettableFuture<S> toSettableFuture() {
+        final var ret = SettableFuture.<S>create();
+        addListener(ignored -> {
+            final var cause = cause();
+            if (cause != null) {
+                ret.setException(cause);
+            } else {
+                ret.set(getNow());
+            }
+        });
+        return ret;
     }
 
     // Triggered when a connection attempt is resolved.
