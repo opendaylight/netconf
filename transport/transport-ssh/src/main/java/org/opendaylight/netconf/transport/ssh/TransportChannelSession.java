@@ -33,6 +33,10 @@ final class TransportChannelSession extends ChannelSession {
         }
 
         commandInstance = openSubsystem;
-        return prepareChannelCommand(request, commandInstance);
+        final var prepareResult = prepareChannelCommand(request, commandInstance);
+        if (prepareResult == RequestHandler.Result.ReplySuccess) {
+            openSubsystem.onPrepareComplete();
+        }
+        return prepareResult;
     }
 }

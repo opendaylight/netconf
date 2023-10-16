@@ -42,15 +42,7 @@ final class TransportServerSubsystem extends AbstractCommandSupport
 
     @Override
     public void run() {
-        future.set(verifyNotNull(head, "setIoOutputStream() should have been called"));
-        future = null;
-        // set additional info for upcoming netconf session:
-        //     final var session = getServerSession();
-        //     final var address = (InetSocketAddress) session.getClientAddress();
-        //     final var additionalHeader =  new NetconfHelloMessageAdditionalHeader(session.getUsername(),
-        //         address.getAddress().getHostAddress(), String.valueOf(address.getPort()), "ssh", "client")
-        //         .toFormattedString();
-        //     head.fireChannelRead(Unpooled.wrappedBuffer(additionalHeader.getBytes(StandardCharsets.UTF_8)));
+        // not used
     }
 
     @Override
@@ -87,5 +79,17 @@ final class TransportServerSubsystem extends AbstractCommandSupport
     @Override
     public void close() {
         // No-op?
+    }
+
+    void onPrepareComplete(){
+        future.set(verifyNotNull(head, "setIoOutputStream() should have been called"));
+        future = null;
+        // set additional info for upcoming netconf session:
+        //     final var session = getServerSession();
+        //     final var address = (InetSocketAddress) session.getClientAddress();
+        //     final var additionalHeader =  new NetconfHelloMessageAdditionalHeader(session.getUsername(),
+        //         address.getAddress().getHostAddress(), String.valueOf(address.getPort()), "ssh", "client")
+        //         .toFormattedString();
+        //     head.fireChannelRead(Unpooled.wrappedBuffer(additionalHeader.getBytes(StandardCharsets.UTF_8)));
     }
 }
