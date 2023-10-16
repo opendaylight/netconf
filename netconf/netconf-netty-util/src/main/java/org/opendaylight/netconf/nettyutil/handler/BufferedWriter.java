@@ -7,25 +7,25 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
-import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.Writer;
 
 /**
- * Custom BufferedWriter optimized for netconf pipeline implemented instead of default BufferedWriter provided by jdk.
+ * Custom BufferedWriter optimized for NETCONF pipeline implemented instead of default BufferedWriter provided by JDK..
  *
  * <p>
- * The line separator instance field in java.io.BufferedWriter is
- * assigned using AccessController and takes considerable amount of time especially
- * if lots of BufferedWriters are created in the system.
+ * In versions up to and including Java 8, java.io.BufferedWriter initialized its lineSeparator field using
+ * AccessController and takes considerable amount of time especially if lots of BufferedWriters are created in the
+ * system. This has been rectified in <a href="https://bugs.openjdk.org/browse/JDK-8068498">Java 9</a>.
  *
  * <p>
- * This implementation should only be used if newLine method is not required
- * such as netconf message to XML encoders.
- * Methods in this implementation are not synchronized.
+ * Despite that issue having been fixed we retain this implementation because its methods are not synchronized, hence
+ * offer a tad better performance.
+ *
+ * <p>
+ * This implementation should only be used if newLine method is not required such as NETCONF message to XML encoders.
  */
 public final class BufferedWriter extends Writer {
-
     private static final int DEFAULT_CHAR_BUFFER_SIZE = 8192;
 
     private final Writer writer;
@@ -40,10 +40,12 @@ public final class BufferedWriter extends Writer {
 
     public BufferedWriter(final Writer writer, final int bufferSize) {
         super(writer);
-        Preconditions.checkArgument(bufferSize > 0, "Buffer size <= 0");
+        if (bufferSize <= 0) {
+            throw new IllegalArgumentException("Buffer size <= 0");
+        }
         this.writer = writer;
-        this.buffer = new char[bufferSize];
         this.bufferSize = bufferSize;
+        buffer = new char[bufferSize];
     }
 
     private void flushBuffer() throws IOException {
@@ -68,7 +70,7 @@ public final class BufferedWriter extends Writer {
         if (offset < 0 || offset > buffer.length
                 || length < 0 || offset + length > buffer.length || offset + length < 0) {
             throw new IndexOutOfBoundsException(
-                    String.format("Buffer size: %d, Offset: %d, Length: %d", buffer.length, offset, length));
+                "Buffer size: %d, Offset: %d, Length: %d".formatted(buffer.length, offset, length));
         } else if (length == 0) {
             return;
         }
