@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
-import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
@@ -23,7 +23,7 @@ public abstract class AbstractChannelInitializer<S extends NetconfSession> {
     public static final String NETCONF_MESSAGE_FRAME_ENCODER = "frameEncoder";
     public static final String NETCONF_SESSION_NEGOTIATOR = "negotiator";
 
-    public void initialize(final Channel ch, final Promise<S> promise) {
+    public void initialize(final Channel ch, final SettableFuture<S> promise) {
         ch.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         initializeMessageDecoder(ch);
         ch.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
@@ -49,5 +49,5 @@ public abstract class AbstractChannelInitializer<S extends NetconfSession> {
      * Insert session negotiator into the pipeline. It must be inserted after message decoder
      * identified by {@link AbstractChannelInitializer#NETCONF_MESSAGE_DECODER}, (or any other custom decoder processor)
      */
-    protected abstract void initializeSessionNegotiator(Channel ch, Promise<S> promise);
+    protected abstract void initializeSessionNegotiator(Channel ch, SettableFuture<S> promise);
 }

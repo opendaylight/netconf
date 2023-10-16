@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.client;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.concurrent.Promise;
 
 /**
  * Client channel initializer for TLS transport.
@@ -32,7 +32,7 @@ public final class TlsClientChannelInitializer extends AbstractClientChannelInit
     }
 
     @Override
-    public void initialize(final Channel ch, final Promise<NetconfClientSession> promise) {
+    public void initialize(final Channel ch, final SettableFuture<NetconfClientSession> promise) {
         // When ssl handshake fails due to the certificate mismatch, the connection will try again,
         // then we have a chance to create a new SslHandler using the latest certificates with the
         // help of the sentry. We will replace the sentry with the new SslHandler once the channel

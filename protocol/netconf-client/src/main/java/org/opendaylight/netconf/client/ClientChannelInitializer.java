@@ -9,8 +9,8 @@ package org.opendaylight.netconf.client;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
-import io.netty.util.concurrent.Promise;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
@@ -26,7 +26,7 @@ public final class ClientChannelInitializer extends AbstractChannelInitializer<N
     }
 
     @Override
-    protected void initializeSessionNegotiator(final Channel ch, final Promise<NetconfClientSession> promise) {
+    protected void initializeSessionNegotiator(final Channel ch, final SettableFuture<NetconfClientSession> promise) {
         ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER, NETCONF_SESSION_NEGOTIATOR,
             negotiatorFactory.getSessionNegotiator(sessionListenerFactory, ch, promise));
         ch.config().setConnectTimeoutMillis((int) negotiatorFactory.getConnectionTimeoutMillis());

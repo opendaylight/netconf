@@ -14,16 +14,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.util.concurrent.Promise;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TlsClientChannelInitializerTest {
@@ -34,30 +33,25 @@ public class TlsClientChannelInitializerTest {
     @Mock
     private NetconfClientSessionListener sessionListener;
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testInitialize() throws Exception {
-        NetconfClientSessionNegotiator sessionNegotiator = mock(NetconfClientSessionNegotiator.class);
-        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(
-            any(NetconfSessionListenerFactory.class), any(Channel.class), any(Promise.class));
-        ChannelPipeline pipeline = mock(ChannelPipeline.class);
+        final var sessionNegotiator = mock(NetconfClientSessionNegotiator.class);
+        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(any(), any(), any());
+        final var pipeline = mock(ChannelPipeline.class);
         doReturn(pipeline).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
-        Channel channel = mock(Channel.class);
+        final var channel = mock(Channel.class);
         doReturn(pipeline).when(channel).pipeline();
 
         doReturn(pipeline).when(pipeline).addFirst(anyString(), any(ChannelHandler.class));
         doReturn(pipeline).when(pipeline).addLast(anyString(), any(ChannelHandler.class));
 
-        ChannelConfig channelConfig = mock(ChannelConfig.class);
+        final var channelConfig = mock(ChannelConfig.class);
         doReturn(channelConfig).when(channel).config();
         doReturn(1L).when(negotiatorFactory).getConnectionTimeoutMillis();
         doReturn(channelConfig).when(channelConfig).setConnectTimeoutMillis(1);
 
-        Promise<NetconfClientSession> promise = mock(Promise.class);
-
-        TlsClientChannelInitializer initializer = new TlsClientChannelInitializer(sslHandlerFactory,
-                negotiatorFactory, sessionListener);
-        initializer.initialize(channel, promise);
+        final var initializer = new TlsClientChannelInitializer(sslHandlerFactory, negotiatorFactory, sessionListener);
+        initializer.initialize(channel, SettableFuture.<NetconfClientSession>create());
         verify(pipeline, times(1)).addFirst(anyString(), any(ChannelHandler.class));
     }
 }

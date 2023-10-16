@@ -10,11 +10,13 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.FutureListener;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
@@ -32,6 +34,7 @@ import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.core.CoreModuleProperties;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +43,32 @@ import org.slf4j.LoggerFactory;
  */
 @Deprecated(since = "7.0.0", forRemoval = true)
 public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
+    private static final class SessionCallback extends AbstractRegistration implements FutureCallback<Object> {
+        private final ChannelPromise channelPromise;
+
+        SessionCallback(final ChannelPromise channelPromise) {
+            this.channelPromise = requireNonNull(channelPromise);
+        }
+
+        @Override
+        public void onSuccess(final Object result) {
+            if (notClosed()) {
+                channelPromise.setSuccess();
+                close();
+            }
+        }
+
+        @Override
+        public void onFailure(final Throwable cause) {
+            // FIXME: we ignore this failure, why exactly?
+        }
+
+        @Override
+        protected void removeRegistration() {
+            // No-op
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandler.class);
     private static final VarHandle DISCONNECTED;
 
@@ -73,7 +102,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     }
 
     private final AuthenticationHandler authenticationHandler;
-    private final Future<?> negotiationFuture;
+    private final ListenableFuture<?> negotiationFuture;
     private final NetconfSshClient sshClient;
     private final String name;
 
@@ -84,12 +113,12 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private AsyncSshHandlerWriter sshWriteAsyncHandler;
     private ChannelSubsystem channel;
     private ClientSession session;
-    private FutureListener<Object> negotiationFutureListener;
+    private SessionCallback negotiationFutureListener;
 
     private volatile boolean disconnected;
 
     private AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
-            final @Nullable Future<?> negotiationFuture, final @Nullable String name) {
+            final @Nullable ListenableFuture<?> negotiationFuture, final @Nullable String name) {
         this.authenticationHandler = requireNonNull(authenticationHandler);
         this.sshClient = requireNonNull(sshClient);
         this.negotiationFuture = negotiationFuture;
@@ -97,7 +126,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     }
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
-            final @Nullable Future<?> negotiationFuture) {
+            final @Nullable ListenableFuture<?> negotiationFuture) {
         this(authenticationHandler, sshClient, negotiationFuture, null);
     }
 
@@ -124,7 +153,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @return                      {@code AsyncSshHandler}
      */
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
-            final Future<?> negotiationFuture, final @Nullable NetconfSshClient sshClient,
+            final ListenableFuture<?> negotiationFuture, final @Nullable NetconfSshClient sshClient,
             final @Nullable String name) {
         return new AsyncSshHandler(authenticationHandler, sshClient != null ? sshClient : DEFAULT_CLIENT,
                 negotiationFuture, name);
@@ -142,13 +171,10 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         connectPromise = requireNonNull(promise);
 
         if (negotiationFuture != null) {
-            negotiationFutureListener = future -> {
-                if (future.isSuccess()) {
-                    promise.setSuccess();
-                }
-            };
-            //complete connection promise with netconf negotiation future
-            negotiationFuture.addListener(negotiationFutureListener);
+            negotiationFutureListener = new SessionCallback(promise);
+
+            // complete connection promise with netconf negotiation future
+            Futures.addCallback(negotiationFuture, negotiationFutureListener, MoreExecutors.directExecutor());
         }
 
         LOG.debug("{}: Starting SSH to {} on channel: {}", name, remoteAddress, ctx.channel());
@@ -278,16 +304,15 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             sshWriteAsyncHandler.close();
         }
 
-        //If connection promise is not already set, it means negotiation failed
-        //we must set connection promise to failure
+        // If connection promise is not already set, it means negotiation failed we must set connection promise to
+        // a failure
         if (!connectPromise.isDone()) {
             connectPromise.setFailure(new IllegalStateException("Negotiation failed"));
         }
 
-        //Remove listener from negotiation future, we don't want notifications
-        //from negotiation anymore
+        // Disable listener from negotiation future, we don't want notifications from negotiation anymore
         if (negotiationFuture != null) {
-            negotiationFuture.removeListener(negotiationFutureListener);
+            negotiationFutureListener.close();
         }
 
         if (session != null && !session.isClosed() && !session.isClosing()) {

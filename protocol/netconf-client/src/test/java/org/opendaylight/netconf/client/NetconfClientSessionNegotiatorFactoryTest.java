@@ -11,10 +11,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
-import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
@@ -29,12 +29,11 @@ public class NetconfClientSessionNegotiatorFactoryTest {
         doReturn(sessionListener).when(listenerFactory).getSessionListener();
 
         Channel channel = mock(Channel.class);
-        Promise<NetconfClientSession> promise = mock(Promise.class);
         NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer,
                 Optional.empty(), 200L);
 
         NetconfClientSessionNegotiator sessionNegotiator = negotiatorFactory.getSessionNegotiator(listenerFactory,
-            channel, promise);
+            channel, SettableFuture.create());
         assertNotNull(sessionNegotiator);
     }
 }

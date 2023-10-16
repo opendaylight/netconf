@@ -11,6 +11,8 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -22,6 +24,8 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -35,11 +39,11 @@ import io.netty.util.Timeout;
 import io.netty.util.Timer;
 import io.netty.util.TimerTask;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.Promise;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,10 +65,10 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecode
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AbstractNetconfSessionNegotiatorTest {
+    private final SettableFuture<TestingNetconfSession> promise = SettableFuture.create();
+
     @Mock
     private NetconfSessionListener<TestingNetconfSession> listener;
-    @Mock
-    private Promise<TestingNetconfSession> promise;
     @Mock
     private SslHandler sslHandler;
     @Mock
@@ -89,7 +93,6 @@ public class AbstractNetconfSessionNegotiatorTest {
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         hello = HelloMessage.createClientHello(Set.of(), Optional.empty());
         helloBase11 = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1), Optional.empty());
-        doReturn(promise).when(promise).setFailure(any());
         negotiator = new TestSessionNegotiator(helloBase11, promise, channel, timer, listener, 100L);
     }
 
@@ -119,8 +122,6 @@ public class AbstractNetconfSessionNegotiatorTest {
     public void testStartNegotiationNotEstablished() throws Exception {
         final ChannelOutboundHandler closedDetector = spy(new CloseDetector());
         channel.pipeline().addLast("closedDetector", closedDetector);
-        doReturn(false).when(promise).isDone();
-        doReturn(false).when(promise).isCancelled();
 
         final ArgumentCaptor<TimerTask> captor = ArgumentCaptor.forClass(TimerTask.class);
         doReturn(timeout).when(timer).newTimeout(captor.capture(), eq(100L), eq(TimeUnit.MILLISECONDS));
@@ -175,9 +176,11 @@ public class AbstractNetconfSessionNegotiatorTest {
         enableTimerTask();
         doReturn(true).when(timeout).cancel();
         negotiator.startNegotiation();
-        final RuntimeException cause = new RuntimeException("failure cause");
+        final var cause = new RuntimeException("failure cause");
         channel.pipeline().fireExceptionCaught(cause);
-        verify(promise).setFailure(cause);
+
+        final var ex = assertThrows(ExecutionException.class, () -> Futures.getDone(promise));
+        assertSame(cause, ex.getCause());
     }
 
     private void enableTimerTask() {

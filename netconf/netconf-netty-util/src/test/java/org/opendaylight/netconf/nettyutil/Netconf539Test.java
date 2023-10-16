@@ -12,10 +12,10 @@ import static org.junit.Assert.assertTrue;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.HashedWheelTimer;
-import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
@@ -39,8 +39,6 @@ import org.w3c.dom.Document;
 public class Netconf539Test {
     @Mock
     private NetconfSessionListener<TestingNetconfSession> listener;
-    @Mock
-    private Promise<TestingNetconfSession> promise;
 
     private EmbeddedChannel channel;
     private TestSessionNegotiator negotiator;
@@ -57,7 +55,8 @@ public class Netconf539Test {
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         final HelloMessage serverHello = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1),
             Optional.empty());
-        negotiator = new TestSessionNegotiator(serverHello, promise, channel, new HashedWheelTimer(), listener, 100L);
+        negotiator = new TestSessionNegotiator(serverHello, SettableFuture.create(), channel, new HashedWheelTimer(),
+            listener, 100L);
     }
 
     @Test

@@ -9,6 +9,7 @@ package org.opendaylight.netconf.client;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -19,12 +20,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.ChannelProgressivePromise;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -32,7 +34,6 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.GenericFutureListener;
-import io.netty.util.concurrent.Promise;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.Set;
@@ -126,11 +127,8 @@ public class NetconfClientSessionNegotiatorTest {
     }
 
     private NetconfClientSessionNegotiator createNetconfClientSessionNegotiator(
-            final Promise<NetconfClientSession> promise,
+            final SettableFuture<NetconfClientSession> promise,
             final RpcMessage startExi) {
-        ChannelProgressivePromise progressivePromise = mock(ChannelProgressivePromise.class);
-        doReturn(progressivePromise).when(promise).setFailure(any(Throwable.class));
-
         long timeout = 10L;
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         Timer timer = new HashedWheelTimer();
@@ -149,35 +147,31 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Test
     public void testNetconfClientSessionNegotiator() throws Exception {
-        Promise<NetconfClientSession> promise = mock(Promise.class);
-        doReturn(promise).when(promise).setSuccess(any());
-        NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
+        final var promise = SettableFuture.<NetconfClientSession>create();
+        var negotiator = createNetconfClientSessionNegotiator(promise, null);
 
         negotiator.channelActive(null);
         doReturn(null).when(future).cause();
         negotiator.handleMessage(HelloMessage.createServerHello(Set.of("a", "b"), new SessionIdType(Uint32.TEN)));
-        verify(promise).setSuccess(any());
+        assertNotNull(Futures.getDone(promise));
     }
 
     @Test
     public void testNegotiatorWhenChannelActiveHappenAfterHandleMessage() throws Exception {
-        Promise<NetconfClientSession> promise = mock(Promise.class);
-        doReturn(false).when(promise).isDone();
-        doReturn(promise).when(promise).setSuccess(any());
-        NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
+        final var promise = SettableFuture.<NetconfClientSession>create();
+        var negotiator = createNetconfClientSessionNegotiator(promise, null);
 
         doReturn(null).when(future).cause();
         negotiator.handleMessage(HelloMessage.createServerHello(Set.of("a", "b"), new SessionIdType(Uint32.TEN)));
         negotiator.channelActive(null);
-        verify(promise).setSuccess(any());
+        assertNotNull(Futures.getDone(promise));
     }
 
     @Test
     public void testNetconfClientSessionNegotiatorWithEXI() throws Exception {
-        Promise<NetconfClientSession> promise = mock(Promise.class);
-        RpcMessage exiMessage = NetconfStartExiMessageProvider.create(EXIParameters.empty(), "msg-id");
-        doReturn(promise).when(promise).setSuccess(any());
-        NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, exiMessage);
+        final var promise = SettableFuture.<NetconfClientSession>create();
+        var exiMessage = NetconfStartExiMessageProvider.create(EXIParameters.empty(), "msg-id");
+        var negotiator = createNetconfClientSessionNegotiator(promise, exiMessage);
 
         doReturn(null).when(future).cause();
         negotiator.channelActive(null);
@@ -193,7 +187,7 @@ public class NetconfClientSessionNegotiatorTest {
         Document expectedResult = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc-reply_ok.xml");
         channelInboundHandlerAdapter.channelRead(handlerContext, new NetconfMessage(expectedResult));
 
-        verify(promise).setSuccess(any());
+        assertNotNull(Futures.getDone(promise));
 
         // two calls for exiMessage, 2 for hello message
         verify(pipeline, times(4)).replace(anyString(), anyString(), any(ChannelHandler.class));
@@ -201,20 +195,19 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Test
     public void testNetconfClientSessionNegotiatorGetCached() throws Exception {
-        Promise<NetconfClientSession> promise = mock(Promise.class);
-        doReturn(promise).when(promise).setSuccess(any());
-        NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-        NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
+        final var sessionListener = mock(NetconfClientSessionListener.class);
+        final var negotiator = createNetconfClientSessionNegotiator(SettableFuture.<NetconfClientSession>create(),
+            null);
 
-        Set<String> set = createCapabilities("/helloMessage3.xml");
+        final var set = createCapabilities("/helloMessage3.xml");
 
-        final Set<String> cachedS1 = (Set<String>) negotiator.getSession(sessionListener, channel,
-                createHelloMsg("/helloMessage1.xml")).getServerCapabilities();
+        final var cachedS1 = (Set<String>) negotiator.getSession(sessionListener, channel,
+            createHelloMsg("/helloMessage1.xml")).getServerCapabilities();
 
         //helloMessage2 and helloMessage3 are the same with different order
-        final Set<String> cachedS2 = (Set<String>) negotiator.getSession(sessionListener, channel,
+        final var cachedS2 = (Set<String>) negotiator.getSession(sessionListener, channel,
                 createHelloMsg("/helloMessage2.xml")).getServerCapabilities();
-        final Set<String> cachedS3 = (Set<String>) negotiator.getSession(sessionListener, channel,
+        final var cachedS3 = (Set<String>) negotiator.getSession(sessionListener, channel,
                 createHelloMsg("/helloMessage3.xml")).getServerCapabilities();
 
         assertEquals(cachedS3, set);

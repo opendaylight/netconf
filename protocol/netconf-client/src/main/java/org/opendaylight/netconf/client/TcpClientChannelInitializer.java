@@ -7,14 +7,18 @@
  */
 package org.opendaylight.netconf.client;
 
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.FutureListener;
-import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
 
 /**
  * Client channel initializer for TCP transport.
@@ -24,39 +28,59 @@ import java.net.SocketAddress;
  */
 @Deprecated
 final class TcpClientChannelInitializer extends AbstractClientChannelInitializer {
+    private static final class SessionCallback extends AbstractRegistration
+            implements FutureCallback<NetconfClientSession> {
+        private final ChannelPromise channelPromise;
+
+        SessionCallback(final ChannelPromise channelPromise) {
+            this.channelPromise = requireNonNull(channelPromise);
+        }
+
+        @Override
+        public void onSuccess(final NetconfClientSession result) {
+            if (notClosed()) {
+                channelPromise.setSuccess();
+                close();
+            }
+        }
+
+        @Override
+        public void onFailure(final Throwable t) {
+            // FIXME: we ignore this failure, why exactly?
+        }
+
+        @Override
+        protected void removeRegistration() {
+            // No-op
+        }
+    }
+
     TcpClientChannelInitializer(final NetconfClientSessionNegotiatorFactory negotiatorFactory,
             final NetconfClientSessionListener sessionListener) {
         super(negotiatorFactory, sessionListener);
     }
 
     @Override
-    public void initialize(final Channel ch, final Promise<NetconfClientSession> promise) {
-        final Future<NetconfClientSession> negotiationFuture = promise;
-
+    public void initialize(final Channel ch, final SettableFuture<NetconfClientSession> promise) {
         //We have to add this channel outbound handler to channel pipeline, in order
         //to get notifications from netconf negotiatior. Set connection promise to
         //success only after successful negotiation.
         ch.pipeline().addFirst(new ChannelOutboundHandlerAdapter() {
             ChannelPromise connectPromise;
-            FutureListener<NetconfClientSession> negotiationFutureListener;
+            SessionCallback negotiationFutureListener;
 
             @Override
             public void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
-                                final SocketAddress localAddress,
-                                final ChannelPromise channelPromise) {
+                    final SocketAddress localAddress, final ChannelPromise channelPromise) {
                 connectPromise = channelPromise;
                 ChannelPromise tcpConnectFuture = ch.newPromise();
 
-                negotiationFutureListener = future -> {
-                    if (future.isSuccess()) {
-                        channelPromise.setSuccess();
-                    }
-                };
+                negotiationFutureListener = new SessionCallback(channelPromise);
 
                 tcpConnectFuture.addListener(future -> {
                     if (future.isSuccess()) {
                         //complete connection promise with netconf negotiation future
-                        negotiationFuture.addListener(negotiationFutureListener);
+                        Futures.addCallback(promise, negotiationFutureListener, MoreExecutors.directExecutor());
                     } else {
                         channelPromise.setFailure(future.cause());
                     }
@@ -76,15 +100,14 @@ final class TcpClientChannelInitializer extends AbstractClientChannelInitializer
                     ctx.fireChannelInactive();
                 }
 
-                //If connection promise is not already set, it means negotiation failed
-                //we must set connection promise to failure
+                // If connection promise is not already set, it means negotiation failed. We must set connection promise
+                // to failure
                 if (!connectPromise.isDone()) {
                     connectPromise.setFailure(new IllegalStateException("Negotiation failed"));
                 }
 
-                //Remove listener from negotiation future, we don't want notifications
-                //from negotiation anymore
-                negotiationFuture.removeListener(negotiationFutureListener);
+                // Disable listener from negotiation future, we don't want notifications from negotiation anymore
+                negotiationFutureListener.close();
 
                 super.disconnect(ctx, promise);
                 promise.setSuccess();

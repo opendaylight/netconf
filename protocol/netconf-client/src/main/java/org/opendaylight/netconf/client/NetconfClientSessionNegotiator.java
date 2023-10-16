@@ -12,11 +12,11 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.Timer;
-import io.netty.util.concurrent.Promise;
 import java.util.Set;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -57,7 +57,7 @@ class NetconfClientSessionNegotiator
     private final RpcMessage startExi;
 
     NetconfClientSessionNegotiator(final HelloMessage hello, final RpcMessage startExi,
-            final Promise<NetconfClientSession> promise, final Channel channel, final Timer timer,
+            final SettableFuture<NetconfClientSession> promise, final Channel channel, final Timer timer,
             final NetconfClientSessionListener sessionListener, final long connectionTimeoutMillis,
             final @NonNegative int maximumIncomingChunkSize) {
         super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis, maximumIncomingChunkSize);
@@ -185,7 +185,7 @@ class NetconfClientSessionNegotiator
         public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
             ctx.pipeline().remove(ExiConfirmationInboundHandler.EXI_CONFIRMED_HANDLER);
 
-            NetconfMessage netconfMessage = (NetconfMessage) msg;
+            final var netconfMessage = (NetconfMessage) msg;
 
             // Ok response to start-exi, try to add exi handlers
             if (NetconfMessageUtil.isOKMessage(netconfMessage)) {
@@ -206,10 +206,9 @@ class NetconfClientSessionNegotiator
 
                 // Unexpected response to start-exi, throwing message away, continue without exi
             } else {
-                LOG.warn("Unexpected response to start-exi message, should be ok, was {}, "
-                        + "Communication will continue without exi "
-                        + "and response message will be thrown away on session {}",
-                        netconfMessage, session);
+                LOG.warn("""
+                    Unexpected response to start-exi message, should be ok, was {}, Communication will continue \
+                    without exi and response message will be thrown away on session {}""", netconfMessage, session);
             }
 
             negotiationSuccessful(session);

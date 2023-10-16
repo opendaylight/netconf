@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
-import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
@@ -30,5 +30,5 @@ public interface NetconfSessionNegotiatorFactory<S extends NetconfSession,
      * @return new negotiator instance
      */
     NetconfSessionNegotiator<S> getSessionNegotiator(NetconfSessionListenerFactory<L> factory, Channel channel,
-            Promise<S> promise);
+        SettableFuture<S> promise);
 }

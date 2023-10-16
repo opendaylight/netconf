@@ -14,13 +14,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.util.concurrent.Promise;
 import org.junit.Test;
-import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 
 public class SshClientChannelInitializerTest {
@@ -33,8 +32,7 @@ public class SshClientChannelInitializerTest {
 
         NetconfClientSessionNegotiator sessionNegotiator = mock(NetconfClientSessionNegotiator.class);
         doReturn("").when(sessionNegotiator).toString();
-        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(
-            any(NetconfSessionListenerFactory.class), any(Channel.class), any(Promise.class));
+        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(any(), any(), any());
         ChannelPipeline pipeline = mock(ChannelPipeline.class);
         doReturn(pipeline).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
         Channel channel = mock(Channel.class);
@@ -47,12 +45,9 @@ public class SshClientChannelInitializerTest {
         doReturn(1L).when(negotiatorFactory).getConnectionTimeoutMillis();
         doReturn(channelConfig).when(channelConfig).setConnectTimeoutMillis(1);
 
-        Promise<NetconfClientSession> promise = mock(Promise.class);
-        doReturn("").when(promise).toString();
-
-        SshClientChannelInitializer initializer = new SshClientChannelInitializer(authenticationHandler,
-                negotiatorFactory, sessionListener);
-        initializer.initialize(channel, promise);
+        final var initializer = new SshClientChannelInitializer(authenticationHandler, negotiatorFactory,
+            sessionListener);
+        initializer.initialize(channel, SettableFuture.create());
         verify(pipeline, times(1)).addFirst(any(ChannelHandler.class));
     }
 }
