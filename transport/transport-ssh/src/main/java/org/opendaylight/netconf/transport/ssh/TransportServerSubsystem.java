@@ -42,6 +42,10 @@ final class TransportServerSubsystem extends AbstractCommandSupport
 
     @Override
     public void run() {
+        // not used
+    }
+
+    void onPrepareComplete(){
         future.set(verifyNotNull(head, "setIoOutputStream() should have been called"));
         future = null;
         // set additional info for upcoming netconf session:
