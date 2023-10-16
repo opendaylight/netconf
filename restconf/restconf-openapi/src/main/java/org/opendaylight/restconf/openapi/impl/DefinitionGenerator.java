@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,9 @@ import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier;
+import org.opendaylight.yangtools.yang.model.api.stmt.UniqueEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
@@ -234,11 +238,16 @@ public final class DefinitionGenerator {
         final String name = filename + discriminator;
         final String ref = COMPONENTS_PREFIX + name;
 
-        if (schemaNode instanceof ListSchemaNode) {
+        if (schemaNode instanceof ListSchemaNode node) {
             dataNodeProperties.type(ARRAY_TYPE);
             final Property items = new Property.Builder().ref(ref).build();
             dataNodeProperties.items(items);
             dataNodeProperties.description(schemaNode.getDescription().orElse(""));
+            if (node.getElementCountConstraint().isPresent()) {
+                dataNodeProperties.minItems(node.getElementCountConstraint().orElse(null).getMinElements());
+                dataNodeProperties.maxItems(node.getElementCountConstraint().orElse(null).getMaxElements());
+                dataNodeProperties.example(createExamples(node));
+            }
         } else {
              /*
                 Description can't be added, because nothing allowed alongside $ref.
@@ -248,6 +257,73 @@ public final class DefinitionGenerator {
         }
 
         return dataNodeProperties.build();
+    }
+
+    private static List<Map<String, Object>> createExamples(ListSchemaNode node) {
+        final var minElements = node.getElementCountConstraint().orElse(null).getMinElements();
+        if (minElements == null) {
+            return null;
+        }
+        final var keys = node.getKeyDefinition();
+        final var unique = node.getUniqueConstraints();
+        final var childNodes = node.getChildNodes();
+        final var examples = new ArrayList<Map<String, Object>>();
+
+        final var childNodesMap = new HashMap<QName, Object>();
+        // Cycle for each child node
+        for (DataSchemaNode childNode : childNodes) {
+            if (childNode instanceof TypedDataSchemaNode leafSchemaNode) {
+                final var property = new Property.Builder();
+                processTypeDef(leafSchemaNode.getType(), leafSchemaNode, property, null);
+                final var exampleValue = property.build().example();
+                if (exampleValue == null) {
+                    continue;
+                }
+                childNodesMap.put(leafSchemaNode.getQName(), exampleValue);
+            }
+        }
+        for (int i = 0; i < minElements; i++) {
+            final var exampleMap = new HashMap<String, Object>();
+            for (Map.Entry<QName, Object> example : childNodesMap.entrySet()) {
+                final var name = example.getKey();
+                var exampleValue = example.getValue();
+                if (keys.contains(name)) {
+                    exampleValue = editExample(exampleValue, i);
+                }
+                exampleMap.put(name.getLocalName(), exampleValue);
+            }
+            examples.add(exampleMap);
+        }
+        if (!unique.isEmpty()) {
+            final var alreadyUnique = new ArrayList<>();
+            for (UniqueEffectiveStatement uniqueSet : unique) {
+                final var uniqueNames = uniqueSet.argument()
+                    .stream().map(SchemaNodeIdentifier::firstNodeIdentifier).toList();
+                if (Collections.disjoint(uniqueNames, keys) && Collections.disjoint(uniqueNames, alreadyUnique)) {
+                    for (int i = 0; i < examples.size(); i++) {
+                        final var example = examples.get(i);
+                        final var exampleToEdit = uniqueNames.get(0);
+                        alreadyUnique.add(exampleToEdit);
+                        example.put(exampleToEdit.getLocalName(),
+                            editExample(example.get(exampleToEdit.getLocalName()), i));
+                    }
+                }
+            }
+        }
+        return examples;
+    }
+
+    private static Object editExample(Object exampleValue, int edit) {
+        if (exampleValue instanceof String string) {
+            exampleValue = string + "_" + edit;
+        } else if (exampleValue instanceof Integer number) {
+            exampleValue = number + edit;
+        } else if (exampleValue instanceof Long number) {
+            exampleValue = number + edit;
+        } else if (exampleValue instanceof Decimal64 number) {
+            exampleValue = Decimal64.valueOf(BigDecimal.valueOf(number.intValue() + edit));
+        }
+        return exampleValue;
     }
 
     private static Property processDataNodeContainer(final DataNodeContainer dataNode, final String parentName,
