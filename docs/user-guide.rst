@@ -53,6 +53,8 @@ the device.**
     NETCONF southbound can be activated by installing
     ``odl-netconf-connector-all`` Karaf feature.
 
+.. _netconf-connector:
+
 Netconf-connector configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2032,3 +2034,65 @@ RESTCONF response:
             ]
         }
     }
+
+RESTCONF OpenAPI
+----------------
+
+Overview
+~~~~~~~~
+
+The OpenAPI provides full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).
+For operational data we only provide GET API. For the majority of requests you can see only config data in examples.
+That’s because we can show only one example per request. The exception when you can see operational data in an
+example is when data are representing an operational (config false) container with no config data in it.
+
+
+Using the OpenAPI Explorer through HTTP
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Install OpenApi into Karaf by installing karaf feature:
+
+::
+
+    $ feature:install odl-restconf-openapi
+
+2.  Navigate to OpenAPI in your web browser which is available at URLs:
+
+-  http://localhost:8181/openapi/explorer/index.html for general overview
+
+-  http://localhost:8181/openapi/api/v3/single for JSON data
+
+.. note::
+
+    In the URL links for OpenAPI, change *localhost* to the IP/Host name of your actual server.
+
+3.  Enter the username and password.
+    By default the credentials are  *admin/admin*.
+
+4.  Select any model to try out.
+
+5.  Select any available request to try out.
+
+6.  Click on the **Try it out** button.
+
+7.  Provide any required parameters or edit request body.
+
+8.  Click the **Execute** button.
+
+9.  You can see responses to the given request.
+
+
+OpenAPI Explorer ca be used for connected device too. How to connect device can be found :ref:`here <netconf-connector>`.
+
+OpenAPI URLs in that case would look like this:
+
+-  `http://localhost:8181/openapi/explorer/index.html?urls.primaryName=17830-sim-device resources - RestConf RFC 8040 <http://localhost:8181/openapi/explorer/index.html?urls.primaryName=17830-sim-device%20resources%20-%20RestConf%20RFC%208040>`_ for device overview
+
+-  http://localhost:8181/openapi/api/v3/mounts/1 for JSON data
+
+-  `http://localhost:8181/openapi/api/v3/mounts/1/toaster(2009-11-20) <http://localhost:8181/openapi/api/v3/mounts/1/toaster(2009-11-20)>`__ JSON data for given model
+
+.. note::
+
+    The URL links for OpenAPI are made for device with name *17830-sim-device* and model toaster
+    with *2009-11-20* revision and need to be changed accordingly to connected device.
