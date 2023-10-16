@@ -1,0 +1,55 @@
+module test-container-childs {
+  namespace "http://example.com/test/container/child";
+  prefix "tcc";
+  revision 2023-09-28;
+
+  container root-container {
+    container nested-container {
+      list mandatory-list {
+        min-elements 2;
+        max-elements 3;
+        key id;
+        leaf id {
+          type uint32;
+        }
+        leaf name {
+          type string;
+        }
+      }
+    }
+  }
+
+  container root-container2 {
+    container nested-container2 {
+      list mandatory-list2 {
+        min-elements 2;
+        max-elements 3;
+        key "id nameKey";
+        leaf id {
+          type uint32;
+        }
+        leaf nameKey {
+          type string;
+        }
+      }
+    }
+  }
+
+  container root-container3 {
+    container nested-container3 {
+      list mandatory-list3 {
+        min-elements 2;
+        max-elements 3;
+        key id;
+        leaf id {
+          type uint32;
+        }
+        container list-nested-container {
+          leaf name {
+            type string;
+          }
+        }
+      }
+    }
+  }
+}
