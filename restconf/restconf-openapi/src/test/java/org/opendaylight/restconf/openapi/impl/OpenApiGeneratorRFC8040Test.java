@@ -427,6 +427,7 @@ public final class OpenApiGeneratorRFC8040Test {
      */
     @Test
     public void testActionsNamespace() {
+//        final var doc = generator.getApiDeclaration("test-container-childs", "2023-09-28", uriInfo);
         final var doc = generator.getApiDeclaration("action-types", null, uriInfo);
         assertNotNull("Failed to find Datastore API", doc);
         final var paths = doc.paths();
