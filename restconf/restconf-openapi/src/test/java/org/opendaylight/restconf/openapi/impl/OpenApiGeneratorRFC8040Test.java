@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;
 import org.junit.BeforeClass;
@@ -441,6 +442,28 @@ public final class OpenApiGeneratorRFC8040Test {
         final var namespace = xml.namespace();
         assertNotNull(namespace);
         assertEquals("urn:ietf:params:xml:ns:yang:test:action:types", namespace);
+    }
+
+    /**
+     * Test that.
+     */
+    @Test
+    public void testListExamplesInteger() {
+        final var doc = generator.getApiDeclaration("test-container-childs", "2023-09-28", uriInfo);
+        assertNotNull("Failed to find Datastore API", doc);
+        final var components = doc.components();
+        final var component = components.schemas().get("test-container-childs_root-container_nested-container");
+        assertNotNull(component);
+        final var property = component.properties().get("mandatory-list");
+        assertNotNull(property);
+        assertNotNull(property.minItems());
+        assertNotNull(property.maxItems());
+        assertEquals(2, (int) property.minItems());
+        assertEquals(3, (int) property.maxItems());
+        final var example = property.example();
+        assertNotNull(example);
+        assertEquals(ArrayList.class, example.getClass());
+        assertEquals(2, ((List<?>)example).size());
     }
 
     /**
