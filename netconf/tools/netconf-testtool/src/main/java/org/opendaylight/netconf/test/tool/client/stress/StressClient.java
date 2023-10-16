@@ -18,12 +18,9 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -40,10 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-@SuppressFBWarnings("DM_EXIT")
 public final class StressClient {
     private static final Logger LOG = LoggerFactory.getLogger(StressClient.class);
 
@@ -91,16 +86,16 @@ public final class StressClient {
     private static Parameters params;
 
     private StressClient() {
-
+        // Hidden on purpose
     }
 
-    public static void main(final String[] args) {
-
-        params = parseArgs(args, Parameters.getParser());
+    public static void main(final String[] args) throws ExecutionException, InterruptedException, TimeoutException {
+        if (initParameters(args)) {
+            return;
+        }
         params.validate();
 
-        final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
-            .getLogger(Logger.ROOT_LOGGER_NAME);
+        final var root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
 
         final int threadAmount = params.threadAmount;
@@ -112,7 +107,7 @@ public final class StressClient {
 
         LOG.info("Preparing messages");
         // Prepare all msgs up front
-        final List<List<NetconfMessage>> allPreparedMessages = new ArrayList<>(threadAmount);
+        final var allPreparedMessages = new ArrayList<List<NetconfMessage>>(threadAmount);
         for (int i = 0; i < threadAmount; i++) {
             if (i != threadAmount - 1) {
                 allPreparedMessages.add(new ArrayList<>(requestsPerThread));
@@ -130,7 +125,7 @@ public final class StressClient {
         }
 
         for (int i = 0; i < threadAmount; i++) {
-            final List<NetconfMessage> preparedMessages = allPreparedMessages.get(i);
+            final var preparedMessages = allPreparedMessages.get(i);
             int padding = 0;
             if (i == threadAmount - 1) {
                 padding = leftoverRequests;
@@ -141,37 +136,29 @@ public final class StressClient {
             }
         }
 
-        final NioEventLoopGroup nioGroup = new NioEventLoopGroup();
-        final Timer timer = new HashedWheelTimer();
+        final var nioGroup = new NioEventLoopGroup();
+        final var timer = new HashedWheelTimer();
 
-        final NetconfClientDispatcherImpl netconfClientDispatcher = configureClientDispatcher(nioGroup, timer);
+        final var netconfClientDispatcher = configureClientDispatcher(nioGroup, timer);
 
-        final List<StressClientCallable> callables = new ArrayList<>(threadAmount);
-        for (final List<NetconfMessage> messages : allPreparedMessages) {
+        final var callables = new ArrayList<StressClientCallable>(threadAmount);
+        for (var messages : allPreparedMessages) {
             callables.add(new StressClientCallable(params, netconfClientDispatcher, messages));
         }
 
-        final ExecutorService executorService = Executors.newFixedThreadPool(threadAmount);
+        final var executorService = Executors.newFixedThreadPool(threadAmount);
 
         LOG.info("Starting stress test");
-        final Stopwatch started = Stopwatch.createStarted();
-        try {
-            final List<Future<Boolean>> futures = executorService.invokeAll(callables);
-            for (final Future<Boolean> future : futures) {
-                try {
-                    future.get(4L, TimeUnit.MINUTES);
-                } catch (ExecutionException | TimeoutException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-            executorService.shutdownNow();
-        } catch (final InterruptedException e) {
-            throw new IllegalStateException("Unable to execute requests", e);
+        final var sw = Stopwatch.createStarted();
+        final var futures = executorService.invokeAll(callables);
+        for (var future : futures) {
+            future.get(4L, TimeUnit.MINUTES);
         }
-        started.stop();
+        executorService.shutdownNow();
+        sw.stop();
 
-        LOG.info("FINISHED. Execution time: {}", started);
-        LOG.info("Requests per second: {}", params.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS));
+        LOG.info("FINISHED. Execution time: {}", sw);
+        LOG.info("Requests per second: {}", params.editCount * 1000.0 / sw.elapsed(TimeUnit.MILLISECONDS));
 
         // Cleanup
         timer.stop();
@@ -197,16 +184,16 @@ public final class StressClient {
             // Insert message id where needed
             String specificEditContent = editContentString.replaceAll(MSG_ID_PLACEHOLDER_REGEX, Integer.toString(id));
 
-            final StringBuilder stringBuilder = new StringBuilder(specificEditContent);
-            int idx = stringBuilder.indexOf(PHYS_ADDR_PLACEHOLDER);
+            final var sb = new StringBuilder(specificEditContent);
+            int idx = sb.indexOf(PHYS_ADDR_PLACEHOLDER);
             while (idx != -1) {
-                stringBuilder.replace(idx, idx + PHYS_ADDR_PLACEHOLDER.length(), TestToolUtils.getMac(macStart++));
-                idx = stringBuilder.indexOf(PHYS_ADDR_PLACEHOLDER);
+                sb.replace(idx, idx + PHYS_ADDR_PLACEHOLDER.length(), TestToolUtils.getMac(macStart++));
+                idx = sb.indexOf(PHYS_ADDR_PLACEHOLDER);
             }
-            specificEditContent = stringBuilder.toString();
+            specificEditContent = sb.toString();
 
             editContentElement = XmlUtil.readXmlToElement(specificEditContent);
-            final Node config = ((Element) msg.getDocumentElement().getElementsByTagName("edit-config").item(0))
+            final var config = ((Element) msg.getDocumentElement().getElementsByTagName("edit-config").item(0))
                     .getElementsByTagName("config").item(0);
             config.appendChild(msg.importNode(editContentElement, true));
         } catch (final IOException | SAXException e) {
@@ -216,34 +203,29 @@ public final class StressClient {
         return netconfMessage;
     }
 
-    private static NetconfClientDispatcherImpl configureClientDispatcher(final NioEventLoopGroup nioGroup,
-            final Timer timer) {
-        final NetconfClientDispatcherImpl netconfClientDispatcher;
-        if (params.exi) {
-            if (params.legacyFraming) {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup, timer);
-            } else {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup, timer);
-            }
-        } else if (params.legacyFraming) {
-            netconfClientDispatcher = ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer);
-        } else {
-            netconfClientDispatcher = ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer);
+    @SuppressFBWarnings(value = "DM_EXIT", justification = "Exit from CLI with error without throwing an exception")
+    private static boolean initParameters(final String[] args) {
+        final var parser = Parameters.getParser();
+        params = new Parameters();
+        try {
+            parser.parseArgs(args, args);
+        } catch (ArgumentParserException e) {
+            parser.handleError(e);
+            System.exit(1);
+            return true;
         }
-        return netconfClientDispatcher;
+        return false;
     }
 
-    private static Parameters parseArgs(final String[] args, final ArgumentParser parser) {
-        final Parameters opt = new Parameters();
-        try {
-            parser.parseArgs(args, opt);
-            return opt;
-        } catch (final ArgumentParserException e) {
-            parser.handleError(e);
+    @Deprecated
+    private static NetconfClientDispatcherImpl configureClientDispatcher(final NioEventLoopGroup nioGroup,
+            final Timer timer) {
+        if (params.exi) {
+            return params.legacyFraming ? ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup, timer)
+                : ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup, timer);
         }
-
-        System.exit(1);
-        return null;
+        return params.legacyFraming ? ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer)
+            : ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer);
     }
 
     static class LoggingRemoteDevice implements RemoteDevice<NetconfDeviceCommunicator> {

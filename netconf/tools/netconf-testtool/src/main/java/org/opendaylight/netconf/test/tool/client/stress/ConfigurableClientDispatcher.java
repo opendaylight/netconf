@@ -14,8 +14,8 @@ import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 
+@Deprecated
 public final class ConfigurableClientDispatcher extends NetconfClientDispatcherImpl {
-
     private final Set<String> capabilities;
 
     private ConfigurableClientDispatcher(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
