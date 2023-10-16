@@ -1,0 +1,18 @@
+module test-container-childs {
+  namespace "http://example.com/test/container/child";
+  prefix "tcc";
+  revision 2023-09-28;
+
+  container root-container {
+    container nested-container {
+      list mandatory-list {
+        min-elements 2;
+        max-elements 3;
+        key id;
+        leaf id {
+          type uint32;
+        }
+      }
+    }
+  }
+}
