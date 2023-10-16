@@ -23,9 +23,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.openapi.model.Property;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.restconf.openapi.model.Xml;
+import org.opendaylight.yangtools.yang.common.AbstractQName;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
@@ -51,6 +54,8 @@ import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.meta.ModelStatement;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
@@ -234,11 +239,19 @@ public final class DefinitionGenerator {
         final String name = filename + discriminator;
         final String ref = COMPONENTS_PREFIX + name;
 
-        if (schemaNode instanceof ListSchemaNode) {
+        if (schemaNode instanceof ListSchemaNode node) {
             dataNodeProperties.type(ARRAY_TYPE);
             final Property items = new Property.Builder().ref(ref).build();
             dataNodeProperties.items(items);
             dataNodeProperties.description(schemaNode.getDescription().orElse(""));
+            if (node.getElementCountConstraint().isPresent()) {
+                final var minElements = node.getElementCountConstraint().orElse(null).getMinElements();
+                dataNodeProperties.minItems(minElements);
+                dataNodeProperties.maxItems(node.getElementCountConstraint().orElse(null).getMaxElements());
+                if (minElements != null) {
+                    dataNodeProperties.example(createExamples(node, minElements));
+                }
+            }
         } else {
              /*
                 Description can't be added, because nothing allowed alongside $ref.
@@ -248,6 +261,66 @@ public final class DefinitionGenerator {
         }
 
         return dataNodeProperties.build();
+    }
+
+    private static List<Map<String, Object>> createExamples(final ListSchemaNode node,
+            @NonNull final Integer minElements) {
+        final var firstExampleMap = prepareFirstListExample(node);
+        final var examples = new ArrayList<Map<String, Object>>();
+        examples.add(firstExampleMap);
+
+        final var unqiueContraintsNameSet = node.getUniqueConstraints().stream()
+            .map(ModelStatement::argument)
+            .flatMap(uniqueSt -> uniqueSt.stream()
+                .map(schemaNI -> schemaNI.lastNodeIdentifier().getLocalName()))
+            .collect(Collectors.toSet());
+        final var keysNameSet = node.getKeyDefinition().stream()
+            .map(AbstractQName::getLocalName)
+            .collect(Collectors.toSet());
+        for (int i = 1; i < minElements; i++) {
+            final var exampleMap = new HashMap<String, Object>();
+            for (final var example : firstExampleMap.entrySet()) {
+                final Object exampleValue;
+                if (keysNameSet.contains(example.getKey()) || unqiueContraintsNameSet.contains(example.getKey())) {
+                    exampleValue = editExample(example.getValue(), i);
+                } else {
+                    exampleValue = example.getValue();
+                }
+                exampleMap.put(example.getKey(), exampleValue);
+            }
+            examples.add(exampleMap);
+        }
+        return examples;
+    }
+
+    private static HashMap<String, Object> prepareFirstListExample(final ListSchemaNode node) {
+        final var childNodes = node.getChildNodes();
+        final var firstExampleMap = new HashMap<String, Object>();
+        // Cycle for each child node
+        for (final var childNode : childNodes) {
+            if (childNode instanceof TypedDataSchemaNode leafSchemaNode) {
+                final var property = new Property.Builder();
+                processTypeDef(leafSchemaNode.getType(), leafSchemaNode, property, null);
+                final var exampleValue = property.build().example();
+                if (exampleValue != null) {
+                    firstExampleMap.put(leafSchemaNode.getQName().getLocalName(), exampleValue);
+                }
+            }
+        }
+        return firstExampleMap;
+    }
+
+    private static Object editExample(final Object exampleValue, final int edit) {
+        if (exampleValue instanceof String string) {
+            return string + "_" + edit;
+        } else if (exampleValue instanceof Integer number) {
+            return number + edit;
+        } else if (exampleValue instanceof Long number) {
+            return number + edit;
+        } else if (exampleValue instanceof Decimal64 number) {
+            return Decimal64.valueOf(BigDecimal.valueOf(number.intValue() + edit));
+        }
+        return exampleValue;
     }
 
     private static Property processDataNodeContainer(final DataNodeContainer dataNode, final String parentName,
