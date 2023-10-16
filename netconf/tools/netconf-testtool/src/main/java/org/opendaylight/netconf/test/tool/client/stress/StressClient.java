@@ -5,18 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.stress;
 
 import ch.qos.logback.classic.Level;
 import com.google.common.base.Stopwatch;
-import com.google.common.io.Files;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -126,7 +124,7 @@ public final class StressClient {
 
         final String editContentString;
         try {
-            editContentString = Files.asCharSource(params.editContent, StandardCharsets.UTF_8).read();
+            editContentString = Files.readString(params.editContent.toPath());
         } catch (final IOException e) {
             throw new IllegalArgumentException("Cannot read content of " + params.editContent, e);
         }
