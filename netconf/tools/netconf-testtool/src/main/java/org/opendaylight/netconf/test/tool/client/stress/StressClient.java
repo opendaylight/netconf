@@ -47,50 +47,39 @@ import org.xml.sax.SAXException;
 
 @SuppressFBWarnings("DM_EXIT")
 public final class StressClient {
-
     private static final Logger LOG = LoggerFactory.getLogger(StressClient.class);
 
     static final QName COMMIT_QNAME = QName.create(CommitInput.QNAME, "commit");
-    public static final NetconfMessage COMMIT_MSG;
-
-    static {
-        try {
-            COMMIT_MSG = new NetconfMessage(XmlUtil.readXmlToDocument(
-                "<rpc message-id=\"commit-batch\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                    + "    <commit/>\n"
-                    + "</rpc>"));
-        } catch (final SAXException | IOException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
+    public static final NetconfMessage COMMIT_MSG = new NetconfMessage(readString("""
+        <rpc message-id="commit-batch" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <commit/>
+        </rpc>"""));
 
     static final QName EDIT_QNAME = QName.create(EditConfigInput.QNAME, "edit-config");
-    static final org.w3c.dom.Document EDIT_CANDIDATE_BLUEPRINT;
-    static final org.w3c.dom.Document EDIT_RUNNING_BLUEPRINT;
+    static final Document EDIT_CANDIDATE_BLUEPRINT = readString("""
+        <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <edit-config>
+                <target>
+                    <candidate/>
+                </target>
+                <default-operation>none</default-operation>
+                <config/>
+            </edit-config>
+        </rpc>""");
+    static final Document EDIT_RUNNING_BLUEPRINT  = readString("""
+        <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <edit-config>
+                <target>
+                    <running/>
+                </target>
+                <default-operation>none</default-operation>
+                <config/>
+            </edit-config>
+        </rpc>""");
 
-    static {
+    private static Document readString(final String str) {
         try {
-            EDIT_CANDIDATE_BLUEPRINT = XmlUtil.readXmlToDocument(
-                    "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                            + "    <edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                            + "        <target>\n"
-                            + "            <candidate/>\n"
-                            + "        </target>\n"
-                            + "        <default-operation>none</default-operation>"
-                            + "        <config/>\n"
-                            + "    </edit-config>\n"
-                            + "</rpc>");
-
-            EDIT_RUNNING_BLUEPRINT = XmlUtil.readXmlToDocument(
-                    "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                            + "    <edit-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                            + "        <target>\n"
-                            + "            <running/>\n"
-                            + "        </target>\n"
-                            + "        <default-operation>none</default-operation>"
-                            + "        <config/>\n"
-                            + "    </edit-config>\n"
-                            + "</rpc>");
+            return XmlUtil.readXmlToDocument(str);
         } catch (SAXException | IOException e) {
             throw new ExceptionInInitializerError(e);
         }
