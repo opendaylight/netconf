@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.openapi.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -15,6 +16,10 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -207,5 +212,104 @@ public final class DefinitionGeneratorTest {
                       the required doneness.""", makeToast.description());
         assertTrue(makeToast.enums().containsAll(Set.of("toast-type","white-bread", "wheat-bread", "frozen-waffle",
             "hash-brown", "frozen-bagel", "wonder-bread")));
+    }
+
+    /**
+     * Test that checks if list min-elements and max-elements are present.
+     * Also checks if number of example elements meets the min-elements condition
+     */
+    @Test
+    public void testListExamples() throws IOException {
+        final var module = context.findModule("test-container-childs", Revision.of("2023-09-28")).orElseThrow();
+        final var jsonObject = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
+        final var component = jsonObject.get("test-container-childs_root-container_nested-container");
+        assertNotNull(component);
+        assertNotNull(component.properties());
+        final var property = component.properties().get("mandatory-list");
+        assertNotNull(property);
+        assertNotNull(property.minItems());
+        assertNotNull(property.maxItems());
+        assertEquals(3, (int) property.minItems());
+        assertEquals(5, (int) property.maxItems());
+        final var example = property.example();
+        assertNotNull(example);
+        assertEquals(ArrayList.class, example.getClass());
+        assertEquals(3, ((List<?>)example).size());
+    }
+
+    /**
+     * Test that checks if list min-elements and max-elements are present.
+     * Also checks if number of example elements meets the min-elements condition
+     * and if key defined leaf have unique values.
+     */
+    @Test
+    public void testListExamplesWithNonKeyLeaf() throws IOException {
+        final var module = context.findModule("test-container-childs", Revision.of("2023-09-28")).orElseThrow();
+        final var jsonObject = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
+        final var component = jsonObject.get("test-container-childs_root-container_nested-container");
+        assertNotNull(component);
+        assertNotNull(component.properties());
+        final var property = component.properties().get("mandatory-list");
+        assertNotNull(property);
+        assertNotNull(property.minItems());
+        assertNotNull(property.maxItems());
+        assertEquals(3, (int) property.minItems());
+        assertEquals(5, (int) property.maxItems());
+        final var example = property.example();
+        assertNotNull(example);
+        assertEquals(3, ((List<?>)example).size());
+        assertTrue(checkUniqueExample(example, "id"));
+        assertFalse(checkUniqueExample(example, "name"));
+        assertFalse(checkUniqueExample(example, "address"));
+    }
+
+    /**
+     * Test that checks if multiple key leafs have unique values.
+     * Also checks if nested container node is ignored.
+     */
+    @Test
+    public void testListExamplesWithTwoKeys() throws IOException {
+        final var module = context.findModule("test-container-childs", Revision.of("2023-09-28")).orElseThrow();
+        final var jsonObject = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
+        final var component = jsonObject.get("test-container-childs_root-container-two-keys_nested-container-two-keys");
+        assertNotNull(component);
+        assertNotNull(component.properties());
+        final var property = component.properties().get("mandatory-list-two-keys");
+        assertNotNull(property);
+        final var example = property.example();
+        assertNotNull(example);
+        assertTrue(checkUniqueExample(example, "id"));
+        assertTrue(checkUniqueExample(example, "name"));
+        assertFalse(checkUniqueExample(example, "address"));
+        assertEquals(3, ((ArrayList<Map<?,?>>)example).get(0).size());
+    }
+
+    /**
+     * Test that checks if sets of unique defined leafs have unique combination of values.
+     */
+    @Test
+    public void testListExamplesWithUnique() throws IOException {
+        final var module = context.findModule("test-container-childs", Revision.of("2023-09-28")).orElseThrow();
+        final var jsonObject = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
+        final var component = jsonObject.get("test-container-childs_root-container-unique_nested-container-unique");
+        assertNotNull(component);
+        assertNotNull(component.properties());
+        final var property = component.properties().get("mandatory-list-unique");
+        assertNotNull(property);
+        final var example = property.example();
+        assertNotNull(example);
+        assertTrue(checkUniqueExample(example, "id"));
+        assertTrue(checkUniqueExample(example, "name") || checkUniqueExample(example, "address"));
+        assertFalse(checkUniqueExample(example, "description"));
+    }
+
+    public boolean checkUniqueExample(Object examples, String key) {
+        assertEquals(ArrayList.class, examples.getClass());
+        final var exampleValues = new ArrayList<>();
+
+        for (Map<String, Object> example : (ArrayList<Map<String, Object>>)examples) {
+            exampleValues.add(example.get(key));
+        }
+        return (exampleValues.size() == new HashSet<>(exampleValues).size());
     }
 }
