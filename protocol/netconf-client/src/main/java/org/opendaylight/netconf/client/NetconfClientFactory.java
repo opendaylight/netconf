@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.client;
 
-import io.netty.util.concurrent.Future;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 
@@ -15,16 +15,14 @@ import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
  * Basic interface for Netconf client factory.
  */
 public interface NetconfClientFactory extends AutoCloseable {
-
     /**
-     * Create netconf client. Network communication has to be set up based on network protocol specified in
+     * Create a NETCONF client. Network communication has to be set up based on network protocol specified in
      * clientConfiguration
      *
      * @param clientConfiguration configuration
-     * @return netconf client as {@link NetconfClientSession} future
+     * @return A future producing the {@link NetconfClientSession}
      * @throws UnsupportedConfigurationException if any transport configuration parameters is invalid
      */
-    Future<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration)
+    ListenableFuture<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration)
         throws UnsupportedConfigurationException;
-
 }
