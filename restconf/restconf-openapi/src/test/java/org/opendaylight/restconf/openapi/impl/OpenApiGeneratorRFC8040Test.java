@@ -444,6 +444,29 @@ public final class OpenApiGeneratorRFC8040Test {
     }
 
     /**
+     * Test that checks if list min-elements and max-elements are present.
+     * Also checks if number of example elements meets the min-elements condition
+     */
+    @Test
+    public void testListExamplesInteger() {
+        final var doc = generator.getApiDeclaration("test-container-childs", "2023-09-28", uriInfo);
+        assertNotNull("Failed to find Datastore API", doc);
+        final var components = doc.components();
+        final var component = components.schemas().get("test-container-childs_root-container_nested-container");
+        assertNotNull(component);
+        final var property = component.properties().get("mandatory-list");
+        assertNotNull(property);
+        assertNotNull(property.minItems());
+        assertNotNull(property.maxItems());
+        assertEquals(2, (int) property.minItems());
+        assertEquals(3, (int) property.maxItems());
+        final var example = property.example();
+        assertNotNull(example);
+        assertEquals(ArrayList.class, example.getClass());
+        assertEquals(2, ((List<?>)example).size());
+    }
+
+    /**
      *  Test JSON and XML references for request operation.
      */
     private static void verifyPostDataRequestRef(final Operation operation, final String expectedJsonRef,
