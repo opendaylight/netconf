@@ -15,6 +15,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -207,5 +209,28 @@ public final class DefinitionGeneratorTest {
                       the required doneness.""", makeToast.description());
         assertTrue(makeToast.enums().containsAll(Set.of("toast-type","white-bread", "wheat-bread", "frozen-waffle",
             "hash-brown", "frozen-bagel", "wonder-bread")));
+    }
+
+    /**
+     * Test that checks if list min-elements and max-elements are present.
+     * Also checks if number of example elements meets the min-elements condition
+     */
+    @Test
+    public void testListExamples() throws IOException {
+        final var module = context.findModule("test-container-childs", Revision.of("2023-09-28")).orElseThrow();
+        final var jsonObject = DefinitionGenerator.convertToSchemas(module, context, new DefinitionNames(), true);
+        final var component = jsonObject.get("test-container-childs_root-container_nested-container");
+        assertNotNull(component);
+        assertNotNull(component.properties());
+        final var property = component.properties().get("mandatory-list");
+        assertNotNull(property);
+        assertNotNull(property.minItems());
+        assertNotNull(property.maxItems());
+        assertEquals(2, (int) property.minItems());
+        assertEquals(3, (int) property.maxItems());
+        final var example = property.example();
+        assertNotNull(example);
+        assertEquals(ArrayList.class, example.getClass());
+        assertEquals(2, ((List<?>)example).size());
     }
 }
