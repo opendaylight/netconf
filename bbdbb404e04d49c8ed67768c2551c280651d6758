@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b36b2a35_e0aa8326",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-16T20:54:17Z",
+      "side": 1,
+      "message": "please do not cherry-pick before initial contribution is merged. it creates confusion as to where the review happens.",
+      "revId": "bbdbb404e04d49c8ed67768c2551c280651d6758",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
