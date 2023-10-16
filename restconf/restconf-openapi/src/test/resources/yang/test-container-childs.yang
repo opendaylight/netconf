@@ -1,0 +1,73 @@
+module test-container-childs {
+  yang-version 1.1;
+  namespace "http://example.com/test/container/child";
+  prefix "tcc";
+  revision 2023-09-28;
+
+  container root-container {
+    container nested-container {
+      list mandatory-list {
+        min-elements 3;
+        max-elements 5;
+        key id;
+        leaf id {
+          type uint32;
+        }
+        leaf name {
+          type string;
+        }
+        leaf address {
+          type string;
+        }
+      }
+    }
+  }
+
+  container root-container-two-keys {
+    container nested-container-two-keys {
+      list mandatory-list-two-keys {
+        min-elements 3;
+        max-elements 5;
+        key "id name";
+        leaf id {
+          type uint32;
+        }
+        leaf name {
+          type string;
+        }
+        leaf address {
+          type string;
+        }
+        container list-nested-container {
+          leaf nested-leaf {
+            type string;
+          }
+        }
+      }
+    }
+  }
+
+
+  container root-container-unique {
+    container nested-container-unique {
+      list mandatory-list-unique {
+        min-elements 3;
+        max-elements 5;
+        key id;
+        unique "name address";
+        leaf id {
+          type uint32;
+        }
+        leaf name {
+          type string;
+        }
+        leaf address {
+          type string;
+        }
+        leaf description {
+          type string;
+        }
+      }
+    }
+  }
+}
