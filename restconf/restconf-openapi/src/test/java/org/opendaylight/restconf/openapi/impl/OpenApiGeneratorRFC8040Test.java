@@ -452,6 +452,83 @@ public final class OpenApiGeneratorRFC8040Test {
     }
 
     /**
+     * Test that checks if list min-elements and max-elements are present.
+     * Also checks if number of example elements meets the min-elements condition
+     * and if key defined leaf have unique values.
+     */
+    @Test
+    public void testListExamplesWithNonKeyLeaf() {
+        final var doc = generator.getApiDeclaration("test-container-childs", "2023-09-28", uriInfo);
+        assertNotNull("Failed to find Datastore API", doc);
+        final var components = doc.components();
+        final var component = components.schemas().get("test-container-childs_root-container_nested-container");
+        assertNotNull(component);
+        assertNotNull(component.properties());
+        final var property = component.properties().get("mandatory-list");
+        assertNotNull(property);
+        assertNotNull(property.minItems());
+        assertNotNull(property.maxItems());
+        assertEquals(3, (int) property.minItems());
+        assertEquals(5, (int) property.maxItems());
+        final var example = property.example();
+        assertNotNull(example);
+        assertEquals(3, ((List<?>)example).size());
+        assertTrue(checkUniqueExample(example, "id"));
+    }
+
+    /**
+     * Test that checks if multiple key leafs have unique values.
+     * Also checks if nested container node is ignored.
+     */
+    @Test
+    public void testListExamplesWithTwoKeys() {
+        final var doc = generator.getApiDeclaration("test-container-childs", "2023-09-28", uriInfo);
+        assertNotNull("Failed to find Datastore API", doc);
+        final var components = doc.components();
+        final var component = components.schemas()
+            .get("test-container-childs_root-container-two-keys_nested-container-two-keys");
+        assertNotNull(component);
+        assertNotNull(component.properties());
+        final var property = component.properties().get("mandatory-list-two-keys");
+        assertNotNull(property);
+        final var example = property.example();
+        assertNotNull(example);
+        assertTrue(checkUniqueExample(example, "id"));
+        assertTrue(checkUniqueExample(example, "name"));
+        assertEquals(3, ((ArrayList<Map<?,?>>)example).get(0).size());
+    }
+
+    /**
+     * Test that checks if sets of unique defined leafs have unique combination of values.
+     */
+    @Test
+    public void testListExamplesWithUnique() {
+        final var doc = generator.getApiDeclaration("test-container-childs", "2023-09-28", uriInfo);
+        assertNotNull("Failed to find Datastore API", doc);
+        final var components = doc.components();
+        final var component = components.schemas()
+            .get("test-container-childs_root-container-unique_nested-container-unique");
+        assertNotNull(component);
+        assertNotNull(component.properties());
+        final var property = component.properties().get("mandatory-list-unique");
+        assertNotNull(property);
+        final var example = property.example();
+        assertNotNull(example);
+        assertTrue(checkUniqueExample(example, "id"));
+        assertTrue(checkUniqueExample(example, "name") || checkUniqueExample(example, "address"));
+    }
+
+    private static boolean checkUniqueExample(final Object examples, final String key) {
+        assertEquals(ArrayList.class, examples.getClass());
+        final var exampleValues = new HashSet<>();
+
+        for (final Map<String, Object> example : (ArrayList<Map<String, Object>>)examples) {
+            exampleValues.add(example.get(key));
+        }
+        return (exampleValues.size() == ((ArrayList<?>) examples).size());
+    }
+
+    /**
      * Test that number of elements in payload is correct.
      */
     @SuppressWarnings("unchecked")
