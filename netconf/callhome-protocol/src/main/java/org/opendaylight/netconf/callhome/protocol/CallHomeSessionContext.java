@@ -24,7 +24,6 @@ import java.security.PublicKey;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
@@ -37,13 +36,15 @@ import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231026.connection.parameters.Protocol.Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // Non-final for testing
 class CallHomeSessionContext implements CallHomeProtocolSessionContext {
+
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeSessionContext.class);
+    private static final String NETCONF = "netconf";
 
     @VisibleForTesting
     static final Session.AttributeKey<CallHomeSessionContext> SESSION_KEY = new Session.AttributeKey<>();
@@ -85,8 +86,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         LOG.debug("Opening NETCONF Subsystem on {}", sshSession);
         try {
             final MinaSshNettyChannel nettyChannel = newMinaSshNettyChannel();
-            final ClientChannel netconfChannel = ((NetconfClientSessionImpl) sshSession).createSubsystemChannel(
-                TransportConstants.SSH_SUBSYSTEM, nettyChannel.pipeline());
+            final ClientChannel netconfChannel =
+                    ((NetconfClientSessionImpl) sshSession).createSubsystemChannel(NETCONF, nettyChannel.pipeline());
             netconfChannel.setStreaming(ClientChannel.Streaming.Async);
             netconfChannel.open().addListener(newSshFutureListener(netconfChannel, nettyChannel));
         } catch (IOException e) {
