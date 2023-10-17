@@ -7,6 +7,10 @@ module netconf-node-topology {
     import netconf-node-optional { prefix nno; }
     import odl-netconf-device { prefix ond; }
 
+    revision 2023-11-07 {
+        description "Stopped usage of odl-netconf-device credentials for authentification.";
+    }
+
     revision 2022-12-25 {
         description "Refactored into odl-netconf-device";
     }
@@ -15,8 +19,51 @@ module netconf-node-topology {
         description "Initial revision of Topology model";
     }
 
+    grouping username-password {
+        leaf username {
+            type string;
+        }
+
+        leaf password {
+            type string;
+        }
+    }
+
+    grouping credentials {
+        choice credentials {
+            config true;
+            case login-pw {
+                description "login-password credentials, encrypted.";
+
+                container login-password {
+                    uses username-password;
+                }
+            }
+            case login-pw-unencrypted {
+                description "login-password credentials, not encrypted.";
+
+                container login-password-unencrypted {
+                    uses username-password;
+                }
+            }
+            case key-auth {
+                description "key-based authentication, use the id for the pair thats stored in the keystore.";
+
+                container key-based {
+                    leaf key-id {
+                        type string;
+                    }
+
+                    leaf username {
+                        type string;
+                    }
+                }
+            }
+        }
+    }
+
     grouping netconf-node-fields {
-      uses ond:credentials;
+      uses credentials;
       uses ond:connection-parameters;
       uses ond:netconf-schema-storage;
       uses ond:datastore-access;
