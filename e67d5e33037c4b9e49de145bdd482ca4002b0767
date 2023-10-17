@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "669f7a5e_9388f9cb",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-17T09:08:44Z",
+      "side": 0,
+      "message": "Revert this formatting back, please.",
+      "revId": "e67d5e33037c4b9e49de145bdd482ca4002b0767",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
