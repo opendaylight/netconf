@@ -10,7 +10,7 @@ package org.opendaylight.netconf.console.api;
 
 import java.util.List;
 import java.util.Map;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231107.NetconfNode;
 
 public interface NetconfCommands {
 

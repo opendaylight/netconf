@@ -28,7 +28,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.protocol.AuthorizedKeysDecoder;
 import org.opendaylight.netconf.callhome.protocol.StatusRecorder;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231107.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.NetconfCallhomeServer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.AllowedDevices;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.Device;

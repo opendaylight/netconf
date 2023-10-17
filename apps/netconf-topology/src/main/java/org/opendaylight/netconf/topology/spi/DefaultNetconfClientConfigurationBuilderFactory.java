@@ -20,14 +20,15 @@ import org.opendaylight.netconf.client.mdsal.DatastoreBackedPublicKeyAuth;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordBase64Handler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.connection.parameters.Protocol.Name;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.credentials.credentials.KeyAuth;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.credentials.credentials.LoginPassword;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.credentials.credentials.LoginPwUnencrypted;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231107.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231107.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231107.credentials.credentials.KeyAuth;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231107.credentials.credentials.LoginPassword;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231107.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231107.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231107.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -91,7 +92,7 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         } else if (credentials instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
-            return new LoginPasswordHandler(loginPassword.getUsername(),
+            return new LoginPasswordBase64Handler(loginPassword.getUsername(),
                     encryptionService.decrypt(loginPassword.getPassword()));
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyPair = keyAuth.getKeyBased();
