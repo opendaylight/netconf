@@ -9,6 +9,10 @@ module odl-netconf-device {
   import ietf-inet-types { prefix inet; }
   import ietf-netconf { prefix nc; }
 
+  revision 2023-10-17 {
+    description "Use pattern for password validation";
+  }
+
   revision 2023-04-30 {
     description "Use ietf-netconf's session-id-type";
   }
@@ -25,6 +29,18 @@ module odl-netconf-device {
     }
   }
 
+  grouping username-password-encrypted {
+      leaf username {
+        type string;
+      }
+
+      leaf password {
+        type string {
+          pattern '(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{4}|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{2}={2})';
+        }
+      }
+    }
+
   grouping credentials {
     choice credentials {
       config true;
@@ -38,7 +54,7 @@ module odl-netconf-device {
         description "login-password credentials, encrypted.";
 
         container login-password {
-          uses username-password;
+          uses username-password-encrypted;
         }
       }
       case login-pw-unencrypted {
