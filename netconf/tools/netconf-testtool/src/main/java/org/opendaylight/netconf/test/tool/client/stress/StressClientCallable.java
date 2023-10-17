@@ -18,7 +18,6 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
-import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.slf4j.Logger;
@@ -70,11 +69,10 @@ public class StressClientCallable implements Callable<Boolean> {
         }
     }
 
-    private static NetconfDeviceCommunicator getSessionListener(
-            final InetSocketAddress inetAddress, final int messageLimit) {
-        final RemoteDevice<NetconfDeviceCommunicator> loggingRemoteDevice = new StressClient.LoggingRemoteDevice();
-        return new NetconfDeviceCommunicator(
-            new RemoteDeviceId("secure-test", inetAddress), loggingRemoteDevice, messageLimit);
+    private static NetconfDeviceCommunicator getSessionListener(final InetSocketAddress inetAddress,
+            final int messageLimit) {
+        return new NetconfDeviceCommunicator(new RemoteDeviceId("secure-test", inetAddress),
+            StressClient.LOGGING_REMOTE_DEVICE, messageLimit);
     }
 
     private static NetconfClientConfiguration getNetconfClientConfiguration(final Parameters params,

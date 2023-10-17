@@ -42,6 +42,24 @@ import org.xml.sax.SAXException;
 public final class StressClient {
     private static final Logger LOG = LoggerFactory.getLogger(StressClient.class);
 
+    static final RemoteDevice<NetconfDeviceCommunicator> LOGGING_REMOTE_DEVICE = new RemoteDevice<>() {
+        @Override
+        public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
+                final NetconfDeviceCommunicator netconfDeviceCommunicator) {
+            LOG.info("Session established");
+        }
+
+        @Override
+        public void onRemoteSessionDown() {
+            LOG.info("Session down");
+        }
+
+        @Override
+        public void onNotification(final NetconfMessage notification) {
+            LOG.info("Notification received: {}", notification);
+        }
+    };
+
     static final QName COMMIT_QNAME = QName.create(CommitInput.QNAME, "commit");
     public static final NetconfMessage COMMIT_MSG = new NetconfMessage(readString("""
         <rpc message-id="commit-batch" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
@@ -226,23 +244,5 @@ public final class StressClient {
         }
         return params.legacyFraming ? ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer)
             : ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer);
-    }
-
-    static class LoggingRemoteDevice implements RemoteDevice<NetconfDeviceCommunicator> {
-        @Override
-        public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
-                                      final NetconfDeviceCommunicator netconfDeviceCommunicator) {
-            LOG.info("Session established");
-        }
-
-        @Override
-        public void onRemoteSessionDown() {
-            LOG.info("Session down");
-        }
-
-        @Override
-        public void onNotification(final NetconfMessage notification) {
-            LOG.info("Notification received: {}", notification);
-        }
     }
 }
