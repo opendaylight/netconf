@@ -87,8 +87,8 @@ public class NetconfDeviceSimulator implements Closeable {
 
     public NetconfDeviceSimulator(final Configuration configuration) {
         this.configuration = configuration;
-        this.servers = new ArrayList<>(configuration.getDeviceCount());
-        this.sshTransportStackFactory = new SSHTransportStackFactory("netconf-device-simulator-threads",
+        servers = new ArrayList<>(configuration.getDeviceCount());
+        sshTransportStackFactory = new SSHTransportStackFactory("netconf-device-simulator-threads",
             configuration.getThreadPoolSize());
         hashedWheelTimer = new HashedWheelTimer();
     }
@@ -271,8 +271,7 @@ public class NetconfDeviceSimulator implements Closeable {
         }
 
         configuration.getDefaultYangResources().forEach(r -> {
-            final SourceIdentifier sourceIdentifier = new SourceIdentifier(r.getModuleName(), r.getRevision());
-            registerSource(consumer, r.getResourcePath(), sourceIdentifier);
+            registerSource(consumer, r.resourcePath(), new SourceIdentifier(r.moduleName(), r.revision()));
         });
 
         try {
