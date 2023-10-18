@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
@@ -104,8 +105,21 @@ public abstract class AbstractNetconfTopology {
             prev.close();
         }
 
-        LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(node));
-        setupConnection(nodeId, node);
+        final var netconfNode = node.augmentation(NetconfNode.class);
+        if (netconfNode == null) {
+            LOG.warn("RemoteDevice{{}} is missing NETCONF node configuration, not starting it", nodeId);
+            return;
+        }
+
+        final RemoteDeviceId deviceId;
+        try {
+            deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
+        } catch (NoSuchElementException e) {
+            LOG.warn("RemoteDevice{{}} is missing NETCONF has invalid configuration, not starting it", nodeId, e);
+            return;
+        }
+
+        setupConnection(nodeId, node, netconfNode, deviceId);
     }
 
     // Non-final for testing
@@ -129,12 +143,12 @@ public abstract class AbstractNetconfTopology {
     }
 
     @Holding("this")
-    protected final void setupConnection(final NodeId nodeId, final Node configNode) {
-        final var netconfNode = configNode.augmentation(NetconfNode.class);
+    private void setupConnection(final NodeId nodeId, final Node configNode, final NetconfNode netconfNode,
+            final RemoteDeviceId deviceId) {
         final var nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
+        LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(configNode));
 
         // Instantiate the handler ...
-        final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
         final var nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor,
             baseSchemas, schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade,
