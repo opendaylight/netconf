@@ -14,6 +14,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doReturn;
 
+import java.util.NoSuchElementException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -112,15 +113,13 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
     }
 
     @Test
-    public void testPort() {
-        assertThrows("Port must be specified.", NullPointerException.class, () ->
-            createConfig(nodeBuilder.setPort(null).build()));
+    public void testNoPort() {
+        assertThrows(NoSuchElementException.class, () -> createConfig(nodeBuilder.setPort(null).build()));
     }
 
     @Test
-    public void testHost() {
-        assertThrows("Host must be specified.", NullPointerException.class, () ->
-            createConfig(nodeBuilder.setHost(null).build()));
+    public void testNoHost() {
+        assertThrows(NoSuchElementException.class, () -> createConfig(nodeBuilder.setHost(null).build()));
     }
 
     private NetconfClientConfiguration createConfig(final NetconfNode netconfNode) {
