@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa52b485_d7a9db65",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-18T17:12:41Z",
+      "side": 1,
+      "message": "Argh, this is shifting consistency checks in *exactly the opposite* direction",
+      "revId": "9b34de22993069b9de22e73a6e3bf3da83f2737c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
