@@ -7,34 +7,29 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import java.io.IOException;
 import javax.xml.transform.dom.DOMSource;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
 
-public class NC881Test {
-    @BeforeClass
-    public static void classSetUp() {
-        XMLUnit.setIgnoreWhitespace(true);
-    }
-
+class NC881Test {
     @Test
-    public void testFilterDomNamespaces() throws IOException, SAXException {
-        final var source = XmlUtil.readXmlToDocument(
-                getClass().getResourceAsStream("/nc881/netconf-state.xml"));
+    void testFilterDomNamespaces() throws Exception {
+        final var source = XmlUtil.readXmlToDocument(NC881Test.class.getResourceAsStream("/nc881/netconf-state.xml"));
         final var expected = XmlUtil.readXmlToDocument(
-                getClass().getResourceAsStream("/nc881/netconf-state-filtered.xml"));
+            NC881Test.class.getResourceAsStream("/nc881/netconf-state-filtered.xml"));
 
         final var filteredDom = NetconfStateSchemas.ietfMonitoringCopy(new DOMSource(source.getDocumentElement()));
         final var filtered = XmlUtil.newDocument();
         filtered.appendChild(filtered.importNode(filteredDom.getNode(), true));
 
-        final var diff = XMLUnit.compareXML(filtered, expected);
-        assertTrue(diff.toString(), diff.similar());
+        final var diff = DiffBuilder.compare(expected)
+            .withTest(filtered)
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 }
