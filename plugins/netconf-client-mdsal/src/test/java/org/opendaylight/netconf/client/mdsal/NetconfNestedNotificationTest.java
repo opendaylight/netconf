@@ -41,7 +41,7 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
 
         final NetconfMessage notificationMessage = prepareNotification("/nested-notification-payload.xml");
         NetconfMessageTransformer messageTransformer = new NetconfMessageTransformer(
-            MountPointContext.of(context), true, BASE_SCHEMAS.getBaseSchema());
+            MountPointContext.of(context), true, BASE_SCHEMAS.baseSchema());
         final DOMNotification domNotification = messageTransformer.toNotification(notificationMessage);
         final ContainerNode root = domNotification.getBody();
         assertNotNull(root);

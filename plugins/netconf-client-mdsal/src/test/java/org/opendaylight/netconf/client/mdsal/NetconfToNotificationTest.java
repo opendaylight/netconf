@@ -17,12 +17,10 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
-import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -64,19 +62,19 @@ public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testMostRecentWrongYangModel() throws Exception {
-        final EffectiveModelContext schemaContext = getNotificationSchemaContext(getClass(), true);
+        final var schemaContext = getNotificationSchemaContext(getClass(), true);
         messageTransformer = new NetconfMessageTransformer(MountPointContext.of(schemaContext), true,
-            BASE_SCHEMAS.getBaseSchema());
+            BASE_SCHEMAS.baseSchema());
         assertThrows(IllegalArgumentException.class, () -> messageTransformer.toNotification(userNotification));
     }
 
     @Test
     public void testToNotificationFunction() throws Exception {
-        final EffectiveModelContext schemaContext = getNotificationSchemaContext(getClass(), false);
+        final var schemaContext = getNotificationSchemaContext(getClass(), false);
         messageTransformer = new NetconfMessageTransformer(MountPointContext.of(schemaContext), true,
-            BASE_SCHEMAS.getBaseSchema());
-        final DOMNotification domNotification = messageTransformer.toNotification(userNotification);
-        final ContainerNode root = domNotification.getBody();
+            BASE_SCHEMAS.baseSchema());
+        final var domNotification = messageTransformer.toNotification(userNotification);
+        final var root = domNotification.getBody();
         assertNotNull(root);
         assertEquals(6, root.body().size());
         assertEquals("user-visited-page", root.name().getNodeType().getLocalName());

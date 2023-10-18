@@ -86,10 +86,10 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Before
     public void setUp() throws Exception {
-        final InputStream okStream = getClass().getResourceAsStream("/netconfMessages/rpc-reply_ok.xml");
-        final InputStream dataStream = getClass().getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
-        final NetconfMessage ok = new NetconfMessage(XmlUtil.readXmlToDocument(okStream));
-        final NetconfMessage data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
+        final var okStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_ok.xml");
+        final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
+        final var ok = new NetconfMessage(XmlUtil.readXmlToDocument(okStream));
+        final var data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)))
                 .thenReturn(RpcResultBuilder.success(data).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME)))
@@ -109,7 +109,7 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME)))
                 .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         final var rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, new NetconfMessageTransformer(
-            MountPointContext.of(SCHEMA_CONTEXT), true, BASE_SCHEMAS.getBaseSchema()));
+            MountPointContext.of(SCHEMA_CONTEXT), true, BASE_SCHEMAS.baseSchema()));
         callback = new NetconfRpcFutureCallback("prefix",
             new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));
         baseOps = new NetconfBaseOps(rpc, MountPointContext.of(SCHEMA_CONTEXT));

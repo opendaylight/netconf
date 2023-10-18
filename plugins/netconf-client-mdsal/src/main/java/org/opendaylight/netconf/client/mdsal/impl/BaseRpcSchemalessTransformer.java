@@ -43,7 +43,7 @@ public class BaseRpcSchemalessTransformer implements RpcTransformer<NormalizedNo
     private final MessageCounter counter;
 
     public BaseRpcSchemalessTransformer(final BaseNetconfSchemas baseSchemas, final MessageCounter counter) {
-        final BaseSchema baseSchema = baseSchemas.getBaseSchema();
+        final var baseSchema = baseSchemas.baseSchema();
         mappedRpcs = baseSchema.getMappedRpcs();
         modelContext = baseSchema.getEffectiveModelContext();
         this.counter = counter;

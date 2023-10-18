@@ -56,7 +56,7 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
         salFacade.onDeviceConnected(
             // FIXME: or bound from base schema rather?
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
-            baseSchemas.getBaseSchema().getMountPointContext()),
+            baseSchemas.baseSchema().getMountPointContext()),
             remoteSessionCapabilities, new RemoteDeviceServices(
                 new SchemalessNetconfDeviceRpc(id,netconfDeviceCommunicator, rpcTransformer, messageTransformer),
                 null));
