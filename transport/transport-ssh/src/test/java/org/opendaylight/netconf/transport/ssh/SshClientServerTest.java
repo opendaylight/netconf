@@ -32,6 +32,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -50,6 +51,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
@@ -62,6 +64,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.SshClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentity;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ServerAuthentication;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.ssh.server.grouping.ClientAuthentication;
@@ -76,6 +79,7 @@ public class SshClientServerTest {
     private static final String EC = "EC";
     private static final String USER = "user";
     private static final String PASSWORD = "pa$$w0rd";
+    private static final String SUBSYSTEM = "subsystem";
     private static final AtomicInteger COUNTER = new AtomicInteger(0);
     private static final AtomicReference<String> USERNAME = new AtomicReference<>(USER);
 
@@ -141,7 +145,9 @@ public class SshClientServerTest {
         when(sshClientConfig.getServerAuthentication()).thenReturn(serverAuth);
         when(sshServerConfig.getServerIdentity()).thenReturn(serverIdentity);
         when(sshServerConfig.getClientAuthentication()).thenReturn(clientAuth);
-        integrationTest();
+        integrationTest(
+            FACTORY.listenServer(SUBSYSTEM, serverListener, tcpServerConfig, sshServerConfig),
+            FACTORY.connectClient(SUBSYSTEM, clientListener, tcpClientConfig, sshClientConfig));
     }
 
     private static Stream<Arguments> itServerKeyVerifyArgs() throws Exception {
@@ -168,7 +174,9 @@ public class SshClientServerTest {
         when(sshClientConfig.getServerAuthentication()).thenReturn(null); // Accept all keys
         when(sshServerConfig.getServerIdentity()).thenReturn(serverIdentity);
         when(sshServerConfig.getClientAuthentication()).thenReturn(clientAuth);
-        integrationTest();
+        integrationTest(
+            FACTORY.listenServer(SUBSYSTEM, serverListener, tcpServerConfig, sshServerConfig),
+            FACTORY.connectClient(SUBSYSTEM, clientListener, tcpClientConfig, sshClientConfig));
     }
 
     private static Stream<Arguments> itUserAuthArgs() throws Exception {
@@ -198,7 +206,7 @@ public class SshClientServerTest {
                 Arguments.of("PublicKey -- RSA keys",
                         buildClientIdentityWithPublicKey(getUsername(), rsaKeyData),
                         buildClientAuthWithPublicKey(getUsernameAndUpdate(), rsaKeyData)),
-                Arguments.of("PublicBased -- EC keys",
+                Arguments.of("PublicKey -- EC keys",
                         buildClientIdentityWithPublicKey(getUsername(), ecKeyData),
                         buildClientAuthWithPublicKey(getUsernameAndUpdate(), ecKeyData))
         );
@@ -215,14 +223,13 @@ public class SshClientServerTest {
         return USERNAME.getAndSet(USER + COUNTER.incrementAndGet());
     }
 
-    private void integrationTest() throws Exception {
+    private void integrationTest(final Future<SSHServer> serverFuture, final Future<SSHClient> clientFuture)
+            throws Exception {
         // start server
-        final var server = FACTORY.listenServer("subsystem", serverListener, tcpServerConfig, sshServerConfig)
-            .get(2, TimeUnit.SECONDS);
+        final var server = serverFuture.get(2, TimeUnit.SECONDS);
         try {
             // connect with client
-            final var client = FACTORY.connectClient("subsystem", clientListener, tcpClientConfig, sshClientConfig)
-                .get(2, TimeUnit.SECONDS);
+            final var client = clientFuture.get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(10_000))
                         .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
@@ -247,24 +254,31 @@ public class SshClientServerTest {
     }
 
     @Test
-    @DisplayName("SSH server with external initializer")
-    void externalServerInitializer() throws Exception {
+    @DisplayName("External service integration")
+    void externalServiceIntegration() throws Exception {
         final var username = getUsernameAndUpdate();
-        when(sshClientConfig.getClientIdentity()).thenReturn(buildClientIdentityWithPassword(username, PASSWORD));
-        // Accept all keys
+        when(sshClientConfig.getClientIdentity()).thenReturn(usernameOnlyIdentity(username));
+        when(sshClientConfig.getServerAuthentication()).thenReturn(null);
+        integrationTest(
+            FACTORY.listenServer(SUBSYSTEM, serverListener, tcpServerConfig, null, serverConfigurator(username)),
+            FACTORY.connectClient(SUBSYSTEM, clientListener, tcpClientConfig, sshClientConfig,
+                clientConfigurator(username)));
+    }
+
+    @Test
+    @DisplayName("Call-home protocol support with services integration")
+    void callHome() throws Exception {
+        final var username = getUsernameAndUpdate();
+        when(sshClientConfig.getClientIdentity()).thenReturn(usernameOnlyIdentity(username));
         when(sshClientConfig.getServerAuthentication()).thenReturn(null);
 
-        final var server = FACTORY.listenServer("subsystem", serverListener, tcpServerConfig, null,
-            factoryManager -> {
-                // authenticate user by credentials and generate host key
-                factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
-                factoryManager.setPasswordAuthenticator(
-                    (usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
-                factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
-            }).get(2, TimeUnit.SECONDS);
+        // start call-home client first, accepting inbound tcp connections
+        final var client = FACTORY.listenClient(SUBSYSTEM, clientListener, tcpServerConfig, sshClientConfig,
+                clientConfigurator(username)).get(2, TimeUnit.SECONDS);
         try {
-            final var client = FACTORY.connectClient("subsystem", clientListener, tcpClientConfig, sshClientConfig)
-                .get(2, TimeUnit.SECONDS);
+            // start a call-home server, init connection
+            final var server = FACTORY.connectServer(SUBSYSTEM, serverListener, tcpClientConfig, null,
+                    serverConfigurator(username)).get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(10_000))
                     .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
@@ -277,13 +291,14 @@ public class SshClientServerTest {
                 assertEquals(serverChannel.remoteAddress(), clientChannel.localAddress());
                 assertEquals(serverChannel.localAddress(), clientChannel.remoteAddress());
                 // validate sessions are authenticated
-                assertSession(ServerSession.class, server.getSessions());
                 assertSession(ClientSession.class, client.getSessions());
+                assertSession(ServerSession.class, server.getSessions());
+
             } finally {
-                client.shutdown().get(2, TimeUnit.SECONDS);
+                server.shutdown().get(2, TimeUnit.SECONDS);
             }
         } finally {
-            server.shutdown().get(2, TimeUnit.SECONDS);
+            client.shutdown().get(2, TimeUnit.SECONDS);
         }
     }
 
@@ -301,5 +316,27 @@ public class SshClientServerTest {
         assertEquals(1, sessions.size());
         final T session = assertInstanceOf(type, sessions.iterator().next());
         assertTrue(session.isAuthenticated());
+    }
+
+    private static ClientIdentity usernameOnlyIdentity(final String username) {
+        return new ClientIdentityBuilder().setUsername(username).build();
+    }
+
+    private static ServerFactoryManagerConfigurator serverConfigurator(final String username) {
+        return factoryManager -> {
+            // authenticate user by credentials and generate host key
+            factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+            factoryManager.setPasswordAuthenticator(
+                (usr, psw, session) -> username.equals(usr) && PASSWORD.equals(psw));
+            factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+        };
+    }
+
+    private static ClientFactoryManagerConfigurator clientConfigurator(final String username) {
+        return factoryManager -> {
+            factoryManager.setPasswordIdentityProvider(PasswordIdentityProvider.wrapPasswords(PASSWORD));
+            factoryManager.setUserAuthFactories(List.of(
+                new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
+        };
     }
 }
