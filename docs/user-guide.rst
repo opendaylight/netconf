@@ -1583,7 +1583,7 @@ Southbound Call-Home API
 
 The Call-Home Server listens for incoming TCP connections and assumes that the other side of
 the connection is a device calling home via a NETCONF connection with SSH for
-management. The server uses port 6666 by default and this can be configured via a
+management. The server uses port 4334 by default and this can be configured via a
 blueprint configuration file.
 
 The device **must** initiate the connection and the server will not try to re-establish the
