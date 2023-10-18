@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "432dbca4f133fe79e3ae92e83d690486dbdb3629",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1efd5d14_708d9476",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-18T07:35:49Z",
+      "side": 1,
+      "message": "I don\u0027t think you can just simply use first POST you find.\n\nfor example in case it have parameter I\u0027m getting this error:\n\nSemantic error at paths./rests/data/network-topology:network-topology/topology\u003dtopology-netconf/node\u003d17830-sim-device/yang-ext:mount.post.parameters.0.name\nPath parameter \"lf1\" must have the corresponding {lf1} segment in the \"/rests/data/network-topology:network-topology/topology\u003dtopology-netconf/node\u003d17830-sim-device/yang-ext:mount\" path\n\neven if not the JSON request doesn\u0027t work\n\n{\n  \"errors\": {\n    \"error\": [\n      {\n        \"error-tag\": \"malformed-message\",\n        \"error-info\": \"Schema node with name darknessFactor was not found under (urn:ietf:params:xml:ns:netconf:base:1.0)data.\",\n        \"error-message\": \"Error parsing input: Schema node with name darknessFactor was not found under (urn:ietf:params:xml:ns:netconf:base:1.0)data.\",\n        \"error-type\": \"protocol\"\n      }\n    ]\n  }\n}",
+      "revId": "432dbca4f133fe79e3ae92e83d690486dbdb3629",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
