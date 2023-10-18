@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -60,6 +59,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     private final @NonNull List<SchemaSourceRegistration<?>> yanglibRegistrations;
     private final @NonNull NetconfClientDispatcher clientDispatcher;
+    private final @NonNull NetconfClientConfiguration clientConfig;
     private final @NonNull NetconfDeviceCommunicator communicator;
     private final @NonNull RemoteDeviceHandler delegate;
     private final @NonNull EventExecutor eventExecutor;
@@ -69,7 +69,6 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final int minSleep;
     private final double sleepFactor;
 
-    private @Nullable NetconfClientConfiguration clientConfig;
     @GuardedBy("this")
     private long attempts;
     @GuardedBy("this")
@@ -77,7 +76,6 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     @GuardedBy("this")
     private Future<?> currentTask;
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     public NetconfNodeHandler(final NetconfClientDispatcher clientDispatcher, final EventExecutor eventExecutor,
             final ScheduledExecutorService keepaliveExecutor, final BaseNetconfSchemas baseSchemas,
             final SchemaResourceManager schemaManager, final Executor processingExecutor,
@@ -142,23 +140,13 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         if (keepAliveFacade != null) {
             keepAliveFacade.setListener(communicator);
         }
-        // FIXME: move this heavy logic out of constructor
-        try {
-            clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
-                .withSessionListener(communicator)
-                .build();
-        } catch (final Exception exception) {
-            LOG.warn("Error initialization configuration for device {}, using null instead.", deviceId, exception);
-            delegate.onDeviceFailed(exception);
-            clientConfig = null;
-        }
+
+        clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
+            .withSessionListener(communicator)
+            .build();
     }
 
     public synchronized void connect() {
-        if (clientConfig == null) {
-            LOG.warn("Connection attempts are skipped for device {} because of missing configuration", deviceId);
-            return;
-        }
         attempts = 1;
         lastSleep = minSleep;
         lockedConnect();
