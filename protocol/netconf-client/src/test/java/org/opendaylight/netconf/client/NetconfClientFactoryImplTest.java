@@ -46,9 +46,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
+import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
+import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
+import org.opendaylight.netconf.transport.ssh.ServerFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.netconf.transport.tls.TLSServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.crypt.hash.rev140806.CryptHash;
@@ -257,5 +262,39 @@ class NetconfClientFactoryImplTest {
         return new ClientAuthenticationBuilder().setUsers(
             new UsersBuilder().setUser(Map.of(user.key(), user)).build()
         ).build();
+    }
+
+    @Test
+    void sshClientWithConfigurator() throws Exception {
+        final ServerFactoryManagerConfigurator serverConfigurator = factoryManager -> {
+            factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+            factoryManager.setPasswordAuthenticator(
+                (usr, psw, session) -> USERNAME.equals(usr) && PASSWORD.equals(psw));
+            factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+        };
+        final ClientFactoryManagerConfigurator clientConfigurator = factoryManager -> {
+            factoryManager.setPasswordIdentityProvider(PasswordIdentityProvider.wrapPasswords(PASSWORD));
+            factoryManager.setUserAuthFactories(List.of(
+                new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
+        };
+
+        final var server = serverTransportFactory.listenServer("netconf", serverTransportListener, tcpServerParams,
+            null, serverConfigurator).get(10, TimeUnit.SECONDS);
+        try {
+            final var clientConfig = NetconfClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
+                .withTcpParameters(tcpClientParams)
+                .withSshParameters(new SshClientParametersBuilder()
+                    .setClientIdentity(new ClientIdentityBuilder().setUsername(USERNAME).build()).build())
+                .withSshConfigurator(clientConfigurator)
+                .withSessionListener(sessionListener)
+                .withConnectionTimeoutMillis(10_000)
+                .build();
+            assertNotNull(factory.createClient(clientConfig));
+            verify(serverTransportListener, timeout(10_000L))
+                .onTransportChannelEstablished(any(TransportChannel.class));
+        } finally {
+            server.shutdown().get(1, TimeUnit.SECONDS);
+        }
     }
 }
