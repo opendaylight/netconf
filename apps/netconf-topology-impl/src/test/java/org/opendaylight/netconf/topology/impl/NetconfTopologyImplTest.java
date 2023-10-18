@@ -113,6 +113,7 @@ class NetconfTopologyImplTest {
         final var node = new NodeBuilder()
             .withKey(key)
             .addAugmentation(new NetconfNodeBuilder()
+                .setLockDatastore(true)
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
