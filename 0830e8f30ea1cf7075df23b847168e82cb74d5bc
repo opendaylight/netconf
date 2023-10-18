@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "12c2b91b_692f1aaa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-18T11:42:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a703991_6d2c1ab8",
+      "revId": "0830e8f30ea1cf7075df23b847168e82cb74d5bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50e95c66_f73ad231",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-10-18T08:07:22Z",
       "side": 1,
       "message": "Why?",
+      "revId": "0830e8f30ea1cf7075df23b847168e82cb74d5bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a9b4a69_45c654fc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-18T11:42:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50e95c66_f73ad231",
       "revId": "0830e8f30ea1cf7075df23b847168e82cb74d5bc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8dcee1bb_477c26f8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-18T11:42:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e9be3da_645baa1d",
+      "revId": "0830e8f30ea1cf7075df23b847168e82cb74d5bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70f2d957_afb9483a",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-10-18T08:07:22Z",
       "side": 1,
       "message": "Not following general code style, final, var, etc.",
+      "revId": "0830e8f30ea1cf7075df23b847168e82cb74d5bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64359744_2e408b52",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-18T11:42:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70f2d957_afb9483a",
       "revId": "0830e8f30ea1cf7075df23b847168e82cb74d5bc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
