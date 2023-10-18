@@ -99,6 +99,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         this.builderFactory = requireNonNull(builderFactory);
     }
 
+    @Deprecated
     @Override
     public Future<NetconfClientSession> createClient(final NetconfClientConfiguration clientConfiguration) {
         return activateChannel(clientConfiguration);
