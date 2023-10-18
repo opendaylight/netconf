@@ -18,6 +18,7 @@ import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
+import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.SshClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
@@ -48,6 +49,7 @@ public class NetconfClientConfigurationBuilder {
     private TlsClientGrouping tlsParameters;
     private org.opendaylight.netconf.transport.tls.SslHandlerFactory transportSslHandlerFactory;
     private SshClientGrouping sshParameters;
+    private ClientFactoryManagerConfigurator sshConfigurator;
 
     protected NetconfClientConfigurationBuilder() {
     }
@@ -258,6 +260,19 @@ public class NetconfClientConfigurationBuilder {
         return this;
     }
 
+    /**
+     * Set SSH Client Factory Manager configurator.
+     *
+     * @param sshConfigurator configurator
+     * @return current builder instance
+     */
+    @SuppressWarnings("checkstyle:hiddenField")
+    public NetconfClientConfigurationBuilder withSshConfigurator(
+            final ClientFactoryManagerConfigurator sshConfigurator) {
+        this.sshConfigurator = sshConfigurator;
+        return this;
+    }
+
     final InetSocketAddress getAddress() {
         return address;
     }
@@ -315,7 +330,7 @@ public class NetconfClientConfigurationBuilder {
                 maximumIncomingChunkSize, name)
             // new configuration
             : new NetconfClientConfiguration(clientProtocol, tcpParameters, tlsParameters, transportSslHandlerFactory,
-                sshParameters, sessionListener, odlHelloCapabilities, connectionTimeoutMillis,
+                sshParameters, sshConfigurator, sessionListener, odlHelloCapabilities, connectionTimeoutMillis,
                 maximumIncomingChunkSize, additionalHeader, name);
     }
 }

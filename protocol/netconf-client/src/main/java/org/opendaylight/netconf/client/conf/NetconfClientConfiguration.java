@@ -21,6 +21,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
+import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.SshClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
@@ -50,6 +51,7 @@ public class NetconfClientConfiguration {
     private final TlsClientGrouping tlsParameters;
     private final org.opendaylight.netconf.transport.tls.SslHandlerFactory transportSslHandlerFactory;
     private final SshClientGrouping sshParameters;
+    private final ClientFactoryManagerConfigurator sshConfigurator;
 
     NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address,
             final Long connectionTimeoutMillis,
@@ -74,6 +76,7 @@ public class NetconfClientConfiguration {
         this.tlsParameters = null;
         this.transportSslHandlerFactory = null;
         this.sshParameters = null;
+        this.sshConfigurator = null;
         validateConfiguration();
     }
 
@@ -82,6 +85,7 @@ public class NetconfClientConfiguration {
             final TlsClientGrouping tlsParameters,
             final org.opendaylight.netconf.transport.tls.SslHandlerFactory transportSslHandlerFactory,
             final SshClientGrouping sshParameters,
+            final ClientFactoryManagerConfigurator sshConfigurator,
             final NetconfClientSessionListener sessionListener,
             final List<Uri> odlHelloCapabilities,
             final Long connectionTimeoutMillis,
@@ -93,6 +97,7 @@ public class NetconfClientConfiguration {
         this.tlsParameters = tlsParameters;
         this.transportSslHandlerFactory = transportSslHandlerFactory;
         this.sshParameters = sshParameters;
+        this.sshConfigurator = sshConfigurator;
         this.sessionListener = requireNonNull(sessionListener);
         this.odlHelloCapabilities = odlHelloCapabilities;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
@@ -170,6 +175,10 @@ public class NetconfClientConfiguration {
 
     public final SshClientGrouping getSshParameters() {
         return sshParameters;
+    }
+
+    public ClientFactoryManagerConfigurator getSshConfigurator() {
+        return sshConfigurator;
     }
 
     private void validateConfiguration() {
