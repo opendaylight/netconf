@@ -12,10 +12,10 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
-import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -103,9 +103,33 @@ public abstract class AbstractNetconfTopology {
             LOG.info("RemoteDevice{{}} was already configured, disconnecting", nodeId);
             prev.close();
         }
+        final var netconfNode = node.augmentation(NetconfNode.class);
+        if (netconfNode == null) {
+            LOG.warn("RemoteDevice{{}} is missing NETCONF node configuration, not starting it", nodeId);
+            return;
+        }
+        final RemoteDeviceId deviceId;
+        try {
+            deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
+        } catch (NoSuchElementException e) {
+            LOG.warn("RemoteDevice{{}} is missing NETCONF has invalid configuration, not starting it", nodeId, e);
+            return;
+        }
 
         LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(node));
-        setupConnection(nodeId, node);
+
+        // Instantiate the handler ...
+        final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
+        final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
+        final var nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor,
+            baseSchemas, schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade,
+            deviceId, nodeId, netconfNode, nodeOptional);
+
+        // ... record it ...
+        activeConnectors.put(nodeId, nodeHandler);
+
+        // ... and start it
+        nodeHandler.connect();
     }
 
     // Non-final for testing
@@ -126,25 +150,6 @@ public abstract class AbstractNetconfTopology {
     protected final synchronized void deleteAllNodes() {
         activeConnectors.values().forEach(NetconfNodeHandler::close);
         activeConnectors.clear();
-    }
-
-    @Holding("this")
-    protected final void setupConnection(final NodeId nodeId, final Node configNode) {
-        final var netconfNode = configNode.augmentation(NetconfNode.class);
-        final var nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
-
-        // Instantiate the handler ...
-        final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
-        final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
-        final var nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor,
-            baseSchemas, schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade,
-            deviceId, nodeId, netconfNode, nodeOptional);
-
-        // ... record it ...
-        activeConnectors.put(nodeId, nodeHandler);
-
-        // ... and start it
-        nodeHandler.connect();
     }
 
     protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final boolean lockDatastore) {
