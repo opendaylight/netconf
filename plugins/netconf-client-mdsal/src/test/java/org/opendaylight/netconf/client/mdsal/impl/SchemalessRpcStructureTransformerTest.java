@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
@@ -20,9 +20,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,8 +33,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
 
 @RunWith(Parameterized.class)
 public class SchemalessRpcStructureTransformerTest {
@@ -72,11 +69,6 @@ public class SchemalessRpcStructureTransformerTest {
             }});
     }
 
-    @BeforeClass
-    public static void suiteSetup() {
-        XMLUnit.setIgnoreWhitespace(true);
-    }
-
     private final Class<? extends Exception> expectedException;
 
     private final String expectedConfig;
@@ -86,13 +78,10 @@ public class SchemalessRpcStructureTransformerTest {
     private final DOMSource source;
 
     private final SchemalessRpcStructureTransformer adapter = new SchemalessRpcStructureTransformer();
-    private final String testDataset;
 
-    public SchemalessRpcStructureTransformerTest(
-            final YangInstanceIdentifier path, final String testDataset,
+    public SchemalessRpcStructureTransformerTest(final YangInstanceIdentifier path, final String testDataset,
             final Class<? extends Exception> expectedException) throws IOException, SAXException, URISyntaxException {
         this.path = path;
-        this.testDataset = testDataset;
         this.expectedException = expectedException;
         source = new DOMSource(XmlUtil.readXmlToDocument(getClass()
                 .getResourceAsStream("/schemaless/data/" + testDataset)).getDocumentElement());
@@ -112,40 +101,46 @@ public class SchemalessRpcStructureTransformerTest {
                 .build();
 
         if (expectedException != null) {
-            assertThrows(expectedException,
-                () -> adapter.createEditConfigStructure(Optional.of(data), path,
+            assertThrows(expectedException, () -> adapter.createEditConfigStructure(Optional.of(data), path,
                     Optional.of(EffectiveOperation.REPLACE)));
             return;
         }
 
-        final DOMSourceAnyxmlNode anyXmlNode =
+        final var anyXmlNode =
                 adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(EffectiveOperation.REPLACE));
-        final String s = XmlUtil.toString((Element) anyXmlNode.body().getNode());
-        Diff diff = new Diff(expectedConfig, s);
-        assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
+        final var diff = DiffBuilder.compare(expectedConfig)
+            .withTest(anyXmlNode.body().getNode())
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test
     public void testToFilterStructure() throws Exception {
-        final DOMSourceAnyxmlNode anyXmlNode = (DOMSourceAnyxmlNode) adapter.toFilterStructure(path);
-        final String s = XmlUtil.toString((Element) anyXmlNode.body().getNode());
-        Diff diff = new Diff(expectedFilter, s);
-        assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
+        final var anyXmlNode = (DOMSourceAnyxmlNode) adapter.toFilterStructure(path);
+        final var diff = DiffBuilder.compare(expectedFilter)
+            .withTest(anyXmlNode.body().getNode())
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test
     public void testSelectFromDataStructure() throws Exception {
-        DOMSourceAnyxmlNode data = Builders.anyXmlBuilder()
+        final var data = Builders.anyXmlBuilder()
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
                 .withValue(new DOMSource(XmlUtil.readXmlToDocument(getConfigData).getDocumentElement()))
                 .build();
-        final DOMSourceAnyxmlNode dataStructure = (DOMSourceAnyxmlNode) adapter.selectFromDataStructure(data, path)
-                .orElseThrow();
+        final var dataStructure = (DOMSourceAnyxmlNode) adapter.selectFromDataStructure(data, path).orElseThrow();
         final XmlElement s = XmlElement.fromDomDocument((Document) dataStructure.body().getNode());
-        final String dataFromReply = XmlUtil.toString(s.getOnlyChildElement().getDomElement());
-        final String expectedData = XmlUtil.toString((Element) source.getNode());
-        Diff diff = new Diff(expectedData, dataFromReply);
-        assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
+        final var diff = DiffBuilder.compare(source.getNode())
+            .withTest(s.getOnlyChildElement().getDomElement())
+            .ignoreWhitespace()
+            .checkForIdentical()
+            .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     private static NodeIdentifier createNodeId(final String name) {
