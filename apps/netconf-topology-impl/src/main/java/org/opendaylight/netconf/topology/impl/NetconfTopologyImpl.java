@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.topology.impl;
 
-import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
@@ -18,7 +17,6 @@ import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -34,17 +32,12 @@ import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFa
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableItem;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -106,7 +99,10 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
 
         LOG.debug("Registering datastore listener");
         dtclReg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(
-            LogicalDatastoreType.CONFIGURATION, createTopologyListPath(topologyId).child(Node.class)), this);
+            LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.builder(NetworkTopology.class)
+                .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+                .child(Node.class)
+                .build()), this);
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, topologyId);
     }
 
@@ -129,47 +125,26 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeModification<Node>> collection) {
-        for (final DataTreeModification<Node> change : collection) {
-            final DataObjectModification<Node> rootNode = change.getRootNode();
-            final NodeId nodeId;
-            switch (rootNode.getModificationType()) {
-                case SUBTREE_MODIFIED -> {
-                    LOG.debug("Config for node {} updated", getNodeId(rootNode.getIdentifier()));
-                    ensureNode(rootNode.getDataAfter());
-                }
-                case WRITE -> {
-                    LOG.debug("Config for node {} created", getNodeId(rootNode.getIdentifier()));
-                    ensureNode(rootNode.getDataAfter());
-                }
+    public void onDataTreeChanged(final Collection<DataTreeModification<Node>> changes) {
+        for (var change : changes) {
+            final var rootNode = change.getRootNode();
+            final var modType = rootNode.getModificationType();
+            switch (modType) {
+                case SUBTREE_MODIFIED -> ensureNode("updated", rootNode.getDataAfter());
+                case WRITE -> ensureNode("created", rootNode.getDataAfter());
                 case DELETE -> {
-                    nodeId = getNodeId(rootNode.getIdentifier());
+                    final var nodeId = InstanceIdentifier.keyOf(change.getRootPath().getRootIdentifier()).getNodeId();
                     LOG.debug("Config for node {} deleted", nodeId);
                     deleteNode(nodeId);
                 }
-                default -> LOG.debug("Unsupported modification type: {}.", rootNode.getModificationType());
+                default -> LOG.debug("Unsupported modification type: {}.", modType);
             }
         }
     }
 
-    /**
-     * Determines the Netconf Node Node ID, given the node's instance
-     * identifier.
-     *
-     * @param pathArgument Node's path argument
-     * @return     NodeId for the node
-     */
-    @VisibleForTesting
-    static NodeId getNodeId(final PathArgument pathArgument) {
-        if (pathArgument instanceof IdentifiableItem<?, ?> ident && ident.getKey() instanceof NodeKey nodeKey) {
-            return nodeKey.getNodeId();
-        }
-        throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);
-    }
-
-    @VisibleForTesting
-    static KeyedInstanceIdentifier<Topology, TopologyKey> createTopologyListPath(final String topologyId) {
-        return InstanceIdentifier.create(NetworkTopology.class)
-            .child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+    private void ensureNode(final String operation, final Node node) {
+        final var nodeId = node.getNodeId();
+        LOG.debug("Config for node {} {}", nodeId, operation);
+        ensureNode(node);
     }
 }
