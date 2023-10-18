@@ -8,15 +8,13 @@
 package org.opendaylight.netconf.topology.impl;
 
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +25,7 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -54,8 +53,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableItem;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.parser.api.YangParserException;
@@ -63,8 +61,9 @@ import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfTopologyImplTest {
-    private static final NodeId NODE_ID = new NodeId("testing-node");
-    private static final String TOPOLOGY_ID = "testing-topology";
+    private static final TopologyKey TOPOLOGY_KEY = new TopologyKey(new TopologyId("testing-topology"));
+    private static final KeyedInstanceIdentifier<Topology, TopologyKey> TOPOLOGY_PATH =
+        InstanceIdentifier.builder(NetworkTopology.class).child(Topology.class, TOPOLOGY_KEY).build();
 
     @Mock
     private NetconfClientDispatcher mockedClientDispatcher;
@@ -88,6 +87,10 @@ public class NetconfTopologyImplTest {
     private NetconfClientConfigurationBuilderFactory builderFactory;
     @Mock
     private WriteTransaction wtx;
+    @Mock
+    private DataObjectModification<Node> objMod;
+    @Mock
+    private DataTreeModification<Node> treeMod;
 
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
@@ -98,62 +101,59 @@ public class NetconfTopologyImplTest {
         doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
 
-        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
-            mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker, mountPointService,
-            encryptionService, builderFactory, rpcProviderService);
+        topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(), mockedClientDispatcher,
+            mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker,
+            mountPointService, encryptionService, builderFactory, rpcProviderService);
         //verify initialization of topology
-        verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.builder(NetworkTopology.class)
-                .child(Topology.class, new TopologyKey(new TopologyId(TOPOLOGY_ID))).build(),
-                new TopologyBuilder().setTopologyId(new TopologyId(TOPOLOGY_ID)).build());
+        verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, TOPOLOGY_PATH,
+            new TopologyBuilder().withKey(TOPOLOGY_KEY).build());
 
         spyTopology = spy(topology);
     }
 
     @Test
     public void testOnDataTreeChange() {
-        final DataObjectModification<Node> newNode = mock(DataObjectModification.class);
-        doReturn(DataObjectModification.ModificationType.WRITE).when(newNode).getModificationType();
+        final var key = new NodeKey(new NodeId("testing-node"));
+        final var node = new NodeBuilder()
+            .withKey(key)
+            .addAugmentation(new NetconfNodeBuilder()
+                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
+                .setReconnectOnChangedSchema(true)
+                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+                .setKeepaliveDelay(Uint32.valueOf(1000))
+                .setTcpOnly(true)
+                .setCredentials(new LoginPasswordBuilder()
+                    .setUsername("testuser")
+                    .setPassword("testpassword")
+                    .build())
+                .build())
+            .build();
 
-        NodeKey key = new NodeKey(NODE_ID);
-        PathArgument pa = IdentifiableItem.of(Node.class, key);
-        doReturn(pa).when(newNode).getIdentifier();
+        doReturn(DataObjectModification.ModificationType.WRITE).when(objMod).getModificationType();
+        doReturn(node).when(objMod).getDataAfter();
 
-        final NodeBuilder nn = new NodeBuilder()
-                .withKey(key)
-                .addAugmentation(new NetconfNodeBuilder()
-                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                    .setPort(new PortNumber(Uint16.valueOf(9999)))
-                    .setReconnectOnChangedSchema(true)
-                    .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                    .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                    .setKeepaliveDelay(Uint32.valueOf(1000))
-                    .setTcpOnly(true)
-                    .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser")
-                        .setPassword("testpassword")
-                        .build())
-                    .build());
-        doReturn(nn.build()).when(newNode).getDataAfter();
+        doReturn(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, TOPOLOGY_PATH.child(Node.class, key)))
+            .when(treeMod).getRootPath();
+        final var changes = List.of(treeMod);
 
-        final Collection<DataTreeModification<Node>> changes = new HashSet<>();
-        final DataTreeModification<Node> ch = mock(DataTreeModification.class);
-        doReturn(newNode).when(ch).getRootNode();
-        changes.add(ch);
+        doReturn(objMod).when(treeMod).getRootNode();
         spyTopology.onDataTreeChanged(changes);
-        verify(spyTopology).ensureNode(nn.build());
+        verify(spyTopology).ensureNode(node);
 
-        doReturn(DataObjectModification.ModificationType.DELETE).when(newNode).getModificationType();
+        doReturn(DataObjectModification.ModificationType.DELETE).when(objMod).getModificationType();
         spyTopology.onDataTreeChanged(changes);
-        verify(spyTopology).deleteNode(NetconfTopologyImpl.getNodeId(pa));
+        verify(spyTopology).deleteNode(key.getNodeId());
 
-        doReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED).when(newNode).getModificationType();
+        doReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED).when(objMod).getModificationType();
         spyTopology.onDataTreeChanged(changes);
 
         // one in previous creating and deleting node and one in updating
-        verify(spyTopology, times(2)).ensureNode(nn.build());
+        verify(spyTopology, times(2)).ensureNode(node);
     }
 
-    public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
+    private static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
         private static final BaseNetconfSchemas BASE_SCHEMAS;
 
         static {
@@ -164,7 +164,7 @@ public class NetconfTopologyImplTest {
             }
         }
 
-        public TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+        TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                 final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                 final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
                 final DataBroker dataBroker, final DOMMountPointService mountPointService,
