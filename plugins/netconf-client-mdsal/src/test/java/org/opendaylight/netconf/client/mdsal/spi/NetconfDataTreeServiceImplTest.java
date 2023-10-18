@@ -63,7 +63,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
         netconService = getNetconService();
         final var model = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class, NetconfState.class);
         netconfMessageTransformer = new NetconfMessageTransformer(MountPointContext.of(model), true,
-                BASE_SCHEMAS.getBaseSchema());
+                BASE_SCHEMAS.baseSchema());
     }
 
     @Test

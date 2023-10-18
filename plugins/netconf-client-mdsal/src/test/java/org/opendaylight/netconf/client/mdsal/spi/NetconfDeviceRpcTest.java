@@ -78,15 +78,15 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setUp() throws Exception {
-        NetconfMessageTransformer transformer = new NetconfMessageTransformer(
-            MountPointContext.of(SCHEMA_CONTEXT), true, BASE_SCHEMAS.getBaseSchema());
-        final NetconfMessage reply = new NetconfMessage(XmlUtil.readXmlToDocument(
+        final var transformer = new NetconfMessageTransformer(
+            MountPointContext.of(SCHEMA_CONTEXT), true, BASE_SCHEMAS.baseSchema());
+        final var reply = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                         + "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"101\">\n"
                         + "<data>\n"
                         + "</data>\n"
                         + "</rpc-reply>"));
-        RpcResult<NetconfMessage> result = RpcResultBuilder.success(reply).build();
+        final var result = RpcResultBuilder.success(reply).build();
         doReturn(Futures.immediateFuture(result))
                 .when(communicator).sendRequest(any(NetconfMessage.class), any(QName.class));
         rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicator, transformer);

@@ -35,7 +35,6 @@ import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_D
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -48,7 +47,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
@@ -189,8 +187,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         XMLUnit.setIgnoreComments(true);
 
         netconfMessageTransformer = getTransformer(SCHEMA);
-        actionNetconfMessageTransformer = new NetconfMessageTransformer(MountPointContext.of(ACTION_SCHEMA),
-            true, BASE_SCHEMAS.getBaseSchema());
+        actionNetconfMessageTransformer = new NetconfMessageTransformer(MountPointContext.of(ACTION_SCHEMA), true,
+            BASE_SCHEMAS.baseSchema());
     }
 
     @Test
@@ -212,7 +210,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
         final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
-            BASE_SCHEMAS.getBaseSchemaWithNotifications());
+            BASE_SCHEMAS.baseSchemaWithNotifications());
         var netconfMessage = transformer.toRpcRequest(CREATE_SUBSCRIPTION_RPC_QNAME, CREATE_SUBSCRIPTION_RPC_CONTENT);
         assertEquals("""
             <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
@@ -223,7 +221,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void tesLockSchemaRequest() throws Exception {
-        final NetconfMessageTransformer transformer = getTransformer(PARTIAL_SCHEMA);
+        final var transformer = getTransformer(PARTIAL_SCHEMA);
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         transformer.toRpcResult(
@@ -420,7 +418,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 .node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME)
                 .nodeWithKey(Schema.QNAME, keys).build();
         final var editConfigStructure =
-                createEditConfigStructure(BASE_SCHEMAS.getBaseSchemaWithNotifications().getEffectiveModelContext(), id,
+                createEditConfigStructure(BASE_SCHEMAS.baseSchemaWithNotifications().getEffectiveModelContext(), id,
                     Optional.empty(), Optional.ofNullable(schemaNode));
 
         final var target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_NODEID);
@@ -527,16 +525,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
-        return new NetconfMessageTransformer(MountPointContext.of(schema), true, BASE_SCHEMAS.getBaseSchema());
+        return new NetconfMessageTransformer(MountPointContext.of(schema), true, BASE_SCHEMAS.baseSchema());
     }
 
     @Test
     public void testCommitResponse() throws Exception {
-        final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
-                "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>"
-        ));
-        final DOMRpcResult compositeNodeRpcResult = netconfMessageTransformer.toRpcResult(
-            RpcResultBuilder.success(response).build(),
+        final var compositeNodeRpcResult = netconfMessageTransformer.toRpcResult(
+            RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(
+                "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>"))).build(),
             NETCONF_COMMIT_QNAME);
         assertTrue(compositeNodeRpcResult.errors().isEmpty());
         assertNull(compositeNodeRpcResult.value());
@@ -544,18 +540,9 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void getActionsTest() {
-        Set<Absolute> schemaPaths = new HashSet<>();
-        schemaPaths.add(RESET_SERVER_PATH);
-        schemaPaths.add(START_DEVICE_PATH);
-        schemaPaths.add(ENABLE_INTERFACE_PATH);
-        schemaPaths.add(OPEN_BOXES_PATH);
-        schemaPaths.add(KILL_SERVER_APP_PATH);
-        schemaPaths.add(XYZZY_FOO_PATH);
-        schemaPaths.add(XYZZY_BAR_PATH);
-        schemaPaths.add(CHOICE_ACTION_PATH);
-        schemaPaths.add(DISABLE_INTERFACE_PATH);
-        schemaPaths.add(CHECK_WITH_OUTPUT_INTERFACE_PATH);
-        schemaPaths.add(CHECK_WITHOUT_OUTPUT_INTERFACE_PATH);
+        final var schemaPaths = Set.of(RESET_SERVER_PATH, START_DEVICE_PATH, ENABLE_INTERFACE_PATH, OPEN_BOXES_PATH,
+            KILL_SERVER_APP_PATH, XYZZY_FOO_PATH, XYZZY_BAR_PATH, CHOICE_ACTION_PATH, DISABLE_INTERFACE_PATH,
+            CHECK_WITH_OUTPUT_INTERFACE_PATH, CHECK_WITHOUT_OUTPUT_INTERFACE_PATH);
 
         var actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
         assertEquals(schemaPaths.size(), actions.size());

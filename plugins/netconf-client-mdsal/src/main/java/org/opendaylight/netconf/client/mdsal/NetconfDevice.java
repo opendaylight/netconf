@@ -301,7 +301,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     private BaseSchema resolveBaseSchema(final boolean notificationSupport) {
-        return notificationSupport ? baseSchemas.getBaseSchemaWithNotifications() : baseSchemas.getBaseSchema();
+        return notificationSupport ? baseSchemas.baseSchemaWithNotifications() : baseSchemas.baseSchema();
     }
 
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,

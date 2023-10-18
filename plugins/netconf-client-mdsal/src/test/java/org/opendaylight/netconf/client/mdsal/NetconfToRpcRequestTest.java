@@ -61,7 +61,7 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
     @Before
     public void before() {
         messageTransformer = new NetconfMessageTransformer(MountPointContext.of(cfgCtx), true,
-            BASE_SCHEMAS.getBaseSchema());
+            BASE_SCHEMAS.baseSchema());
     }
 
     @Test

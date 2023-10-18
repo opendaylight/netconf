@@ -13,10 +13,9 @@ import org.opendaylight.netconf.client.mdsal.impl.BaseSchema;
 
 @Beta
 @NonNullByDefault
-// FIXME: implements Immutable once we do not use Blueprint, or ARIES-2078 is fixed
 public interface BaseNetconfSchemas {
 
-    BaseSchema getBaseSchema();
+    BaseSchema baseSchema();
 
-    BaseSchema getBaseSchemaWithNotifications();
+    BaseSchema baseSchemaWithNotifications();
 }
