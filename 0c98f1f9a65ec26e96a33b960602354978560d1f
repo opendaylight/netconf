@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d80dea94_ab82411f",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeUtilsTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-19T09:26:36Z",
+      "side": 1,
+      "message": "It\u0027s ok",
+      "parentUuid": "a8190c08_9b24e870",
+      "revId": "0c98f1f9a65ec26e96a33b960602354978560d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19c3a180_e9dea2b1",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-10-19T08:13:33Z",
       "side": 1,
       "message": "Something similar here",
+      "revId": "0c98f1f9a65ec26e96a33b960602354978560d1f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a2916d4_359b2dc8",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeUtilsTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-19T09:26:36Z",
+      "side": 1,
+      "message": "It\u0027s ok",
+      "parentUuid": "19c3a180_e9dea2b1",
       "revId": "0c98f1f9a65ec26e96a33b960602354978560d1f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
