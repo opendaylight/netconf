@@ -278,7 +278,7 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
             return rxTransaction.read(LogicalDatastoreType.OPERATIONAL, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES)
                     .get().orElse(null);
         } catch (ExecutionException | InterruptedException e) {
-            LOG.error("Error trying to read the whitelist devices", e);
+            LOG.error("Error trying to read the allowlist devices", e);
             return null;
         }
     }
@@ -300,7 +300,7 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
                 keyString = device.getSshHostKey();
             }
             if (keyString == null) {
-                LOG.info("Whitelist device {} does not have a host key, skipping it", device.getUniqueId());
+                LOG.info("Allowlist device {} does not have a host key, skipping it", device.getUniqueId());
                 continue;
             }
 
@@ -321,7 +321,7 @@ final class CallhomeStatusReporter implements DataTreeChangeListener<Node>, Stat
             }
         }
 
-        LOG.error("No match found for the failed auth device (should have been filtered by whitelist). Key: {}",
+        LOG.error("No match found for the failed auth device (should have been filtered by allowlist). Key: {}",
                 sshKey);
     }
 

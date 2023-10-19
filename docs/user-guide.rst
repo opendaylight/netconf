@@ -1312,9 +1312,9 @@ Configure device to connect over SSH protocol
 Netconf Call Home Server uses device provided SSH server key (host key)
 to identify device. The pairing of name and server key is configured in
 ``/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices``.
-This list is colloquially called a whitelist.
+This list is colloquially called a allowlist.
 
-If the Call-Home Server finds the SSH host key in the whitelist, it continues
+If the Call-Home Server finds the SSH host key in the allowlist, it continues
 to negotiate a NETCONF connection over an SSH session. If the SSH host key is
 not found, the connection between the Call Home server and the device is dropped
 immediately. In either case, the device that connects to the Call home server
@@ -1573,7 +1573,7 @@ available for network management.
 Rogue Devices
 '''''''''''''
 
-Devices which are not on the whitelist might try to connect to the Call-Home Server. In
+Devices which are not on the allowlist might try to connect to the Call-Home Server. In
 these cases, the server will keep a record by instantiating an operational device. There
 will be no corresponding config device for these rogues. They can be identified readily
 because their device id, rather than being user-supplied, will be of the form
