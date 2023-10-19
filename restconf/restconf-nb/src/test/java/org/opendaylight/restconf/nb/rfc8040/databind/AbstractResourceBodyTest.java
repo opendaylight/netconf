@@ -95,7 +95,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
 
     static final void assertRangeViolation(final ThrowingRunnable runnable) {
         final var ex = assertThrows(RestconfDocumentedException.class, runnable);
-        assertEquals(Status.BAD_REQUEST, ex.getResponse().getStatusInfo());
+        assertEquals(Status.BAD_REQUEST, ex.getStatus());
 
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());

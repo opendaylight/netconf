@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -27,18 +26,15 @@ import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
- * Unchecked exception to communicate error information, as defined in the ietf restcong draft, to be sent to the
- * client.
- *
- * <p>
- * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>
+ * Unchecked exception to communicate error information, as defined
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.9">"errors" YANG Data Template</a>.
  *
  * @author Devin Avery
  * @author Thomas Pantelis
  */
-public class RestconfDocumentedException extends WebApplicationException {
+public class RestconfDocumentedException extends RuntimeException {
     @java.io.Serial
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     private final List<RestconfError> errors;
     private final Status status;
@@ -164,25 +160,25 @@ public class RestconfDocumentedException extends WebApplicationException {
     }
 
     public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
-        super(cause, ErrorTags.statusOf(error.getErrorTag()));
+        super(cause);
+        status = ErrorTags.statusOf(error.getErrorTag());
         errors = List.of(error);
-        status = null;
-        modelContext = null;
-    }
-
-    public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
-        super(cause, ErrorTags.statusOf(errors.get(0).getErrorTag()));
-        this.errors = List.copyOf(errors);
-        status = null;
         modelContext = null;
     }
 
     public RestconfDocumentedException(final Throwable cause, final RestconfError error,
             final EffectiveModelContext modelContext) {
-        super(cause, ErrorTags.statusOf(error.getErrorTag()));
+        super(cause);
+        status = ErrorTags.statusOf(error.getErrorTag());
         errors = List.of(error);
-        status = null;
         this.modelContext = requireNonNull(modelContext);
+    }
+
+    public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
+        super(cause);
+        status = ErrorTags.statusOf(errors.get(0).getErrorTag());
+        this.errors = List.copyOf(errors);
+        modelContext = null;
     }
 
     public static RestconfDocumentedException decodeAndThrow(final String message,
@@ -277,6 +273,11 @@ public class RestconfDocumentedException extends WebApplicationException {
         return errorList;
     }
 
+    @Override
+    public String getMessage() {
+        return "errors: " + errors;
+    }
+
     /**
      * Reference to {@link EffectiveModelContext} in which this exception was generated. This method will return
      * {@code null} if this exception was serialized or if the context is not available.
@@ -293,10 +294,5 @@ public class RestconfDocumentedException extends WebApplicationException {
 
     public Status getStatus() {
         return status;
-    }
-
-    @Override
-    public String getMessage() {
-        return "errors: " + errors + (status != null ? ", status: " + status : "");
     }
 }
