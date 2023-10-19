@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.Iterators;
@@ -43,14 +44,11 @@ public class RestconfValidationTest {
     }
 
     /**
-     * Negative test of module revision validation when there is no revision. Test fails catching
-     * <code>RestconfDocumentedException</code> and checking for correct error type, error tag and error status code.
+     * Test of module revision validation when there is no revision. Test checks if the returned value is null.
      */
     @Test
     public void validateAndGetRevisionNotSuppliedTest() {
-        final var error = assertInvalidValue(
-            () -> ParserIdentifier.validateAndGetRevision(Collections.emptyIterator()));
-        assertEquals("Revision date must be supplied.", error.getErrorMessage());
+        assertNull(ParserIdentifier.validateAndGetRevision(Collections.emptyIterator()));
     }
 
     /**
