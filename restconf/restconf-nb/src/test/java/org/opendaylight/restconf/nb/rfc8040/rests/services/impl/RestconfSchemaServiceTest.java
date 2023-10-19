@@ -46,7 +46,9 @@ public class RestconfSchemaServiceTest {
     private static final String NOT_EXISTING_MOUNT_POINT = "mount-point-3:cont/yang-ext:mount/";
 
     private static final String TEST_MODULE = "module1/2014-01-01";
+    private static final String TEST_MODULE3 = "module3";
     private static final String TEST_MODULE_BEHIND_MOUNT_POINT = "module1-behind-mount-point/2014-02-03";
+    private static final String TEST_MODULE2_BEHIND_MOUNT_POINT = "module2-behind-mount-point";
     private static final String NOT_EXISTING_MODULE = "not-existing/2016-01-01";
 
     // schema context with modules
@@ -334,37 +336,50 @@ public class RestconfSchemaServiceTest {
     }
 
     /**
-     * Try to get schema with identifier which does not contain revision catching
-     * <code>RestconfDocumentedException</code>. Error type, error tag and error status code are compared to expected
-     * values.
+     * Try to get schema with identifier which does not contain revision catching and check
+     * if the correct module was found.
      */
     @Test
     public void getSchemaWithoutRevisionTest() {
-        // prepare conditions - return correct schema context without mount points
+        // prepare conditions - return not-mount point schema context
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
 
-        // make test and verify
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> schemaService.getSchema("module"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        // make test
+        final SchemaExportContext exportContext = schemaService.getSchema(TEST_MODULE3);
+
+        // verify
+        assertNotNull("Export context should not be null", exportContext);
+
+        final Module module = exportContext.module();
+        assertNotNull("Existing module should be found", module);
+
+        assertEquals("Not expected module name", "module3", module.getName());
+        assertEquals("Not expected module revision", Revision.ofNullable(null), module.getRevision());
+        assertEquals("Not expected module namespace", "module:3", module.getNamespace().toString());
     }
 
     /**
-     * Try to get schema behind mount point with identifier when does not contain revision catching
-     * <code>RestconfDocumentedException</code>. Error type, error tag and error status code are compared to expected
-     * values.
+     * Try to get schema behind mount point with identifier when does not contain revision catching and check
+     * if the correct module was found.
      */
     @Test
     public void getSchemaWithoutRevisionMountPointTest() {
-        // prepare conditions - return correct schema context with mount points
+        // prepare conditions - return schema context with mount points
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
-        // make test and verify
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> schemaService.getSchema(MOUNT_POINT + "module"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        // make test
+        final SchemaExportContext exportContext =
+            schemaService.getSchema(MOUNT_POINT + TEST_MODULE2_BEHIND_MOUNT_POINT);
+
+        // verify
+        assertNotNull("Export context should not be null", exportContext);
+
+        final Module module = exportContext.module();
+        assertNotNull("Existing module should be found", module);
+
+        assertEquals("Not expected module name", "module2-behind-mount-point", module.getName());
+        assertEquals("Not expected module revision", Revision.ofNullable(null), module.getRevision());
+        assertEquals("Not expected module namespace", "module:2:behind:mount:point", module.getNamespace().toString());
     }
 
     /**
