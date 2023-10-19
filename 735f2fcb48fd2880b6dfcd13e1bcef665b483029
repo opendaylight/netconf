@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33c90b91_c8ea7f15",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-19T12:58:46Z",
+      "side": 1,
+      "message": "why do we need AtomicInteger here??",
+      "revId": "735f2fcb48fd2880b6dfcd13e1bcef665b483029",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88e7bf5b_28f529e8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-19T12:58:46Z",
+      "side": 1,
+      "message": "move this inside the if",
+      "revId": "735f2fcb48fd2880b6dfcd13e1bcef665b483029",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e835adf_cabaf3ad",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-19T12:58:46Z",
+      "side": 1,
+      "message": "doesn\u0027t seem correct",
+      "revId": "735f2fcb48fd2880b6dfcd13e1bcef665b483029",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76cc2599_36d2e354",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-19T12:58:46Z",
+      "side": 1,
+      "message": "i think minItems.intValue() is better",
+      "revId": "735f2fcb48fd2880b6dfcd13e1bcef665b483029",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6b021a4_b55b596d",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-19T12:58:46Z",
+      "side": 1,
+      "message": "doesn\u0027t seem correct",
+      "revId": "735f2fcb48fd2880b6dfcd13e1bcef665b483029",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "444241ac_a38c115a",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-19T12:58:46Z",
+      "side": 1,
+      "message": "i think minItems.intValue() is better",
+      "revId": "735f2fcb48fd2880b6dfcd13e1bcef665b483029",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
