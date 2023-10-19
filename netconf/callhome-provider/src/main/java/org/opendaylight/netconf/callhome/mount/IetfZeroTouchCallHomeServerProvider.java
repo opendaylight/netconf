@@ -177,7 +177,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
                 readAndUpdateStatus(confDevice);
             }
         } catch (ExecutionException | InterruptedException e) {
-            LOG.error("Error trying to read the whitelist devices", e);
+            LOG.error("Error trying to read the allowlist devices", e);
         }
     }
 
