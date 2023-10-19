@@ -227,8 +227,10 @@ public final class ParserIdentifier {
      */
     @VisibleForTesting
     static Revision validateAndGetRevision(final Iterator<String> revisionDate) {
-        RestconfDocumentedException.throwIf(!revisionDate.hasNext(), "Revision date must be supplied.",
-            ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        if (!revisionDate.hasNext()) {
+            LOG.warn("Revision date is not provided");
+            return null;
+        }
         try {
             return Revision.of(revisionDate.next());
         } catch (final DateTimeParseException e) {
