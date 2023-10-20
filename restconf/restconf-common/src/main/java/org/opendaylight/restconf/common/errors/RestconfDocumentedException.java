@@ -12,14 +12,11 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
-import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -142,6 +139,18 @@ public class RestconfDocumentedException extends RuntimeException {
         this(message, cause, convertToRestconfErrors(rpcErrors));
     }
 
+    private static List<RestconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
+        if (rpcErrors == null || rpcErrors.isEmpty()) {
+            return List.of();
+        }
+
+        final var errorList = new ArrayList<RestconfError>();
+        for (var rpcError : rpcErrors) {
+            errorList.add(new RestconfError(rpcError));
+        }
+        return errorList;
+    }
+
     public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
         super(cause);
         errors = List.of(error);
@@ -162,87 +171,6 @@ public class RestconfDocumentedException extends RuntimeException {
         }
         this.errors = List.copyOf(errors);
         modelContext = null;
-    }
-
-    /**
-     * Throw an instance of this exception if an expression evaluates to true. If the expression evaluates to false,
-     * this method does nothing.
-     *
-     * @param expression Expression to be evaluated
-     * @param errorType The enumerated type indicating the layer where the error occurred.
-     * @param errorTag The enumerated tag representing a more specific error cause.
-     * @param format Format string, according to {@link String#format(String, Object...)}.
-     * @param args Format string arguments, according to {@link String#format(String, Object...)}
-     * @throws RestconfDocumentedException if the expression evaluates to true.
-     */
-    public static void throwIf(final boolean expression, final ErrorType errorType, final ErrorTag errorTag,
-            final @NonNull String format, final Object... args) {
-        if (expression) {
-            throw new RestconfDocumentedException(String.format(format, args), errorType, errorTag);
-        }
-    }
-
-    /**
-     * Throw an instance of this exception if an expression evaluates to true. If the expression evaluates to false,
-     * this method does nothing.
-     *
-     * @param expression Expression to be evaluated
-     * @param message error message
-     * @param errorType The enumerated type indicating the layer where the error occurred.
-     * @param errorTag The enumerated tag representing a more specific error cause.
-     * @throws RestconfDocumentedException if the expression evaluates to true.
-     */
-    public static void throwIf(final boolean expression, final @NonNull String message,
-            final ErrorType errorType, final ErrorTag errorTag) {
-        if (expression) {
-            throw new RestconfDocumentedException(message, errorType, errorTag);
-        }
-    }
-
-    /**
-     * Throw an instance of this exception if an object is null. If the object is non-null, it will
-     * be returned as the result of this method.
-     *
-     * @param obj Object reference to be checked
-     * @param errorType The enumerated type indicating the layer where the error occurred.
-     * @param errorTag The enumerated tag representing a more specific error cause.
-     * @param format Format string, according to {@link String#format(String, Object...)}.
-     * @param args Format string arguments, according to {@link String#format(String, Object...)}
-     * @throws RestconfDocumentedException if the expression evaluates to true.
-     */
-    public static <T> @NonNull T throwIfNull(final @Nullable T obj, final ErrorType errorType, final ErrorTag errorTag,
-            final @NonNull String format, final Object... args) {
-        if (obj == null) {
-            throw new RestconfDocumentedException(String.format(format, args), errorType, errorTag);
-        }
-        return obj;
-    }
-
-    /**
-     * Throw an instance of this exception if the specified exception has a {@link YangNetconfError} attachment.
-     *
-     * @param cause Proposed cause of a RestconfDocumented exception
-     */
-    public static void throwIfYangError(final Throwable cause) {
-        if (cause instanceof YangNetconfErrorAware infoAware) {
-            throw new RestconfDocumentedException(cause, infoAware.getNetconfErrors().stream()
-                .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),
-                    // FIXME: pass down error info
-                    null, error.path()))
-                .toList());
-        }
-    }
-
-    private static List<RestconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
-        if (rpcErrors == null || rpcErrors.isEmpty()) {
-            return List.of();
-        }
-
-        final var errorList = new ArrayList<RestconfError>();
-        for (var rpcError : rpcErrors) {
-            errorList.add(new RestconfError(rpcError));
-        }
-        return errorList;
     }
 
     @Override
