@@ -14,10 +14,8 @@ import java.util.Collection;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
@@ -164,17 +162,6 @@ public class RestconfDocumentedException extends RuntimeException {
         }
         this.errors = List.copyOf(errors);
         modelContext = null;
-    }
-
-    public static RestconfDocumentedException decodeAndThrow(final String message,
-            final OperationFailedException cause) {
-        for (final RpcError error : cause.getErrorList()) {
-            if (error.getErrorType() == ErrorType.TRANSPORT && error.getTag().equals(ErrorTag.RESOURCE_DENIED)) {
-                throw new RestconfDocumentedException(error.getMessage(), ErrorType.TRANSPORT,
-                    ErrorTags.RESOURCE_DENIED_TRANSPORT, cause);
-            }
-        }
-        throw new RestconfDocumentedException(message, cause, cause.getErrorList());
     }
 
     /**
