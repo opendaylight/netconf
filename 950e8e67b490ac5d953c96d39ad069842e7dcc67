@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31e60afc_839872e6",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/InfoStream.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-20T18:28:51Z",
+      "side": 1,
+      "message": "right, but can you also override read(byte[], int, int), please?\n\nthis works, but one character at a time, so it may be skewing testing results quite a lot",
+      "range": {
+        "startLine": 32,
+        "startChar": 15,
+        "endLine": 32,
+        "endChar": 19
+      },
+      "revId": "950e8e67b490ac5d953c96d39ad069842e7dcc67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37977cb7_463189a1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PathEntity.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-20T18:28:51Z",
+      "side": 1,
+      "message": "what are these for? are they to be passed to the constructor or will this class become non-final and these will be overridden?",
+      "range": {
+        "startLine": 55,
+        "startChar": 21,
+        "endLine": 55,
+        "endChar": 24
+      },
+      "revId": "950e8e67b490ac5d953c96d39ad069842e7dcc67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
