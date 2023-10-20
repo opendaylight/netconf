@@ -25,13 +25,6 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.MountPointInstance;
  * <a href="https://helloreverb.com/developers/swagger"
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
- *
- * <p>
- * NOTE: These API's need to be synchronized due to bug 1198. Thread access to
- * the SchemaContext is not synchronized properly and thus you can end up with
- * missing definitions without this synchronization. There are likely otherways
- * to work around this limitation, but given that this API is a dev only tool
- * and not dependent UI, this was the fastest work around.
  */
 public class ApiDocServiceImpl implements ApiDocService {
 
@@ -55,7 +48,7 @@ public class ApiDocServiceImpl implements ApiDocService {
     }
 
     @Override
-    public synchronized Response getAllModulesDoc(final UriInfo uriInfo) {
+    public Response getAllModulesDoc(final UriInfo uriInfo) {
         return Response.ok(allModulesDocGenerator.getAllModulesDoc(uriInfo, identifyOpenApiVersion(uriInfo))).build();
     }
 
@@ -63,7 +56,7 @@ public class ApiDocServiceImpl implements ApiDocService {
      * Generates Swagger compliant document listing APIs for module.
      */
     @Override
-    public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
+    public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
         return Response.ok(
             apiDocGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, identifyOpenApiVersion(uriInfo)))
             .build();
@@ -73,12 +66,12 @@ public class ApiDocServiceImpl implements ApiDocService {
      * Redirects to embedded swagger ui.
      */
     @Override
-    public synchronized Response getApiExplorer(final UriInfo uriInfo) {
+    public Response getApiExplorer(final UriInfo uriInfo) {
         return Response.seeOther(uriInfo.getBaseUriBuilder().path("../explorer/index.html").build()).build();
     }
 
     @Override
-    public synchronized Response getListOfMounts(final UriInfo uriInfo) {
+    public Response getListOfMounts(final UriInfo uriInfo) {
         final List<MountPointInstance> entity = mountPointSwaggerRFC8040
                 .getInstanceIdentifiers().entrySet().stream()
                 .map(MountPointInstance::new).collect(Collectors.toList());
@@ -86,7 +79,7 @@ public class ApiDocServiceImpl implements ApiDocService {
     }
 
     @Override
-    public synchronized Response getMountDocByModule(final String instanceNum, final String module,
+    public Response getMountDocByModule(final String instanceNum, final String module,
                                                      final String revision, final UriInfo uriInfo) {
         final OAversion oaversion = identifyOpenApiVersion(uriInfo);
         final CommonApiObject api = mountPointSwaggerRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum),
@@ -95,7 +88,7 @@ public class ApiDocServiceImpl implements ApiDocService {
     }
 
     @Override
-    public synchronized Response getMountDoc(final String instanceNum, final UriInfo uriInfo) {
+    public Response getMountDoc(final String instanceNum, final UriInfo uriInfo) {
         final CommonApiObject api;
         final OAversion oaversion = identifyOpenApiVersion(uriInfo);
         final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
