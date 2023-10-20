@@ -15,6 +15,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
+import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +64,22 @@ public abstract sealed class AbstractBody implements AutoCloseable
             throw new IllegalStateException("Input stream has already been consumed");
         }
         return is;
+    }
+
+
+    /**
+     * Throw a {@link RestconfDocumentedException} if the specified exception has a {@link YangNetconfError} attachment.
+     *
+     * @param cause Proposed cause of a RestconfDocumentedException
+     */
+    static void throwIfYangError(final Exception cause) {
+        if (cause instanceof YangNetconfErrorAware infoAware) {
+            throw new RestconfDocumentedException(cause, infoAware.getNetconfErrors().stream()
+                .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),
+                    // FIXME: pass down error info
+                    null, error.path()))
+                .toList());
+        }
     }
 
     private @Nullable InputStream getStream() {

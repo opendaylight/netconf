@@ -52,7 +52,7 @@ public final class XmlResourceBody extends ResourceBody {
             xmlParser.traverse(new DOMSource(docRoot));
         } catch (SAXException | XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
-            RestconfDocumentedException.throwIfYangError(e);
+            throwIfYangError(e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, e);
         }
