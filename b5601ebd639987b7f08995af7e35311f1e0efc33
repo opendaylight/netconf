@@ -33,6 +33,24 @@
       "message": "what about doing something like this here:\n\n        final var firstNode \u003d getListOrContainer(module.getChildNodes());\n        if (firstNode !\u003d null)\n\nso we don\u0027t look for the node 2 times",
       "revId": "b5601ebd639987b7f08995af7e35311f1e0efc33",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb0beb18_54b4d2aa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-20T18:34:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b69eed0_967cc6b1",
+      "revId": "b5601ebd639987b7f08995af7e35311f1e0efc33",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
