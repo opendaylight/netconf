@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d55341b4_24dbd907",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-20T14:40:38Z",
+      "side": 1,
+      "message": "you can do something like this instead of the if:\n\n    case \"uint64\", \"uint32\", \"uint16\", \"uint8\", \"int64\", \"int32\", \"int16\", \"int8\" -\u003e \"integer\";",
+      "revId": "eecd6dae7422cad32659a0ce1ee71a593bdcc6d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ebac2d1_e438cbff",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-20T14:40:38Z",
+      "side": 1,
+      "message": "i think you wanted to use return switch here",
+      "revId": "eecd6dae7422cad32659a0ce1ee71a593bdcc6d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
