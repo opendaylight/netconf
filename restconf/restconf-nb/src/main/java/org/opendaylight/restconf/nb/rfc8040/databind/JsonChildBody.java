@@ -56,7 +56,7 @@ public final class JsonChildBody extends ChildBody {
                         + "Are you creating multiple resources/subresources in POST request?", e);
             }
 
-            RestconfDocumentedException.throwIfYangError(e);
+            throwIfYangError(e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                 ErrorTag.MALFORMED_MESSAGE, e);
         }

@@ -38,7 +38,7 @@ public final class XmlOperationInputBody extends OperationInputBody {
             XmlParserStream.create(writer, stack.toInference()).parse(UntrustedXML.createXMLStreamReader(inputStream));
         } catch (XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
-            RestconfDocumentedException.throwIfYangError(e);
+            throwIfYangError(e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, e);
         }
