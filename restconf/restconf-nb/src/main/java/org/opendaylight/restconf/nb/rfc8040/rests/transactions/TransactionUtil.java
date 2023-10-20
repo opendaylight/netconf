@@ -14,6 +14,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.restconf.common.errors.ErrorPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -65,11 +66,11 @@ final class TransactionUtil {
                     if (errorTag.equals(ErrorTag.DATA_EXISTS)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
                         return new RestconfDocumentedException(ex, new RestconfError(ErrorType.PROTOCOL,
-                            ErrorTag.DATA_EXISTS, "Data already exists", path), context);
+                            ErrorTag.DATA_EXISTS, "Data already exists", new ErrorPath(context, path)), context);
                     } else if (errorTag.equals(ErrorTag.DATA_MISSING)) {
                         LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
                         return new RestconfDocumentedException(ex, new RestconfError(ErrorType.PROTOCOL,
-                            ErrorTag.DATA_MISSING, "Data does not exist", path), context);
+                            ErrorTag.DATA_MISSING, "Data does not exist", new ErrorPath(context, path)), context);
                     }
                 } else if (error instanceof NetconfDocumentedException netconfError) {
                     return new RestconfDocumentedException(netconfError.getMessage(), netconfError.getErrorType(),

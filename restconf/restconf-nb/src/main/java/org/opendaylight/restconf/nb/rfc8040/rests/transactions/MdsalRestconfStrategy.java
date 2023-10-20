@@ -23,6 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.restconf.common.errors.ErrorPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -60,7 +61,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             public void onSuccess(final Boolean result) {
                 if (!result) {
                     cancelTx(new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL,
-                        ErrorTag.DATA_MISSING, path));
+                        ErrorTag.DATA_MISSING, new ErrorPath(modelContext(), path)));
                     return;
                 }
 

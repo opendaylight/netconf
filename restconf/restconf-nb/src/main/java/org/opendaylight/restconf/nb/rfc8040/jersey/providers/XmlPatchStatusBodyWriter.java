@@ -106,8 +106,8 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             final var errorPath = restconfError.getErrorPath();
             if (errorPath != null) {
                 writer.writeStartElement("error-path");
-                XmlCodecFactory.create(modelContext).instanceIdentifierCodec()
-                    .writeValue(writer, errorPath);
+                XmlCodecFactory.create(errorPath.context()).instanceIdentifierCodec()
+                    .writeValue(writer, errorPath.path());
                 writer.writeEndElement();
             }
 

@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.opendaylight.restconf.common.errors.ErrorPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
@@ -38,6 +39,7 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -46,14 +48,15 @@ public class RestconfDocumentedExceptionMapperTest {
     private static final QNameModule MONITORING_MODULE_INFO = QNameModule.create(
         XMLNamespace.of("instance:identifier:patch:module"), Revision.of("2015-11-21"));
 
-    private static RestconfDocumentedExceptionMapper exceptionMapper;
+    private static EffectiveModelContext SCHEMA;
+    private static RestconfDocumentedExceptionMapper MAPPER;
 
     @BeforeClass
     public static void setupExceptionMapper() {
-        final var schemaContext = YangParserTestUtils.parseYangResources(
+        SCHEMA = YangParserTestUtils.parseYangResources(
                 RestconfDocumentedExceptionMapperTest.class, "/restconf/impl/ietf-restconf@2017-01-26.yang",
                 "/instanceidentifier/yang/instance-identifier-patch-module.yang");
-        exceptionMapper = new RestconfDocumentedExceptionMapper(() -> DatabindContext.ofModel(schemaContext));
+        MAPPER = new RestconfDocumentedExceptionMapper(() -> DatabindContext.ofModel(SCHEMA));
     }
 
     /**
@@ -71,13 +74,13 @@ public class RestconfDocumentedExceptionMapperTest {
                 new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                     "message 2", "app tag #2", "my info"),
                 new RestconfError(ErrorType.RPC, ErrorTag.DATA_MISSING,
-                    "message 3", " app tag #3", "my error info", YangInstanceIdentifier.builder()
+                    "message 3", " app tag #3", "my error info", new ErrorPath(SCHEMA, YangInstanceIdentifier.builder()
                     .node(QName.create(MONITORING_MODULE_INFO, "patch-cont"))
                     .node(QName.create(MONITORING_MODULE_INFO, "my-list1"))
                     .nodeWithKey(QName.create(MONITORING_MODULE_INFO, "my-list1"),
                         QName.create(MONITORING_MODULE_INFO, "name"), "sample")
                     .node(QName.create(MONITORING_MODULE_INFO, "my-leaf12"))
-                    .build())));
+                    .build()))));
 
         return Arrays.asList(new Object[][] {
             {
@@ -210,8 +213,8 @@ public class RestconfDocumentedExceptionMapperTest {
 
     @Test
     public void testMappingOfExceptionToResponse() throws JSONException {
-        exceptionMapper.setHttpHeaders(httpHeaders);
-        final Response response = exceptionMapper.toResponse(thrownException);
+        MAPPER.setHttpHeaders(httpHeaders);
+        final Response response = MAPPER.toResponse(thrownException);
         compareResponseWithExpectation(expectedResponse, response);
     }
 
@@ -219,8 +222,8 @@ public class RestconfDocumentedExceptionMapperTest {
     public void testFormatingJson() throws JSONException {
         assumeTrue(expectedResponse.getMediaType().equals(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE));
 
-        exceptionMapper.setHttpHeaders(httpHeaders);
-        final Response response = exceptionMapper.toResponse(thrownException);
+        MAPPER.setHttpHeaders(httpHeaders);
+        final Response response = MAPPER.toResponse(thrownException);
         assertEquals(expectedResponse.getEntity().toString(), response.getEntity().toString());
     }
 

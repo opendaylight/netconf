@@ -80,8 +80,8 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             final var errorPath = restconfError.getErrorPath();
             if (errorPath != null) {
                 jsonWriter.name("error-path");
-                JSONCodecFactorySupplier.RFC7951.getShared(context).instanceIdentifierCodec()
-                    .writeValue(jsonWriter, errorPath);
+                JSONCodecFactorySupplier.RFC7951.getShared(errorPath.context()).instanceIdentifierCodec()
+                    .writeValue(jsonWriter, errorPath.path());
             }
             final var errorMessage = restconfError.getErrorMessage();
             if (errorMessage != null) {

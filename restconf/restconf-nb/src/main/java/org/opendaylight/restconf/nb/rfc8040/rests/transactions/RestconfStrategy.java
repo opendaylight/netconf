@@ -34,6 +34,7 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.common.errors.ErrorPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
@@ -588,12 +589,12 @@ public abstract class RestconfStrategy {
      * @param path         Path to be checked
      * @throws RestconfDocumentedException if data already exists.
      */
-    static void checkItemDoesNotExists(final ListenableFuture<Boolean> existsFuture,
+    final void checkItemDoesNotExists(final ListenableFuture<Boolean> existsFuture,
             final YangInstanceIdentifier path) {
         if (TransactionUtil.syncAccess(existsFuture, path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
             throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
-                path);
+                new ErrorPath(modelContext(), path));
         }
     }
 

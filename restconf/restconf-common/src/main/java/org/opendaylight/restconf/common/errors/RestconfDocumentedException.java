@@ -16,7 +16,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -76,10 +75,10 @@ public class RestconfDocumentedException extends RuntimeException {
      * @param message A string which provides a plain text string describing the error.
      * @param errorType The enumerated type indicating the layer where the error occurred.
      * @param errorTag The enumerated tag representing a more specific error cause.
-     * @param errorPath The instance identifier representing error path
+     * @param errorPath The error path
      */
     public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
-                                       final YangInstanceIdentifier errorPath) {
+                                       final ErrorPath errorPath) {
         this(new RestconfError(errorType, errorTag, message, errorPath));
     }
 

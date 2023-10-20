@@ -14,7 +14,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
  * Encapsulates a single {@code error} within the
@@ -33,7 +32,7 @@ public class RestconfError implements Serializable {
     private final String errorInfo;
     private final String errorAppTag;
     private final String errorMessage;
-    private final YangInstanceIdentifier errorPath;
+    private final ErrorPath errorPath;
 
     /**
      * Constructs a RestconfError.
@@ -66,10 +65,10 @@ public class RestconfError implements Serializable {
      * @param errorType The enumerated type indicating the layer where the error occurred.
      * @param errorTag The enumerated tag representing a more specific error cause.
      * @param errorMessage A string which provides a plain text string describing the error.
-     * @param errorPath An instance identifier which contains error path
+     * @param errorPath An ErrorPath
      */
     public RestconfError(final ErrorType errorType, final ErrorTag errorTag, final String errorMessage,
-            final YangInstanceIdentifier errorPath) {
+            final ErrorPath errorPath) {
         this(errorType, errorTag, errorMessage, null, null, errorPath);
     }
 
@@ -97,10 +96,10 @@ public class RestconfError implements Serializable {
      * @param errorAppTag A string which represents an application-specific error tag that further specifies the error
      *                    cause.
      * @param errorInfo A string, <b>formatted as XML</b>, which contains additional error information.
-     * @param errorPath An instance identifier which contains error path
+     * @param errorPath An ErrorPath
      */
     public RestconfError(final ErrorType errorType, final ErrorTag errorTag, final String errorMessage,
-            final String errorAppTag, final String errorInfo, final YangInstanceIdentifier errorPath) {
+            final String errorAppTag, final String errorInfo, final ErrorPath errorPath) {
         this.errorType = requireNonNull(errorType, "Error type is required for RestConfError");
         this.errorTag = requireNonNull(errorTag, "Error tag is required for RestConfError");
         this.errorMessage = errorMessage;
@@ -160,7 +159,7 @@ public class RestconfError implements Serializable {
         return errorMessage;
     }
 
-    public YangInstanceIdentifier getErrorPath() {
+    public ErrorPath getErrorPath() {
         return errorPath;
     }
 
