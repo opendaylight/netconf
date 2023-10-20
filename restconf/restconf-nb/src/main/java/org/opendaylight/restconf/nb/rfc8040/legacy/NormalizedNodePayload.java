@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.legacy;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.RestconfResponse;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -18,7 +19,8 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
  * messy details needed to deal with the payload.
  */
 @NonNullByDefault
-public record NormalizedNodePayload(Inference inference, NormalizedNode data, QueryParameters writerParameters) {
+public record NormalizedNodePayload(Inference inference, NormalizedNode data, QueryParameters writerParameters)
+        implements RestconfResponse.Body {
     public NormalizedNodePayload {
         requireNonNull(inference);
         requireNonNull(data);
