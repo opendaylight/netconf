@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.api.RestconfResponse;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -26,7 +27,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * @author Devin Avery
  * @author Thomas Pantelis
  */
-public class RestconfDocumentedException extends RuntimeException {
+public final class RestconfDocumentedException extends RuntimeException implements RestconfResponse.Body {
     @java.io.Serial
     private static final long serialVersionUID = 3L;
 
