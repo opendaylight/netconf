@@ -16,6 +16,24 @@
       "message": "We have broken RPC create-device:\nWe got:\n```\n        at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:234) ~[?:?]\n        at org.ops4j.pax.web.service.jetty.internal.PrioritizedHandlerCollection.handle(PrioritizedHandlerCollection.java:96) ~[?:?]\n        ... 17 more\nCaused by: org.opendaylight.yangtools.yang.data.api.codec.YangInvalidValueException: Value \u0027adminadmin\u0027 does not match regular expression \u0027(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{4}|[A-Za-z0-9+\\/]{3}\u003d|[A-Za-z0-9+\\/]{2}\u003d{2})\u0027\n        at org.opendaylight.yangtools.yang.data.impl.codec.CompiledPatternContext.validate(CompiledPatternContext.java:42) ~[?:?]\n        at org.opendaylight.yangtools.yang.data.impl.codec.StringPatternCheckingCodec.validate(StringPatternCheckingCodec.java:43) ~[?:?]\n```\n\nAfter invoking `/rests/operations/netconf-node-topology:create-device` with payload:\n```\ncurl -X \u0027POST\u0027 \\\n  \u0027http://192.168.56.25:8181/rests/operations/netconf-node-topology:create-device\u0027 \\\n  -H \u0027accept: */*\u0027 \\\n  -H \u0027Content-Type: application/json\u0027 \\\n  -d \u0027{\n  \"input\": {\n    \"node-id\": \"netconf-mdsal\",\n    \"netconf-node-topology:concurrent-rpc-limit\": 0,\n    \"netconf-node-topology:schema-cache-directory\": \"netconf-mdsal\",\n    \"netconf-node-topology:login-password\": {\n        \"username\": \"admin\",\n        \"password\": \"adminadmin\"\n    },\n    \"netconf-node-topology:default-request-timeout-millis\": 1800000,\n    \"netconf-node-topology:port\": 2830,\n    \"netconf-node-topology:tcp-only\": false,\n    \"netconf-node-topology:host\": \"127.0.0.1\",\n    \"netconf-node-topology:actor-response-wait-time\": 600,\n    \"netconf-node-topology:keepalive-delay\": 600\n  }\n}\n```",
       "revId": "8828d4667400f45db0651691ad41c9222fbeb7d1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9a81953_fe3f9d20",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-20T18:25:52Z",
+      "side": 1,
+      "message": "Of course it fails. You are sending this request using encrypted case - hence it fails because password not base64 string. It would\u0027ve been SUCCESSFUL if you used:\n\n \"netconf-node-topology:login-password-unencrypted\": {\n   \"username\": \"admin\",\n   \"password\": \"adminadmin\"\n }",
+      "parentUuid": "e1001255_52200c8b",
+      "revId": "8828d4667400f45db0651691ad41c9222fbeb7d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
