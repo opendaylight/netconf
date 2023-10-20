@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.api.RestconfResponse;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -24,7 +25,7 @@ public record PatchStatusContext(
     @NonNull String patchId,
     @NonNull List<PatchStatusEntity> editCollection,
     boolean ok,
-    @Nullable List<RestconfError> globalErrors) {
+    @Nullable List<RestconfError> globalErrors) implements RestconfResponse.Body {
 
     public PatchStatusContext {
         requireNonNull(patchId);
