@@ -169,24 +169,6 @@ public class RestconfDocumentedException extends RuntimeException {
      * this method does nothing.
      *
      * @param expression Expression to be evaluated
-     * @param errorType The enumerated type indicating the layer where the error occurred.
-     * @param errorTag The enumerated tag representing a more specific error cause.
-     * @param format Format string, according to {@link String#format(String, Object...)}.
-     * @param args Format string arguments, according to {@link String#format(String, Object...)}
-     * @throws RestconfDocumentedException if the expression evaluates to true.
-     */
-    public static void throwIf(final boolean expression, final ErrorType errorType, final ErrorTag errorTag,
-            final @NonNull String format, final Object... args) {
-        if (expression) {
-            throw new RestconfDocumentedException(String.format(format, args), errorType, errorTag);
-        }
-    }
-
-    /**
-     * Throw an instance of this exception if an expression evaluates to true. If the expression evaluates to false,
-     * this method does nothing.
-     *
-     * @param expression Expression to be evaluated
      * @param message error message
      * @param errorType The enumerated type indicating the layer where the error occurred.
      * @param errorTag The enumerated tag representing a more specific error cause.

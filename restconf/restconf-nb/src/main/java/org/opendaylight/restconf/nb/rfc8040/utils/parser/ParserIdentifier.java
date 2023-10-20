@@ -227,8 +227,10 @@ public final class ParserIdentifier {
      */
     @VisibleForTesting
     static Revision validateAndGetRevision(final Iterator<String> revisionDate) {
-        RestconfDocumentedException.throwIf(!revisionDate.hasNext(), "Revision date must be supplied.",
-            ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        if (!revisionDate.hasNext()) {
+            throw new RestconfDocumentedException("Revision date must be supplied.",
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        }
         try {
             return Revision.of(revisionDate.next());
         } catch (final DateTimeParseException e) {
@@ -244,15 +246,20 @@ public final class ParserIdentifier {
      */
     @VisibleForTesting
     static String validateAndGetModulName(final Iterator<String> moduleName) {
-        RestconfDocumentedException.throwIf(!moduleName.hasNext(), "Module name must be supplied.", ErrorType.PROTOCOL,
-            ErrorTag.INVALID_VALUE);
-        final String name = moduleName.next();
+        if (!moduleName.hasNext()) {
+            throw new RestconfDocumentedException("Module name must be supplied.",
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        }
 
+        final String name = moduleName.next();
         RestconfDocumentedException.throwIf(
             name.isEmpty() || !YangNames.IDENTIFIER_START.matches(name.charAt(0)),
             "Identifier must start with character from set 'a-zA-Z_", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        RestconfDocumentedException.throwIf(name.toUpperCase(Locale.ROOT).startsWith("XML"),
-            "Identifier must NOT start with XML ignore case.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        if (name.toUpperCase(Locale.ROOT).startsWith("XML")) {
+            throw new RestconfDocumentedException("Identifier must NOT start with XML ignore case.",
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        }
+
         RestconfDocumentedException.throwIf(
             YangNames.NOT_IDENTIFIER_PART.matchesAnyOf(name.substring(1)),
             "Supplied name has not expected identifier format.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);

@@ -204,10 +204,11 @@ public final class YangInstanceIdentifierDeserializer {
                     ? prepareNodeWithPredicates(stack, qname, listSchema, values)
                         : prepareNodeWithValue(stack, qname, schema, values);
             } else {
-                RestconfDocumentedException.throwIf(childNode.dataSchemaNode() instanceof ListSchemaNode listChild
-                    && !listChild.getKeyDefinition().isEmpty(),
-                    ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
-                    "Entry '%s' requires key or value predicate to be present.", qname);
+                if (childNode.dataSchemaNode() instanceof ListSchemaNode list && !list.getKeyDefinition().isEmpty()) {
+                    throw new RestconfDocumentedException(
+                        "Entry '" + qname + "' requires key or value predicate to be present.",
+                        ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE);
+                }
                 pathArg = childNode.getPathStep();
             }
 
@@ -316,9 +317,11 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private @NonNull QNameModule resolveNamespace(final String moduleName) {
-        final var modules = schemaContext.findModules(moduleName);
-        RestconfDocumentedException.throwIf(modules.isEmpty(), ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT,
-            "Failed to lookup for module with name '%s'.", moduleName);
-        return modules.iterator().next().getQNameModule();
+        final var it = schemaContext.findModuleStatements(moduleName).iterator();
+        if (it.hasNext()) {
+            return it.next().localQNameModule();
+        }
+        throw new RestconfDocumentedException("Failed to lookup for module with name '" + moduleName + "'.",
+            ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
     }
 }
