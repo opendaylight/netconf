@@ -132,9 +132,13 @@ public final class YangInstanceIdentifierDeserializer {
         //
         // We therefore peel that first iteration here and not worry about those details in further iterations
         var step = it.next();
-        final var firstModule = RestconfDocumentedException.throwIfNull(step.module(),
-            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
-            "First member must use namespace-qualified form, '%s' does not", step.identifier());
+        final var firstModule = step.module();
+        if (firstModule == null) {
+            throw new RestconfDocumentedException(
+                "First member must use namespace-qualified form, '" + step.identifier() + "' does not",
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        }
+
         var namespace = resolveNamespace(firstModule);
         var qname = step.identifier().bindTo(namespace);
 
@@ -184,9 +188,12 @@ public final class YangInstanceIdentifierDeserializer {
             }
 
             // Resolve the child step with respect to data schema tree
-            final var found = RestconfDocumentedException.throwIfNull(
-                parentNode instanceof DataSchemaContext.Composite composite ? composite.enterChild(stack, qname) : null,
-                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Schema for '%s' not found", qname);
+            final var found = parentNode instanceof DataSchemaContext.Composite composite
+                ? composite.enterChild(stack, qname) : null;
+            if (found == null) {
+                throw new RestconfDocumentedException("Schema for '" + qname + "' not found",
+                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+            }
 
             // Now add all mixins encountered to the path
             var childNode = found;
@@ -204,10 +211,11 @@ public final class YangInstanceIdentifierDeserializer {
                     ? prepareNodeWithPredicates(stack, qname, listSchema, values)
                         : prepareNodeWithValue(stack, qname, schema, values);
             } else {
-                RestconfDocumentedException.throwIf(childNode.dataSchemaNode() instanceof ListSchemaNode listChild
-                    && !listChild.getKeyDefinition().isEmpty(),
-                    ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
-                    "Entry '%s' requires key or value predicate to be present.", qname);
+                if (childNode.dataSchemaNode() instanceof ListSchemaNode list && !list.getKeyDefinition().isEmpty()) {
+                    throw new RestconfDocumentedException(
+                        "Entry '" + qname + "' requires key or value predicate to be present.",
+                        ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE);
+                }
                 pathArg = childNode.getPathStep();
             }
 
@@ -316,9 +324,11 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private @NonNull QNameModule resolveNamespace(final String moduleName) {
-        final var modules = schemaContext.findModules(moduleName);
-        RestconfDocumentedException.throwIf(modules.isEmpty(), ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT,
-            "Failed to lookup for module with name '%s'.", moduleName);
-        return modules.iterator().next().getQNameModule();
+        final var it = schemaContext.findModuleStatements(moduleName).iterator();
+        if (it.hasNext()) {
+            return it.next().localQNameModule();
+        }
+        throw new RestconfDocumentedException("Failed to lookup for module with name '" + moduleName + "'.",
+            ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
     }
 }

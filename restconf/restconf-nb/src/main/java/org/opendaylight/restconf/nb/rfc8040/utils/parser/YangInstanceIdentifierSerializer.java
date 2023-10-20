@@ -83,10 +83,12 @@ public final class YangInstanceIdentifierSerializer {
 
             final var childContext = currentContext instanceof DataSchemaContext.Composite composite
                 ? composite.childByArg(arg) : null;
+            if (childContext == null) {
+                throw new RestconfDocumentedException(
+                    "Invalid input '%s': schema for argument '%s' (after '%s') not found".formatted(data, arg, path),
+                    ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT);
+            }
 
-            RestconfDocumentedException.throwIfNull(childContext, ErrorType.APPLICATION,
-                    ErrorTag.UNKNOWN_ELEMENT, "Invalid input '%s': schema for argument '%s' (after '%s') not found",
-                    data, arg, path);
             variables.setCurrent(childContext);
             if (childContext instanceof PathMixin) {
                 continue;
