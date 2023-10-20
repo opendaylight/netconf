@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.common;
+package org.opendaylight.restconf.nb.rfc8040.legacy;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableMap;
 import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -22,7 +21,6 @@ import org.slf4j.LoggerFactory;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-7">RFC8040 section 7</a>, we also define tags which
  * map to useful {@link Status} codes.
  */
-@Beta
 @NonNullByDefault
 public final class ErrorTags {
     /**
@@ -71,7 +69,7 @@ public final class ErrorTags {
      * @throws NullPointerException if {@code tag} is null
      */
     public static Status statusOf(final ErrorTag tag) {
-        final Status known = WELL_KNOWN_ERROR_TAGS.get(requireNonNull(tag));
+        final var known = WELL_KNOWN_ERROR_TAGS.get(requireNonNull(tag));
         return known != null ? known : Status.INTERNAL_SERVER_ERROR;
     }
 
@@ -80,8 +78,8 @@ public final class ErrorTags {
         // HTTP status 409 as specified by RFC8040 (and all previous drafts). See the discussion in:
         // https://www.rfc-editor.org/errata/eid5565
         // https://mailarchive.ietf.org/arch/msg/netconf/hkVDdHK4xA74NgvXzWP0zObMiyY/
-        final String propName = "org.opendaylight.restconf.eid5565";
-        final String propValue = System.getProperty(propName, "disabled");
+        final var propName = "org.opendaylight.restconf.eid5565";
+        final var propValue = System.getProperty(propName, "disabled");
         switch (propValue) {
             case "enabled":
                 // RFC7231 interpretation: 404 Not Found
