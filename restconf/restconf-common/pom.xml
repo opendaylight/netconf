@@ -28,6 +28,10 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>concepts</artifactId>
     </dependency>
@@ -64,8 +68,8 @@
       <artifactId>rfc8072</artifactId>
     </dependency>
     <dependency>
-      <groupId>jakarta.ws.rs</groupId>
-      <artifactId>jakarta.ws.rs-api</artifactId>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>restconf-api</artifactId>
     </dependency>
 
     <dependency>

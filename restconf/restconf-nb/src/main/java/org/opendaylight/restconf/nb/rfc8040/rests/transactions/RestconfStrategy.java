@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.api.RestconfResponse;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -97,7 +98,7 @@ public abstract class RestconfStrategy {
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>. The definition makes it
      * clear that the logical operation is {@code create-or-replace}.
      */
-    public enum CreateOrReplaceResult {
+    public enum CreateOrReplaceResult implements RestconfResponse.Body {
         /**
          * A new resource has been created.
          */
