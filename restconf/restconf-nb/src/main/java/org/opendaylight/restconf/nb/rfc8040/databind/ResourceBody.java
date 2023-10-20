@@ -69,7 +69,7 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
         } catch (RestconfDocumentedException e) {
             throw e;
         } catch (RuntimeException e) {
-            RestconfDocumentedException.throwIfYangError(e);
+            throwIfYangError(e);
             throw e;
         }
 
@@ -128,9 +128,11 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
             final List<QName> keyDefinitions) {
         final var mutableCopyUriKeyValues = new HashMap<>(uriKeyValues);
         for (var keyDefinition : keyDefinitions) {
-            final var uriKeyValue = RestconfDocumentedException.throwIfNull(
-                mutableCopyUriKeyValues.remove(keyDefinition), ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
-                "Missing key %s in URI.", keyDefinition);
+            final var uriKeyValue = mutableCopyUriKeyValues.remove(keyDefinition);
+            if (uriKeyValue == null) {
+                throw new RestconfDocumentedException("Missing key " + keyDefinition + " in URI.",
+                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+            }
 
             final var dataKeyValue = payload.name().getValue(keyDefinition);
             if (!uriKeyValue.equals(dataKeyValue)) {
