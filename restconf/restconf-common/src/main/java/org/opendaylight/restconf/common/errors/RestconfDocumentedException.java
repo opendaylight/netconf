@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.ErrorTags;
@@ -37,7 +36,6 @@ public class RestconfDocumentedException extends RuntimeException {
     private static final long serialVersionUID = 3L;
 
     private final List<RestconfError> errors;
-    private final Status status;
 
     // FIXME: this field should be non-null
     private final transient @Nullable EffectiveModelContext modelContext;
@@ -129,13 +127,12 @@ public class RestconfDocumentedException extends RuntimeException {
         // FIXME: We override getMessage so supplied message is lost for any public access
         // this was lost also in original code.
         super(cause);
-        if (!errors.isEmpty()) {
-            this.errors = List.copyOf(errors);
-        } else {
+        if (errors.isEmpty()) {
             this.errors = List.of(new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message));
+        } else {
+            this.errors = List.copyOf(errors);
         }
 
-        status = null;
         modelContext = null;
     }
 
@@ -147,21 +144,8 @@ public class RestconfDocumentedException extends RuntimeException {
         this(message, cause, convertToRestconfErrors(rpcErrors));
     }
 
-    /**
-     * Constructs an instance with an HTTP status and no error information.
-     *
-     * @param status
-     *            the HTTP status.
-     */
-    public RestconfDocumentedException(final Status status) {
-        errors = List.of();
-        modelContext = null;
-        this.status = requireNonNull(status, "Status can't be null");
-    }
-
     public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
         super(cause);
-        status = ErrorTags.statusOf(error.getErrorTag());
         errors = List.of(error);
         modelContext = null;
     }
@@ -169,14 +153,15 @@ public class RestconfDocumentedException extends RuntimeException {
     public RestconfDocumentedException(final Throwable cause, final RestconfError error,
             final EffectiveModelContext modelContext) {
         super(cause);
-        status = ErrorTags.statusOf(error.getErrorTag());
         errors = List.of(error);
         this.modelContext = requireNonNull(modelContext);
     }
 
     public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
         super(cause);
-        status = ErrorTags.statusOf(errors.get(0).getErrorTag());
+        if (errors.isEmpty()) {
+            throw new IllegalArgumentException("At least one error is required");
+        }
         this.errors = List.copyOf(errors);
         modelContext = null;
     }
@@ -290,9 +275,5 @@ public class RestconfDocumentedException extends RuntimeException {
 
     public List<RestconfError> getErrors() {
         return errors;
-    }
-
-    public Status getStatus() {
-        return status;
     }
 }

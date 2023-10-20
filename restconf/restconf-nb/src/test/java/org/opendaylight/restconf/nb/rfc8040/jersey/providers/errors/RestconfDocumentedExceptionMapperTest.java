@@ -43,9 +43,6 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 @RunWith(Parameterized.class)
 public class RestconfDocumentedExceptionMapperTest {
-
-    private static final String EMPTY_XML = "<errors xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"></errors>";
-    private static final String EMPTY_JSON = "{}";
     private static final QNameModule MONITORING_MODULE_INFO = QNameModule.create(
         XMLNamespace.of("instance:identifier:patch:module"), Revision.of("2015-11-21"));
 
@@ -84,95 +81,24 @@ public class RestconfDocumentedExceptionMapperTest {
 
         return Arrays.asList(new Object[][] {
             {
-                "Mapping of the exception without any errors and XML output derived from content type",
-                new RestconfDocumentedException(Status.BAD_REQUEST),
-                mockHttpHeaders(MediaType.APPLICATION_XML_TYPE, List.of()),
-                Response.status(Status.BAD_REQUEST)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
-                        .entity(EMPTY_XML)
-                        .build()
-            },
-            {
-                "Mapping of the exception without any errors and JSON output derived from unsupported content type",
-                new RestconfDocumentedException(Status.INTERNAL_SERVER_ERROR),
-                mockHttpHeaders(MediaType.APPLICATION_FORM_URLENCODED_TYPE, List.of()),
-                Response.status(Status.INTERNAL_SERVER_ERROR)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
-                        .entity(EMPTY_JSON)
-                        .build()
-            },
-            {
-                "Mapping of the exception without any errors and JSON output derived from missing content type "
-                        + "and accepted media types",
-                new RestconfDocumentedException(Status.NOT_IMPLEMENTED),
-                mockHttpHeaders(null, List.of()),
-                Response.status(Status.NOT_IMPLEMENTED)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
-                        .entity(EMPTY_JSON)
-                        .build()
-            },
-            {
-                "Mapping of the exception without any errors and JSON output derived from expected types - both JSON"
-                        + "and XML types are accepted, but server should prefer JSON format",
-                new RestconfDocumentedException(Status.INTERNAL_SERVER_ERROR),
-                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(
-                        MediaType.APPLICATION_FORM_URLENCODED_TYPE, MediaType.APPLICATION_XML_TYPE,
-                        MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_OCTET_STREAM_TYPE)),
-                Response.status(Status.INTERNAL_SERVER_ERROR)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
-                        .entity(EMPTY_JSON)
-                        .build()
-            },
-            {
-                "Mapping of the exception without any errors and JSON output derived from expected types - there"
-                        + "is only a wildcard type that should be mapped to default type",
-                new RestconfDocumentedException(Status.NOT_FOUND),
-                mockHttpHeaders(null, List.of(MediaType.WILDCARD_TYPE)),
-                Response.status(Status.NOT_FOUND)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
-                        .entity(EMPTY_JSON)
-                        .build()
-            },
-            {
-                "Mapping of the exception without any errors and XML output derived from expected types - "
-                        + "we should choose the most specific and supported type",
-                new RestconfDocumentedException(Status.NOT_FOUND),
-                mockHttpHeaders(null, List.of(MediaType.valueOf("*/yang-data+json"),
-                        MediaType.valueOf("application/yang-data+xml"), MediaType.WILDCARD_TYPE)),
-                Response.status(Status.NOT_FOUND)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
-                        .entity(EMPTY_XML)
-                        .build()
-            },
-            {
-                "Mapping of the exception without any errors and XML output derived from expected types - "
-                        + "we should choose the most specific and supported type",
-                new RestconfDocumentedException(Status.NOT_FOUND),
-                mockHttpHeaders(null, List.of(MediaType.valueOf("*/unsupported"),
-                        MediaType.valueOf("application/*"), MediaType.WILDCARD_TYPE)),
-                Response.status(Status.NOT_FOUND)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
-                        .entity(EMPTY_JSON)
-                        .build()
-            },
-            {
                 "Mapping of the exception with one error entry but null status code. This status code should"
                         + "be derived from single error entry; JSON output",
                 new RestconfDocumentedException("Sample error message"),
                 mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(MediaTypes.APPLICATION_YANG_PATCH_JSON_TYPE)),
                 Response.status(Status.INTERNAL_SERVER_ERROR)
                         .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
-                        .entity("{\n"
-                                + "  \"errors\": {\n"
-                                + "    \"error\": [\n"
-                                + "      {\n"
-                                + "        \"error-tag\": \"operation-failed\",\n"
-                                + "        \"error-message\": \"Sample error message\",\n"
-                                + "        \"error-type\": \"application\"\n"
-                                + "      }\n"
-                                + "    ]\n"
-                                + "  }\n"
-                                + "}")
+                        .entity("""
+                            {
+                              "errors": {
+                                "error": [
+                                  {
+                                    "error-tag": "operation-failed",
+                                    "error-message": "Sample error message",
+                                    "error-type": "application"
+                                  }
+                                ]
+                              }
+                            }""")
                         .build()
             },
             {
@@ -184,18 +110,19 @@ public class RestconfDocumentedExceptionMapperTest {
                 mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(MediaTypes.APPLICATION_YANG_PATCH_XML_TYPE)),
                 Response.status(Status.BAD_REQUEST)
                         .type(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
-                        .entity("<errors xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\">\n"
-                                + "<error>\n"
-                                + "<error-message>message 1</error-message>\n"
-                                + "<error-tag>bad-attribute</error-tag>\n"
-                                + "<error-type>application</error-type>\n"
-                                + "</error>\n"
-                                + "<error>\n"
-                                + "<error-message>message 2</error-message>\n"
-                                + "<error-tag>operation-failed</error-tag>\n"
-                                + "<error-type>application</error-type>\n"
-                                + "</error>\n"
-                                + "</errors>")
+                        .entity("""
+                            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+                              <error>
+                                <error-message>message 1</error-message>
+                                <error-tag>bad-attribute</error-tag>
+                                <error-type>application</error-type>
+                              </error>
+                              <error>
+                                <error-message>message 2</error-message>
+                                <error-tag>operation-failed</error-tag>
+                                <error-type>application</error-type>
+                              </error>
+                            </errors>""")
                         .build()
             },
             {
@@ -205,34 +132,35 @@ public class RestconfDocumentedExceptionMapperTest {
                         MediaType.APPLICATION_JSON_TYPE)),
                 Response.status(Status.BAD_REQUEST)
                         .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
-                        .entity("{\n"
-                                + "  \"errors\": {\n"
-                                + "    \"error\": [\n"
-                                + "      {\n"
-                                + "        \"error-tag\": \"bad-attribute\",\n"
-                                + "        \"error-app-tag\": \"app tag #1\",\n"
-                                + "        \"error-message\": \"message 1\",\n"
-                                + "        \"error-type\": \"application\"\n"
-                                + "      },\n"
-                                + "      {\n"
-                                + "        \"error-tag\": \"operation-failed\",\n"
-                                + "        \"error-app-tag\": \"app tag #2\",\n"
-                                + "        \"error-info\": \"my info\",\n"
-                                + "        \"error-message\": \"message 2\",\n"
-                                + "        \"error-type\": \"application\"\n"
-                                + "      },\n"
-                                + "      {\n"
-                                + "        \"error-tag\": \"data-missing\",\n"
-                                + "        \"error-app-tag\": \" app tag #3\",\n"
-                                + "        \"error-info\": \"my error info\",\n"
-                                + "        \"error-message\": \"message 3\",\n"
-                                + "        \"error-path\": \"/instance-identifier-patch-module:patch-cont/"
-                                + "my-list1[name='sample']/my-leaf12\",\n"
-                                + "        \"error-type\": \"rpc\"\n"
-                                + "      }\n"
-                                + "    ]\n"
-                                + "  }\n"
-                                + "}")
+                        .entity("""
+                            {
+                              "errors": {
+                                "error": [
+                                  {
+                                    "error-tag": "bad-attribute",
+                                    "error-app-tag": "app tag #1",
+                                    "error-message": "message 1",
+                                    "error-type": "application"
+                                  },
+                                  {
+                                    "error-tag": "operation-failed",
+                                    "error-app-tag": "app tag #2",
+                                    "error-info": "my info",
+                                    "error-message": "message 2",
+                                    "error-type": "application"
+                                  },
+                                  {
+                                    "error-tag": "data-missing",
+                                    "error-app-tag": " app tag #3",
+                                    "error-info": "my error info",
+                                    "error-message": "message 3",
+                                    "error-path": "/instance-identifier-patch-module:patch-cont/\
+                            my-list1[name='sample']/my-leaf12",
+                                    "error-type": "rpc"
+                                  }
+                                ]
+                              }
+                            }""")
                         .build()
             },
             {
@@ -242,29 +170,30 @@ public class RestconfDocumentedExceptionMapperTest {
                         List.of(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)),
                 Response.status(Status.BAD_REQUEST)
                         .type(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
-                        .entity("<errors xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\">\n"
-                                + "<error>\n"
-                                + "<error-type>application</error-type>\n"
-                                + "<error-message>message 1</error-message>\n"
-                                + "<error-tag>bad-attribute</error-tag>\n"
-                                + "<error-app-tag>app tag #1</error-app-tag>\n"
-                                + "</error>\n"
-                                + "<error>\n"
-                                + "<error-type>application</error-type>\n"
-                                + "<error-message>message 2</error-message>\n"
-                                + "<error-tag>operation-failed</error-tag>\n"
-                                + "<error-app-tag>app tag #2</error-app-tag>\n"
-                                + "<error-info>my info</error-info></error>\n"
-                                + "<error>\n"
-                                + "<error-type>rpc</error-type>\n"
-                                + "<error-path xmlns:a=\"instance:identifier:patch:module\">/a:patch-cont/"
-                                + "a:my-list1[a:name='sample']/a:my-leaf12</error-path>\n"
-                                + "<error-message>message 3</error-message>\n"
-                                + "<error-tag>data-missing</error-tag>\n"
-                                + "<error-app-tag> app tag #3</error-app-tag>\n"
-                                + "<error-info>my error info</error-info>\n"
-                                + "</error>\n"
-                                + "</errors>")
+                        .entity("""
+                            <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+                              <error>
+                                <error-type>application</error-type>
+                                <error-message>message 1</error-message>
+                                <error-tag>bad-attribute</error-tag>
+                                <error-app-tag>app tag #1</error-app-tag>
+                              </error>
+                              <error>
+                                <error-type>application</error-type>
+                                <error-message>message 2</error-message>
+                                <error-tag>operation-failed</error-tag>
+                                <error-app-tag>app tag #2</error-app-tag>
+                                <error-info>my info</error-info></error>
+                              <error>
+                                <error-type>rpc</error-type>
+                                <error-path xmlns:a="instance:identifier:patch:module">/a:patch-cont/\
+                            a:my-list1[a:name='sample']/a:my-leaf12</error-path>
+                                <error-message>message 3</error-message>
+                                <error-tag>data-missing</error-tag>
+                                <error-app-tag> app tag #3</error-app-tag>
+                                <error-info>my error info</error-info>
+                              </error>
+                            </errors>""")
                         .build()
             }
         });

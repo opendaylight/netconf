@@ -212,29 +212,24 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * @return Derived status code.
      */
     private static Status getResponseStatusCode(final RestconfDocumentedException exception) {
-        final Status status = exception.getStatus();
-        if (status != null) {
-            // status code that is specified directly as field in exception has the precedence over error entries
-            return status;
-        }
-
-        final List<RestconfError> errors = exception.getErrors();
+        final var errors = exception.getErrors();
         if (errors.isEmpty()) {
             // if the module, that thrown exception, doesn't specify status code, it is treated as internal
             // server error
             return DEFAULT_STATUS_CODE;
         }
 
-        final Set<Status> allStatusCodesOfErrorEntries = errors.stream()
+        final var allStatusCodesOfErrorEntries = errors.stream()
                 .map(restconfError -> ErrorTags.statusOf(restconfError.getErrorTag()))
                 // we would like to preserve iteration order in collected entries - hence usage of LinkedHashSet
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         // choosing of the first status code from appended errors, if there are different status codes in error
         // entries, we should create WARN message
         if (allStatusCodesOfErrorEntries.size() > 1) {
-            LOG.warn("An unexpected error occurred during translation of exception {} to response: "
-                    + "Different status codes have been found in appended error entries: {}. The first error "
-                    + "entry status code is chosen for response.", exception, allStatusCodesOfErrorEntries);
+            LOG.warn("""
+                An unexpected error occurred during translation of exception {} to response: Different status codes
+                have been found in appended error entries: {}. The first error entry status code is chosen for
+                response.""", exception, allStatusCodesOfErrorEntries);
         }
         return allStatusCodesOfErrorEntries.iterator().next();
     }

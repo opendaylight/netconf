@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.function.Function;
-import javax.ws.rs.core.Response.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.BeforeClass;
 import org.junit.function.ThrowingRunnable;
@@ -95,8 +94,6 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
 
     static final void assertRangeViolation(final ThrowingRunnable runnable) {
         final var ex = assertThrows(RestconfDocumentedException.class, runnable);
-        assertEquals(Status.BAD_REQUEST, ex.getStatus());
-
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
 
