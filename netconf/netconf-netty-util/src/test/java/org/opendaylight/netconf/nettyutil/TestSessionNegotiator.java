@@ -16,7 +16,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yangtools.yang.common.Uint32;
 
 final class TestSessionNegotiator
-        extends AbstractNetconfSessionNegotiator<TestingNetconfSession, NetconfSessionListener<TestingNetconfSession>> {
+        extends NetconfSessionNegotiator<TestingNetconfSession, NetconfSessionListener<TestingNetconfSession>> {
     TestSessionNegotiator(final HelloMessage hello, final Promise<TestingNetconfSession> promise,
             final Channel channel, final Timer timer,
             final NetconfSessionListener<TestingNetconfSession> sessionListener, final long connectionTimeoutMillis) {
