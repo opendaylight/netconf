@@ -25,10 +25,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
-import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
+import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
@@ -52,8 +51,7 @@ public class Netconf539Test {
             new ChannelInboundHandlerAdapter());
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
             new NetconfXMLToHelloMessageDecoder());
-        channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
-            FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
+        channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER, new EOMFramingMechanismEncoder());
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         final HelloMessage serverHello = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1),
             Optional.empty());
