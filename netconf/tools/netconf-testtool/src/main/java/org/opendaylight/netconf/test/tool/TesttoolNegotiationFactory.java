@@ -9,9 +9,9 @@ package org.opendaylight.netconf.test.tool;
 
 import io.netty.util.Timer;
 import java.net.SocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class TesttoolNegotiationFactory extends NetconfServerSessionNegotiatorFactory {
     private static final Logger LOG = LoggerFactory.getLogger(TesttoolNegotiationFactory.class);
 
-    private final Map<SocketAddress, NetconfOperationService> cachedOperationServices = new HashMap<>();
+    private final ConcurrentMap<SocketAddress, NetconfOperationService> operationServices = new ConcurrentHashMap<>();
 
     public TesttoolNegotiationFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
             final SessionIdProvider idProvider, final long connectionTimeoutMillis,
@@ -43,16 +43,10 @@ public class TesttoolNegotiationFactory extends NetconfServerSessionNegotiatorFa
     @Override
     protected NetconfOperationService getOperationServiceForAddress(final SessionIdType sessionId,
             final SocketAddress socketAddress) {
-        if (cachedOperationServices.containsKey(socketAddress)) {
-            LOG.debug("Session {}: Getting cached operation service factory for test tool device on address {}",
-                sessionId.getValue(), socketAddress);
-            return cachedOperationServices.get(socketAddress);
-        } else {
-            final NetconfOperationService service = getOperationServiceFactory().createService(sessionId);
-            cachedOperationServices.put(socketAddress, service);
+        return operationServices.computeIfAbsent(socketAddress, addr -> {
             LOG.debug("Session {}: Creating new operation service factory for test tool device on address {}",
-                sessionId.getValue(), socketAddress);
-            return service;
-        }
+                sessionId.getValue(), addr);
+            return getOperationServiceFactory().createService(sessionId);
+        });
     }
 }
