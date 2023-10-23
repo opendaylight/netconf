@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2de355a_abde82d8",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 2043,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-23T12:36:34Z",
+      "side": 1,
+      "message": "requests?",
+      "range": {
+        "startLine": 2043,
+        "startChar": 66,
+        "endLine": 2043,
+        "endChar": 73
+      },
+      "revId": "d20840816a2306471e03dffbf5e05d16c1ba9897",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
