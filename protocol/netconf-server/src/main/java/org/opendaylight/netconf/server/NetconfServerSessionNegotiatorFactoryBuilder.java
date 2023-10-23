@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.util.Timer;
 import java.util.Set;
 import org.checkerframework.checker.index.qual.NonNegative;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
+import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
@@ -25,8 +25,7 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
     private long connectionTimeoutMillis;
     private NetconfMonitoringService monitoringService;
     private Set<String> baseCapabilities;
-    private @NonNegative int maximumIncomingChunkSize =
-        AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
+    private @NonNegative int maximumIncomingChunkSize = NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
 
     public NetconfServerSessionNegotiatorFactoryBuilder() {
     }
