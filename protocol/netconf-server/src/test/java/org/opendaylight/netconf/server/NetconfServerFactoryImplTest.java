@@ -43,6 +43,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.type
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.password.grouping.password.type.CleartextPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.InlineBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev230417.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.inline.InlineDefinitionBuilder;
@@ -74,7 +75,7 @@ class NetconfServerFactoryImplTest {
 
     private static EventLoopGroup clientGroup;
     @Mock
-    private ServerChannelInitializer serverChannelInitializer;
+    private NetconfServerSessionNegotiatorFactory negotiatorFactory;
     @Mock
     private TransportChannelListener clientListener;
 
@@ -96,13 +97,15 @@ class NetconfServerFactoryImplTest {
 
     @BeforeEach
     void beforeEach() throws Exception {
-        factory = new NetconfServerFactoryImpl(serverChannelInitializer, FACTORY);
+        factory = new NetconfServerFactoryImpl(new ServerTransportInitializer(negotiatorFactory), FACTORY);
 
         // create temp socket to get available port for test
-        final var socket = new ServerSocket(0);
-        final var address = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
-        final var port = new PortNumber(Uint16.valueOf(socket.getLocalPort()));
-        socket.close();
+        final IpAddress address;
+        final PortNumber port;
+        try (var socket = new ServerSocket(0)) {
+            address = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
+            port = new PortNumber(Uint16.valueOf(socket.getLocalPort()));
+        }
 
         tcpServerParams = new TcpServerParametersBuilder().setLocalAddress(address).setLocalPort(port).build();
         tcpClientParams =
@@ -116,7 +119,7 @@ class NetconfServerFactoryImplTest {
             final var client = TCPClient.connect(clientListener,
                 NettyTransportSupport.newBootstrap().group(clientGroup), tcpClientParams).get(1, TimeUnit.SECONDS);
             try {
-                verify(serverChannelInitializer, timeout(1000L)).initialize(any(Channel.class), any());
+                verify(negotiatorFactory, timeout(1000L)).getSessionNegotiator(any(Channel.class), any());
                 verify(clientListener, timeout(1000L)).onTransportChannelEstablished(any(TransportChannel.class));
             } finally {
                 client.shutdown().get(1, TimeUnit.SECONDS);
