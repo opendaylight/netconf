@@ -15,7 +15,7 @@ import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
+import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -42,7 +42,7 @@ public class NetconfClientConfigurationBuilder {
     private NetconfSshClient sshClient;
     private List<Uri> odlHelloCapabilities;
     private @NonNegative int maximumIncomingChunkSize =
-        AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
+        NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
     private String name;
     private TcpClientGrouping tcpParameters;
     private TlsClientGrouping tlsParameters;
