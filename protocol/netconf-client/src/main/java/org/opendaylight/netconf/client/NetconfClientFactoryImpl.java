@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
 import javax.inject.Singleton;
+import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
@@ -74,8 +75,9 @@ public class NetconfClientFactoryImpl implements NetconfClientFactory {
                     configuration.getTcpParameters(), configuration.getTransportSslHandlerFactory());
             }
         } else if (SSH.equals(protocol)) {
-            factory.connectClient("netconf", new ClientTransportChannelListener(future, channelInitializer),
-                configuration.getTcpParameters(), configuration.getSshParameters());
+            factory.connectClient(TransportConstants.SSH_SUBSYSTEM,
+                new ClientTransportChannelListener(future, channelInitializer), configuration.getTcpParameters(),
+                configuration.getSshParameters());
         }
         return future;
     }
