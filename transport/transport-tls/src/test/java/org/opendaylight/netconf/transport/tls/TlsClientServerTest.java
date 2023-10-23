@@ -52,6 +52,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.EcPrivateKeyFormat;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.RsaPrivateKeyFormat;
@@ -176,9 +177,9 @@ class TlsClientServerTest {
         when(tlsServerConfig.getClientAuthentication()).thenReturn(clientAuth);
 
         integrationTest(
-            TLSServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
+            () -> TLSServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
                 tcpServerConfig, tlsServerConfig),
-            TLSClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
+            () -> TLSClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
                 tcpClientConfig, tlsClientConfig)
         );
     }
@@ -195,11 +196,49 @@ class TlsClientServerTest {
             .trustManager(buildTrustManagerFactory(serverKs)).build();
 
         integrationTest(
-            TLSServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
+            () -> TLSServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
                 tcpServerConfig, channel -> serverContext.newHandler(channel.alloc())),
-            TLSClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
+            () -> TLSClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
                 tcpClientConfig, channel -> clientContext.newHandler(channel.alloc()))
         );
+    }
+
+    @Test
+    @DisplayName("Call-Home client/server with external SslHandlerFactory integration")
+    void callHome() throws Exception {
+
+        final var serverKs = buildKeystoreWithGeneratedCert(RSA_ALGORITHM);
+        final var clientKs = buildKeystoreWithGeneratedCert(EC_ALGORITHM);
+        final var serverContext = SslContextBuilder.forServer(buildKeyManagerFactory(serverKs))
+            .clientAuth(ClientAuth.REQUIRE).trustManager(buildTrustManagerFactory(clientKs)).build();
+        final var clientContext = SslContextBuilder.forClient().keyManager(buildKeyManagerFactory(clientKs))
+            .trustManager(buildTrustManagerFactory(serverKs)).build();
+
+        // start call-home client
+        final var client = TLSClient.listen(clientListener, NettyTransportSupport.newServerBootstrap().group(group),
+            tcpServerConfig, channel -> clientContext.newHandler(channel.alloc())).get(2, TimeUnit.SECONDS);
+        try {
+            // connect with call-home server
+            final var server = TLSServer.connect(serverListener, NettyTransportSupport.newBootstrap().group(group),
+                tcpClientConfig, channel -> serverContext.newHandler(channel.alloc())).get(2, TimeUnit.SECONDS);
+            try {
+                verify(serverListener, timeout(500))
+                    .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
+                verify(clientListener, timeout(500))
+                    .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
+                // validate channels are in expected state
+                var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
+                var clientChannel = assertChannel(clientTransportChannelCaptor.getAllValues());
+                // validate channels are connecting same sockets
+                assertEquals(serverChannel.remoteAddress(), clientChannel.localAddress());
+                assertEquals(serverChannel.localAddress(), clientChannel.remoteAddress());
+
+            } finally {
+                server.shutdown().get(2, TimeUnit.SECONDS);
+            }
+        } finally {
+            client.shutdown().get(2, TimeUnit.SECONDS);
+        }
     }
 
     private static KeyStore buildKeystoreWithGeneratedCert(final String algorithm) throws Exception {
@@ -210,13 +249,13 @@ class TlsClientServerTest {
         return ret;
     }
 
-    private void integrationTest(final ListenableFuture<TLSServer> serverFuture,
-            final ListenableFuture<TLSClient> clientFuture) throws Exception {
+    private void integrationTest(final Builder<TLSServer> serverBuilder,
+            final Builder<TLSClient> clientBuilder) throws Exception {
         // start server
-        final var server = serverFuture.get(2, TimeUnit.SECONDS);
+        final var server = serverBuilder.build().get(2, TimeUnit.SECONDS);
         try {
             // connect with client
-            final var client = clientFuture.get(2, TimeUnit.SECONDS);
+            final var client = clientBuilder.build().get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(500))
                         .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
@@ -245,5 +284,9 @@ class TlsClientServerTest {
         assertTrue(channel.isOpen()); // connection is open
         assertNotNull(channel.pipeline().get(SslHandler.class)); //  has an SSL handler within a pipeline
         return channel;
+    }
+
+    private interface Builder<T extends TLSTransportStack> {
+        ListenableFuture<T> build() throws UnsupportedConfigurationException;
     }
 }
