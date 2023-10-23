@@ -80,17 +80,17 @@ public class NetconfServerSessionNegotiatorFactory
 
     private static ImmutableSet<String> validateBaseCapabilities(final Set<String> baseCapabilities) {
         // Check base capabilities to be supported by the server
-        final Sets.SetView<String> unknownBaseCaps = Sets.difference(baseCapabilities, DEFAULT_BASE_CAPABILITIES);
+        final var unknownBaseCaps = Sets.difference(baseCapabilities, DEFAULT_BASE_CAPABILITIES);
         Preconditions.checkArgument(unknownBaseCaps.isEmpty(),
                 "Base capabilities that will be supported by netconf server have to be subset of %s, "
                         + "unknown base capabilities: %s",
                 DEFAULT_BASE_CAPABILITIES, unknownBaseCaps);
 
-        final ImmutableSet.Builder<String> b = ImmutableSet.builder();
-        b.addAll(baseCapabilities);
-        // Base 1.0 capability is supported by default
-        b.add(CapabilityURN.BASE);
-        return b.build();
+        return ImmutableSet.<String>builder()
+            .addAll(baseCapabilities)
+            // Base 1.0 capability is supported by default
+            .add(CapabilityURN.BASE)
+            .build();
     }
 
     /**
