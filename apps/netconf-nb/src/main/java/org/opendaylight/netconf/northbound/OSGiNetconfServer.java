@@ -14,7 +14,7 @@ import io.netty.util.Timer;
 import java.util.Map;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
-import org.opendaylight.netconf.server.ServerChannelInitializer;
+import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
@@ -42,7 +42,7 @@ public final class OSGiNetconfServer {
 
     private final AggregatedNetconfOperationServiceFactory mappers = new AggregatedNetconfOperationServiceFactory();
     private final ComponentInstance<DefaultNetconfMonitoringService> monitoring;
-    private final ServerChannelInitializer serverChannelInitializer;
+    private final ServerTransportInitializer serverTransportInitializer;
 
     @Activate
     public OSGiNetconfServer(
@@ -58,7 +58,7 @@ public final class OSGiNetconfServer {
         mappers.onAddNetconfOperationServiceFactory(mapperAggregatorRegistry);
         monitoring = monitoringFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfMonitoringService.props(
             mapperAggregatorRegistry, sshScheduledExecutor, configuration.monitoring$_$update$_$interval())));
-        serverChannelInitializer =  new ServerChannelInitializer(new NetconfServerSessionNegotiatorFactory(timer,
+        serverTransportInitializer = new ServerTransportInitializer(new NetconfServerSessionNegotiatorFactory(timer,
             mappers, sessionIdProvider, configuration.connection$_$timeout$_$millis(), monitoring.getInstance()));
     }
 
@@ -68,8 +68,8 @@ public final class OSGiNetconfServer {
         mappers.close();
     }
 
-    ServerChannelInitializer serverChannelInitializer() {
-        return serverChannelInitializer;
+    ServerTransportInitializer serverTransportInitializer() {
+        return serverTransportInitializer;
     }
 
     static <T> T extractProp(final Map<String, ?> properties, final String key, final Class<T> valueType) {
