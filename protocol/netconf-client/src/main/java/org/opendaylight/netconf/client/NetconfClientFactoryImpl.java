@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
@@ -56,6 +57,9 @@ public class NetconfClientFactoryImpl implements NetconfClientFactory {
     @Override
     public ListenableFuture<NetconfClientSession> createClient(final NetconfClientConfiguration configuration)
             throws UnsupportedConfigurationException {
+        if (configuration.getTcpParameters() == null) {
+            throw new UnsupportedConfigurationException("TCP Client parameters are required");
+        }
         final var protocol = configuration.getProtocol();
         final var future = SettableFuture.<NetconfClientSession>create();
         final var channelInitializer = new ClientChannelInitializer(createNegotiatorFactory(configuration),
@@ -78,6 +82,35 @@ public class NetconfClientFactoryImpl implements NetconfClientFactory {
                 configuration.getTcpParameters(), configuration.getSshParameters(), configuration.getSshConfigurator());
         }
         return future;
+    }
+
+    @Override
+    public ListenableFuture<? extends TransportStack> createCallHomeClient(NetconfClientConfiguration configuration)
+            throws UnsupportedConfigurationException {
+        if (configuration.getTcpServerParameters() == null) {
+            throw new UnsupportedConfigurationException("TCP Server parameters are required");
+        }
+        final var protocol = configuration.getProtocol();
+        final var future = SettableFuture.<NetconfClientSession>create();
+        final var channelInitializer = new ClientChannelInitializer(createNegotiatorFactory(configuration),
+            () -> configuration.getSessionListener());
+        final var bootstrap = factory.newServerBootstrap();
+
+        if (TLS.equals(protocol)) {
+            if (configuration.getTlsParameters() != null) {
+                return TLSClient.listen(new ClientTransportChannelListener(future, channelInitializer), bootstrap,
+                    configuration.getTcpServerParameters(), configuration.getTlsParameters());
+            } else {
+                return TLSClient.listen(new ClientTransportChannelListener(future, channelInitializer), bootstrap,
+                    configuration.getTcpServerParameters(), configuration.getTransportSslHandlerFactory());
+            }
+        } else if (SSH.equals(protocol)) {
+            return factory.listenClient("netconf",
+                new ClientTransportChannelListener(future, channelInitializer),
+                configuration.getTcpServerParameters(), configuration.getSshParameters(),
+                configuration.getSshConfigurator());
+        }
+        throw new UnsupportedConfigurationException("Unsupported protocol " + protocol);
     }
 
     private NetconfClientSessionNegotiatorFactory createNegotiatorFactory(

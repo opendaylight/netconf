@@ -9,6 +9,7 @@ package org.opendaylight.netconf.client;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 
 /**
@@ -24,5 +25,16 @@ public interface NetconfClientFactory extends AutoCloseable {
      * @throws UnsupportedConfigurationException if any transport configuration parameters is invalid
      */
     ListenableFuture<NetconfClientSession> createClient(NetconfClientConfiguration clientConfiguration)
+        throws UnsupportedConfigurationException;
+
+    /**
+     * Creates a Call-Home NETCONF client. Opens specified port for incoming connections. Network communication has
+     * to be set up based on network protocol specified in clientConfiguration
+     *
+     * @param clientConfiguration configuration
+     * @return A future producing the {@link TransportStack} implementation instance representing of call-home client
+     * @throws UnsupportedConfigurationException if any transport configuration parameters is invalid
+     */
+    ListenableFuture<? extends TransportStack> createCallHomeClient(NetconfClientConfiguration clientConfiguration)
         throws UnsupportedConfigurationException;
 }
