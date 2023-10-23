@@ -18,7 +18,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
