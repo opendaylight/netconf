@@ -20,7 +20,7 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
+import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
 import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
@@ -101,7 +101,7 @@ public final class NetconfClientSessionNegotiatorFactory {
                                                  final long connectionTimeoutMillis, final EXIParameters exiOptions,
                                                  final Set<String> capabilities) {
         this(timer, additionalHeader, connectionTimeoutMillis, exiOptions, capabilities,
-            AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
+            NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
     public NetconfClientSessionNegotiatorFactory(final Timer timer,
