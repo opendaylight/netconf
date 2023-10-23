@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler.ssh.authentication;
 
 import java.io.IOException;
+import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 
 /**
@@ -18,6 +18,5 @@ public abstract class AuthenticationHandler {
 
     public abstract String getUsername();
 
-    public abstract org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture authenticate(ClientSession session)
-            throws IOException;
+    public abstract AuthFuture authenticate(ClientSession session) throws IOException;
 }
