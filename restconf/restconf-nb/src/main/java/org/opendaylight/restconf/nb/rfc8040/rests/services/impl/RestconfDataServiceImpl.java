@@ -147,7 +147,7 @@ public final class RestconfDataServiceImpl {
      * Get target data resource from data root.
      *
      * @param uriInfo URI info
-     * @return {@link NormalizedNodePayload}
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link NormalizedNodePayload}
      */
     @GET
     @Path("/data")
@@ -158,9 +158,14 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response readData(@Context final UriInfo uriInfo) {
-        final var readParams = QueryParams.newReadDataParams(uriInfo);
-        return readData(server.bindRequestRoot(databindProvider.currentContext()), readParams).getValue();
+    public void readData(@Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+        readData(server.bindRequestRoot(databindProvider.currentContext()),  QueryParams.newReadDataParams(uriInfo))
+            .addCallback(new JaxRsRestconfCallback<>(ar) {
+                @Override
+                Response transform(Entry<NormalizedNode, Response> result) {
+                    return result.getValue();
+                }
+            });
     }
 
     /**
@@ -168,7 +173,7 @@ public final class RestconfDataServiceImpl {
      *
      * @param identifier path to target
      * @param uriInfo URI info
-     * @return {@link NormalizedNodePayload}
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link NormalizedNodePayload}
      */
     @GET
     @Path("/data/{identifier:.+}")
@@ -179,8 +184,8 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response readData(@Encoded @PathParam("identifier") final String identifier,
-            @Context final UriInfo uriInfo) {
+    public void readData(@Encoded @PathParam("identifier") final String identifier, @Context final UriInfo uriInfo,
+            @Suspended final AsyncResponse ar) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
         final var databind = databindProvider.currentContext();
         final var schemaContextRef = databind.modelContext();
@@ -206,12 +211,12 @@ public final class RestconfDataServiceImpl {
         return nodeAndResponse.getValue();
     }
 
-    private Entry<NormalizedNode, Response> readData(final InstanceIdentifierContext reqPath,
+    private RestconfFuture<Entry<NormalizedNode, Response>> readData(final InstanceIdentifierContext reqPath,
             final ReadDataParams readParams) {
         final var queryParams = QueryParams.newQueryParameters(readParams, reqPath);
         final var fieldPaths = queryParams.fieldPaths();
         final var strategy = server.getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
-        final NormalizedNode node;
+        final RestconfFuture<NormalizedNode> node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
             node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
                 readParams.withDefaults(), fieldPaths);

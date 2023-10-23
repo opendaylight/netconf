@@ -158,9 +158,9 @@ public abstract class RestconfStrategy {
      *
      * @param store the logical data store which should be modified
      * @param path the data object path
-     * @return a ListenableFuture containing the result of the read
+     * @return a RestconfFuture containing the result of the read
      */
-    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path);
+    abstract RestconfFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path);
 
     /**
      * Read data selected using fields from the datastore.
@@ -168,9 +168,9 @@ public abstract class RestconfStrategy {
      * @param store the logical data store which should be modified
      * @param path the parent data object path
      * @param fields paths to selected fields relative to parent path
-     * @return a ListenableFuture containing the result of the read
+     * @return a RestconfFuture containing the result of the read
      */
-    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path,
+    abstract RestconfFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path,
         List<YangInstanceIdentifier> fields);
 
     /**
@@ -606,7 +606,7 @@ public abstract class RestconfStrategy {
      * @param defaultsMode value of with-defaults parameter
      * @return {@link NormalizedNode}
      */
-    public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
+    public @Nullable RestconfFuture<NormalizedNode> readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) {
         return switch (content) {
             case ALL -> {
@@ -637,7 +637,7 @@ public abstract class RestconfStrategy {
      * @param fields   paths to selected subtrees which should be read, relative to to the parent path
      * @return {@link NormalizedNode}
      */
-    public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
+    public @Nullable RestconfFuture<NormalizedNode >readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
             final @NonNull List<YangInstanceIdentifier> fields) {
         return switch (content) {
