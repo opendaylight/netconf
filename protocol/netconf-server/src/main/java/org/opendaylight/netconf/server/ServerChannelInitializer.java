@@ -31,6 +31,6 @@ public final class ServerChannelInitializer extends AbstractChannelInitializer<N
     @Override
     protected void initializeSessionNegotiator(final Channel ch, final Promise<NetconfServerSession> promise) {
         ch.pipeline().addAfter(DESERIALIZER_EX_HANDLER_KEY, NETCONF_SESSION_NEGOTIATOR,
-            negotiatorFactory.getSessionNegotiator(null, ch, promise));
+            negotiatorFactory.getSessionNegotiator(ch, promise));
     }
 }
