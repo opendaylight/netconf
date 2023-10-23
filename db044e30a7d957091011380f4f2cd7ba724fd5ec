@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "673a3ace_b22dce2a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-10-23T09:42:40Z",
+      "side": 1,
+      "message": "Merge conflict, plrase rebase",
+      "revId": "db044e30a7d957091011380f4f2cd7ba724fd5ec",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
