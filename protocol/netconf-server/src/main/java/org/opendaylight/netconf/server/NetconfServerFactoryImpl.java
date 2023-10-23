@@ -22,26 +22,25 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
 
 public final class NetconfServerFactoryImpl implements NetconfServerFactory {
     private final SSHTransportStackFactory factory;
-    private final ServerChannelInitializer channelInitializer;
+    private final ServerTransportInitializer transportInitializer;
 
-    public NetconfServerFactoryImpl(final ServerChannelInitializer channelInitializer,
+    public NetconfServerFactoryImpl(final ServerTransportInitializer transportInitializer,
             final SSHTransportStackFactory factory) {
         this.factory = requireNonNull(factory);
-        this.channelInitializer = requireNonNull(channelInitializer);
+        this.transportInitializer = requireNonNull(transportInitializer);
     }
 
     @Override
     public ListenableFuture<TCPServer> createTcpServer(final TcpServerGrouping params)
             throws UnsupportedConfigurationException {
-        return TCPServer.listen(new ServerTransportInitializer(channelInitializer), factory.newServerBootstrap(),
-            params);
+        return TCPServer.listen(transportInitializer, factory.newServerBootstrap(), params);
     }
 
     @Override
     public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
             final SshServerGrouping sshParams, final ServerFactoryManagerConfigurator configurator)
                 throws UnsupportedConfigurationException {
-        return factory.listenServer(TransportConstants.SSH_SUBSYSTEM,
-            new ServerTransportInitializer(channelInitializer), tcpParams, sshParams, configurator);
+        return factory.listenServer(TransportConstants.SSH_SUBSYSTEM, transportInitializer, tcpParams, sshParams,
+            configurator);
     }
 }

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.auth.AuthProvider;
-import org.opendaylight.netconf.server.ServerChannelInitializer;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
@@ -57,20 +56,20 @@ public final class SshServerTransport implements AutoCloseable {
             @Reference final OSGiNetconfServer backend,
             @Reference(target = "(type=netconf-auth-provider)") final AuthProvider authProvider,
             final Configuration configuration) {
-        this(factoryHolder, backend.serverChannelInitializer(), authProvider, new TcpServerParametersBuilder()
+        this(factoryHolder, backend.serverTransportInitializer(), authProvider, new TcpServerParametersBuilder()
             .setLocalAddress(IetfInetUtil.ipAddressFor(configuration.bindingAddress()))
             .setLocalPort(new PortNumber(Uint16.valueOf(configuration.portNumber())))
             .build());
     }
 
-    public SshServerTransport(final TransportFactoryHolder factoryHolder, final ServerChannelInitializer initializer,
+    public SshServerTransport(final TransportFactoryHolder factoryHolder, final ServerTransportInitializer initializer,
             final AuthProvider authProvider, final TcpServerGrouping listenParams) {
         final var localAddr = listenParams.requireLocalAddress().stringValue();
         final var localPort = listenParams.requireLocalPort().getValue();
 
         try {
-            sshServer = factoryHolder.factory().listenServer(TransportConstants.SSH_SUBSYSTEM,
-                new ServerTransportInitializer(initializer), listenParams, null, factoryMgr -> {
+            sshServer = factoryHolder.factory().listenServer(TransportConstants.SSH_SUBSYSTEM, initializer,
+                listenParams, null, factoryMgr -> {
                     factoryMgr.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
                     factoryMgr.setPasswordAuthenticator(
                         (username, password, session) -> authProvider.authenticated(username, password));
