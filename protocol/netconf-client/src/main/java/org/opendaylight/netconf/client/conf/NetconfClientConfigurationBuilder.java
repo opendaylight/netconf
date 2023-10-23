@@ -22,6 +22,7 @@ import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.SshClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417.TlsClientGrouping;
 
 /**
@@ -46,6 +47,7 @@ public class NetconfClientConfigurationBuilder {
         AbstractNetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
     private String name;
     private TcpClientGrouping tcpParameters;
+    private TcpServerGrouping tcpServerParameters;
     private TlsClientGrouping tlsParameters;
     private org.opendaylight.netconf.transport.tls.SslHandlerFactory transportSslHandlerFactory;
     private SshClientGrouping sshParameters;
@@ -224,6 +226,18 @@ public class NetconfClientConfigurationBuilder {
     }
 
     /**
+     * Set TCP Server transport parameters for Call-Home incoming requests.
+     *
+     * @param tcpServerParameters parameters
+     * @return current builder instance
+     */
+    @SuppressWarnings("checkstyle:hiddenField")
+    public NetconfClientConfigurationBuilder withTcpServerParameters(final TcpServerGrouping tcpServerParameters) {
+        this.tcpServerParameters = tcpServerParameters;
+        return this;
+    }
+
+    /**
      * Set TLS client transport parameters.
      *
      * @param tlsParameters parameters
@@ -323,14 +337,14 @@ public class NetconfClientConfigurationBuilder {
      * @return immutable configuration instance
      */
     public NetconfClientConfiguration build() {
-        return tcpParameters == null
+        return tcpParameters == null && tcpServerParameters == null
             // legacy configuration
             ? new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
                 sessionListener, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities,
                 maximumIncomingChunkSize, name)
             // new configuration
-            : new NetconfClientConfiguration(clientProtocol, tcpParameters, tlsParameters, transportSslHandlerFactory,
-                sshParameters, sshConfigurator, sessionListener, odlHelloCapabilities, connectionTimeoutMillis,
-                maximumIncomingChunkSize, additionalHeader, name);
+            : new NetconfClientConfiguration(clientProtocol, tcpParameters, tcpServerParameters, tlsParameters,
+                transportSslHandlerFactory, sshParameters, sshConfigurator, sessionListener, odlHelloCapabilities,
+                connectionTimeoutMillis, maximumIncomingChunkSize, additionalHeader, name);
     }
 }

@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.client.conf;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
-import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +25,7 @@ import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.SshClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417.TlsClientGrouping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ public class NetconfClientConfiguration {
     private final String name;
 
     private final TcpClientGrouping tcpParameters;
+    private final TcpServerGrouping tcpServerParameters;
     private final TlsClientGrouping tlsParameters;
     private final org.opendaylight.netconf.transport.tls.SslHandlerFactory transportSslHandlerFactory;
     private final SshClientGrouping sshParameters;
@@ -73,6 +75,7 @@ public class NetconfClientConfiguration {
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
         this.name = name;
         this.tcpParameters = null;
+        this.tcpServerParameters = null;
         this.tlsParameters = null;
         this.transportSslHandlerFactory = null;
         this.sshParameters = null;
@@ -82,6 +85,7 @@ public class NetconfClientConfiguration {
 
     NetconfClientConfiguration(final NetconfClientProtocol protocol,
             final TcpClientGrouping tcpParameters,
+            final TcpServerGrouping tcpServerParameters,
             final TlsClientGrouping tlsParameters,
             final org.opendaylight.netconf.transport.tls.SslHandlerFactory transportSslHandlerFactory,
             final SshClientGrouping sshParameters,
@@ -93,7 +97,8 @@ public class NetconfClientConfiguration {
             final NetconfHelloMessageAdditionalHeader additionalHeader,
             final String name) {
         this.clientProtocol = requireNonNull(protocol);
-        this.tcpParameters = requireNonNull(tcpParameters);
+        this.tcpParameters = tcpParameters;
+        this.tcpServerParameters = tcpServerParameters;
         this.tlsParameters = tlsParameters;
         this.transportSslHandlerFactory = transportSslHandlerFactory;
         this.sshParameters = sshParameters;
@@ -109,8 +114,10 @@ public class NetconfClientConfiguration {
         this.sslHandlerFactory = null;
         this.sshClient = null;
         // validate
+        checkArgument(tcpParameters != null || tcpServerParameters != null,
+            "Either tcpParameters or tcpServerParameters is required");
         if (NetconfClientProtocol.TLS.equals(protocol)) {
-            Preconditions.checkArgument(tlsParameters != null || transportSslHandlerFactory != null,
+            checkArgument(tlsParameters != null || transportSslHandlerFactory != null,
                 "Either tlsParameters or sslHandlerFactory is required");
         } else if (NetconfClientProtocol.SSH.equals(protocol)) {
             requireNonNull(sshParameters);
@@ -163,6 +170,10 @@ public class NetconfClientConfiguration {
 
     public final TcpClientGrouping getTcpParameters() {
         return tcpParameters;
+    }
+
+    public final TcpServerGrouping getTcpServerParameters() {
+        return tcpServerParameters;
     }
 
     public final  TlsClientGrouping getTlsParameters() {
