@@ -5,16 +5,17 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler;
 
-import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
 import java.nio.charset.StandardCharsets;
+import org.opendaylight.netconf.api.messages.FramingMechanism;
 
-public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf> {
+/**
+ * A {@link FramingMechanismEncoder} handling {@link FramingMechanism#CHUNK}.
+ */
+public final class ChunkedFramingMechanismEncoder extends FramingMechanismEncoder {
     public static final int DEFAULT_CHUNK_SIZE = 8192;
     public static final int MIN_CHUNK_SIZE = 128;
     public static final int MAX_CHUNK_SIZE = 16 * 1024 * 1024;
@@ -26,13 +27,13 @@ public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf
     }
 
     public ChunkedFramingMechanismEncoder(final int chunkSize) {
-        Preconditions.checkArgument(chunkSize >= MIN_CHUNK_SIZE && chunkSize <= MAX_CHUNK_SIZE,
-                "Unsupported chunk size %s", chunkSize);
+        if (chunkSize < MIN_CHUNK_SIZE) {
+            throw new IllegalArgumentException(chunkSize + " is lower than minimum supported " + MIN_CHUNK_SIZE);
+        }
+        if (chunkSize > MAX_CHUNK_SIZE) {
+            throw new IllegalArgumentException(chunkSize + " is lower than maximum supported " + MAX_CHUNK_SIZE);
+        }
         this.chunkSize = chunkSize;
-    }
-
-    public final int getChunkSize() {
-        return chunkSize;
     }
 
     @Override
