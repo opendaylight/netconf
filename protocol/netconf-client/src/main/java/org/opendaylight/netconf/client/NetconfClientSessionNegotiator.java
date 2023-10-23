@@ -30,7 +30,7 @@ import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
+import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ import org.w3c.dom.NodeList;
 
 // Non-final for mocking
 class NetconfClientSessionNegotiator
-        extends AbstractNetconfSessionNegotiator<NetconfClientSession, NetconfClientSessionListener> {
+        extends NetconfSessionNegotiator<NetconfClientSession, NetconfClientSessionListener> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientSessionNegotiator.class);
 
     private static final XPathExpression SESSION_ID_X_PATH = XMLNetconfUtil
