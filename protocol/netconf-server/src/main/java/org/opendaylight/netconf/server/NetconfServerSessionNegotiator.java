@@ -22,13 +22,13 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
+import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class NetconfServerSessionNegotiator
-        extends AbstractNetconfSessionNegotiator<NetconfServerSession, NetconfServerSessionListener> {
+        extends NetconfSessionNegotiator<NetconfServerSession, NetconfServerSessionListener> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiator.class);
     private static final String UNKNOWN = "unknown";
 
