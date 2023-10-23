@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
 import org.opendaylight.netconf.api.CapabilityURN;
-import org.opendaylight.netconf.server.NetconfServerFactoryImpl;
-import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
+import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.server.ServerChannelInitializer;
+import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
@@ -51,6 +51,7 @@ import org.opendaylight.netconf.transport.api.TransportStack;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.ssh.ServerFactoryManagerConfigurator;
+import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -77,10 +78,10 @@ import org.slf4j.LoggerFactory;
 public class NetconfDeviceSimulator implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSimulator.class);
 
-    private final HashedWheelTimer hashedWheelTimer;
+    private final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
     private final Configuration configuration;
     private final List<TransportStack> servers;
-    private final SSHTransportStackFactory sshTransportStackFactory;
+    private final SSHTransportStackFactory sshStackFactory;
     private EffectiveModelContext schemaContext;
 
     private boolean sendFakeSchema = false;
@@ -88,15 +89,13 @@ public class NetconfDeviceSimulator implements Closeable {
     public NetconfDeviceSimulator(final Configuration configuration) {
         this.configuration = configuration;
         servers = new ArrayList<>(configuration.getDeviceCount());
-        sshTransportStackFactory = new SSHTransportStackFactory("netconf-device-simulator-threads",
+        sshStackFactory = new SSHTransportStackFactory("netconf-device-simulator-threads",
             configuration.getThreadPoolSize());
-        hashedWheelTimer = new HashedWheelTimer();
     }
 
-    private ServerChannelInitializer createServerChannelInitializer(final Set<Capability> capabilities,
+    private ServerTransportInitializer createTransportInitializer(final Set<Capability> capabilities,
             final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
-
-        final Set<Capability> transformedCapabilities = new HashSet<>(Collections2.transform(capabilities, input -> {
+        final var transformedCapabilities = new HashSet<>(Collections2.transform(capabilities, input -> {
             if (sendFakeSchema) {
                 sendFakeSchema = false;
                 return new FakeCapability((YangModuleCapability) input);
@@ -105,20 +104,15 @@ public class NetconfDeviceSimulator implements Closeable {
             }
         }));
         transformedCapabilities.add(new BasicCapability(CapabilityURN.CANDIDATE));
-        final NetconfMonitoringService monitoringService1 = new DummyMonitoringService(transformedCapabilities);
-        final SessionIdProvider idProvider = new DefaultSessionIdProvider();
+        final var monitoringService1 = new DummyMonitoringService(transformedCapabilities);
+        final var idProvider = new DefaultSessionIdProvider();
 
-        final NetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(
+        final var aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(
             sourceProvider, transformedCapabilities, monitoringService1, idProvider);
 
-        final Set<String> serverCapabilities = configuration.getCapabilities();
-
-        final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new TesttoolNegotiationFactory(
-                hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider,
-                configuration.getGenerateConfigsTimeout(),
-                monitoringService1, serverCapabilities);
-
-        return new ServerChannelInitializer(serverNegotiatorFactory);
+        return new ServerTransportInitializer(new ServerChannelInitializer(new TesttoolNegotiationFactory(
+            hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider,
+            configuration.getGenerateConfigsTimeout(), monitoringService1, configuration.getCapabilities())));
     }
 
     private NetconfOperationServiceFactory createOperationServiceFactory(
@@ -172,9 +166,8 @@ public class NetconfDeviceSimulator implements Closeable {
 
         final var schemaRepo = new SharedSchemaRepository("netconf-simulator");
         final var capabilities = parseSchemasToModuleCapabilities(schemaRepo);
-        final var serverChannelInitializer = createServerChannelInitializer(capabilities,
+        final var transportInitializer = createTransportInitializer(capabilities,
             sourceIdentifier -> schemaRepo.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class));
-        final var serverFactory = new NetconfServerFactoryImpl(serverChannelInitializer, sshTransportStackFactory);
 
         final var ipAddress = getIpAddress(configuration);
         final var startingPort = getStartingPort(configuration);
@@ -191,8 +184,9 @@ public class NetconfDeviceSimulator implements Closeable {
             try {
                 final var connectParams = connectionParams(ipAddress, port);
                 final var serverFuture = configuration.isSsh()
-                    ? serverFactory.createSshServer(connectParams, null, configurator)
-                    : serverFactory.createTcpServer(connectParams);
+                    ? sshStackFactory.listenServer(TransportConstants.SSH_SUBSYSTEM, transportInitializer,
+                        connectParams, null, configurator)
+                        : TCPServer.listen(transportInitializer, sshStackFactory.newServerBootstrap(), connectParams);
                 servers.add(serverFuture.get());
                 openDevices.add(port);
             } catch (UnsupportedConfigurationException | InterruptedException | ExecutionException e) {
@@ -358,6 +352,6 @@ public class NetconfDeviceSimulator implements Closeable {
                 LOG.debug("Exception on simulated device shutdown", e);
             }
         }
-        sshTransportStackFactory.close();
+        sshStackFactory.close();
     }
 }
