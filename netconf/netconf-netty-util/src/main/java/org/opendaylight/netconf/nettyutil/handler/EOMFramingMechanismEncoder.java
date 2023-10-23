@@ -5,16 +5,18 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
+import org.opendaylight.netconf.api.messages.FramingMechanism;
 
-public class EOMFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf> {
+/**
+ * A {@link FramingMechanismEncoder} handling {@link FramingMechanism#EOM}.
+ */
+public final class EOMFramingMechanismEncoder extends FramingMechanismEncoder {
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
+    protected void encode(final ChannelHandlerContext ctx, final ByteBuf msg, final ByteBuf out) {
         out.writeBytes(msg);
         out.writeBytes(MessageParts.END_OF_MESSAGE);
     }
