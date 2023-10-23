@@ -29,7 +29,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 
-// FIXME: Non-final for testtool. Why exactly?
+// non-final for testing and netconf-testtool (for some reason)
 public class NetconfServerSessionNegotiatorFactory {
     public static final Set<String> DEFAULT_BASE_CAPABILITIES = ImmutableSet.of(
         CapabilityURN.BASE,
