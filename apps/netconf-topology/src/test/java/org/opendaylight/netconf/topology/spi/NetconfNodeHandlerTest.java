@@ -11,24 +11,24 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.google.common.net.InetAddresses;
-import io.netty.util.concurrent.DefaultPromise;
-import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.ImmediateEventExecutor;
-import io.netty.util.concurrent.ScheduledFuture;
-import io.netty.util.concurrent.SucceededFuture;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.SettableFuture;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -40,7 +40,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.api.CapabilityURN;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
@@ -79,7 +79,7 @@ public class NetconfNodeHandlerTest {
 
     // Core setup
     @Mock
-    private ScheduledExecutorService keepaliveExecutor;
+    private ScheduledExecutorService scheduledExecutor;
     @Mock
     private SchemaResourceManager schemaManager;
     @Mock
@@ -99,7 +99,7 @@ public class NetconfNodeHandlerTest {
 
     // Mock client dispatcher-related things
     @Mock
-    private NetconfClientDispatcher clientDispatcher;
+    private NetconfClientFactory clientFactory;
     @Mock
     private NetconfClientSession clientSession;
     @Captor
@@ -110,8 +110,6 @@ public class NetconfNodeHandlerTest {
     private ArgumentCaptor<RemoteDeviceServices> servicesCaptor;
 
     // Mock eventExecutor-related things
-    @Mock
-    private EventExecutor eventExecutor;
     @Mock
     private ScheduledFuture<?> scheduleFuture;
     @Captor
@@ -134,9 +132,9 @@ public class NetconfNodeHandlerTest {
     @Before
     public void before() {
         // Instantiate the handler
-        handler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor, BASE_SCHEMAS,
+        handler = new NetconfNodeHandler(clientFactory, scheduledExecutor, BASE_SCHEMAS,
             schemaManager, processingExecutor,
-            new DefaultNetconfClientConfigurationBuilderFactory(encryptionService, credentialProvider,
+            new LegacyNetconfClientConfigurationBuilderFactory(encryptionService, credentialProvider,
                 sslHandlerFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
@@ -154,10 +152,12 @@ public class NetconfNodeHandlerTest {
                 .setConnectionTimeoutMillis(Uint32.valueOf(1000))
                 .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
                 .build(), null);
+        lenient().doReturn(scheduleFuture).when(scheduledExecutor)
+            .schedule(any(Runnable.class), anyLong(), any(TimeUnit.class));
     }
 
     @Test
-    public void successfullOnDeviceConnectedPropagates() {
+    public void successfulOnDeviceConnectedPropagates() throws Exception {
         assertSuccessfulConnect();
         assertEquals(1, handler.attempts());
 
@@ -178,78 +178,73 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
-    public void failedSchemaCausesReconnect() {
+    public void failedSchemaCausesReconnect() throws Exception {
         assertSuccessfulConnect();
         assertEquals(1, handler.attempts());
 
         // Note: this will count as a second attempt
-        doReturn(scheduleFuture).when(eventExecutor).schedule(scheduleCaptor.capture(), eq(150L),
-            eq(TimeUnit.MILLISECONDS));
         handler.onDeviceFailed(new AssertionError("schema failure"));
-
         assertEquals(2, handler.attempts());
+        verify(scheduledExecutor, times(1))
+            .schedule(scheduleCaptor.capture(), eq(150L), eq(TimeUnit.MILLISECONDS));
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
         scheduleCaptor.getValue().run();
-        verify(clientDispatcher, times(2)).createClient(any());
+        verify(clientFactory, times(2)).createClient(any());
         assertEquals(2, handler.attempts());
     }
 
     @Test
-    public void downAfterUpCausesReconnect() {
+    public void downAfterUpCausesReconnect() throws Exception {
         // Let's borrow common bits
-        successfullOnDeviceConnectedPropagates();
+        successfulOnDeviceConnectedPropagates();
 
         // when the device is connected, we propagate the information and initiate reconnect
         doNothing().when(delegate).onDeviceDisconnected();
-        doReturn(scheduleFuture).when(eventExecutor).schedule(scheduleCaptor.capture(), eq(100L),
-            eq(TimeUnit.MILLISECONDS));
         handler.onDeviceDisconnected();
+        verify(scheduledExecutor, times(1)).schedule(scheduleCaptor.capture(), eq(100L), eq(TimeUnit.MILLISECONDS));
 
         assertEquals(1, handler.attempts());
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
         scheduleCaptor.getValue().run();
-        verify(clientDispatcher, times(2)).createClient(any());
+        verify(clientFactory, times(2)).createClient(any());
         assertEquals(1, handler.attempts());
     }
 
     @Test
-    public void socketFailuresAreRetried() {
-        final var firstPromise = new DefaultPromise<NetconfClientSession>(ImmediateEventExecutor.INSTANCE);
-        final var secondPromise = new DefaultPromise<NetconfClientSession>(ImmediateEventExecutor.INSTANCE);
-        doReturn(firstPromise, secondPromise).when(clientDispatcher).createClient(any());
+    public void socketFailuresAreRetried() throws Exception {
+        final var firstFuture = SettableFuture.create();
+        final var secondFuture = SettableFuture.create();
+        doReturn(firstFuture, secondFuture).when(clientFactory).createClient(any());
         handler.connect();
         assertEquals(1, handler.attempts());
 
-        doReturn(scheduleFuture).when(eventExecutor).schedule(scheduleCaptor.capture(), eq(150L),
+        firstFuture.setException(new AssertionError("first"));
+        verify(scheduledExecutor).schedule(scheduleCaptor.capture(), eq(150L),
             eq(TimeUnit.MILLISECONDS));
-        firstPromise.setFailure(new AssertionError("first"));
-
-        assertEquals(2, handler.attempts());
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
         scheduleCaptor.getValue().run();
-        verify(clientDispatcher, times(2)).createClient(any());
+        verify(clientFactory, times(2)).createClient(any());
         assertEquals(2, handler.attempts());
 
         // now report the second failure
         final var throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
         doNothing().when(delegate).onDeviceFailed(throwableCaptor.capture());
-        secondPromise.setFailure(new AssertionError("second"));
+        secondFuture.setException(new AssertionError("second"));
         assertThat(throwableCaptor.getValue(), instanceOf(ConnectGivenUpException.class));
 
         // but nothing else happens
         assertEquals(2, handler.attempts());
     }
 
-    // Initiate a connect() which results in immediate clientDispatcher report. No interactions with delegate may occur,
+    // Initiate connect() which results in immediate clientDispatcher report. No interactions with delegate may occur,
     // as this is just a prelude to a follow-up callback
-    private void assertSuccessfulConnect() {
-        doReturn(new SucceededFuture<>(ImmediateEventExecutor.INSTANCE, clientSession))
-            .when(clientDispatcher).createClient(any());
+    private void assertSuccessfulConnect() throws Exception {
+        doReturn(Futures.immediateFuture(clientSession)).when(clientFactory).createClient(any());
         handler.connect();
-        verify(clientDispatcher).createClient(any());
+        verify(clientFactory).createClient(any());
         verifyNoInteractions(delegate);
     }
 }
