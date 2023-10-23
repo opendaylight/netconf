@@ -11,6 +11,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -123,10 +126,10 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         sshSession.close(false);
     }
 
-    private synchronized Promise<NetconfClientSession> doActivate(final ClientChannel netconfChannel,
+    private synchronized ListenableFuture<NetconfClientSession> doActivate(final ClientChannel netconfChannel,
             final NetconfClientSessionListener listener, final MinaSshNettyChannel nettyChannel) {
         if (activated) {
-            return newSessionPromise().setFailure(new IllegalStateException("Session already activated."));
+            return Futures.immediateFailedFuture(new IllegalStateException("Session already activated."));
         }
         activated = true;
         nettyChannel.pipeline().addFirst(new SshWriteAsyncHandlerAdapter(netconfChannel));
@@ -135,11 +138,21 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         factory.getChannelInitializer(listener).initialize(nettyChannel, activationPromise);
         ((ChannelSubsystem) netconfChannel).onClose(nettyChannel::doNettyDisconnect);
         factory.getNettyGroup().register(nettyChannel).awaitUninterruptibly(500);
-        return activationPromise;
+        final SettableFuture<NetconfClientSession> future = SettableFuture.create();
+        activationPromise.addListener(ignored -> {
+            final var cause = activationPromise.cause();
+            if (cause != null) {
+                future.setException(cause);
+            } else {
+                future.set(activationPromise.getNow());
+            }
+        });
+        return future;
     }
 
     @Deprecated(since = "7.0.0", forRemoval = true)
-    protected MinaSshNettyChannel newMinaSshNettyChannel() {
+    @VisibleForTesting
+    MinaSshNettyChannel newMinaSshNettyChannel() {
         return new MinaSshNettyChannel(this, sshSession);
     }
 

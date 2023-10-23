@@ -21,7 +21,7 @@ import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -44,29 +44,30 @@ public abstract class AbstractNetconfTopology {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
     private final HashMap<NodeId, NetconfNodeHandler> activeConnectors = new HashMap<>();
-    private final NetconfClientDispatcher clientDispatcher;
+    private final NetconfClientFactory clientFactory;
     private final EventExecutor eventExecutor;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager schemaManager;
     private final BaseNetconfSchemas baseSchemas;
     private final NetconfClientConfigurationBuilderFactory builderFactory;
 
-    protected final ScheduledExecutorService keepaliveExecutor;
+    protected final ScheduledExecutorService scheduledExecutor;
     protected final Executor processingExecutor;
     protected final DataBroker dataBroker;
     protected final DOMMountPointService mountPointService;
     protected final String topologyId;
 
-    protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-            final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-            final ThreadPool processingExecutor, final SchemaResourceManager schemaManager, final DataBroker dataBroker,
-            final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
+    protected AbstractNetconfTopology(final String topologyId, final NetconfClientFactory clientDispatcher,
+            final EventExecutor eventExecutor, final ScheduledThreadPool scheduledThreadPool,
+            final ThreadPool processingThreadPool, final SchemaResourceManager schemaManager,
+            final DataBroker dataBroker, final DOMMountPointService mountPointService,
+            final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas) {
         this.topologyId = requireNonNull(topologyId);
-        this.clientDispatcher = clientDispatcher;
+        this.clientFactory = clientDispatcher;
         this.eventExecutor = eventExecutor;
-        this.keepaliveExecutor = keepaliveExecutor.getExecutor();
-        this.processingExecutor = processingExecutor.getExecutor();
+        this.scheduledExecutor = scheduledThreadPool.getExecutor();
+        this.processingExecutor = processingThreadPool.getExecutor();
         this.schemaManager = requireNonNull(schemaManager);
         this.deviceActionFactory = deviceActionFactory;
         this.dataBroker = requireNonNull(dataBroker);
@@ -124,9 +125,9 @@ public abstract class AbstractNetconfTopology {
 
         final NetconfNodeHandler nodeHandler;
         try {
-            nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor, baseSchemas,
-                schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade, deviceId,
-                nodeId, netconfNode, nodeOptional);
+            nodeHandler = new NetconfNodeHandler(clientFactory, scheduledExecutor, baseSchemas,
+                schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade,
+                deviceId, nodeId, netconfNode, nodeOptional);
         } catch (IllegalArgumentException e) {
             // This is a workaround for NETCONF-1114 where the encrypted password's lexical structure is not enforced
             // in the datastore and it ends up surfacing when we decrypt the password.
