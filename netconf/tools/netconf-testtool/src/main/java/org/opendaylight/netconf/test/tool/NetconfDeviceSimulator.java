@@ -27,7 +27,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.TransportConstants;
-import org.opendaylight.netconf.server.ServerChannelInitializer;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
@@ -110,9 +109,9 @@ public class NetconfDeviceSimulator implements Closeable {
         final var aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(
             sourceProvider, transformedCapabilities, monitoringService1, idProvider);
 
-        return new ServerTransportInitializer(new ServerChannelInitializer(new TesttoolNegotiationFactory(
+        return new ServerTransportInitializer(new TesttoolNegotiationFactory(
             hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider,
-            configuration.getGenerateConfigsTimeout(), monitoringService1, configuration.getCapabilities())));
+            configuration.getGenerateConfigsTimeout(), monitoringService1, configuration.getCapabilities()));
     }
 
     private NetconfOperationServiceFactory createOperationServiceFactory(

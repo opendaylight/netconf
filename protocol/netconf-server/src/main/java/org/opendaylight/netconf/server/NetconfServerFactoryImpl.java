@@ -21,27 +21,26 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
 
 public final class NetconfServerFactoryImpl implements NetconfServerFactory {
+    private final ServerTransportInitializer transportInitializer;
     private final SSHTransportStackFactory factory;
-    private final ServerChannelInitializer channelInitializer;
 
-    public NetconfServerFactoryImpl(final ServerChannelInitializer channelInitializer,
+    public NetconfServerFactoryImpl(final ServerTransportInitializer transportInitializer,
             final SSHTransportStackFactory factory) {
+        this.transportInitializer = requireNonNull(transportInitializer);
         this.factory = requireNonNull(factory);
-        this.channelInitializer = requireNonNull(channelInitializer);
     }
 
     @Override
     public ListenableFuture<TCPServer> createTcpServer(final TcpServerGrouping params)
             throws UnsupportedConfigurationException {
-        return TCPServer.listen(new ServerTransportInitializer(channelInitializer), factory.newServerBootstrap(),
-            params);
+        return TCPServer.listen(transportInitializer, factory.newServerBootstrap(), params);
     }
 
     @Override
     public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
             final SshServerGrouping sshParams, final ServerFactoryManagerConfigurator configurator)
                 throws UnsupportedConfigurationException {
-        return factory.listenServer(TransportConstants.SSH_SUBSYSTEM,
-            new ServerTransportInitializer(channelInitializer), tcpParams, sshParams, configurator);
+        return factory.listenServer(TransportConstants.SSH_SUBSYSTEM, transportInitializer, tcpParams, sshParams,
+            configurator);
     }
 }
