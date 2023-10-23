@@ -181,8 +181,8 @@ public class ConcurrentClientsTest {
             .build();
 
         serverTransportFactory = new SSHTransportStackFactory("server", threads);
-        final var serverFactory = new NetconfServerFactoryImpl(
-            new ServerChannelInitializer(serverNegotiatorFactory), serverTransportFactory);
+        final var serverFactory = new NetconfServerFactoryImpl(new ServerTransportInitializer(serverNegotiatorFactory),
+            serverTransportFactory);
         server = serverFactory.createTcpServer(serverParams).get(TIMEOUT, MILLISECONDS);
     }
 
