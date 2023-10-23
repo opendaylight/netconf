@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.nettyutil;
+package org.opendaylight.netconf.client;
 
 import static java.util.Objects.requireNonNull;
 
@@ -39,14 +39,14 @@ import org.slf4j.LoggerFactory;
  * start method that will handle sockets in different thread.
  */
 @Deprecated(forRemoval = true)
-public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L extends NetconfSessionListener<? super S>> {
+abstract class AbstractNetconfDispatcher<S extends NetconfSession, L extends NetconfSessionListener<? super S>> {
     protected interface ChannelPipelineInitializer<C extends Channel, S extends NetconfSession> {
         /**
          * Initializes channel by specifying the handlers in its pipeline. Handlers are protocol specific, therefore
          * this method needs to be implemented in protocol specific Dispatchers.
          *
-         * @param channel whose pipeline should be defined, also to be passed to {@link NetconfSessionNegotiator}
-         * @param promise to be passed to {@link NetconfSessionNegotiator}
+         * @param channel whose pipeline should be defined, also to be passed to {@link NetconfClientSessionNegotiator}
+         * @param promise to be passed to {@link NetconfClientSessionNegotiator}
          */
         void initializeChannel(C channel, Promise<S> promise);
     }
@@ -74,7 +74,6 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
         this.workerGroup = requireNonNull(workerGroup);
         this.executor = requireNonNull(executor);
     }
-
 
     /**
      * Creates server. Each server needs factories to pass their instances to client sessions.
