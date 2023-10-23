@@ -103,21 +103,19 @@ public class NetconfServerSessionNegotiatorFactory
      * @param promise                       Promise to be notified
      * @return session negotiator
      */
+    @Deprecated
     @Override
     public NetconfServerSessionNegotiator getSessionNegotiator(
             final NetconfSessionListenerFactory<NetconfServerSessionListener> defunctSessionListenerFactory,
             final Channel channel, final Promise<NetconfServerSession> promise) {
         final var sessionId = idProvider.getNextSessionId();
         final var socketAddress = channel.parent() == null ? null : channel.parent().localAddress();
+        final var service = getOperationServiceForAddress(sessionId, socketAddress);
+        final var listener = new NetconfServerSessionListener(
+            new NetconfOperationRouterImpl(service, monitoringService, sessionId), monitoringService, service);
 
         return new NetconfServerSessionNegotiator(createHelloMessage(sessionId, monitoringService), sessionId, promise,
-            channel, timer, getListener(sessionId, socketAddress), connectionTimeoutMillis, maximumIncomingChunkSize);
-    }
-
-    private NetconfServerSessionListener getListener(final SessionIdType sessionId, final SocketAddress socketAddress) {
-        final var service = getOperationServiceForAddress(sessionId, socketAddress);
-        return new NetconfServerSessionListener(
-            new NetconfOperationRouterImpl(service, monitoringService, sessionId), monitoringService, service);
+            channel, timer, listener, connectionTimeoutMillis, maximumIncomingChunkSize);
     }
 
     protected NetconfOperationService getOperationServiceForAddress(final SessionIdType sessionId,
