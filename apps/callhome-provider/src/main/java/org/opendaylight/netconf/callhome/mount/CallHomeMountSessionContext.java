@@ -10,7 +10,7 @@ package org.opendaylight.netconf.callhome.mount;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
-import io.netty.util.concurrent.Future;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
@@ -107,7 +107,7 @@ class CallHomeMountSessionContext {
                 .build();
     }
 
-    Future<NetconfClientSession> activateNetconfChannel(final NetconfClientSessionListener sessionListener) {
+    ListenableFuture<NetconfClientSession> activateNetconfChannel(final NetconfClientSessionListener sessionListener) {
         return activator.activate(wrap(sessionListener));
     }
 

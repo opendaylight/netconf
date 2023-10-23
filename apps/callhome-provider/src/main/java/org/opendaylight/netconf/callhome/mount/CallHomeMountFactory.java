@@ -10,9 +10,9 @@ package org.opendaylight.netconf.callhome.mount;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.FailedFuture;
-import io.netty.util.concurrent.Future;
 import java.net.InetSocketAddress;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -21,7 +21,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
@@ -36,16 +36,16 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(service = { CallHomeMountDispatcher.class, CallHomeNetconfSubsystemListener.class }, immediate = true)
+@Component(service = { CallHomeMountFactory.class, CallHomeNetconfSubsystemListener.class }, immediate = true)
 // Non-final for testing
-public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHomeNetconfSubsystemListener {
-    private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountDispatcher.class);
+public class CallHomeMountFactory implements NetconfClientFactory, CallHomeNetconfSubsystemListener {
+    private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountFactory.class);
 
     private final CallHomeMountSessionManager sessionManager = new CallHomeMountSessionManager();
     private final String topologyId;
     private final EventExecutor eventExecutor;
-    private final ScheduledThreadPool keepaliveExecutor;
-    private final ThreadPool processingExecutor;
+    private final ScheduledThreadPool scheduledThreadPool;
+    private final ThreadPool processingThreadPool;
     private final SchemaResourceManager schemaRepositoryProvider;
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
@@ -57,40 +57,40 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final BaseNetconfSchemas baseSchemas;
 
 
-    public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
-            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
+    public CallHomeMountFactory(final String topologyId, final EventExecutor eventExecutor,
+            final ScheduledThreadPool scheduledThreadPool, final ThreadPool processingThreadPool,
             final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
             final DataBroker dataBroker, final DOMMountPointService mountService,
             final NetconfClientConfigurationBuilderFactory builderFactory) {
-        this(topologyId, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider, baseSchemas,
-            dataBroker, mountService, builderFactory, null);
+        this(topologyId, eventExecutor, scheduledThreadPool, processingThreadPool, schemaRepositoryProvider,
+            baseSchemas, dataBroker, mountService, builderFactory, null);
     }
 
     @Activate
-    public CallHomeMountDispatcher(
+    public CallHomeMountFactory(
             @Reference(target = "(type=global-event-executor)") final EventExecutor eventExecutor,
             @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
-                final ScheduledThreadPool keepaliveExecutor,
-            @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingExecutor,
+                final ScheduledThreadPool scheduledThreadPool,
+            @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingThreadPool,
             @Reference final SchemaResourceManager schemaRepositoryProvider,
             @Reference final BaseNetconfSchemas baseSchemas, @Reference final DataBroker dataBroker,
             @Reference final DOMMountPointService mountService,
-            @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
+            @Reference(target = "(type=legacy)") final NetconfClientConfigurationBuilderFactory builderFactory,
             @Reference final DeviceActionFactory deviceActionFactory) {
-        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, eventExecutor, keepaliveExecutor, processingExecutor,
+        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, eventExecutor, scheduledThreadPool, processingThreadPool,
             schemaRepositoryProvider, baseSchemas, dataBroker, mountService, builderFactory, deviceActionFactory);
     }
 
-    public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
-            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
+    public CallHomeMountFactory(final String topologyId, final EventExecutor eventExecutor,
+            final ScheduledThreadPool scheduledThreadPool, final ThreadPool processingThreadPool,
             final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
             final DataBroker dataBroker, final DOMMountPointService mountService,
             final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory) {
         this.topologyId = topologyId;
         this.eventExecutor = eventExecutor;
-        this.keepaliveExecutor = keepaliveExecutor;
-        this.processingExecutor = processingExecutor;
+        this.scheduledThreadPool = scheduledThreadPool;
+        this.processingThreadPool = processingThreadPool;
         this.schemaRepositoryProvider = schemaRepositoryProvider;
         this.deviceActionFactory = deviceActionFactory;
         this.baseSchemas = requireNonNull(baseSchemas);
@@ -101,15 +101,15 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
 
     @Deprecated
     @Override
-    public Future<NetconfClientSession> createClient(final NetconfClientConfiguration clientConfiguration) {
+    public ListenableFuture<NetconfClientSession> createClient(final NetconfClientConfiguration clientConfiguration) {
         return activateChannel(clientConfiguration);
     }
 
-    private Future<NetconfClientSession> activateChannel(final NetconfClientConfiguration conf) {
+    private ListenableFuture<NetconfClientSession> activateChannel(final NetconfClientConfiguration conf) {
         final InetSocketAddress remoteAddr = conf.getAddress();
         final CallHomeMountSessionContext context = sessionManager().getByAddress(remoteAddr);
         LOG.info("Activating NETCONF channel for ip {} device context {}", remoteAddr, context);
-        return context == null ? new FailedFuture<>(eventExecutor, new NullPointerException())
+        return context == null ? Futures.immediateFailedFuture(new NullPointerException("context is null"))
             : context.activateNetconfChannel(conf.getSessionListener());
     }
 
@@ -130,12 +130,17 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
 
     @VisibleForTesting
     void createTopology() {
-        topology = new CallHomeTopology(topologyId, this, eventExecutor, keepaliveExecutor, processingExecutor,
+        topology = new CallHomeTopology(topologyId, this, eventExecutor, scheduledThreadPool, processingThreadPool,
                 schemaRepositoryProvider, dataBroker, mountService, builderFactory, baseSchemas, deviceActionFactory);
     }
 
     @VisibleForTesting
     CallHomeMountSessionManager sessionManager() {
         return sessionManager;
+    }
+
+    @Override
+    public void close() throws Exception {
+        // no action
     }
 }

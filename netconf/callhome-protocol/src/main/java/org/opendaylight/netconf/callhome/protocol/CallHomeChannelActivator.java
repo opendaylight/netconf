@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.callhome.protocol;
 
-import io.netty.util.concurrent.Future;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -26,5 +26,5 @@ public interface CallHomeChannelActivator {
      * @param listener Client Session Listener to be attached to NETCONF session.
      * @return Future with negotiated NETCONF session
      */
-    @NonNull Future<NetconfClientSession> activate(@NonNull NetconfClientSessionListener listener);
+    @NonNull ListenableFuture<NetconfClientSession> activate(@NonNull NetconfClientSessionListener listener);
 }

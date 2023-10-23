@@ -16,7 +16,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -31,7 +31,7 @@ public class NetconfTopologySetup {
     private final Executor processingExecutor;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
-    private final NetconfClientDispatcher netconfClientDispatcher;
+    private final NetconfClientFactory netconfClientFactory;
     private final String topologyId;
     private final NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
     private final Duration idleTimeout;
@@ -46,7 +46,7 @@ public class NetconfTopologySetup {
         processingExecutor = builder.getProcessingExecutor();
         actorSystem = builder.getActorSystem();
         eventExecutor = builder.getEventExecutor();
-        netconfClientDispatcher = builder.getNetconfClientDispatcher();
+        netconfClientFactory = builder.getNetconfClientFactory();
         topologyId = builder.getTopologyId();
         schemaResourceDTO = builder.getSchemaResourceDTO();
         idleTimeout = builder.getIdleTimeout();
@@ -89,8 +89,8 @@ public class NetconfTopologySetup {
         return topologyId;
     }
 
-    public NetconfClientDispatcher getNetconfClientDispatcher() {
-        return netconfClientDispatcher;
+    public NetconfClientFactory getNetconfClientFactory() {
+        return netconfClientFactory;
     }
 
     public NetconfDevice.SchemaResourcesDTO getSchemaResourcesDTO() {
@@ -115,7 +115,7 @@ public class NetconfTopologySetup {
         private ActorSystem actorSystem;
         private EventExecutor eventExecutor;
         private String topologyId;
-        private NetconfClientDispatcher netconfClientDispatcher;
+        private NetconfClientFactory netconfClientFactory;
         private NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
         private Duration idleTimeout;
         private BaseNetconfSchemas baseSchemas;
@@ -219,12 +219,12 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        NetconfClientDispatcher getNetconfClientDispatcher() {
-            return netconfClientDispatcher;
+        NetconfClientFactory getNetconfClientFactory() {
+            return netconfClientFactory;
         }
 
-        public NetconfTopologySetupBuilder setNetconfClientDispatcher(final NetconfClientDispatcher clientDispatcher) {
-            netconfClientDispatcher = clientDispatcher;
+        public NetconfTopologySetupBuilder setNetconfClientFactory(final NetconfClientFactory clientFactory) {
+            netconfClientFactory = clientFactory;
             return this;
         }
 

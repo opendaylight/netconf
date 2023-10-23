@@ -9,6 +9,9 @@ package org.opendaylight.netconf.callhome.protocol.tls;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.HashedWheelTimer;
@@ -67,10 +70,11 @@ final class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext 
         channel.close();
     }
 
-    private Promise<NetconfClientSession> doActivate(final Channel ch, final NetconfClientSessionListener listener) {
+    private ListenableFuture<NetconfClientSession> doActivate(final Channel ch,
+            final NetconfClientSessionListener listener) {
         final Promise<NetconfClientSession> activationPromise = newSessionPromise();
         if (activated.compareAndExchange(false, true)) {
-            return activationPromise.setFailure(new IllegalStateException("Session (channel) already activated."));
+            return Futures.immediateFailedFuture(new IllegalStateException("Session (channel) already activated."));
         }
 
         LOG.info("Activating Netconf channel for {} with {}", getRemoteAddress(), listener);
@@ -79,7 +83,16 @@ final class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext 
         final TlsClientChannelInitializer tlsClientChannelInitializer = new TlsClientChannelInitializer(
             sslHandlerFactory, negotiatorFactory, listener);
         tlsClientChannelInitializer.initialize(ch, activationPromise);
-        return activationPromise;
+        final SettableFuture<NetconfClientSession> future = SettableFuture.create();
+        activationPromise.addListener(ignored -> {
+            final var cause = activationPromise.cause();
+            if (cause != null) {
+                future.setException(cause);
+            } else {
+                future.set(activationPromise.getNow());
+            }
+        });
+        return future;
     }
 
     @Override

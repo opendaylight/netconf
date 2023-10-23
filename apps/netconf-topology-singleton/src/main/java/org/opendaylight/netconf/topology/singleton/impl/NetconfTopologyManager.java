@@ -42,7 +42,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -103,7 +103,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     private final Executor processingExecutor;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
-    private final NetconfClientDispatcher clientDispatcher;
+    private final NetconfClientFactory clientFactory;
     private final String topologyId;
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
@@ -123,7 +123,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingExecutor,
             @Reference final ActorSystemProvider actorSystemProvider,
             @Reference(target = "(type=global-event-executor)") final EventExecutor eventExecutor,
-            @Reference(target = "(type=netconf-client-dispatcher)") final NetconfClientDispatcher clientDispatcher,
+            @Reference(target = "(type=netconf-client-factory)") final NetconfClientFactory clientFactory,
             @Reference final DOMMountPointService mountPointService,
             @Reference final AAAEncryptionService encryptionService,
             @Reference final RpcProviderService rpcProviderService,
@@ -132,7 +132,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
             final Configuration configuration) {
         this(baseSchemas, dataBroker, clusterSingletonServiceProvider, keepaliveExecutor.getExecutor(),
-            processingExecutor.getExecutor(), actorSystemProvider.getActorSystem(), eventExecutor, clientDispatcher,
+            processingExecutor.getExecutor(), actorSystemProvider.getActorSystem(), eventExecutor, clientFactory,
             mountPointService, encryptionService, rpcProviderService, deviceActionFactory, resourceManager,
             builderFactory, configuration.topology$_$id(),
             Uint16.valueOf(configuration.write$_$transaction$_$idle$_$timeout()));
@@ -143,12 +143,12 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
-            final NetconfClientDispatcher clientDispatcher, final DOMMountPointService mountPointService,
+            final NetconfClientFactory clientFactory, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
             final DeviceActionFactory deviceActionFactory, final SchemaResourceManager resourceManager,
             final NetconfClientConfigurationBuilderFactory builderFactory) {
         this(baseSchemas, dataBroker, clusterSingletonServiceProvider, keepaliveExecutor.getExecutor(),
-            processingExecutor.getExecutor(), actorSystemProvider.getActorSystem(), eventExecutor, clientDispatcher,
+            processingExecutor.getExecutor(), actorSystemProvider.getActorSystem(), eventExecutor, clientFactory,
             mountPointService, encryptionService, rpcProviderService, deviceActionFactory, resourceManager,
             builderFactory, NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, Uint16.ZERO);
     }
@@ -159,7 +159,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
             final ScheduledExecutorService keepaliveExecutor, final Executor processingExecutor,
             final ActorSystem actorSystem, final EventExecutor eventExecutor,
-            final NetconfClientDispatcher clientDispatcher, final DOMMountPointService mountPointService,
+            final NetconfClientFactory clientFactory, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
             final DeviceActionFactory deviceActionFactory, final SchemaResourceManager resourceManager,
             final NetconfClientConfigurationBuilderFactory builderFactory, final String topologyId,
@@ -171,7 +171,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         this.processingExecutor = requireNonNull(processingExecutor);
         this.actorSystem = requireNonNull(actorSystem);
         this.eventExecutor = requireNonNull(eventExecutor);
-        this.clientDispatcher = requireNonNull(clientDispatcher);
+        this.clientFactory = requireNonNull(clientFactory);
         this.topologyId = requireNonNull(topologyId);
         writeTxIdleTimeout = Duration.ofSeconds(writeTransactionIdleTimeout.toJava());
         this.mountPointService = mountPointService;
@@ -341,7 +341,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
                 .setKeepaliveExecutor(keepaliveExecutor)
                 .setProcessingExecutor(processingExecutor)
                 .setTopologyId(topologyId)
-                .setNetconfClientDispatcher(clientDispatcher)
+                .setNetconfClientFactory(clientFactory)
                 .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode.getSchemaCacheDirectory(),
                     deviceId))
                 .setIdleTimeout(writeTxIdleTimeout)

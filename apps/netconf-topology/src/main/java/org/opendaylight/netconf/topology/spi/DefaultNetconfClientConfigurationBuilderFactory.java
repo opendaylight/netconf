@@ -33,10 +33,14 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * Default implementation of NetconfClientConfigurationBuildFactory.
+ * Legacy implementation of NetconfClientConfigurationBuildFactory.
+ *
+ * @deprecated as outdated. Should be replaced with {@link NetconfClientConfigurationBuilderFactoryImpl} once
+ *     callhome-provider is migrated to transport-api.
  */
-@Component
+@Component(service = NetconfClientConfigurationBuilderFactory.class, property = "type=legacy")
 @Singleton
+@Deprecated(forRemoval = true)
 public final class DefaultNetconfClientConfigurationBuilderFactory implements NetconfClientConfigurationBuilderFactory {
     private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
     private final AAAEncryptionService encryptionService;

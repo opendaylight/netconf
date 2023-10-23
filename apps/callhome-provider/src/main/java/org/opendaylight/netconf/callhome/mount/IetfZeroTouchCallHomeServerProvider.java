@@ -65,7 +65,7 @@ public final class IetfZeroTouchCallHomeServerProvider
     private static final Logger LOG = LoggerFactory.getLogger(IetfZeroTouchCallHomeServerProvider.class);
 
     private final DataBroker dataBroker;
-    private final CallHomeMountDispatcher mountDispacher;
+    private final CallHomeMountFactory mountDispacher;
     private final CallHomeAuthProviderImpl authProvider;
     private final CallhomeStatusReporter statusReporter;
     private final int port;
@@ -75,15 +75,15 @@ public final class IetfZeroTouchCallHomeServerProvider
 
     @Activate
     public IetfZeroTouchCallHomeServerProvider(@Reference final DataBroker dataBroker,
-            @Reference final CallHomeMountDispatcher mountDispacher) {
+            @Reference final CallHomeMountFactory mountDispacher) {
         // FIXME: make this configurable
         this(dataBroker, mountDispacher, Uint16.valueOf(4334));
     }
 
     public IetfZeroTouchCallHomeServerProvider(final DataBroker dataBroker,
-            final CallHomeMountDispatcher mountDispacher, final Uint16 port) {
+            final CallHomeMountFactory mountFactory, final Uint16 port) {
         this.dataBroker = requireNonNull(dataBroker);
-        this.mountDispacher = requireNonNull(mountDispacher);
+        this.mountDispacher = requireNonNull(mountFactory);
 
         LOG.info("Setting port for call home server to {}", port);
         this.port = port.toJava();
