@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler.ssh.authentication;
 
 import java.io.IOException;
@@ -16,9 +15,9 @@ import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
  * Class Providing username/password authentication option to
  * {@link org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler}.
  */
-public class LoginPasswordHandler extends AuthenticationHandler {
-    protected final String username;
-    protected final String password;
+public final class LoginPasswordHandler extends AuthenticationHandler {
+    private final String username;
+    private final String password;
 
     public LoginPasswordHandler(final String username, final String password) {
         this.username = username;
