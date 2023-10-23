@@ -45,8 +45,8 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
          * Initializes channel by specifying the handlers in its pipeline. Handlers are protocol specific, therefore
          * this method needs to be implemented in protocol specific Dispatchers.
          *
-         * @param channel whose pipeline should be defined, also to be passed to {@link NetconfSessionNegotiatorFactory}
-         * @param promise to be passed to {@link NetconfSessionNegotiatorFactory}
+         * @param channel whose pipeline should be defined, also to be passed to {@link NetconfSessionNegotiator}
+         * @param promise to be passed to {@link NetconfSessionNegotiator}
          */
         void initializeChannel(C channel, Promise<S> promise);
     }
