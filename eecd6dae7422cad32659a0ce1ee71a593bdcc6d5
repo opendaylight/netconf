@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "24df9934_058e2af5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-10-23T05:39:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d55341b4_24dbd907",
+      "revId": "eecd6dae7422cad32659a0ce1ee71a593bdcc6d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ebac2d1_e438cbff",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-10-20T14:40:38Z",
       "side": 1,
       "message": "i think you wanted to use return switch here",
+      "revId": "eecd6dae7422cad32659a0ce1ee71a593bdcc6d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81d6f6cb_3306bf4d",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-10-23T05:39:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ebac2d1_e438cbff",
       "revId": "eecd6dae7422cad32659a0ce1ee71a593bdcc6d5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
