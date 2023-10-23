@@ -9,6 +9,9 @@ package org.opendaylight.netconf.server;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.channel.Channel;
+import io.netty.util.concurrent.Promise;
+import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.slf4j.Logger;
@@ -20,18 +23,34 @@ import org.slf4j.LoggerFactory;
  */
 public final class ServerTransportInitializer implements TransportChannelListener {
     private static final Logger LOG = LoggerFactory.getLogger(ServerTransportInitializer.class);
+    private static final String DESERIALIZER_EX_HANDLER_KEY = "deserializerExHandler";
 
-    private final ServerChannelInitializer initializer;
+    private final NetconfServerSessionNegotiatorFactory negotiatorFactory;
 
-    public ServerTransportInitializer(final ServerChannelInitializer initializer) {
-        this.initializer = requireNonNull(initializer);
+    public ServerTransportInitializer(final NetconfServerSessionNegotiatorFactory negotiatorFactory) {
+        this.negotiatorFactory = requireNonNull(negotiatorFactory);
     }
 
     @Override
     public void onTransportChannelEstablished(final TransportChannel channel) {
         LOG.debug("Transport channel {} established", channel);
         final var nettyChannel = channel.channel();
-        initializer.initialize(nettyChannel, nettyChannel.eventLoop().newPromise());
+
+        // FIXME: NETCONF--106: Do not create this object. That requires figuring out why DeserializerExceptionHandler
+        //                      is really needed on server-side, but not on client-side.
+        new AbstractChannelInitializer<NetconfServerSession>() {
+            @Override
+            protected void initializeMessageDecoder(final Channel ch) {
+                super.initializeMessageDecoder(ch);
+                ch.pipeline().addLast(DESERIALIZER_EX_HANDLER_KEY, new DeserializerExceptionHandler());
+            }
+
+            @Override
+            protected void initializeSessionNegotiator(final Channel ch, final Promise<NetconfServerSession> promise) {
+                ch.pipeline().addAfter(DESERIALIZER_EX_HANDLER_KEY, NETCONF_SESSION_NEGOTIATOR,
+                    negotiatorFactory.getSessionNegotiator(null, ch, promise));
+            }
+        }.initialize(nettyChannel, nettyChannel.eventLoop().newPromise());
     }
 
     @Override
