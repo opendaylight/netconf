@@ -18,10 +18,8 @@ import java.net.SocketAddress;
 import java.util.Set;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.CapabilityURN;
-import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
-import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationService;
@@ -31,9 +29,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 
-public class NetconfServerSessionNegotiatorFactory
-    implements NetconfSessionNegotiatorFactory<NetconfServerSession, NetconfServerSessionListener> {
-
+// FIXME: Non-final for testtool. Why exactly?
+public class NetconfServerSessionNegotiatorFactory {
     public static final Set<String> DEFAULT_BASE_CAPABILITIES = ImmutableSet.of(
         CapabilityURN.BASE,
         CapabilityURN.BASE_1_1,
@@ -96,18 +93,12 @@ public class NetconfServerSessionNegotiatorFactory
     /**
      * Get session negotiator.
      *
-     * @param defunctSessionListenerFactory will not be taken into account as session listener factory can
-     *                                      only be created after snapshot is opened, thus this method constructs
-     *                                      proper session listener factory.
      * @param channel                       Underlying channel
      * @param promise                       Promise to be notified
      * @return session negotiator
      */
-    @Deprecated
-    @Override
-    public NetconfServerSessionNegotiator getSessionNegotiator(
-            final NetconfSessionListenerFactory<NetconfServerSessionListener> defunctSessionListenerFactory,
-            final Channel channel, final Promise<NetconfServerSession> promise) {
+    public NetconfServerSessionNegotiator getSessionNegotiator(final Channel channel,
+            final Promise<NetconfServerSession> promise) {
         final var sessionId = idProvider.getNextSessionId();
         final var socketAddress = channel.parent() == null ? null : channel.parent().localAddress();
         final var service = getOperationServiceForAddress(sessionId, socketAddress);

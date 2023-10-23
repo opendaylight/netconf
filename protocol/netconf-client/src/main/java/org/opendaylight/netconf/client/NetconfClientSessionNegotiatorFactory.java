@@ -21,7 +21,6 @@ import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfSessionNegotiator;
-import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiatorFactory;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
 import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
@@ -30,9 +29,7 @@ import org.opendaylight.netconf.shaded.exificient.core.exceptions.UnsupportedOpt
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfClientSessionNegotiatorFactory
-        implements NetconfSessionNegotiatorFactory<NetconfClientSession, NetconfClientSessionListener> {
-
+public final class NetconfClientSessionNegotiatorFactory {
     public static final Set<String> EXI_CLIENT_CAPABILITIES = ImmutableSet.of(
         CapabilityURN.BASE,
         CapabilityURN.BASE_1_1,
@@ -124,7 +121,14 @@ public class NetconfClientSessionNegotiatorFactory
         return connectionTimeoutMillis;
     }
 
-    @Override
+    /**
+     * Create a new negotiator attached to a channel, which will notify
+     * a promise once the negotiation completes.
+     *
+     * @param channel Underlying channel
+     * @param promise Promise to be notified
+     * @return new negotiator instance
+     */
     public NetconfClientSessionNegotiator getSessionNegotiator(
             final NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory,
             final Channel channel, final Promise<NetconfClientSession> promise) {
