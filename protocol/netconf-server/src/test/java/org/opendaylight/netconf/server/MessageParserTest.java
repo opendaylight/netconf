@@ -19,10 +19,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.netconf.api.messages.FramingMechanism;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
-import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
+import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
@@ -41,7 +40,7 @@ public class MessageParserTest {
     @Test
     public void testChunkedFramingMechanismOnPipeline() throws Exception {
         final var testChunkChannel = new EmbeddedChannel(
-                FramingMechanismHandlerFactory.createHandler(FramingMechanism.CHUNK),
+                new ChunkedFramingMechanismEncoder(),
                 new NetconfMessageToXMLEncoder(),
                 new NetconfChunkAggregator(ChunkedFramingMechanismEncoder.MAX_CHUNK_SIZE),
                 new NetconfXMLToMessageDecoder());
@@ -60,7 +59,7 @@ public class MessageParserTest {
             chunkCount++;
         }
 
-        final var endOfChunkBytes = FramingMechanism.CHUNK_END_STR.getBytes(StandardCharsets.US_ASCII);
+        final var endOfChunkBytes = "\n##\n".getBytes(StandardCharsets.US_ASCII);
         for (int i = 1; i <= chunkCount; i++) {
             final var recievedOutbound = (ByteBuf) messages.poll();
             int exptHeaderLength = ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE;
@@ -93,13 +92,13 @@ public class MessageParserTest {
     @Test
     public void testEOMFramingMechanismOnPipeline() throws Exception {
         final var testChunkChannel = new EmbeddedChannel(
-                FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM),
+                new EOMFramingMechanismEncoder(),
                 new NetconfMessageToXMLEncoder(), new NetconfEOMAggregator(), new NetconfXMLToMessageDecoder());
 
         testChunkChannel.writeOutbound(msg);
         final ByteBuf recievedOutbound = testChunkChannel.readOutbound();
 
-        final var endOfMsgBytes = FramingMechanism.EOM_STR.getBytes(StandardCharsets.US_ASCII);
+        final var endOfMsgBytes = "]]>]]>".getBytes(StandardCharsets.US_ASCII);
         final var eom = new byte[endOfMsgBytes.length];
         recievedOutbound.getBytes(recievedOutbound.readableBytes() - endOfMsgBytes.length, eom);
         assertArrayEquals(endOfMsgBytes, eom);

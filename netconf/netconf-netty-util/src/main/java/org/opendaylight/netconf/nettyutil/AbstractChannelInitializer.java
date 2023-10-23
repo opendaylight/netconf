@@ -10,8 +10,7 @@ package org.opendaylight.netconf.nettyutil;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.api.NetconfSession;
-import org.opendaylight.netconf.api.messages.FramingMechanism;
-import org.opendaylight.netconf.nettyutil.handler.FramingMechanismHandlerFactory;
+import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEOMAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfHelloMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
@@ -26,8 +25,7 @@ public abstract class AbstractChannelInitializer<S extends NetconfSession> {
     public void initialize(final Channel ch, final Promise<S> promise) {
         ch.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         initializeMessageDecoder(ch);
-        ch.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
-                FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
+        ch.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER, new EOMFramingMechanismEncoder());
         initializeMessageEncoder(ch);
 
         initializeSessionNegotiator(ch, promise);
