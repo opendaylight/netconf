@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec85d3c7_1416db13",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-23T06:41:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cce63122_b9c6c595",
+      "revId": "4b0904e57be5868c35c231a485023fcb154f1d63",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a33525f_2a96505d",
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "96526255_d4a1f8b1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-23T06:41:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a70f52f_edd435b0",
+      "revId": "4b0904e57be5868c35c231a485023fcb154f1d63",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "85822703_b7f6d1ba",
@@ -65,6 +101,24 @@
       "writtenOn": "2023-10-19T14:26:25Z",
       "side": 1,
       "message": "var map \u003d new HashMap\u003cString, Object\u003e()",
+      "revId": "4b0904e57be5868c35c231a485023fcb154f1d63",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "effd038b_d969c967",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-23T06:41:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "85822703_b7f6d1ba",
       "revId": "4b0904e57be5868c35c231a485023fcb154f1d63",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +140,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c93cdfe_e7b3e419",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-23T06:41:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f58501d4_28594b3f",
+      "revId": "4b0904e57be5868c35c231a485023fcb154f1d63",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "75c8ec69_60d1a4f5",
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "213b2d8e_4bd74ccf",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-23T06:41:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "75c8ec69_60d1a4f5",
+      "revId": "4b0904e57be5868c35c231a485023fcb154f1d63",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aea36dde_b486b5df",
@@ -116,6 +206,24 @@
       "writtenOn": "2023-10-19T14:26:25Z",
       "side": 1,
       "message": "Please create example with \n - Two keys.\n - Additional leaf elements that are not keys.\n - A container node nested within this list.",
+      "revId": "4b0904e57be5868c35c231a485023fcb154f1d63",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc841639_5c7fb84d",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang/test-container-childs.yang",
+        "patchSetId": 12
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-23T06:41:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aea36dde_b486b5df",
       "revId": "4b0904e57be5868c35c231a485023fcb154f1d63",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
