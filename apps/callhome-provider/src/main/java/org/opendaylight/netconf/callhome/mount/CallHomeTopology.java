@@ -13,7 +13,7 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -24,13 +24,13 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 
 // Non-final for mocking
 public class CallHomeTopology extends AbstractNetconfTopology {
-    public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-            final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-            final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
+    public CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory,
+            final EventExecutor eventExecutor, final ScheduledThreadPool scheduledThreadPool,
+            final ThreadPool processingThreadPool, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final NetconfClientConfigurationBuilderFactory builderFactory, final BaseNetconfSchemas baseSchemas,
             final DeviceActionFactory deviceActionFactory) {
-        super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
+        super(topologyId, clientFactory, eventExecutor, scheduledThreadPool, processingThreadPool,
             schemaRepositoryProvider, dataBroker, mountPointService, builderFactory, deviceActionFactory,
             baseSchemas);
     }

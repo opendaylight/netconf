@@ -9,18 +9,27 @@ package org.opendaylight.netconf.topology.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.base.Strings;
+import java.io.IOException;
+import java.io.StringReader;
+import java.security.KeyPair;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
+import org.opendaylight.aaa.encrypt.PKIUtil;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.client.mdsal.DatastoreBackedPublicKeyAuth;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
+import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
+import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.password.grouping.password.type.CleartextPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentity;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.client.identity.PasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.credentials.credentials.KeyAuth;
@@ -36,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * Default implementation of NetconfClientConfigurationBuildFactory.
  */
-@Component
+@Component(service = NetconfClientConfigurationBuilderFactory.class, property = "type=default")
 @Singleton
 public final class DefaultNetconfClientConfigurationBuilderFactory implements NetconfClientConfigurationBuilderFactory {
     private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
@@ -46,9 +55,9 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
     @Inject
     @Activate
     public DefaultNetconfClientConfigurationBuilderFactory(
-            @Reference final AAAEncryptionService encryptionService,
-            @Reference final CredentialProvider credentialProvider,
-            @Reference final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
+        @Reference final AAAEncryptionService encryptionService,
+        @Reference final CredentialProvider credentialProvider,
+        @Reference final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
         this.encryptionService = requireNonNull(encryptionService);
         this.credentialProvider = requireNonNull(credentialProvider);
         this.sslHandlerFactoryProvider = requireNonNull(sslHandlerFactoryProvider);
@@ -56,18 +65,20 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
 
     @Override
     public NetconfClientConfigurationBuilder createClientConfigurationBuilder(final NodeId nodeId,
-            final NetconfNode node) {
+        final NetconfNode node) {
         final var builder = NetconfClientConfigurationBuilder.create();
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
-            builder.withProtocol(NetconfClientProtocol.TCP)
-                .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+            builder.withProtocol(NetconfClientProtocol.TCP);
         } else if (protocol == null || protocol.getName() == Name.SSH) {
-            builder.withProtocol(NetconfClientProtocol.SSH)
-                .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+            builder.withProtocol(NetconfClientProtocol.SSH);
+            setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
-            builder.withProtocol(NetconfClientProtocol.TLS)
-                .withSslHandlerFactory(sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification()));
+            builder.withProtocol(NetconfClientProtocol.TLS).withTransportSslHandlerFactory(channel -> {
+                final var sslHandlerBuilder =
+                    sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification());
+                return sslHandlerBuilder.createSslHandler();
+            });
         } else {
             throw new IllegalArgumentException("Unsupported protocol type: " + protocol.getName());
         }
@@ -79,26 +90,71 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
 
         return builder
             .withName(nodeId.getValue())
-            .withAddress(NetconfNodeUtils.toInetSocketAddress(node))
+            .withTcpParameters(new TcpClientParametersBuilder()
+                .setRemoteAddress(node.requireHost())
+                .setRemotePort(node.requirePort()).build())
             .withConnectionTimeoutMillis(node.requireConnectionTimeoutMillis().toJava());
     }
 
-    private @NonNull AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
+    private void setSshParametersFromCredentials(final NetconfClientConfigurationBuilder confBuilder,
+        final Credentials credentials) {
+        final var sshParamsBuilder = new SshClientParametersBuilder();
         if (credentials instanceof LoginPassword loginPassword) {
-            return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
+            sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
+                loginPassword.getUsername(), loginPassword.getPassword()));
+
         } else if (credentials instanceof LoginPwUnencrypted unencrypted) {
             final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
-            return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
+            sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
+                loginPassword.getUsername(), loginPassword.getPassword()));
+
         } else if (credentials instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
-            return new LoginPasswordHandler(loginPassword.getUsername(),
-                    encryptionService.decrypt(loginPassword.getPassword()));
+            sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
+                loginPassword.getUsername(), encryptionService.decrypt(loginPassword.getPassword())));
+
         } else if (credentials instanceof KeyAuth keyAuth) {
-            final var keyPair = keyAuth.getKeyBased();
-            return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getKeyId(), credentialProvider,
-                encryptionService);
+            final var keyBased = keyAuth.getKeyBased();
+            sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder().setUsername(keyBased.getUsername()).build());
+            confBuilder.withSshConfigurator(factoryMgr -> {
+                final var keyPair = getKeyPair(keyBased.getKeyId(), credentialProvider, encryptionService);
+                factoryMgr.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
+                final var factory = new UserAuthPublicKeyFactory();
+                factory.setSignatureFactories(factoryMgr.getSignatureFactories());
+                factoryMgr.setUserAuthFactories(List.of(factory));
+            });
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
+        }
+        confBuilder.withSshParameters(sshParamsBuilder.build());
+    }
+
+    private static ClientIdentity loginPasswordIdentity(final String username, final String password) {
+        requireNonNull(username, "username is undefined");
+        requireNonNull(password, "password is undefined");
+        return new ClientIdentityBuilder()
+            .setUsername(username)
+            .setPassword(new PasswordBuilder()
+                .setPasswordType(new CleartextPasswordBuilder().setCleartextPassword(password).build())
+                .build())
+            .build();
+    }
+
+    private static KeyPair getKeyPair(final String keyId,
+        final CredentialProvider credentialProvider, final AAAEncryptionService encryptionService) {
+
+        // public key retrieval logic taken from DatastoreBackedPublicKeyAuth
+        final var dsKeypair = credentialProvider.credentialForId(keyId);
+        if (dsKeypair == null) {
+            throw new IllegalArgumentException("No keypair found with keyId=" + keyId);
+        }
+        final var passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
+        try {
+            return new PKIUtil().decodePrivateKey(
+                new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey()).replace("\\n", "\n")),
+                encryptionService.decrypt(passPhrase));
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not decode private key with keyId=" + keyId, e);
         }
     }
 }
