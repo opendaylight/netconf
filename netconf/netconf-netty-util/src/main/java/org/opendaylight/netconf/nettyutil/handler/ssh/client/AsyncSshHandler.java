@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
@@ -50,8 +51,6 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             throw new ExceptionInInitializerError(e);
         }
     }
-
-    public static final String SUBSYSTEM = "netconf";
 
     public static final int SSH_DEFAULT_NIO_WORKERS = 8;
 
@@ -201,7 +200,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
         final OpenFuture openFuture;
         try {
-            channel = clientSession.createSubsystemChannel(SUBSYSTEM, ctx);
+            channel = clientSession.createSubsystemChannel(TransportConstants.SSH_SUBSYSTEM, ctx);
             channel.setStreaming(ClientChannel.Streaming.Async);
             openFuture = channel.open();
         } catch (final IOException e) {

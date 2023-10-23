@@ -10,6 +10,7 @@ package org.opendaylight.netconf.northbound;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.server.ServerChannelInitializer;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
@@ -42,6 +43,7 @@ public final class SshServerTransport implements AutoCloseable {
     public @interface Configuration {
         @AttributeDefinition
         String bindingAddress() default "0.0.0.0";
+        // NOTE: default is not TransportConstants.SSH_TCP_PORT to allow unprivileged execution
         @AttributeDefinition(min = "1", max = "65535")
         int portNumber() default 2830;
     }
@@ -67,8 +69,8 @@ public final class SshServerTransport implements AutoCloseable {
         final var localPort = listenParams.requireLocalPort().getValue();
 
         try {
-            sshServer = factoryHolder.factory().listenServer("netconf", new ServerTransportInitializer(initializer),
-                listenParams, null, factoryMgr -> {
+            sshServer = factoryHolder.factory().listenServer(TransportConstants.SSH_SUBSYSTEM,
+                new ServerTransportInitializer(initializer), listenParams, null, factoryMgr -> {
                     factoryMgr.setUserAuthFactories(List.of(UserAuthPasswordFactory.INSTANCE));
                     factoryMgr.setPasswordAuthenticator(
                         (username, password, session) -> authProvider.authenticated(username, password));
