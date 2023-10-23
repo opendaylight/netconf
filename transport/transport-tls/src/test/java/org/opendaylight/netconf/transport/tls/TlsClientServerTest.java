@@ -202,6 +202,44 @@ class TlsClientServerTest {
         );
     }
 
+    @Test
+    @DisplayName("Call-Home client/server with external SslHandlerFactory integration")
+    void callHome() throws Exception {
+
+        final var serverKs = buildKeystoreWithGeneratedCert(RSA_ALGORITHM);
+        final var clientKs = buildKeystoreWithGeneratedCert(EC_ALGORITHM);
+        final var serverContext = SslContextBuilder.forServer(buildKeyManagerFactory(serverKs))
+            .clientAuth(ClientAuth.REQUIRE).trustManager(buildTrustManagerFactory(clientKs)).build();
+        final var clientContext = SslContextBuilder.forClient().keyManager(buildKeyManagerFactory(clientKs))
+            .trustManager(buildTrustManagerFactory(serverKs)).build();
+
+        // start call-home client
+        final var client = TLSClient.listen(clientListener, NettyTransportSupport.newServerBootstrap().group(group),
+            tcpServerConfig, channel -> clientContext.newHandler(channel.alloc())).get(2, TimeUnit.SECONDS);
+        try {
+            // connect with call-home server
+            final var server = TLSServer.connect(serverListener, NettyTransportSupport.newBootstrap().group(group),
+                tcpClientConfig, channel -> serverContext.newHandler(channel.alloc())).get(2, TimeUnit.SECONDS);
+            try {
+                verify(serverListener, timeout(500))
+                    .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
+                verify(clientListener, timeout(500))
+                    .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
+                // validate channels are in expected state
+                var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
+                var clientChannel = assertChannel(clientTransportChannelCaptor.getAllValues());
+                // validate channels are connecting same sockets
+                assertEquals(serverChannel.remoteAddress(), clientChannel.localAddress());
+                assertEquals(serverChannel.localAddress(), clientChannel.remoteAddress());
+
+            } finally {
+                server.shutdown().get(2, TimeUnit.SECONDS);
+            }
+        } finally {
+            client.shutdown().get(2, TimeUnit.SECONDS);
+        }
+    }
+
     private static KeyStore buildKeystoreWithGeneratedCert(final String algorithm) throws Exception {
         final var data = generateX509CertData(algorithm);
         final var ret = newKeyStore();

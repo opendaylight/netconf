@@ -180,6 +180,38 @@ class NetconfClientFactoryImplTest {
         }
     }
 
+    @Test
+    void tlsCallHomeClient() throws Exception {
+        final var keyStore = buildKeystoreWithGeneratedCertificate();
+        final var keyMgr = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyMgr.init(keyStore, EMPTY_SECRET);
+        final var trustMgr = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustMgr.init(keyStore);
+        final var serverContext = SslContextBuilder.forServer(keyMgr).trustManager(trustMgr).build();
+        final var clientContext = SslContextBuilder.forClient().keyManager(keyMgr).trustManager(trustMgr).build();
+
+        final var clientConfig = NetconfClientConfigurationBuilder.create()
+            .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
+            .withTcpServerParameters(tcpServerParams)
+            .withTransportSslHandlerFactory(channel -> clientContext.newHandler(channel.alloc()))
+            .withSessionListener(sessionListener).build();
+
+        final var callHomeClient = factory.createCallHomeClient(clientConfig).get(1, TimeUnit.SECONDS);
+        try {
+            final var callHomeServer = TLSServer.connect(serverTransportListener, serverTransportFactory.newBootstrap(),
+                tcpClientParams, channel -> serverContext.newHandler(channel.alloc())).get(1, TimeUnit.SECONDS);
+            try {
+                verify(serverTransportListener, timeout(1000L))
+                    .onTransportChannelEstablished(any(TransportChannel.class));
+            } finally {
+                callHomeServer.shutdown().get(1, TimeUnit.SECONDS);
+            }
+        } finally {
+            callHomeClient.shutdown().get(1, TimeUnit.SECONDS);
+
+        }
+    }
+
     private static KeyStore buildKeystoreWithGeneratedCertificate() throws Exception {
         // key pair
         final var keyPairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -266,27 +298,15 @@ class NetconfClientFactoryImplTest {
 
     @Test
     void sshClientWithConfigurator() throws Exception {
-        final ServerFactoryManagerConfigurator serverConfigurator = factoryManager -> {
-            factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
-            factoryManager.setPasswordAuthenticator(
-                (usr, psw, session) -> USERNAME.equals(usr) && PASSWORD.equals(psw));
-            factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
-        };
-        final ClientFactoryManagerConfigurator clientConfigurator = factoryManager -> {
-            factoryManager.setPasswordIdentityProvider(PasswordIdentityProvider.wrapPasswords(PASSWORD));
-            factoryManager.setUserAuthFactories(List.of(
-                new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
-        };
-
         final var server = serverTransportFactory.listenServer("netconf", serverTransportListener, tcpServerParams,
-            null, serverConfigurator).get(10, TimeUnit.SECONDS);
+            null, serverConfigurator()).get(10, TimeUnit.SECONDS);
         try {
             final var clientConfig = NetconfClientConfigurationBuilder.create()
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
                 .withTcpParameters(tcpClientParams)
                 .withSshParameters(new SshClientParametersBuilder()
                     .setClientIdentity(new ClientIdentityBuilder().setUsername(USERNAME).build()).build())
-                .withSshConfigurator(clientConfigurator)
+                .withSshConfigurator(clientConfigurator())
                 .withSessionListener(sessionListener)
                 .withConnectionTimeoutMillis(10_000)
                 .build();
@@ -296,5 +316,48 @@ class NetconfClientFactoryImplTest {
         } finally {
             server.shutdown().get(1, TimeUnit.SECONDS);
         }
+    }
+
+    @Test
+    void sshCallHomeClientWithConfigurator() throws Exception {
+        final var clientConfig = NetconfClientConfigurationBuilder.create()
+            .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
+            .withTcpServerParameters(tcpServerParams)
+            .withSshParameters(new SshClientParametersBuilder()
+                .setClientIdentity(new ClientIdentityBuilder().setUsername(USERNAME).build()).build())
+            .withSshConfigurator(clientConfigurator())
+            .withSessionListener(sessionListener)
+            .withConnectionTimeoutMillis(10_000)
+            .build();
+        final var callHomeClient = factory.createCallHomeClient(clientConfig).get(10, TimeUnit.SECONDS);
+        try {
+            final var callHomeServer = serverTransportFactory.connectServer("netconf", serverTransportListener,
+                tcpClientParams, null, serverConfigurator()).get(10, TimeUnit.SECONDS);
+            try {
+                verify(serverTransportListener, timeout(10_000L))
+                    .onTransportChannelEstablished(any(TransportChannel.class));
+            } finally {
+                callHomeServer.shutdown().get(1, TimeUnit.SECONDS);
+            }
+        } finally {
+            callHomeClient.shutdown().get(1, TimeUnit.SECONDS);
+        }
+    }
+
+    private static ServerFactoryManagerConfigurator serverConfigurator() {
+        return factoryManager -> {
+            factoryManager.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+            factoryManager.setPasswordAuthenticator(
+                (usr, psw, session) -> USERNAME.equals(usr) && PASSWORD.equals(psw));
+            factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+        };
+    }
+
+    private static ClientFactoryManagerConfigurator clientConfigurator() {
+        return factoryManager -> {
+            factoryManager.setPasswordIdentityProvider(PasswordIdentityProvider.wrapPasswords(PASSWORD));
+            factoryManager.setUserAuthFactories(List.of(
+                new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
+        };
     }
 }
