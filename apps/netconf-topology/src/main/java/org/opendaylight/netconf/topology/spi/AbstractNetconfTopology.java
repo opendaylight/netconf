@@ -21,7 +21,7 @@ import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -44,7 +44,7 @@ public abstract class AbstractNetconfTopology {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfTopology.class);
 
     private final HashMap<NodeId, NetconfNodeHandler> activeConnectors = new HashMap<>();
-    private final NetconfClientDispatcher clientDispatcher;
+    private final NetconfClientFactory clientFactory;
     private final EventExecutor eventExecutor;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager schemaManager;
@@ -57,13 +57,13 @@ public abstract class AbstractNetconfTopology {
     protected final DOMMountPointService mountPointService;
     protected final String topologyId;
 
-    protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+    protected AbstractNetconfTopology(final String topologyId, final NetconfClientFactory clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor, final SchemaResourceManager schemaManager, final DataBroker dataBroker,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas) {
         this.topologyId = requireNonNull(topologyId);
-        this.clientDispatcher = clientDispatcher;
+        this.clientFactory = clientDispatcher;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor.getExecutor();
         this.processingExecutor = processingExecutor.getExecutor();
@@ -136,7 +136,7 @@ public abstract class AbstractNetconfTopology {
         // Instantiate the handler ...
         final var deviceId = NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
-        final var nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor,
+        final var nodeHandler = new NetconfNodeHandler(clientFactory, keepaliveExecutor,
             baseSchemas, schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade,
             deviceId, nodeId, netconfNode, nodeOptional);
 

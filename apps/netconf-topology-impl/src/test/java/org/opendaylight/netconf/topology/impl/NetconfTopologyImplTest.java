@@ -31,7 +31,7 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemas;
@@ -64,7 +64,7 @@ class NetconfTopologyImplTest {
         InstanceIdentifier.builder(NetworkTopology.class).child(Topology.class, TOPOLOGY_KEY).build();
 
     @Mock
-    private NetconfClientDispatcher mockedClientDispatcher;
+    private NetconfClientFactory mockedClientFactory;
     @Mock
     private EventExecutor mockedEventExecutor;
     @Mock
@@ -99,7 +99,7 @@ class NetconfTopologyImplTest {
         doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
 
-        topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(), mockedClientDispatcher,
+        topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(), mockedClientFactory,
             mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker,
             mountPointService, encryptionService, builderFactory, rpcProviderService,
             new DefaultBaseNetconfSchemas(new DefaultYangParserFactory()));
@@ -150,14 +150,14 @@ class NetconfTopologyImplTest {
     }
 
     private static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
-        TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+        TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory,
                 final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                 final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
                 final DataBroker dataBroker, final DOMMountPointService mountPointService,
                 final AAAEncryptionService encryptionService,
                 final NetconfClientConfigurationBuilderFactory builderFactory,
                 final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas) {
-            super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
+            super(topologyId, clientFactory, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, builderFactory,
                 rpcProviderService, baseSchemas);
         }

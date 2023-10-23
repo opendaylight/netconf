@@ -93,7 +93,7 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegist
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProviderImpl;
 import org.opendaylight.netconf.api.CapabilityURN;
-import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
@@ -107,7 +107,7 @@ import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
-import org.opendaylight.netconf.topology.spi.DefaultNetconfClientConfigurationBuilderFactory;
+import org.opendaylight.netconf.topology.spi.LegacyNetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -186,7 +186,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     @Mock private RpcProviderService mockRpcProviderService;
     @Mock private Registration mockRpcReg;
-    @Mock private NetconfClientDispatcher mockClientDispatcher;
+    @Mock private NetconfClientFactory mockClientFactory;
     @Mock private AAAEncryptionService mockEncryptionService;
     @Mock private ScheduledExecutorService mockKeepaliveExecutor;
     @Mock private DeviceActionFactory deviceActionFactory;
@@ -261,7 +261,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             }
         };
 
-        builderFactory = new DefaultNetconfClientConfigurationBuilderFactory(mockEncryptionService, credentialProvider,
+        builderFactory = new LegacyNetconfClientConfigurationBuilderFactory(mockEncryptionService, credentialProvider,
             sslHandlerFactoryProvider);
 
         doReturn(mockRpcReg).when(mockRpcProviderService).registerRpcImplementations(any());
@@ -271,7 +271,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         setupSlave();
 
         yangNodeInstanceId = bindingToNormalized.toYangInstanceIdentifier(NODE_INSTANCE_ID);
-        doReturn(mock(Future.class)).when(mockClientDispatcher).createClient(any());
+        doReturn(mock(Future.class)).when(mockClientFactory).createClient(any());
 
         LOG.info("****** Setup complete");
     }
@@ -308,7 +308,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
                 masterClusterSingletonServiceProvider, mockKeepaliveExecutor, MoreExecutors.directExecutor(),
-                masterSystem, eventExecutor, mockClientDispatcher, masterMountPointService,
+                masterSystem, eventExecutor, mockClientFactory, masterMountPointService,
                 mockEncryptionService, mockRpcProviderService, deviceActionFactory, resourceManager, builderFactory,
                 TOPOLOGY_ID, Uint16.ZERO) {
             @Override
@@ -345,7 +345,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         slaveNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, slaveDataBroker,
                 mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, MoreExecutors.directExecutor(),
-                slaveSystem, eventExecutor, mockClientDispatcher, slaveMountPointService,
+                slaveSystem, eventExecutor, mockClientFactory, slaveMountPointService,
                 mockEncryptionService, mockRpcProviderService, deviceActionFactory, resourceManager, builderFactory,
                 TOPOLOGY_ID, Uint16.ZERO) {
             @Override

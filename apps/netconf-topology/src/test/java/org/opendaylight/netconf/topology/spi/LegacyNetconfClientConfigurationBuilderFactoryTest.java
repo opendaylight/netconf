@@ -7,18 +7,19 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.NoSuchElementException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
@@ -40,11 +41,9 @@ import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
-@ExtendWith(MockitoExtension.class)
-class DefaultNetconfClientConfigurationBuilderFactoryTest {
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
+public class LegacyNetconfClientConfigurationBuilderFactoryTest {
     private static final NodeId NODE_ID = new NodeId("testing-node");
-    private static final Host HOST = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
-    private static final PortNumber PORT = new PortNumber(Uint16.valueOf(9999));
 
     @Mock
     private NetconfClientSessionListener sessionListener;
@@ -57,74 +56,69 @@ class DefaultNetconfClientConfigurationBuilderFactoryTest {
     @Mock
     private SslHandlerFactory sslHandlerFactory;
 
-    private NetconfNodeBuilder nodeBuilder;
-    private DefaultNetconfClientConfigurationBuilderFactory factory;
+    private final NetconfNodeBuilder nodeBuilder = new NetconfNodeBuilder()
+        .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+        .setPort(new PortNumber(Uint16.valueOf(9999)))
+        .setReconnectOnChangedSchema(true)
+        .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+        .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+        .setKeepaliveDelay(Uint32.valueOf(1000))
+        .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
+        .setMaxConnectionAttempts(Uint32.ZERO)
+        .setSleepFactor(Decimal64.valueOf("1.5"))
+        .setConnectionTimeoutMillis(Uint32.valueOf(20000));
 
-    @BeforeEach
-    void beforeEach() {
-        nodeBuilder = new NetconfNodeBuilder()
-            .setHost(HOST).setPort(PORT)
-            .setReconnectOnChangedSchema(true)
-            .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-            .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-            .setKeepaliveDelay(Uint32.valueOf(1000))
-            .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
-            .setMaxConnectionAttempts(Uint32.ZERO)
-            .setSleepFactor(Decimal64.valueOf("1.5"))
-            .setConnectionTimeoutMillis(Uint32.valueOf(20000));
-        factory = new DefaultNetconfClientConfigurationBuilderFactory(encryptionService, credentialProvider,
+    private LegacyNetconfClientConfigurationBuilderFactory factory;
+
+    @Before
+    public void before() {
+        doReturn(sslHandlerFactory).when(sslHandlerFactoryProvider).getSslHandlerFactory(null);
+
+        factory = new LegacyNetconfClientConfigurationBuilderFactory(encryptionService, credentialProvider,
             sslHandlerFactoryProvider);
     }
 
-    private void assertConfig(NetconfClientConfiguration config) {
-        assertNotNull(config);
-        assertNotNull(config.getTcpParameters());
-        assertEquals(HOST, config.getTcpParameters().getRemoteAddress());
-        assertEquals(PORT, config.getTcpParameters().getRemotePort());
-        assertSame(sessionListener, config.getSessionListener());
-    }
-
     @Test
-    void testDefault() {
+    public void testDefault() {
         final var config = createConfig(nodeBuilder.setTcpOnly(false).build());
-        assertConfig(config);
         assertEquals(NetconfClientProtocol.SSH, config.getProtocol());
-        assertNotNull(config.getSshParameters());
+        assertNotNull(config.getAuthHandler());
+        assertNull(config.getSslHandlerFactory());
     }
 
     @Test
-    void testSsh() {
+    public void testSsh() {
         final var config = createConfig(
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.SSH).build()).build());
-        assertConfig(config);
         assertEquals(NetconfClientProtocol.SSH, config.getProtocol());
-        assertNotNull(config.getSshParameters());
+        assertNotNull(config.getAuthHandler());
+        assertNull(config.getSslHandlerFactory());
     }
 
     @Test
-    void testTcp() {
+    public void testTcp() {
         final var config = createConfig(nodeBuilder.setTcpOnly(true).build());
-        assertConfig(config);
         assertEquals(NetconfClientProtocol.TCP, config.getProtocol());
+        assertNotNull(config.getAuthHandler());
+        assertNull(config.getSslHandlerFactory());
     }
 
     @Test
-    void testTls() {
-        doReturn(sslHandlerFactory).when(sslHandlerFactoryProvider).getSslHandlerFactory(null);
+    public void testTls() {
         final var config = createConfig(
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build());
-        assertConfig(config);
         assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
-        assertNotNull(config.getTransportSslHandlerFactory());
+        assertNull(config.getAuthHandler());
+        assertSame(sslHandlerFactory, config.getSslHandlerFactory());
     }
 
     @Test
-    void noPort() {
+    public void testNoPort() {
         assertThrows(NoSuchElementException.class, () -> createConfig(nodeBuilder.setPort(null).build()));
     }
 
     @Test
-    void noHost() {
+    public void testNoHost() {
         assertThrows(NoSuchElementException.class, () -> createConfig(nodeBuilder.setHost(null).build()));
     }
 
