@@ -70,6 +70,24 @@
       "parentUuid": "30a9b06b_22e0b766",
       "revId": "8828d4667400f45db0651691ad41c9222fbeb7d1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96ee4cce_eb895edb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-24T08:06:45Z",
+      "side": 1,
+      "message": "What is stored in datastore in that case?",
+      "parentUuid": "92bb5d8f_399d71da",
+      "revId": "8828d4667400f45db0651691ad41c9222fbeb7d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
