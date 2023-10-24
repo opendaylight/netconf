@@ -19,7 +19,6 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,12 +29,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
-import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
-import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -62,8 +58,6 @@ public class NetconfSessionMonitoringServiceTest {
     private NetconfManagementSession sessionMock2;
     @Mock
     private NetconfMonitoringService.SessionsListener listener;
-    @Mock
-    private BaseNotificationPublisherRegistration notificationPublisher;
 
     private NetconfSessionMonitoringService monitoringService;
 
@@ -81,8 +75,6 @@ public class NetconfSessionMonitoringServiceTest {
     @Test
     public void testListeners() {
         monitoringService.onSessionUp(sessionMock1);
-        HashSet<Capability> added = new HashSet<>();
-        added.add(new BasicCapability("toAdd"));
         monitoringService.onSessionDown(sessionMock1);
         verify(listener).onSessionStarted(any());
         verify(listener).onSessionEnded(any());
@@ -126,8 +118,7 @@ public class NetconfSessionMonitoringServiceTest {
         monitoringService.onSessionUp(sessionMock1);
         monitoringService.onSessionUp(sessionMock2);
         monitoringService.onSessionEvent(SessionEvent.inRpcSuccess(sessionMock1));
-        ArgumentCaptor<Collection> captor =
-                ArgumentCaptor.forClass(Collection.class);
+        final var captor = ArgumentCaptor.forClass(Collection.class);
         verify(listener, timeout(2000)).onSessionsUpdated(captor.capture());
         final Collection<Session> value = captor.getValue();
         assertTrue(value.contains(SESSION_1));
