@@ -174,7 +174,7 @@ public class ConcurrentClientsTest {
         doReturn(EMPTY_CAPABILITIES).when(monitoringService).getCapabilities();
 
         serverBootstrapFactory = new BootstrapFactory("server", threads);
-        server = TCPServer.listen(new ServerTransportInitializer(new NetconfServerSessionNegotiatorFactoryBuilder()
+        server = TCPServer.listen(new ServerTransportInitializer(NetconfServerSessionNegotiatorFactory.builder()
             .setTimer(hashedWheelTimer)
             .setAggregatedOpService(factoriesListener)
             .setIdProvider(ID_PROVIDER)
