@@ -18,6 +18,7 @@ import static org.opendaylight.restconf.openapi.OpenApiTestUtils.getPathParamete
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.COMPONENTS_PREFIX;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -506,6 +507,34 @@ public final class OpenApiGeneratorRFC8040Test {
         assertNotNull(postXmlRef);
         assertEquals(expectedXmlRef, postXmlRef.textValue());
     }
+
+    /**
+     * Test that number of elements in payload is correct.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testLeafListWithMinElementsPayload() {
+        final var doc = generator.getApiDeclaration(MANDATORY_TEST, null, uriInfo);
+        assertNotNull(doc);
+        final var paths = doc.paths();
+        final var path = paths.get("/rests/data/mandatory-test:root-container/mandatory-container");
+        assertNotNull(path);
+        final var requestBody = path.post().requestBody().get("content");
+        assertNotNull(requestBody);
+        final var jsonRef = requestBody.get("application/json").get("schema").get("$ref");
+        assertNotNull(jsonRef);
+        final var xmlRef = requestBody.get("application/xml").get("schema").get("$ref");
+        assertNotNull(xmlRef);
+        final var schema = doc.components().schemas().get("mandatory-test_root-container_mandatory-container");
+        assertNotNull(schema);
+        final var minItems = schema.properties().get("leaf-list-with-min-elements").get("minItems");
+        assertNotNull(minItems);
+        final var listOfExamples = ((ArrayNode) schema.properties().get("leaf-list-with-min-elements").get("example"));
+        assertNotNull(listOfExamples);
+        assertEquals(xmlRef, jsonRef);
+        assertEquals(listOfExamples.size(), minItems.intValue());
+    }
+
 
     private static void verifyPostRequestRef(final Operation operation, final String expectedJsonRef,
         final String expectedXmlRef, String nodeType) {
