@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.server;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -78,10 +77,11 @@ public class NetconfServerSessionNegotiatorFactory {
     private static ImmutableSet<String> validateBaseCapabilities(final Set<String> baseCapabilities) {
         // Check base capabilities to be supported by the server
         final var unknownBaseCaps = Sets.difference(baseCapabilities, DEFAULT_BASE_CAPABILITIES);
-        Preconditions.checkArgument(unknownBaseCaps.isEmpty(),
-                "Base capabilities that will be supported by netconf server have to be subset of %s, "
-                        + "unknown base capabilities: %s",
-                DEFAULT_BASE_CAPABILITIES, unknownBaseCaps);
+        if (!unknownBaseCaps.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Base capabilities that will be supported by netconf server have to be subset of "
+                    + DEFAULT_BASE_CAPABILITIES + ", unknown base capabilities: " + unknownBaseCaps);
+        }
 
         return ImmutableSet.<String>builder()
             .addAll(baseCapabilities)
