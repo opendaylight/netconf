@@ -14,8 +14,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
@@ -49,10 +49,11 @@ public final class SSHClient extends SSHTransportStack {
         this.subsystem = subsystem;
     }
 
-    static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
-            final String subsystem, final TransportChannelListener listener, final SshClientGrouping clientParams)
+    static SSHClient of(final NettyIoServiceFactoryFactory ioServiceFactory,
+            final ScheduledExecutorService executorService, final String subsystem,
+            final TransportChannelListener listener, final SshClientGrouping clientParams)
                 throws UnsupportedConfigurationException {
-        return new SSHClient(subsystem, listener, new TransportSshClient.Builder(ioServiceFactory, group)
+        return new SSHClient(subsystem, listener, new TransportSshClient.Builder(ioServiceFactory, executorService)
             .transportParams(clientParams.getTransportParams())
             .keepAlives(clientParams.getKeepalives())
             .clientIdentity(clientParams.getClientIdentity())
