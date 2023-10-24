@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.server;
 
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.netty.channel.Channel;
@@ -100,17 +99,18 @@ public class NetconfServerSessionNegotiatorFactory {
     public NetconfServerSessionNegotiator getSessionNegotiator(final Channel channel,
             final Promise<NetconfServerSession> promise) {
         final var sessionId = idProvider.getNextSessionId();
-        final var socketAddress = channel.parent() == null ? null : channel.parent().localAddress();
-        final var service = getOperationServiceForAddress(sessionId, socketAddress);
-        final var listener = new NetconfServerSessionListener(
-            new NetconfOperationRouterImpl(service, monitoringService, sessionId), monitoringService, service);
+        final var service = getOperationServiceForAddress(sessionId,
+            channel.parent() == null ? null : channel.parent().localAddress());
 
         return new NetconfServerSessionNegotiator(createHelloMessage(sessionId, monitoringService), sessionId, promise,
-            channel, timer, listener, connectionTimeoutMillis, maximumIncomingChunkSize);
+            channel, timer,
+            new NetconfServerSessionListener(new NetconfOperationRouterImpl(service, monitoringService, sessionId),
+                monitoringService, service),
+            connectionTimeoutMillis, maximumIncomingChunkSize);
     }
 
     protected NetconfOperationService getOperationServiceForAddress(final SessionIdType sessionId,
-                                                                    final SocketAddress socketAddress) {
+            final SocketAddress socketAddress) {
         return aggregatedOpService.createService(sessionId);
     }
 
@@ -125,7 +125,7 @@ public class NetconfServerSessionNegotiatorFactory {
             sessionId);
     }
 
-    public static Set<String> transformCapabilities(final Capabilities capabilities) {
-        return Sets.newHashSet(Collections2.transform(capabilities.getCapability(), Uri::getValue));
+    public static ImmutableSet<String> transformCapabilities(final Capabilities capabilities) {
+        return capabilities.requireCapability().stream().map(Uri::getValue).collect(ImmutableSet.toImmutableSet());
     }
 }

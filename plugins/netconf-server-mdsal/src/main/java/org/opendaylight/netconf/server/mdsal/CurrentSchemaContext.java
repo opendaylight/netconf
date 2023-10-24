@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.netconf.server.api.monitoring.Capability;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -27,7 +26,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 @SuppressWarnings("checkstyle:FinalClass")
 public class CurrentSchemaContext implements EffectiveModelContextListener, AutoCloseable {
     private final AtomicReference<EffectiveModelContext> currentContext = new AtomicReference<>();
-    private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(new HashSet<>());
+    private final Set<CapabilityListener> listeners = Collections.synchronizedSet(new HashSet<>());
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
 
     private Registration schemaContextListenerListenerRegistration;
@@ -59,16 +58,16 @@ public class CurrentSchemaContext implements EffectiveModelContextListener, Auto
     public void onModelContextUpdated(final EffectiveModelContext schemaContext) {
         currentContext.set(schemaContext);
         // FIXME is notifying all the listeners from this callback wise ?
-        final Set<Capability> addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(
-                currentContext.get(), rootSchemaSourceProvider);
-        for (final CapabilityListener listener : listeners1) {
+        final var addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(schemaContext,
+            rootSchemaSourceProvider);
+        for (var listener : listeners) {
             listener.onCapabilitiesChanged(addedCaps, Set.of());
         }
     }
 
     @Override
     public void close() {
-        listeners1.clear();
+        listeners.clear();
         schemaContextListenerListenerRegistration.close();
         currentContext.set(null);
     }
@@ -76,7 +75,7 @@ public class CurrentSchemaContext implements EffectiveModelContextListener, Auto
     public Registration registerCapabilityListener(final CapabilityListener listener) {
         listener.onCapabilitiesChanged(MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(),
                 rootSchemaSourceProvider), Set.of());
-        listeners1.add(listener);
-        return () -> listeners1.remove(listener);
+        listeners.add(listener);
+        return () -> listeners.remove(listener);
     }
 }
