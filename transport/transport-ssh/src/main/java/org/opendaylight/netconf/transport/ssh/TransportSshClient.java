@@ -11,8 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.DoNotCall;
-import io.netty.channel.EventLoopGroup;
 import java.security.cert.Certificate;
+import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.netconf.shaded.sshd.client.ClientBuilder;
 import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.netconf.shaded.sshd.client.auth.UserAuthFactory;
@@ -70,14 +70,14 @@ final class TransportSshClient extends SshClient {
      */
     static final class Builder extends ClientBuilder {
         private final NettyIoServiceFactoryFactory ioServiceFactory;
-        private final EventLoopGroup group;
+        private final ScheduledExecutorService executorService;
 
         private Keepalives keepAlives;
         private ClientIdentity clientIdentity;
 
-        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group) {
+        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final ScheduledExecutorService executorService) {
             this.ioServiceFactory = requireNonNull(ioServiceFactory);
-            this.group = requireNonNull(group);
+            this.executorService = requireNonNull(executorService);
         }
 
         Builder transportParams(final TransportParamsGrouping params) throws UnsupportedConfigurationException {
@@ -136,7 +136,7 @@ final class TransportSshClient extends SshClient {
                 setClientIdentity(ret, clientIdentity);
             }
             ret.setIoServiceFactoryFactory(ioServiceFactory);
-            ret.setScheduledExecutorService(group);
+            ret.setScheduledExecutorService(executorService);
 
             try {
                 ret.checkConfig();

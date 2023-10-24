@@ -12,9 +12,9 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.DoNotCall;
-import io.netty.channel.EventLoopGroup;
 import java.security.PublicKey;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.netconf.shaded.sshd.common.channel.ChannelFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
@@ -74,16 +74,16 @@ final class TransportSshServer extends SshServer {
             DirectTcpipFactory.INSTANCE);
 
         private final NettyIoServiceFactoryFactory ioServiceFactory;
-        private final EventLoopGroup group;
+        private final ScheduledExecutorService executorService;
 
         private ServerFactoryManagerConfigurator configurator;
         private ClientAuthentication clientAuthentication;
         private ServerIdentity serverIdentity;
         private Keepalives keepAlives;
 
-        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group) {
+        Builder(final NettyIoServiceFactoryFactory ioServiceFactory, final ScheduledExecutorService executorService) {
             this.ioServiceFactory = requireNonNull(ioServiceFactory);
-            this.group = requireNonNull(group);
+            this.executorService = requireNonNull(executorService);
         }
 
         Builder serverParams(final SshServerGrouping serverParams) throws UnsupportedConfigurationException {
@@ -147,7 +147,7 @@ final class TransportSshServer extends SshServer {
             }
 
             ret.setIoServiceFactoryFactory(ioServiceFactory);
-            ret.setScheduledExecutorService(group);
+            ret.setScheduledExecutorService(executorService);
 
             try {
                 ret.checkConfig();
