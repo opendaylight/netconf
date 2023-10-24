@@ -11,41 +11,30 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.EventLoopGroup;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.netconf.transport.tcp.NettyTransportSupport;
+import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.SshClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
 
 /**
- * A factory capable of instantiating {@link SSHClient}s and {@link SSHServer}s.
+ * A {@link BootstrapFactory} additionally capable of instantiating {@link SSHClient}s and {@link SSHServer}s.
  */
-public final class SSHTransportStackFactory implements AutoCloseable {
-    private final EventLoopGroup group;
-    private final EventLoopGroup parentGroup;
-    private final NettyIoServiceFactoryFactory ioServiceFactory;
-
-    private SSHTransportStackFactory(final EventLoopGroup group, final EventLoopGroup parentGroup) {
-        this.group = requireNonNull(group);
-        this.parentGroup = parentGroup;
-        ioServiceFactory = new NettyIoServiceFactoryFactory(group);
-    }
+public final class SSHTransportStackFactory extends BootstrapFactory {
+    private final NettyIoServiceFactoryFactory ioServiceFactory =
+        new NettyIoServiceFactoryFactory(requireNonNull(group));
 
     public SSHTransportStackFactory(final @NonNull String groupName, final int groupThreads) {
-        this(NettyTransportSupport.newEventLoopGroup(groupName, groupThreads), null);
+        super(groupName, groupThreads);
     }
 
     public SSHTransportStackFactory(final @NonNull String groupName, final int groupThreads,
             final @NonNull String parentGroupName, final int parentGroupThreads) {
-        this(NettyTransportSupport.newEventLoopGroup(groupName, groupThreads),
-            NettyTransportSupport.newEventLoopGroup(parentGroupName, parentGroupThreads));
+        super(groupName, groupThreads, parentGroupName, parentGroupThreads);
     }
 
     public @NonNull ListenableFuture<SSHClient> connectClient(final String subsystem,
@@ -96,31 +85,5 @@ public final class SSHTransportStackFactory implements AutoCloseable {
             "Neither server parameters nor factory configurator is defined");
         return SSHServer.of(ioServiceFactory, group, subsystem, listener, serverParams, configurator)
             .listen(newServerBootstrap(), listenParams);
-    }
-
-    /**
-     * Create a new {@link Bootstrap} based on this factory's {@link EventLoopGroup}s.
-     *
-     * @return A new {@link Bootstrap}
-     */
-    public @NonNull Bootstrap newBootstrap() {
-        return NettyTransportSupport.newBootstrap().group(group);
-    }
-
-    /**
-     * Create a new {@link ServerBootstrap} based on this factory's {@link EventLoopGroup}s.
-     *
-     * @return A new {@link ServerBootstrap}
-     */
-    public @NonNull ServerBootstrap newServerBootstrap() {
-        return NettyTransportSupport.newServerBootstrap().group(parentGroup != null ? parentGroup : group, group);
-    }
-
-    @Override
-    public void close() {
-        if (parentGroup != null) {
-            parentGroup.shutdownGracefully();
-        }
-        group.shutdownGracefully();
     }
 }
