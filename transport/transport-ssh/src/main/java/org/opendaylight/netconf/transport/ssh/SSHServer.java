@@ -16,8 +16,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
@@ -46,11 +46,12 @@ public final class SSHServer extends SSHTransportStack {
         this.subsystem = requireNonNull(subsystem);
     }
 
-    static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory, final EventLoopGroup group,
-            final String subsystem, final TransportChannelListener listener, final SshServerGrouping serverParams,
+    static SSHServer of(final NettyIoServiceFactoryFactory ioServiceFactory,
+            final ScheduledExecutorService executorService, final String subsystem,
+            final TransportChannelListener listener, final SshServerGrouping serverParams,
             final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
         return new SSHServer(subsystem, listener,
-            new TransportSshServer.Builder(ioServiceFactory, group)
+            new TransportSshServer.Builder(ioServiceFactory, executorService)
                 .serverParams(serverParams)
                 .configurator(configurator)
                 .buildChecked());
