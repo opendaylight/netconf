@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
+import org.opendaylight.aaa.encrypt.exception.DecryptionException;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.DatastoreBackedPublicKeyAuth;
@@ -91,8 +92,12 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         } else if (credentials instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
-            return new LoginPasswordHandler(loginPassword.getUsername(),
+            try {
+                return new LoginPasswordHandler(loginPassword.getUsername(),
                     encryptionService.decrypt(loginPassword.getPassword()));
+            } catch (DecryptionException e) {
+                throw new IllegalArgumentException("Failed to decrypt provided password", e);
+            }
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyPair = keyAuth.getKeyBased();
             return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getKeyId(), credentialProvider,

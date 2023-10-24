@@ -21,6 +21,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
+import org.opendaylight.aaa.encrypt.exception.EncryptionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -143,10 +144,16 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final List<KeyCredential> keypairs = input.nonnullKeyCredential().values().stream()
-            .map(keypair -> new KeyCredentialBuilder(keypair)
-                .setPrivateKey(encryptionService.encrypt(keypair.getPrivateKey()))
-                .setPassphrase(encryptionService.encrypt(keypair.getPassphrase()))
-                .build())
+            .map(keypair -> {
+                try {
+                    return new KeyCredentialBuilder(keypair)
+                        .setPrivateKey(encryptionService.encrypt(keypair.getPrivateKey()))
+                        .setPassphrase(encryptionService.encrypt(keypair.getPassphrase()))
+                        .build();
+                } catch (EncryptionException e) {
+                    throw new IllegalStateException("Failed to encrypt keypair",  e);
+                }
+            })
             .collect(Collectors.toList());
 
         for (KeyCredential keypair : keypairs) {

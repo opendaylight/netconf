@@ -14,6 +14,7 @@ import java.security.KeyPair;
 import java.util.Optional;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.aaa.encrypt.PKIUtil;
+import org.opendaylight.aaa.encrypt.exception.DecryptionException;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
@@ -72,7 +73,7 @@ public final class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
             keyPair = Optional.of(new PKIUtil().decodePrivateKey(
                 new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey()).replace("\\n", "\n")),
                 encryptionService.decrypt(passPhrase)));
-        } catch (IOException exception) {
+        } catch (IOException | DecryptionException exception) {
             LOG.warn("Unable to decode private key, id={}", pairId, exception);
             return false;
         }
