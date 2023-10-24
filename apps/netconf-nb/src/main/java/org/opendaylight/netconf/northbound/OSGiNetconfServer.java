@@ -58,8 +58,13 @@ public final class OSGiNetconfServer {
         mappers.onAddNetconfOperationServiceFactory(mapperAggregatorRegistry);
         monitoring = monitoringFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfMonitoringService.props(
             mapperAggregatorRegistry, sshScheduledExecutor, configuration.monitoring$_$update$_$interval())));
-        serverTransportInitializer = new ServerTransportInitializer(new NetconfServerSessionNegotiatorFactory(timer,
-            mappers, sessionIdProvider, configuration.connection$_$timeout$_$millis(), monitoring.getInstance()));
+        serverTransportInitializer = new ServerTransportInitializer(NetconfServerSessionNegotiatorFactory.builder()
+            .setTimer(timer)
+            .setAggregatedOpService(mappers)
+            .setIdProvider(sessionIdProvider)
+            .setConnectionTimeoutMillis(configuration.connection$_$timeout$_$millis())
+            .setMonitoringService(monitoring.getInstance())
+            .build());
     }
 
     @Deactivate
