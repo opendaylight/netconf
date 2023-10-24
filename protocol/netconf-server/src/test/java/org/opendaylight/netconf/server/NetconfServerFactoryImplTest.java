@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.netconf.server.api.NetconfServerFactory;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.opendaylight.netconf.transport.api.TransportChannel;
@@ -66,6 +65,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @ExtendWith(MockitoExtension.class)
+@Deprecated(forRemoval = true)
 class NetconfServerFactoryImplTest {
     private static final String USERNAME = "username";
     private static final String PASSWORD = "pa$$w0rd";
@@ -79,7 +79,7 @@ class NetconfServerFactoryImplTest {
     @Mock
     private TransportChannelListener clientListener;
 
-    private NetconfServerFactory factory;
+    private NetconfServerFactoryImpl factory;
     private TcpServerGrouping tcpServerParams;
     private TcpClientGrouping tcpClientParams;
 

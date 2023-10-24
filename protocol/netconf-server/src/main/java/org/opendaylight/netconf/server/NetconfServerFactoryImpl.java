@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.netconf.api.TransportConstants;
-import org.opendaylight.netconf.server.api.NetconfServerFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHServer;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
@@ -20,27 +19,30 @@ import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev230417.SshServerGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.server.rev230417.TcpServerGrouping;
 
-public final class NetconfServerFactoryImpl implements NetconfServerFactory {
+@Deprecated(forRemoval = true)
+final class NetconfServerFactoryImpl {
     private final ServerTransportInitializer transportInitializer;
     private final SSHTransportStackFactory factory;
 
-    public NetconfServerFactoryImpl(final ServerTransportInitializer transportInitializer,
+    NetconfServerFactoryImpl(final ServerTransportInitializer transportInitializer,
             final SSHTransportStackFactory factory) {
         this.transportInitializer = requireNonNull(transportInitializer);
         this.factory = requireNonNull(factory);
     }
 
-    @Override
-    public ListenableFuture<TCPServer> createTcpServer(final TcpServerGrouping params)
+    ListenableFuture<TCPServer> createTcpServer(final TcpServerGrouping params)
             throws UnsupportedConfigurationException {
         return TCPServer.listen(transportInitializer, factory.newServerBootstrap(), params);
     }
 
-    @Override
-    public ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams,
-            final SshServerGrouping sshParams, final ServerFactoryManagerConfigurator configurator)
-                throws UnsupportedConfigurationException {
+    ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams, final SshServerGrouping sshParams,
+            final ServerFactoryManagerConfigurator configurator) throws UnsupportedConfigurationException {
         return factory.listenServer(TransportConstants.SSH_SUBSYSTEM, transportInitializer, tcpParams, sshParams,
             configurator);
+    }
+
+    ListenableFuture<SSHServer> createSshServer(final TcpServerGrouping tcpParams, final SshServerGrouping sshParams)
+            throws UnsupportedConfigurationException {
+        return createSshServer(tcpParams, requireNonNull(sshParams), null);
     }
 }
