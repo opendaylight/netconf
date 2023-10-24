@@ -512,13 +512,24 @@ public abstract class BaseYangSwaggerGenerator {
             final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams, oaversion);
             operations.put("delete", delete);
 
-            if (!(node instanceof ListSchemaNode)) {
-                final ObjectNode post = buildPost(node, parentName, nodeName, discriminator, moduleName, deviceName,
-                        node.getDescription().orElse(""), pathParams, oaversion);
-                operations.put("post", post);
+            if (node instanceof ContainerSchemaNode container) {
+                final var childNode = getListOrContainerChildNode(container);
+                // we have to ensure that we are able to create POST payload containing the first container/list child
+                if (childNode != null) {
+                    final ObjectNode post = buildPost(childNode, parentName, nodeName, discriminator, moduleName,
+                            deviceName, node.getDescription().orElse(""), pathParams, oaversion);
+                    operations.put("post", post);
+                }
             }
+
         }
         return operations;
+    }
+
+    private static <T extends DataNodeContainer> DataSchemaNode getListOrContainerChildNode(final T node) {
+        return node.getChildNodes().stream()
+                .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
+                .findFirst().orElse(null);
     }
 
     protected abstract ListPathBuilder newListPathBuilder();
