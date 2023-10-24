@@ -25,28 +25,28 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 
-public final class SendErrorExceptionUtil {
+final class SendErrorExceptionUtil {
     private static final Logger LOG = LoggerFactory.getLogger(SendErrorExceptionUtil.class);
 
     private SendErrorExceptionUtil() {
         // Hidden on purpose
     }
 
-    public static void sendErrorMessage(final NetconfSession session, final DocumentedException sendErrorException) {
+    static void sendErrorMessage(final NetconfSession session, final DocumentedException sendErrorException) {
         LOG.trace("Sending error", sendErrorException);
         final Document errorDocument = createDocument(sendErrorException);
         ChannelFuture channelFuture = session.sendMessage(new NetconfMessage(errorDocument));
         channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 
-    public static void sendErrorMessage(final Channel channel, final DocumentedException sendErrorException) {
+    static void sendErrorMessage(final Channel channel, final DocumentedException sendErrorException) {
         LOG.trace("Sending error", sendErrorException);
         final Document errorDocument = createDocument(sendErrorException);
         ChannelFuture channelFuture = channel.writeAndFlush(new NetconfMessage(errorDocument));
         channelFuture.addListener(new SendErrorVerifyingListener(sendErrorException));
     }
 
-    public static void sendErrorMessage(final NetconfSession session, final DocumentedException sendErrorException,
+    static void sendErrorMessage(final NetconfSession session, final DocumentedException sendErrorException,
             final NetconfMessage incommingMessage) {
         final Document errorDocument = createDocument(sendErrorException);
         if (LOG.isTraceEnabled()) {
