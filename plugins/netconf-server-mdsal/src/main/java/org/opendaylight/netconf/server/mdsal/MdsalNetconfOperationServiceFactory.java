@@ -88,8 +88,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     }
 
     // FIXME: ImmutableSet
-    static Set<Capability> transformCapabilities(
-            final EffectiveModelContext currentContext,
+    static Set<Capability> transformCapabilities(final EffectiveModelContext currentContext,
             final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
         final var capabilities = new HashSet<Capability>();
 
