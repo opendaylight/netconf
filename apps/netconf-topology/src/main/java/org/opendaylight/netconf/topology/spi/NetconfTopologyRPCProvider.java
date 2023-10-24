@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
+import org.opendaylight.aaa.encrypt.exception.EncryptionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -84,7 +85,12 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
     }
 
     private ListenableFuture<RpcResult<CreateDeviceOutput>> createDevice(final CreateDeviceInput input) {
-        final NetconfNode node = encryptPassword(input);
+        final NetconfNode node;
+        try {
+            node = encryptPassword(input);
+        } catch (EncryptionException e) {
+            throw new IllegalStateException("Failed to encrypt provided password", e);
+        }
         final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult = SettableFuture.create();
         final NodeId nodeId = new NodeId(input.getNodeId());
         writeToConfigDS(node, nodeId, futureResult);
@@ -120,7 +126,7 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
     }
 
     @VisibleForTesting
-    NetconfNode encryptPassword(final CreateDeviceInput input) {
+    NetconfNode encryptPassword(final CreateDeviceInput input) throws EncryptionException {
         final NetconfNodeBuilder builder = new NetconfNodeBuilder();
         builder.fieldsFrom(input);
 
@@ -128,7 +134,7 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
             .build();
     }
 
-    private Credentials handleEncryption(final Credentials credentials) {
+    private Credentials handleEncryption(final Credentials credentials) throws EncryptionException {
         if (credentials instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
 
