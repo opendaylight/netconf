@@ -19,19 +19,20 @@ import static org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFact
 
 import io.netty.util.HashedWheelTimer;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -68,6 +69,7 @@ import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
+import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -106,7 +108,7 @@ public class ConcurrentClientsTest {
     private static NetconfMessage clientHelloMessage;
 
     private HashedWheelTimer hashedWheelTimer;
-    private SSHTransportStackFactory serverTransportFactory;
+    private BootstrapFactory serverBootstrapFactory;
     private NetconfClientFactory clientFactory;
     private TCPServer server;
 
@@ -132,9 +134,9 @@ public class ConcurrentClientsTest {
 
         // create temp socket to get available port for test
         serverAddress = InetAddress.getLoopbackAddress();
-        final var socket = new ServerSocket(0);
-        serverPort = socket.getLocalPort();
-        socket.close();
+        try (var socket = new ServerSocket(0)) {
+            serverPort = socket.getLocalPort();
+        }
 
         final var address = IetfInetUtil.ipAddressFor(serverAddress);
         final var port = new PortNumber(Uint16.valueOf(serverPort));
@@ -171,33 +173,30 @@ public class ConcurrentClientsTest {
         doReturn(serverSessionListener).when(monitoringService).getSessionListener();
         doReturn(EMPTY_CAPABILITIES).when(monitoringService).getCapabilities();
 
-        final var serverNegotiatorFactory = new NetconfServerSessionNegotiatorFactoryBuilder()
+        serverBootstrapFactory = new BootstrapFactory("server", threads);
+        server = TCPServer.listen(new ServerTransportInitializer(new NetconfServerSessionNegotiatorFactoryBuilder()
             .setTimer(hashedWheelTimer)
             .setAggregatedOpService(factoriesListener)
             .setIdProvider(ID_PROVIDER)
             .setConnectionTimeoutMillis(TIMEOUT)
             .setMonitoringService(monitoringService)
             .setBaseCapabilities(serverCapabilities)
-            .build();
-
-        serverTransportFactory = new SSHTransportStackFactory("server", threads);
-        final var serverFactory = new NetconfServerFactoryImpl(new ServerTransportInitializer(serverNegotiatorFactory),
-            serverTransportFactory);
-        server = serverFactory.createTcpServer(serverParams).get(TIMEOUT, MILLISECONDS);
+            .build()), serverBootstrapFactory.newServerBootstrap(), serverParams)
+            .get(TIMEOUT, MILLISECONDS);
     }
 
     @AfterEach
     void afterEach() throws Exception {
         hashedWheelTimer.stop();
         server.shutdown().get(TIMEOUT, MILLISECONDS);
-        serverTransportFactory.close();
+        serverBootstrapFactory.close();
         if (clientFactory != null) {
             clientFactory.close();
         }
     }
 
     @ParameterizedTest
-    @MethodSource("concurrentClientArgs")
+    @MethodSource
     @Timeout(CONCURRENCY * 1000)
     void testConcurrentClients(final int threads, final Class<? extends Runnable> clientClass,
             final Set<String> serverCaps) throws Exception {
@@ -218,8 +217,8 @@ public class ConcurrentClientsTest {
         assertEquals(CONCURRENCY, testingNetconfOperation.counter.get());
     }
 
-    private static Stream<Arguments> concurrentClientArgs() {
-        return Stream.of(
+    private static List<Arguments> testConcurrentClients() {
+        return List.of(
             // (threads, runnable client class, server capabilities)
             Arguments.of(4, NetconfClientRunnable.class, DEFAULT_BASE_CAPABILITIES),
             Arguments.of(1, NetconfClientRunnable.class, DEFAULT_BASE_CAPABILITIES),
@@ -295,42 +294,34 @@ public class ConcurrentClientsTest {
      * Pure socket based blocking client.
      */
     private record BlockingClientRunnable() implements Runnable {
-
         @Override
-        @SuppressWarnings("checkstyle:IllegalCatch")
         public void run() {
-            try {
-                run2();
-            } catch (Exception e) {
+            try (var clientSocket = new Socket(serverAddress, serverPort)) {
+                final var outToServer = new DataOutputStream(clientSocket.getOutputStream());
+                final var inFromServer = new InputStreamReader(clientSocket.getInputStream());
+
+                var sb = new StringBuilder();
+                while (!sb.toString().endsWith("]]>]]>")) {
+                    sb.append((char) inFromServer.read());
+                }
+                LOG.info(sb.toString());
+
+                outToServer.write(clientHelloMessage.toString().getBytes(StandardCharsets.UTF_8));
+                outToServer.write("]]>]]>".getBytes());
+                outToServer.flush();
+                // Thread.sleep(100);
+                outToServer.write(getConfigMessage.toString().getBytes(StandardCharsets.UTF_8));
+                outToServer.write("]]>]]>".getBytes());
+                outToServer.flush();
+                // Thread.sleep(100);
+                sb = new StringBuilder();
+                while (!sb.toString().endsWith("]]>]]>")) {
+                    sb.append((char) inFromServer.read());
+                }
+                LOG.info(sb.toString());
+            } catch (IOException e) {
                 throw new IllegalStateException(Thread.currentThread().getName(), e);
             }
-        }
-
-        private void run2() throws Exception {
-            final var clientSocket = new Socket(serverAddress, serverPort);
-            final var outToServer = new DataOutputStream(clientSocket.getOutputStream());
-            final var inFromServer = new InputStreamReader(clientSocket.getInputStream());
-
-            var sb = new StringBuilder();
-            while (!sb.toString().endsWith("]]>]]>")) {
-                sb.append((char) inFromServer.read());
-            }
-            LOG.info(sb.toString());
-
-            outToServer.write(clientHelloMessage.toString().getBytes(StandardCharsets.UTF_8));
-            outToServer.write("]]>]]>".getBytes());
-            outToServer.flush();
-            // Thread.sleep(100);
-            outToServer.write(getConfigMessage.toString().getBytes(StandardCharsets.UTF_8));
-            outToServer.write("]]>]]>".getBytes());
-            outToServer.flush();
-            // Thread.sleep(100);
-            sb = new StringBuilder();
-            while (!sb.toString().endsWith("]]>]]>")) {
-                sb.append((char) inFromServer.read());
-            }
-            LOG.info(sb.toString());
-            clientSocket.close();
         }
     }
 
