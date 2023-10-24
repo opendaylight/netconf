@@ -16,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.concurrent.GenericFutureListener;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +32,7 @@ public class DeserializerExceptionHandlerTest {
         channel = mock(Channel.class);
         doReturn(channel).when(context).channel();
         channelFuture = mock(ChannelFuture.class);
-        doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
+        doReturn(channelFuture).when(channelFuture).addListener(any());
         doReturn(channelFuture).when(channel).writeAndFlush(any());
     }
 

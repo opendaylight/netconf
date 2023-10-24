@@ -40,7 +40,7 @@ import org.w3c.dom.Document;
 public class DefaultCloseSessionTest {
 
     private static void mockEventLoop(final Channel channel) {
-        final EventLoop eventLoop = mock(EventLoop.class);
+        final var eventLoop = mock(EventLoop.class);
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
             invocation.getArgument(0, Runnable.class).run();
@@ -61,13 +61,13 @@ public class DefaultCloseSessionTest {
         mockEventLoop(channel);
         final ChannelFuture channelFuture = mock(ChannelFuture.class);
         doReturn(channelFuture).when(channel).close();
-        doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
+        doReturn(channelFuture).when(channelFuture).addListener(any());
 
         final ChannelPromise sendFuture = mock(ChannelPromise.class);
         doAnswer(invocation -> {
             invocation.getArgument(0, GenericFutureListener.class).operationComplete(sendFuture);
             return null;
-        }).when(sendFuture).addListener(any(GenericFutureListener.class));
+        }).when(sendFuture).addListener(any());
         doReturn(sendFuture).when(channel).newPromise();
         doReturn(sendFuture).when(channel).writeAndFlush(any(), any());
         doReturn(true).when(sendFuture).isSuccess();
@@ -90,13 +90,13 @@ public class DefaultCloseSessionTest {
 
     @Test
     public void testDefaultCloseSession2() throws Exception {
-        final NetconfDocumentedException expectedCause = new NetconfDocumentedException("testMessage");
-        final AutoCloseable res = mock(AutoCloseable.class);
+        final var expectedCause = new NetconfDocumentedException("testMessage");
+        final var res = mock(AutoCloseable.class);
         doThrow(expectedCause).when(res).close();
-        final DefaultCloseSession session = new DefaultCloseSession(new SessionIdType(Uint32.TEN), res);
-        XmlElement elem = XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"));
+        final var session = new DefaultCloseSession(new SessionIdType(Uint32.TEN), res);
+        final var elem = XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"));
 
-        final DocumentedException ex = assertThrows(DocumentedException.class,
+        final var ex = assertThrows(DocumentedException.class,
             () -> session.handleWithNoSubsequentOperations(XmlUtil.newDocument(), elem));
         assertEquals("Unable to properly close session 10", ex.getMessage());
         assertSame(expectedCause, ex.getCause());

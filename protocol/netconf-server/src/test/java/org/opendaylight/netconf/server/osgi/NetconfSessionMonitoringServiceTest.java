@@ -126,8 +126,7 @@ public class NetconfSessionMonitoringServiceTest {
         monitoringService.onSessionUp(sessionMock1);
         monitoringService.onSessionUp(sessionMock2);
         monitoringService.onSessionEvent(SessionEvent.inRpcSuccess(sessionMock1));
-        ArgumentCaptor<Collection> captor =
-                ArgumentCaptor.forClass(Collection.class);
+        final var captor = ArgumentCaptor.forClass(Collection.class);
         verify(listener, timeout(2000)).onSessionsUpdated(captor.capture());
         final Collection<Session> value = captor.getValue();
         assertTrue(value.contains(SESSION_1));
