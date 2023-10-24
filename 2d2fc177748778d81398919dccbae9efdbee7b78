@@ -16,6 +16,24 @@
       "message": "The headline is wrong, as we still have the -unencrypted case.\n\nAlso this needs to be done in two steps:\n- mark these as \u0027status obsolete\u0027, which is the first revision bump\n- remove these (this patch), which is another revision bump\nThe reason for doing this is that we can backport the first patch to communicate a much stronger deprecation warning (I think).",
       "revId": "2d2fc177748778d81398919dccbae9efdbee7b78",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6113d0ac_ab9af0ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-24T10:13:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bfc74f2b_eb01472a",
+      "revId": "2d2fc177748778d81398919dccbae9efdbee7b78",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
