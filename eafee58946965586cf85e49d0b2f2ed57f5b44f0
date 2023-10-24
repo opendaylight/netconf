@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "305ed0c9_cefd262d",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 2057,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-24T07:27:25Z",
+      "side": 1,
+      "message": "We will need to install netconf-topology to use device.\n\nSplit this into two parts: for controller and for device.",
+      "revId": "eafee58946965586cf85e49d0b2f2ed57f5b44f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f6fc1ec_6921ea53",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 2066,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-24T07:27:25Z",
+      "side": 1,
+      "message": "What? JSON?\n\nUse real examples like:\nhttp://192.168.56.25:8181/apidoc/openapi3/apis/mounts/1/toaster(2009-11-20)\n\nand write comment that this request is for module toaster with 2009-11-20 revision.",
+      "revId": "eafee58946965586cf85e49d0b2f2ed57f5b44f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
