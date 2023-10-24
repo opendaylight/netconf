@@ -15,6 +15,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -29,6 +31,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -37,14 +46,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +67,12 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     static final QName ERROR_INFO_QNAME = qnameOf("error-info");
     private static final QName ERROR_PATH_QNAME = qnameOf("error-path");
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
+    private static final XMLOutputFactory XML_OUTPUT_FACTORY;
+
+    static {
+        XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
+        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
+    }
 
     private final DatabindProvider databindProvider;
 
@@ -94,13 +102,12 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
             LOG.warn("Input exception has a family of 4xx but does not contain any descriptive errors", exception);
         }
 
-        final ContainerNode errorsContainer = buildErrorsContainer(exception);
         final String serializedResponseBody;
         final MediaType responseMediaType = transformToResponseMediaType(getSupportedMediaType());
         if (MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE.equals(responseMediaType)) {
             serializedResponseBody = serializeExceptionToJson(exception, databindProvider);
         } else {
-            serializedResponseBody = serializeErrorsContainerToXml(errorsContainer);
+            serializedResponseBody = serializeExceptionToXml(exception, databindProvider);
         }
 
         final Response preparedResponse = Response.status(responseStatus)
@@ -110,57 +117,6 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         LOG.debug("Exception {} has been successfully mapped to response: {}",
                 exception.getMessage(), preparedResponse);
         return preparedResponse;
-    }
-
-    /**
-     * Filling up of the errors container with data from input {@link RestconfDocumentedException}.
-     *
-     * @param exception Thrown exception.
-     * @return Built errors container.
-     */
-    private static ContainerNode buildErrorsContainer(final RestconfDocumentedException exception) {
-        return Builders.containerBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(Errors.QNAME))
-            .withChild(Builders.unkeyedListBuilder()
-                .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
-                .withValue(exception.getErrors().stream()
-                    .map(RestconfDocumentedExceptionMapper::createErrorEntry)
-                    .collect(Collectors.toList()))
-                .build())
-            .build();
-    }
-
-    /**
-     * Building of one error entry using provided {@link RestconfError}.
-     *
-     * @param restconfError Error details.
-     * @return Built list entry.
-     */
-    private static UnkeyedListEntryNode createErrorEntry(final RestconfError restconfError) {
-        // filling in mandatory leafs
-        final var entryBuilder = Builders.unkeyedListEntryBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(Error.QNAME))
-            .withChild(ImmutableNodes.leafNode(ERROR_TYPE_QNAME, restconfError.getErrorType().elementBody()))
-            .withChild(ImmutableNodes.leafNode(ERROR_TAG_QNAME, restconfError.getErrorTag().elementBody()));
-
-        // filling in optional fields
-        if (restconfError.getErrorMessage() != null) {
-            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_MESSAGE_QNAME, restconfError.getErrorMessage()));
-        }
-        if (restconfError.getErrorAppTag() != null) {
-            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_APP_TAG_QNAME, restconfError.getErrorAppTag()));
-        }
-        if (restconfError.getErrorInfo() != null) {
-            // Oddly, error-info is defined as an empty container in the restconf yang. Apparently the
-            // intention is for implementors to define their own data content so we'll just treat it as a leaf
-            // with string data.
-            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_INFO_QNAME, restconfError.getErrorInfo()));
-        }
-
-        if (restconfError.getErrorPath() != null) {
-            entryBuilder.withChild(ImmutableNodes.leafNode(ERROR_PATH_QNAME, restconfError.getErrorPath()));
-        }
-        return entryBuilder.build();
     }
 
     /**
@@ -216,28 +172,77 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     }
 
     /**
-     * Serialization of the errors container into XML representation.
+     * Serialization exceptions into XML representation.
      *
-     * @param errorsContainer To be serialized errors container.
-     * @return XML representation of the errors container.
+     * @param exception To be serialized exception.
+     * @param databindProvider Holder of current {@code DatabindContext}.
+     * @return XML representation of the exception.
      */
-    private String serializeErrorsContainerToXml(final ContainerNode errorsContainer) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            return writeNormalizedNode(errorsContainer, outputStream,
-                new XmlStreamWriterWithDisabledValidation(databindProvider.currentContext(), outputStream));
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot close some of the output XML writers", e);
-        }
-    }
+    private static String serializeExceptionToXml(final RestconfDocumentedException exception,
+            final DatabindProvider databindProvider) {
+        try (var outputStream = new ByteArrayOutputStream()) {
+            final var xmlWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(outputStream,
+                StandardCharsets.UTF_8.name());
+            xmlWriter.writeStartDocument();
+            xmlWriter.writeStartElement(Errors.QNAME.getLocalName());
+            xmlWriter.writeNamespace("xmlns", Errors.QNAME.getNamespace().toString());
+            if (exception.getErrors() != null && !exception.getErrors().isEmpty()) {
+                for (final var error : exception.getErrors()) {
+                    xmlWriter.writeStartElement(Error.QNAME.getLocalName());
+                    // Write error-type element
+                    xmlWriter.writeStartElement(ERROR_TYPE_QNAME.getLocalName());
+                    xmlWriter.writeCharacters(error.getErrorType().elementBody());
+                    xmlWriter.writeEndElement();
 
-    private static String writeNormalizedNode(final NormalizedNode errorsContainer,
-            final ByteArrayOutputStream outputStream, final StreamWriterWithDisabledValidation streamWriter) {
-        try (NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
-            nnWriter.write(errorsContainer);
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot write error response body", e);
+                    if (error.getErrorPath() != null) {
+                        xmlWriter.writeStartElement(ERROR_PATH_QNAME.getLocalName());
+                        databindProvider.currentContext().xmlCodecs().instanceIdentifierCodec()
+                            .writeValue(xmlWriter, error.getErrorPath());
+                        xmlWriter.writeEndElement();
+                    }
+                    if (error.getErrorMessage() != null) {
+                        xmlWriter.writeStartElement(ERROR_MESSAGE_QNAME.getLocalName());
+                        xmlWriter.writeCharacters(error.getErrorMessage());
+                        xmlWriter.writeEndElement();
+                    }
+
+                    // Write error-tag element
+                    xmlWriter.writeStartElement(ERROR_TAG_QNAME.getLocalName());
+                    xmlWriter.writeCharacters(error.getErrorTag().elementBody());
+                    xmlWriter.writeEndElement();
+
+                    if (error.getErrorAppTag() != null) {
+                        xmlWriter.writeStartElement(ERROR_APP_TAG_QNAME.getLocalName());
+                        xmlWriter.writeCharacters(error.getErrorAppTag());
+                        xmlWriter.writeEndElement();
+                    }
+                    if (error.getErrorInfo() != null) {
+                        xmlWriter.writeStartElement(ERROR_INFO_QNAME.getLocalName());
+                        xmlWriter.writeCharacters(error.getErrorInfo());
+                        xmlWriter.writeEndElement();
+                    }
+                    xmlWriter.writeEndElement();
+                }
+            }
+            xmlWriter.writeEndElement();
+            xmlWriter.writeEndDocument();
+            xmlWriter.close();
+
+            final var transformerFactory = TransformerFactory.newInstance();
+            final var transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            // 2 spaces for indentation
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
+                String.valueOf(DEFAULT_INDENT_SPACES_NUM));
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            final var xmlSource = new StreamSource(new StringReader(outputStream.toString(StandardCharsets.UTF_8)));
+            final var stringWriter = new StringWriter();
+            final var streamResult = new StreamResult(stringWriter);
+            transformer.transform(xmlSource, streamResult);
+            return stringWriter.toString();
+        } catch (IOException | XMLStreamException | TransformerException e) {
+            throw new IllegalStateException("Error while serializing restconf exception into XML", e);
         }
-        return outputStream.toString(StandardCharsets.UTF_8);
     }
 
     /**
