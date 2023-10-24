@@ -25,8 +25,6 @@ import javax.ws.rs.core.Response;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -75,7 +73,7 @@ public final class OperationBuilder {
 
     }
 
-    public static ObjectNode buildPost(final DataSchemaNode node, final String parentName, final String nodeName,
+    public static ObjectNode buildPost(final DataSchemaNode childNode, final String parentName, final String nodeName,
             final String discriminator, final String moduleName, final Optional<String> deviceName,
             final String description, final ArrayNode pathParams, final OAversion oaversion) {
         final ObjectNode value = JsonNodeFactory.instance.objectNode();
@@ -88,7 +86,6 @@ public final class OperationBuilder {
         final String defName = cleanDefName + discriminator;
         final String xmlDefName = cleanDefName + discriminator;
         ref.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
-        final DataSchemaNode childNode = getListOrContainerChildNode(Optional.ofNullable(node));
         if (childNode != null && childNode.isConfiguration()) {
             final String childNodeName = childNode.getQName().getLocalName();
             final String cleanChildDefName = parentName + "_" + nodeName + CONFIG + "_" + childNodeName;
@@ -443,11 +440,5 @@ public final class OperationBuilder {
             return schema;
         }
         return parameter;
-    }
-
-    private static DataSchemaNode getListOrContainerChildNode(final Optional<DataSchemaNode> node) {
-        return node.flatMap(schemaNode -> ((DataNodeContainer) schemaNode).getChildNodes().stream()
-            .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
-            .findFirst()).orElse(null);
     }
 }

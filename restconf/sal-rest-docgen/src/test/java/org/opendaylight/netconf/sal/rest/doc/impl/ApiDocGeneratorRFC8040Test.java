@@ -93,8 +93,8 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
                 "/rests/data/toaster2:lst/cont1/cont11",
                 "/rests/data/toaster2:lst/cont1/lst11",
                 "/rests/data/toaster2:lst/lst1={key1},{key2}");
-        final List<String> configPathsForPost = List.of("/rests/data/toaster2:lst/cont1",
-                "/rests/data/toaster2:lst/cont1/cont11");
+        final String configPathForPostCont = "/rests/data/toaster2:lst/cont1";
+        final String configPathForPostLeaf = "/rests/data/toaster2:lst/cont1/cont11";
 
         final SwaggerObject doc = (SwaggerObject) generator.getApiDeclaration(NAME, REVISION_DATE, URI_INFO,
             OAversion.V2_0);
@@ -107,10 +107,12 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
             assertFalse(node.path("patch").isMissingNode());
         }
 
-        for (final String path : configPathsForPost) {
-            final JsonNode node = doc.getPaths().get(path);
-            assertFalse(node.path("post").isMissingNode());
-        }
+        final JsonNode node = doc.getPaths().get(configPathForPostCont);
+        assertFalse(node.path("post").isMissingNode());
+
+        // Assert we do not generate post for container which contains only leafs.
+        final JsonNode nodeLeaf = doc.getPaths().get(configPathForPostLeaf);
+        assertTrue(nodeLeaf.path("post").isMissingNode());
     }
 
     /**
@@ -339,9 +341,6 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
         assertEquals(List.of("/rests/data", "/rests/data/my-yang:data"),
                 ImmutableList.copyOf(doc.getPaths().fieldNames()));
         final var JsonNodeMyYangData = doc.getPaths().get("/rests/data/my-yang:data");
-        verifyRequestRef(JsonNodeMyYangData.path("post"),
-                "#/components/schemas/my-yang_config_data",
-                "#/components/schemas/my-yang_config_data");
         verifyRequestRef(JsonNodeMyYangData.path("put"), "#/components/schemas/my-yang_config_data_TOP",
                 "#/components/schemas/my-yang_config_data");
         verifyRequestRef(JsonNodeMyYangData.path("get"), "#/components/schemas/my-yang_data_TOP",
@@ -379,9 +378,6 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         final var jsonNodeSlotInfo = doc.getPaths().get(
                 "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo");
-        verifyRequestRef(jsonNodeSlotInfo.path("post"),
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo",
-                "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
         verifyRequestRef(jsonNodeSlotInfo.path("put"),
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo_TOP",
                 "#/components/schemas/toaster2_toaster_toasterSlot_config_slotInfo");
