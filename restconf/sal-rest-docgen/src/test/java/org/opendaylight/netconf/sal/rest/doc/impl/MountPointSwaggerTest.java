@@ -141,23 +141,23 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
 
         var pathToList1 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}";
         assertTrue(mountPointApi.getPaths().has(pathToList1));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList1));
+        assertEquals(List.of("name"), getPathGetParameters(mountPointApi.getPaths(), pathToList1));
 
         var pathToList2 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list2={name1}";
         assertTrue(mountPointApi.getPaths().has(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.getPaths(), pathToList2));
+        assertEquals(List.of("name", "name1"), getPathGetParameters(mountPointApi.getPaths(), pathToList2));
 
         var pathToList3 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}";
         assertTrue(mountPointApi.getPaths().has(pathToList3));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList3));
+        assertEquals(List.of("name"), getPathGetParameters(mountPointApi.getPaths(), pathToList3));
 
         var pathToList4 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name1}";
         assertTrue(mountPointApi.getPaths().has(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(mountPointApi.getPaths(), pathToList4));
+        assertEquals(List.of("name", "name1"), getPathGetParameters(mountPointApi.getPaths(), pathToList4));
 
         var pathToList5 = "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2";
         assertTrue(mountPointApi.getPaths().has(pathToList5));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathToList5));
+        assertEquals(List.of("name"), getPathGetParameters(mountPointApi.getPaths(), pathToList5));
     }
 
     /**
@@ -193,12 +193,12 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         final var pathWithParameters =
             "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action";
         assertTrue(mountPointApi.getPaths().has(pathWithParameters));
-        assertEquals(List.of("name"), getPathParameters(mountPointApi.getPaths(), pathWithParameters));
+        assertEquals(List.of("name"), getPathPostParameters(mountPointApi.getPaths(), pathWithParameters));
 
         final var pathWithoutParameters =
             "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action";
         assertTrue(mountPointApi.getPaths().has(pathWithoutParameters));
-        assertEquals(List.of(), getPathParameters(mountPointApi.getPaths(), pathWithoutParameters));
+        assertEquals(List.of(), getPathPostParameters(mountPointApi.getPaths(), pathWithoutParameters));
     }
 
     /**

@@ -32,10 +32,27 @@ public abstract class AbstractApiDocTest {
         URI_INFO = DocGenTestHelper.createMockUriInfo("http://localhost/path");
     }
 
-    protected static List<String> getPathParameters(final ObjectNode paths, final String path) {
+    protected static List<String> getPathPostParameters(final ObjectNode paths, final String path) {
         final var params = new ArrayList<String>();
         paths.get(path).get("post").get("parameters").elements()
             .forEachRemaining(p -> params.add(p.get("name").asText()));
+        return params;
+    }
+
+    /**
+     * Get path parameters names for {@code path} for GET operation.
+     *
+     * @return {@link List} of parameters excluding `content` parameter
+     */
+    public static List<String> getPathGetParameters(final ObjectNode paths, final String path) {
+        final var params = new ArrayList<String>();
+        paths.get(path).get("get").get("parameters").elements()
+                .forEachRemaining(p -> {
+                    final String name = p.get("name").asText();
+                    if (!"content".equals(name)) {
+                        params.add(name);
+                    }
+                });
         return params;
     }
 }
