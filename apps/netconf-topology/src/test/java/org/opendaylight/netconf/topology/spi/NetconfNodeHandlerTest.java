@@ -132,7 +132,7 @@ public class NetconfNodeHandlerTest {
     }
 
     @Before
-    public void before() {
+    public void before() throws Exception {
         // Instantiate the handler
         handler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor, BASE_SCHEMAS,
             schemaManager, processingExecutor,

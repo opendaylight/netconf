@@ -24,6 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
 import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
@@ -40,6 +41,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.spi.KeepaliveSalFacade;
+import org.opendaylight.netconf.topology.spi.DefaultNetconfClientConfigurationBuilderFactory.DecryptionException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
@@ -82,7 +84,8 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
-            final NetconfNodeAugmentedOptional nodeOptional) {
+            final NetconfNodeAugmentedOptional nodeOptional) throws DecryptionException {
+        final var clientConfigurationBuilder = builderFactory.createClientConfigurationBuilder(nodeId, node);
         this.clientDispatcher = requireNonNull(clientDispatcher);
         this.eventExecutor = requireNonNull(eventExecutor);
         this.delegate = requireNonNull(delegate);
@@ -141,8 +144,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             keepAliveFacade.setListener(communicator);
         }
 
-        clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
-            .withSessionListener(communicator)
+        clientConfig = clientConfigurationBuilder.withSessionListener(communicator)
             .build();
     }
 

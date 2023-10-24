@@ -10,6 +10,8 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -56,15 +58,23 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
 
     @Override
     public NetconfClientConfigurationBuilder createClientConfigurationBuilder(final NodeId nodeId,
-            final NetconfNode node) {
+            final NetconfNode node) throws DecryptionException {
         final var builder = NetconfClientConfigurationBuilder.create();
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
-            builder.withProtocol(NetconfClientProtocol.TCP)
-                .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+            try {
+                builder.withProtocol(NetconfClientProtocol.TCP)
+                    .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+            } catch (IllegalBlockSizeException | BadPaddingException e) {
+                throw new DecryptionException(e);
+            }
         } else if (protocol == null || protocol.getName() == Name.SSH) {
-            builder.withProtocol(NetconfClientProtocol.SSH)
-                .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+            try {
+                builder.withProtocol(NetconfClientProtocol.SSH)
+                    .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+            } catch (IllegalBlockSizeException | BadPaddingException e) {
+                throw new DecryptionException(e);
+            }
         } else if (protocol.getName() == Name.TLS) {
             builder.withProtocol(NetconfClientProtocol.TLS)
                 .withSslHandlerFactory(sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification()));
@@ -83,7 +93,8 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
             .withConnectionTimeoutMillis(node.requireConnectionTimeoutMillis().toJava());
     }
 
-    private @NonNull AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
+    private @NonNull AuthenticationHandler getHandlerFromCredentials(final Credentials credentials)
+            throws IllegalBlockSizeException, BadPaddingException {
         if (credentials instanceof LoginPassword loginPassword) {
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         } else if (credentials instanceof LoginPwUnencrypted unencrypted) {
@@ -99,6 +110,12 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
                 encryptionService);
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
+        }
+    }
+
+    public static class DecryptionException extends Exception {
+        public DecryptionException(Throwable cause) {
+            super(cause);
         }
     }
 }

@@ -15,6 +15,8 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -84,7 +86,12 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
     }
 
     private ListenableFuture<RpcResult<CreateDeviceOutput>> createDevice(final CreateDeviceInput input) {
-        final NetconfNode node = encryptPassword(input);
+        final NetconfNode node;
+        try {
+            node = encryptPassword(input);
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
+            throw new RuntimeException(e);
+        }
         final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult = SettableFuture.create();
         final NodeId nodeId = new NodeId(input.getNodeId());
         writeToConfigDS(node, nodeId, futureResult);
@@ -120,7 +127,7 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
     }
 
     @VisibleForTesting
-    NetconfNode encryptPassword(final CreateDeviceInput input) {
+    NetconfNode encryptPassword(final CreateDeviceInput input) throws IllegalBlockSizeException, BadPaddingException {
         final NetconfNodeBuilder builder = new NetconfNodeBuilder();
         builder.fieldsFrom(input);
 
@@ -128,7 +135,8 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
             .build();
     }
 
-    private Credentials handleEncryption(final Credentials credentials) {
+    private Credentials handleEncryption(final Credentials credentials) throws IllegalBlockSizeException,
+            BadPaddingException {
         if (credentials instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
 

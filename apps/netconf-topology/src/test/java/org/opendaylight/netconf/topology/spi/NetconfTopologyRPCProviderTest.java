@@ -57,14 +57,14 @@ public class NetconfTopologyRPCProviderTest {
     private NetconfTopologyRPCProvider rpcProvider;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         doReturn(ENC_PWD).when(encryptionService).encrypt(TEST_PWD);
         doReturn(rpcReg).when(rpcProviderService).registerRpcImplementations(any());
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, TOPOLOGY_ID);
     }
 
     @Test
-    public void testEncryptPassword() {
+    public void testEncryptPassword() throws Exception {
 
         final NetconfNode encryptedPwNode = rpcProvider.encryptPassword(getInput(true));
 
@@ -76,7 +76,7 @@ public class NetconfTopologyRPCProviderTest {
     }
 
     @Test
-    public void testNoEncryption() {
+    public void testNoEncryption() throws Exception {
         final NetconfNode encryptedPwNode = rpcProvider.encryptPassword(getInput(false));
 
         final Credentials credentials = encryptedPwNode.getCredentials();

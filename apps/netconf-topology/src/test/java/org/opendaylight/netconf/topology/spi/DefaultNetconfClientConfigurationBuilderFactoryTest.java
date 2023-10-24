@@ -27,6 +27,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.netconf.topology.spi.DefaultNetconfClientConfigurationBuilderFactory.DecryptionException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -79,7 +80,7 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
     }
 
     @Test
-    public void testDefault() {
+    public void testDefault() throws Exception {
         final var config = createConfig(nodeBuilder.setTcpOnly(false).build());
         assertEquals(NetconfClientProtocol.SSH, config.getProtocol());
         assertNotNull(config.getAuthHandler());
@@ -87,7 +88,7 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
     }
 
     @Test
-    public void testSsh() {
+    public void testSsh() throws Exception {
         final var config = createConfig(
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.SSH).build()).build());
         assertEquals(NetconfClientProtocol.SSH, config.getProtocol());
@@ -96,7 +97,7 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
     }
 
     @Test
-    public void testTcp() {
+    public void testTcp() throws Exception {
         final var config = createConfig(nodeBuilder.setTcpOnly(true).build());
         assertEquals(NetconfClientProtocol.TCP, config.getProtocol());
         assertNotNull(config.getAuthHandler());
@@ -104,7 +105,7 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
     }
 
     @Test
-    public void testTls() {
+    public void testTls() throws Exception {
         final var config = createConfig(
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build());
         assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
@@ -122,7 +123,7 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
         assertThrows(NoSuchElementException.class, () -> createConfig(nodeBuilder.setHost(null).build()));
     }
 
-    private NetconfClientConfiguration createConfig(final NetconfNode netconfNode) {
+    private NetconfClientConfiguration createConfig(final NetconfNode netconfNode) throws DecryptionException {
         return factory.createClientConfigurationBuilder(NODE_ID, netconfNode)
             .withSessionListener(sessionListener)
             .build();

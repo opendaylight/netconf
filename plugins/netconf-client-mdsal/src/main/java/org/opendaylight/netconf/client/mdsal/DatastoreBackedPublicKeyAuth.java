@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.security.KeyPair;
 import java.util.Optional;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.aaa.encrypt.PKIUtil;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
@@ -72,7 +74,7 @@ public final class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
             keyPair = Optional.of(new PKIUtil().decodePrivateKey(
                 new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey()).replace("\\n", "\n")),
                 encryptionService.decrypt(passPhrase)));
-        } catch (IOException exception) {
+        } catch (IOException | IllegalBlockSizeException | BadPaddingException exception) {
             LOG.warn("Unable to decode private key, id={}", pairId, exception);
             return false;
         }

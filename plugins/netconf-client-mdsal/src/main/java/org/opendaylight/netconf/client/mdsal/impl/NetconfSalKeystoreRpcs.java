@@ -18,6 +18,8 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -143,10 +145,16 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final List<KeyCredential> keypairs = input.nonnullKeyCredential().values().stream()
-            .map(keypair -> new KeyCredentialBuilder(keypair)
-                .setPrivateKey(encryptionService.encrypt(keypair.getPrivateKey()))
-                .setPassphrase(encryptionService.encrypt(keypair.getPassphrase()))
-                .build())
+            .map(keypair -> {
+                try {
+                    return new KeyCredentialBuilder(keypair)
+                        .setPrivateKey(encryptionService.encrypt(keypair.getPrivateKey()))
+                        .setPassphrase(encryptionService.encrypt(keypair.getPassphrase()))
+                        .build();
+                } catch (IllegalBlockSizeException | BadPaddingException e) {
+                    throw new RuntimeException(e);
+                }
+            })
             .collect(Collectors.toList());
 
         for (KeyCredential keypair : keypairs) {

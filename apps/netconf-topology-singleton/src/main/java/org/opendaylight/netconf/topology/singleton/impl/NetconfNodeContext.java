@@ -23,6 +23,7 @@ import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
+import org.opendaylight.netconf.topology.spi.DefaultNetconfClientConfigurationBuilderFactory.DecryptionException;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
@@ -141,10 +142,14 @@ final class NetconfNodeContext implements AutoCloseable {
         // Instantiate the handler ...
         masterSalFacade = createSalFacade(netconfNode.requireLockDatastore());
 
-        nodeHandler = new NetconfNodeHandler(setup.getNetconfClientDispatcher(), setup.getEventExecutor(),
-            setup.getKeepaliveExecutor(), setup.getBaseSchemas(), schemaManager, setup.getProcessingExecutor(),
-            builderFactory, deviceActionFactory, masterSalFacade, remoteDeviceId, configNode.getNodeId(), netconfNode,
-            nodeOptional);
+        try {
+            nodeHandler = new NetconfNodeHandler(setup.getNetconfClientDispatcher(), setup.getEventExecutor(),
+                setup.getKeepaliveExecutor(), setup.getBaseSchemas(), schemaManager, setup.getProcessingExecutor(),
+                builderFactory, deviceActionFactory, masterSalFacade, remoteDeviceId, configNode.getNodeId(),
+                netconfNode, nodeOptional);
+        } catch (DecryptionException e) {
+            throw new IllegalArgumentException(e);
+        }
         nodeHandler.connect();
     }
 
