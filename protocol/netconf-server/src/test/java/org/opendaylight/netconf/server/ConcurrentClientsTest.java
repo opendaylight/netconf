@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.server;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,6 +16,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.HashedWheelTimer;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -27,6 +27,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,11 +49,12 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.client.NetconfClientFactory;
-import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
+import org.opendaylight.netconf.client.ClientChannelInitializer;
+import org.opendaylight.netconf.client.NetconfClientSession;
+import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.client.NetconfMessageUtil;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
-import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
@@ -68,8 +70,8 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFac
 import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
 import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
-import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
+import org.opendaylight.netconf.transport.tcp.TCPClient;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -109,7 +111,7 @@ public class ConcurrentClientsTest {
 
     private HashedWheelTimer hashedWheelTimer;
     private BootstrapFactory serverBootstrapFactory;
-    private NetconfClientFactory clientFactory;
+    private BootstrapFactory clientBootstrapFactory;
     private TCPServer server;
 
     @Mock
@@ -167,6 +169,7 @@ public class ConcurrentClientsTest {
         doNothing().when(serverSessionListener).onSessionUp(any(NetconfServerSession.class));
         doNothing().when(serverSessionListener).onSessionDown(any(NetconfServerSession.class));
         doNothing().when(serverSessionListener).onSessionEvent(any(SessionEvent.class));
+        // FIXME: do not use lenient()
         lenient().doReturn((Registration) () -> {
         }).when(monitoringService)
             .registerCapabilitiesListener(any(NetconfMonitoringService.CapabilitiesListener.class));
@@ -190,8 +193,8 @@ public class ConcurrentClientsTest {
         hashedWheelTimer.stop();
         server.shutdown().get(TIMEOUT, MILLISECONDS);
         serverBootstrapFactory.close();
-        if (clientFactory != null) {
-            clientFactory.close();
+        if (clientBootstrapFactory != null) {
+            clientBootstrapFactory.close();
         }
     }
 
@@ -200,15 +203,17 @@ public class ConcurrentClientsTest {
     @Timeout(CONCURRENCY * 1000)
     void testConcurrentClients(final int threads, final Class<? extends Runnable> clientClass,
             final Set<String> serverCaps) throws Exception {
-
         startServer(threads, serverCaps);
-        clientFactory = clientClass == NetconfClientRunnable.class
-            ? new NetconfClientFactoryImpl(new SSHTransportStackFactory("client", threads)) : null;
+
+        clientBootstrapFactory = clientClass == NetconfClientRunnable.class ? new BootstrapFactory("client", threads)
+            : null;
+        final var negotiatorFactory = new NetconfClientSessionNegotiatorFactory(hashedWheelTimer, Optional.empty(),
+            5_000, NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
 
         final var futures = new ArrayList<Future<?>>(CONCURRENCY);
         for (int i = 0; i < CONCURRENCY; i++) {
             final var runnableClient = clientClass == NetconfClientRunnable.class
-                ? new NetconfClientRunnable(clientFactory) : new BlockingClientRunnable();
+                ? new NetconfClientRunnable(clientBootstrapFactory, negotiatorFactory) : new BlockingClientRunnable();
             futures.add(clientExecutor.submit(runnableClient));
         }
         for (var future : futures) {
@@ -328,27 +333,33 @@ public class ConcurrentClientsTest {
     /**
      * NetconfClientFactory based runnable.
      */
-    private record NetconfClientRunnable(NetconfClientFactory factory) implements Runnable {
-
-        @SuppressWarnings("checkstyle:IllegalCatch")
+    private record NetconfClientRunnable(
+            BootstrapFactory bootstrapFactory,
+            NetconfClientSessionNegotiatorFactory negotiatorFactory) implements Runnable {
         @Override
         public void run() {
             final var sessionListener = new SimpleNetconfClientSessionListener();
-            final var clientConfig = NetconfClientConfigurationBuilder.create()
-                .withTcpParameters(clientParams).withSessionListener(sessionListener).build();
-            try (var session = factory.createClient(clientConfig).get()) {
+
+            final var future = SettableFuture.<NetconfClientSession>create();
+            TCPClient.connect(new ClientTransportChannelListener(future,
+                new ClientChannelInitializer(negotiatorFactory, () -> sessionListener),
+                bootstrapFactory.newBootstrap(), clientParams));
+
+            try (var session = future.get()) {
                 final var sessionId = session.sessionId();
                 LOG.info("Client with session id {}: hello exchanged", sessionId);
                 final var result = sessionListener.sendRequest(getConfigMessage).get();
                 LOG.info("Client with session id {}: got result {}", sessionId.getValue(), result);
 
-                checkState(!NetconfMessageUtil.isErrorMessage(result),
-                    "Received error response: " + XmlUtil.toString(result.getDocument()) + " to request: "
+                if (NetconfMessageUtil.isErrorMessage(result)) {
+                    throw new IllegalStateException("Received error response: "
+                        + XmlUtil.toString(result.getDocument()) + " to request: "
                         + XmlUtil.toString(getConfigMessage.getDocument()));
+                }
 
                 LOG.info("Client with session id {}: ended", sessionId.getValue());
-            } catch (final Exception e) {
-                throw new IllegalStateException(Thread.currentThread().getName(), e);
+//            } catch (final Exception e) {
+//                throw new IllegalStateException(Thread.currentThread().getName(), e);
             }
         }
     }
