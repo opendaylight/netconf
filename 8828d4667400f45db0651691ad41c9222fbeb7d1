@@ -52,6 +52,24 @@
       "parentUuid": "d9a81953_fe3f9d20",
       "revId": "8828d4667400f45db0651691ad41c9222fbeb7d1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92bb5d8f_399d71da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-10-24T08:01:19Z",
+      "side": 1,
+      "message": "Device will be created. It\u0027s not big math - in one case we accept only strings that pass pattern(it should be base64 string) and in other - every string(that mean any string base64 or not).",
+      "parentUuid": "30a9b06b_22e0b766",
+      "revId": "8828d4667400f45db0651691ad41c9222fbeb7d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
