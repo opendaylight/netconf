@@ -1,0 +1,15 @@
+module list-post {
+  namespace "list-post";
+  prefix lp;
+  container container {
+    list list {
+      key "name address";
+      leaf name {
+        type string;
+      }
+      leaf address {
+        type string;
+      }
+    }
+  }
+}
