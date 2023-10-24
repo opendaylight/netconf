@@ -34,6 +34,24 @@
       "parentUuid": "e1001255_52200c8b",
       "revId": "8828d4667400f45db0651691ad41c9222fbeb7d1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30a9b06b_22e0b766",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-24T06:49:12Z",
+      "side": 1,
+      "message": "What happens when I use base64 encoded string with my previous request?",
+      "parentUuid": "d9a81953_fe3f9d20",
+      "revId": "8828d4667400f45db0651691ad41c9222fbeb7d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
