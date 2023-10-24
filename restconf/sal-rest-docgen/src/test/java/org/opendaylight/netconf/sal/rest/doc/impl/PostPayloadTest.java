@@ -140,14 +140,6 @@ public class PostPayloadTest {
         final var xmlRef2 = getXmlRef(containerDoc, path2);
         assertEquals("#/components/schemas/container-test_cont_cont1_config_list4", xmlRef2);
 
-        final var path3 = "/rests/data/container-test:cont/cont1/list4={key4}";
-        assertNotNull(containerDoc.getPaths().get(path3));
-        final var jsonRef3 = getJsonRef(containerDoc, path3);
-        assertEquals("{\"cont2\":{\"$ref\":\"#/components/schemas/"
-                + "container-test_cont_cont1_list4_config_cont2\"}}", jsonRef3);
-        final var xmlRef3 = getXmlRef(containerDoc, path3);
-        assertEquals("#/components/schemas/container-test_cont_cont1_list4_config_cont2", xmlRef3);
-
         final var path4 = "/rests/data/container-test:cont/cont1/list4={key4}/cont2";
         assertNotNull(containerDoc.getPaths().get(path4));
         final var jsonRef4 = getJsonRef(containerDoc, path4);
@@ -166,14 +158,6 @@ public class PostPayloadTest {
             + "#/components/schemas/list-test_cont_config_list1\"}}}", jsonRef1);
         final var xmlRef1 = getXmlRef(listDoc, path1);
         assertEquals("#/components/schemas/list-test_cont_config_list1", xmlRef1);
-
-        final var path2 = "/rests/data/list-test:cont/list2={key2}";
-        assertNotNull(listDoc.getPaths().get(path2));
-        final var jsonRef2 = getJsonRef(listDoc, path2);
-        assertEquals("{\"list3\":{\"type\":\"array\",\"items\":{\"$ref\":\""
-            + "#/components/schemas/list-test_cont_list2_config_list3\"}}}", jsonRef2);
-        final var xmlRef2 = getXmlRef(listDoc, path2);
-        assertEquals("#/components/schemas/list-test_cont_list2_config_list3", xmlRef2);
     }
 
     private static String getJsonRef(final OpenApiObject openApiObject, final String path) {

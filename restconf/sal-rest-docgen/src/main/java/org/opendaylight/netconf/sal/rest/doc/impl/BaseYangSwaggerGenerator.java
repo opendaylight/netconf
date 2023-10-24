@@ -445,8 +445,11 @@ public abstract class BaseYangSwaggerGenerator {
             final ObjectNode delete = buildDelete(node, moduleName, deviceName, pathParams, oaversion);
             operations.put("delete", delete);
 
-            operations.put("post", buildPost(node, parentName, nodeName, discriminator, moduleName, deviceName,
-                    node.getDescription().orElse(""), pathParams, oaversion));
+            if (!(node instanceof ListSchemaNode)) {
+                final ObjectNode post = buildPost(node, parentName, nodeName, discriminator, moduleName, deviceName,
+                        node.getDescription().orElse(""), pathParams, oaversion);
+                operations.put("post", post);
+            }
         }
         return operations;
     }
