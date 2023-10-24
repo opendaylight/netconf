@@ -243,23 +243,23 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         var pathToList1 = "/rests/data/path-params-test:cont/list1={name}";
         assertTrue(doc.getPaths().has(pathToList1));
-        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList1));
+        assertEquals(List.of("name"), getPathGetParameters(doc.getPaths(), pathToList1));
 
         var pathToList2 = "/rests/data/path-params-test:cont/list1={name}/list2={name1}";
         assertTrue(doc.getPaths().has(pathToList2));
-        assertEquals(List.of("name", "name1"), getPathParameters(doc.getPaths(), pathToList2));
+        assertEquals(List.of("name", "name1"), getPathGetParameters(doc.getPaths(), pathToList2));
 
         var pathToList3 = "/rests/data/path-params-test:cont/list3={name}";
         assertTrue(doc.getPaths().has(pathToList3));
-        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList3));
+        assertEquals(List.of("name"), getPathGetParameters(doc.getPaths(), pathToList3));
 
         var pathToList4 = "/rests/data/path-params-test:cont/list1={name}/list4={name1}";
         assertTrue(doc.getPaths().has(pathToList4));
-        assertEquals(List.of("name", "name1"), getPathParameters(doc.getPaths(), pathToList4));
+        assertEquals(List.of("name", "name1"), getPathGetParameters(doc.getPaths(), pathToList4));
 
         var pathToList5 = "/rests/data/path-params-test:cont/list1={name}/cont2";
         assertTrue(doc.getPaths().has(pathToList4));
-        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathToList5));
+        assertEquals(List.of("name"), getPathGetParameters(doc.getPaths(), pathToList5));
     }
 
     private static void verifyThatPropertyDoesNotHaveRequired(final List<String> expected,
@@ -298,11 +298,11 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
 
         final var pathWithParameters = "/rests/operations/action-types:list={name}/list-action";
         assertTrue(doc.getPaths().has(pathWithParameters));
-        assertEquals(List.of("name"), getPathParameters(doc.getPaths(), pathWithParameters));
+        assertEquals(List.of("name"), getPathPostParameters(doc.getPaths(), pathWithParameters));
 
         final var pathWithoutParameters = "/rests/operations/action-types:multi-container/inner-container/action";
         assertTrue(doc.getPaths().has(pathWithoutParameters));
-        assertEquals(List.of(), getPathParameters(doc.getPaths(), pathWithoutParameters));
+        assertEquals(List.of(), getPathPostParameters(doc.getPaths(), pathWithoutParameters));
     }
 
     @Test
