@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "248faac1_aa398e99",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 540,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-25T15:09:51Z",
+      "side": 1,
+      "message": "path.path.path",
+      "revId": "bbbd16ad35938586397b19c748a92032ea2c9559",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64c0d967_7b244a74",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 542,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-25T15:09:51Z",
+      "side": 1,
+      "message": "assert not missing node",
+      "revId": "bbbd16ad35938586397b19c748a92032ea2c9559",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "560e64f4_a1267ee8",
         "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointSwaggerTest.java",
         "patchSetId": 4
