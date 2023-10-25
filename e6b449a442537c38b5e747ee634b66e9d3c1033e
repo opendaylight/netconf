@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97a0e92a_6782af77",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-25T14:59:12Z",
+      "side": 1,
+      "message": "We need to redefine this msg, see patchset 1.",
+      "revId": "e6b449a442537c38b5e747ee634b66e9d3c1033e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
