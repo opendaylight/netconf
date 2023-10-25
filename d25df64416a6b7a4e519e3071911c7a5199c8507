@@ -158,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3289ef54_dd9f2cbe",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApiTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-10-25T08:57:36Z",
+      "side": 1,
+      "message": "Increased because new yang model for testing is added.",
+      "parentUuid": "100593af_06a0e007",
+      "revId": "d25df64416a6b7a4e519e3071911c7a5199c8507",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39035f3c_58af39b4",
