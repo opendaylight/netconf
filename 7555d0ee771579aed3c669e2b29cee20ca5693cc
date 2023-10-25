@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b48e2934_7aad74e0",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerSessionNegotiatorFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-10-25T09:19:09Z",
+      "side": 1,
+      "message": "it makes sense to make constructors private, once Builder is has access to it",
+      "range": {
+        "startLine": 51,
+        "startChar": 4,
+        "endLine": 51,
+        "endChar": 10
+      },
+      "revId": "7555d0ee771579aed3c669e2b29cee20ca5693cc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
