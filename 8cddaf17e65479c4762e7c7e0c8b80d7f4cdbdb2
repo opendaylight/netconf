@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e67fa228_1ce7ec86",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/AbstractNetconfServerTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-10-25T09:01:40Z",
+      "side": 1,
+      "message": "I see no reason in these tests once the `NetconfServerFactory{Impl}` artifact is removed.\n\nThe only package related functionality tested here is server transport listener being triggered on connection established. Similar tests are existing in transport packages, mocks used there, implementation used here. No reason to up server/client to validate the functionality of `ServerTransportInitializer` (dedicated UT is expected for this artifact)\n\nSuggested removing `{Abstract,Tcp,Ssh}NetconfServerTest` tests as duplicates (extra)",
+      "range": {
+        "startLine": 27,
+        "startChar": 15,
+        "endLine": 27,
+        "endChar": 40
+      },
+      "revId": "8cddaf17e65479c4762e7c7e0c8b80d7f4cdbdb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
