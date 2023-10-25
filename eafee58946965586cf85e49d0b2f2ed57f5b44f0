@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfaf5a5d_761e302b",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 2057,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-25T13:10:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "305ed0c9_cefd262d",
+      "revId": "eafee58946965586cf85e49d0b2f2ed57f5b44f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7f6fc1ec_6921ea53",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-10-24T07:27:25Z",
       "side": 1,
       "message": "What? JSON?\n\nUse real examples like:\nhttp://192.168.56.25:8181/apidoc/openapi3/apis/mounts/1/toaster(2009-11-20)\n\nand write comment that this request is for module toaster with 2009-11-20 revision.",
+      "revId": "eafee58946965586cf85e49d0b2f2ed57f5b44f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2850ed67_eb2b8077",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 2066,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-25T13:10:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f6fc1ec_6921ea53",
       "revId": "eafee58946965586cf85e49d0b2f2ed57f5b44f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
