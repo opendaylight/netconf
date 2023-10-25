@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7461a9e_589e5655",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-25T11:17:02Z",
+      "side": 1,
+      "message": "Maybe some of tests cleanup can be done in separate patches.",
+      "revId": "8cddaf17e65479c4762e7c7e0c8b80d7f4cdbdb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e67fa228_1ce7ec86",
@@ -20,6 +37,40 @@
         "endLine": 27,
         "endChar": 40
       },
+      "revId": "8cddaf17e65479c4762e7c7e0c8b80d7f4cdbdb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41277b6a_8096a747",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/osgi/NetconfSessionMonitoringServiceTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-25T11:17:02Z",
+      "side": 1,
+      "message": "notificationPublisher is not used",
+      "revId": "8cddaf17e65479c4762e7c7e0c8b80d7f4cdbdb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de57633f_b77fbe66",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/osgi/NetconfSessionMonitoringServiceTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-25T11:17:02Z",
+      "side": 1,
+      "message": "`added` is not read",
       "revId": "8cddaf17e65479c4762e7c7e0c8b80d7f4cdbdb2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
