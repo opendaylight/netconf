@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae271f1d_54d2af1e",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerSessionNegotiatorFactory.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-25T10:57:14Z",
+      "side": 1,
+      "message": "We can use requireCapability().",
+      "revId": "945fc3a532f1023e020dd0165699ac6660aeeb15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
