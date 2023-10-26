@@ -30,6 +30,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 public final class PostEntity extends OperationEntity {
 
     private final DocumentedNode parentNode;
+    private final boolean isRootTag;
+    private final String deviceName;
     private static final String INPUT_SUFFIX = "_input";
     private static final String INPUT_KEY = "input";
     private static final String POST_DESCRIPTION = """
@@ -40,9 +42,12 @@ public final class PostEntity extends OperationEntity {
         """;
 
     public PostEntity(final SchemaNode schema, final String deviceName, final String moduleName,
-            final List<ParameterEntity> parameters, final String refPath, final DocumentedNode parentNode) {
+            final List<ParameterEntity> parameters, final String refPath, final DocumentedNode parentNode,
+            final boolean isRootTag) {
         super(schema, deviceName, moduleName, parameters, refPath);
         this.parentNode = parentNode;
+        this.isRootTag = isRootTag;
+        this.deviceName = deviceName;
     }
 
     protected String operation() {
@@ -206,6 +211,17 @@ public final class PostEntity extends OperationEntity {
             return parentNode.getDescription().orElse("");
         } else {
             return super.description();
+        }
+    }
+
+    @Override
+    void generateTags(final @NonNull JsonGenerator generator) throws IOException {
+        if (isRootTag) {
+            generator.writeArrayFieldStart("tags");
+            generator.writeString(deviceName + " root");
+            generator.writeEndArray();
+        } else {
+            super.generateTags(generator);
         }
     }
 }

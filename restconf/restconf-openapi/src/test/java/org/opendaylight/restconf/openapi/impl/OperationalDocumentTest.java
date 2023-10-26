@@ -80,7 +80,6 @@ public class OperationalDocumentTest extends AbstractDocumentTest {
         final var expectedJson = getExpectedDoc("operational-document/" + jsonPath);
         final var moduleDoc = getMountDocByModule(moduleName, revision);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
-
     }
 
     static Stream<Arguments> getOperationalMountParameters() {
