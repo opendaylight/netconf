@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "700b2bc3_7b63cce6",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerSessionNegotiatorFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-26T04:23:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b48e2934_7aad74e0",
+      "range": {
+        "startLine": 51,
+        "startChar": 4,
+        "endLine": 51,
+        "endChar": 10
+      },
+      "revId": "7555d0ee771579aed3c669e2b29cee20ca5693cc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5bd9572f_8d78f419",
@@ -37,6 +61,24 @@
       "writtenOn": "2023-10-25T11:00:54Z",
       "side": 1,
       "message": "`private static ImmutableSet\u003cString\u003e ... `\n\nAlso can be moved to its one user.",
+      "revId": "7555d0ee771579aed3c669e2b29cee20ca5693cc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71d72a6c_013e5aa4",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerSessionNegotiatorFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-26T04:23:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5bd9572f_8d78f419",
       "revId": "7555d0ee771579aed3c669e2b29cee20ca5693cc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
