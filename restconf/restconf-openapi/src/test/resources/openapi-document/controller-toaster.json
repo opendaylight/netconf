@@ -12,6 +12,18 @@
   ],
   "paths": {
     "/rests/data": {
+      "get": {
+        "tags": [
+          "Controller root"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Queries the config (startup) datastore on the mounted hosted.",
+        "summary": "GET - Controller - datastore - data"
+      },
       "post": {
         "tags": [
           "Controller toaster"

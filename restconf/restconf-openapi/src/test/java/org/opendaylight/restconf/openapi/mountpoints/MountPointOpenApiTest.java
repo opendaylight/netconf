@@ -115,7 +115,7 @@ public final class MountPointOpenApiTest {
         final Map<String, Path> paths = mountPointApi.paths();
         assertNotNull(paths);
 
-        assertEquals("Unexpected api list size", 2, paths.size());
+        assertEquals("Unexpected api list size", 1, paths.size());
 
         final Set<String> actualUrls = new TreeSet<>();
 
@@ -126,8 +126,7 @@ public final class MountPointOpenApiTest {
             assertNotNull("Expected non-null desc on " + path, getOperation.description());
         }
 
-        assertEquals(Set.of("/rests/data" + INSTANCE_URL + "yang-ext:mount",
-            "/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
+        assertEquals(Set.of("/rests/operations" + INSTANCE_URL + "yang-ext:mount"), actualUrls);
     }
 
     /**
@@ -161,7 +160,7 @@ public final class MountPointOpenApiTest {
         }
 
         assertEquals("Unexpected GET paths size", 70, getOperations.size());
-        assertEquals("Unexpected POST paths size", 21, postOperations.size());
+        assertEquals("Unexpected POST paths size", 22, postOperations.size());
         assertEquals("Unexpected PUT paths size", 68, putOperations.size());
         assertEquals("Unexpected PATCH paths size", 68, patchOperations.size());
         assertEquals("Unexpected DELETE paths size", 68, deleteOperations.size());
