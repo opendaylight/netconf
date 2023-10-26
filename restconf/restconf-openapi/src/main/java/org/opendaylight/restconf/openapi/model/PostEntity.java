@@ -40,8 +40,9 @@ public final class PostEntity extends OperationEntity {
         """;
 
     public PostEntity(final SchemaNode schema, final String deviceName, final String moduleName,
-            final List<ParameterEntity> parameters, final String refPath, final DocumentedNode parentNode) {
-        super(schema, deviceName, moduleName, parameters, refPath);
+            final List<ParameterEntity> parameters, final String refPath, final DocumentedNode parentNode,
+            final boolean isPostRoot) {
+        super(schema, deviceName, moduleName, parameters, refPath, isPostRoot);
         this.parentNode = parentNode;
     }
 

@@ -40,7 +40,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + BASE_PATH;
         final var modules = context.getModules();
-        return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
+        return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, true,
             modules);
     }
 

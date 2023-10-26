@@ -21,7 +21,7 @@ public final class DeleteEntity extends OperationEntity {
 
     public DeleteEntity(final SchemaNode schema, final String deviceName, final String moduleName,
             final List<ParameterEntity> parameters, final String refPath) {
-        super(schema, deviceName, moduleName, parameters, refPath);
+        super(schema, deviceName, moduleName, parameters, refPath, false);
     }
 
     @Override

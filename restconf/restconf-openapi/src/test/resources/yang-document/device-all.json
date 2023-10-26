@@ -1139,7 +1139,7 @@
     "/rests/operations/nodes/node=123/yang-ext:mount": {
       "get": {
         "tags": [
-          "123 GET root"
+          "123 root"
         ],
         "responses": {
           "200": {
@@ -6279,7 +6279,7 @@
     "/rests/data/nodes/node=123/yang-ext:mount": {
       "get": {
         "tags": [
-          "123 GET root"
+          "123 root"
         ],
         "responses": {
           "200": {
@@ -6288,6 +6288,42 @@
         },
         "description": "Queries the config (startup) datastore on the mounted hosted.",
         "summary": "GET - 123 - datastore - data"
+      },
+      "post": {
+        "tags": [
+          "123 root"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "list",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_list"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/action-types_list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - action-types - action-types"
       }
     },
     "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container/nested-container": {

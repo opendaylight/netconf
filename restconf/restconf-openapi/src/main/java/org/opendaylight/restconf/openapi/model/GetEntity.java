@@ -25,7 +25,7 @@ public final class GetEntity extends OperationEntity {
 
     public GetEntity(final SchemaNode schema, final String deviceName, final String moduleName,
             final List<ParameterEntity> parameters, final String refPath, final boolean isConfig) {
-        super(schema, deviceName, moduleName, parameters, refPath);
+        super(schema, deviceName, moduleName, parameters, refPath, false);
         this.isConfig = isConfig;
     }
 

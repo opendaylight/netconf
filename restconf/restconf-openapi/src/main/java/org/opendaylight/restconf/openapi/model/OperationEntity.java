@@ -45,6 +45,7 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
     private final String deviceName;
     private final String moduleName;
     private final String refPath;
+    private final boolean isRootTag;
     private final List<ParameterEntity> parameters;
 
     protected SchemaNode schema() {
@@ -68,12 +69,13 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
     }
 
     public OperationEntity(final SchemaNode schema, final String deviceName, final String moduleName,
-            final List<ParameterEntity> parameters, final String refPath) {
+            final List<ParameterEntity> parameters, final String refPath, final boolean isRootTag) {
         this.schema = schema;
         this.deviceName = deviceName;
         this.moduleName = moduleName;
         this.parameters = parameters;
         this.refPath = refPath;
+        this.isRootTag = isRootTag;
     }
 
     @Override
@@ -130,9 +132,15 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
     }
 
     void generateTags(final @NonNull JsonGenerator generator) throws IOException {
-        generator.writeArrayFieldStart("tags");
-        generator.writeString(deviceName + " " + moduleName);
-        generator.writeEndArray();
+        if (isRootTag) {
+            generator.writeArrayFieldStart("tags");
+            generator.writeString(deviceName + " root");
+            generator.writeEndArray();
+        } else {
+            generator.writeArrayFieldStart("tags");
+            generator.writeString(deviceName + " " + moduleName);
+            generator.writeEndArray();
+        }
     }
 
     void generateParams(final @NonNull JsonGenerator generator) throws IOException {
@@ -182,7 +190,7 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
         final var summary = HttpMethod.GET + " - " + deviceName() + " - datastore - " + resourceType;
         generator.writeStringField(SUMMARY, summary);
         generator.writeArrayFieldStart("tags");
-        generator.writeString(deviceName + " GET root");
+        generator.writeString(deviceName + " root");
         generator.writeEndArray(); //end of tags
         generator.writeEndObject(); //end of get
     }
