@@ -37,7 +37,7 @@ public final class GetRootEntity extends GetEntity {
         final var summary = HttpMethod.GET + " - " + deviceName() + " - datastore - " + type;
         generator.writeStringField(SUMMARY, summary);
         generator.writeArrayFieldStart("tags");
-        generator.writeString(deviceName() + " GET root");
+        generator.writeString(deviceName() + " root");
         generator.writeEndArray(); //end of tags
         generator.writeEndObject(); //end of get
     }
