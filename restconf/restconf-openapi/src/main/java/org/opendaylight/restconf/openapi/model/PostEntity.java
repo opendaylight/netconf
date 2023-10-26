@@ -39,13 +39,18 @@ public final class PostEntity extends OperationEntity {
         guidelines of RFC 8040, which allows us to create only one resource in POST request.
         """;
 
+    private final String deviceName;
+    private final boolean isRootTag;
     private final @Nullable DocumentedNode parentNode;
 
     public PostEntity(final @NonNull SchemaNode schema, final @NonNull String deviceName,
             final @NonNull String moduleName, final @NonNull List<ParameterEntity> parameters,
-            final @NonNull String refPath, final @Nullable DocumentedNode parentNode) {
+            final @NonNull String refPath, final @Nullable DocumentedNode parentNode,
+            final boolean isRootTag) {
         super(requireNonNull(schema), deviceName, moduleName, requireNonNull(parameters), requireNonNull(refPath));
         this.parentNode = parentNode;
+        this.isRootTag = isRootTag;
+        this.deviceName = deviceName;
     }
 
     protected @NonNull String operation() {
@@ -215,5 +220,16 @@ public final class PostEntity extends OperationEntity {
             }
         }
         return COMPONENTS_PREFIX + moduleName() + "_" + operationName + suf;
+    }
+
+    @Override
+    void generateTags(final @NonNull JsonGenerator generator) throws IOException {
+        if (isRootTag) {
+            generator.writeArrayFieldStart("tags");
+            generator.writeString(deviceName + " root");
+            generator.writeEndArray();
+        } else {
+            super.generateTags(generator);
+        }
     }
 }

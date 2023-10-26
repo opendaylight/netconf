@@ -11,6 +11,70 @@
     }
   ],
   "paths": {
+    "/rests/data/nodes/node=123/yang-ext:mount": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - action-types - action-types",
+        "requestBody": {
+          "description": "list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/action-types_list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "123 root"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "Queries the config (startup) datastore on the mounted hosted.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "GET - 123 - datastore - data",
+        "tags": [
+          "123 root"
+        ]
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount": {
+      "get": {
+        "description": "Queries the available operations (RPC calls) on the mounted hosted.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "GET - 123 - datastore - operations",
+        "tags": [
+          "123 root"
+        ]
+      }
+    },
     "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
       "post": {
         "tags": [
@@ -846,20 +910,6 @@
         "summary": "PATCH - action-types - 123 - inner-container"
       }
     },
-    "/rests/operations/nodes/node=123/yang-ext:mount": {
-      "get": {
-        "tags": [
-          "123 GET root"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "description": "Queries the available operations (RPC calls) on the mounted hosted.",
-        "summary": "GET - 123 - datastore - operations"
-      }
-    },
     "/rests/data/nodes/node=123/yang-ext:mount/operational:root/oper-container": {
       "get": {
         "tags": [
@@ -1290,20 +1340,6 @@
         },
         "description": "",
         "summary": "PATCH - operational - 123 - config-container"
-      }
-    },
-    "/rests/data/nodes/node=123/yang-ext:mount": {
-      "get": {
-        "tags": [
-          "123 GET root"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "description": "Queries the config (startup) datastore on the mounted hosted.",
-        "summary": "GET - 123 - datastore - data"
       }
     }
   },
