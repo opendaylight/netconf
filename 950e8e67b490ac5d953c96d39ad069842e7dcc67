@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dbfa0246_6cc605f0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/InfoStream.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-26T07:56:04Z",
+      "side": 1,
+      "message": "ATM I have no other idea instead of using default logic - I will try to think about something...",
+      "parentUuid": "31e60afc_839872e6",
+      "range": {
+        "startLine": 32,
+        "startChar": 15,
+        "endLine": 32,
+        "endChar": 19
+      },
+      "revId": "950e8e67b490ac5d953c96d39ad069842e7dcc67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "37977cb7_463189a1",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PathEntity.java",
         "patchSetId": 9
@@ -37,6 +61,30 @@
       "writtenOn": "2023-10-20T18:28:51Z",
       "side": 1,
       "message": "what are these for? are they to be passed to the constructor or will this class become non-final and these will be overridden?",
+      "range": {
+        "startLine": 55,
+        "startChar": 21,
+        "endLine": 55,
+        "endChar": 24
+      },
+      "revId": "950e8e67b490ac5d953c96d39ad069842e7dcc67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fe7d403_6f1c05cb",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PathEntity.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-26T07:56:04Z",
+      "side": 1,
+      "message": "1. In some cases new parameter into class will be added\n2. In most situations we will use SchemaNode to construct the value we are interested in, like in SchemaEntity.java\n\n    private @Nullable String description() {\n        return value.getDescription().orElse(null);\n    }\n    \nFor other cases/classes the logic in methods will be more complicated but IMO this way we can rework current implementation to the new one.\n\nIn general, we are using SchemaNode to determine most of the fields. The logic for it will be in methods like this.",
+      "parentUuid": "37977cb7_463189a1",
       "range": {
         "startLine": 55,
         "startChar": 21,
