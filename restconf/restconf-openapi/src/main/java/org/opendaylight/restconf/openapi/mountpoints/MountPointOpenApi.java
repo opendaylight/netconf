@@ -16,12 +16,15 @@ import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.DE
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.OPEN_API_BASIC_AUTH;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.OPEN_API_VERSION;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.addRootPostLink;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.filterByRange;
+import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.getListOrContainerChildNode;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.getSortedModules;
 import static org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_TEMPLATE;
 
 import com.google.common.collect.Range;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -216,6 +219,12 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             schemas.putAll(openApiGenerator.getSchemas(module, context, definitionNames, false));
             paths.putAll(openApiGenerator.getPaths(module, urlPrefix, deviceName, context, definitionNames, false));
         }
+        filteredModules.stream()
+            .filter(module -> getListOrContainerChildNode(module) != null)
+            .findFirst()
+            .ifPresent(module -> addRootPostLink(module, deviceName, new ArrayList<>(),
+                openApiGenerator.getResourcePath("data", urlPrefix), paths, true));
+
         final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
         if (includeDataStore) {
             paths.putAll(getDataStoreApiPaths(urlPrefix, deviceName));
@@ -240,22 +249,21 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     private Map<String, Path> getDataStoreApiPaths(final String context, final String deviceName) {
-        final var dataBuilder = new Path.Builder();
+/*        final var dataBuilder = new Path.Builder();
         dataBuilder.get(createGetPathItem("data",
-                "Queries the config (startup) datastore on the mounted hosted.", deviceName));
+                "Queries the config (startup) datastore on the mounted hosted.", deviceName));*/
 
         final var operationsBuilder = new Path.Builder();
         operationsBuilder.get(createGetPathItem("operations",
                 "Queries the available operations (RPC calls) on the mounted hosted.", deviceName));
 
-        return Map.of(openApiGenerator.getResourcePath("data", context), dataBuilder.build(),
-            openApiGenerator.getResourcePath("operations", context), operationsBuilder.build());
+        return Map.of(openApiGenerator.getResourcePath("operations", context), operationsBuilder.build());
     }
 
     private static Operation createGetPathItem(final String resourceType, final String description,
             final String deviceName) {
         final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.GET, deviceName, "datastore", resourceType);
-        final List<String> tags = List.of(deviceName + " GET root");
+        final List<String> tags = List.of(deviceName + " root");
         final ResponseObject okResponse = new ResponseObject.Builder()
             .description(Response.Status.OK.getReasonPhrase())
             .build();
