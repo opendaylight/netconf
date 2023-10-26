@@ -171,21 +171,18 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return Futures.immediateFuture(Empty.value());
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     protected ListenableFuture<Empty> setupConnection(final NodeId nodeId, final Node configNode) {
         final NetconfNode netconfNode = configNode.augmentation(NetconfNode.class);
         final NetconfNodeAugmentedOptional nodeOptional = configNode.augmentation(NetconfNodeAugmentedOptional.class);
 
+        requireNonNull(netconfNode.getHost());
+        requireNonNull(netconfNode.getPort());
+
         final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, nodeOptional);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
-        NetconfReconnectingClientConfiguration clientConfig = null;
-        try {
-            clientConfig = getClientConfig(netconfClientSessionListener, netconfNode, nodeId);
-        } catch (final Exception exception) {
-            LOG.warn("Error initialization configuration for device {}, using null instead.",
-                NetconfNodeUtils.toRemoteDeviceId(nodeId, netconfNode), exception);
-        }
+        final NetconfReconnectingClientConfiguration clientConfig =
+                getClientConfig(netconfClientSessionListener, netconfNode, nodeId);
         final ListenableFuture<Empty> future =
                 deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
 
@@ -305,10 +302,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 node.requireMaxConnectionAttempts().toJava(), node.requireBetweenAttemptsTimeoutMillis().toJava(),
                 node.requireSleepFactor().decimalValue());
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
-
-        requireNonNull(node.getHost());
-        requireNonNull(node.getPort());
-
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
