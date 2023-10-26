@@ -56,6 +56,24 @@
       "message": "requireCapability()",
       "revId": "7555d0ee771579aed3c669e2b29cee20ca5693cc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c26f311_3d785825",
+        "filename": "protocol/netconf-server/src/main/java/org/opendaylight/netconf/server/NetconfServerSessionNegotiatorFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-26T04:03:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14a1d1b5_c11262fe",
+      "revId": "7555d0ee771579aed3c669e2b29cee20ca5693cc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
