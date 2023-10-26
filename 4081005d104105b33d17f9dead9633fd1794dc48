@@ -22,6 +22,30 @@
       },
       "revId": "4081005d104105b33d17f9dead9633fd1794dc48",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1e5f935_df287921",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-10-26T09:07:28Z",
+      "side": 1,
+      "message": "Out of scope for current update. \n\nThe change updates callhome api only, keeps prior behavior via using LegacyNetconfClientConfigurationBuilderFactory (ex Default*)\nto provide legacy configuration for callhome provider.\n\ncallhome to be megrated with separate change.",
+      "parentUuid": "25d2b82c_ad1e6ee4",
+      "range": {
+        "startLine": 142,
+        "startChar": 24,
+        "endLine": 142,
+        "endChar": 46
+      },
+      "revId": "4081005d104105b33d17f9dead9633fd1794dc48",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
