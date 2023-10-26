@@ -1,0 +1,231 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "439a3902_eabc6c8b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "it should be ok to use .get() here since you already check .isPresent()",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdddcde5_623f50e6",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "can be done like this\n\n                if (exampleValue !\u003d null) {\n                    childNodesMap.put(leafSchemaNode.getQName(), exampleValue);\n                }\n            }",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "460d4d51_8168c79f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "could be good place to use ternary operator",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96c78eb2_6888ae52",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "I would consider if making everything unique is not easier at this point",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c16f35c4_f3123cfa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "new ArrayList\u003c\u003e(keys);\n\nyou can do only one disjoint then",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23981487_176e25b9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "final var?",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0df12a6a_e83cda5f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "put this out of for loop",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0548516f_f2030663",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "this too",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f29051b9_8c9aca48",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "and make this variable out of for loop too",
+      "range": {
+        "startLine": 307,
+        "startChar": 36,
+        "endLine": 307,
+        "endChar": 64
+      },
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88a11a30_9b60e705",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/DefinitionGenerator.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "return here and make exampleValue final",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf88f8f8_c13b2bd4",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "are these assertFalse checks necessary? in other tests too",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43754377_741ab567",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/DefinitionGeneratorTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "can\u0027t this be set right away and reuse examples to check size?",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d36491cd_29dbb635",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/OpenApiGeneratorRFC8040Test.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-10-26T08:55:33Z",
+      "side": 1,
+      "message": "same as DefinitionGeneratorTest",
+      "revId": "aaabafdbff8441fd0b7a02ee8fdc7b2402236d23",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
