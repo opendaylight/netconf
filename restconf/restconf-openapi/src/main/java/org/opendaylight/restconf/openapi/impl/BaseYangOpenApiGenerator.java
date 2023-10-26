@@ -40,7 +40,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
         final var modules = context.getModules();
-        return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
+        return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, true,
             modules, basePath);
     }
 
