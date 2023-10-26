@@ -18,7 +18,7 @@
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>sal-rest-connector-config</artifactId>
-  <version>5.0.9</version>
+  <version>5.0.10-SNAPSHOT</version>
   <description>Configuration files for sal-rest-connector</description>
 
   <packaging>jar</packaging>
