@@ -1,0 +1,727 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "operational",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That’s because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/data/operational:root/config-container": {
+      "get": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root_config-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "config-container": {
+                      "$ref": "#/components/schemas/operational_root_config-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - operational - config-container"
+      },
+      "put": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "config-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root_config-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "operational:config-container": {
+                    "$ref": "#/components/schemas/operational_root_config-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - operational - Controller - config-container"
+      },
+      "post": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "config-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root_config-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root_config-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - operational - config-container"
+      },
+      "delete": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - operational - config-container"
+      },
+      "patch": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "config-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "operational:config-container": {
+                    "$ref": "#/components/schemas/operational_root_config-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root_config-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - operational - Controller - config-container"
+      }
+    },
+    "/rests/data/operational:root/config-container/config-container-oper-list={oper-container-list-leaf}": {
+      "get": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [
+          {
+            "name": "oper-container-list-leaf",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root_config-container_config-container-oper-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "config-container-oper-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/operational_root_config-container_config-container-oper-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - operational - config-container-oper-list"
+      }
+    },
+    "/rests/data": {
+      "post": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "root": {
+                    "$ref": "#/components/schemas/operational_root",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - operational - operational"
+      }
+    },
+    "/rests/data/operational:root": {
+      "get": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root": {
+                      "$ref": "#/components/schemas/operational_root",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - operational - root"
+      },
+      "put": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "operational:root": {
+                    "$ref": "#/components/schemas/operational_root",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - operational - Controller - root"
+      },
+      "post": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - operational - root"
+      },
+      "delete": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - operational - root"
+      },
+      "patch": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "operational:root": {
+                    "$ref": "#/components/schemas/operational_root",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - operational - Controller - root"
+      }
+    },
+    "/rests/data/operational:root/oper-container": {
+      "get": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root_oper-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "oper-container": {
+                      "$ref": "#/components/schemas/operational_root_oper-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - operational - oper-container"
+      }
+    },
+    "/rests/data/operational:root/oper-container/config-container": {
+      "get": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root_oper-container_config-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "config-container": {
+                      "$ref": "#/components/schemas/operational_root_oper-container_config-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - operational - config-container"
+      }
+    },
+    "/rests/data/operational:root/oper-container/oper-container-list={oper-container-list-leaf}": {
+      "get": {
+        "tags": [
+          "Controller operational"
+        ],
+        "parameters": [
+          {
+            "name": "oper-container-list-leaf",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root_oper-container_oper-container-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "oper-container-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/operational_root_oper-container_oper-container-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - operational - oper-container-list"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "operational_root_config-container": {
+        "properties": {
+          "config-container-config-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some config-container-config-leaf"
+          },
+          "leaf-second-case": {
+            "description": "",
+            "type": "string",
+            "example": "Some leaf-second-case"
+          }
+        },
+        "xml": {
+          "name": "config-container",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root_config-container",
+        "type": "object"
+      },
+      "operational_root": {
+        "properties": {
+          "leaf-config": {
+            "description": "",
+            "type": "string",
+            "example": "Some leaf-config"
+          },
+          "config-container": {
+            "$ref": "#/components/schemas/operational_root_config-container"
+          }
+        },
+        "xml": {
+          "name": "root",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root",
+        "type": "object"
+      },
+      "operational_root_oper-container_oper-container-list": {
+        "properties": {
+          "oper-container-list-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some oper-container-list-leaf"
+          }
+        },
+        "xml": {
+          "name": "oper-container-list",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root_oper-container_oper-container-list",
+        "type": "object"
+      },
+      "operational_root_oper-container_config-container": {
+        "required": [
+          "config-container-config-leaf"
+        ],
+        "properties": {
+          "opconfig-container-oper-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some opconfig-container-oper-leaf"
+          },
+          "config-container-config-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some config-container-config-leaf"
+          }
+        },
+        "xml": {
+          "name": "config-container",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root_oper-container_config-container",
+        "type": "object"
+      },
+      "operational_root_oper-container": {
+        "required": [
+          "config-container"
+        ],
+        "properties": {
+          "config-container": {
+            "$ref": "#/components/schemas/operational_root_oper-container_config-container"
+          },
+          "oper-container-config-leaf-list": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Some oper-container-config-leaf-list"
+            }
+          },
+          "oper-container-list": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/operational_root_oper-container_oper-container-list"
+            }
+          },
+          "leaf-first-case": {
+            "description": "",
+            "type": "string",
+            "example": "Some leaf-first-case"
+          },
+          "oper-leaf-first-case": {
+            "description": "",
+            "type": "string",
+            "example": "Some oper-leaf-first-case"
+          }
+        },
+        "xml": {
+          "name": "oper-container",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root_oper-container",
+        "type": "object"
+      },
+      "operational_root_config-container_config-container-oper-list": {
+        "properties": {
+          "oper-container-list-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some oper-container-list-leaf"
+          }
+        },
+        "xml": {
+          "name": "config-container-oper-list",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root_config-container_config-container-oper-list",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
