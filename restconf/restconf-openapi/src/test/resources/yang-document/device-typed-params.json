@@ -1,0 +1,3711 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "typed-params",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That’s because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "typed": {
+                      "$ref": "#/components/schemas/typed-params_typed",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - typed"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "typed",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:typed": {
+                    "$ref": "#/components/schemas/typed-params_typed",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - typed"
+      },
+      "post": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "string",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_string"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "string": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_string",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - typed-params - typed"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - typed"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "typed",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:typed": {
+                    "$ref": "#/components/schemas/typed-params_typed",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - typed"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/int16={int16-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int16-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_int16"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "int16": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_int16",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - int16"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int16-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "int16",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_int16"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:int16": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_int16",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - int16"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int16-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - int16"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int16-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "int16",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:int16": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_int16",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_int16"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - int16"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/enumeration={enumeration-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "enumeration-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_enumeration"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "enumeration": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_enumeration",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - enumeration"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "enumeration-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "enumeration",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_enumeration"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:enumeration": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_enumeration",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - enumeration"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "enumeration-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - enumeration"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "enumeration-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "enumeration",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:enumeration": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_enumeration",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_enumeration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - enumeration"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/bits={bits-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "bits-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_bits"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "bits": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_bits",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - bits"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "bits-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "bits",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_bits"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:bits": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_bits",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - bits"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "bits-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - bits"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "bits-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "bits",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:bits": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_bits",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_bits"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - bits"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/uint64={uint64-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_uint64"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "uint64": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_uint64",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - uint64"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "uint64",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_uint64"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:uint64": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_uint64",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - uint64"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - uint64"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "uint64",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:uint64": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_uint64",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_uint64"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - uint64"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/int64={int64-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_int64"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "int64": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_int64",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - int64"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "int64",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_int64"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:int64": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_int64",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - int64"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - int64"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "int64",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:int64": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_int64",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_int64"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - int64"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/string={string-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "string-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "string": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_string",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - string"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "string-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "string",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_string"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:string": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_string",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - string"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "string-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - string"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "string-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "string",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:string": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_string",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - string"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/uint16={uint16-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint16-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_uint16"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "uint16": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_uint16",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - uint16"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint16-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "uint16",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_uint16"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:uint16": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_uint16",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - uint16"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint16-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - uint16"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint16-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "uint16",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:uint16": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_uint16",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_uint16"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - uint16"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/uint32={uint32-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint32-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_uint32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "uint32": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_uint32",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - uint32"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint32-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "uint32",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_uint32"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:uint32": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_uint32",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - uint32"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint32-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - uint32"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint32-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "uint32",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:uint32": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_uint32",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_uint32"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - uint32"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/union={union-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "union-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_union"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "union": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_union",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - union"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "union-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "union",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_union"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:union": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_union",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - union"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "union-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - union"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "union-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "union",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:union": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_union",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_union"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - union"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/empty={empty-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "empty-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_empty"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "empty": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_empty",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - empty"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "empty-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "empty",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_empty"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:empty": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_empty",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - empty"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "empty-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - empty"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "empty-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "empty",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:empty": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_empty",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_empty"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - empty"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/binary={binary-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "binary-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "binary": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_binary",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - binary"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "binary-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "binary",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_binary"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:binary": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_binary",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - binary"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "binary-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - binary"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "binary-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "binary",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:binary": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_binary",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - binary"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/instance-identifier={instance-identifier-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "instance-identifier-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_instance-identifier"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "instance-identifier": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_instance-identifier",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - instance-identifier"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "instance-identifier-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "instance-identifier",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_instance-identifier"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:instance-identifier": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_instance-identifier",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - instance-identifier"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "instance-identifier-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - instance-identifier"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "instance-identifier-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "instance-identifier",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:instance-identifier": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_instance-identifier",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_instance-identifier"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - instance-identifier"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/uint8={uint8-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint8-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_uint8"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "uint8": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_uint8",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - uint8"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint8-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "uint8",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_uint8"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:uint8": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_uint8",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - uint8"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint8-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - uint8"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "uint8-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "uint8",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:uint8": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_uint8",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_uint8"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - uint8"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/boolean={boolean-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "boolean-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_boolean"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "boolean": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_boolean",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - boolean"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "boolean-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "boolean",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_boolean"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:boolean": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_boolean",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - boolean"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "boolean-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - boolean"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "boolean-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "boolean",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:boolean": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_boolean",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_boolean"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - boolean"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/decimal64={decimal64-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "decimal64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_decimal64"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "decimal64": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_decimal64",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - decimal64"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "decimal64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "decimal64",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_decimal64"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:decimal64": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_decimal64",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - decimal64"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "decimal64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - decimal64"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "decimal64-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "decimal64",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:decimal64": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_decimal64",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_decimal64"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - decimal64"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/int32={int32-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int32-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "int32": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_int32",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - int32"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int32-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "int32",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_int32"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:int32": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_int32",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - int32"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int32-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - int32"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int32-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "int32",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:int32": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_int32",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_int32"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - int32"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/int8={int8-key}": {
+      "get": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int8-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_int8"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "int8": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_int8",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - typed-params - int8"
+      },
+      "put": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int8-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "int8",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_int8"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:int8": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_int8",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - typed-params - 123 - int8"
+      },
+      "delete": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int8-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - int8"
+      },
+      "patch": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "int8-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "int8",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:int8": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_int8",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_int8"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - int8"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount": {
+      "post": {
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "typed",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed": {
+                    "$ref": "#/components/schemas/typed-params_typed",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - typed-params - typed-params"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "typed-params_typed_boolean": {
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "boolean-key": {
+            "description": "",
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "xml": {
+          "name": "boolean",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_boolean",
+        "type": "object"
+      },
+      "typed-params_typed_instance-identifier": {
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "instance-identifier-key": {
+            "description": "",
+            "type": "string",
+            "example": "/tparams:typed"
+          }
+        },
+        "xml": {
+          "name": "instance-identifier",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_instance-identifier",
+        "type": "object"
+      },
+      "typed-params_typed_uint8": {
+        "properties": {
+          "uint8-key": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int32"
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "uint8",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_uint8",
+        "type": "object"
+      },
+      "typed-params_typed_bits": {
+        "properties": {
+          "bits-key": {
+            "default": "UP UP",
+            "enum": [
+              "UP"
+            ],
+            "description": "",
+            "type": "string",
+            "minItems": 0,
+            "uniqueItems": true
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "bits",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_bits",
+        "type": "object"
+      },
+      "typed-params_typed_binary": {
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "binary-key": {
+            "description": "",
+            "type": "string",
+            "format": "byte"
+          }
+        },
+        "xml": {
+          "name": "binary",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_binary",
+        "type": "object"
+      },
+      "typed-params_typed": {
+        "properties": {
+          "boolean": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_boolean"
+            }
+          },
+          "decimal64": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_decimal64"
+            }
+          },
+          "uint8": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_uint8"
+            }
+          },
+          "enumeration": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_enumeration"
+            }
+          },
+          "empty": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_empty"
+            }
+          },
+          "binary": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_binary"
+            }
+          },
+          "uint16": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_uint16"
+            }
+          },
+          "bits": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_bits"
+            }
+          },
+          "int8": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_int8"
+            }
+          },
+          "int64": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_int64"
+            }
+          },
+          "int32": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_int32"
+            }
+          },
+          "string": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_string"
+            }
+          },
+          "uint64": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_uint64"
+            }
+          },
+          "instance-identifier": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_instance-identifier"
+            }
+          },
+          "union": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_union"
+            }
+          },
+          "uint32": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_uint32"
+            }
+          },
+          "int16": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_int16"
+            }
+          }
+        },
+        "xml": {
+          "name": "typed",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed",
+        "type": "object"
+      },
+      "typed-params_typed_int8": {
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "int8-key": {
+            "description": "",
+            "type": "integer",
+            "example": -128,
+            "format": "int32"
+          }
+        },
+        "xml": {
+          "name": "int8",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_int8",
+        "type": "object"
+      },
+      "typed-params_typed_int64": {
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "int64-key": {
+            "description": "",
+            "type": "integer",
+            "example": -9223372036854775808,
+            "format": "int64"
+          }
+        },
+        "xml": {
+          "name": "int64",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_int64",
+        "type": "object"
+      },
+      "typed-params_typed_int32": {
+        "properties": {
+          "int32-key": {
+            "description": "",
+            "type": "integer",
+            "example": -2147483648,
+            "format": "int32"
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "int32",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_int32",
+        "type": "object"
+      },
+      "typed-params_typed_uint64": {
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "uint64-key": {
+            "description": "",
+            "type": "integer",
+            "example": 0
+          }
+        },
+        "xml": {
+          "name": "uint64",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_uint64",
+        "type": "object"
+      },
+      "typed-params_typed_uint32": {
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "uint32-key": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          }
+        },
+        "xml": {
+          "name": "uint32",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_uint32",
+        "type": "object"
+      },
+      "typed-params_typed_empty": {
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "empty-key": {
+            "description": "",
+            "type": "object"
+          }
+        },
+        "xml": {
+          "name": "empty",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_empty",
+        "type": "object"
+      },
+      "typed-params_typed_int16": {
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "int16-key": {
+            "description": "",
+            "type": "integer",
+            "example": -32768,
+            "format": "int32"
+          }
+        },
+        "xml": {
+          "name": "int16",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_int16",
+        "type": "object"
+      },
+      "typed-params_typed_uint16": {
+        "properties": {
+          "uint16-key": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int32"
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "uint16",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_uint16",
+        "type": "object"
+      },
+      "typed-params_typed_enumeration": {
+        "properties": {
+          "enumeration-key": {
+            "enum": [
+              "first",
+              "second",
+              "third"
+            ],
+            "description": "",
+            "type": "string",
+            "example": "first"
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "enumeration",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_enumeration",
+        "type": "object"
+      },
+      "typed-params_typed_decimal64": {
+        "properties": {
+          "decimal64-key": {
+            "description": "",
+            "type": "number",
+            "example": -92233720368547758.08
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "decimal64",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_decimal64",
+        "type": "object"
+      },
+      "typed-params_typed_union": {
+        "properties": {
+          "union-key": {
+            "description": "",
+            "type": "integer",
+            "example": -2147483648,
+            "format": "int32"
+          },
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          }
+        },
+        "xml": {
+          "name": "union",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_union",
+        "type": "object"
+      },
+      "typed-params_typed_string": {
+        "properties": {
+          "value": {
+            "description": "",
+            "type": "string",
+            "example": "Some value"
+          },
+          "string-key": {
+            "description": "",
+            "type": "string",
+            "example": "Some string-key"
+          }
+        },
+        "xml": {
+          "name": "string",
+          "namespace": "urn:typed-params"
+        },
+        "description": "",
+        "title": "typed-params_typed_string",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
