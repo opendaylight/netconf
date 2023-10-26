@@ -1,0 +1,1399 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "mandatory-test",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That’s because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/mandatory-container": {
+      "get": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "mandatory-container": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - mandatory-container"
+      },
+      "put": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "mandatory-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:mandatory-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - mandatory-container"
+      },
+      "delete": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - mandatory-container"
+      },
+      "patch": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "mandatory-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:mandatory-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - mandatory-container"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/optional-list={id}": {
+      "get": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container_optional-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "optional-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/mandatory-test_root-container_optional-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - optional-list"
+      },
+      "put": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "optional-list",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_optional-list"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:optional-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_optional-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - optional-list"
+      },
+      "delete": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - optional-list"
+      },
+      "patch": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "optional-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:optional-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_optional-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_optional-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - optional-list"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/mandatory-list={id}": {
+      "get": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "mandatory-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - mandatory-list"
+      },
+      "put": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "mandatory-list",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - mandatory-list"
+      },
+      "delete": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - mandatory-list"
+      },
+      "patch": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "mandatory-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - mandatory-list"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-optional-list={id}": {
+      "get": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-optional-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-optional-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/mandatory-test_root-optional-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - root-optional-list"
+      },
+      "put": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "root-optional-list",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-optional-list"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-optional-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-optional-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - root-optional-list"
+      },
+      "delete": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - root-optional-list"
+      },
+      "patch": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "root-optional-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-optional-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-optional-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-optional-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - root-optional-list"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container": {
+      "get": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-container": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - root-container"
+      },
+      "put": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - root-container"
+      },
+      "post": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "optional-presence-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "optional-presence-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - mandatory-test - root-container"
+      },
+      "delete": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - root-container"
+      },
+      "patch": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - root-container"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/optional-presence-container": {
+      "get": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "optional-presence-container": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - optional-presence-container"
+      },
+      "put": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "optional-presence-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:optional-presence-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - optional-presence-container"
+      },
+      "delete": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - optional-presence-container"
+      },
+      "patch": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "optional-presence-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:optional-presence-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - optional-presence-container"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount": {
+      "post": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "root-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - mandatory-test - mandatory-test"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-mandatory-list={id}": {
+      "get": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-mandatory-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-mandatory-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/mandatory-test_root-mandatory-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - root-mandatory-list"
+      },
+      "put": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "root-mandatory-list",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-mandatory-list"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - root-mandatory-list"
+      },
+      "delete": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - root-mandatory-list"
+      },
+      "patch": {
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "root-mandatory-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - root-mandatory-list"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "mandatory-test_root-container_mandatory-list": {
+        "required": [
+          "mandatory-list-field"
+        ],
+        "properties": {
+          "mandatory-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-list-field"
+          },
+          "id": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          }
+        },
+        "xml": {
+          "name": "mandatory-list",
+          "namespace": "http://example.com/test"
+        },
+        "description": "",
+        "title": "mandatory-test_root-container_mandatory-list",
+        "type": "object"
+      },
+      "mandatory-test_root-container": {
+        "required": [
+          "mandatory-root-leaf",
+          "mandatory-container",
+          "mandatory-first-choice",
+          "mandatory-list"
+        ],
+        "properties": {
+          "mandatory-root-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-root-leaf"
+          },
+          "mandatory-list": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list"
+            },
+            "example": [
+              {
+                "id": 0,
+                "mandatory-list-field": "Some mandatory-list-field"
+              },
+              {
+                "id": 1,
+                "mandatory-list-field": "Some mandatory-list-field"
+              }
+            ],
+            "minItems": 2
+          },
+          "mandatory-first-choice": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-first-choice"
+          },
+          "optional-root-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-root-leaf"
+          },
+          "optional-presence-container": {
+            "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+          },
+          "mandatory-container": {
+            "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container"
+          },
+          "optional-first-choice": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-first-choice"
+          },
+          "optional-list": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/mandatory-test_root-container_optional-list"
+            }
+          }
+        },
+        "xml": {
+          "name": "root-container",
+          "namespace": "http://example.com/test"
+        },
+        "description": "",
+        "title": "mandatory-test_root-container",
+        "type": "object"
+      },
+      "mandatory-test_root-container_optional-list": {
+        "properties": {
+          "optional-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-list-field"
+          },
+          "id": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          }
+        },
+        "xml": {
+          "name": "optional-list",
+          "namespace": "http://example.com/test"
+        },
+        "description": "",
+        "title": "mandatory-test_root-container_optional-list",
+        "type": "object"
+      },
+      "mandatory-test_root-container_optional-presence-container": {
+        "properties": {
+          "presence-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some presence-leaf"
+          }
+        },
+        "xml": {
+          "name": "optional-presence-container",
+          "namespace": "http://example.com/test"
+        },
+        "description": "",
+        "title": "mandatory-test_root-container_optional-presence-container",
+        "type": "object"
+      },
+      "mandatory-test_root-optional-list": {
+        "properties": {
+          "root-optional-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some root-optional-list-field"
+          },
+          "id": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          }
+        },
+        "xml": {
+          "name": "root-optional-list",
+          "namespace": "http://example.com/test"
+        },
+        "description": "",
+        "title": "mandatory-test_root-optional-list",
+        "type": "object"
+      },
+      "mandatory-test_root-mandatory-list": {
+        "properties": {
+          "id": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          },
+          "root-mandatory-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some root-mandatory-list-field"
+          }
+        },
+        "xml": {
+          "name": "root-mandatory-list",
+          "namespace": "http://example.com/test"
+        },
+        "description": "",
+        "title": "mandatory-test_root-mandatory-list",
+        "type": "object"
+      },
+      "mandatory-test_root-container_mandatory-container": {
+        "required": [
+          "mandatory-leaf",
+          "leaf-list-with-min-elements"
+        ],
+        "properties": {
+          "leaf-list-with-min-elements": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Some leaf-list-with-min-elements"
+            },
+            "example": [
+              "Some leaf-list-with-min-elements",
+              "Some leaf-list-with-min-elements"
+            ],
+            "minItems": 2
+          },
+          "mandatory-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-leaf"
+          }
+        },
+        "xml": {
+          "name": "mandatory-container",
+          "namespace": "http://example.com/test"
+        },
+        "description": "",
+        "title": "mandatory-test_root-container_mandatory-container",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

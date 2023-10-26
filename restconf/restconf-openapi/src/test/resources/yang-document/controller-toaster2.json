@@ -1,0 +1,1900 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "toaster2",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That’s because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/operations/toaster2:cancel-toast": {
+      "post": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "cancel-toast_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "xml": {
+                  "name": "input",
+                  "namespace": "http://netconfcentral.org/ns/toaster2"
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC cancel-toast success"
+          }
+        },
+        "description": "Stop making toast, if any is being made.\n  A 'resource-denied' error will be returned\n  if the toaster service is disabled.",
+        "summary": "POST - Controller - toaster2 - cancel-toast"
+      }
+    },
+    "/rests/data/toaster2:lst={lf1}/cont1/cont11": {
+      "get": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "cont11": {
+                      "$ref": "#/components/schemas/toaster2_lst_cont1_cont11",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster2_lst_cont1_cont11"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - toaster2 - cont11"
+      },
+      "put": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "cont11",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster2:cont11": {
+                    "$ref": "#/components/schemas/toaster2_lst_cont1_cont11",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst_cont1_cont11"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - toaster2 - Controller - cont11"
+      },
+      "delete": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - toaster2 - cont11"
+      },
+      "patch": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "cont11",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst_cont1_cont11"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster2:cont11": {
+                    "$ref": "#/components/schemas/toaster2_lst_cont1_cont11",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - toaster2 - Controller - cont11"
+      }
+    },
+    "/rests/data": {
+      "post": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster": {
+                    "$ref": "#/components/schemas/toaster2_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_toaster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "YANG version of the TOASTER-MIB.\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - toaster2 - toaster2"
+      }
+    },
+    "/rests/data/toaster2:lst={lf1}": {
+      "get": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "lst": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/toaster2_lst",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster2_lst"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - toaster2 - lst"
+      },
+      "put": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "lst",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster2:lst": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/toaster2_lst",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - toaster2 - Controller - lst"
+      },
+      "delete": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - toaster2 - lst"
+      },
+      "patch": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "lst",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster2:lst": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/toaster2_lst",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - toaster2 - Controller - lst"
+      }
+    },
+    "/rests/data/toaster2:toaster": {
+      "get": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "toaster": {
+                      "$ref": "#/components/schemas/toaster2_toaster",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster2_toaster"
+                }
+              }
+            }
+          }
+        },
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "GET - Controller - toaster2 - toaster"
+      },
+      "put": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster2:toaster": {
+                    "$ref": "#/components/schemas/toaster2_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_toaster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "PUT - toaster2 - Controller - toaster"
+      },
+      "post": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "toasterSlot",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toasterSlot": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/toaster2_toaster_toasterSlot",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_toaster_toasterSlot"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "Top-level container for all toaster database objects.\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - toaster2 - toaster"
+      },
+      "delete": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "DELETE - Controller - toaster2 - toaster"
+      },
+      "patch": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_toaster"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster2:toaster": {
+                    "$ref": "#/components/schemas/toaster2_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "PATCH - toaster2 - Controller - toaster"
+      }
+    },
+    "/rests/data/toaster2:lst={lf1}/cont1": {
+      "get": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "cont1": {
+                      "$ref": "#/components/schemas/toaster2_lst_cont1",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster2_lst_cont1"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - toaster2 - cont1"
+      },
+      "put": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "cont1",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster2:cont1": {
+                    "$ref": "#/components/schemas/toaster2_lst_cont1",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst_cont1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - toaster2 - Controller - cont1"
+      },
+      "post": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "cont11",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "cont11": {
+                    "$ref": "#/components/schemas/toaster2_lst_cont1_cont11",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst_cont1_cont11"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - toaster2 - cont1"
+      },
+      "delete": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - toaster2 - cont1"
+      },
+      "patch": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "cont1",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst_cont1"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster2:cont1": {
+                    "$ref": "#/components/schemas/toaster2_lst_cont1",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - toaster2 - Controller - cont1"
+      }
+    },
+    "/rests/data/toaster2:toaster/toasterSlot={slotId}/toaster-augmented:slotInfo": {
+      "get": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "slotInfo": {
+                      "$ref": "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - toaster2 - slotInfo"
+      },
+      "put": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "slotInfo",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster-augmented:slotInfo": {
+                    "$ref": "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - toaster2 - Controller - slotInfo"
+      },
+      "delete": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - toaster2 - slotInfo"
+      },
+      "patch": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "slotInfo",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster-augmented:slotInfo": {
+                    "$ref": "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - toaster2 - Controller - slotInfo"
+      }
+    },
+    "/rests/operations/toaster2:make-toast": {
+      "post": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "make-toast_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/toaster2_make-toast_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_make-toast_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC make-toast success"
+          }
+        },
+        "description": "Make some toast.\n  The toastDone notification will be sent when\n  the toast is finished.\n  An 'in-use' error will be returned if toast\n  is already being made.\n  A 'resource-denied' error will be returned\n  if the toaster service is disabled.",
+        "summary": "POST - Controller - toaster2 - make-toast"
+      }
+    },
+    "/rests/data/toaster2:lst={lf1}/cont1/lst11={lf111}": {
+      "get": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lf111",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "lst11": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/toaster2_lst_cont1_lst11",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster2_lst_cont1_lst11"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - toaster2 - lst11"
+      },
+      "put": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lf111",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "lst11",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster2:lst11": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/toaster2_lst_cont1_lst11",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst_cont1_lst11"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - toaster2 - Controller - lst11"
+      },
+      "delete": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lf111",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - toaster2 - lst11"
+      },
+      "patch": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lf111",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "lst11",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst_cont1_lst11"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster2:lst11": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/toaster2_lst_cont1_lst11",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - toaster2 - Controller - lst11"
+      }
+    },
+    "/rests/data/toaster2:lst={lf1}/lst1={key1},{key2}": {
+      "get": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "key2",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "lst1": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/toaster2_lst_lst1",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster2_lst_lst1"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - toaster2 - lst1"
+      },
+      "put": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "key2",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "lst1",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster2:lst1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/toaster2_lst_lst1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst_lst1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - toaster2 - Controller - lst1"
+      },
+      "delete": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "key2",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - toaster2 - lst1"
+      },
+      "patch": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "lf1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "key2",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "lst1",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_lst_lst1"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster2:lst1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/toaster2_lst_lst1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - toaster2 - Controller - lst1"
+      }
+    },
+    "/rests/data/toaster2:toaster/toasterSlot={slotId}": {
+      "get": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "toasterSlot": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/toaster2_toaster_toasterSlot",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster2_toaster_toasterSlot"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - toaster2 - toasterSlot"
+      },
+      "put": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "toasterSlot",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster2:toasterSlot": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/toaster2_toaster_toasterSlot",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_toaster_toasterSlot"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - toaster2 - Controller - toasterSlot"
+      },
+      "delete": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - toaster2 - toasterSlot"
+      },
+      "patch": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "toasterSlot",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_toaster_toasterSlot"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster2:toasterSlot": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/toaster2_toaster_toasterSlot",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - toaster2 - Controller - toasterSlot"
+      }
+    },
+    "/rests/operations/toaster2:restock-toaster": {
+      "post": {
+        "tags": [
+          "Controller toaster2"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "restock-toaster_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/toaster2_restock-toaster_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_restock-toaster_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC restock-toaster success"
+          }
+        },
+        "description": "Restocks the toaster with the amount of bread specified.",
+        "summary": "POST - Controller - toaster2 - restock-toaster"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "toaster2_lst_cont1": {
+        "properties": {
+          "lst11": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/toaster2_lst_cont1_lst11"
+            }
+          },
+          "cont11": {
+            "$ref": "#/components/schemas/toaster2_lst_cont1_cont11"
+          }
+        },
+        "xml": {
+          "name": "cont1",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        },
+        "description": "",
+        "title": "toaster2_lst_cont1",
+        "type": "object"
+      },
+      "toaster2_make-toast_input": {
+        "properties": {
+          "toasterDoneness": {
+            "default": 5,
+            "description": "This variable controls how well-done is the\n      ensuing toast. It should be on a scale of 1 to 10.\n      Toast made at 10 generally is considered unfit\n      for human consumption; toast made at 1 is warmed\n      lightly.",
+            "type": "integer",
+            "example": 1,
+            "format": "int64"
+          },
+          "toasterToastType": {
+            "default": "wheat-bread",
+            "enum": [
+              "toast-type",
+              "white-bread",
+              "wheat-bread",
+              "frozen-waffle",
+              "hash-brown",
+              "wonder-bread",
+              "frozen-bagel"
+            ],
+            "description": "This variable informs the toaster of the type of\n      material that is being toasted. The toaster\n      uses this information, combined with\n      toasterDoneness, to compute for how\n      long the material must be toasted to achieve\n      the required doneness.",
+            "type": "string",
+            "example": "toast-type"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        },
+        "title": "toaster2_make-toast_input",
+        "type": "object"
+      },
+      "toaster2_lst": {
+        "properties": {
+          "cont1": {
+            "$ref": "#/components/schemas/toaster2_lst_cont1"
+          },
+          "lf1": {
+            "description": "",
+            "type": "string",
+            "example": "Some lf1"
+          },
+          "lst1": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/toaster2_lst_lst1"
+            }
+          }
+        },
+        "xml": {
+          "name": "lst",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        },
+        "description": "",
+        "title": "toaster2_lst",
+        "type": "object"
+      },
+      "toaster2_toaster": {
+        "properties": {
+          "darknessFactor": {
+            "default": 1000,
+            "description": "The darkness factor. Basically, the number of ms to multiple the doneness value by.",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          },
+          "toasterSlot": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/toaster2_toaster_toasterSlot"
+            }
+          }
+        },
+        "xml": {
+          "name": "toaster",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        },
+        "description": "Top-level container for all toaster database objects.",
+        "title": "toaster2_toaster",
+        "type": "object"
+      },
+      "toaster2_lst_lst1": {
+        "properties": {
+          "key1": {
+            "description": "",
+            "type": "integer",
+            "example": -2147483648,
+            "format": "int32"
+          },
+          "key2": {
+            "description": "",
+            "type": "integer",
+            "example": -128,
+            "format": "int32"
+          },
+          "lf11": {
+            "description": "",
+            "type": "integer",
+            "example": -32768,
+            "format": "int32"
+          }
+        },
+        "xml": {
+          "name": "lst1",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        },
+        "description": "",
+        "title": "toaster2_lst_lst1",
+        "type": "object"
+      },
+      "toaster2_lst_cont1_cont11": {
+        "properties": {
+          "lf111": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          },
+          "lf112": {
+            "description": "",
+            "type": "string",
+            "example": "Some lf112"
+          }
+        },
+        "xml": {
+          "name": "cont11",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        },
+        "description": "",
+        "title": "toaster2_lst_cont1_cont11",
+        "type": "object"
+      },
+      "toaster2_toaster_toasterSlot_slotInfo": {
+        "properties": {
+          "numberOfToastPrepared": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          }
+        },
+        "xml": {
+          "name": "slotInfo",
+          "namespace": "http://netconfcentral.org/ns/toaster/augmented"
+        },
+        "description": "",
+        "title": "toaster2_toaster_toasterSlot_slotInfo",
+        "type": "object"
+      },
+      "toaster2_toaster_toasterSlot": {
+        "properties": {
+          "slotInfo": {
+            "$ref": "#/components/schemas/toaster2_toaster_toasterSlot_slotInfo"
+          },
+          "slotId": {
+            "description": "",
+            "type": "string",
+            "example": "Some slotId"
+          }
+        },
+        "xml": {
+          "name": "toasterSlot",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        },
+        "description": "",
+        "title": "toaster2_toaster_toasterSlot",
+        "type": "object"
+      },
+      "toaster2_lst_cont1_lst11": {
+        "properties": {
+          "lf111": {
+            "description": "",
+            "type": "string",
+            "example": "Some lf111"
+          }
+        },
+        "xml": {
+          "name": "lst11",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        },
+        "description": "",
+        "title": "toaster2_lst_cont1_lst11",
+        "type": "object"
+      },
+      "toaster2_restock-toaster_input": {
+        "properties": {
+          "amountOfBreadToStock": {
+            "description": "Indicates the amount of bread to re-stock",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        },
+        "title": "toaster2_restock-toaster_input",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

@@ -267,10 +267,10 @@
             },
             "application/json": {
               "schema": {
-                "properties":{
-                  "toaster":{
-                    "$ref":"#/components/schemas/toaster_toaster",
-                    "type":"object"
+                "properties": {
+                  "toaster": {
+                    "$ref": "#/components/schemas/toaster_toaster",
+                    "type": "object"
                   }
                 }
               }
