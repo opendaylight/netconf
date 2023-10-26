@@ -182,7 +182,7 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
         final var summary = HttpMethod.GET + " - " + deviceName() + " - datastore - " + resourceType;
         generator.writeStringField(SUMMARY, summary);
         generator.writeArrayFieldStart("tags");
-        generator.writeString(deviceName + " GET root");
+        generator.writeString(deviceName + " root");
         generator.writeEndArray(); //end of tags
         generator.writeEndObject(); //end of get
     }
