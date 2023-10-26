@@ -1,0 +1,1585 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "123 modules of RESTCONF",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That’s because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
+      "post": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list-action_input",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_list-action_input"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/action-types_list-action_input",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC list-action success",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_list-action_output"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_list-action_output"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "POST - 123 - action-types - list-action"
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:container/container-action": {
+      "post": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "container-action_input",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_container-action_input"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/action-types_container-action_input",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC container-action success",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_container-action_output"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_container-action_output"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "POST - 123 - action-types - container-action"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:list={name}": {
+      "get": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/action-types_list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - action-types - list"
+      },
+      "put": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_list"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action-types:list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/action-types_list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - action-types - 123 - list"
+      },
+      "delete": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - action-types - list"
+      },
+      "patch": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "action-types:list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/action-types_list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - action-types - 123 - list"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/operational:root": {
+      "get": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root": {
+                      "$ref": "#/components/schemas/operational_root",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - operational - root"
+      },
+      "put": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "operational:root": {
+                    "$ref": "#/components/schemas/operational_root",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - operational - 123 - root"
+      },
+      "post": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - operational - root"
+      },
+      "delete": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - operational - root"
+      },
+      "patch": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "operational:root": {
+                    "$ref": "#/components/schemas/operational_root",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - operational - 123 - root"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/operational:root/oper-container/config-container": {
+      "get": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root_oper-container_config-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "config-container": {
+                      "$ref": "#/components/schemas/operational_root_oper-container_config-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - operational - config-container"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/operational:root/oper-container/oper-container-list={oper-container-list-leaf}": {
+      "get": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [
+          {
+            "name": "oper-container-list-leaf",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root_oper-container_oper-container-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "oper-container-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/operational_root_oper-container_oper-container-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - operational - oper-container-list"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:multi-container": {
+      "get": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_multi-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "multi-container": {
+                      "$ref": "#/components/schemas/action-types_multi-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - action-types - multi-container"
+      },
+      "put": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "multi-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_multi-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action-types:multi-container": {
+                    "$ref": "#/components/schemas/action-types_multi-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - action-types - 123 - multi-container"
+      },
+      "post": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "inner-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_multi-container_inner-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "inner-container": {
+                    "$ref": "#/components/schemas/action-types_multi-container_inner-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - action-types - multi-container"
+      },
+      "delete": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - action-types - multi-container"
+      },
+      "patch": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "multi-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "action-types:multi-container": {
+                    "$ref": "#/components/schemas/action-types_multi-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_multi-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - action-types - 123 - multi-container"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container": {
+      "get": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_multi-container_inner-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "inner-container": {
+                      "$ref": "#/components/schemas/action-types_multi-container_inner-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - action-types - inner-container"
+      },
+      "put": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "inner-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_multi-container_inner-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action-types:inner-container": {
+                    "$ref": "#/components/schemas/action-types_multi-container_inner-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - action-types - 123 - inner-container"
+      },
+      "delete": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - action-types - inner-container"
+      },
+      "patch": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "inner-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "action-types:inner-container": {
+                    "$ref": "#/components/schemas/action-types_multi-container_inner-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_multi-container_inner-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - action-types - 123 - inner-container"
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount": {
+      "get": {
+        "tags": [
+          "123 GET root"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Queries the available operations (RPC calls) on the mounted hosted.",
+        "summary": "GET - 123 - datastore - operations"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/operational:root/oper-container": {
+      "get": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root_oper-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "oper-container": {
+                      "$ref": "#/components/schemas/operational_root_oper-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - operational - oper-container"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:container": {
+      "get": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "container": {
+                      "$ref": "#/components/schemas/action-types_container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - action-types - container"
+      },
+      "put": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action-types:container": {
+                    "$ref": "#/components/schemas/action-types_container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - action-types - 123 - container"
+      },
+      "delete": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - action-types - container"
+      },
+      "patch": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "action-types:container": {
+                    "$ref": "#/components/schemas/action-types_container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - action-types - 123 - container"
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:multi-container/inner-container/action": {
+      "post": {
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "action_input",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "xml": {
+                  "name": "input",
+                  "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+                },
+                "type": "object"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC action success"
+          }
+        },
+        "description": "",
+        "summary": "POST - 123 - action-types - action"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/operational:root/config-container/config-container-oper-list={oper-container-list-leaf}": {
+      "get": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [
+          {
+            "name": "oper-container-list-leaf",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root_config-container_config-container-oper-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "config-container-oper-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/operational_root_config-container_config-container-oper-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - operational - config-container-oper-list"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/operational:root/config-container": {
+      "get": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/operational_root_config-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "config-container": {
+                      "$ref": "#/components/schemas/operational_root_config-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - operational - config-container"
+      },
+      "put": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "config-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root_config-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "operational:config-container": {
+                    "$ref": "#/components/schemas/operational_root_config-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - operational - 123 - config-container"
+      },
+      "post": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "config-container",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root_config-container"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root_config-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - operational - config-container"
+      },
+      "delete": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - operational - config-container"
+      },
+      "patch": {
+        "tags": [
+          "123 operational"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "config-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "operational:config-container": {
+                    "$ref": "#/components/schemas/operational_root_config-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/operational_root_config-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - operational - 123 - config-container"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount": {
+      "get": {
+        "tags": [
+          "123 GET root"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Queries the config (startup) datastore on the mounted hosted.",
+        "summary": "GET - 123 - datastore - data"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "action-types_multi-container": {
+        "properties": {
+          "inner-container": {
+            "$ref": "#/components/schemas/action-types_multi-container_inner-container"
+          }
+        },
+        "xml": {
+          "name": "multi-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        },
+        "description": "",
+        "title": "action-types_multi-container",
+        "type": "object"
+      },
+      "operational_root_config-container": {
+        "properties": {
+          "leaf-second-case": {
+            "description": "",
+            "type": "string",
+            "example": "Some leaf-second-case"
+          },
+          "config-container-config-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some config-container-config-leaf"
+          }
+        },
+        "xml": {
+          "name": "config-container",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root_config-container",
+        "type": "object"
+      },
+      "operational_root": {
+        "properties": {
+          "leaf-config": {
+            "description": "",
+            "type": "string",
+            "example": "Some leaf-config"
+          },
+          "config-container": {
+            "$ref": "#/components/schemas/operational_root_config-container"
+          }
+        },
+        "xml": {
+          "name": "root",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root",
+        "type": "object"
+      },
+      "action-types_container-action_input": {
+        "required": [
+          "ca-input"
+        ],
+        "properties": {
+          "ca-input": {
+            "description": "",
+            "type": "string",
+            "example": "Some ca-input"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        },
+        "title": "action-types_container-action_input",
+        "type": "object"
+      },
+      "operational_root_oper-container_config-container": {
+        "required": [
+          "config-container-config-leaf"
+        ],
+        "properties": {
+          "config-container-config-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some config-container-config-leaf"
+          },
+          "opconfig-container-oper-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some opconfig-container-oper-leaf"
+          }
+        },
+        "xml": {
+          "name": "config-container",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root_oper-container_config-container",
+        "type": "object"
+      },
+      "operational_root_oper-container": {
+        "required": [
+          "config-container"
+        ],
+        "properties": {
+          "oper-container-list": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/operational_root_oper-container_oper-container-list"
+            }
+          },
+          "oper-container-config-leaf-list": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Some oper-container-config-leaf-list"
+            }
+          },
+          "config-container": {
+            "$ref": "#/components/schemas/operational_root_oper-container_config-container"
+          },
+          "oper-leaf-first-case": {
+            "description": "",
+            "type": "string",
+            "example": "Some oper-leaf-first-case"
+          },
+          "leaf-first-case": {
+            "description": "",
+            "type": "string",
+            "example": "Some leaf-first-case"
+          }
+        },
+        "xml": {
+          "name": "oper-container",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root_oper-container",
+        "type": "object"
+      },
+      "action-types_multi-container_inner-container": {
+        "properties": {},
+        "xml": {
+          "name": "inner-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        },
+        "description": "",
+        "title": "action-types_multi-container_inner-container",
+        "type": "object"
+      },
+      "operational_root_config-container_config-container-oper-list": {
+        "properties": {
+          "oper-container-list-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some oper-container-list-leaf"
+          }
+        },
+        "xml": {
+          "name": "config-container-oper-list",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root_config-container_config-container-oper-list",
+        "type": "object"
+      },
+      "action-types_container-action_output": {
+        "required": [
+          "ca-output"
+        ],
+        "properties": {
+          "ca-output": {
+            "description": "",
+            "type": "string",
+            "example": "Some ca-output"
+          }
+        },
+        "xml": {
+          "name": "output",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        },
+        "title": "action-types_container-action_output",
+        "type": "object"
+      },
+      "action-types_list-action_input": {
+        "required": [
+          "la-input"
+        ],
+        "properties": {
+          "la-input": {
+            "description": "",
+            "type": "string",
+            "example": "Some la-input"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        },
+        "title": "action-types_list-action_input",
+        "type": "object"
+      },
+      "action-types_container": {
+        "properties": {},
+        "xml": {
+          "name": "container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        },
+        "description": "",
+        "title": "action-types_container",
+        "type": "object"
+      },
+      "action-types_list-action_output": {
+        "required": [
+          "la-output"
+        ],
+        "properties": {
+          "la-output": {
+            "description": "",
+            "type": "string",
+            "example": "Some la-output"
+          }
+        },
+        "xml": {
+          "name": "output",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        },
+        "title": "action-types_list-action_output",
+        "type": "object"
+      },
+      "operational_root_oper-container_oper-container-list": {
+        "properties": {
+          "oper-container-list-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some oper-container-list-leaf"
+          }
+        },
+        "xml": {
+          "name": "oper-container-list",
+          "namespace": "urn:opendaylight:oper"
+        },
+        "description": "",
+        "title": "operational_root_oper-container_oper-container-list",
+        "type": "object"
+      },
+      "action-types_list": {
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        },
+        "description": "",
+        "title": "action-types_list",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

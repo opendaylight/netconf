@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-public class SwaggerDocumentTest {
+public class ToasterDocumentTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     /**
      * We want flexibility in comparing the resulting JSONs by not enforcing strict ordering of array contents.
@@ -45,7 +45,7 @@ public class SwaggerDocumentTest {
     @BeforeClass
     public static void beforeClass() {
         final var schemaService = mock(DOMSchemaService.class);
-        final var context = YangParserTestUtils.parseYangResource("/openapi-document/toaster.yang");
+        final var context = YangParserTestUtils.parseYangResource("/toaster-document/toaster.yang");
         when(schemaService.getGlobalContext()).thenReturn(context);
 
         final var mountPoint = mock(DOMMountPoint.class);
@@ -70,7 +70,7 @@ public class SwaggerDocumentTest {
 
         final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocAll);
         final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("openapi-document/controller-all.json")));
+            getClass().getClassLoader().getResourceAsStream("toaster-document/controller-all.json")));
         JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
     }
 
@@ -84,7 +84,7 @@ public class SwaggerDocumentTest {
 
         final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocToaster.getEntity());
         final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("openapi-document/controller-toaster.json")));
+            getClass().getClassLoader().getResourceAsStream("toaster-document/controller-toaster.json")));
         JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
     }
 
@@ -99,7 +99,7 @@ public class SwaggerDocumentTest {
 
         final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocAll.getEntity());
         final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("openapi-document/device-all.json")));
+            getClass().getClassLoader().getResourceAsStream("toaster-document/device-all.json")));
         JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
     }
 
@@ -113,7 +113,7 @@ public class SwaggerDocumentTest {
 
         final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocToaster.getEntity());
         final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("openapi-document/device-toaster.json")));
+            getClass().getClassLoader().getResourceAsStream("toaster-document/device-toaster.json")));
         JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
     }
 }
