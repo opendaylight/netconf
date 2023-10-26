@@ -178,6 +178,18 @@
       }
     },
     "/rests/data": {
+      "get": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Queries the config (startup) datastore on the mounted hosted.",
+        "summary": "GET - Controller - datastore - data"
+      },
       "post": {
         "tags": [
           "Controller path-params-test"

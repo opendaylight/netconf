@@ -55,9 +55,11 @@ public final class OperationBuilder {
 
     public static Operation buildPost(final @NonNull DataSchemaNode childNode, final String parentName,
             final String nodeName, final String discriminator, final String moduleName,
-            final @NonNull String deviceName, final String description, final List<Parameter> pathParams) {
+            final @NonNull String deviceName, final String description, final List<Parameter> pathParams,
+            final boolean isRootTag) {
         final var summary = SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName, moduleName, nodeName);
-        final List<String> tags = List.of(deviceName + " " + moduleName);
+        final List<String> tags = isRootTag ? List.of(deviceName + " root")
+            : List.of(deviceName + " " + moduleName);
         final List<Parameter> parameters = new ArrayList<>(pathParams);
         final RequestBody requestBody;
         final List<String> nameElements = new ArrayList<>();
