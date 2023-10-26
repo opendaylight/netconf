@@ -84,6 +84,21 @@ public final class PathEntity extends OpenApiEntity {
         this.delete = null;
     }
 
+    /**
+     * Construct new path instance pointing to root containers.
+     *
+     * <p>
+     * Paths to root device configuration data with specified POST and GET operations.
+     */
+    public PathEntity(final @NonNull String path, final @NonNull PostEntity post, final @NonNull GetEntity get) {
+        this.path = requireNonNull(path);
+        this.get = requireNonNull(get);
+        this.post = requireNonNull(post);
+        this.put = null;
+        this.patch = null;
+        this.delete = null;
+    }
+
     @Override
     public void generate(@NonNull JsonGenerator generator) throws IOException {
         generator.writeObjectFieldStart(path);
