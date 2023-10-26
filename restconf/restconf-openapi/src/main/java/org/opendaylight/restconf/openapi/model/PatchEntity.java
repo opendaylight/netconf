@@ -25,7 +25,7 @@ public final class PatchEntity extends OperationEntity {
 
     public PatchEntity(final SchemaNode schema, final String deviceName, final String moduleName,
             final List<ParameterEntity> parameters, final String refPath, final String fullName) {
-        super(schema, deviceName, moduleName, parameters, refPath);
+        super(schema, deviceName, moduleName, parameters, refPath, false);
         this.fullName = fullName;
     }
 
