@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.openapi.impl;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.SUMMARY_TEMPLATE;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildDelete;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildGet;
 import static org.opendaylight.restconf.openapi.model.builder.OperationBuilder.buildPatch;
@@ -33,6 +34,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -42,6 +45,7 @@ import org.opendaylight.restconf.openapi.model.OpenApiObject;
 import org.opendaylight.restconf.openapi.model.Operation;
 import org.opendaylight.restconf.openapi.model.Parameter;
 import org.opendaylight.restconf.openapi.model.Path;
+import org.opendaylight.restconf.openapi.model.ResponseObject;
 import org.opendaylight.restconf.openapi.model.Schema;
 import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.restconf.openapi.model.security.Http;
@@ -110,6 +114,11 @@ public abstract class BaseYangOpenApiGenerator {
             schemas.putAll(getSchemas(module, context, definitionNames, false));
             paths.putAll(getPaths(module, "", CONTROLLER_RESOURCE_NAME, context, definitionNames, false));
         }
+        getSortedModules(context).stream()
+            .filter(module -> getListOrContainerChildNode(module) != null)
+            .findFirst()
+            .ifPresent(module -> addRootPostLink(module, CONTROLLER_RESOURCE_NAME, new ArrayList<>(),
+                getResourcePath("data", ""), paths, true));
 
         final var components = new Components(schemas, Map.of(BASIC_AUTH_NAME, OPEN_API_BASIC_AUTH));
         return new OpenApiObject(OPEN_API_VERSION, info, servers, paths, components, SECURITY);
@@ -213,7 +222,7 @@ public abstract class BaseYangOpenApiGenerator {
                  */
                 if (isConfig && isForSingleModule && !hasAddRootPostLink) {
                     LOG.debug("Has added root post link for module {}", moduleName);
-                    addRootPostLink(module, deviceName, pathParams, resourcePath, paths);
+                    addRootPostLink(module, deviceName, pathParams, resourcePath, paths, false);
 
                     hasAddRootPostLink = true;
                 }
@@ -247,16 +256,29 @@ public abstract class BaseYangOpenApiGenerator {
         return schemas;
     }
 
-    private static void addRootPostLink(final Module module, final String deviceName,
-            final List<Parameter> pathParams, final String resourcePath, final Map<String, Path> paths) {
+    public static void addRootPostLink(final Module module, final String deviceName,
+            final List<Parameter> pathParams, final String resourcePath, final Map<String, Path> paths,
+            final boolean isRootTag) {
         final var childNode = getListOrContainerChildNode(module);
+        final var pathBuilder = new Path.Builder();
         if (childNode != null) {
             final String moduleName = module.getName();
-            paths.put(resourcePath, new Path.Builder()
-                .post(buildPost(childNode, null, moduleName, "", moduleName, deviceName,
-                    module.getDescription().orElse(""), pathParams))
-                .build());
+            pathBuilder.post(buildPost(childNode, null, moduleName, "", moduleName, deviceName,
+                    module.getDescription().orElse(""), pathParams, isRootTag));
         }
+        final String summary = SUMMARY_TEMPLATE.formatted(HttpMethod.GET, deviceName, "datastore", "data");
+        final List<String> tags = List.of(deviceName + " root");
+        final ResponseObject okResponse = new ResponseObject.Builder()
+            .description(Response.Status.OK.getReasonPhrase())
+            .build();
+        pathBuilder.get(new Operation.Builder()
+            .tags(tags)
+            .responses(Map.of(String.valueOf(Response.Status.OK.getStatusCode()), okResponse))
+            .description("Queries the config (startup) datastore on the mounted hosted.")
+            .summary(summary)
+            .build());
+
+        paths.put(resourcePath, pathBuilder.build());
     }
 
     public abstract String getResourcePath(String resourceType, String context);
@@ -335,7 +357,7 @@ public abstract class BaseYangOpenApiGenerator {
                 // we have to ensure that we are able to create POST payload containing the first container/list child
                 if (childNode != null) {
                     final Operation post = buildPost(childNode, parentName, nodeName, discriminator, moduleName,
-                        deviceName, node.getDescription().orElse(""), pathParams);
+                        deviceName, node.getDescription().orElse(""), pathParams, false);
                     operationsBuilder.post(post);
                 }
             }
@@ -343,9 +365,9 @@ public abstract class BaseYangOpenApiGenerator {
         return operationsBuilder.build();
     }
 
-    private static <T extends DataNodeContainer> DataSchemaNode getListOrContainerChildNode(final T node) {
+    public static <T extends DataNodeContainer> DataSchemaNode getListOrContainerChildNode(final T node) {
         return node.getChildNodes().stream()
-            .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
+            .filter(n ->  n.isConfiguration() && (n instanceof ListSchemaNode || n instanceof ContainerSchemaNode))
             .findFirst().orElse(null);
     }
 
