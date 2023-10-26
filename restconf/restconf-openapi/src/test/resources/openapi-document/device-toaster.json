@@ -252,6 +252,18 @@
       }
     },
     "/rests/data/nodes/node=123/yang-ext:mount": {
+      "get": {
+        "tags": [
+          "123 root"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Queries the config (startup) datastore on the mounted hosted.",
+        "summary": "GET - 123 - datastore - data"
+      },
       "post": {
         "tags": [
           "123 toaster"

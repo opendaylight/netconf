@@ -525,7 +525,7 @@ public final class OpenApiGeneratorRFC8040Test {
         }
         final var references = new HashSet<String>();
         final var get = path.get();
-        if (get != null) {
+        if (get != null && !get.tags().contains("Controller root")) {
             references.addAll(schemaRefFromContent(get.responses().get("200").content()));
         }
         final var post = path.post();
