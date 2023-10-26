@@ -41,6 +41,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03dc28fa_865fccca",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/AbstractNetconfServerTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-26T16:28:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e67fa228_1ce7ec86",
+      "range": {
+        "startLine": 27,
+        "startChar": 15,
+        "endLine": 27,
+        "endChar": 40
+      },
+      "revId": "8cddaf17e65479c4762e7c7e0c8b80d7f4cdbdb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "41277b6a_8096a747",
@@ -58,6 +82,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1a44bf0_f792cdb2",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/osgi/NetconfSessionMonitoringServiceTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-26T16:28:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "41277b6a_8096a747",
+      "revId": "8cddaf17e65479c4762e7c7e0c8b80d7f4cdbdb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de57633f_b77fbe66",
@@ -71,6 +113,24 @@
       "writtenOn": "2023-10-25T11:17:02Z",
       "side": 1,
       "message": "`added` is not read",
+      "revId": "8cddaf17e65479c4762e7c7e0c8b80d7f4cdbdb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "597b4e6d_25d4a79e",
+        "filename": "protocol/netconf-server/src/test/java/org/opendaylight/netconf/server/osgi/NetconfSessionMonitoringServiceTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-26T16:28:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de57633f_b77fbe66",
       "revId": "8cddaf17e65479c4762e7c7e0c8b80d7f4cdbdb2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
