@@ -11,15 +11,14 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
+import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
+import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,27 +26,21 @@ public class StressClientCallable implements Callable<Boolean> {
 
     private static final Logger LOG = LoggerFactory.getLogger(StressClientCallable.class);
 
-    private final Parameters params;
     private final NetconfDeviceCommunicator sessionListener;
-    private final NetconfClientDispatcherImpl netconfClientDispatcher;
-    private final NetconfClientConfiguration cfg;
     private final NetconfClientSession netconfClientSession;
     private final ExecutionStrategy executionStrategy;
 
     public StressClientCallable(final Parameters params,
-                                final NetconfClientDispatcherImpl netconfClientDispatcher,
+                                final NetconfClientFactory netconfClientFactory,
+                                final NetconfClientConfiguration baseConfiguration,
                                 final List<NetconfMessage> preparedMessages) {
-        this.params = params;
         sessionListener = getSessionListener(params.getInetAddress(), params.concurrentMessageLimit);
-        this.netconfClientDispatcher = netconfClientDispatcher;
-        cfg = getNetconfClientConfiguration(this.params, sessionListener);
+        final var cfg = getNetconfClientConfiguration(baseConfiguration, sessionListener);
 
         LOG.info("Connecting to netconf server {}:{}", params.ip, params.port);
         try {
-            netconfClientSession = netconfClientDispatcher.createClient(cfg).get();
-        } catch (final InterruptedException e) {
-            throw new IllegalStateException(e);
-        } catch (final ExecutionException e) {
+            netconfClientSession = netconfClientFactory.createClient(cfg).get();
+        } catch (final InterruptedException | ExecutionException | UnsupportedConfigurationException e) {
             throw new IllegalStateException("Unable to connect", e);
         }
         executionStrategy = getExecutionStrategy(params, preparedMessages, sessionListener);
@@ -75,27 +68,15 @@ public class StressClientCallable implements Callable<Boolean> {
             StressClient.LOGGING_REMOTE_DEVICE, messageLimit);
     }
 
-    private static NetconfClientConfiguration getNetconfClientConfiguration(final Parameters params,
+    private static NetconfClientConfiguration getNetconfClientConfiguration(final NetconfClientConfiguration base,
             final NetconfDeviceCommunicator sessionListener) {
-        final var netconfClientConfigurationBuilder = NetconfClientConfigurationBuilder.create()
-            .withSessionListener(sessionListener)
-            .withAddress(params.getInetAddress())
-            .withProtocol(params.ssh ? NetconfClientConfiguration.NetconfClientProtocol.SSH
-                : NetconfClientConfiguration.NetconfClientProtocol.TCP)
-            .withAuthHandler(new LoginPasswordHandler(params.username, params.password))
-            .withConnectionTimeoutMillis(20000L);
-
-        if (params.tcpHeader != null) {
-            final String header = params.tcpHeader.replace("\"", "").trim() + "\n";
-            netconfClientConfigurationBuilder.withAdditionalHeader(
-                new NetconfHelloMessageAdditionalHeader(null, null, null, null, null) {
-                    @Override
-                    public String toFormattedString() {
-                        LOG.debug("Sending TCP header {}", header);
-                        return header;
-                    }
-                });
-        }
-        return netconfClientConfigurationBuilder.build();
+        return NetconfClientConfigurationBuilder.create()
+            .withProtocol(base.getProtocol())
+            .withTcpParameters(base.getTcpParameters())
+            .withSshParameters(base.getSshParameters())
+            .withOdlHelloCapabilities(base.getOdlHelloCapabilities())
+            .withAdditionalHeader(base.getAdditionalHeader().orElse(null))
+            .withConnectionTimeoutMillis(base.getConnectionTimeoutMillis())
+            .withSessionListener(sessionListener).build();
     }
 }

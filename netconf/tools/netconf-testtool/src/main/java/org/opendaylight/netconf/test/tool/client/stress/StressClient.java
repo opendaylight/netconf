@@ -10,29 +10,40 @@ package org.opendaylight.netconf.test.tool.client.stress;
 import ch.qos.logback.classic.Level;
 import com.google.common.base.Stopwatch;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
+import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
+import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
-import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
 import org.opendaylight.netconf.test.tool.TestToolUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.CommitInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev230417.password.grouping.password.type.CleartextPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentityBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.client.identity.PasswordBuilder;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -154,14 +165,11 @@ public final class StressClient {
             }
         }
 
-        final var nioGroup = new NioEventLoopGroup();
-        final var timer = new HashedWheelTimer();
-
-        final var netconfClientDispatcher = configureClientDispatcher(nioGroup, timer);
+        final var netconfClientFactory = new NetconfClientFactoryImpl();
 
         final var callables = new ArrayList<StressClientCallable>(threadAmount);
         for (var messages : allPreparedMessages) {
-            callables.add(new StressClientCallable(params, netconfClientDispatcher, messages));
+            callables.add(new StressClientCallable(params, netconfClientFactory, getBaseConfiguration(), messages));
         }
 
         final var executorService = Executors.newFixedThreadPool(threadAmount);
@@ -179,16 +187,7 @@ public final class StressClient {
         LOG.info("Requests per second: {}", params.editCount * 1000.0 / sw.elapsed(TimeUnit.MILLISECONDS));
 
         // Cleanup
-        timer.stop();
-        try {
-            nioGroup.shutdownGracefully().get(20L, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            LOG.warn("Unable to close executor properly", e);
-        }
-        //stop the underlying ssh thread that gets spawned if we use ssh
-        if (params.ssh) {
-            AsyncSshHandler.DEFAULT_CLIENT.stop();
-        }
+        netconfClientFactory.close();
     }
 
     static NetconfMessage prepareMessage(final int id, final String editContentString) {
@@ -235,14 +234,52 @@ public final class StressClient {
         return false;
     }
 
-    @Deprecated
-    private static NetconfClientDispatcherImpl configureClientDispatcher(final NioEventLoopGroup nioGroup,
-            final Timer timer) {
-        if (params.exi) {
-            return params.legacyFraming ? ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup, timer)
-                : ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup, timer);
+    private static NetconfClientConfiguration getBaseConfiguration() {
+        final var confBuilder = NetconfClientConfigurationBuilder.create()
+            .withProtocol(params.ssh ? NetconfClientConfiguration.NetconfClientProtocol.SSH
+                : NetconfClientConfiguration.NetconfClientProtocol.TCP)
+            .withConnectionTimeoutMillis(20000L)
+            .withOdlHelloCapabilities(getCapabilities().stream().map(Uri::new).toList())
+            .withTcpParameters(new TcpClientParametersBuilder()
+                .setRemoteAddress(new Host(IetfInetUtil.ipAddressFor(params.ip)))
+                .setRemotePort(new PortNumber(Uint16.valueOf(params.port))).build());
+        if (params.ssh) {
+            confBuilder.withSshParameters(new SshClientParametersBuilder()
+                .setClientIdentity(new ClientIdentityBuilder()
+                    .setUsername(params.username)
+                    .setPassword(new PasswordBuilder()
+                        .setPasswordType(
+                            new CleartextPasswordBuilder().setCleartextPassword(params.password).build())
+                        .build())
+                    .build())
+                .build());
         }
-        return params.legacyFraming ? ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer)
-            : ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer);
+        if (params.tcpHeader != null) {
+            final String header = params.tcpHeader.replace("\"", "").trim() + "\n";
+            confBuilder.withAdditionalHeader(
+                new NetconfHelloMessageAdditionalHeader(null, null, null, null, null) {
+                    @Override
+                    public String toFormattedString() {
+                        LOG.debug("Sending TCP header {}", header);
+                        return header;
+                    }
+                });
+        }
+        return confBuilder.build();
+    }
+
+    private static Set<String> getCapabilities() {
+        if (params.exi) {
+            return params.legacyFraming
+                // EXI + ]]gt;]]gt; framing.
+                ? NetconfClientSessionNegotiatorFactory.LEGACY_EXI_CLIENT_CAPABILITIES
+                // EXI + chunked framing
+                : NetconfClientSessionNegotiatorFactory.EXI_CLIENT_CAPABILITIES;
+        }
+        return params.legacyFraming
+            // ]]gt;]]gt; framing.
+            ? NetconfClientSessionNegotiatorFactory.LEGACY_FRAMING_CLIENT_CAPABILITIES
+            // Chunked framing
+            : NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES;
     }
 }
