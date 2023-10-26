@@ -19,7 +19,7 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>shaded-exificient</artifactId>
     <packaging>bundle</packaging>
-    <version>5.0.9-SNAPSHOT</version>
+    <version>5.0.9</version>
     <name>${project.artifactId}</name>
 
     <properties>
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>shaded-exificient-jar</artifactId>
-            <version>5.0.9-SNAPSHOT</version>
+            <version>5.0.9</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
