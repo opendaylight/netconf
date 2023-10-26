@@ -1,0 +1,1278 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "path-params-test",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That’s because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/data/path-params-test:cont/list1={name}/cont2": {
+      "get": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list1_cont2"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "cont2": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1_cont2",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - path-params-test - cont2"
+      },
+      "put": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "cont2",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_cont2"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:cont2": {
+                    "$ref": "#/components/schemas/path-params-test_cont_list1_cont2",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - path-params-test - Controller - cont2"
+      },
+      "delete": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - path-params-test - cont2"
+      },
+      "patch": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "cont2",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:cont2": {
+                    "$ref": "#/components/schemas/path-params-test_cont_list1_cont2",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_cont2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - path-params-test - Controller - cont2"
+      }
+    },
+    "/rests/data": {
+      "post": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "cont",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "cont": {
+                    "$ref": "#/components/schemas/path-params-test_cont",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - path-params-test - path-params-test"
+      }
+    },
+    "/rests/data/path-params-test:cont/list1={name}": {
+      "get": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list1"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list1": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/path-params-test_cont_list1",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - path-params-test - list1"
+      },
+      "put": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list1",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - path-params-test - Controller - list1"
+      },
+      "delete": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - path-params-test - list1"
+      },
+      "patch": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list1",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - path-params-test - Controller - list1"
+      }
+    },
+    "/rests/data/path-params-test:cont/list3={name}": {
+      "get": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list3"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list3": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/path-params-test_cont_list3",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - path-params-test - list3"
+      },
+      "put": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list3",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list3"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list3": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list3",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - path-params-test - Controller - list3"
+      },
+      "delete": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - path-params-test - list3"
+      },
+      "patch": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list3",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list3": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list3",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list3"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - path-params-test - Controller - list3"
+      }
+    },
+    "/rests/data/path-params-test:cont/list1={name}/list2={name1}": {
+      "get": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list1_list2"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list2": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/path-params-test_cont_list1_list2",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - path-params-test - list2"
+      },
+      "put": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list2",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_list2"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list2": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1_list2",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - path-params-test - Controller - list2"
+      },
+      "delete": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - path-params-test - list2"
+      },
+      "patch": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list2",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list2": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1_list2",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_list2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - path-params-test - Controller - list2"
+      }
+    },
+    "/rests/data/path-params-test:cont": {
+      "get": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "cont": {
+                      "$ref": "#/components/schemas/path-params-test_cont",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - path-params-test - cont"
+      },
+      "put": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "cont",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:cont": {
+                    "$ref": "#/components/schemas/path-params-test_cont",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - path-params-test - Controller - cont"
+      },
+      "post": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "list1",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "list1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - path-params-test - cont"
+      },
+      "delete": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - path-params-test - cont"
+      },
+      "patch": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "cont",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:cont": {
+                    "$ref": "#/components/schemas/path-params-test_cont",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - path-params-test - Controller - cont"
+      }
+    },
+    "/rests/data/path-params-test:cont/list1={name}/list4={name1}": {
+      "get": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list1_list4"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list4": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/path-params-test_cont_list1_list4",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - path-params-test - list4"
+      },
+      "put": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list4",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_list4"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list4": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1_list4",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - path-params-test - Controller - list4"
+      },
+      "delete": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - path-params-test - list4"
+      },
+      "patch": {
+        "tags": [
+          "Controller path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list4",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list4": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1_list4",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_list4"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - path-params-test - Controller - list4"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "path-params-test_cont_list1": {
+        "properties": {
+          "cont2": {
+            "$ref": "#/components/schemas/path-params-test_cont_list1_cont2"
+          },
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          },
+          "list2": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/path-params-test_cont_list1_list2"
+            }
+          },
+          "list4": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/path-params-test_cont_list1_list4"
+            }
+          }
+        },
+        "xml": {
+          "name": "list1",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        },
+        "description": "",
+        "title": "path-params-test_cont_list1",
+        "type": "object"
+      },
+      "path-params-test_cont_list3": {
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list3",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        },
+        "description": "",
+        "title": "path-params-test_cont_list3",
+        "type": "object"
+      },
+      "path-params-test_cont": {
+        "properties": {
+          "list3": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/path-params-test_cont_list3"
+            }
+          },
+          "list1": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/path-params-test_cont_list1"
+            }
+          }
+        },
+        "xml": {
+          "name": "cont",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        },
+        "description": "",
+        "title": "path-params-test_cont",
+        "type": "object"
+      },
+      "path-params-test_cont_list1_list2": {
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list2",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        },
+        "description": "",
+        "title": "path-params-test_cont_list1_list2",
+        "type": "object"
+      },
+      "path-params-test_cont_list1_cont2": {
+        "properties": {},
+        "xml": {
+          "name": "cont2",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        },
+        "description": "",
+        "title": "path-params-test_cont_list1_cont2",
+        "type": "object"
+      },
+      "path-params-test_cont_list1_list4": {
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list4",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        },
+        "description": "",
+        "title": "path-params-test_cont_list1_list4",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

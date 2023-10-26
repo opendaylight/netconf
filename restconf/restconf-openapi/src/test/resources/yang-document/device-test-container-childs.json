@@ -1,0 +1,2083 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "test-container-childs",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That’s because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container/nested-container": {
+      "get": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "nested-container": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container_nested-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - nested-container"
+      },
+      "put": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "nested-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:nested-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container_nested-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - nested-container"
+      },
+      "post": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "mandatory-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - test-container-childs - nested-container"
+      },
+      "delete": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - nested-container"
+      },
+      "patch": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "nested-container",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:nested-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container_nested-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - nested-container"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container-unique": {
+      "get": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-container-unique": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-unique",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container-unique"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - root-container-unique"
+      },
+      "put": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root-container-unique",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:root-container-unique": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-unique",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-unique"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - root-container-unique"
+      },
+      "post": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "nested-container-unique",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "nested-container-unique": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - test-container-childs - root-container-unique"
+      },
+      "delete": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - root-container-unique"
+      },
+      "patch": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root-container-unique",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-unique"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:root-container-unique": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-unique",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - root-container-unique"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container/nested-container/mandatory-list={id}": {
+      "get": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "mandatory-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - mandatory-list"
+      },
+      "put": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "mandatory-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - mandatory-list"
+      },
+      "delete": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - mandatory-list"
+      },
+      "patch": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "mandatory-list",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - mandatory-list"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container-two-keys/nested-container-two-keys/mandatory-list-two-keys={id},{name}": {
+      "get": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "mandatory-list-two-keys": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - mandatory-list-two-keys"
+      },
+      "put": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "mandatory-list-two-keys",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:mandatory-list-two-keys": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - mandatory-list-two-keys"
+      },
+      "delete": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - mandatory-list-two-keys"
+      },
+      "patch": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "mandatory-list-two-keys",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:mandatory-list-two-keys": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - mandatory-list-two-keys"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container-two-keys": {
+      "get": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-container-two-keys": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-two-keys",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container-two-keys"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - root-container-two-keys"
+      },
+      "put": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root-container-two-keys",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:root-container-two-keys": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-two-keys",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-two-keys"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - root-container-two-keys"
+      },
+      "post": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "nested-container-two-keys",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "nested-container-two-keys": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - test-container-childs - root-container-two-keys"
+      },
+      "delete": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - root-container-two-keys"
+      },
+      "patch": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root-container-two-keys",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-two-keys"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:root-container-two-keys": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-two-keys",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - root-container-two-keys"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container-two-keys/nested-container-two-keys/mandatory-list-two-keys={id},{name}/list-nested-container": {
+      "get": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list-nested-container": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - list-nested-container"
+      },
+      "put": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list-nested-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:list-nested-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - list-nested-container"
+      },
+      "delete": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - list-nested-container"
+      },
+      "patch": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "list-nested-container",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:list-nested-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - list-nested-container"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container-unique/nested-container-unique/mandatory-list-unique={id}": {
+      "get": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "mandatory-list-unique": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - mandatory-list-unique"
+      },
+      "put": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "mandatory-list-unique",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:mandatory-list-unique": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - mandatory-list-unique"
+      },
+      "delete": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - mandatory-list-unique"
+      },
+      "patch": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "mandatory-list-unique",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:mandatory-list-unique": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - mandatory-list-unique"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container": {
+      "get": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-container": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - root-container"
+      },
+      "put": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:root-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - root-container"
+      },
+      "post": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "nested-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "nested-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container_nested-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - test-container-childs - root-container"
+      },
+      "delete": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - root-container"
+      },
+      "patch": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:root-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - root-container"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container-unique/nested-container-unique": {
+      "get": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "nested-container-unique": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - nested-container-unique"
+      },
+      "put": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "nested-container-unique",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:nested-container-unique": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - nested-container-unique"
+      },
+      "post": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "mandatory-list-unique",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-list-unique": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - test-container-childs - nested-container-unique"
+      },
+      "delete": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - nested-container-unique"
+      },
+      "patch": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "nested-container-unique",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:nested-container-unique": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - nested-container-unique"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount": {
+      "post": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "root-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - test-container-childs - test-container-childs"
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container-two-keys/nested-container-two-keys": {
+      "get": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "nested-container-two-keys": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - nested-container-two-keys"
+      },
+      "put": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "nested-container-two-keys",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:nested-container-two-keys": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - nested-container-two-keys"
+      },
+      "post": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "mandatory-list-two-keys",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-list-two-keys": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - test-container-childs - nested-container-two-keys"
+      },
+      "delete": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - nested-container-two-keys"
+      },
+      "patch": {
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "nested-container-two-keys",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:nested-container-two-keys": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - nested-container-two-keys"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "test-container-childs_root-container-unique": {
+        "properties": {
+          "nested-container-unique": {
+            "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique"
+          }
+        },
+        "xml": {
+          "name": "root-container-unique",
+          "namespace": "http://example.com/test/container/child"
+        },
+        "description": "",
+        "title": "test-container-childs_root-container-unique",
+        "type": "object"
+      },
+      "test-container-childs_root-container-two-keys": {
+        "properties": {
+          "nested-container-two-keys": {
+            "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys"
+          }
+        },
+        "xml": {
+          "name": "root-container-two-keys",
+          "namespace": "http://example.com/test/container/child"
+        },
+        "description": "",
+        "title": "test-container-childs_root-container-two-keys",
+        "type": "object"
+      },
+      "test-container-childs_root-container-unique_nested-container-unique": {
+        "required": [
+          "mandatory-list-unique"
+        ],
+        "properties": {
+          "mandatory-list-unique": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique"
+            },
+            "example": [
+              {
+                "address": "Some address",
+                "name": "Some name",
+                "description": "Some description",
+                "id": 0
+              },
+              {
+                "address": "Some address_1",
+                "name": "Some name_1",
+                "description": "Some description",
+                "id": 1
+              },
+              {
+                "address": "Some address_2",
+                "name": "Some name_2",
+                "description": "Some description",
+                "id": 2
+              }
+            ],
+            "minItems": 3,
+            "maxItems": 5
+          }
+        },
+        "xml": {
+          "name": "nested-container-unique",
+          "namespace": "http://example.com/test/container/child"
+        },
+        "description": "",
+        "title": "test-container-childs_root-container-unique_nested-container-unique",
+        "type": "object"
+      },
+      "test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container": {
+        "properties": {
+          "nested-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some nested-leaf"
+          }
+        },
+        "xml": {
+          "name": "list-nested-container",
+          "namespace": "http://example.com/test/container/child"
+        },
+        "description": "",
+        "title": "test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container",
+        "type": "object"
+      },
+      "test-container-childs_root-container-two-keys_nested-container-two-keys": {
+        "required": [
+          "mandatory-list-two-keys"
+        ],
+        "properties": {
+          "mandatory-list-two-keys": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys"
+            },
+            "example": [
+              {
+                "address": "Some address",
+                "name": "Some name",
+                "id": 0
+              },
+              {
+                "address": "Some address",
+                "name": "Some name_1",
+                "id": 1
+              },
+              {
+                "address": "Some address",
+                "name": "Some name_2",
+                "id": 2
+              }
+            ],
+            "minItems": 3,
+            "maxItems": 5
+          }
+        },
+        "xml": {
+          "name": "nested-container-two-keys",
+          "namespace": "http://example.com/test/container/child"
+        },
+        "description": "",
+        "title": "test-container-childs_root-container-two-keys_nested-container-two-keys",
+        "type": "object"
+      },
+      "test-container-childs_root-container": {
+        "properties": {
+          "nested-container": {
+            "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+          }
+        },
+        "xml": {
+          "name": "root-container",
+          "namespace": "http://example.com/test/container/child"
+        },
+        "description": "",
+        "title": "test-container-childs_root-container",
+        "type": "object"
+      },
+      "test-container-childs_root-container_nested-container_mandatory-list": {
+        "properties": {
+          "address": {
+            "description": "",
+            "type": "string",
+            "example": "Some address"
+          },
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          },
+          "id": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          }
+        },
+        "xml": {
+          "name": "mandatory-list",
+          "namespace": "http://example.com/test/container/child"
+        },
+        "description": "",
+        "title": "test-container-childs_root-container_nested-container_mandatory-list",
+        "type": "object"
+      },
+      "test-container-childs_root-container_nested-container": {
+        "required": [
+          "mandatory-list"
+        ],
+        "properties": {
+          "mandatory-list": {
+            "description": "",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list"
+            },
+            "example": [
+              {
+                "address": "Some address",
+                "name": "Some name",
+                "id": 0
+              },
+              {
+                "address": "Some address",
+                "name": "Some name",
+                "id": 1
+              },
+              {
+                "address": "Some address",
+                "name": "Some name",
+                "id": 2
+              }
+            ],
+            "minItems": 3,
+            "maxItems": 5
+          }
+        },
+        "xml": {
+          "name": "nested-container",
+          "namespace": "http://example.com/test/container/child"
+        },
+        "description": "",
+        "title": "test-container-childs_root-container_nested-container",
+        "type": "object"
+      },
+      "test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys": {
+        "properties": {
+          "id": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          },
+          "address": {
+            "description": "",
+            "type": "string",
+            "example": "Some address"
+          },
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          },
+          "list-nested-container": {
+            "$ref": "#/components/schemas/test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container"
+          }
+        },
+        "xml": {
+          "name": "mandatory-list-two-keys",
+          "namespace": "http://example.com/test/container/child"
+        },
+        "description": "",
+        "title": "test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys",
+        "type": "object"
+      },
+      "test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique": {
+        "properties": {
+          "id": {
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int64"
+          },
+          "description": {
+            "description": "",
+            "type": "string",
+            "example": "Some description"
+          },
+          "address": {
+            "description": "",
+            "type": "string",
+            "example": "Some address"
+          },
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "mandatory-list-unique",
+          "namespace": "http://example.com/test/container/child"
+        },
+        "description": "",
+        "title": "test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
