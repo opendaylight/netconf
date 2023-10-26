@@ -11,6 +11,67 @@
     }
   ],
   "paths": {
+    "/rests/data": {
+      "post": {
+        "description": "YANG version of the TOASTER-MIB.\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - toaster - toaster",
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster": {
+                    "$ref": "#/components/schemas/toaster_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_toaster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "Controller root"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "Queries the config (startup) datastore on the mounted hosted.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "GET - Controller - datastore - data",
+        "tags": [
+          "Controller root"
+        ]
+      }
+    },
+    "/rests/operations": {
+      "get": {
+        "description": "Queries the available operations (RPC calls) on the mounted hosted.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "GET - Controller - datastore - operations",
+        "tags": [
+          "Controller root"
+        ]
+      }
+    },
     "/rests/operations/toaster:cancel-toast": {
       "post": {
         "tags": [
