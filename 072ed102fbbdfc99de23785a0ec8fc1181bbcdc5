@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b5cb194_e6599349",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointSwaggerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-10-26T10:14:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3606ed52_c639521b",
+      "revId": "072ed102fbbdfc99de23785a0ec8fc1181bbcdc5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ecf20fc_5572fd29",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-10-25T15:10:16Z",
       "side": 1,
       "message": "assert not missing node",
+      "revId": "072ed102fbbdfc99de23785a0ec8fc1181bbcdc5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a714563c_e5944627",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointSwaggerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-10-26T10:14:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ecf20fc_5572fd29",
       "revId": "072ed102fbbdfc99de23785a0ec8fc1181bbcdc5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
