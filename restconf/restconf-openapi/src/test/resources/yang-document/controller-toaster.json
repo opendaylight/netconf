@@ -1,0 +1,345 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "toaster",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That’s because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/data": {
+      "post": {
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_toaster"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster": {
+                    "$ref": "#/components/schemas/toaster_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "YANG version of the TOASTER-MIB.\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - toaster - toaster"
+      }
+    },
+    "/rests/operations/toaster:cancel-toast": {
+      "post": {
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "cancel-toast_input",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "xml": {
+                  "name": "input",
+                  "namespace": "http://netconfcentral.org/ns/toaster"
+                },
+                "type": "object"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC cancel-toast success"
+          }
+        },
+        "description": "Stop making toast, if any is being made.\n  A 'resource-denied' error will be returned\n  if the toaster service is disabled.",
+        "summary": "POST - Controller - toaster - cancel-toast"
+      }
+    },
+    "/rests/data/toaster:toaster": {
+      "get": {
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster_toaster"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "toaster": {
+                      "$ref": "#/components/schemas/toaster_toaster",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "GET - Controller - toaster - toaster"
+      },
+      "put": {
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_toaster"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster:toaster": {
+                    "$ref": "#/components/schemas/toaster_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "PUT - toaster - Controller - toaster"
+      },
+      "delete": {
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "DELETE - Controller - toaster - toaster"
+      },
+      "patch": {
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster:toaster": {
+                    "$ref": "#/components/schemas/toaster_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_toaster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "PATCH - toaster - Controller - toaster"
+      }
+    },
+    "/rests/operations/toaster:make-toast": {
+      "post": {
+        "tags": [
+          "Controller toaster"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "make-toast_input",
+          "content": {
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_make-toast_input"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/toaster_make-toast_input",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC make-toast success"
+          }
+        },
+        "description": "Make some toast.\n  The toastDone notification will be sent when\n  the toast is finished.\n  An 'in-use' error will be returned if toast\n  is already being made.\n  A 'resource-denied' error will be returned\n  if the toaster service is disabled.",
+        "summary": "POST - Controller - toaster - make-toast"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "toaster_make-toast_input": {
+        "properties": {
+          "toasterDoneness": {
+            "default": 5,
+            "description": "This variable controls how well-done is the\n      ensuing toast. It should be on a scale of 1 to 10.\n      Toast made at 10 generally is considered unfit\n      for human consumption; toast made at 1 is warmed\n      lightly.",
+            "type": "integer",
+            "example": 1,
+            "format": "int64"
+          },
+          "toasterToastType": {
+            "default": "wheat-bread",
+            "enum": [
+              "toast-type",
+              "frozen-waffle",
+              "wonder-bread",
+              "white-bread",
+              "hash-brown",
+              "frozen-bagel",
+              "wheat-bread"
+            ],
+            "description": "This variable informs the toaster of the type of\n      material that is being toasted. The toaster\n      uses this information, combined with\n      toasterDoneness, to compute for how\n      long the material must be toasted to achieve\n      the required doneness.",
+            "type": "string",
+            "example": "toast-type"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "http://netconfcentral.org/ns/toaster"
+        },
+        "title": "toaster_make-toast_input",
+        "type": "object"
+      },
+      "toaster_toaster": {
+        "properties": {
+          "allow-user": {
+            "description": "A list of user name patterns to allow",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Some allow-user"
+            }
+          },
+          "testToasterBits": {
+            "default": "testbit2",
+            "enum": [
+              "testbit1",
+              "testbit2"
+            ],
+            "description": "",
+            "type": "string",
+            "minItems": 0,
+            "uniqueItems": true
+          },
+          "testUnion": {
+            "description": "",
+            "type": "integer",
+            "example": -2147483648,
+            "format": "int32"
+          },
+          "interval": {
+            "default": 30,
+            "description": "",
+            "type": "integer",
+            "example": 0,
+            "format": "int32"
+          }
+        },
+        "xml": {
+          "name": "toaster",
+          "namespace": "http://netconfcentral.org/ns/toaster"
+        },
+        "description": "Top-level container for all toaster database objects.",
+        "title": "toaster_toaster",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}

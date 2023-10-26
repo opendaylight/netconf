@@ -1,0 +1,228 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "strings-from-regex",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That’s because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/data": {
+      "post": {
+        "tags": [
+          "Controller strings-from-regex"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test": {
+                    "$ref": "#/components/schemas/strings-from-regex_test",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/strings-from-regex_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - strings-from-regex - strings-from-regex"
+      }
+    },
+    "/rests/data/strings-from-regex:test": {
+      "get": {
+        "tags": [
+          "Controller strings-from-regex"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "test": {
+                      "$ref": "#/components/schemas/strings-from-regex_test",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/strings-from-regex_test"
+                }
+              }
+            }
+          }
+        },
+        "description": "",
+        "summary": "GET - Controller - strings-from-regex - test"
+      },
+      "put": {
+        "tags": [
+          "Controller strings-from-regex"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "strings-from-regex:test": {
+                    "$ref": "#/components/schemas/strings-from-regex_test",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/strings-from-regex_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "201": {
+            "description": "Created"
+          }
+        },
+        "description": "",
+        "summary": "PUT - strings-from-regex - Controller - test"
+      },
+      "delete": {
+        "tags": [
+          "Controller strings-from-regex"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "description": "",
+        "summary": "DELETE - Controller - strings-from-regex - test"
+      },
+      "patch": {
+        "tags": [
+          "Controller strings-from-regex"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/strings-from-regex_test"
+              }
+            },
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "strings-from-regex:test": {
+                    "$ref": "#/components/schemas/strings-from-regex_test",
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "description": "",
+        "summary": "PATCH - strings-from-regex - Controller - test"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "strings-from-regex_test": {
+        "properties": {
+          "login-date-time": {
+            "description": "",
+            "type": "string",
+            "example": "0000-00-00T00:00:00Z",
+            "minLength": 0,
+            "maxLength": 2147483647
+          },
+          "mac-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00:00:00:00:00",
+            "minLength": 0,
+            "maxLength": 2147483647
+          },
+          "ipv4-address": {
+            "description": "",
+            "type": "string",
+            "example": "0.0.0.0",
+            "minLength": 0,
+            "maxLength": 2147483647
+          }
+        },
+        "xml": {
+          "name": "test",
+          "namespace": "urn:ietf:params:xml:ns:yang:strings:regex"
+        },
+        "description": "",
+        "title": "strings-from-regex_test",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
