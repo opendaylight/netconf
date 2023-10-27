@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "857c6fd8_727627f1",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-27T14:20:16Z",
+      "side": 1,
+      "message": "assertEquals(expected, actual)",
+      "range": {
+        "startLine": 538,
+        "startChar": 8,
+        "endLine": 538,
+        "endChar": 20
+      },
+      "revId": "e0424169d3a19af138a71fc3bca6350996b3c805",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a0bdc69_66afe0e4",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointSwaggerTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-27T14:20:16Z",
+      "side": 1,
+      "message": "assertEquals(expected, actual)",
+      "revId": "e0424169d3a19af138a71fc3bca6350996b3c805",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
