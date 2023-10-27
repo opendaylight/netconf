@@ -7,32 +7,15 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Optional;
-import org.glassfish.jersey.internal.util.collection.ImmutableMultivaluedMap;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.openapi.DocGenTestHelper;
-import org.opendaylight.restconf.openapi.api.OpenApiService;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
-public class YangDocumentTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    /**
-     * We want flexibility in comparing the resulting JSONs by not enforcing strict ordering of array contents.
-     * This comparison mode allows us to do that and also to restrict extensibility (extensibility = additional fields)
-     */
-    private static final JSONCompareMode IGNORE_ORDER = JSONCompareMode.NON_EXTENSIBLE;
+public class YangDocumentTest extends AbstractDocumentTest {
     private static final String ACTION_TYPES = "action-types";
     private static final String CHOICE_TEST = "choice-test";
     private static final String DEFINITION_TEST = "definition-test";
@@ -55,268 +38,50 @@ public class YangDocumentTest {
     private static final String TYPED_PARAMS = "typed-params";
     private static final String TYPED_PARAMS_REV = "2023-10-24";
 
-    private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
-        .node(QName.create("", "nodes"))
-        .node(QName.create("", "node"))
-        .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
-
-    private static OpenApiService openApiService;
-
-    @BeforeClass
-    public static void beforeClass() {
-        final var schemaService = mock(DOMSchemaService.class);
-        final var context = YangParserTestUtils.parseYangResourceDirectory("/yang/");
-        when(schemaService.getGlobalContext()).thenReturn(context);
-
-        final var mountPoint = mock(DOMMountPoint.class);
-        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
-
-        final var service = mock(DOMMountPointService.class);
-        when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
-
-        final var mountPointRFC8040 = new MountPointOpenApiGeneratorRFC8040(schemaService, service);
-        final var openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(schemaService);
-        mountPointRFC8040.getMountPointOpenApi().onMountPointCreated(INSTANCE_ID);
-        openApiService = new OpenApiServiceImpl(mountPointRFC8040, openApiGeneratorRFC8040);
+    @BeforeAll
+    public static void beforeAll() {
+        initializeClass("/yang/");
     }
 
     /**
-     * Tests the openapi document that is result of the call to the '/single' endpoint.
+     * Tests the swagger document that is result of the call to the '/single' endpoint.
      */
     @Test
     public void getAllModulesDocTest() throws Exception {
-        final var getAllController = DocGenTestHelper.createMockUriInfo("http://localhost:8181/openapi/api/v3/single");
-        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController).getEntity();
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocAll);
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-all.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
+        final var expectedJson = getExpectedDoc("yang-document/controller-all.json");
+        final var allModulesDoc = getAllModulesDoc();
+        JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
     /**
-     * Tests the swagger document that is result of the call to the '/action-types' endpoint.
+     * Tests the swagger document that is result of the call to the '/moduleName' endpoint.
      */
-    @Test
-    public void getDocActionTypesTest() throws Exception {
-        final var getActionTypesController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/action-types");
-        final var controllerDocActionTypes = openApiService.getDocByModule(ACTION_TYPES, null,
-            getActionTypesController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocActionTypes.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-action-types.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
+    @ParameterizedTest
+    @MethodSource("getOperationalParameters")
+    public void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
+            throws Exception {
+        final var expectedJson = getExpectedDoc("yang-document/" + jsonPath);
+        final var moduleDoc = getDocByModule(moduleName, revision);
+        JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
-    /**
-     * Tests the swagger document that is result of the call to the '/choice-test' endpoint.
-     */
-    @Test
-    public void getDocChoiceTest() throws Exception {
-        final var getChoiceTestController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/choice-test");
-        final var controllerDocOperational = openApiService.getDocByModule(CHOICE_TEST, null,
-            getChoiceTestController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-choice-test.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/definition-test' endpoint.
-     */
-    @Test
-    public void getDocDefinitionTest() throws Exception {
-        final var getDefinitionTestController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/definition-test");
-        final var controllerDocOperational = openApiService.getDocByModule(DEFINITION_TEST, null,
-            getDefinitionTestController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-definition-test.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mandatory-test' endpoint.
-     */
-    @Test
-    public void getDocMandatoryTest() throws Exception {
-        final var getMandatoryTestController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mandatory-test");
-        final var controllerDocOperational = openApiService.getDocByModule(MANDATORY_TEST, null,
-            getMandatoryTestController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-mandatory-test.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-
-    /**
-     * Tests the swagger document that is result of the call to the '/my-yang' endpoint.
-     */
-    @Test
-    public void getDocMyYangTest() throws Exception {
-        final var getMyYangController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/my-yang(2022-10-06)");
-        final var controllerDocOperational = openApiService.getDocByModule(MY_YANG, MY_YANG_REV,
-            getMyYangController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-my-yang.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/opflex' endpoint.
-     */
-    @Test
-    public void getDocOpflexTest() throws Exception {
-        final var getOpflexController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/opflex");
-        final var controllerDocOperational = openApiService.getDocByModule(OPFLEX, OPFLEX_REV,
-            getOpflexController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-opflex.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/path-params-test' endpoint.
-     */
-    @Test
-    public void getDocPathParamsTest() throws Exception {
-        final var getPathParamsController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/path-params-test");
-        final var controllerDocOperational = openApiService.getDocByModule(PATH_PARAMS_TEST, null,
-            getPathParamsController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-path-params-test.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/recursive' endpoint.
-     */
-    @Test
-    public void getDocRecursiveTest() throws Exception {
-        final var getRecursiveController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/recursive");
-        final var controllerDocOperational = openApiService.getDocByModule(RECURSIVE, RECURSIVE_REV,
-            getRecursiveController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-recursive.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/string-types' endpoint.
-     */
-    @Test
-    public void getDocStringTypesTest() throws Exception {
-        final var getStringTypesController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/string-types");
-        final var controllerDocOperational = openApiService.getDocByModule(STRING_TYPES, null,
-            getStringTypesController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-string-types.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/string-from-regex' endpoint.
-     */
-    @Test
-    public void getDocStringFromRegexTest() throws Exception {
-        final var getStringFromRegexController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/string-from-regex");
-        final var controllerDocOperational = openApiService.getDocByModule(STRINGS_FROM_REGEX, null,
-            getStringFromRegexController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-string-from-regex.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/toaster' endpoint.
-     */
-    @Test
-    public void getDocToasterTest() throws Exception {
-        final var getToasterController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/toaster");
-        final var controllerDocOperational = openApiService.getDocByModule(TOASTER, TOASTER_REV,
-            getToasterController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-toaster.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/toaster-augmented' endpoint.
-     */
-    @Test
-    public void getDocToasterAugmentedTest() throws Exception {
-        final var getToasterAugmentedController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/toaster-augmented");
-        final var controllerDocOperational = openApiService.getDocByModule(TOASTER_AUGMENTED, TOASTER_AUGMENTED_REV,
-            getToasterAugmentedController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-toaster-augmented.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/toaster-short' endpoint.
-     */
-    @Test
-    public void getDocToasterShortTest() throws Exception {
-        final var getToasterShortController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/toaster2");
-        final var controllerDocOperational = openApiService.getDocByModule(TOASTER_SHORT, TOASTER_SHORT_REV,
-            getToasterShortController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-toaster2.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/typed-params' endpoint.
-     */
-    @Test
-    public void getDocTypedParamsTest() throws Exception {
-        final var getTypedParamsController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/typed-params");
-        final var controllerDocOperational = openApiService.getDocByModule(TYPED_PARAMS, TYPED_PARAMS_REV,
-            getTypedParamsController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/controller-typed-params.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
+    private static Stream<Arguments> getOperationalParameters() {
+        return Stream.of(
+            Arguments.of(ACTION_TYPES, null, "controller-action-types.json"),
+            Arguments.of(CHOICE_TEST, null, "controller-choice-test.json"),
+            Arguments.of(DEFINITION_TEST, null, "controller-definition-test.json"),
+            Arguments.of(MANDATORY_TEST, null, "controller-mandatory-test.json"),
+            Arguments.of(MY_YANG, MY_YANG_REV, "controller-my-yang.json"),
+            Arguments.of(OPFLEX, OPFLEX_REV, "controller-opflex.json"),
+            Arguments.of(PATH_PARAMS_TEST, null, "controller-path-params-test.json"),
+            Arguments.of(RECURSIVE, RECURSIVE_REV, "controller-recursive.json"),
+            Arguments.of(STRING_TYPES, null, "controller-string-types.json"),
+            Arguments.of(STRINGS_FROM_REGEX, null, "controller-string-from-regex.json"),
+            Arguments.of(TOASTER, TOASTER_REV, "controller-toaster.json"),
+            Arguments.of(TOASTER_AUGMENTED, TOASTER_AUGMENTED_REV, "controller-toaster-augmented.json"),
+            Arguments.of(TOASTER_SHORT, TOASTER_SHORT_REV, "controller-toaster2.json"),
+            Arguments.of(TYPED_PARAMS, TYPED_PARAMS_REV, "controller-typed-params.json")
+        );
     }
 
     /**
@@ -324,237 +89,40 @@ public class YangDocumentTest {
      */
     @Test
     public void getMountDocTest() throws Exception {
-        final var getAllDevice = DocGenTestHelper.createMockUriInfo("http://localhost:8181/openapi/api/v3/mounts/1");
-        when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
-        final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocAll.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-all.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
+        final var expectedJson = getExpectedDoc("yang-document/device-all.json");
+        final var allModulesDoc = getMountDoc();
+        JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
     /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/action-types' endpoint.
+     * Tests the swagger document that is result of the call to the '/mounts/1/moduleName' endpoint.
      */
-    @Test
-    public void getMountDocActionTypesTest() throws Exception {
-        final var getActionTypesDevice = DocGenTestHelper.createMockUriInfo("http://localhost:8181/openapi/api/v3/mounts/1/action-types");
-        final var deviceDocActionTypes = openApiService.getMountDocByModule("1", ACTION_TYPES, null,
-            getActionTypesDevice);
+    @ParameterizedTest
+    @MethodSource("getOperationalMountParameters")
+    public void getMountDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
+            throws Exception {
+        final var expectedJson = getExpectedDoc("yang-document/" + jsonPath);
+        final var moduleDoc = getMountDocByModule(moduleName, revision);
+        JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
 
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocActionTypes.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-action-types.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
     }
 
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/choice-test' endpoint.
-     */
-    @Test
-    public void getMountDocChoiceTest() throws Exception {
-        final var getChoiceTestDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/choice-test");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", CHOICE_TEST, null,
-            getChoiceTestDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-choice-test.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/definition-test' endpoint.
-     */
-    @Test
-    public void getMountDocDefinitionTest() throws Exception {
-        final var getDefinitionTestDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/definition-test");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", DEFINITION_TEST, null,
-            getDefinitionTestDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-definition-test.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/mandatory-test' endpoint.
-     */
-    @Test
-    public void getMountDocMandatoryTest() throws Exception {
-        final var getMandatoryTestDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/mandatory-test");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", MANDATORY_TEST, null,
-            getMandatoryTestDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-mandatory-test.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/my-yang' endpoint.
-     */
-    @Test
-    public void getMountDocMyYangTest() throws Exception {
-        final var getMyYangDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/my-yang(2022-10-06)");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", MY_YANG, MY_YANG_REV,
-            getMyYangDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-my-yang.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/opflex' endpoint.
-     */
-    @Test
-    public void getMountDocOpflexTest() throws Exception {
-        final var getOpflexDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/opflex");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", OPFLEX, OPFLEX_REV,
-            getOpflexDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-opflex.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/path-params-test' endpoint.
-     */
-    @Test
-    public void getMountDocPathParamsTest() throws Exception {
-        final var getPathParamsDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/path-params-test");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", PATH_PARAMS_TEST, null,
-            getPathParamsDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-path-params-test.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/recursive' endpoint.
-     */
-    @Test
-    public void getMountDocRecursiveTest() throws Exception {
-        final var getRecursiveDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/recursive");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", RECURSIVE, RECURSIVE_REV,
-            getRecursiveDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-recursive.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/string-types' endpoint.
-     */
-    @Test
-    public void getMountDocStringTypesTest() throws Exception {
-        final var getStringTypesDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/string-types");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", STRING_TYPES, null,
-            getStringTypesDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-string-types.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/string-from-regex' endpoint.
-     */
-    @Test
-    public void getMountDocStringFromRegexTest() throws Exception {
-        final var getStringFromRegexDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/string-from-regex");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", STRINGS_FROM_REGEX, null,
-            getStringFromRegexDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-string-from-regex.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/toaster' endpoint.
-     */
-    @Test
-    public void getMountDocToasterTest() throws Exception {
-        final var getToasterDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/toaster");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", TOASTER, TOASTER_REV,
-            getToasterDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-toaster.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/toaster-augmented' endpoint.
-     */
-    @Test
-    public void getMountDocToasterAugmentedTest() throws Exception {
-        final var getToasterAugmentedDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/toaster-augmented");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", TOASTER_AUGMENTED,
-            TOASTER_AUGMENTED_REV, getToasterAugmentedDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-toaster-augmented.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/toaster-short' endpoint.
-     */
-    @Test
-    public void getMountDocToasterShortTest() throws Exception {
-        final var getToasterShortDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/toaster2");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", TOASTER_SHORT, TOASTER_SHORT_REV,
-            getToasterShortDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-toaster2.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/typed-params' endpoint.
-     */
-    @Test
-    public void getMountDocTypedParamsTest() throws Exception {
-        final var getTypedParamsDevice = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/mounts/1/typed-params");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", TYPED_PARAMS, TYPED_PARAMS_REV,
-            getTypedParamsDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("yang-document/device-typed-params.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
+    private static Stream<Arguments> getOperationalMountParameters() {
+        return Stream.of(
+            Arguments.of(ACTION_TYPES, null, "device-action-types.json"),
+            Arguments.of(CHOICE_TEST, null, "device-choice-test.json"),
+            Arguments.of(DEFINITION_TEST, null, "device-definition-test.json"),
+            Arguments.of(MANDATORY_TEST, null, "device-mandatory-test.json"),
+            Arguments.of(MY_YANG, MY_YANG_REV, "device-my-yang.json"),
+            Arguments.of(OPFLEX, OPFLEX_REV, "device-opflex.json"),
+            Arguments.of(PATH_PARAMS_TEST, null, "device-path-params-test.json"),
+            Arguments.of(RECURSIVE, RECURSIVE_REV, "device-recursive.json"),
+            Arguments.of(STRING_TYPES, null, "device-string-types.json"),
+            Arguments.of(STRINGS_FROM_REGEX, null, "device-string-from-regex.json"),
+            Arguments.of(TOASTER, TOASTER_REV, "device-toaster.json"),
+            Arguments.of(TOASTER_AUGMENTED, TOASTER_AUGMENTED_REV, "device-toaster-augmented.json"),
+            Arguments.of(TOASTER_SHORT, TOASTER_SHORT_REV, "device-toaster2.json"),
+            Arguments.of(TYPED_PARAMS, TYPED_PARAMS_REV, "device-typed-params.json")
+        );
     }
 }
