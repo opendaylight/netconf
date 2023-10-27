@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b68eb43f_8051ba3b",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorRFC8040Test.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-10-27T19:15:18Z",
+      "side": 1,
+      "message": "Split to 2 seperate asserts with expected values",
+      "parentUuid": "02be042b_eef63528",
+      "revId": "dbb582c76094f2fdc6f129dd5e85ac3b8fa4bf0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a558a2ab_b313315b",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-10-27T14:20:00Z",
       "side": 1,
       "message": "assertEquals(expected, actual)",
+      "revId": "dbb582c76094f2fdc6f129dd5e85ac3b8fa4bf0e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc09a291_ab3d0d7f",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/netconf/sal/rest/doc/impl/MountPointSwaggerTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-10-27T19:15:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a558a2ab_b313315b",
       "revId": "dbb582c76094f2fdc6f129dd5e85ac3b8fa4bf0e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
