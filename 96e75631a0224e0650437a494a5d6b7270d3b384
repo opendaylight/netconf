@@ -72,6 +72,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88c9bc4f_b5d408ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-10-27T14:28:10Z",
+      "side": 1,
+      "message": "Yes, NetconfDevice should be connected only once. The issue arises when NetconfDevice is unexpectedly closed during the process of preparing the EffectiveModelContext for the device. This doesn\u0027t prevent further calls to salFacade.onDeviceConnected() after the EffectiveModelContext has been prepared.",
+      "parentUuid": "9c87aa8d_37788968",
+      "revId": "96e75631a0224e0650437a494a5d6b7270d3b384",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a2e11bf_9a7d44c5",

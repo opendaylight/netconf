@@ -52,6 +52,24 @@
       "parentUuid": "cffe3eba_7ddc2705",
       "revId": "1a3587f8d12d55b5630fa3bdae959639f4aba08e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f97a64d2_60e9e76e",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-10-27T14:28:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "33a38fdb_76085334",
+      "revId": "1a3587f8d12d55b5630fa3bdae959639f4aba08e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
