@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0efbea8_26efaa15",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/DefaultNetconfClientConfigurationBuilderFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-27T14:26:58Z",
+      "side": 1,
+      "message": "this stuff should be pushed down into aaa, so that it has proper interface and users are not bothered by the concrete exceptions -- there\u0027s no recovery anyway, right?",
+      "range": {
+        "startLine": 116,
+        "startChar": 24,
+        "endLine": 116,
+        "endChar": 43
+      },
+      "revId": "c13c8879e3da7b5a599558825e1994098580ee61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
