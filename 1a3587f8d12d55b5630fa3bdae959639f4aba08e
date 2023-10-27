@@ -34,6 +34,24 @@
       "message": "IMO we can rework this to be boolean by checking the state.",
       "revId": "1a3587f8d12d55b5630fa3bdae959639f4aba08e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33a38fdb_76085334",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-27T11:25:05Z",
+      "side": 1,
+      "message": "Or, maybe, let\u0027s cancel `EffectiveModelContext` computation when device is set to be disconnected. We do not care about it anymore:\nhttps://www.baeldung.com/java-future#2-canceling-a-future-with-cancel",
+      "parentUuid": "cffe3eba_7ddc2705",
+      "revId": "1a3587f8d12d55b5630fa3bdae959639f4aba08e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
