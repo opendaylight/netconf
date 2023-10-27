@@ -7,57 +7,21 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Optional;
-import org.glassfish.jersey.internal.util.collection.ImmutableMultivaluedMap;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.openapi.DocGenTestHelper;
-import org.opendaylight.restconf.openapi.api.OpenApiService;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
-public class OperationalDocumentTest {
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    /**
-     * We want flexibility in comparing the resulting JSONs by not enforcing strict ordering of array contents.
-     * This comparison mode allows us to do that and also to restrict extensibility (extensibility = additional fields)
-     */
-    private static final JSONCompareMode IGNORE_ORDER = JSONCompareMode.NON_EXTENSIBLE;
+public class OperationalDocumentTest extends AbstractDocumentTest {
     private static final String ACTION_TYPES = "action-types";
     private static final String OPERATIONAL = "operational";
-    private static final YangInstanceIdentifier INSTANCE_ID = YangInstanceIdentifier.builder()
-        .node(QName.create("", "nodes"))
-        .node(QName.create("", "node"))
-        .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
 
-    private static OpenApiService openApiService;
-
-    @BeforeClass
-    public static void beforeClass() {
-        final var schemaService = mock(DOMSchemaService.class);
-        final var context = YangParserTestUtils.parseYangResourceDirectory("/operational/");
-        when(schemaService.getGlobalContext()).thenReturn(context);
-
-        final var mountPoint = mock(DOMMountPoint.class);
-        when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
-
-        final var service = mock(DOMMountPointService.class);
-        when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
-
-        final var mountPointRFC8040 = new MountPointOpenApiGeneratorRFC8040(schemaService, service);
-        final var openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(schemaService);
-        mountPointRFC8040.getMountPointOpenApi().onMountPointCreated(INSTANCE_ID);
-        openApiService = new OpenApiServiceImpl(mountPointRFC8040, openApiGeneratorRFC8040);
+    @BeforeAll
+    public static void beforeAll() {
+        initializeClass("/operational/");
     }
 
     /**
@@ -65,46 +29,29 @@ public class OperationalDocumentTest {
      */
     @Test
     public void getAllModulesDocTest() throws Exception {
-        final var getAllController = DocGenTestHelper.createMockUriInfo("http://localhost:8181/openapi/api/v3/single");
-        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController).getEntity();
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocAll);
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("operational-document/controller-all.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
-    }
-
-    /**
-     * Tests the swagger document that is result of the call to the '/action-types' endpoint.
-     */
-    @Test
-    public void getDocActionTypesTest() throws Exception {
-        final var getActionTypesController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/action-types");
-        final var controllerDocActionTypes = openApiService.getDocByModule(ACTION_TYPES, null,
-            getActionTypesController);
-
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocActionTypes.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream(
-                "operational-document/controller-action-types.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
+        final var expectedJson = getExpectedDoc("operational-document/controller-all.json");
+        final var allModulesDoc = getAllModulesDoc();
+        JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
     /**
      * Tests the swagger document that is result of the call to the '/operational' endpoint.
      */
-    @Test
-    public void getDocOperationalTest() throws Exception {
-        final var getOperationalController = DocGenTestHelper.createMockUriInfo(
-            "http://localhost:8181/openapi/api/v3/operational");
-        final var controllerDocOperational = openApiService.getDocByModule(OPERATIONAL, null,
-            getOperationalController);
+    @ParameterizedTest
+    @MethodSource("getOperationalParameters")
+    public void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
+            throws Exception {
+        final var expectedJson = getExpectedDoc("operational-document/" + jsonPath);
+        final var moduleDoc = getDocByModule(moduleName, revision);
+        JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
+    }
 
-        final var jsonControllerDoc = MAPPER.writeValueAsString(controllerDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("operational-document/controller-operational.json")));
-        JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
+    static Stream<Arguments> getOperationalParameters() {
+        // moduleName, revision, jsonPath
+        return Stream.of(
+            Arguments.of(ACTION_TYPES, null, "controller-action-types.json"),
+            Arguments.of(OPERATIONAL, null, "controller-operational.json")
+        );
     }
 
     /**
@@ -112,43 +59,29 @@ public class OperationalDocumentTest {
      */
     @Test
     public void getMountDocTest() throws Exception {
-        final var getAllDevice = DocGenTestHelper.createMockUriInfo("http://localhost:8181/openapi/api/v3/mounts/1");
-        when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
-        final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocAll.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("operational-document/device-all.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
+        final var expectedJson = getExpectedDoc("operational-document/device-all.json");
+        final var allModulesDoc = getMountDoc();
+        JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
     /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/action-types' endpoint.
+     * Tests the swagger document that is result of the call to the '/mounts/1/moduleName' endpoint.
      */
-    @Test
-    public void getMountDocActionTypesTest() throws Exception {
-        final var getActionTypesDevice = DocGenTestHelper.createMockUriInfo("http://localhost:8181/openapi/api/v3/mounts/1/action-types");
-        final var deviceDocActionTypes = openApiService.getMountDocByModule("1", ACTION_TYPES, null,
-            getActionTypesDevice);
+    @ParameterizedTest
+    @MethodSource("getOperationalMountParameters")
+    public void getMountDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
+            throws Exception {
+        final var expectedJson = getExpectedDoc("operational-document/" + jsonPath);
+        final var moduleDoc = getMountDocByModule(moduleName, revision);
+        JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
 
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocActionTypes.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("operational-document/device-action-types.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
     }
 
-    /**
-     * Tests the swagger document that is result of the call to the '/mounts/1/operational' endpoint.
-     */
-    @Test
-    public void getMountDocOperationalTest() throws Exception {
-        final var getOperationalDevice = DocGenTestHelper.createMockUriInfo("http://localhost:8181/openapi/api/v3/mounts/1/operational");
-        final var deviceDocOperational = openApiService.getMountDocByModule("1", OPERATIONAL, null,
-            getOperationalDevice);
-
-        final var jsonDeviceDoc = MAPPER.writeValueAsString(deviceDocOperational.getEntity());
-        final var expectedJson = MAPPER.writeValueAsString(MAPPER.readTree(
-            getClass().getClassLoader().getResourceAsStream("operational-document/device-operational.json")));
-        JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
+    static Stream<Arguments> getOperationalMountParameters() {
+        // moduleName, revision, jsonPath
+        return Stream.of(
+            Arguments.of(ACTION_TYPES, null, "device-action-types.json"),
+            Arguments.of(OPERATIONAL, null, "device-operational.json")
+        );
     }
 }
