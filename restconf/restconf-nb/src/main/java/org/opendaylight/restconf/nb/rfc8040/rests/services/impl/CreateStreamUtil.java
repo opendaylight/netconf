@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import com.google.common.collect.ImmutableSet;
+import java.util.Optional;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -16,6 +17,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
@@ -94,7 +96,7 @@ final class CreateStreamUtil {
      *                  }
      *              }
      *              </pre>
-     * @param refSchemaCtx Reference to {@link EffectiveModelContext}.
+     * @param modelContext Reference to {@link EffectiveModelContext}.
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON:
      *     <pre>
      *     {@code
@@ -107,24 +109,24 @@ final class CreateStreamUtil {
      *     </pre>
      */
     // FIXME: this really should be a normal RPC implementation
-    static ContainerNode createDataChangeNotifiStream(final ListenersBroker listenersBroker, final ContainerNode input,
-            final EffectiveModelContext refSchemaCtx) {
+    static RestconfFuture<Optional<ContainerNode>> createDataChangeNotifiStream(final ListenersBroker listenersBroker,
+            final ContainerNode input, final EffectiveModelContext modelContext) {
         final var datastoreName = extractStringLeaf(input, DATASTORE_NODEID);
         final var scopeName = extractStringLeaf(input, SCOPE_NODEID);
-        final var adapter = listenersBroker.registerDataChangeListener(refSchemaCtx,
+        final var adapter = listenersBroker.registerDataChangeListener(modelContext,
             datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName) : LogicalDatastoreType.CONFIGURATION,
             preparePath(input), scopeName != null ? Scope.ofName(scopeName) : Scope.BASE, prepareOutputType(input));
 
         // building of output
-        return Builders.containerBuilder()
+        return RestconfFuture.of(Optional.of(Builders.containerBuilder()
             .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
             .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, adapter.getStreamName()))
-            .build();
+            .build()));
     }
 
     // FIXME: this really should be a normal RPC implementation
-    static ContainerNode createNotificationStream(final ListenersBroker listenersBroker, final ContainerNode input,
-            final EffectiveModelContext refSchemaCtx) {
+    static RestconfFuture<Optional<ContainerNode>> createNotificationStream(final ListenersBroker listenersBroker,
+            final ContainerNode input, final EffectiveModelContext modelContext) {
         final var qnames = ((LeafSetNode<String>) input.getChildByArg(NOTIFICATIONS)).body().stream()
             .map(LeafSetEntryNode::body)
             .map(QName::create)
@@ -132,20 +134,20 @@ final class CreateStreamUtil {
             .collect(ImmutableSet.toImmutableSet());
 
         for (var qname : qnames) {
-            if (refSchemaCtx.findNotification(qname).isEmpty()) {
+            if (modelContext.findNotification(qname).isEmpty()) {
                 throw new RestconfDocumentedException(qname + " refers to an unknown notification",
                     ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
             }
         }
 
         // registration of the listener
-        final var adapter = listenersBroker.registerNotificationListener(refSchemaCtx, qnames,
+        final var adapter = listenersBroker.registerNotificationListener(modelContext, qnames,
             prepareOutputType(input));
 
-        return Builders.containerBuilder()
+        return RestconfFuture.of(Optional.of(Builders.containerBuilder()
             .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
             .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, adapter.getStreamName()))
-            .build();
+            .build()));
     }
 
     /**
@@ -158,9 +160,9 @@ final class CreateStreamUtil {
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
     // FIXME: this should be an RPC invocation
-    static ContainerNode createDeviceNotificationListener(final String baseUrl, final ContainerNode input,
-            final SubscribeToStreamUtil streamUtil, final DOMMountPointService mountPointService,
-            final ListenersBroker listenersBroker) {
+    static RestconfFuture<Optional<ContainerNode>> createDeviceNotificationListener(
+            final ListenersBroker listenersBroker, final ContainerNode input, final String baseUrl,
+            final DOMMountPointService mountPointService) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
         final var path = (YangInstanceIdentifier) input.findChildByArg(DEVICE_NOTIFICATION_PATH_NODEID)
@@ -203,12 +205,12 @@ final class CreateStreamUtil {
             prepareOutputType(input), mountModelContext, mountPointService, mountPoint.getIdentifier());
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 
-        return Builders.containerBuilder()
+        return RestconfFuture.of(Optional.of(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
             .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH,
                 baseUrl + notificationListenerAdapter.getStreamName() + "?"
                     + RestconfStreamsConstants.NOTIFICATION_TYPE + "=" + RestconfStreamsConstants.DEVICE))
-            .build();
+            .build()));
     }
 
     /**
