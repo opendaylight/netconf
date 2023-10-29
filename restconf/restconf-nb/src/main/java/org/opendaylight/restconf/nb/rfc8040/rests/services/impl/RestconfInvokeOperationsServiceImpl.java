@@ -154,7 +154,6 @@ public final class RestconfInvokeOperationsServiceImpl {
                     .orElseGet(() -> Response.noContent().build());
             }
         });
-
     }
 
     private RestconfFuture<Optional<ContainerNode>> hackInvokeRpc(final DatabindContext localDatabind,
@@ -165,15 +164,14 @@ public final class RestconfInvokeOperationsServiceImpl {
         if (mountPoint == null) {
             // Hacked-up integration of streams
             if (CreateDataChangeEventSubscription.QNAME.equals(type)) {
-                return RestconfFuture.of(Optional.of(CreateStreamUtil.createDataChangeNotifiStream(
-                    streamUtils.listenersBroker(), input, localDatabind.modelContext())));
+                return CreateStreamUtil.createDataChangeNotifiStream(streamUtils.listenersBroker(), input,
+                    localDatabind.modelContext());
             } else if (CreateNotificationStream.QNAME.equals(type)) {
-                return RestconfFuture.of(Optional.of(CreateStreamUtil.createNotificationStream(
-                    streamUtils.listenersBroker(), input, localDatabind.modelContext())));
+                return CreateStreamUtil.createNotificationStream(streamUtils.listenersBroker(), input,
+                    localDatabind.modelContext());
             } else if (SubscribeDeviceNotification.QNAME.equals(type)) {
-                final var baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
-                return RestconfFuture.of(Optional.of(CreateStreamUtil.createDeviceNotificationListener(baseUrl, input,
-                    streamUtils, mountPointService, listenersBroker)));
+                return CreateStreamUtil.createDeviceNotificationListener(listenersBroker, input,
+                    streamUtils.prepareUriByStreamName(uriInfo, "").toString(), mountPointService);
             }
         }
 
