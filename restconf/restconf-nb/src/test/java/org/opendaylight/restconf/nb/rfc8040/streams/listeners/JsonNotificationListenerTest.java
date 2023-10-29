@@ -164,8 +164,8 @@ public class JsonNotificationListenerTest extends AbstractNotificationListenerTe
 
     private String prepareJson(final DOMNotification notificationData, final QName schemaPathNotifi)
             throws Exception {
-        final var notifiAdapter = listenersBroker.registerNotificationListener(ImmutableSet.of(schemaPathNotifi),
-            "json-stream", NotificationOutputType.JSON);
-        return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
+        final var notifiAdapter = listenersBroker.registerNotificationListener(MODEL_CONTEXT,
+            ImmutableSet.of(schemaPathNotifi), NotificationOutputType.JSON);
+        return notifiAdapter.formatter().eventData(MODEL_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }
 }

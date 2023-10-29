@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.AbstractNotificationListenerTest.MODEL_CONTEXT;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.net.URI;
@@ -20,12 +21,12 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -35,23 +36,21 @@ import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.AbstractNotificationListenerTest;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class RestconfStreamsSubscriptionServiceImplTest {
+public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotificationListenerTest {
     private static final String URI = "/rests/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
             + "toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
-
-    private static EffectiveModelContext MODEL_CONTEXT;
 
     @Mock
     private DOMDataBroker dataBroker;
@@ -65,17 +64,12 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     private StreamsConfiguration configurationSse;
     private DatabindProvider databindProvider;
 
-    @BeforeClass
-    public static void beforeClass() {
-        MODEL_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/notifications");
-    }
 
     @Before
     public void setUp() throws URISyntaxException {
-        final var name = "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
-        listenersBroker.registerDataChangeListener(
+        listenersBroker.registerDataChangeListener(MODEL_CONTEXT, LogicalDatastoreType.OPERATIONAL,
             YangInstanceIdentifier.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster")),
-            name, NotificationOutputType.JSON);
+            Scope.ONE, NotificationOutputType.JSON);
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
         doReturn(wTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
@@ -98,10 +92,9 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Test
     public void testSubscribeToStreamSSE() {
-        listenersBroker.registerDataChangeListener(
-                IdentifierCodec.deserialize("toaster:toaster/toasterStatus", MODEL_CONTEXT),
-                "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
-                NotificationOutputType.XML);
+        listenersBroker.registerDataChangeListener(MODEL_CONTEXT, LogicalDatastoreType.OPERATIONAL,
+            IdentifierCodec.deserialize("toaster:toaster/toasterStatus", MODEL_CONTEXT), Scope.ONE,
+            NotificationOutputType.XML);
         final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
             notificationService, databindProvider, listenersBroker, configurationSse);
         final var response = streamsSubscriptionService.subscribeToStream(
@@ -113,10 +106,9 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Test
     public void testSubscribeToStreamWS() {
-        listenersBroker.registerDataChangeListener(
-                IdentifierCodec.deserialize("toaster:toaster/toasterStatus", MODEL_CONTEXT),
-                "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
-                NotificationOutputType.XML);
+        listenersBroker.registerDataChangeListener(MODEL_CONTEXT, LogicalDatastoreType.OPERATIONAL,
+            IdentifierCodec.deserialize("toaster:toaster/toasterStatus", MODEL_CONTEXT), Scope.ONE,
+            NotificationOutputType.XML);
         final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
             notificationService, databindProvider, listenersBroker, configurationWs);
         final var response = streamsSubscriptionService.subscribeToStream(
@@ -128,9 +120,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Test
     public void testSubscribeToStreamMissingDatastoreInPath() {
-        final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
-                new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider,
-                    listenersBroker, configurationWs);
+        final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
+            notificationService, databindProvider, listenersBroker, configurationWs);
         final var errors = assertThrows(RestconfDocumentedException.class,
             () -> streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", uriInfo))
             .getErrors();
@@ -143,9 +134,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @Test
     public void testSubscribeToStreamMissingScopeInPath() {
-        final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
-                new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider,
-                    listenersBroker, configurationWs);
+        final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
+            notificationService, databindProvider, listenersBroker, configurationWs);
         final var errors = assertThrows(RestconfDocumentedException.class,
             () -> streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 uriInfo)).getErrors();

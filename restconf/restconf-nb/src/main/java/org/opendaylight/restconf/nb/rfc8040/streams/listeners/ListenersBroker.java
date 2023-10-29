@@ -18,14 +18,21 @@ import java.util.concurrent.locks.StampedLock;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
@@ -135,20 +142,24 @@ public final class ListenersBroker {
      * hasn't been created yet.
      *
      * @param path       Path to data in data repository.
-     * @param streamName Stream name.
      * @param outputType Specific type of output for notifications - XML or JSON.
      * @return Created or existing data-change listener adapter.
      */
-    public ListenerAdapter registerDataChangeListener(final YangInstanceIdentifier path, final String streamName,
+    public ListenerAdapter registerDataChangeListener(final EffectiveModelContext modelContext,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final Scope scope,
             final NotificationOutputType outputType) {
-        requireNonNull(path);
-        requireNonNull(streamName);
-        requireNonNull(outputType);
+        final var sb = new StringBuilder(RestconfStreamsConstants.DATA_SUBSCRIPTION)
+            .append('/').append(createStreamNameFromUri(IdentifierCodec.serialize(path, modelContext)))
+            .append('/').append(RestconfStreamsConstants.DATASTORE_PARAM_NAME).append('=').append(datastore)
+            .append('/').append(RestconfStreamsConstants.SCOPE_PARAM_NAME).append('=').append(scope);
+        if (outputType != NotificationOutputType.XML) {
+            sb.append('/').append(outputType.getName());
+        }
 
         final long stamp = dataChangeListenersLock.writeLock();
         try {
-            return dataChangeListeners.computeIfAbsent(streamName,
-                stream -> new ListenerAdapter(path, stream, outputType, this));
+            return dataChangeListeners.computeIfAbsent(sb.toString(),
+                streamName -> new ListenerAdapter(path, streamName, outputType, this));
         } finally {
             dataChangeListenersLock.unlockWrite(stamp);
         }
@@ -163,16 +174,37 @@ public final class ListenersBroker {
      * @param outputType Specific type of output for notifications - XML or JSON.
      * @return Created or existing notification listener adapter.
      */
-    public NotificationListenerAdapter registerNotificationListener(final ImmutableSet<QName> notifications,
-            final String streamName, final NotificationOutputType outputType) {
-        requireNonNull(notifications);
-        requireNonNull(streamName);
-        requireNonNull(outputType);
+    public NotificationListenerAdapter registerNotificationListener(final EffectiveModelContext refSchemaCtx,
+            final ImmutableSet<QName> notifications, final NotificationOutputType outputType) {
+        final var sb = new StringBuilder(RestconfStreamsConstants.NOTIFICATION_STREAM).append('/');
+        var haveFirst = false;
+        for (var qname : notifications) {
+            final var module = refSchemaCtx.findModuleStatement(qname.getModule())
+                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown module",
+                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+            final var stmt = module.findSchemaTreeNode(qname)
+                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an notification",
+                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+            if (!(stmt instanceof NotificationEffectiveStatement)) {
+                throw new RestconfDocumentedException(qname + " refers to a non-notification",
+                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+            }
+
+            if (haveFirst) {
+                sb.append(',');
+            } else {
+                haveFirst = true;
+            }
+            sb.append(module.argument().getLocalName()).append(':').append(qname.getLocalName());
+        }
+        if (outputType != NotificationOutputType.XML) {
+            sb.append('/').append(outputType.getName());
+        }
 
         final long stamp = notificationListenersLock.writeLock();
         try {
-            return notificationListeners.computeIfAbsent(streamName,
-                stream -> new NotificationListenerAdapter(notifications, stream, outputType, this));
+            return notificationListeners.computeIfAbsent(sb.toString(),
+                streamName -> new NotificationListenerAdapter(notifications, streamName, outputType, this));
         } finally {
             notificationListenersLock.unlockWrite(stamp);
         }
@@ -182,20 +214,19 @@ public final class ListenersBroker {
      * Creates new {@link DeviceNotificationListenerAdaptor} listener using input stream name and schema path
      * if such listener haven't been created yet.
      *
-     * @param streamName Stream name.
+     * @param deviceName Device name.
      * @param outputType Specific type of output for notifications - XML or JSON.
      * @param refSchemaCtx Schema context of node
      * @param mountPointService Mount point service
      * @return Created or existing device notification listener adapter.
      */
-    public DeviceNotificationListenerAdaptor registerDeviceNotificationListener(final String streamName,
-        final NotificationOutputType outputType, final EffectiveModelContext refSchemaCtx,
-        final DOMMountPointService mountPointService, final YangInstanceIdentifier path) {
-
+    public DeviceNotificationListenerAdaptor registerDeviceNotificationListener(final String deviceName,
+            final NotificationOutputType outputType, final EffectiveModelContext refSchemaCtx,
+            final DOMMountPointService mountPointService, final YangInstanceIdentifier path) {
         final long stamp = deviceNotificationListenersLock.writeLock();
         try {
-            return deviceNotificationListeners.computeIfAbsent(streamName,
-                stream -> new DeviceNotificationListenerAdaptor(streamName, outputType, refSchemaCtx,
+            return deviceNotificationListeners.computeIfAbsent(deviceName,
+                streamName -> new DeviceNotificationListenerAdaptor(deviceName, outputType, refSchemaCtx,
                     mountPointService, path, this));
         } finally {
             deviceNotificationListenersLock.unlockWrite(stamp);

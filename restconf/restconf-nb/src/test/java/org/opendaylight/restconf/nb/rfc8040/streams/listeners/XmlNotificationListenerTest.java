@@ -156,8 +156,8 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
 
     private String prepareXmlResult(final DOMNotification notificationData, final QName schemaPathNotifi)
             throws Exception {
-        final var notifiAdapter = listenersBroker.registerNotificationListener(ImmutableSet.of(schemaPathNotifi),
-            "xml-stream", NotificationOutputType.XML);
-        return notifiAdapter.formatter().eventData(SCHEMA_CONTEXT, notificationData, Instant.now()).orElseThrow();
+        final var notifiAdapter = listenersBroker.registerNotificationListener(MODEL_CONTEXT,
+            ImmutableSet.of(schemaPathNotifi), NotificationOutputType.XML);
+        return notifiAdapter.formatter().eventData(MODEL_CONTEXT, notificationData, Instant.now()).orElseThrow();
     }
 }

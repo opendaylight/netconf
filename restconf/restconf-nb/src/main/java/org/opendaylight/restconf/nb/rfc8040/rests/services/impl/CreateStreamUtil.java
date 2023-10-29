@@ -7,11 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.collect.ImmutableSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -21,9 +17,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.DeviceNotificationListenerAdaptor;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
@@ -115,25 +109,16 @@ final class CreateStreamUtil {
     // FIXME: this really should be a normal RPC implementation
     static ContainerNode createDataChangeNotifiStream(final ListenersBroker listenersBroker, final ContainerNode input,
             final EffectiveModelContext refSchemaCtx) {
-        // parsing out of container with settings and path
-        final YangInstanceIdentifier path = preparePath(input);
-
-        // building of stream name
-        final StringBuilder streamNameBuilder = new StringBuilder(
-                prepareDataChangeNotifiStreamName(path, requireNonNull(refSchemaCtx), input));
-        final NotificationOutputType outputType = prepareOutputType(input);
-        if (outputType.equals(NotificationOutputType.JSON)) {
-            streamNameBuilder.append('/').append(outputType.getName());
-        }
-        final String streamName = streamNameBuilder.toString();
-
-        // registration of the listener
-        listenersBroker.registerDataChangeListener(path, streamName, outputType);
+        final var datastoreName = extractStringLeaf(input, DATASTORE_NODEID);
+        final var scopeName = extractStringLeaf(input, SCOPE_NODEID);
+        final var adapter = listenersBroker.registerDataChangeListener(refSchemaCtx,
+            datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName) : LogicalDatastoreType.CONFIGURATION,
+            preparePath(input), scopeName != null ? Scope.ofName(scopeName) : Scope.BASE, prepareOutputType(input));
 
         // building of output
         return Builders.containerBuilder()
             .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
-            .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, streamName))
+            .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, adapter.getStreamName()))
             .build();
     }
 
@@ -146,40 +131,20 @@ final class CreateStreamUtil {
             .sorted()
             .collect(ImmutableSet.toImmutableSet());
 
-        final var streamNameBuilder = new StringBuilder(RestconfStreamsConstants.NOTIFICATION_STREAM).append('/');
-        var haveFirst = false;
         for (var qname : qnames) {
-            final var module = refSchemaCtx.findModuleStatement(qname.getModule())
-                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown module",
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
-            final var stmt = module.findSchemaTreeNode(qname)
-                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an notification",
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
-            if (!(stmt instanceof NotificationEffectiveStatement)) {
-                throw new RestconfDocumentedException(qname + " refers to a non-notification",
+            if (refSchemaCtx.findNotification(qname).isEmpty()) {
+                throw new RestconfDocumentedException(qname + " refers to an unknown notification",
                     ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
             }
-
-            if (haveFirst) {
-                streamNameBuilder.append(',');
-            } else {
-                haveFirst = true;
-            }
-            streamNameBuilder.append(module.argument().getLocalName()).append(':').append(qname.getLocalName());
         }
-        final var outputType = prepareOutputType(input);
-        if (outputType.equals(NotificationOutputType.JSON)) {
-            streamNameBuilder.append('/').append(outputType.getName());
-        }
-
-        final var streamName = streamNameBuilder.toString();
 
         // registration of the listener
-        listenersBroker.registerNotificationListener(qnames, streamName, outputType);
+        final var adapter = listenersBroker.registerNotificationListener(refSchemaCtx, qnames,
+            prepareOutputType(input));
 
         return Builders.containerBuilder()
             .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
-            .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, streamName))
+            .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, adapter.getStreamName()))
             .build();
     }
 
@@ -198,8 +163,7 @@ final class CreateStreamUtil {
             final ListenersBroker listenersBroker) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
-        final YangInstanceIdentifier path =
-            (YangInstanceIdentifier) input.findChildByArg(DEVICE_NOTIFICATION_PATH_NODEID)
+        final var path = (YangInstanceIdentifier) input.findChildByArg(DEVICE_NOTIFICATION_PATH_NODEID)
                 .map(DataContainerChild::body)
                 .orElseThrow(() -> new RestconfDocumentedException("No path specified", ErrorType.APPLICATION,
                     ErrorTag.DATA_MISSING));
@@ -222,28 +186,28 @@ final class CreateStreamUtil {
             .orElseThrow(() -> new RestconfDocumentedException("Mount point does not support notifications",
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED));
 
-        final EffectiveModelContext mountModelContext = mountPoint.getService(DOMSchemaService.class)
+        final var mountModelContext = mountPoint.getService(DOMSchemaService.class)
             .orElseThrow(() -> new RestconfDocumentedException("Mount point schema not available",
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED))
             .getGlobalContext();
-        final Set<Absolute> notificationPaths = mountModelContext.getModuleStatements().values().stream()
+        final var notificationPaths = mountModelContext.getModuleStatements().values().stream()
             .flatMap(module -> module.streamEffectiveSubstatements(NotificationEffectiveStatement.class))
             .map(notification -> Absolute.of(notification.argument()))
-            .collect(Collectors.toUnmodifiableSet());
+            .collect(ImmutableSet.toImmutableSet());
         if (notificationPaths.isEmpty()) {
             throw new RestconfDocumentedException("Device does not support notification", ErrorType.APPLICATION,
                 ErrorTag.OPERATION_FAILED);
         }
 
-        final DeviceNotificationListenerAdaptor notificationListenerAdapter = listenersBroker
-            .registerDeviceNotificationListener(deviceName, prepareOutputType(input), mountModelContext,
-                mountPointService, mountPoint.getIdentifier());
+        final var notificationListenerAdapter = listenersBroker.registerDeviceNotificationListener(deviceName,
+            prepareOutputType(input), mountModelContext, mountPointService, mountPoint.getIdentifier());
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 
         return Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
-            .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH, baseUrl + deviceName + "?"
-                + RestconfStreamsConstants.NOTIFICATION_TYPE + "=" + RestconfStreamsConstants.DEVICE))
+            .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH,
+                baseUrl + notificationListenerAdapter.getStreamName() + "?"
+                    + RestconfStreamsConstants.NOTIFICATION_TYPE + "=" + RestconfStreamsConstants.DEVICE))
             .build();
     }
 
@@ -256,30 +220,6 @@ final class CreateStreamUtil {
     private static NotificationOutputType prepareOutputType(final ContainerNode data) {
         final String outputName = extractStringLeaf(data, OUTPUT_TYPE_NODEID);
         return outputName != null ? NotificationOutputType.valueOf(outputName) : NotificationOutputType.XML;
-    }
-
-    /**
-     * Prepare stream name.
-     *
-     * @param path          Path of element from which data-change-event notifications are going to be generated.
-     * @param schemaContext Schema context.
-     * @param data          Container with stream settings (RPC create-stream).
-     * @return Parsed stream name.
-     */
-    private static String prepareDataChangeNotifiStreamName(final YangInstanceIdentifier path,
-            final EffectiveModelContext schemaContext, final ContainerNode data) {
-        final String datastoreName = extractStringLeaf(data, DATASTORE_NODEID);
-        final LogicalDatastoreType datastoreType = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
-            : LogicalDatastoreType.CONFIGURATION;
-
-        final String scopeName = extractStringLeaf(data, SCOPE_NODEID);
-        // FIXME: this is not really used
-        final Scope scope = scopeName != null ? Scope.ofName(scopeName) : Scope.BASE;
-
-        return RestconfStreamsConstants.DATA_SUBSCRIPTION
-            + "/" + ListenersBroker.createStreamNameFromUri(IdentifierCodec.serialize(path, schemaContext)
-                + "/" + RestconfStreamsConstants.DATASTORE_PARAM_NAME + "=" + datastoreType
-                + "/" + RestconfStreamsConstants.SCOPE_PARAM_NAME + "=" + scope);
     }
 
     /**
