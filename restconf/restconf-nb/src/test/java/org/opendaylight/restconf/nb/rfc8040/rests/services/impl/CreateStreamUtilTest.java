@@ -54,7 +54,7 @@ public class CreateStreamUtilTest {
             "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE", "stream-name"),
             CreateStreamUtil.createDataChangeNotifiStream(listenersBroker,
                 prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster", "path"),
-                SCHEMA_CTX));
+                SCHEMA_CTX).getOrThrow().orElseThrow());
     }
 
     @Test
