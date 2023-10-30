@@ -24,6 +24,7 @@ import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.Info;
 import org.opendaylight.restconf.openapi.model.InfoEntity;
 import org.opendaylight.restconf.openapi.model.OpenApiVersionEntity;
+import org.opendaylight.restconf.openapi.model.SecurityEntity;
 import org.opendaylight.restconf.openapi.model.Server;
 import org.opendaylight.restconf.openapi.model.ServerEntity;
 import org.opendaylight.restconf.openapi.model.ServersEntity;
@@ -47,7 +48,7 @@ public final class OpenApiInputStream extends InputStream {
             List.of(new ServerEntity(servers.iterator().next().url()))), writer));
         stack.add(new PathsSteam(context, writer, generator, stream));
         stack.add(new SchemasStream(context, writer, generator, stream));
-        stack.add(new SecurityStream(writer));
+        stack.add(new SecurityStream(writer, new SecurityEntity(security)));
     }
 
     @Override
