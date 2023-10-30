@@ -18,9 +18,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.SchemaEntity;
+import org.opendaylight.restconf.openapi.model.security.Http;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -32,6 +33,9 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public final class SchemasStream extends InputStream {
+    private static final String BASIC_AUTH_NAME = "basicAuth";
+    private static final Http OPEN_API_BASIC_AUTH = new Http("basic", null, null);
+
     private static final String OBJECT_TYPE = "object";
     private static final String INPUT_SUFFIX = "_input";
     private static final String OUTPUT_SUFFIX = "_output";
@@ -82,12 +86,13 @@ public final class SchemasStream extends InputStream {
                 continue;
             }
             if (!schemesWritten) {
-                reader = new InputStreamReader(new SecuritySchemesStream(writer), StandardCharsets.UTF_8);
+                generator.writeEndObject();
+                reader = new InputStreamReader(new SecuritySchemesStream(writer, Map.of(BASIC_AUTH_NAME,
+                    OPEN_API_BASIC_AUTH)), StandardCharsets.UTF_8);
                 read = reader.read();
                 schemesWritten = true;
                 continue;
             }
-            generator.writeEndObject();
             generator.writeEndObject();
             generator.flush();
             reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8);
@@ -115,59 +120,56 @@ public final class SchemasStream extends InputStream {
             final var rpcInput = rpc.getInput();
             if (!rpcInput.getChildNodes().isEmpty()) {
                 final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, OBJECT_TYPE,
-                    stack, moduleName, false, definitionNames, EntityType.RPC);
+                    stack, moduleName, false, definitionNames);
                 result.add(input);
-                stack.enterSchemaTree(rpcInput.getQName());
-                for (final var child : rpcInput.getChildNodes()) {
-                    processDataNodeContainers(child, moduleName, stack, definitionNames, moduleName, result,
-                        rpcInput.getQName().getLocalName(),false);
-                }
-                stack.exit();
             }
             final var rpcOutput = rpc.getOutput();
             if (!rpcOutput.getChildNodes().isEmpty()) {
                 final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, OBJECT_TYPE,
-                    stack, moduleName, false, definitionNames, EntityType.RPC);
+                    stack, moduleName, false, definitionNames);
                 result.add(output);
-                stack.enterSchemaTree(rpcOutput.getQName());
-                for (final var child : rpcOutput.getChildNodes()) {
-                    processDataNodeContainers(child, moduleName, stack, definitionNames, moduleName, result,
-                        rpcOutput.getQName().getLocalName(),false);
-                }
-                stack.exit();
             }
             stack.exit();
         }
 
         for (final var childNode : module.getChildNodes()) {
-            processDataNodeContainers(childNode, moduleName, stack, definitionNames, moduleName, result, moduleName,
-                true);
+            processDataNodeContainers(childNode, moduleName, stack, definitionNames, result, moduleName, true);
+
+            if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
+                for (final var actionDef : ((ActionNodeContainer) childNode).getActions()) {
+                    stack.enterSchemaTree(actionDef.getQName());
+                    final var actionName = actionDef.getQName().getLocalName();
+                    final var actionInput = actionDef.getInput();
+                    if (!actionInput.getChildNodes().isEmpty()) {
+                        final var input = new SchemaEntity(actionInput, moduleName + "_" + actionName + INPUT_SUFFIX,
+                            OBJECT_TYPE, stack, moduleName, false, definitionNames);
+                        result.add(input);
+                    }
+                    final var actionOutput = actionDef.getInput();
+                    if (!actionOutput.getChildNodes().isEmpty()) {
+                        final var output = new SchemaEntity(actionOutput, moduleName + "_" + actionName + OUTPUT_SUFFIX,
+                            OBJECT_TYPE, stack, moduleName, false, definitionNames);
+                        result.add(output);
+                    }
+                    stack.exit();
+                }
+            }
         }
         return result;
     }
 
     private static void processDataNodeContainers(final DataSchemaNode node, final String title,
-        final SchemaInferenceStack stack, final DefinitionNames definitionNames, final String moduleName,
+        final SchemaInferenceStack stack, final DefinitionNames definitionNames,
         final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
             final var newTitle = title + "_" + node.getQName().getLocalName();
-            final String discriminator;
-            if (!definitionNames.isListedNode(node)) {
-                final var parentNameConfigLocalName = parentName + "_" + node.getQName().getLocalName();
-                final var names = List.of(parentNameConfigLocalName);
-                discriminator = definitionNames.pickDiscriminator(node, names);
-            } else {
-                discriminator = definitionNames.getDiscriminator(node);
-            }
-            final var child = new SchemaEntity(node, newTitle + discriminator, OBJECT_TYPE, stack, parentName,
-                isParentConfig, definitionNames, EntityType.NODE);
+            final var child = new SchemaEntity(node, newTitle, OBJECT_TYPE, stack, parentName, isParentConfig,
+                definitionNames);
             final boolean isConfig = node.isConfiguration() && isParentConfig;
             result.add(child);
             stack.enterSchemaTree(node.getQName());
-            processActions(node, moduleName, stack, definitionNames, result, parentName);
             for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
-                processDataNodeContainers(childNode, newTitle, stack, definitionNames, moduleName, result, newTitle,
-                    isConfig);
+                processDataNodeContainers(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
             }
             stack.exit();
         } else if (node instanceof ChoiceSchemaNode choiceNode) {
@@ -178,38 +180,10 @@ public final class SchemasStream extends InputStream {
             stack.enterSchemaTree(choiceNode.getQName());
             stack.enterSchemaTree(caseNode.getQName());
             for (final var childNode : caseNode.getChildNodes()) {
-                processDataNodeContainers(childNode, title, stack, definitionNames, moduleName, result, parentName,
-                    isParentConfig);
+                processDataNodeContainers(childNode, title, stack, definitionNames, result, parentName, isParentConfig);
             }
             stack.exit(); // Exit the CaseSchemaNode context
             stack.exit(); // Exit the ChoiceSchemaNode context
         }
-    }
-
-    private static void processActions(final DataSchemaNode node, final String moduleName,
-        final SchemaInferenceStack stack, final DefinitionNames definitionNames,
-        final ArrayDeque<SchemaEntity> result, final String parentName) {
-        for (final var actionDef : ((ActionNodeContainer) node).getActions()) {
-            stack.enterSchemaTree(actionDef.getQName());
-            final var actionName = actionDef.getQName().getLocalName();
-            final var actionInput = actionDef.getInput();
-            if (!actionInput.getChildNodes().isEmpty()) {
-                final var input = new SchemaEntity(actionInput, moduleName + "_" + actionName + INPUT_SUFFIX,
-                    OBJECT_TYPE, stack, parentName, false, definitionNames, EntityType.RPC);
-                result.add(input);
-            }
-            final var actionOutput = actionDef.getOutput();
-            if (!actionOutput.getChildNodes().isEmpty()) {
-                final var output = new SchemaEntity(actionOutput, moduleName + "_" + actionName + OUTPUT_SUFFIX,
-                    OBJECT_TYPE, stack, parentName, false, definitionNames, EntityType.RPC);
-                result.add(output);
-            }
-            stack.exit();
-        }
-    }
-
-    public enum EntityType {
-        NODE,
-        RPC
     }
 }
