@@ -13,25 +13,28 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
-import org.opendaylight.restconf.openapi.model.SecurityEntity;
+import org.opendaylight.restconf.openapi.model.SecuritySchemasEntity;
+import org.opendaylight.restconf.openapi.model.security.SecuritySchemeObject;
 
-public final class SecurityStream extends InputStream {
+public final class SecuritySchemasStream extends InputStream {
     private final OpenApiBodyWriter writer;
-    private final SecurityEntity entity;
+    private final SecuritySchemasEntity securitySchemasEntity;
 
     private Reader reader;
 
-    public SecurityStream(final OpenApiBodyWriter writer, final SecurityEntity entity) {
+    public SecuritySchemasStream(final OpenApiBodyWriter writer, Map<String, SecuritySchemeObject> securitySchemes) {
         this.writer = writer;
-        this.entity = entity;
+        this.securitySchemasEntity = new SecuritySchemasEntity(securitySchemes);
     }
 
     @Override
     public int read() throws IOException {
         if (reader == null) {
-            reader = new InputStreamReader(new ByteArrayInputStream(writeNextEntity(entity)), StandardCharsets.UTF_8);
+            reader = new InputStreamReader(new ByteArrayInputStream(writeNextEntity(securitySchemasEntity)),
+                StandardCharsets.UTF_8);
         }
         return reader.read();
     }
