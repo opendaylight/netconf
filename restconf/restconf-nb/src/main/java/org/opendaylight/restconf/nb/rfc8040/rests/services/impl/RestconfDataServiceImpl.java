@@ -79,8 +79,6 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.CreateOrReplaceResult;
-import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -112,25 +110,19 @@ public final class RestconfDataServiceImpl {
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
     private final DatabindProvider databindProvider;
-    private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
     private final MdsalRestconfServer server;
     @Deprecated(forRemoval = true)
     private final DOMDataBroker dataBroker;
-    private final ListenersBroker listenersBroker;
 
     public RestconfDataServiceImpl(final DatabindProvider databindProvider, final MdsalRestconfServer server,
             final DOMDataBroker dataBroker, final RestconfStreamsSubscriptionService delegRestconfSubscrService,
-            final DOMActionService actionService, final ListenersBroker listenersBroker,
-            final StreamsConfiguration configuration) {
+            final DOMActionService actionService) {
         this.databindProvider = requireNonNull(databindProvider);
         this.server = requireNonNull(server);
         this.dataBroker = requireNonNull(dataBroker);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
         this.actionService = requireNonNull(actionService);
-        this.listenersBroker = requireNonNull(listenersBroker);
-        streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents(listenersBroker)
-                : SubscribeToStreamUtil.webSockets(listenersBroker);
     }
 
     /**

@@ -38,8 +38,7 @@ public class RestconfApplication extends AbstractRestconfApplication {
             final StreamsConfiguration configuration) {
         super(databindProvider, List.of(
             streamSubscription,
-            new RestconfDataServiceImpl(databindProvider, server, dataBroker, streamSubscription, actionService,
-                listenersBroker, configuration),
+            new RestconfDataServiceImpl(databindProvider, server, dataBroker, streamSubscription, actionService),
             new RestconfInvokeOperationsServiceImpl(databindProvider, server, mountPointService, listenersBroker,
                 configuration),
             new RestconfOperationsServiceImpl(databindProvider, server),
