@@ -9,11 +9,9 @@ package org.opendaylight.restconf.openapi.model.security;
 
 import static java.util.Objects.requireNonNull;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public record Http(
         @NonNull String scheme,
         @Nullable String description,
