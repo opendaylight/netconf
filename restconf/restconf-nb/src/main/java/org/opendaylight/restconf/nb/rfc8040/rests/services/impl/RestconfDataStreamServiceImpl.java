@@ -19,15 +19,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.SSESessionHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -60,36 +57,24 @@ public final class RestconfDataStreamServiceImpl {
      * Get target data resource.
      *
      * @param identifier path to target
-     * @param uriInfo URI info
      */
     @GET
     @Path("/{identifier:.+}")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void getSSE(@Encoded @PathParam("identifier") final String identifier, @Context final UriInfo uriInfo,
-            @Context final SseEventSink sink, @Context final Sse sse) {
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        final BaseListenerInterface listener;
-        final String notificaionType =
-            uriInfo.getQueryParameters().getFirst(RestconfStreamsConstants.NOTIFICATION_TYPE);
-        if (notificaionType != null && notificaionType.equals(RestconfStreamsConstants.DEVICE)) {
-            listener = listenersBroker.deviceNotificationListenerFor(streamName);
-            if (listener == null) {
-                LOG.debug("Listener for device path with name {} was not found.", streamName);
-                throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
-            }
-        } else {
-            listener = listenersBroker.listenerFor(streamName);
-            if (listener == null) {
-                LOG.debug("Listener for stream with name {} was not found.", streamName);
-                throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
-            }
+    public void getSSE(@Encoded @PathParam("identifier") final String identifier, @Context final SseEventSink sink,
+            @Context final Sse sse) {
+        final var streamName = ListenersBroker.createStreamNameFromUri(identifier);
+        final var listener = listenersBroker.listenerFor(streamName);
+        if (listener == null) {
+            LOG.debug("Listener for stream with name {} was not found.", streamName);
+            throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
         }
 
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
         // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
         //        handler.init()/handler.close()
-        final SSESessionHandler handler = new SSESessionHandler(executorService, sink, sse, listener,
-            maximumFragmentLength, heartbeatInterval);
+        final var handler = new SSESessionHandler(executorService, sink, sse, listener, maximumFragmentLength,
+            heartbeatInterval);
         handler.init();
     }
 }

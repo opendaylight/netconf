@@ -104,17 +104,17 @@ public final class ListenersBroker {
     /**
      * Get listener for device path.
      *
-     * @param path name.
-     * @return {@link BaseListenerInterface} specified by stream name or {@code null} if listener with specified
-     *         stream name does not exist.
+     * @param streamName name.
+     * @return {@link DeviceNotificationListenerAdaptor} specified by stream name or {@code null} if listener with
+     *         specified stream name does not exist.
      * @throws NullPointerException in {@code path} is {@code null}
      */
-    public @Nullable BaseListenerInterface deviceNotificationListenerFor(final String path) {
-        requireNonNull(path);
+    public @Nullable DeviceNotificationListenerAdaptor deviceNotificationListenerFor(final String streamName) {
+        requireNonNull(streamName);
 
         final long stamp = deviceNotificationListenersLock.readLock();
         try {
-            return deviceNotificationListeners.get(path);
+            return deviceNotificationListeners.get(streamName);
         } finally {
             deviceNotificationListenersLock.unlockRead(stamp);
         }
@@ -132,6 +132,8 @@ public final class ListenersBroker {
             return notificationListenerFor(streamName);
         } else if (streamName.startsWith(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
             return dataChangeListenerFor(streamName);
+        } else if (streamName.startsWith(RestconfStreamsConstants.DEVICE_NOTIFICATION_STREAM)) {
+            return deviceNotificationListenerFor(streamName);
         } else {
             return null;
         }
@@ -223,10 +225,13 @@ public final class ListenersBroker {
     public DeviceNotificationListenerAdaptor registerDeviceNotificationListener(final String deviceName,
             final NotificationOutputType outputType, final EffectiveModelContext refSchemaCtx,
             final DOMMountPointService mountPointService, final YangInstanceIdentifier path) {
+        final var sb = new StringBuilder(RestconfStreamsConstants.DEVICE_NOTIFICATION_STREAM).append('/')
+            .append(deviceName);
+
         final long stamp = deviceNotificationListenersLock.writeLock();
         try {
-            return deviceNotificationListeners.computeIfAbsent(deviceName,
-                streamName -> new DeviceNotificationListenerAdaptor(deviceName, outputType, refSchemaCtx,
+            return deviceNotificationListeners.computeIfAbsent(sb.toString(),
+                streamName -> new DeviceNotificationListenerAdaptor(streamName, outputType, refSchemaCtx,
                     mountPointService, path, this));
         } finally {
             deviceNotificationListenersLock.unlockWrite(stamp);

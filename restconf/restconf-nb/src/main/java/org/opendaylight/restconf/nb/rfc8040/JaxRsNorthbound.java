@@ -7,11 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
-import static org.opendaylight.restconf.nb.rfc8040.URLConstants.BASE_PATH;
-import static org.opendaylight.restconf.nb.rfc8040.URLConstants.SSE_SUBPATH;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.DATA_SUBSCRIPTION;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
-
 import com.google.common.annotations.Beta;
 import javax.servlet.ServletException;
 import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration;
@@ -33,6 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
@@ -103,7 +99,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
 
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
-            .contextPath("/" + BASE_PATH)
+            .contextPath("/" + URLConstants.BASE_PATH)
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
@@ -114,7 +110,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern("/" + SSE_SUBPATH + "/*")
+                .addUrlPattern("/" + URLConstants.SSE_SUBPATH + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new DataStreamApplication(databindProvider,
                         new RestconfDataStreamServiceImpl(scheduledThreadPool, listenersBroker, streamsConfiguration)))
@@ -123,8 +119,9 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
-                .addUrlPattern("/" + DATA_SUBSCRIPTION + "/*")
-                .addUrlPattern("/" + NOTIFICATION_STREAM + "/*")
+                .addUrlPattern("/" + RestconfStreamsConstants.DATA_SUBSCRIPTION + "/*")
+                .addUrlPattern("/" + RestconfStreamsConstants.NOTIFICATION_STREAM + "/*")
+                .addUrlPattern("/" + RestconfStreamsConstants.DEVICE_NOTIFICATION_STREAM + "/*")
                 .servlet(new WebSocketInitializer(scheduledThreadPool, listenersBroker, streamsConfiguration))
                 .build())
 
@@ -145,7 +142,8 @@ public final class JaxRsNorthbound implements AutoCloseable {
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
-                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(BASE_PATH)).build())
+                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(URLConstants.BASE_PATH))
+                    .build())
                 .name("Rootfound")
                 .build());
 

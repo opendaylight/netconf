@@ -208,8 +208,7 @@ final class CreateStreamUtil {
         return RestconfFuture.of(Optional.of(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
             .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH,
-                baseUrl + notificationListenerAdapter.getStreamName() + "?"
-                    + RestconfStreamsConstants.NOTIFICATION_TYPE + "=" + RestconfStreamsConstants.DEVICE))
+                baseUrl + notificationListenerAdapter.getStreamName()))
             .build()));
     }
 
