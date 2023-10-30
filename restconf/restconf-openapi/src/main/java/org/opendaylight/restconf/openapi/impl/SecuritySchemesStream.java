@@ -7,21 +7,46 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
+import org.opendaylight.restconf.openapi.model.OpenApiEntity;
+import org.opendaylight.restconf.openapi.model.SecuritySchemesEntity;
+import org.opendaylight.restconf.openapi.model.security.SecuritySchemeObject;
 
 public final class SecuritySchemesStream extends InputStream {
-    public SecuritySchemesStream(final OpenApiBodyWriter writer) {
+    private final OpenApiBodyWriter writer;
+    private final SecuritySchemesEntity securitySchemesEntity;
+
+    private Reader reader;
+
+    public SecuritySchemesStream(final OpenApiBodyWriter writer,
+            final Map<String, SecuritySchemeObject> securitySchemes) {
+        this.writer = writer;
+        this.securitySchemesEntity = new SecuritySchemesEntity(securitySchemes);
     }
 
     @Override
     public int read() throws IOException {
-        return -1;
+        if (reader == null) {
+            reader = new InputStreamReader(new ByteArrayInputStream(writeNextEntity(securitySchemesEntity)),
+                StandardCharsets.UTF_8);
+        }
+        return reader.read();
     }
 
     @Override
     public int read(final byte[] array, final int off, final int len) throws IOException {
         return super.read(array, off, len);
+    }
+
+    private byte[] writeNextEntity(final OpenApiEntity next) throws IOException {
+        writer.writeTo(next, null, null, null, null, null, null);
+        return writer.readFrom();
     }
 }
