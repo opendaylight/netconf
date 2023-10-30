@@ -18,8 +18,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.Map;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.SchemaEntity;
+import org.opendaylight.restconf.openapi.model.security.Http;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -31,6 +33,9 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public final class SchemasStream extends InputStream {
+    private static final String BASIC_AUTH_NAME = "basicAuth";
+    private static final Http OPEN_API_BASIC_AUTH = new Http("basic", null, null);
+
     private static final String OBJECT_TYPE = "object";
     private static final String INPUT_SUFFIX = "_input";
     private static final String OUTPUT_SUFFIX = "_output";
@@ -80,13 +85,14 @@ public final class SchemasStream extends InputStream {
                 read = reader.read();
                 continue;
             }
+            generator.writeEndObject();
             if (!schemesWritten) {
-                reader = new InputStreamReader(new SecuritySchemesStream(writer), StandardCharsets.UTF_8);
+                reader = new InputStreamReader(new SecuritySchemesStream(writer, Map.of(BASIC_AUTH_NAME,
+                    OPEN_API_BASIC_AUTH)), StandardCharsets.UTF_8);
                 read = reader.read();
                 schemesWritten = true;
                 continue;
             }
-            generator.writeEndObject();
             generator.writeEndObject();
             generator.flush();
             reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8);
