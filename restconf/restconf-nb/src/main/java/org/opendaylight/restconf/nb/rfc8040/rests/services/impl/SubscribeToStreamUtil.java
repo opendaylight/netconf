@@ -15,7 +15,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -69,19 +68,15 @@ public abstract class SubscribeToStreamUtil {
 
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
-            final String scheme = uriInfo.getAbsolutePath().getScheme();
-            final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-            switch (scheme) {
-                case "https":
+            return uriInfo.getBaseUriBuilder()
+                .scheme(switch (uriInfo.getAbsolutePath().getScheme()) {
                     // Secured HTTP goes to Secured WebSockets
-                    uriBuilder.scheme("wss");
-                    break;
-                case "http":
-                default:
+                    case "https" -> "wss";
                     // Unsecured HTTP and others go to unsecured WebSockets
-                    uriBuilder.scheme("ws");
-            }
-            return uriBuilder.replacePath(URLConstants.BASE_PATH + '/' + streamName).build();
+                    default -> "ws";
+                })
+                .replacePath(URLConstants.BASE_PATH + '/' + streamName)
+                .build();
         }
     }
 
