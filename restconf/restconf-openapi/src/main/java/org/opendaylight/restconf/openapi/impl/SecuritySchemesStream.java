@@ -12,6 +12,7 @@ import java.io.InputStream;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 
 public final class SecuritySchemesStream extends InputStream {
+
     public SecuritySchemesStream(final OpenApiBodyWriter writer) {
     }
 

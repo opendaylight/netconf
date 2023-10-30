@@ -9,11 +9,14 @@ package org.opendaylight.restconf.openapi.model;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * TODO use this class to simplify SchemasStream.
  */
 public final class ComponentsEntity extends OpenApiEntity {
+    public ComponentsEntity() {
+    }
 
     @Override
     public void generate(final JsonGenerator generator) throws IOException {
