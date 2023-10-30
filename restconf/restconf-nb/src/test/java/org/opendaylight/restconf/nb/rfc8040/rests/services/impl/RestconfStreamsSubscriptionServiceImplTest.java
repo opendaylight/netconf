@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.AbstractNotificationListenerTest.MODEL_CONTEXT;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.net.URI;
@@ -35,7 +34,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.AbstractNotificationListenerTest;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
@@ -60,10 +58,7 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
     private DOMNotificationService notificationService;
 
     private final ListenersBroker listenersBroker = new ListenersBroker();
-    private StreamsConfiguration configurationWs;
-    private StreamsConfiguration configurationSse;
-    private DatabindProvider databindProvider;
-
+    private final DatabindProvider databindProvider = () -> DatabindContext.ofModel(MODEL_CONTEXT);
 
     @Before
     public void setUp() throws URISyntaxException {
@@ -84,10 +79,6 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(UriBuilder.fromUri("http://localhost:8181")).when(uriInfo).getBaseUriBuilder();
         doReturn(new URI("http://127.0.0.1/" + URI)).when(uriInfo).getAbsolutePath();
-
-        databindProvider = () -> DatabindContext.ofModel(MODEL_CONTEXT);
-        configurationWs = new StreamsConfiguration(0, 100, 10, false);
-        configurationSse = new StreamsConfiguration(0, 100, 10, true);
     }
 
     @Test
@@ -96,7 +87,7 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
             IdentifierCodec.deserialize("toaster:toaster/toasterStatus", MODEL_CONTEXT), Scope.ONE,
             NotificationOutputType.XML);
         final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
-            notificationService, databindProvider, listenersBroker, configurationSse);
+            notificationService, databindProvider, SubscribeToStreamUtil.serverSentEvents(listenersBroker));
         final var response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
         assertEquals("http://localhost:8181/" + URLConstants.BASE_PATH + "/" + URLConstants.SSE_SUBPATH
@@ -110,7 +101,7 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
             IdentifierCodec.deserialize("toaster:toaster/toasterStatus", MODEL_CONTEXT), Scope.ONE,
             NotificationOutputType.XML);
         final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
-            notificationService, databindProvider, listenersBroker, configurationWs);
+            notificationService, databindProvider, SubscribeToStreamUtil.webSockets(listenersBroker));
         final var response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
         assertEquals("ws://localhost:8181/" + URLConstants.BASE_PATH
@@ -121,7 +112,7 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
     @Test
     public void testSubscribeToStreamMissingDatastoreInPath() {
         final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
-            notificationService, databindProvider, listenersBroker, configurationWs);
+            notificationService, databindProvider, SubscribeToStreamUtil.webSockets(listenersBroker));
         final var errors = assertThrows(RestconfDocumentedException.class,
             () -> streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", uriInfo))
             .getErrors();
@@ -135,7 +126,7 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
     @Test
     public void testSubscribeToStreamMissingScopeInPath() {
         final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
-            notificationService, databindProvider, listenersBroker, configurationWs);
+            notificationService, databindProvider, SubscribeToStreamUtil.webSockets(listenersBroker));
         final var errors = assertThrows(RestconfDocumentedException.class,
             () -> streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 uriInfo)).getErrors();

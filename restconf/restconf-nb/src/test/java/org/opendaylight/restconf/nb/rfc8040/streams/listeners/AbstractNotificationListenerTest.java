@@ -16,6 +16,6 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public abstract class AbstractNotificationListenerTest {
     static final QNameModule MODULE = QNameModule.create(XMLNamespace.of("notifi:mod"), Revision.of("2016-11-23"));
 
-    public static final EffectiveModelContext MODEL_CONTEXT =
+    protected static final EffectiveModelContext MODEL_CONTEXT =
         YangParserTestUtils.parseYangResourceDirectory("/notifications");
 }
