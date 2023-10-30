@@ -34,6 +34,24 @@
       "parentUuid": "addd27a8_942da962",
       "revId": "6bf65e72cc3fa2aae2d94b14f0b8e532752e26d5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6d6d8e6_93c139af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-10-30T17:41:39Z",
+      "side": 1,
+      "message": "The reason for this ask is that NETCONF-669 will be migrating things upwards from sal-netconf-connector and concurrently with this effort and we want to minimize overlap/conflicts while that is happening.",
+      "parentUuid": "addd27a8_942da962",
+      "revId": "6bf65e72cc3fa2aae2d94b14f0b8e532752e26d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
