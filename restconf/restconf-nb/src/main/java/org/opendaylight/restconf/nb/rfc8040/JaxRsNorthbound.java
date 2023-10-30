@@ -28,6 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.SubscribeToStreamUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
@@ -97,19 +98,11 @@ public final class JaxRsNorthbound implements AutoCloseable {
         final var scheduledThreadPool = new ScheduledThreadPoolWrapper(pingMaxThreadCount,
             new NamingThreadPoolFactory(pingNamePrefix));
 
-        final var restconfBuilder = WebContext.builder()
-            .name("RFC8040 RESTCONF")
-            .contextPath("/" + URLConstants.BASE_PATH)
-            .supportsSessions(false)
-            .addServlet(ServletDetails.builder()
-                .addUrlPattern("/*")
-                .servlet(servletSupport.createHttpServletBuilder(
-                    new RestconfApplication(databindProvider, server, mountPointService, dataBroker, rpcService,
-                        actionService, notificationService, schemaService, listenersBroker, streamsConfiguration))
-                    .build())
-                .asyncSupported(true)
-                .build())
-            .addServlet(ServletDetails.builder()
+        final SubscribeToStreamUtil streamUtils;
+        final ServletDetails streamServlet;
+        if (streamsConfiguration.useSSE()) {
+            streamUtils = SubscribeToStreamUtil.serverSentEvents(listenersBroker);
+            streamServlet = ServletDetails.builder()
                 .addUrlPattern("/" + URLConstants.SSE_SUBPATH + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new DataStreamApplication(databindProvider,
@@ -117,13 +110,30 @@ public final class JaxRsNorthbound implements AutoCloseable {
                     .build())
                 .name("notificationServlet")
                 .asyncSupported(true)
-                .build())
-            .addServlet(ServletDetails.builder()
+                .build();
+        } else {
+            streamUtils = SubscribeToStreamUtil.webSockets(listenersBroker);
+            streamServlet = ServletDetails.builder()
                 .addUrlPattern("/" + RestconfStreamsConstants.DATA_SUBSCRIPTION + "/*")
                 .addUrlPattern("/" + RestconfStreamsConstants.NOTIFICATION_STREAM + "/*")
                 .addUrlPattern("/" + RestconfStreamsConstants.DEVICE_NOTIFICATION_STREAM + "/*")
                 .servlet(new WebSocketInitializer(scheduledThreadPool, listenersBroker, streamsConfiguration))
+                .build();
+        }
+
+        final var restconfBuilder = WebContext.builder()
+            .name("RFC8040 RESTCONF")
+            .contextPath("/" + URLConstants.BASE_PATH)
+            .supportsSessions(false)
+            .addServlet(ServletDetails.builder()
+                .addUrlPattern("/*")
+                .servlet(servletSupport.createHttpServletBuilder(
+                    new RestconfApplication(databindProvider, server, mountPointService, dataBroker, actionService,
+                        notificationService, schemaService, streamUtils))
+                    .build())
+                .asyncSupported(true)
                 .build())
+            .addServlet(streamServlet)
 
             // Allows user to add javax.servlet.Filter(s) in front of REST services
             .addFilter(FilterDetails.builder()
