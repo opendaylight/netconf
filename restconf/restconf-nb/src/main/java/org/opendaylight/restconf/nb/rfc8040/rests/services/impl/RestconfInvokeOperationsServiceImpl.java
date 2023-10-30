@@ -35,8 +35,6 @@ import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStream;
@@ -59,17 +57,14 @@ public final class RestconfInvokeOperationsServiceImpl {
     @Deprecated(forRemoval = true)
     private final DOMMountPointService mountPointService;
     private final SubscribeToStreamUtil streamUtils;
-    private final ListenersBroker listenersBroker;
 
     public RestconfInvokeOperationsServiceImpl(final DatabindProvider databindProvider,
             final MdsalRestconfServer server, final DOMMountPointService mountPointService,
-            final ListenersBroker listenersBroker, final StreamsConfiguration configuration) {
+            final SubscribeToStreamUtil streamUtils) {
         this.databindProvider = requireNonNull(databindProvider);
         this.server = requireNonNull(server);
         this.mountPointService = requireNonNull(mountPointService);
-        this.listenersBroker = requireNonNull(listenersBroker);
-        streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents(listenersBroker)
-            : SubscribeToStreamUtil.webSockets(listenersBroker);
+        this.streamUtils = requireNonNull(streamUtils);
     }
 
     /**
@@ -170,7 +165,7 @@ public final class RestconfInvokeOperationsServiceImpl {
                 return CreateStreamUtil.createNotificationStream(streamUtils.listenersBroker(), input,
                     localDatabind.modelContext());
             } else if (SubscribeDeviceNotification.QNAME.equals(type)) {
-                return CreateStreamUtil.createDeviceNotificationListener(listenersBroker, input,
+                return CreateStreamUtil.createDeviceNotificationListener(streamUtils.listenersBroker(), input,
                     streamUtils.prepareUriByStreamName(uriInfo, "").toString(), mountPointService);
             }
         }

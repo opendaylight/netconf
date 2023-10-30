@@ -42,13 +42,12 @@ import org.slf4j.LoggerFactory;
 /**
  * Subscribe to stream util class.
  */
-abstract class SubscribeToStreamUtil {
+public abstract class SubscribeToStreamUtil {
     /**
      * Implementation of SubscribeToStreamUtil for Server-sent events.
      */
     private static final class ServerSentEvents extends SubscribeToStreamUtil {
-
-        private ServerSentEvents(final ListenersBroker listenersBroker) {
+        ServerSentEvents(final ListenersBroker listenersBroker) {
             super(listenersBroker);
         }
 
@@ -64,8 +63,7 @@ abstract class SubscribeToStreamUtil {
      * Implementation of SubscribeToStreamUtil for Web sockets.
      */
     private static final class WebSockets extends SubscribeToStreamUtil {
-
-        private WebSockets(final ListenersBroker listenersBroker) {
+        WebSockets(final ListenersBroker listenersBroker) {
             super(listenersBroker);
         }
 
@@ -92,15 +90,15 @@ abstract class SubscribeToStreamUtil {
 
     private final @NonNull ListenersBroker listenersBroker;
 
-    SubscribeToStreamUtil(final ListenersBroker listenersBroker) {
+    private SubscribeToStreamUtil(final ListenersBroker listenersBroker) {
         this.listenersBroker = requireNonNull(listenersBroker);
     }
 
-    static SubscribeToStreamUtil serverSentEvents(final ListenersBroker listenersBroker) {
+    public static @NonNull SubscribeToStreamUtil serverSentEvents(final ListenersBroker listenersBroker) {
         return new ServerSentEvents(listenersBroker);
     }
 
-    static SubscribeToStreamUtil webSockets(final ListenersBroker listenersBroker) {
+    public static @NonNull SubscribeToStreamUtil webSockets(final ListenersBroker listenersBroker) {
         return new WebSockets(listenersBroker);
     }
 
