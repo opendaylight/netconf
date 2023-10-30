@@ -10,8 +10,10 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.Serial;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,17 +33,14 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 public final class WebSocketInitializer extends WebSocketServlet {
-    @Serial
+    @java.io.Serial
     private static final long serialVersionUID = 1L;
 
-    @SuppressFBWarnings(value = "SE_BAD_FIELD",
-        justification = "Servlet/WebSocket bridge, we need this service for heartbeats")
-    private final ScheduledExecutorService executorService;
+    private final transient ScheduledExecutorService executorService;
+    private final transient ListenersBroker listenersBroker;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
     private final int idleTimeoutMillis;
-    @SuppressFBWarnings(value = "SE_BAD_FIELD", justification = "Required for session mgmt")
-    private final ListenersBroker listenersBroker;
 
     /**
      * Creation of the web-socket initializer.
@@ -69,6 +68,22 @@ public final class WebSocketInitializer extends WebSocketServlet {
         factory.getPolicy().setIdleTimeout(idleTimeoutMillis);
         factory.setCreator(new WebSocketFactory(executorService, listenersBroker, maximumFragmentLength,
             heartbeatInterval));
+    }
+
+    @java.io.Serial
+    @SuppressWarnings("static-method")
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        throwNSE();
+    }
+
+    @java.io.Serial
+    @SuppressWarnings("static-method")
+    private void writeObject(final ObjectOutputStream out) throws IOException {
+        throwNSE();
+    }
+
+    private static void throwNSE() throws NotSerializableException {
+        throw new NotSerializableException(WebSocketInitializer.class.getName());
     }
 
     /**
