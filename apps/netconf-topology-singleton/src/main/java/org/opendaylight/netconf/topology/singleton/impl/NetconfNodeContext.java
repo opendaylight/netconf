@@ -26,6 +26,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUti
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
+import org.opendaylight.netconf.topology.spi.exception.NetconfClientConfigurationBuilderException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.slf4j.Logger;
@@ -142,14 +143,13 @@ final class NetconfNodeContext implements AutoCloseable {
         final NetconfClientConfigurationBuilder clientConfigurationBuilder;
         try {
             clientConfigurationBuilder = builderFactory.createClientConfigurationBuilder(nodeId, netconfNode);
-        } catch (IllegalArgumentException e) {
+        } catch (NetconfClientConfigurationBuilderException e) {
             LOG.warn("RemoteDevice{{}} has invalid client configuration, not connecting it", nodeId, e);
             return;
         }
 
         // Instantiate the handler ...
         masterSalFacade = createSalFacade(netconfNode.requireLockDatastore());
-
         nodeHandler = new NetconfNodeHandler(setup.getNetconfClientDispatcher(), setup.getEventExecutor(),
             setup.getKeepaliveExecutor(), setup.getBaseSchemas(), schemaManager, setup.getProcessingExecutor(),
             clientConfigurationBuilder, deviceActionFactory, masterSalFacade, remoteDeviceId, nodeId,

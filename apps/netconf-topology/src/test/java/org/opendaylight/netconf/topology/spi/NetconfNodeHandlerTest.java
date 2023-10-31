@@ -132,7 +132,7 @@ public class NetconfNodeHandlerTest {
     }
 
     @Before
-    public void before() {
+    public void before() throws Exception {
         // Instantiate the handler
         final var netconfNode = new NetconfNodeBuilder()
             .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
