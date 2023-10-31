@@ -22,6 +22,30 @@
       },
       "revId": "c13c8879e3da7b5a599558825e1994098580ee61",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44cf1687_309c6a42",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/DefaultNetconfClientConfigurationBuilderFactory.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-10-31T11:46:49Z",
+      "side": 1,
+      "message": "Done. Agreed, there probably shouldn\u0027t be any attempt at recovery or establishing a connection to the device. That\u0027s why I\u0027ve introduced an extension to this patch, enhancing the workaround fix for NETCONF-1114.\nhttps://git.opendaylight.org/gerrit/c/netconf/+/108782/2\n\nMerged workaround doesn\u0027t prevent the creation of the Sal-facade, initiating connection attempts.",
+      "parentUuid": "a0efbea8_26efaa15",
+      "range": {
+        "startLine": 116,
+        "startChar": 24,
+        "endLine": 116,
+        "endChar": 43
+      },
+      "revId": "c13c8879e3da7b5a599558825e1994098580ee61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
