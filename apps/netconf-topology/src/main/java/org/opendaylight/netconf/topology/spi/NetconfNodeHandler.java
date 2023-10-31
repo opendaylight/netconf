@@ -24,6 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
 import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
@@ -79,7 +80,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     public NetconfNodeHandler(final NetconfClientDispatcher clientDispatcher, final EventExecutor eventExecutor,
             final ScheduledExecutorService keepaliveExecutor, final BaseNetconfSchemas baseSchemas,
             final SchemaResourceManager schemaManager, final Executor processingExecutor,
-            final NetconfClientConfigurationBuilderFactory builderFactory,
+            final NetconfClientConfigurationBuilder clientConfigurationBuilder,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
@@ -141,8 +142,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             keepAliveFacade.setListener(communicator);
         }
 
-        clientConfig = builderFactory.createClientConfigurationBuilder(nodeId, node)
-            .withSessionListener(communicator)
+        clientConfig = clientConfigurationBuilder.withSessionListener(communicator)
             .build();
     }
 

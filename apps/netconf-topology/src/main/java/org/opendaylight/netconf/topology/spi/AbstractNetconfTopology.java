@@ -22,11 +22,13 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.netconf.topology.spi.exception.NetconfClientConfigurationBuilderException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -115,6 +117,13 @@ public abstract class AbstractNetconfTopology {
             LOG.warn("RemoteDevice{{}} has invalid configuration, not connecting it", nodeId, e);
             return;
         }
+        final NetconfClientConfigurationBuilder clientConfigurationBuilder;
+        try {
+            clientConfigurationBuilder = builderFactory.createClientConfigurationBuilder(nodeId, netconfNode);
+        } catch (NetconfClientConfigurationBuilderException e) {
+            LOG.warn("RemoteDevice{{}} has invalid client configuration, not connecting it", nodeId, e);
+            return;
+        }
 
         LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(node));
 
@@ -122,17 +131,9 @@ public abstract class AbstractNetconfTopology {
         final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
 
-        final NetconfNodeHandler nodeHandler;
-        try {
-            nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor, baseSchemas,
-                schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade, deviceId,
-                nodeId, netconfNode, nodeOptional);
-        } catch (IllegalArgumentException e) {
-            // This is a workaround for NETCONF-1114 where the encrypted password's lexical structure is not enforced
-            // in the datastore and it ends up surfacing when we decrypt the password.
-            LOG.warn("RemoteDevice{{}} failed to connect", nodeId, e);
-            return;
-        }
+        final NetconfNodeHandler nodeHandler = new NetconfNodeHandler(clientDispatcher, eventExecutor,
+            keepaliveExecutor, baseSchemas, schemaManager, processingExecutor, clientConfigurationBuilder,
+            deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode, nodeOptional);
 
         // ... record it ...
         activeConnectors.put(nodeId, nodeHandler);
