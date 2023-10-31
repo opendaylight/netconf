@@ -52,6 +52,24 @@
       "parentUuid": "addd27a8_942da962",
       "revId": "6bf65e72cc3fa2aae2d94b14f0b8e532752e26d5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "230a1a80_1d0ca564",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-10-31T08:11:10Z",
+      "side": 1,
+      "message": "Its done here: https://jira.opendaylight.org/browse/NETCONF-1039",
+      "parentUuid": "f6d6d8e6_93c139af",
+      "revId": "6bf65e72cc3fa2aae2d94b14f0b8e532752e26d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
