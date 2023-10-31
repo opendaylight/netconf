@@ -79,7 +79,7 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
     }
 
     @Test
-    public void testDefault() {
+    public void testDefault() throws Exception {
         final var config = createConfig(nodeBuilder.setTcpOnly(false).build());
         assertEquals(NetconfClientProtocol.SSH, config.getProtocol());
         assertNotNull(config.getAuthHandler());
@@ -87,7 +87,7 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
     }
 
     @Test
-    public void testSsh() {
+    public void testSsh() throws Exception {
         final var config = createConfig(
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.SSH).build()).build());
         assertEquals(NetconfClientProtocol.SSH, config.getProtocol());
@@ -96,7 +96,7 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
     }
 
     @Test
-    public void testTcp() {
+    public void testTcp() throws Exception {
         final var config = createConfig(nodeBuilder.setTcpOnly(true).build());
         assertEquals(NetconfClientProtocol.TCP, config.getProtocol());
         assertNotNull(config.getAuthHandler());
@@ -104,7 +104,7 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
     }
 
     @Test
-    public void testTls() {
+    public void testTls() throws Exception {
         final var config = createConfig(
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build());
         assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
@@ -122,7 +122,7 @@ public class DefaultNetconfClientConfigurationBuilderFactoryTest {
         assertThrows(NoSuchElementException.class, () -> createConfig(nodeBuilder.setHost(null).build()));
     }
 
-    private NetconfClientConfiguration createConfig(final NetconfNode netconfNode) {
+    private NetconfClientConfiguration createConfig(final NetconfNode netconfNode) throws Exception {
         return factory.createClientConfigurationBuilder(NODE_ID, netconfNode)
             .withSessionListener(sessionListener)
             .build();

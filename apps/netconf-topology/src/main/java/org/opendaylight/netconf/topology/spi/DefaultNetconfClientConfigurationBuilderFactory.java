@@ -22,6 +22,7 @@ import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
+import org.opendaylight.netconf.topology.spi.exception.NetconfClientConfigurationBuilderException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231024.credentials.credentials.KeyAuth;
@@ -57,7 +58,7 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
 
     @Override
     public NetconfClientConfigurationBuilder createClientConfigurationBuilder(final NodeId nodeId,
-            final NetconfNode node) {
+            final NetconfNode node) throws NetconfClientConfigurationBuilderException {
         final var builder = NetconfClientConfigurationBuilder.create();
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
@@ -70,7 +71,7 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
             builder.withProtocol(NetconfClientProtocol.TLS)
                 .withSslHandlerFactory(sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification()));
         } else {
-            throw new IllegalArgumentException("Unsupported protocol type: " + protocol.getName());
+            throw new NetconfClientConfigurationBuilderException("Unsupported protocol type: " + protocol.getName());
         }
 
         final var helloCapabilities = node.getOdlHelloMessageCapabilities();
@@ -84,7 +85,8 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
             .withConnectionTimeoutMillis(node.requireConnectionTimeoutMillis().toJava());
     }
 
-    private @NonNull AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
+    private @NonNull AuthenticationHandler getHandlerFromCredentials(final Credentials credentials)
+            throws NetconfClientConfigurationBuilderException  {
         if (credentials instanceof LoginPassword loginPassword) {
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         } else if (credentials instanceof LoginPwUnencrypted unencrypted) {
@@ -96,14 +98,15 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
                 return new LoginPasswordHandler(loginPassword.getUsername(),
                     encryptionService.decrypt(loginPassword.getPassword()));
             } catch (DecryptionException e) {
-                throw new IllegalArgumentException("Failed to decrypt provided password", e);
+                throw new NetconfClientConfigurationBuilderException("Failed to decrypt provided password", e);
             }
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyPair = keyAuth.getKeyBased();
             return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getKeyId(), credentialProvider,
                 encryptionService);
         } else {
-            throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
+            throw new NetconfClientConfigurationBuilderException("Unsupported credential type: "
+                + credentials.getClass());
         }
     }
 }

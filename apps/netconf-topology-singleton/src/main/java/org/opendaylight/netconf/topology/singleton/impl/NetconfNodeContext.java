@@ -16,6 +16,7 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -25,6 +26,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUti
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
+import org.opendaylight.netconf.topology.spi.exception.NetconfClientConfigurationBuilderException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.slf4j.Logger;
@@ -137,14 +139,21 @@ final class NetconfNodeContext implements AutoCloseable {
 
         requireNonNull(netconfNode.getHost());
         requireNonNull(netconfNode.getPort());
+        final var nodeId = configNode.getNodeId();
+        final NetconfClientConfigurationBuilder clientConfigurationBuilder;
+        try {
+            clientConfigurationBuilder = builderFactory.createClientConfigurationBuilder(nodeId, netconfNode);
+        } catch (NetconfClientConfigurationBuilderException e) {
+            LOG.warn("RemoteDevice{{}} has invalid client configuration, not connecting it", nodeId, e);
+            return;
+        }
 
         // Instantiate the handler ...
         masterSalFacade = createSalFacade(netconfNode.requireLockDatastore());
-
         nodeHandler = new NetconfNodeHandler(setup.getNetconfClientDispatcher(), setup.getEventExecutor(),
             setup.getKeepaliveExecutor(), setup.getBaseSchemas(), schemaManager, setup.getProcessingExecutor(),
-            builderFactory, deviceActionFactory, masterSalFacade, remoteDeviceId, configNode.getNodeId(), netconfNode,
-            nodeOptional);
+            clientConfigurationBuilder, deviceActionFactory, masterSalFacade, remoteDeviceId, nodeId,
+            netconfNode, nodeOptional);
         nodeHandler.connect();
     }
 
