@@ -26,6 +26,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUti
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
+import org.opendaylight.netconf.topology.spi.exception.NetconfClientConfigurationBuilderException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.slf4j.Logger;
@@ -142,9 +143,7 @@ final class NetconfNodeContext implements AutoCloseable {
         final NetconfClientConfigurationBuilder clientConfigurationBuilder;
         try {
             clientConfigurationBuilder = builderFactory.createClientConfigurationBuilder(nodeId, netconfNode);
-        } catch (IllegalArgumentException e) {
-            // This is a workaround for NETCONF-1114 where the encrypted password's lexical structure is not enforced
-            // in the datastore and it ends up surfacing when we decrypt the password.
+        } catch (NetconfClientConfigurationBuilderException e) {
             LOG.warn("RemoteDevice{{}} has invalid client configuration, not connecting it", nodeId, e);
             return;
         }
