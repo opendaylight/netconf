@@ -105,7 +105,7 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
         certificatesReg.close();
     }
 
-    private static class CertificatesMonitor implements ClusteredDataTreeChangeListener<Keystore> {
+    private static final class CertificatesMonitor implements ClusteredDataTreeChangeListener<Keystore> {
 
         @Override
         public void onDataTreeChanged(@NonNull final Collection<DataTreeModification<Keystore>> changes) {
@@ -161,10 +161,10 @@ public class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, A
 
     }
 
-    private static class AllowedDevicesMonitor implements ClusteredDataTreeChangeListener<Device> {
+    private static final class AllowedDevicesMonitor implements ClusteredDataTreeChangeListener<Device> {
 
         @Override
-        public final void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
+        public void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
             for (final DataTreeModification<Device> dataTreeModification : mods) {
                 final DataObjectModification<Device> deviceMod = dataTreeModification.getRootNode();
                 final DataObjectModification.ModificationType modType = deviceMod.getModificationType();
