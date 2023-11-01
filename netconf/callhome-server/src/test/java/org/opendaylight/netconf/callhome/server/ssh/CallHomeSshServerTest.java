@@ -1,0 +1,228 @@
+/*
+ * Copyright (c) 2023 PANTHEON.tech s.r.o. and others. All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.netconf.callhome.server.ssh;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.opendaylight.netconf.api.TransportConstants.SSH_SUBSYSTEM;
+
+import io.netty.util.HashedWheelTimer;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.SocketAddress;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.RSAKeyGenParameterSpec;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import org.eclipse.jdt.annotation.Nullable;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
+import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshAuthSettings.DefaultAuthSettings;
+import org.opendaylight.netconf.client.NetconfClientSession;
+import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.server.NetconfServerSession;
+import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
+import org.opendaylight.netconf.server.ServerTransportInitializer;
+import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
+import org.opendaylight.netconf.server.api.monitoring.SessionListener;
+import org.opendaylight.netconf.server.impl.DefaultSessionIdProvider;
+import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFactory;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
+import org.opendaylight.netconf.shaded.sshd.server.auth.password.PasswordAuthenticator;
+import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
+import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
+import org.opendaylight.netconf.transport.ssh.SSHServer;
+import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
+import org.opendaylight.yangtools.yang.common.Uint16;
+
+@ExtendWith(MockitoExtension.class)
+public class CallHomeSshServerTest {
+    private static final long TIMEOUT = 5000L;
+    private static final Capabilities EMPTY_CAPABILITIES = new CapabilitiesBuilder().setCapability(Set.of()).build();
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "pa$$W0rd";
+
+    @Mock
+    private NetconfMonitoringService monitoringService;
+    @Mock
+    private SessionListener serverSessionListener;
+    @Mock
+    private NetconfClientSessionListener clientSessionListener;
+    @Mock
+    private CallHomeStatusRecorder statusRecorder;
+
+    @Test
+    void integrationTest() throws Exception {
+
+        // key pairs
+        final var serverKeys = generateKeyPair();
+        final var clientKeys1 = generateKeyPair();
+        final var clientKeys2 = generateKeyPair();
+        final var clientKeys3 = generateKeyPair();
+        final var clientKeys4 = generateKeyPair();
+
+        // Auth provider
+        final var authProvider = new CallHomeSshAuthProvider() {
+            @Override
+            public CallHomeSshAuthSettings provideAuth(final SocketAddress remoteAddress, final PublicKey publicKey) {
+                // identify client 2 by password (invalid)
+                if (clientKeys2.getPublic().equals(publicKey)) {
+                    return new DefaultAuthSettings("client2-id", USERNAME, Set.of("invalid-password"), null);
+                }
+                // identify client 3 by password (valid)
+                if (clientKeys3.getPublic().equals(publicKey)) {
+                    return new DefaultAuthSettings("client3-id", USERNAME, Set.of(PASSWORD), null);
+                }
+                // identify client 4 by public key
+                if (clientKeys4.getPublic().equals(publicKey)) {
+                    return new DefaultAuthSettings("client4-id", USERNAME, null, Set.of(serverKeys));
+                }
+                // client 1 is not identified
+                return null;
+            }
+        };
+
+        // Netconf layer for clients
+        doNothing().when(serverSessionListener).onSessionUp(any(NetconfServerSession.class));
+        lenient().doNothing().when(serverSessionListener).onSessionDown(any(NetconfServerSession.class));
+        doReturn(serverSessionListener).when(monitoringService).getSessionListener();
+        doReturn(EMPTY_CAPABILITIES).when(monitoringService).getCapabilities();
+
+        final var negotiatorFactory = NetconfServerSessionNegotiatorFactory.builder()
+            .setTimer(new HashedWheelTimer())
+            .setAggregatedOpService(new AggregatedNetconfOperationServiceFactory())
+            .setIdProvider(new DefaultSessionIdProvider())
+            .setConnectionTimeoutMillis(TIMEOUT)
+            .setMonitoringService(monitoringService)
+            .build();
+        final var netconfTransportListener = new ServerTransportInitializer(negotiatorFactory);
+
+        // tcp layer for clients
+        final var sshTransportFactory = new SSHTransportStackFactory("call-home-test-client", 0);
+        final var serverPort = serverPort();
+        final var tcpConnectParams = new TcpClientParametersBuilder()
+            .setRemoteAddress(new Host(IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress())))
+            .setRemotePort(new PortNumber(Uint16.valueOf(serverPort))).build();
+
+        // start Call-Home server
+        final var contextMgr = new CallHomeSshSessionContextManager() {
+            // inject netconf session listener
+            @Override
+            public CallHomeSshSessionContext createContext(String id, ClientSession clientSession) {
+                return new CallHomeSshSessionContext(id, clientSession.getRemoteAddress(), clientSession,
+                    clientSessionListener);
+            }
+        };
+        final var server = CallHomeSshServer.builder()
+            .withAuthProvider(authProvider)
+            .withSessionContextManager(contextMgr)
+            .withStatusRecorder(statusRecorder)
+            .withPort(serverPort).build();
+
+        SSHServer client1 = null;
+        SSHServer client2 = null;
+        SSHServer client3 = null;
+        SSHServer client4 = null;
+
+        try {
+
+            // clients configuration
+            final PasswordAuthenticator passwordAuth =
+                (username, password, session) -> USERNAME.equals(username) && PASSWORD.equals(password);
+
+            // client 1: rejected due to public key is not identified
+            client1 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
+                null, factoryMgr -> {
+                    factoryMgr.setKeyPairProvider(KeyPairProvider.wrap(clientKeys1));
+                    factoryMgr.setPasswordAuthenticator(passwordAuth);
+                    factoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                }).get(TIMEOUT, TimeUnit.MILLISECONDS);
+            // verify unknown key reported
+            verify(statusRecorder, timeout(TIMEOUT).times(1)).reportUnknown(eq(clientKeys1.getPublic()));
+
+            // client 2: rejected due to auth failure (wrong password)
+            client2 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
+                null, factoryMgr -> {
+                    factoryMgr.setKeyPairProvider(KeyPairProvider.wrap(clientKeys2));
+                    factoryMgr.setPasswordAuthenticator(passwordAuth);
+                    factoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                }).get(TIMEOUT, TimeUnit.MILLISECONDS);
+            // verify auth failure reported for known key
+            verify(statusRecorder, timeout(TIMEOUT).times(1)).reportFailedAuth(eq(clientKeys2.getPublic()));
+
+            // client 3: success with password auth
+            client3 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
+                null, factoryMgr -> {
+                    factoryMgr.setKeyPairProvider(KeyPairProvider.wrap(clientKeys3));
+                    factoryMgr.setPasswordAuthenticator(passwordAuth);
+                    factoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory()));
+                }).get(TIMEOUT, TimeUnit.MILLISECONDS);
+            // verify netconf sessions established
+            verify(clientSessionListener, timeout(TIMEOUT).times(1)).onSessionUp(any(NetconfClientSession.class));
+            verify(serverSessionListener, timeout(TIMEOUT).times(1)).onSessionUp(any(NetconfServerSession.class));
+
+            // client 4: success with public key auth
+            client4 = sshTransportFactory.connectServer(SSH_SUBSYSTEM, netconfTransportListener, tcpConnectParams,
+                null, factoryMgr -> {
+                    factoryMgr.setKeyPairProvider(KeyPairProvider.wrap(clientKeys4));
+                    final var pkFactory = new UserAuthPublicKeyFactory();
+                    pkFactory.setSignatureFactories(factoryMgr.getSignatureFactories());
+                    factoryMgr.setPublickeyAuthenticator(
+                        (username, publicKey, session) -> serverKeys.getPublic().equals(publicKey));
+                    factoryMgr.setUserAuthFactories(List.of(pkFactory));
+                }).get(TIMEOUT, TimeUnit.MILLISECONDS);
+            // verify netconf sessions established
+            verify(clientSessionListener, timeout(TIMEOUT).times(2)).onSessionUp(any(NetconfClientSession.class));
+            verify(serverSessionListener, timeout(TIMEOUT).times(2)).onSessionUp(any(NetconfServerSession.class));
+
+        } finally {
+            server.close();
+            shutdownClient(client1);
+            shutdownClient(client2);
+            shutdownClient(client3);
+            shutdownClient(client4);
+        }
+    }
+
+    private static void shutdownClient(final @Nullable SSHServer client) throws Exception {
+        if (client != null) {
+            client.shutdown().get(TIMEOUT, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private static int serverPort() throws Exception {
+        try (var socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        }
+    }
+
+    private static KeyPair generateKeyPair() throws Exception {
+        final var keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4), new SecureRandom());
+        return keyPairGenerator.generateKeyPair();
+    }
+}
