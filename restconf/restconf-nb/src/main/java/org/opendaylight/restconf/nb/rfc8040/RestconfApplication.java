@@ -35,7 +35,7 @@ public class RestconfApplication extends AbstractRestconfApplication {
             final DOMSchemaService domSchemaService, final SubscribeToStreamUtil streamUtils) {
         super(databindProvider, List.of(
             streamSubscription,
-            new RestconfDataServiceImpl(databindProvider, server, dataBroker, streamSubscription, actionService),
+            new RestconfDataServiceImpl(databindProvider, server, actionService),
             new RestconfInvokeOperationsServiceImpl(databindProvider, server, mountPointService, streamUtils),
             new RestconfOperationsServiceImpl(databindProvider, server),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
