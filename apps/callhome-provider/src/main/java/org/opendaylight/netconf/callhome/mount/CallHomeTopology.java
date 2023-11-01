@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.netty.util.Timer;
 import java.util.concurrent.Executor;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -22,8 +21,8 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
 // Non-final for mocking
-public class CallHomeTopology extends AbstractNetconfTopology {
-    public CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
+class CallHomeTopology extends AbstractNetconfTopology {
+    CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
             final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final NetconfClientConfigurationBuilderFactory builderFactory, final BaseNetconfSchemas baseSchemas,
@@ -32,12 +31,11 @@ public class CallHomeTopology extends AbstractNetconfTopology {
             mountPointService, builderFactory, deviceActionFactory, baseSchemas);
     }
 
-    void disconnectNode(final NodeId nodeId) {
+    void disableNode(final NodeId nodeId) {
         deleteNode(nodeId);
     }
 
-    @VisibleForTesting
-    public void connectNode(final Node node) {
+    void enableNode(final Node node) {
         ensureNode(node);
     }
 }
