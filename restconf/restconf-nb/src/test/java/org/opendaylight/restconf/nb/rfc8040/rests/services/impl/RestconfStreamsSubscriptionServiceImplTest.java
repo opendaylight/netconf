@@ -15,7 +15,6 @@ import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.net.URI;
-import java.net.URISyntaxException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -42,8 +41,6 @@ import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev14070
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotificationListenerTest {
@@ -57,19 +54,15 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
     @Mock
     private DOMNotificationService notificationService;
 
-    private final ListenersBroker listenersBroker = new ListenersBroker();
     private final DatabindProvider databindProvider = () -> DatabindContext.ofModel(MODEL_CONTEXT);
 
     @Before
-    public void setUp() throws URISyntaxException {
-        listenersBroker.registerDataChangeListener(MODEL_CONTEXT, LogicalDatastoreType.OPERATIONAL,
-            YangInstanceIdentifier.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster")),
-            Scope.ONE, NotificationOutputType.JSON);
-        final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
+    public void setUp() throws Exception {
+        final var wTx = mock(DOMDataTreeWriteTransaction.class);
         doReturn(wTx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
-        DOMDataTreeChangeService dataTreeChangeService = mock(DOMDataTreeChangeService.class);
+        final var dataTreeChangeService = mock(DOMDataTreeChangeService.class);
         doReturn(mock(ListenerRegistration.class)).when(dataTreeChangeService)
                 .registerDataTreeChangeListener(any(), any());
 
@@ -83,11 +76,12 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
 
     @Test
     public void testSubscribeToStreamSSE() {
+        final var listenersBroker = new ListenersBroker.ServerSentEvents();
         listenersBroker.registerDataChangeListener(MODEL_CONTEXT, LogicalDatastoreType.OPERATIONAL,
             IdentifierCodec.deserialize("toaster:toaster/toasterStatus", MODEL_CONTEXT), Scope.ONE,
             NotificationOutputType.XML);
         final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
-            notificationService, databindProvider, SubscribeToStreamUtil.serverSentEvents(listenersBroker));
+            notificationService, databindProvider,listenersBroker);
         final var response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
         assertEquals("http://localhost:8181/" + URLConstants.BASE_PATH + "/" + URLConstants.SSE_SUBPATH
@@ -97,11 +91,12 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
 
     @Test
     public void testSubscribeToStreamWS() {
+        final var listenersBroker = new ListenersBroker.WebSockets();
         listenersBroker.registerDataChangeListener(MODEL_CONTEXT, LogicalDatastoreType.OPERATIONAL,
             IdentifierCodec.deserialize("toaster:toaster/toasterStatus", MODEL_CONTEXT), Scope.ONE,
             NotificationOutputType.XML);
         final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
-            notificationService, databindProvider, SubscribeToStreamUtil.webSockets(listenersBroker));
+            notificationService, databindProvider, listenersBroker);
         final var response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
         assertEquals("ws://localhost:8181/" + URLConstants.BASE_PATH
@@ -111,8 +106,9 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
 
     @Test
     public void testSubscribeToStreamMissingDatastoreInPath() {
+        final var listenersBroker = new ListenersBroker.WebSockets();
         final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
-            notificationService, databindProvider, SubscribeToStreamUtil.webSockets(listenersBroker));
+            notificationService, databindProvider, listenersBroker);
         final var errors = assertThrows(RestconfDocumentedException.class,
             () -> streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", uriInfo))
             .getErrors();
@@ -125,8 +121,9 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
 
     @Test
     public void testSubscribeToStreamMissingScopeInPath() {
+        final var listenersBroker = new ListenersBroker.WebSockets();
         final var streamsSubscriptionService = new RestconfStreamsSubscriptionServiceImpl(dataBroker,
-            notificationService, databindProvider, SubscribeToStreamUtil.webSockets(listenersBroker));
+            notificationService, databindProvider, listenersBroker);
         final var errors = assertThrows(RestconfDocumentedException.class,
             () -> streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 uriInfo)).getErrors();

@@ -31,7 +31,7 @@ import org.xmlunit.assertj.XmlAssert;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class XmlNotificationListenerTest extends AbstractNotificationListenerTest {
-    private final ListenersBroker listenersBroker = new ListenersBroker();
+    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
 
     @Test
     public void notifi_leafTest() throws Exception {

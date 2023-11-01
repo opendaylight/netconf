@@ -34,7 +34,7 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
     private static final String REGISTERED_STREAM_NAME = "data-change-event-subscription/"
             + "toaster:toaster/datastore=CONFIGURATION/scope=SUBTREE/JSON";
 
-    private final ListenersBroker listenersBroker = new ListenersBroker();
+    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
 
     @Mock
     private ScheduledExecutorService execService;
