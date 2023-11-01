@@ -13,6 +13,7 @@ import java.net.URI;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -74,7 +75,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         return Response.ok()
             .location(location)
             .entity(new NormalizedNodePayload(
-                Inference.ofDataTreePath(handlersHolder.getDatabindProvider().currentContext().modelContext(),
+                Inference.ofDataTreePath(handlersHolder.databindProvider().currentContext().modelContext(),
                     Notifi.QNAME, LOCATION_QNAME),
                 ImmutableNodes.leafNode(LOCATION_NODEID, location.toString())))
             .build();
@@ -84,43 +85,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * Holder of all handlers for notifications.
      */
     // FIXME: why do we even need this class?!
-    public static final class HandlersHolder {
-        private final DOMDataBroker dataBroker;
-        private final DOMNotificationService notificationService;
-        private final DatabindProvider databindProvider;
+    public record HandlersHolder(
+            @NonNull DOMDataBroker dataBroker,
+            @NonNull DOMNotificationService notificationService,
+            @NonNull DatabindProvider databindProvider) {
 
-        private HandlersHolder(final DOMDataBroker dataBroker, final DOMNotificationService notificationService,
-                final DatabindProvider databindProvider) {
-            this.dataBroker = dataBroker;
-            this.notificationService = notificationService;
-            this.databindProvider = databindProvider;
-        }
-
-        /**
-         * Get {@link DOMDataBroker}.
-         *
-         * @return the dataBroker
-         */
-        public DOMDataBroker getDataBroker() {
-            return dataBroker;
-        }
-
-        /**
-         * Get {@link DOMNotificationService}.
-         *
-         * @return the notificationService
-         */
-        public DOMNotificationService getNotificationServiceHandler() {
-            return notificationService;
-        }
-
-        /**
-         * Get {@link DatabindProvider}.
-         *
-         * @return the schemaHandler
-         */
-        public DatabindProvider getDatabindProvider() {
-            return databindProvider;
+        public HandlersHolder {
+            requireNonNull(dataBroker);
+            requireNonNull(notificationService);
+            requireNonNull(databindProvider);
         }
     }
 }

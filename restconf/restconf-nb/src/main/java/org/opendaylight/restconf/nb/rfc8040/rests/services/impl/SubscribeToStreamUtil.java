@@ -131,9 +131,9 @@ public abstract class SubscribeToStreamUtil {
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         notificationListenerAdapter.setQueryParams(notificationQueryParams);
-        notificationListenerAdapter.listen(handlersHolder.getNotificationServiceHandler());
-        final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
-        notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.getDatabindProvider());
+        notificationListenerAdapter.listen(handlersHolder.notificationService());
+        final DOMDataBroker dataBroker = handlersHolder.dataBroker();
+        notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.databindProvider());
         final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(streamName,
             notificationListenerAdapter.qnames(), notificationListenerAdapter.getStart(),
             notificationListenerAdapter.getOutputType(), uri);
@@ -166,8 +166,8 @@ public abstract class SubscribeToStreamUtil {
 
         listener.setQueryParams(notificationQueryParams);
 
-        final var dataBroker = handlersHolder.getDataBroker();
-        final var schemaHandler = handlersHolder.getDatabindProvider();
+        final var dataBroker = handlersHolder.dataBroker();
+        final var schemaHandler = handlersHolder.databindProvider();
         listener.setCloseVars(dataBroker, schemaHandler);
         listener.listen(dataBroker);
 
