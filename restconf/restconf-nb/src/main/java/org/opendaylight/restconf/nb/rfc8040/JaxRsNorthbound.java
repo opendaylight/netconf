@@ -27,7 +27,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
@@ -102,8 +101,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             streamServlet = ServletDetails.builder()
                 .addUrlPattern("/" + URLConstants.SSE_SUBPATH + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(
-                    new DataStreamApplication(databindProvider,
-                        new RestconfDataStreamServiceImpl(scheduledThreadPool, listenersBroker, streamsConfiguration)))
+                    new ServerSentEventsApplication(scheduledThreadPool, listenersBroker, streamsConfiguration))
                     .build())
                 .name("notificationServlet")
                 .asyncSupported(true)
