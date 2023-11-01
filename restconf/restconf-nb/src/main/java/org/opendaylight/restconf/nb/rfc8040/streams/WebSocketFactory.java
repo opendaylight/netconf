@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

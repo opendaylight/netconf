@@ -5,16 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
+package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import java.util.Set;
-import org.opendaylight.restconf.nb.rfc8040.streams.StreamSessionHandler;
 
 /**
  * Base interface for both listeners({@link ListenerAdapter}, {@link NotificationListenerAdapter}).
  */
 public interface BaseListenerInterface extends AutoCloseable {
-
     /**
      * Return all subscribers of listener.
      *

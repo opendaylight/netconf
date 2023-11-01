@@ -29,7 +29,6 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 
 public class WebSocketSessionHandlerTest {
 

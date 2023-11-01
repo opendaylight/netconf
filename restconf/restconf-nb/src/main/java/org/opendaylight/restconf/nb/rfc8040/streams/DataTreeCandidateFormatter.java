@@ -5,12 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
+package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.SAL_REMOTE_NAMESPACE;
-import static org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationFormatter.XML_OUTPUT_FACTORY;
+import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
+import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
+import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.SAL_REMOTE_NAMESPACE;
+import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.XML_OUTPUT_FACTORY;
 
 import java.io.IOException;
 import java.util.Collection;

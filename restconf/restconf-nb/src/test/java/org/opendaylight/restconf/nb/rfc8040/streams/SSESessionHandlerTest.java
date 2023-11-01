@@ -31,7 +31,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SSESessionHandlerTest {

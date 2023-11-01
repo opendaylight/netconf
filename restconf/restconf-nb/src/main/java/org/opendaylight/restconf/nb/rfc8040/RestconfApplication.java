@@ -23,7 +23,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfInvokeOp
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
+import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
 
 @Singleton
 public class RestconfApplication extends AbstractRestconfApplication {

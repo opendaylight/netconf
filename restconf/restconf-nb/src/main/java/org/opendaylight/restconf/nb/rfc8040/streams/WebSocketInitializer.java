@@ -16,7 +16,6 @@ import javax.inject.Singleton;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 
 /**
  * Web-socket servlet listening on ws or wss schemas for created data-change-event or notification streams.
