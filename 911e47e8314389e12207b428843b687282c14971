@@ -16,6 +16,24 @@
       "message": "This needs a unit test focused on the failure being fixed",
       "revId": "911e47e8314389e12207b428843b687282c14971",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c3f58ff_1db6cc2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 612
+      },
+      "writtenOn": "2023-11-01T18:27:46Z",
+      "side": 1,
+      "message": "PS8 introduces such test so it is clear that it fails on unchanged code\nPS9 contains the fix",
+      "parentUuid": "626c901d_cb231989",
+      "revId": "911e47e8314389e12207b428843b687282c14971",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
