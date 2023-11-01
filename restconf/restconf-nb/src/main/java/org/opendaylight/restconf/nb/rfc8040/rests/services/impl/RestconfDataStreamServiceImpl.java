@@ -10,8 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.ScheduledExecutorService;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -34,7 +32,6 @@ import org.slf4j.LoggerFactory;
  * Access to notification streams via Server-Sent Events.
  */
 @Path("/")
-@Singleton
 public final class RestconfDataStreamServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataStreamServiceImpl.class);
 
@@ -43,7 +40,6 @@ public final class RestconfDataStreamServiceImpl {
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
-    @Inject
     public RestconfDataStreamServiceImpl(final ScheduledThreadPool scheduledThreadPool,
             final ListenersBroker listenersBroker, final StreamsConfiguration configuration) {
         executorService = scheduledThreadPool.getExecutor();
