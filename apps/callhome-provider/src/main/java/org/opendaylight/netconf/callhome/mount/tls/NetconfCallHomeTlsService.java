@@ -7,73 +7,77 @@
  */
 package org.opendaylight.netconf.callhome.mount.tls;
 
-import static java.util.Objects.requireNonNull;
-
-import io.netty.channel.EventLoopGroup;
-import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
-import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServer;
-import org.opendaylight.netconf.callhome.protocol.tls.NetconfCallHomeTlsServerBuilder;
-import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.opendaylight.netconf.callhome.mount.CallHomeMountService;
+import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
+import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsAuthProvider;
+import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsServer;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(service = { })
+@Component(service = NetconfCallHomeTlsService.class,
+    configurationPid = "org.opendaylight.netconf.callhome.mount.tls.server")
+@Designate(ocd = NetconfCallHomeTlsService.Configuration.class)
+@Singleton
 public class NetconfCallHomeTlsService implements AutoCloseable {
+
+    @ObjectClassDefinition
+    public @interface Configuration {
+        @AttributeDefinition
+        String host() default "0.0.0.0";
+
+        @AttributeDefinition(min = "1", max = "65535")
+        int port() default 4335;
+
+        @AttributeDefinition
+        int timeoutMillis() default 10_000;
+
+        @AttributeDefinition
+        int maxConnections() default 64;
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(NetconfCallHomeTlsService.class);
 
-    private final NetconfCallHomeTlsServer server;
+    private final CallHomeTlsServer server;
 
     @Activate
-    public NetconfCallHomeTlsService(@Reference final SslHandlerFactoryProvider sslHandlerFactoryProvider,
-            @Reference final TlsAllowedDevicesMonitor allowedDevicesMonitor,
-            @Reference final CallHomeNetconfSubsystemListener subsystemListener,
-            @Reference(target = "(type=global-boss-group)") final EventLoopGroup bossGroup,
-            @Reference(target = "(type=global-worker-group)") final EventLoopGroup workerGroup) {
-        this(sslHandlerFactoryProvider, allowedDevicesMonitor, subsystemListener, bossGroup, workerGroup,
-            // FIXME: tie together with OSGi Config Admin
-            defaultTlsConfiguration());
-    }
+    @Inject
+    public NetconfCallHomeTlsService(
+            final @Reference CallHomeMountService mountService,
+            final @Reference CallHomeTlsAuthProvider authProvider,
+            final @Reference CallHomeStatusRecorder statusRecorder,
+            final Configuration configuration) {
 
-    public NetconfCallHomeTlsService(final SslHandlerFactoryProvider sslHandlerFactoryProvider,
-                                     final TlsAllowedDevicesMonitor allowedDevicesMonitor,
-                                     final CallHomeNetconfSubsystemListener subsystemListener,
-                                     final EventLoopGroup bossGroup,
-                                     final EventLoopGroup workerGroup, final Configuration config) {
-        LOG.info("Initializing Call Home TLS server instance");
-        server = new NetconfCallHomeTlsServerBuilder()
-            .setHost(config.getHost())
-            .setPort(config.getPort())
-            .setTimeout(config.getTimeout())
-            .setMaxConnections(config.getMaxConnections())
-            .setAllowedDevicesMonitor(requireNonNull(allowedDevicesMonitor))
-            .setSslHandlerFactory(new SslHandlerFactoryAdapter(sslHandlerFactoryProvider.getSslHandlerFactory(null),
-                allowedDevicesMonitor))
-            .setSubsystemListener(requireNonNull(subsystemListener))
-            .setBossGroup(requireNonNull(bossGroup))
-            .setWorkerGroup(requireNonNull(workerGroup))
-            .build();
-        server.start();
-
-        LOG.info("Initializing Call Home TLS server instance completed successfuly");
-    }
-
-    private static Configuration defaultTlsConfiguration() {
-        final var conf = new Configuration();
-        conf.setHost("0.0.0.0");
-        conf.setPort(4335);
-        conf.setTimeout(10_000);
-        conf.setMaxConnections(64);
-        return conf;
+        LOG.info("Starting Call-Home TLS server at {}:{}", configuration.host(), configuration.port());
+        try {
+            server = CallHomeTlsServer.builder()
+                .withAddress(InetAddress.getByName(configuration.host()))
+                .withPort(configuration.port())
+                .withTimeout(configuration.timeoutMillis())
+                .withMaxConnections(configuration.maxConnections())
+                .withAuthProvider(authProvider)
+                .withSessionContextManager(
+                    mountService.createTlsSessionContextManager(authProvider, statusRecorder))
+                .build();
+        } catch (UnknownHostException e) {
+            throw new IllegalArgumentException("invalid host", e);
+        }
+        LOG.info("Call-Home TLS server started");
     }
 
     @Deactivate
     @Override
-    public void close() {
-        server.stop();
+    public void close() throws Exception {
+        server.close();
     }
 }
