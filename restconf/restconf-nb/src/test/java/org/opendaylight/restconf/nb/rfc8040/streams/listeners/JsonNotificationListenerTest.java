@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public class JsonNotificationListenerTest extends AbstractNotificationListenerTest {
     private static final Logger LOG = LoggerFactory.getLogger(JsonNotificationListenerTest.class);
 
-    private final ListenersBroker listenersBroker = new ListenersBroker();
+    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
 
     @Test
     public void notifi_leafTest() throws Exception {

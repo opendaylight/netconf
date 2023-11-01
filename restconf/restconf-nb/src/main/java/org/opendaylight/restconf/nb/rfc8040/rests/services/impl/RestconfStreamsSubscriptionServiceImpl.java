@@ -22,6 +22,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yang.gen.v1.subscribe.to.notification.rev161028.Notifi;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -39,7 +40,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     private static final QName LOCATION_QNAME = QName.create(Notifi.QNAME, "location").intern();
     private static final NodeIdentifier LOCATION_NODEID = NodeIdentifier.create(LOCATION_QNAME);
 
-    private final SubscribeToStreamUtil streamUtils;
+    private final ListenersBroker listenersBroker;
     private final HandlersHolder handlersHolder;
 
     /**
@@ -48,13 +49,13 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      * @param dataBroker {@link DOMDataBroker}
      * @param notificationService {@link DOMNotificationService}
      * @param databindProvider a {@link DatabindProvider}
-     * @param streamUtils a {@link SubscribeToStreamUtil}
+     * @param listenersBroker a {@link ListenersBroker}
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
             final DOMNotificationService notificationService, final DatabindProvider databindProvider,
-            final SubscribeToStreamUtil streamUtils) {
+            final ListenersBroker listenersBroker) {
         handlersHolder = new HandlersHolder(dataBroker, notificationService, databindProvider);
-        this.streamUtils = requireNonNull(streamUtils);
+        this.listenersBroker = requireNonNull(listenersBroker);
     }
 
     @Override
@@ -63,9 +64,9 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         final URI location;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            location = streamUtils.subscribeToDataStream(identifier, uriInfo, params, handlersHolder);
+            location = listenersBroker.subscribeToDataStream(identifier, uriInfo, params, handlersHolder);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-            location = streamUtils.subscribeToYangStream(identifier, uriInfo, params, handlersHolder);
+            location = listenersBroker.subscribeToYangStream(identifier, uriInfo, params, handlersHolder);
         } else {
             final String msg = "Bad type of notification of sal-remote";
             LOG.warn(msg);

@@ -89,7 +89,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     public void setup() {
         server = new MdsalRestconfServer(dataBroker, rpcService, mountPointService);
         invokeOperationsService = new RestconfInvokeOperationsServiceImpl(() -> CONTEXT, server, mountPointService,
-            SubscribeToStreamUtil.webSockets(new ListenersBroker()));
+            new ListenersBroker.WebSockets());
     }
 
     @Test

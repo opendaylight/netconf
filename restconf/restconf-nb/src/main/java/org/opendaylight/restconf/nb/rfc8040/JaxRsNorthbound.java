@@ -28,7 +28,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.SubscribeToStreamUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
@@ -78,11 +77,10 @@ public final class JaxRsNorthbound implements AutoCloseable {
             @Reference final DOMMountPointService mountPointService,
             @Reference final DOMNotificationService notificationService, @Reference final DOMRpcService rpcService,
             @Reference final DOMSchemaService schemaService, @Reference final DatabindProvider databindProvider,
-            @Reference final MdsalRestconfServer server, @Reference final ListenersBroker listenersBroker,
-            final Configuration configuration) throws ServletException {
+            @Reference final MdsalRestconfServer server, final Configuration configuration) throws ServletException {
         this(webServer, webContextSecurer, servletSupport, filterAdapterConfiguration, actionService, dataBroker,
             mountPointService, notificationService, rpcService, schemaService, databindProvider, server,
-            listenersBroker, configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
+            configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval(), configuration.use$_$sse()));
     }
@@ -92,16 +90,15 @@ public final class JaxRsNorthbound implements AutoCloseable {
             final DOMActionService actionService, final DOMDataBroker dataBroker,
             final DOMMountPointService mountPointService, final DOMNotificationService notificationService,
             final DOMRpcService rpcService, final DOMSchemaService schemaService,
-            final DatabindProvider databindProvider, final MdsalRestconfServer server,
-            final ListenersBroker listenersBroker, final String pingNamePrefix, final int pingMaxThreadCount,
-            final StreamsConfiguration streamsConfiguration) throws ServletException {
+            final DatabindProvider databindProvider, final MdsalRestconfServer server, final String pingNamePrefix,
+            final int pingMaxThreadCount, final StreamsConfiguration streamsConfiguration) throws ServletException {
         final var scheduledThreadPool = new ScheduledThreadPoolWrapper(pingMaxThreadCount,
             new NamingThreadPoolFactory(pingNamePrefix));
 
-        final SubscribeToStreamUtil streamUtils;
+        final ListenersBroker listenersBroker;
         final ServletDetails streamServlet;
         if (streamsConfiguration.useSSE()) {
-            streamUtils = SubscribeToStreamUtil.serverSentEvents(listenersBroker);
+            listenersBroker = new ListenersBroker.ServerSentEvents();
             streamServlet = ServletDetails.builder()
                 .addUrlPattern("/" + URLConstants.SSE_SUBPATH + "/*")
                 .servlet(servletSupport.createHttpServletBuilder(
@@ -112,7 +109,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .asyncSupported(true)
                 .build();
         } else {
-            streamUtils = SubscribeToStreamUtil.webSockets(listenersBroker);
+            listenersBroker = new ListenersBroker.WebSockets();
             streamServlet = ServletDetails.builder()
                 .addUrlPattern("/" + RestconfStreamsConstants.DATA_SUBSCRIPTION + "/*")
                 .addUrlPattern("/" + RestconfStreamsConstants.NOTIFICATION_STREAM + "/*")
@@ -129,7 +126,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                 .addUrlPattern("/*")
                 .servlet(servletSupport.createHttpServletBuilder(
                     new RestconfApplication(databindProvider, server, mountPointService, dataBroker, actionService,
-                        notificationService, schemaService, streamUtils))
+                        notificationService, schemaService, listenersBroker))
                     .build())
                 .asyncSupported(true)
                 .build())
