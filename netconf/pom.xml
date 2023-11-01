@@ -37,6 +37,7 @@
 
     <module>callhome-model</module>
     <module>callhome-protocol</module>
+    <module>callhome-server</module>
 
     <module>netconf-test-models</module>
   </modules>
