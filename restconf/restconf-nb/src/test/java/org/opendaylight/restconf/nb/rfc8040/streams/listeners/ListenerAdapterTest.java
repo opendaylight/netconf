@@ -149,7 +149,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
-    private final ListenersBroker listenersBroker = new ListenersBroker();
+    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
     private DatabindProvider databindProvider;

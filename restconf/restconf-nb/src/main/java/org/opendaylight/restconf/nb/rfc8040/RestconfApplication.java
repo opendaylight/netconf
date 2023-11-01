@@ -23,7 +23,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfInvokeOp
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.SubscribeToStreamUtil;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 
 @Singleton
 public class RestconfApplication extends AbstractRestconfApplication {
@@ -31,12 +31,13 @@ public class RestconfApplication extends AbstractRestconfApplication {
     public RestconfApplication(final DatabindProvider databindProvider, final MdsalRestconfServer server,
             final DOMMountPointService mountPointService, final DOMDataBroker dataBroker,
             final DOMActionService actionService, final DOMNotificationService notificationService,
-            final DOMSchemaService domSchemaService, final SubscribeToStreamUtil streamUtils) {
+            final DOMSchemaService domSchemaService, final ListenersBroker listenersBroker) {
         super(databindProvider, List.of(
             // FIXME: NETCONF:1102: do not instantiate this service
-            new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider, streamUtils),
+            new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider,
+                listenersBroker),
             new RestconfDataServiceImpl(databindProvider, server, actionService),
-            new RestconfInvokeOperationsServiceImpl(databindProvider, server, mountPointService, streamUtils),
+            new RestconfInvokeOperationsServiceImpl(databindProvider, server, mountPointService, listenersBroker),
             new RestconfOperationsServiceImpl(databindProvider, server),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
             new RestconfImpl(databindProvider)));
