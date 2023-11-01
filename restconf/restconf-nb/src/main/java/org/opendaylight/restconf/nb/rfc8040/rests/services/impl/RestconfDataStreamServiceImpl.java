@@ -17,17 +17,16 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.SSESessionHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +66,7 @@ public final class RestconfDataStreamServiceImpl {
         final var listener = listenersBroker.listenerFor(streamName);
         if (listener == null) {
             LOG.debug("Listener for stream with name {} was not found.", streamName);
-            throw new RestconfDocumentedException("Data missing", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+            throw new WebApplicationException("No such stream: " + streamName, Status.NOT_FOUND);
         }
 
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
