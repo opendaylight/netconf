@@ -161,7 +161,7 @@ public final class ListenersBroker {
         final long stamp = dataChangeListenersLock.writeLock();
         try {
             return dataChangeListeners.computeIfAbsent(sb.toString(),
-                streamName -> new ListenerAdapter(path, streamName, outputType, this));
+                streamName -> new ListenerAdapter(datastore, path, streamName, outputType, this));
         } finally {
             dataChangeListenersLock.unlockWrite(stamp);
         }

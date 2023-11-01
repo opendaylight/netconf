@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.ClusteredDOMDataTreeChangeListener;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -37,7 +38,8 @@ public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTre
     private static final DataTreeCandidateFormatterFactory JSON_FORMATTER_FACTORY =
             JSONDataTreeCandidateFormatter.createFactory(JSONCodecFactorySupplier.RFC7951);
 
-    private final YangInstanceIdentifier path;
+    private final @NonNull LogicalDatastoreType datastore;
+    private final @NonNull YangInstanceIdentifier path;
 
     /**
      * Creates new {@link ListenerAdapter} listener specified by path and stream name and register for subscribing.
@@ -47,9 +49,10 @@ public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTre
      * @param outputType Type of output on notification (JSON, XML).
      */
     @VisibleForTesting
-    public ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
-            final NotificationOutputType outputType, final ListenersBroker listenersBroker) {
+    public ListenerAdapter(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
+            final String streamName, final NotificationOutputType outputType, final ListenersBroker listenersBroker) {
         super(streamName, outputType, getFormatterFactory(outputType), listenersBroker);
+        this.datastore = requireNonNull(datastore);
         this.path = requireNonNull(path);
     }
 
@@ -99,18 +102,16 @@ public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTre
      * Register data change listener in DOM data broker and set it to listener on stream.
      *
      * @param domDataBroker data broker for register data change listener
-     * @param datastore     {@link LogicalDatastoreType}
      */
-    public final synchronized void listen(final DOMDataBroker domDataBroker, final LogicalDatastoreType datastore) {
+    public final synchronized void listen(final DOMDataBroker domDataBroker) {
         if (!isListening()) {
-            final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
-                .getInstance(DOMDataTreeChangeService.class);
+            final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
             if (changeService == null) {
                 throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService");
             }
 
             setRegistration(changeService.registerDataTreeChangeListener(
-                new DOMDataTreeIdentifier(datastore, getPath()), this));
+                new DOMDataTreeIdentifier(datastore, path), this));
         }
     }
 

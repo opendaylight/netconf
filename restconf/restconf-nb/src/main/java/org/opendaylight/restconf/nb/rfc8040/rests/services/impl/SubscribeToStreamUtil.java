@@ -12,8 +12,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Splitter;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
@@ -24,17 +22,13 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.monitoring.RestconfStateStreams;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
-import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,24 +157,8 @@ public abstract class SubscribeToStreamUtil {
      */
     final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
-        final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
-
-        final String datastoreParam = mapOfValues.get(RestconfStreamsConstants.DATASTORE_PARAM_NAME);
-        if (isNullOrEmpty(datastoreParam)) {
-            final String message = "Stream name does not contain datastore value (pattern /datastore=)";
-            LOG.debug(message);
-            throw new RestconfDocumentedException(message, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
-        }
-
-        // FIXME: this is kept only for compatibility, we are not using this parameter
-        if (isNullOrEmpty(mapOfValues.get(RestconfStreamsConstants.SCOPE_PARAM_NAME))) {
-            final String message = "Stream name does not contain scope value (pattern /scope=)";
-            LOG.warn(message);
-            throw new RestconfDocumentedException(message, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
-        }
-
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        final ListenerAdapter listener = listenersBroker.dataChangeListenerFor(streamName);
+        final var streamName = ListenersBroker.createStreamNameFromUri(identifier);
+        final var listener = listenersBroker.dataChangeListenerFor(streamName);
         if (listener == null) {
             throw new RestconfDocumentedException("No listener found for stream " + streamName,
                 ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
@@ -188,18 +166,18 @@ public abstract class SubscribeToStreamUtil {
 
         listener.setQueryParams(notificationQueryParams);
 
-        final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
-        final DatabindProvider schemaHandler = handlersHolder.getDatabindProvider();
+        final var dataBroker = handlersHolder.getDataBroker();
+        final var schemaHandler = handlersHolder.getDatabindProvider();
         listener.setCloseVars(dataBroker, schemaHandler);
-        listener.listen(dataBroker, LogicalDatastoreType.valueOf(datastoreParam));
+        listener.listen(dataBroker);
 
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
-        final EffectiveModelContext schemaContext = schemaHandler.currentContext().modelContext();
-        final String serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
+        final var uri = prepareUriByStreamName(uriInfo, streamName);
+        final var schemaContext = schemaHandler.currentContext().modelContext();
+        final var serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 
-        final MapEntryNode mapToStreams = RestconfStateStreams.dataChangeStreamEntry(listener.getPath(),
+        final var mapToStreams = RestconfStateStreams.dataChangeStreamEntry(listener.getPath(),
                 listener.getStart(), listener.getOutputType(), uri, schemaContext, serializedPath);
-        final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+        final var writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
         return uri;
@@ -218,22 +196,5 @@ public abstract class SubscribeToStreamUtil {
         } catch (final InterruptedException | ExecutionException e) {
             throw new RestconfDocumentedException("Problem while putting data to DS.", e);
         }
-    }
-
-    /**
-     * Prepare map of URI parameter-values.
-     *
-     * @param identifier String identification of URI.
-     * @return Map od URI parameters and values.
-     */
-    private static Map<String, String> mapValuesFromUri(final String identifier) {
-        final var result = new HashMap<String, String>();
-        for (final String token : SLASH_SPLITTER.split(identifier)) {
-            final String[] paramToken = token.split("=");
-            if (paramToken.length == 2) {
-                result.put(paramToken[0], paramToken[1]);
-            }
-        }
-        return result;
     }
 }
