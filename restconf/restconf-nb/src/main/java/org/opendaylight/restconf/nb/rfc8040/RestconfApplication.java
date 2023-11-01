@@ -16,7 +16,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
@@ -28,27 +27,18 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.SubscribeToStrea
 
 @Singleton
 public class RestconfApplication extends AbstractRestconfApplication {
-    private RestconfApplication(final DatabindProvider databindProvider, final MdsalRestconfServer server,
-            final DOMMountPointService mountPointService,
-            final RestconfStreamsSubscriptionService streamSubscription, final DOMDataBroker dataBroker,
-            final DOMActionService actionService, final DOMNotificationService notificationService,
-            final DOMSchemaService domSchemaService, final SubscribeToStreamUtil streamUtils) {
-        super(databindProvider, List.of(
-            streamSubscription,
-            new RestconfDataServiceImpl(databindProvider, server, dataBroker, streamSubscription, actionService),
-            new RestconfInvokeOperationsServiceImpl(databindProvider, server, mountPointService, streamUtils),
-            new RestconfOperationsServiceImpl(databindProvider, server),
-            new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
-            new RestconfImpl(databindProvider)));
-    }
-
     @Inject
     public RestconfApplication(final DatabindProvider databindProvider, final MdsalRestconfServer server,
             final DOMMountPointService mountPointService, final DOMDataBroker dataBroker,
             final DOMActionService actionService, final DOMNotificationService notificationService,
             final DOMSchemaService domSchemaService, final SubscribeToStreamUtil streamUtils) {
-        this(databindProvider, server, mountPointService,
+        super(databindProvider, List.of(
+            // FIXME: NETCONF:1102: do not instantiate this service
             new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider, streamUtils),
-            dataBroker, actionService, notificationService, domSchemaService, streamUtils);
+            new RestconfDataServiceImpl(databindProvider, server, actionService),
+            new RestconfInvokeOperationsServiceImpl(databindProvider, server, mountPointService, streamUtils),
+            new RestconfOperationsServiceImpl(databindProvider, server),
+            new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
+            new RestconfImpl(databindProvider)));
     }
 }
