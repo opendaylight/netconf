@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.ScheduledExecutorService;
-import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -49,16 +48,15 @@ public final class RestconfDataStreamServiceImpl {
     }
 
     /**
-     * Get target data resource.
+     * Attach to a particular notification stream.
      *
-     * @param identifier path to target
+     * @param streamName path to target
      */
     @GET
-    @Path("/{identifier:.+}")
+    @Path("/{streamName:.+}")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void getSSE(@Encoded @PathParam("identifier") final String identifier, @Context final SseEventSink sink,
+    public void getSSE(@PathParam("streamName") final String streamName, @Context final SseEventSink sink,
             @Context final Sse sse) {
-        final var streamName = ListenersBroker.createStreamNameFromUri(identifier);
         final var listener = listenersBroker.listenerFor(streamName);
         if (listener == null) {
             LOG.debug("Listener for stream with name {} was not found.", streamName);
