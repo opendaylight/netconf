@@ -39,31 +39,29 @@ record WebSocketFactory(
 
     /**
      * Creation of the new web-socket based on input HTTP/HTTPS upgrade request. Web-socket is created only if the
-     * data listener for input URI can be found (results in status code 101); otherwise status code 404 is set
-     * in upgrade response.
+     * data listener for input URI can be found (results in status code
+     * {@value HttpServletResponse#SC_SWITCHING_PROTOCOLS}); otherwise status code
+     * {@value HttpServletResponse#SC_NOT_FOUND} is set in upgrade response.
      *
-     * @param servletUpgradeRequest  Upgrade request.
-     * @param servletUpgradeResponse Upgrade response.
+     * @param req the request details
+     * @param resp the response details
      * @return Created web-socket instance or {@code null} if the web-socket cannot be created.
      */
     @Override
-    public Object createWebSocket(final ServletUpgradeRequest servletUpgradeRequest,
-            final ServletUpgradeResponse servletUpgradeResponse) {
-        final var streamName = ListenersBroker.createStreamNameFromUri(
-            servletUpgradeRequest.getRequestURI().getRawPath());
-
+    public Object createWebSocket(final ServletUpgradeRequest req, final ServletUpgradeResponse resp) {
+        final var streamName = ListenersBroker.createStreamNameFromUri(req.getRequestURI().getRawPath());
         final var listener = listenersBroker.listenerFor(streamName);
         if (listener == null) {
             LOG.debug("Listener for stream with name {} was not found.", streamName);
-            servletUpgradeResponse.setSuccess(false);
-            servletUpgradeResponse.setStatusCode(HttpServletResponse.SC_NOT_FOUND);
+            resp.setSuccess(false);
+            resp.setStatusCode(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
 
         LOG.debug("Listener for stream with name {} has been found, web-socket session handler will be created",
             streamName);
-        servletUpgradeResponse.setSuccess(true);
-        servletUpgradeResponse.setStatusCode(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
+        resp.setSuccess(true);
+        resp.setStatusCode(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
         // note: every web-socket manages PING process individually because this approach scales better than sending
         //       of PING frames at once over all web-socket sessions
         return new WebSocketSessionHandler(executorService, listener, maximumFragmentLength, heartbeatInterval);
