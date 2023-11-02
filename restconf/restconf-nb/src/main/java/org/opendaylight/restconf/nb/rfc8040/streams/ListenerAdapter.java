@@ -13,7 +13,6 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -71,17 +70,17 @@ public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTre
     @SuppressWarnings("checkstyle:IllegalCatch")
     public void onDataTreeChanged(final List<DataTreeCandidate> dataTreeCandidates) {
         final var now = Instant.now();
-        final Optional<String> maybeData;
+        final String data;
         try {
-            maybeData = formatter().eventData(databindProvider.currentContext().modelContext(), dataTreeCandidates,
-                now);
+            data = formatter().eventData(databindProvider.currentContext().modelContext(), dataTreeCandidates, now);
         } catch (final Exception e) {
             LOG.error("Failed to process notification {}",
                     dataTreeCandidates.stream().map(Object::toString).collect(Collectors.joining(",")), e);
             return;
         }
-
-        maybeData.ifPresent(this::post);
+        if (data != null) {
+            post(data);
+        }
     }
 
     /**

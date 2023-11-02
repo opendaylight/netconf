@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import java.time.Instant;
-import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -45,14 +44,16 @@ abstract class AbstractNotificationListenerAdaptor extends AbstractCommonSubscri
     @SuppressWarnings("checkstyle:IllegalCatch")
     public final void onNotification(final DOMNotification notification) {
         final var eventInstant = notification instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now();
-        final Optional<String> maybeOutput;
+        final String data;
         try {
-            maybeOutput = formatter().eventData(effectiveModel(), notification, eventInstant);
+            data = formatter().eventData(effectiveModel(), notification, eventInstant);
         } catch (Exception e) {
             LOG.error("Failed to process notification {}", notification, e);
             return;
         }
-        maybeOutput.ifPresent(this::post);
+        if (data != null) {
+            post(data);
+        }
     }
 
     abstract @NonNull EffectiveModelContext effectiveModel();

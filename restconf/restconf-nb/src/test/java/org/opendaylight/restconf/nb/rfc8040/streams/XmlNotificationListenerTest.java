@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -156,8 +157,9 @@ public class XmlNotificationListenerTest extends AbstractNotificationListenerTes
 
     private String prepareXmlResult(final DOMNotification notificationData, final QName schemaPathNotifi)
             throws Exception {
-        final var notifiAdapter = listenersBroker.registerNotificationListener(MODEL_CONTEXT,
-            ImmutableSet.of(schemaPathNotifi), NotificationOutputType.XML);
-        return notifiAdapter.formatter().eventData(MODEL_CONTEXT, notificationData, Instant.now()).orElseThrow();
+        final var ret = listenersBroker.registerNotificationListener(MODEL_CONTEXT, ImmutableSet.of(schemaPathNotifi),
+            NotificationOutputType.XML).formatter().eventData(MODEL_CONTEXT, notificationData, Instant.now());
+        assertNotNull(ret);
+        return ret;
     }
 }
