@@ -32,18 +32,16 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
     private final @NonNull EffectiveModelContext effectiveModel;
     private final @NonNull DOMMountPointService mountPointService;
     private final @NonNull YangInstanceIdentifier instanceIdentifier;
-    private final @NonNull ListenersBroker listenersBroker;
 
     private ListenerRegistration<DOMMountPointListener> reg;
 
-    public DeviceNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType,
-            final EffectiveModelContext effectiveModel, final DOMMountPointService mountPointService,
-            final YangInstanceIdentifier path, final ListenersBroker listenersBroker) {
+    DeviceNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType,
+            final ListenersBroker listenersBroker, final EffectiveModelContext effectiveModel,
+            final DOMMountPointService mountPointService, final YangInstanceIdentifier instanceIdentifier) {
         super(streamName, outputType, listenersBroker);
         this.effectiveModel = requireNonNull(effectiveModel);
         this.mountPointService = requireNonNull(mountPointService);
-        instanceIdentifier = requireNonNull(path);
-        this.listenersBroker = requireNonNull(listenersBroker);
+        this.instanceIdentifier = requireNonNull(instanceIdentifier);
     }
 
     public synchronized void listen(final DOMNotificationService notificationService, final Set<Absolute> paths) {

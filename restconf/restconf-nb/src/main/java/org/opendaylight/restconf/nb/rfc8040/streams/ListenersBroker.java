@@ -194,7 +194,7 @@ public abstract sealed class ListenersBroker {
         final long stamp = dataChangeListenersLock.writeLock();
         try {
             return dataChangeListeners.computeIfAbsent(sb.toString(),
-                streamName -> new ListenerAdapter(datastore, path, streamName, outputType, this));
+                streamName -> new ListenerAdapter(streamName, outputType, this, datastore, path));
         } finally {
             dataChangeListenersLock.unlockWrite(stamp);
         }
@@ -239,7 +239,7 @@ public abstract sealed class ListenersBroker {
         final long stamp = notificationListenersLock.writeLock();
         try {
             return notificationListeners.computeIfAbsent(sb.toString(),
-                streamName -> new NotificationListenerAdapter(notifications, streamName, outputType, this));
+                streamName -> new NotificationListenerAdapter(streamName, outputType, this, notifications));
         } finally {
             notificationListenersLock.unlockWrite(stamp);
         }
@@ -264,8 +264,8 @@ public abstract sealed class ListenersBroker {
         final long stamp = deviceNotificationListenersLock.writeLock();
         try {
             return deviceNotificationListeners.computeIfAbsent(sb.toString(),
-                streamName -> new DeviceNotificationListenerAdaptor(streamName, outputType, refSchemaCtx,
-                    mountPointService, path, this));
+                streamName -> new DeviceNotificationListenerAdaptor(streamName, outputType, this, refSchemaCtx,
+                    mountPointService, path));
         } finally {
             deviceNotificationListenersLock.unlockWrite(stamp);
         }

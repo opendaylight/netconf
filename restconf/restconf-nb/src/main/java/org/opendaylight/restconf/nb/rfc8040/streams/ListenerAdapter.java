@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import java.time.Instant;
 import java.util.Collection;
@@ -48,9 +47,9 @@ public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTre
      * @param streamName The name of the stream.
      * @param outputType Type of output on notification (JSON, XML).
      */
-    @VisibleForTesting
-    public ListenerAdapter(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-            final String streamName, final NotificationOutputType outputType, final ListenersBroker listenersBroker) {
+    ListenerAdapter(final String streamName, final NotificationOutputType outputType,
+            final ListenersBroker listenersBroker, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path) {
         super(streamName, outputType, getFormatterFactory(outputType), listenersBroker);
         this.datastore = requireNonNull(datastore);
         this.path = requireNonNull(path);

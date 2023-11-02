@@ -180,7 +180,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                 final NotificationOutputType outputType, final boolean leafNodesOnly,
                 final boolean skipNotificationData, final boolean changedLeafNodesOnly, final boolean childNodesOnly,
                 final ListenersBroker listenersBroker) {
-            super(LogicalDatastoreType.CONFIGURATION, path, streamName, outputType, listenersBroker);
+            super(streamName, outputType, listenersBroker, LogicalDatastoreType.CONFIGURATION, path);
             setQueryParams(NotificationQueryParams.of(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
                 leafNodesOnly ? LeafNodesOnlyParam.of(true) : null,
                 skipNotificationData ? SkipNotificationDataParam.of(true) : null,
