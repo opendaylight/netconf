@@ -70,11 +70,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTre
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
     public void onDataTreeChanged(final List<DataTreeCandidate> dataTreeCandidates) {
-        final Instant now = Instant.now();
-        if (!checkStartStop(now)) {
-            return;
-        }
-
+        final var now = Instant.now();
         final Optional<String> maybeData;
         try {
             maybeData = formatter().eventData(databindProvider.currentContext().modelContext(), dataTreeCandidates,

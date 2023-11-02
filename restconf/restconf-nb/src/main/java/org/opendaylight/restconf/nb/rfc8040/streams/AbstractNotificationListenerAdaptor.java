@@ -45,10 +45,6 @@ abstract class AbstractNotificationListenerAdaptor extends AbstractCommonSubscri
     @SuppressWarnings("checkstyle:IllegalCatch")
     public final void onNotification(final DOMNotification notification) {
         final var eventInstant = notification instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now();
-        if (!checkStartStop(eventInstant)) {
-            return;
-        }
-
         final Optional<String> maybeOutput;
         try {
             maybeOutput = formatter().eventData(effectiveModel(), notification, eventInstant);

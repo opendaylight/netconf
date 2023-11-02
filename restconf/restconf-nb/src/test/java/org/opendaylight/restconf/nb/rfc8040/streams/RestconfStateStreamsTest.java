@@ -12,10 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -56,39 +52,30 @@ public class RestconfStateStreamsTest {
     public void toStreamEntryNodeTest() throws Exception {
         final YangInstanceIdentifier path = ParserIdentifier.toInstanceIdentifier(
                 "nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
-        final Instant start = Instant.now();
         final String outputType = "XML";
         final URI uri = new URI("uri");
         final String streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
-        final Map<QName, Object> map = prepareMap(streamName, uri, start, outputType);
-        final MapEntryNode mappedData = RestconfStateStreams.dataChangeStreamEntry(path, start, outputType, uri,
-            schemaContextMonitoring, streamName);
-        assertMappedData(map, mappedData);
+        assertMappedData(prepareMap(streamName, uri, outputType),
+            RestconfStateStreams.dataChangeStreamEntry(path, outputType, uri, schemaContextMonitoring, streamName));
     }
 
     @Test
     public void toStreamEntryNodeNotifiTest() throws Exception {
-        final Instant start = Instant.now();
         final String outputType = "JSON";
         final URI uri = new URI("uri");
 
-        final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
+        final var map = prepareMap("notifi", uri, outputType);
         map.put(RestconfStateStreams.DESCRIPTION_QNAME, "(urn:nested:module?revision=2014-06-03)notifi");
 
-        final MapEntryNode mappedData = RestconfStateStreams.notificationStreamEntry("notifi",
-            Set.of(QName.create("urn:nested:module", "2014-06-03", "notifi")), start, outputType, uri);
-        assertMappedData(map, mappedData);
+        assertMappedData(map, RestconfStateStreams.notificationStreamEntry("notifi",
+            Set.of(QName.create("urn:nested:module", "2014-06-03", "notifi")), outputType, uri));
     }
 
-    private static Map<QName, Object> prepareMap(final String name, final URI uri, final Instant start,
-            final String outputType) {
-        final Map<QName, Object> map = new HashMap<>();
+    private static Map<QName, Object> prepareMap(final String name, final URI uri, final String outputType) {
+        final var map = new HashMap<QName, Object>();
         map.put(RestconfStateStreams.NAME_QNAME, name);
         map.put(RestconfStateStreams.LOCATION_QNAME, uri.toString());
-        map.put(RestconfStateStreams.REPLAY_SUPPORT_QNAME, Boolean.TRUE);
-        map.put(RestconfStateStreams.REPLAY_LOG_CREATION_TIME, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
-            OffsetDateTime.ofInstant(start, ZoneId.systemDefault())));
         map.put(RestconfStateStreams.ENCODING_QNAME, outputType);
         return map;
     }
