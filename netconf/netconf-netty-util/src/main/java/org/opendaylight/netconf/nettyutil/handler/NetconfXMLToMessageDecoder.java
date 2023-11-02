@@ -70,16 +70,13 @@ public final class NetconfXMLToMessageDecoder extends ByteToMessageDecoder {
             }
         }
         if (in.isReadable()) {
-            NetconfMessage msg;
-
             try {
-                msg = new NetconfMessage(XmlUtil.readXmlToDocument(new ByteBufInputStream(in)));
-            } catch (SAXParseException exception) {
-                LOG.error("Failed to parse received message", exception);
-                msg = new FailedNetconfMessage(exception);
+                out.add(new NetconfMessage(XmlUtil.readXmlToDocument(new ByteBufInputStream(in))));
+            } catch (SAXParseException e) {
+                LOG.error("Failed to parse received message", e);
+                out.add(new FailedNetconfMessage(e));
+                in.skipBytes(in.readableBytes());
             }
-
-            out.add(msg);
         } else {
             LOG.debug("No more content in incoming buffer.");
         }
