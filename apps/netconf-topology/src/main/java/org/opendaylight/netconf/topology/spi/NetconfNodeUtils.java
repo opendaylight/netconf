@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology.spi;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceId;
@@ -62,6 +63,7 @@ public final class NetconfNodeUtils {
      * @param node A {@link NetconfNode}
      * @return A {@link InetSocketAddress}
      * @throws NullPointerException if {@code node} is {@code null}
+     * @throws NoSuchElementException if either host or port configuration is missing
      */
     public static @NonNull InetSocketAddress toInetSocketAddress(final NetconfNode node) {
         final var host = node.requireHost();
