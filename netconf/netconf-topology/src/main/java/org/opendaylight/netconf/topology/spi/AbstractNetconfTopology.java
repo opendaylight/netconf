@@ -170,10 +170,17 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, nodeOptional);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
-        final NetconfReconnectingClientConfiguration clientConfig =
-                getClientConfig(netconfClientSessionListener, netconfNode, nodeId);
+        final NetconfReconnectingClientConfiguration clientConfig;
+        try {
+            clientConfig = getClientConfig(netconfClientSessionListener, netconfNode, nodeId);
+        } catch (final IllegalArgumentException e) {
+            // This is a workaround for NETCONF-1114 where the encrypted password's lexical structure is not enforced
+            // in the datastore and it ends up surfacing when we decrypt the password.
+            LOG.warn("RemoteDevice{{}} failed to connect", nodeId, e);
+            return Futures.immediateFailedFuture(e);
+        }
         final ListenableFuture<NetconfDeviceCapabilities> future =
-                deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
+            deviceCommunicator.initializeRemoteConnection(clientDispatcher, clientConfig);
 
         activeConnectors.put(nodeId, deviceCommunicatorDTO);
 
