@@ -18,12 +18,16 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.SSESessionHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,20 +52,50 @@ public final class RestconfDataStreamServiceImpl {
     }
 
     /**
-     * Attach to a particular notification stream.
+     * Attach to a particular notification stream, receiving JSON-formatted events.
      *
      * @param streamName path to target
      */
     @GET
-    @Path("/{streamName:.+}")
+    @Path("/json/{streamName:.+}")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void getSSE(@PathParam("streamName") final String streamName, @Context final SseEventSink sink,
-            @Context final Sse sse) {
+    public void getJsonSSE(@PathParam("streamName") final String streamName, final @Context UriInfo uriInfo,
+            @Context final SseEventSink sink, @Context final Sse sse) {
+        getSSE(NotificationOutputType.JSON, streamName, uriInfo, sink, sse);
+    }
+
+    /**
+     * Attach to a particular notification stream, receiving XML-formatted events.
+     *
+     * @param streamName path to target
+     */
+    @GET
+    @Path("/xml/{streamName:.+}")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void getXmlSSE(@PathParam("streamName") final String streamName, final @Context UriInfo uriInfo,
+            @Context final SseEventSink sink, @Context final Sse sse) {
+        getSSE(NotificationOutputType.XML, streamName, uriInfo, sink, sse);
+    }
+
+    private void getSSE(final NotificationOutputType outputType, final String streamName, final UriInfo uriInfo,
+            final SseEventSink sink, final Sse sse) {
         final var listener = listenersBroker.listenerFor(streamName);
         if (listener == null) {
             LOG.debug("Listener for stream with name {} was not found.", streamName);
             throw new WebApplicationException("No such stream: " + streamName, Status.NOT_FOUND);
         }
+
+        // FIXME: pass down to listener
+        final ReceiveEventsParams params;
+        try {
+            params = QueryParams.newReceiveEventsParams(uriInfo);
+        } catch (IllegalArgumentException e) {
+            throw new WebApplicationException(e.getMessage(), e, Status.BAD_REQUEST);
+        }
+
+
+
+
 
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
         // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
