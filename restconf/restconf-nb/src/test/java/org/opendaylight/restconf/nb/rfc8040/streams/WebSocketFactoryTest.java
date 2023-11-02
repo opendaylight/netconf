@@ -54,7 +54,8 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
 
     @Test
     void createWebSocketSuccessfully() {
-        doReturn(URI.create('/' + REGISTERED_STREAM_NAME + '/')).when(upgradeRequest).getRequestURI();
+        doReturn(URI.create("https://localhost:8181/rests/streams/" + REGISTERED_STREAM_NAME))
+            .when(upgradeRequest).getRequestURI();
 
         assertInstanceOf(WebSocketSessionHandler.class,
             webSocketFactory.createWebSocket(upgradeRequest, upgradeResponse));
@@ -64,7 +65,7 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
 
     @Test
     void createWebSocketUnsuccessfully() {
-        doReturn(URI.create('/' + REGISTERED_STREAM_NAME + '/' + "toasterStatus"))
+        doReturn(URI.create("https://localhost:8181/rests/streams/" + REGISTERED_STREAM_NAME + "/toasterStatus"))
             .when(upgradeRequest).getRequestURI();
 
         assertNull(webSocketFactory.createWebSocket(upgradeRequest, upgradeResponse));

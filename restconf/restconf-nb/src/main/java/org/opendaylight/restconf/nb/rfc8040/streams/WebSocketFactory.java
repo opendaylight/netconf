@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
+import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,8 @@ record WebSocketFactory(
         int maximumFragmentLength,
         int heartbeatInterval) implements WebSocketCreator {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketFactory.class);
+    private static final String STREAMS_PREFIX =
+        "/" + URLConstants.BASE_PATH + "/" + URLConstants.STREAMS_SUBPATH + "/";
 
     WebSocketFactory {
         requireNonNull(executorService);
@@ -49,21 +52,26 @@ record WebSocketFactory(
      */
     @Override
     public Object createWebSocket(final ServletUpgradeRequest req, final ServletUpgradeResponse resp) {
-        final var streamName = ListenersBroker.createStreamNameFromUri(req.getRequestURI().getRawPath());
-        final var listener = listenersBroker.listenerFor(streamName);
-        if (listener == null) {
-            LOG.debug("Listener for stream with name {} was not found.", streamName);
-            resp.setSuccess(false);
-            resp.setStatusCode(HttpServletResponse.SC_NOT_FOUND);
-            return null;
-        }
+        final var path = req.getRequestURI().getPath();
+        if (path.startsWith(STREAMS_PREFIX)) {
+            final var streamName = path.substring(STREAMS_PREFIX.length());
+            final var listener = listenersBroker.listenerFor(streamName);
+            if (listener != null) {
+                LOG.debug("Listener for stream with name {} has been found, web-socket session handler will be created",
+                    streamName);
+                resp.setSuccess(true);
+                resp.setStatusCode(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
+                // note: every web-socket manages PING process individually because this approach scales better than
+                //       sending PING frames at once over all web-socket sessions
+                return new WebSocketSessionHandler(executorService, listener, maximumFragmentLength, heartbeatInterval);
+            }
 
-        LOG.debug("Listener for stream with name {} has been found, web-socket session handler will be created",
-            streamName);
-        resp.setSuccess(true);
-        resp.setStatusCode(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
-        // note: every web-socket manages PING process individually because this approach scales better than sending
-        //       of PING frames at once over all web-socket sessions
-        return new WebSocketSessionHandler(executorService, listener, maximumFragmentLength, heartbeatInterval);
+            LOG.debug("Listener for stream with name {} was not found.", streamName);
+        } else {
+            LOG.debug("Request path '{}' does not start with '{}'", path, STREAMS_PREFIX);
+        }
+        resp.setSuccess(false);
+        resp.setStatusCode(HttpServletResponse.SC_NOT_FOUND);
+        return null;
     }
 }

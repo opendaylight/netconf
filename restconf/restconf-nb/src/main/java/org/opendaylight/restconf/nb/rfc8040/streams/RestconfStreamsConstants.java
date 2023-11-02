@@ -17,7 +17,7 @@ public final class RestconfStreamsConstants {
     // Prefixes for stream names
     public static final String DATA_SUBSCRIPTION = "data-change-event-subscription";
     public static final String NOTIFICATION_STREAM = "notification-stream";
-    public static final String DEVICE_NOTIFICATION_STREAM = "device-notification-stream";
+    static final String DEVICE_NOTIFICATION_STREAM = "device-notification-stream";
 
     public static final String STREAMS_PATH = "ietf-restconf-monitoring:restconf-state/streams";
     public static final String STREAM_PATH_PART = "/stream=";

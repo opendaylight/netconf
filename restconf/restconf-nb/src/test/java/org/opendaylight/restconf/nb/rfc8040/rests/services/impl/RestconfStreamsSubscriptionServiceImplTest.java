@@ -30,7 +30,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.streams.AbstractNotificationListenerTest;
@@ -84,7 +83,7 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
             notificationService, databindProvider,listenersBroker);
         final var response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
-        assertEquals("http://localhost:8181/" + URLConstants.BASE_PATH + "/" + URLConstants.SSE_SUBPATH
+        assertEquals("http://localhost:8181/rests/streams"
             + "/data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
             response.getLocation().toString());
     }
@@ -99,7 +98,7 @@ public class RestconfStreamsSubscriptionServiceImplTest extends AbstractNotifica
             notificationService, databindProvider, listenersBroker);
         final var response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
-        assertEquals("ws://localhost:8181/" + URLConstants.BASE_PATH
+        assertEquals("ws://localhost:8181/rests/streams"
             + "/data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
             response.getLocation().toString());
     }

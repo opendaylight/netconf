@@ -58,7 +58,7 @@ public abstract sealed class ListenersBroker {
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
             return uriInfo.getBaseUriBuilder()
-                .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.SSE_SUBPATH + '/' + streamName)
+                .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.STREAMS_SUBPATH + '/' + streamName)
                 .build();
         }
     }
@@ -78,7 +78,7 @@ public abstract sealed class ListenersBroker {
 
             return uriInfo.getBaseUriBuilder()
                 .scheme(scheme)
-                .replacePath(URLConstants.BASE_PATH + '/' + streamName)
+                .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.STREAMS_SUBPATH + '/' + streamName)
                 .build();
         }
     }
@@ -443,7 +443,7 @@ public abstract sealed class ListenersBroker {
      * @param uri URI for creation of stream name.
      * @return String representation of stream name.
      */
-    public static String createStreamNameFromUri(final String uri) {
+    private static String createStreamNameFromUri(final String uri) {
         String result = requireNonNull(uri);
         while (true) {
             if (result.startsWith(URLConstants.BASE_PATH)) {

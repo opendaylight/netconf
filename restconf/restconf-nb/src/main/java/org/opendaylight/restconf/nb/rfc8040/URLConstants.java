@@ -15,13 +15,13 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public final class URLConstants {
     /**
-     * The first element URL path element for RESTCONF implementation, i.e. {@code https://localhost/BASE_PATH}.
+     * The first URL path element for RESTCONF implementation, i.e. {@code https://localhost/BASE_PATH}.
      */
     public static final String BASE_PATH = "rests";
     /**
-     * The second element for Server Sent Events support, i.e. {@code https://localhost/BASE_PATH/NOTIF}.
+     * The second URL path element for streams supper, i.e. {@code https://localhost/BASE_PATH/STREAMS}.
      */
-    public static final String SSE_SUBPATH = "notif";
+    public static final String STREAMS_SUBPATH = "streams";
 
     private URLConstants() {
         // Hidden on purpose

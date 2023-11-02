@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import com.google.common.annotations.Beta;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration;
 import org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter;
 import org.opendaylight.aaa.web.FilterDetails;
@@ -28,7 +29,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
 import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
-import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -95,25 +95,15 @@ public final class JaxRsNorthbound implements AutoCloseable {
             new NamingThreadPoolFactory(pingNamePrefix));
 
         final ListenersBroker listenersBroker;
-        final ServletDetails streamServlet;
+        final HttpServlet streamServlet;
         if (streamsConfiguration.useSSE()) {
             listenersBroker = new ListenersBroker.ServerSentEvents();
-            streamServlet = ServletDetails.builder()
-                .addUrlPattern("/" + URLConstants.SSE_SUBPATH + "/*")
-                .servlet(servletSupport.createHttpServletBuilder(
-                    new ServerSentEventsApplication(scheduledThreadPool, listenersBroker, streamsConfiguration))
-                    .build())
-                .name("notificationServlet")
-                .asyncSupported(true)
+            streamServlet = servletSupport.createHttpServletBuilder(
+                new ServerSentEventsApplication(scheduledThreadPool, listenersBroker, streamsConfiguration))
                 .build();
         } else {
             listenersBroker = new ListenersBroker.WebSockets();
-            streamServlet = ServletDetails.builder()
-                .addUrlPattern("/" + RestconfStreamsConstants.DATA_SUBSCRIPTION + "/*")
-                .addUrlPattern("/" + RestconfStreamsConstants.NOTIFICATION_STREAM + "/*")
-                .addUrlPattern("/" + RestconfStreamsConstants.DEVICE_NOTIFICATION_STREAM + "/*")
-                .servlet(new WebSocketInitializer(scheduledThreadPool, listenersBroker, streamsConfiguration))
-                .build();
+            streamServlet = new WebSocketInitializer(scheduledThreadPool, listenersBroker, streamsConfiguration);
         }
 
         final var restconfBuilder = WebContext.builder()
@@ -128,7 +118,12 @@ public final class JaxRsNorthbound implements AutoCloseable {
                     .build())
                 .asyncSupported(true)
                 .build())
-            .addServlet(streamServlet)
+            .addServlet(ServletDetails.builder()
+                .addUrlPattern("/" + URLConstants.STREAMS_SUBPATH + "/*")
+                .servlet(streamServlet)
+                .name("notificationServlet")
+                .asyncSupported(true)
+                .build())
 
             // Allows user to add javax.servlet.Filter(s) in front of REST services
             .addFilter(FilterDetails.builder()
