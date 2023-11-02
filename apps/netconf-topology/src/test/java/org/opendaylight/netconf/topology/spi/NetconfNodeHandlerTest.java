@@ -134,26 +134,29 @@ public class NetconfNodeHandlerTest {
     @Before
     public void before() {
         // Instantiate the handler
+        final var netconfNode = new NetconfNodeBuilder()
+            .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+            .setPort(new PortNumber(Uint16.valueOf(9999)))
+            .setReconnectOnChangedSchema(true)
+            .setSchemaless(true)
+            .setTcpOnly(true)
+            .setSleepFactor(Decimal64.valueOf("1.5"))
+            .setConcurrentRpcLimit(Uint16.ONE)
+            // One reconnection attempt
+            .setMaxConnectionAttempts(Uint32.TWO)
+            .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+            .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+            .setKeepaliveDelay(Uint32.valueOf(1000))
+            .setConnectionTimeoutMillis(Uint32.valueOf(1000))
+            .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
+            .build();
+
+        final var builderFactory = new DefaultNetconfClientConfigurationBuilderFactory(encryptionService,
+            credentialProvider, sslHandlerFactoryProvider);
+        final var clientConfigurationBuilder = builderFactory.createClientConfigurationBuilder(NODE_ID, netconfNode);
         handler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor, BASE_SCHEMAS,
-            schemaManager, processingExecutor,
-            new DefaultNetconfClientConfigurationBuilderFactory(encryptionService, credentialProvider,
-                sslHandlerFactoryProvider),
-            deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setSchemaless(true)
-                .setTcpOnly(true)
-                .setSleepFactor(Decimal64.valueOf("1.5"))
-                .setConcurrentRpcLimit(Uint16.ONE)
-                // One reconnection attempt
-                .setMaxConnectionAttempts(Uint32.TWO)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setConnectionTimeoutMillis(Uint32.valueOf(1000))
-                .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
-                .build(), null);
+            schemaManager, processingExecutor, clientConfigurationBuilder, deviceActionFactory, delegate, DEVICE_ID,
+            NODE_ID, netconfNode, null);
     }
 
     @Test

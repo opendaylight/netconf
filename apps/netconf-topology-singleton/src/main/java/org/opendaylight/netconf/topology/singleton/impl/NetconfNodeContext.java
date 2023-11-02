@@ -16,6 +16,7 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -137,14 +138,22 @@ final class NetconfNodeContext implements AutoCloseable {
 
         requireNonNull(netconfNode.getHost());
         requireNonNull(netconfNode.getPort());
+        final var nodeId = configNode.getNodeId();
+        final NetconfClientConfigurationBuilder clientConfigurationBuilder;
+        try {
+            clientConfigurationBuilder = builderFactory.createClientConfigurationBuilder(nodeId, netconfNode);
+        } catch (IllegalArgumentException e) {
+            LOG.warn("RemoteDevice{{}} has invalid client configuration, not connecting it", nodeId, e);
+            return;
+        }
 
         // Instantiate the handler ...
         masterSalFacade = createSalFacade(netconfNode.requireLockDatastore());
 
         nodeHandler = new NetconfNodeHandler(setup.getNetconfClientDispatcher(), setup.getEventExecutor(),
             setup.getKeepaliveExecutor(), setup.getBaseSchemas(), schemaManager, setup.getProcessingExecutor(),
-            builderFactory, deviceActionFactory, masterSalFacade, remoteDeviceId, configNode.getNodeId(), netconfNode,
-            nodeOptional);
+            clientConfigurationBuilder, deviceActionFactory, masterSalFacade, remoteDeviceId, nodeId,
+            netconfNode, nodeOptional);
         nodeHandler.connect();
     }
 
