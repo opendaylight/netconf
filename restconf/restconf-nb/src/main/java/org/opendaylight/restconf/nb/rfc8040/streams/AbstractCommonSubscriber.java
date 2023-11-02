@@ -13,6 +13,11 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.base.VerifyException;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -21,12 +26,14 @@ import javax.xml.xpath.XPathExpressionException;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +41,97 @@ import org.slf4j.LoggerFactory;
  * Features of subscribing part of both notifications.
  */
 abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData implements BaseListenerInterface {
+    private record Subscriber<T>(EventFormatter<T> formatter, StreamSessionHandler handler) {
+        Subscriber {
+            requireNonNull(formatter);
+            requireNonNull(handler);
+        }
+    }
+
+    private static abstract sealed class Subscribers<T> {
+        static final class Single<T> extends Subscribers<T> {
+            private final Subscriber<T> subscriber;
+
+            Single(final Subscriber<T> subscriber) {
+                this.subscriber = requireNonNull(subscriber);
+            }
+
+            @Override
+            Subscribers<T> add(final Subscriber<T> toAdd) {
+                return new Multiple<>(ImmutableListMultimap.of(
+                    subscriber.formatter, subscriber,
+                    toAdd.formatter, toAdd));
+            }
+
+            @Override
+            Subscribers<T> remove(final Subscriber<T> toRemove) {
+                return toRemove.equals(subscriber) ? null : this;
+            }
+
+            @Override
+            void formatAndPublish(final EffectiveModelContext modelContext, final T input, final Instant now) {
+                final var formatted = format(subscriber.formatter, modelContext, input, now);
+                if (formatted != null) {
+                    subscriber.handler.sendDataMessage(formatted);
+                }
+            }
+        }
+
+        static final class Multiple<T> extends Subscribers<T> {
+            private final ImmutableListMultimap<EventFormatter<T>, Subscriber<T>> subscribers;
+
+            Multiple(final ListMultimap<EventFormatter<T>, Subscriber<T>> subscribers) {
+                this.subscribers = ImmutableListMultimap.copyOf(subscribers);
+            }
+
+            @Override
+            Subscribers<T> add(final Subscriber<T> toAdd) {
+                final var newSubscribers = ArrayListMultimap.create(subscribers);
+                newSubscribers.put(toAdd.formatter, toAdd);
+                return new Multiple<>(newSubscribers);
+            }
+
+            @Override
+            Subscribers<T> remove(final Subscriber<T> toRemove) {
+                final var newSubscribers = ArrayListMultimap.create(subscribers);
+                return newSubscribers.remove(toRemove.formatter, toRemove)
+                    ? switch (newSubscribers.size()) {
+                        case 0 -> throw new VerifyException("Unexpected empty subscribers");
+                        case 1 -> new Single<>(newSubscribers.values().iterator().next());
+                        default -> new Multiple<>(newSubscribers);
+                    } : this;
+            }
+
+            @Override
+            void formatAndPublish(final EffectiveModelContext modelContext, final T input, final Instant now) {
+                for (var entry : subscribers.asMap().entrySet()) {
+                    final var formatted = format(entry.getKey(), modelContext, input, now);
+                    if (formatted != null) {
+                        for (var subscriber : entry.getValue()) {
+                            subscriber.handler.sendDataMessage(formatted);
+                        }
+                    }
+                }
+            }
+        }
+
+        abstract @NonNull Subscribers<T> add(Subscriber<T> toAdd);
+
+        abstract @Nullable Subscribers<T> remove(Subscriber<T> toRemove);
+
+        abstract void formatAndPublish(EffectiveModelContext modelContext, T input, Instant now);
+
+        @Nullable String format(final EventFormatter<T> formatter, final EffectiveModelContext modelContext,
+                final T input, final Instant now) {
+            try {
+                return formatter.eventData(modelContext, input, now);
+            } catch (Exception e) {
+                // FIXME: better error handling
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
     private final EventFormatterFactory<T> formatterFactory;
@@ -42,7 +140,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
     protected final @NonNull ListenersBroker listenersBroker;
 
     @GuardedBy("this")
-    private final Set<StreamSessionHandler> subscribers = new HashSet<>();
+    private final Subscribers<T> subscribers = null;
     @GuardedBy("this")
     private Registration registration;
 
@@ -170,6 +268,13 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
     @Holding("this")
     final boolean isListening() {
         return registration != null;
+    }
+
+    final void formatAndPublish(final T input) {
+        final var local = subscribers;
+        if (local != null) {
+            local.formatAndPublish(input);
+        }
     }
 
     /**
