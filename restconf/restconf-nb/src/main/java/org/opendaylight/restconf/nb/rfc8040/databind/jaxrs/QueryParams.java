@@ -35,8 +35,8 @@ import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
-import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
@@ -64,7 +64,7 @@ public final class QueryParams {
         // Utility class
     }
 
-    public static @NonNull NotificationQueryParams newNotificationQueryParams(final UriInfo uriInfo) {
+    public static @NonNull ReceiveEventsParams newNotificationQueryParams(final UriInfo uriInfo) {
         StartTimeParam startTime = null;
         StopTimeParam stopTime = null;
         FilterParam filter = null;
@@ -112,7 +112,7 @@ public final class QueryParams {
         }
 
         try {
-            return NotificationQueryParams.of(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
+            return new ReceiveEventsParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
                 changedLeafNodesOnly, childNodesOnly);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);

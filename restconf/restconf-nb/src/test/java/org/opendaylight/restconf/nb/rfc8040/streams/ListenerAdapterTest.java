@@ -37,7 +37,7 @@ import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
 import org.opendaylight.restconf.api.query.StartTimeParam;
-import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.PatchCont1Builder;
@@ -181,7 +181,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                 final boolean skipNotificationData, final boolean changedLeafNodesOnly, final boolean childNodesOnly,
                 final ListenersBroker listenersBroker) {
             super(streamName, outputType, listenersBroker, LogicalDatastoreType.CONFIGURATION, path);
-            setQueryParams(NotificationQueryParams.of(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
+            setQueryParams(new ReceiveEventsParams(StartTimeParam.forUriValue("1970-01-01T00:00:00Z"), null, null,
                 leafNodesOnly ? LeafNodesOnlyParam.of(true) : null,
                 skipNotificationData ? SkipNotificationDataParam.of(true) : null,
                 changedLeafNodesOnly ? ChangedLeafNodesOnlyParam.of(true) : null,

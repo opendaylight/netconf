@@ -28,7 +28,7 @@ import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -132,7 +132,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
      *
      * @param params NotificationQueryParams to use.
      */
-    public final void setQueryParams(final NotificationQueryParams params) {
+    public final void setQueryParams(final ReceiveEventsParams params) {
         final var startTime = params.startTime();
         start = startTime == null ? Instant.now() : parseDateAndTime(startTime.value());
 
