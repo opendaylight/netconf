@@ -7,12 +7,15 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import org.junit.Test;
+import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.xml.sax.SAXParseException;
 
 public class NetconfXMLToMessageDecoderTest {
@@ -89,5 +92,23 @@ public class NetconfXMLToMessageDecoderTest {
                 out);
         assertEquals(1, out.size());
     }
-}
 
+    @Test
+    public void testDecodeAfterInvalidXml() throws Exception {
+        /* Test that decoding of the next message after an invalid XML is successful.
+        */
+        final var out = new ArrayList<>();
+        final var decoder = new NetconfXMLToMessageDecoder();
+        final var buffer = Unpooled.buffer();
+
+        buffer.writeBytes("<?xml version=\"1.0\"\u0006 encoding=\"UTF-8\"?><msg/>".getBytes());
+        decoder.decode(null, buffer, out);
+        assertEquals(1, out.size());
+        assertThat(out.get(0), instanceOf(SAXParseException.class));
+
+        buffer.writeBytes("<msg/>".getBytes());
+        decoder.decode(null, buffer, out);
+        assertEquals(2, out.size());
+        assertThat(out.get(1), instanceOf(NetconfMessage.class));
+    }
+}
