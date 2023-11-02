@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,6 +23,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
@@ -73,12 +73,9 @@ abstract class EventFormatter<T> implements Immutable {
         filter = xpath.compile(xpathFilter);
     }
 
-    final Optional<String> eventData(final EffectiveModelContext schemaContext, final T input, final Instant now)
+    final @Nullable String eventData(final EffectiveModelContext schemaContext, final T input, final Instant now)
             throws Exception {
-        if (!filterMatches(schemaContext, input, now)) {
-            return Optional.empty();
-        }
-        return Optional.ofNullable(createText(textParams, schemaContext, input, now));
+        return filterMatches(schemaContext, input, now) ? createText(textParams, schemaContext, input, now) : null;
     }
 
     /**
