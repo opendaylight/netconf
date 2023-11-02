@@ -31,8 +31,8 @@ public final class NotificationListenerAdapter extends AbstractNotificationListe
      * @param outputType Type of output on notification (JSON or XML).
      * @param listenersBroker Associated {@link ListenersBroker}
      */
-    NotificationListenerAdapter(final ImmutableSet<QName> paths, final String streamName,
-            final NotificationOutputType outputType, final ListenersBroker listenersBroker) {
+    NotificationListenerAdapter(final String streamName, final NotificationOutputType outputType,
+            final ListenersBroker listenersBroker, final ImmutableSet<QName> paths) {
         super(streamName, outputType, listenersBroker);
         this.paths = requireNonNull(paths);
     }
