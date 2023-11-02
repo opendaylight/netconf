@@ -24,15 +24,9 @@ import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
-    private static final @NonNull String NOTIFICATION_NAME = "ietf-restconf:notification";
-
-    private static final @NonNull String DATA_CHANGED_NOTIFICATION_NAME;
     private static final @NonNull String DATA_CHANGED_EVENT_NAME = DataChangeEvent.QNAME.getLocalName();
-
-    static {
-        final var salRemoteName = $YangModuleInfoImpl.getInstance().getName().getLocalName();
-        DATA_CHANGED_NOTIFICATION_NAME = salRemoteName + ":" + DataChangedNotification.QNAME.getLocalName();
-    }
+    private static final @NonNull String DATA_CHANGED_NOTIFICATION_NAME =
+        $YangModuleInfoImpl.getInstance().getName().getLocalName() + ":" + DataChangedNotification.QNAME.getLocalName();
 
     private final JSONCodecFactorySupplier codecSupplier;
 
@@ -72,7 +66,7 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
             boolean nonEmpty = false;
             try (var jsonWriter = new JsonWriter(writer)) {
                 jsonWriter.beginObject()
-                    .name(NOTIFICATION_NAME).beginObject()
+                    .name("ietf-restconf:notification").beginObject()
                         .name("event-time").value(toRFC3339(now))
                         .name(DATA_CHANGED_NOTIFICATION_NAME).beginObject()
                             .name(DATA_CHANGED_EVENT_NAME).beginArray();
