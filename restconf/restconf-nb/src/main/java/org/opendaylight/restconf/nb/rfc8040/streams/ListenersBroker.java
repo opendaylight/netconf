@@ -88,23 +88,23 @@ public abstract sealed class ListenersBroker {
     private final StampedLock dataChangeListenersLock = new StampedLock();
     private final StampedLock notificationListenersLock = new StampedLock();
     private final StampedLock deviceNotificationListenersLock = new StampedLock();
-    private final BiMap<String, ListenerAdapter> dataChangeListeners = HashBiMap.create();
-    private final BiMap<String, NotificationListenerAdapter> notificationListeners = HashBiMap.create();
-    private final BiMap<String, DeviceNotificationListenerAdaptor> deviceNotificationListeners = HashBiMap.create();
+    private final BiMap<String, DataTreeChangeStream> dataChangeListeners = HashBiMap.create();
+    private final BiMap<String, NotificationStream> notificationListeners = HashBiMap.create();
+    private final BiMap<String, DeviceStream> deviceNotificationListeners = HashBiMap.create();
 
     private ListenersBroker() {
         // Hidden on purpose
     }
 
     /**
-     * Gets {@link ListenerAdapter} specified by stream identification.
+     * Gets {@link DataTreeChangeStream} specified by stream identification.
      *
      * @param streamName Stream name.
-     * @return {@link ListenerAdapter} specified by stream name or {@code null} if listener with specified stream name
-     *         does not exist.
+     * @return {@link DataTreeChangeStream} specified by stream name or {@code null} if listener with specified stream
+     *         name does not exist.
      * @throws NullPointerException in {@code streamName} is {@code null}
      */
-    public final @Nullable ListenerAdapter dataChangeListenerFor(final String streamName) {
+    public final @Nullable DataTreeChangeStream dataChangeListenerFor(final String streamName) {
         requireNonNull(streamName);
 
         final long stamp = dataChangeListenersLock.readLock();
@@ -116,14 +116,14 @@ public abstract sealed class ListenersBroker {
     }
 
     /**
-     * Gets {@link NotificationListenerAdapter} specified by stream name.
+     * Gets {@link NotificationStream} specified by stream name.
      *
      * @param streamName Stream name.
-     * @return {@link NotificationListenerAdapter} specified by stream name or {@code null} if listener with specified
-     *         stream name does not exist.
+     * @return {@link NotificationStream} specified by stream name or {@code null} if listener with specified stream
+     *         name does not exist.
      * @throws NullPointerException in {@code streamName} is {@code null}
      */
-    public final @Nullable NotificationListenerAdapter notificationListenerFor(final String streamName) {
+    public final @Nullable NotificationStream notificationListenerFor(final String streamName) {
         requireNonNull(streamName);
 
         final long stamp = notificationListenersLock.readLock();
@@ -142,7 +142,7 @@ public abstract sealed class ListenersBroker {
      *         specified stream name does not exist.
      * @throws NullPointerException in {@code path} is {@code null}
      */
-    public final @Nullable DeviceNotificationListenerAdaptor deviceNotificationListenerFor(final String streamName) {
+    public final @Nullable DeviceStream deviceNotificationListenerFor(final String streamName) {
         requireNonNull(streamName);
 
         final long stamp = deviceNotificationListenersLock.readLock();
@@ -160,7 +160,7 @@ public abstract sealed class ListenersBroker {
      * @return {@link NotificationListenerAdapter} or {@link ListenerAdapter} object wrapped in {@link Optional}
      *     or {@link Optional#empty()} if listener with specified stream name doesn't exist.
      */
-    public final @Nullable BaseListenerInterface listenerFor(final String streamName) {
+    public final @Nullable Stream listenerFor(final String streamName) {
         if (streamName.startsWith(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
             return notificationListenerFor(streamName);
         } else if (streamName.startsWith(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
@@ -180,7 +180,7 @@ public abstract sealed class ListenersBroker {
      * @param outputType Specific type of output for notifications - XML or JSON.
      * @return Created or existing data-change listener adapter.
      */
-    public final ListenerAdapter registerDataChangeListener(final EffectiveModelContext modelContext,
+    public final DataTreeChangeStream registerDataChangeListener(final EffectiveModelContext modelContext,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final Scope scope,
             final NotificationOutputType outputType) {
         final var sb = new StringBuilder(RestconfStreamsConstants.DATA_SUBSCRIPTION)
@@ -498,7 +498,7 @@ public abstract sealed class ListenersBroker {
         final DOMDataBroker dataBroker = handlersHolder.dataBroker();
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.databindProvider());
         final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(streamName,
-            notificationListenerAdapter.qnames(), notificationListenerAdapter.getStart(),
+            notificationListenerAdapter.notifications(), notificationListenerAdapter.getStart(),
             notificationListenerAdapter.getOutputType(), uri);
 
         // FIXME: how does this correlate with the transaction notificationListenerAdapter.close() will do?
@@ -536,9 +536,9 @@ public abstract sealed class ListenersBroker {
 
         final var uri = prepareUriByStreamName(uriInfo, streamName);
         final var schemaContext = schemaHandler.currentContext().modelContext();
-        final var serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
+        final var serializedPath = IdentifierCodec.serialize(listener.path(), schemaContext);
 
-        final var mapToStreams = RestconfStateStreams.dataChangeStreamEntry(listener.getPath(),
+        final var mapToStreams = RestconfStateStreams.dataChangeStreamEntry(listener.path(),
                 listener.getStart(), listener.getOutputType(), uri, schemaContext, serializedPath);
         final var writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeDataToDS(writeTransaction, mapToStreams);
