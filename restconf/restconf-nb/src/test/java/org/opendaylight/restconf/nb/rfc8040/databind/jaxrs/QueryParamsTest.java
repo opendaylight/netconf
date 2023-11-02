@@ -74,11 +74,11 @@ public class QueryParamsTest {
      */
     @Test
     public void checkParametersTypesNegativeTest() {
-        assertUnknownParam(QueryParams::newNotificationQueryParams);
+        assertUnknownParam(QueryParams::newReceiveEventsParams);
         assertUnknownParam(QueryParams::newReadDataParams);
         assertUnknownParam(uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo));
 
-        assertInvalidParam(QueryParams::newNotificationQueryParams, ContentParam.ALL);
+        assertInvalidParam(QueryParams::newReceiveEventsParams, ContentParam.ALL);
         assertInvalidParam(QueryParams::newReadDataParams, InsertParam.LAST);
         assertInvalidParam(
             uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo),

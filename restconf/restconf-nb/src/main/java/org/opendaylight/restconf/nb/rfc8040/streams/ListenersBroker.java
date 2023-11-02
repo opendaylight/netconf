@@ -26,7 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.NotificationQueryParams;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
@@ -480,7 +480,7 @@ public abstract sealed class ListenersBroker {
      * @return Stream location for listening.
      */
     public final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final ReceiveEventsParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final String streamName = createStreamNameFromUri(identifier);
         if (isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -519,7 +519,7 @@ public abstract sealed class ListenersBroker {
      * @return Location for listening.
      */
     public final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final ReceiveEventsParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final var streamName = createStreamNameFromUri(identifier);
         final var listener = dataChangeListenerFor(streamName);
         if (listener == null) {

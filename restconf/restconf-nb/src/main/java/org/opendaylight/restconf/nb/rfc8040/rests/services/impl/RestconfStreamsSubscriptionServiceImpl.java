@@ -60,7 +60,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     @Override
     public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
-        final var params = QueryParams.newNotificationQueryParams(uriInfo);
+        final var params = QueryParams.newReceiveEventsParams(uriInfo);
 
         final URI location;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
