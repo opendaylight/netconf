@@ -74,6 +74,7 @@ public final class NetconfXMLToMessageDecoder extends ByteToMessageDecoder {
             } catch (SAXParseException e) {
                 LOG.error("Failed to parse received message", e);
                 out.add(e);
+                in.readerIndex(in.writerIndex());
             }
         } else {
             LOG.debug("No more content in incoming buffer.");
