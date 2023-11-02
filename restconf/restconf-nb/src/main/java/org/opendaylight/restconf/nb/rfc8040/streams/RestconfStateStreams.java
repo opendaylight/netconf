@@ -11,10 +11,6 @@ import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.rest
 
 import com.google.common.annotations.VisibleForTesting;
 import java.net.URI;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -51,10 +47,6 @@ public final class RestconfStateStreams {
     static final QName LOCATION_QNAME = qnameOf("location");
     @VisibleForTesting
     static final QName NAME_QNAME = qnameOf("name");
-    @VisibleForTesting
-    static final QName REPLAY_SUPPORT_QNAME = qnameOf("replay-support");
-    @VisibleForTesting
-    static final QName REPLAY_LOG_CREATION_TIME = qnameOf("replay-log-creation-time");
 
     private RestconfStateStreams() {
         // Hidden on purpose
@@ -73,43 +65,34 @@ public final class RestconfStateStreams {
      *
      * @param streamName stream name
      * @param qnames Notification QNames to listen on
-     * @param start start-time query parameter of notification
      * @param outputType output type of notification
      * @param uri location of registered listener for sending data of notification
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
     public static MapEntryNode notificationStreamEntry(final String streamName, final Set<QName> qnames,
-            final Instant start, final String outputType, final URI uri) {
-        final var streamEntry = Builders.mapEntryBuilder()
+            final String outputType, final URI uri) {
+        return Builders.mapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName))
             .withChild(ImmutableNodes.leafNode(NAME_QNAME, streamName))
             .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, qnames.stream()
                 .map(QName::toString)
                 .collect(Collectors.joining(","))))
-            // FIXME: this is not quite accurate
-            .withChild(ImmutableNodes.leafNode(REPLAY_SUPPORT_QNAME, Boolean.TRUE));
-        if (start != null) {
-            streamEntry.withChild(ImmutableNodes.leafNode(REPLAY_LOG_CREATION_TIME,
-                DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start,
-                    ZoneId.systemDefault()))));
-        }
-
-        return streamEntry.withChild(createAccessList(outputType, uri)).build();
+            .withChild(createAccessList(outputType, uri))
+            .build();
     }
 
     /**
      * Map data of data change notification to normalized node according to ietf-restconf-monitoring.
      *
      * @param path path of data to listen on
-     * @param start start-time query parameter of notification
      * @param outputType output type of notification
      * @param uri location of registered listener for sending data of notification
      * @param schemaContext schemaContext for parsing instance identifier to get schema node of data
      * @return mapped data of notification - map entry node if parent exists,
      *         container streams with list and map entry node if not
      */
-    public static MapEntryNode dataChangeStreamEntry(final YangInstanceIdentifier path, final Instant start,
+    public static MapEntryNode dataChangeStreamEntry(final YangInstanceIdentifier path,
             final String outputType, final URI uri, final EffectiveModelContext schemaContext,
             final String streamName) {
         final var streamEntry = Builders.mapEntryBuilder()
@@ -122,9 +105,6 @@ public final class RestconfStateStreams {
             .ifPresent(desc -> streamEntry.withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, desc)));
 
         return streamEntry
-            .withChild(ImmutableNodes.leafNode(REPLAY_SUPPORT_QNAME, Boolean.TRUE))
-            .withChild(ImmutableNodes.leafNode(REPLAY_LOG_CREATION_TIME,
-                DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start, ZoneId.systemDefault()))))
             .withChild(createAccessList(outputType, uri))
             .build();
     }

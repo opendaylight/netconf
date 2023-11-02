@@ -498,8 +498,7 @@ public abstract sealed class ListenersBroker {
         final DOMDataBroker dataBroker = handlersHolder.dataBroker();
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.databindProvider());
         final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(streamName,
-            notificationListenerAdapter.qnames(), notificationListenerAdapter.getStart(),
-            notificationListenerAdapter.getOutputType(), uri);
+            notificationListenerAdapter.qnames(), notificationListenerAdapter.getOutputType(), uri);
 
         // FIXME: how does this correlate with the transaction notificationListenerAdapter.close() will do?
         final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
@@ -539,7 +538,7 @@ public abstract sealed class ListenersBroker {
         final var serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 
         final var mapToStreams = RestconfStateStreams.dataChangeStreamEntry(listener.getPath(),
-                listener.getStart(), listener.getOutputType(), uri, schemaContext, serializedPath);
+                listener.getOutputType(), uri, schemaContext, serializedPath);
         final var writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeDataToDS(writeTransaction, mapToStreams);
         submitData(writeTransaction);
