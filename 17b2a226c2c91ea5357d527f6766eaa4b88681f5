@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb73abee_97fb7861",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-11-02T12:59:07Z",
+      "side": 1,
+      "message": "duplicate wrapping",
+      "range": {
+        "startLine": 271,
+        "startChar": 22,
+        "endLine": 271,
+        "endChar": 54
+      },
+      "revId": "17b2a226c2c91ea5357d527f6766eaa4b88681f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
