@@ -52,11 +52,13 @@ record WebSocketFactory(
      */
     @Override
     public Object createWebSocket(final ServletUpgradeRequest req, final ServletUpgradeResponse resp) {
-        final var path = req.getRequestURI().getPath();
+        final var uri = req.getRequestURI();
+        final var path = uri.getPath();
         if (path.startsWith(STREAMS_PREFIX)) {
             final var streamName = path.substring(STREAMS_PREFIX.length());
             final var listener = listenersBroker.listenerFor(streamName);
             if (listener != null) {
+                // FIXME: uri.getQuery() and construct NotificationQueryParams... grr...
                 LOG.debug("Listener for stream with name {} has been found, web-socket session handler will be created",
                     streamName);
                 resp.setSuccess(true);

@@ -18,9 +18,12 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.SSESessionHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
@@ -55,13 +58,25 @@ public final class RestconfDataStreamServiceImpl {
     @GET
     @Path("/{streamName:.+}")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void getSSE(@PathParam("streamName") final String streamName, @Context final SseEventSink sink,
-            @Context final Sse sse) {
+    public void getSSE(@PathParam("streamName") final String streamName, final @Context UriInfo uriInfo,
+            @Context final SseEventSink sink, @Context final Sse sse) {
         final var listener = listenersBroker.listenerFor(streamName);
         if (listener == null) {
             LOG.debug("Listener for stream with name {} was not found.", streamName);
             throw new WebApplicationException("No such stream: " + streamName, Status.NOT_FOUND);
         }
+
+        // FIXME: pass down to listener
+        final ReceiveEventsParams params;
+        try {
+            params = QueryParams.newReceiveEventsParams(uriInfo);
+        } catch (IllegalArgumentException e) {
+            throw new WebApplicationException(e.getMessage(), e, Status.BAD_REQUEST);
+        }
+
+
+
+
 
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
         // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
