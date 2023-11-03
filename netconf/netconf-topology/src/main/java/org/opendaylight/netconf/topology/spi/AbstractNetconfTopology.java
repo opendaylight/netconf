@@ -177,6 +177,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             // This is a workaround for NETCONF-1114 where the encrypted password's lexical structure is not enforced
             // in the datastore and it ends up surfacing when we decrypt the password.
             LOG.warn("RemoteDevice{{}} failed to connect", nodeId, e);
+            deviceCommunicatorDTO.close();
             return Futures.immediateFailedFuture(e);
         }
         final ListenableFuture<NetconfDeviceCapabilities> future =
