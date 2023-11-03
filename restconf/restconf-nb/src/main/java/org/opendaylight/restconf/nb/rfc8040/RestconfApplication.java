@@ -28,7 +28,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfInvokeOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
 
 final class RestconfApplication extends Application {
@@ -40,9 +39,6 @@ final class RestconfApplication extends Application {
             final DOMSchemaService domSchemaService, final ListenersBroker listenersBroker) {
         singletons = Set.of(
             new RestconfDocumentedExceptionMapper(databindProvider),
-            // FIXME: NETCONF:1102: do not instantiate this service
-            new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider,
-                listenersBroker),
             new RestconfDataServiceImpl(databindProvider, server, actionService),
             new RestconfInvokeOperationsServiceImpl(databindProvider, server, mountPointService, listenersBroker),
             new RestconfOperationsServiceImpl(databindProvider, server),

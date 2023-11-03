@@ -25,10 +25,11 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -82,6 +83,71 @@ public abstract sealed class ListenersBroker {
                 .build();
         }
     }
+
+    /**
+     * Holder of all handlers for notifications.
+     */
+    // FIXME: why do we even need this class?!
+    private record HandlersHolder(
+            @NonNull DOMDataBroker dataBroker,
+            @NonNull DOMNotificationService notificationService,
+            @NonNull DatabindProvider databindProvider) {
+
+        HandlersHolder {
+            requireNonNull(dataBroker);
+            requireNonNull(notificationService);
+            requireNonNull(databindProvider);
+        }
+    }
+
+//    // FIXME: NETCONF:1102: do not instantiate this service
+//    new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider,
+//        listenersBroker),
+
+//    private static final QName LOCATION_QNAME = QName.create(Notifi.QNAME, "location").intern();
+//    private static final NodeIdentifier LOCATION_NODEID = NodeIdentifier.create(LOCATION_QNAME);
+//
+//    private final ListenersBroker listenersBroker;
+//    private final HandlersHolder handlersHolder;
+//
+//    /**
+//     * Initialize holder of handlers with holders as parameters.
+//     *
+//     * @param dataBroker {@link DOMDataBroker}
+//     * @param notificationService {@link DOMNotificationService}
+//     * @param databindProvider a {@link DatabindProvider}
+//     * @param listenersBroker a {@link ListenersBroker}
+//     */
+//    public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
+//            final DOMNotificationService notificationService, final DatabindProvider databindProvider,
+//            final ListenersBroker listenersBroker) {
+//        handlersHolder = new HandlersHolder(dataBroker, notificationService, databindProvider);
+//        this.listenersBroker = requireNonNull(listenersBroker);
+//    }
+//
+//    @Override
+//    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
+//        final var params = QueryParams.newReceiveEventsParams(uriInfo);
+//
+//        final URI location;
+//        if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
+//            location = listenersBroker.subscribeToDataStream(identifier, uriInfo, params, handlersHolder);
+//        } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
+//            location = listenersBroker.subscribeToYangStream(identifier, uriInfo, params, handlersHolder);
+//        } else {
+//            final String msg = "Bad type of notification of sal-remote";
+//            LOG.warn(msg);
+//            throw new RestconfDocumentedException(msg);
+//        }
+//
+//        return Response.ok()
+//            .location(location)
+//            .entity(new NormalizedNodePayload(
+//                Inference.ofDataTreePath(handlersHolder.databindProvider().currentContext().modelContext(),
+//                    Notifi.QNAME, LOCATION_QNAME),
+//                ImmutableNodes.leafNode(LOCATION_NODEID, location.toString())))
+//            .build();
+//    }
 
     private static final Logger LOG = LoggerFactory.getLogger(ListenersBroker.class);
 
