@@ -46,7 +46,7 @@ abstract class AbstractStream<T> implements AutoCloseable {
     protected final @NonNull ListenersBroker listenersBroker;
 
     @GuardedBy("this")
-    private final Set<StreamSessionHandler> subscribers = new HashSet<>();
+    private final Subscribers<T> subscribers = Subscribers.empty();
     @GuardedBy("this")
     private Registration registration;
 
