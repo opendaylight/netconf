@@ -15,9 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -39,7 +42,15 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 class ListenersBrokerTest {
     private static final EffectiveModelContext SCHEMA_CTX = YangParserTestUtils.parseYangResourceDirectory("/streams");
 
-    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
+    @Mock
+    private DOMDataBroker dataBroker;
+
+    private ListenersBroker listenersBroker;
+
+    @BeforeEach
+    public void before() {
+        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
+    }
 
     @Test
     void createStreamTest() {
