@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -44,6 +46,7 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
     private final int heartbeatInterval;
 
     private Session session;
+    private Subscriber<?> subscriber;
     private ScheduledFuture<?> pingProcess;
 
     /**
@@ -64,8 +67,8 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
      */
     WebSocketSessionHandler(final ScheduledExecutorService executorService, final RestconfStream<?> listener,
             final int maximumFragmentLength, final int heartbeatInterval) {
-        this.executorService = executorService;
-        this.listener = listener;
+        this.executorService = requireNonNull(executorService);
+        this.listener = requireNonNull(listener);
         this.maximumFragmentLength = maximumFragmentLength;
         this.heartbeatInterval = heartbeatInterval;
     }
@@ -82,7 +85,7 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
     public synchronized void onWebSocketConnected(final Session webSocketSession) {
         if (session == null || !session.isOpen()) {
             session = webSocketSession;
-            listener.addSubscriber(this);
+            subscriber = listener.addSubscriber(this);
             LOG.debug("A new web-socket session {} has been successfully registered.", webSocketSession);
             if (heartbeatInterval != 0) {
                 // sending of PING frame can be long if there is an error on web-socket - from this reason
@@ -128,9 +131,13 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
         } else {
             LOG.warn("An error occurred on web-socket: ", error);
         }
+        final var local = subscriber;
+        if (local != null) {
+            subscriber = null;
+            listener.removeSubscriber(local);
+        }
         if (session != null) {
             LOG.info("Trying to close web-socket session {} gracefully after error.", session);
-            listener.removeSubscriber(this);
             if (session.isOpen()) {
                 session.close();
             }

@@ -35,6 +35,7 @@ public final class SSESessionHandler implements StreamSessionHandler {
     private final Sse sse;
 
     private ScheduledFuture<?> pingProcess;
+    private Subscriber<?> subscriber;
 
     /**
      * Creation of the new server-sent events session handler.
@@ -66,12 +67,18 @@ public final class SSESessionHandler implements StreamSessionHandler {
      * Initialization of SSE connection. SSE session handler is registered at data-change-event / YANG notification
      * listener and the heartbeat ping process is started if it is enabled.
      */
-    public synchronized void init() {
-        listener.addSubscriber(this);
+    public synchronized boolean init() {
+        final var local = listener.addSubscriber(this);
+        if (local == null) {
+            return false;
+        }
+
+        subscriber = local;
         if (heartbeatInterval != 0) {
             pingProcess = executorService.scheduleWithFixedDelay(this::sendPingMessage, heartbeatInterval,
-                    heartbeatInterval, TimeUnit.MILLISECONDS);
+                heartbeatInterval, TimeUnit.MILLISECONDS);
         }
+        return true;
     }
 
     /**
@@ -79,8 +86,11 @@ public final class SSESessionHandler implements StreamSessionHandler {
      */
     @VisibleForTesting
     synchronized void close() {
-        listener.removeSubscriber(this);
-        stopPingProcess();
+        final var local = subscriber;
+        if (local != null) {
+            listener.removeSubscriber(local);
+            stopPingProcess();
+        }
     }
 
     @Override
