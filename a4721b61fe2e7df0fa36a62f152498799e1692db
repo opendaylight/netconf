@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e55580b8_f0a15b13",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-11-03T20:38:07Z",
+      "side": 1,
+      "message": "There are two more futures chained after this. What if `sourceResolverFuture` is already completed and cannot be canceled?\n\nAnd even if cancellation is attempted during `onRemoteSessionDown`. It may be possible that the task is completed before it\u0027s canceled and then `handleSalInitializationSuccess` is processed when `connected \u003d true`:\n- `onRemoteSessionDown`\n  - Schema processing complete\n  - Cancel future (cannot be canceled)\n- `onRemoteSessionUp` (wins over `handleSalInitializationSuccess`)\n- `handleSalInitializationSuccess`\n  - salFacade.onDeviceConnected\n  \nI think this is very unlikely to happen in practice but this looks like a feasible path at least in theory.",
+      "revId": "a4721b61fe2e7df0fa36a62f152498799e1692db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
