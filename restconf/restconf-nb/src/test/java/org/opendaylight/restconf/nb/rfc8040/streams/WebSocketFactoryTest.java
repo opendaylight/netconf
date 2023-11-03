@@ -50,10 +50,10 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
         listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
         webSocketFactory = new WebSocketFactory(execService, listenersBroker, 5000, 2000);
 
-        streamName = listenersBroker.createStream(name -> new ListenerAdapter(listenersBroker, name,
+        streamName = listenersBroker.createStream(name -> new DataTreeChangeStream(listenersBroker, name,
             NotificationOutputType.JSON, databindProvider, LogicalDatastoreType.CONFIGURATION,
             YangInstanceIdentifier.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"))))
-            .getStreamName();
+            .name();
     }
 
     @Test

@@ -19,24 +19,16 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 /**
- * {@link NotificationListenerAdapter} is responsible to track events on notifications.
+ * A {@link RestconfStream} reporting YANG notifications.
  */
-public final class NotificationListenerAdapter extends AbstractNotificationListenerAdaptor {
+public final class NotificationStream extends AbstractNotificationStream {
     private final DatabindProvider databindProvider;
     private final ImmutableSet<QName> paths;
 
-    /**
-     * Set path of listener and stream name.
-     *
-     * @param paths      Top-level  Schema path of YANG notification.
-     * @param streamName Name of the stream.
-     * @param outputType Type of output on notification (JSON or XML).
-     * @param listenersBroker Associated {@link ListenersBroker}
-     */
-    NotificationListenerAdapter(final ListenersBroker listenersBroker, final String streamName,
+    NotificationStream(final ListenersBroker listenersBroker, final String name,
             final NotificationOutputType outputType, final DatabindProvider databindProvider,
             final ImmutableSet<QName> paths) {
-        super(listenersBroker, streamName, outputType);
+        super(listenersBroker, name, outputType);
         this.databindProvider = requireNonNull(databindProvider);
         this.paths = requireNonNull(paths);
     }

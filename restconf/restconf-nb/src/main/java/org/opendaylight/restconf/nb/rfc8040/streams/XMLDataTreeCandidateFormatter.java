@@ -13,7 +13,7 @@ import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Instant;
-import java.util.Collection;
+import java.util.List;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
@@ -47,7 +47,7 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
     @Override
     String createText(final TextParameters params, final EffectiveModelContext schemaContext,
-            final Collection<DataTreeCandidate> input, final Instant now) throws Exception {
+            final List<DataTreeCandidate> input, final Instant now) throws Exception {
         final var writer = new StringWriter();
         boolean nonEmpty = false;
         try {
