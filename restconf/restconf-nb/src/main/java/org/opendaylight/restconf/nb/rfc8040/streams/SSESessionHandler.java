@@ -23,12 +23,11 @@ import org.slf4j.LoggerFactory;
  */
 public final class SSESessionHandler implements StreamSessionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(SSESessionHandler.class);
-    private static final String PING_PAYLOAD = "ping";
-
     private static final CharMatcher CR_OR_LF = CharMatcher.anyOf("\r\n");
 
     private final ScheduledExecutorService executorService;
-    private final BaseListenerInterface listener;
+    // FIXME: this really should include subscription details like formatter etc.
+    private final AbstractStream<?> listener;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
     private final SseEventSink sink;
@@ -53,7 +52,7 @@ public final class SSESessionHandler implements StreamSessionHandler {
      *            session up. Ping control frames are disabled if this parameter is set to 0.
      */
     public SSESessionHandler(final ScheduledExecutorService executorService, final SseEventSink sink, final Sse sse,
-            final BaseListenerInterface listener, final int maximumFragmentLength, final int heartbeatInterval) {
+            final AbstractStream<?> listener, final int maximumFragmentLength, final int heartbeatInterval) {
         this.executorService = executorService;
         this.sse = sse;
         this.sink = sink;
@@ -124,8 +123,8 @@ public final class SSESessionHandler implements StreamSessionHandler {
 
     private synchronized void sendPingMessage() {
         if (!sink.isClosed()) {
-            LOG.debug("sending PING:{}", PING_PAYLOAD);
-            sink.send(sse.newEventBuilder().comment(PING_PAYLOAD).build());
+            LOG.debug("sending PING");
+            sink.send(sse.newEventBuilder().comment("ping").build());
         } else {
             close();
         }

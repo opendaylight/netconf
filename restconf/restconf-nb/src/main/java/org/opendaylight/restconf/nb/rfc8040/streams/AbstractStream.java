@@ -35,10 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Features of subscribing part of both notifications.
+ * Base superclass for all stream types.
  */
-abstract class AbstractCommonSubscriber<T> implements BaseListenerInterface {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
+abstract class AbstractStream<T> implements AutoCloseable {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractStream.class);
 
     private final EventFormatterFactory<T> formatterFactory;
     private final NotificationOutputType outputType;
@@ -57,7 +57,7 @@ abstract class AbstractCommonSubscriber<T> implements BaseListenerInterface {
     protected DatabindProvider databindProvider;
     private DOMDataBroker dataBroker;
 
-    AbstractCommonSubscriber(final String streamName, final NotificationOutputType outputType,
+    AbstractStream(final String streamName, final NotificationOutputType outputType,
             final EventFormatterFactory<T> formatterFactory, final ListenersBroker listenersBroker) {
         this.streamName = requireNonNull(streamName);
         checkArgument(!streamName.isEmpty());
@@ -68,23 +68,39 @@ abstract class AbstractCommonSubscriber<T> implements BaseListenerInterface {
         formatter = formatterFactory.emptyFormatter();
     }
 
-    @Override
+    /**
+     * Get name of stream.
+     *
+     * @return Stream name.
+     */
     public final String getStreamName() {
         return streamName;
     }
 
-    @Override
-    public final String getOutputType() {
+    /**
+     * Get output type.
+     *
+     * @return Output type (JSON or XML).
+     */
+    final String getOutputType() {
         return outputType.getName();
     }
 
-    @Override
-    public final synchronized boolean hasSubscribers() {
+    /**
+     * Checks if exists at least one {@link StreamSessionHandler} subscriber.
+     *
+     * @return {@code true} if exist at least one {@link StreamSessionHandler} subscriber, {@code false} otherwise.
+     */
+    final synchronized boolean hasSubscribers() {
         return !subscribers.isEmpty();
     }
 
-    @Override
-    public final synchronized Set<StreamSessionHandler> getSubscribers() {
+    /**
+     * Return all subscribers of listener.
+     *
+     * @return Set of all subscribers.
+     */
+    final synchronized Set<StreamSessionHandler> getSubscribers() {
         return new HashSet<>(subscribers);
     }
 
@@ -98,16 +114,24 @@ abstract class AbstractCommonSubscriber<T> implements BaseListenerInterface {
         subscribers.clear();
     }
 
-    @Override
-    public synchronized void addSubscriber(final StreamSessionHandler subscriber) {
+    /**
+     * Registers {@link StreamSessionHandler} subscriber.
+     *
+     * @param subscriber SSE or WS session handler.
+     */
+    synchronized void addSubscriber(final StreamSessionHandler subscriber) {
         final boolean isConnected = subscriber.isConnected();
         checkState(isConnected);
         LOG.debug("Subscriber {} is added.", subscriber);
         subscribers.add(subscriber);
     }
 
-    @Override
-    public synchronized void removeSubscriber(final StreamSessionHandler subscriber) {
+    /**
+     * Removes {@link StreamSessionHandler} subscriber.
+     *
+     * @param subscriber SSE or WS session handler.
+     */
+    synchronized void removeSubscriber(final StreamSessionHandler subscriber) {
         subscribers.remove(subscriber);
         LOG.debug("Subscriber {} is removed", subscriber);
         if (!hasSubscribers()) {

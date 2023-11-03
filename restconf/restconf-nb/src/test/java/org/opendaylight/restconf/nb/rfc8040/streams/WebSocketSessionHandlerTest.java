@@ -31,17 +31,16 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 public class WebSocketSessionHandlerTest {
-
     private static final class WebSocketTestSessionState {
-        private final BaseListenerInterface listener;
+        private final AbstractStream<?> listener;
         private final ScheduledExecutorService executorService;
         private final WebSocketSessionHandler webSocketSessionHandler;
         private final int heartbeatInterval;
         private final int maxFragmentSize;
         private final ScheduledFuture pingFuture;
 
-        private WebSocketTestSessionState(final int maxFragmentSize, final int heartbeatInterval) {
-            listener = mock(BaseListenerInterface.class);
+        WebSocketTestSessionState(final int maxFragmentSize, final int heartbeatInterval) {
+            listener = mock(AbstractStream.class);
             executorService = mock(ScheduledExecutorService.class);
             this.heartbeatInterval = heartbeatInterval;
             this.maxFragmentSize = maxFragmentSize;

@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * Abstract base class for functionality shared between {@link NotificationListenerAdapter} and
  * {@link DeviceNotificationListenerAdaptor}.
  */
-abstract class AbstractNotificationListenerAdaptor extends AbstractCommonSubscriber<DOMNotification>
+abstract class AbstractNotificationListenerAdaptor extends AbstractStream<DOMNotification>
         implements DOMNotificationListener {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationListenerAdaptor.class);
     private static final NotificationFormatterFactory JSON_FORMATTER_FACTORY =
