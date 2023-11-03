@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Base superclass for all stream types.
  */
-abstract class AbstractStream<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractStream.class);
+abstract class RestconfStream<T> {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
 
     private final EventFormatterFactory<T> formatterFactory;
     private final NotificationOutputType outputType;
@@ -47,7 +47,7 @@ abstract class AbstractStream<T> {
     // FIXME: NETCONF-1102: this should be tied to a subscriber
     private @NonNull EventFormatter<T> formatter;
 
-    AbstractStream(final ListenersBroker listenersBroker, final String streamName,
+    RestconfStream(final ListenersBroker listenersBroker, final String streamName,
             final NotificationOutputType outputType, final EventFormatterFactory<T> formatterFactory) {
         this.listenersBroker = requireNonNull(listenersBroker);
         this.streamName = requireNonNull(streamName);

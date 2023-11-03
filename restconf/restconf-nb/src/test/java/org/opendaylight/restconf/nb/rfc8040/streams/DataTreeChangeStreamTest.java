@@ -60,8 +60,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmlunit.assertj.XmlAssert;
 
-public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
-    private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapterTest.class);
+public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
+    private static final Logger LOG = LoggerFactory.getLogger(DataTreeChangeStreamTest.class);
 
     private static final String JSON_NOTIF_LEAVES_CREATE = "/listener-adapter-test/notif-leaves-create.json";
     private static final String JSON_NOTIF_LEAVES_UPDATE =  "/listener-adapter-test/notif-leaves-update.json";
@@ -170,12 +170,11 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         listenersBroker = new ListenersBroker.ServerSentEvents(domDataBroker);
     }
 
-    class ListenerAdapterTester extends ListenerAdapter {
-
-        private volatile String lastNotification;
+    class TestDataTreeChangeStream extends DataTreeChangeStream {
         private CountDownLatch notificationLatch = new CountDownLatch(1);
+        private volatile String lastNotification;
 
-        ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
+        TestDataTreeChangeStream(final YangInstanceIdentifier path, final String streamName,
                 final NotificationOutputType outputType, final boolean leafNodesOnly,
                 final boolean skipNotificationData, final boolean changedLeafNodesOnly, final boolean childNodesOnly,
                 final ListenersBroker listenersBroker) {
@@ -235,7 +234,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonNotifsLeaves() throws Exception {
-        var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
+        var adapter = new TestDataTreeChangeStream(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
             true, false, false, false, listenersBroker);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
@@ -273,7 +272,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonNotifsChangedLeaves() throws Exception {
-        var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
+        var adapter = new TestDataTreeChangeStream(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
                 false, false, true, false, listenersBroker);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
@@ -319,7 +318,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonChildNodesOnly() throws Exception {
-        final var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
+        final var adapter = new TestDataTreeChangeStream(PATCH_CONT_YIID, "Casey",
             NotificationOutputType.JSON, false, false, false, true, listenersBroker);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
@@ -353,7 +352,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlLeavesOnly() throws Exception {
-        var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
+        var adapter = new TestDataTreeChangeStream(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
             true, false, false, false, listenersBroker);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
@@ -403,7 +402,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlChangedLeavesOnly() throws Exception {
-        var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
+        var adapter = new TestDataTreeChangeStream(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
                 false, false, true, false, listenersBroker);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
@@ -461,7 +460,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlChildNodesOnly() throws Exception {
-        final var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
+        final var adapter = new TestDataTreeChangeStream(PATCH_CONT_YIID, "Casey",
             NotificationOutputType.XML, false, false, false, true, listenersBroker);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
@@ -565,7 +564,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     private void jsonNotifications(final YangInstanceIdentifier pathYiid, final boolean skipData,
             final String jsonNotifCreate, final String jsonNotifUpdate, final String jsonNotifDelete) throws Exception {
-        final var adapter = new ListenerAdapterTester(pathYiid, "Casey",
+        final var adapter = new TestDataTreeChangeStream(pathYiid, "Casey",
                 NotificationOutputType.JSON, false, skipData, false, false, listenersBroker);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
@@ -594,7 +593,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     private void xmlNotifications(final YangInstanceIdentifier pathYiid, final boolean skipData,
             final String xmlNotifCreate, final String xmlNotifUpdate, final String xmlNotifDelete) throws Exception {
-        final var adapter = new ListenerAdapterTester(pathYiid, "Casey", NotificationOutputType.XML,
+        final var adapter = new TestDataTreeChangeStream(pathYiid, "Casey", NotificationOutputType.XML,
                 false, skipData, false, false, listenersBroker);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);

@@ -11,7 +11,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Instant;
-import java.util.Collection;
+import java.util.List;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.$YangModuleInfoImpl;
@@ -51,7 +51,7 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
 
     @Override
     String createText(final TextParameters params, final EffectiveModelContext schemaContext,
-            final Collection<DataTreeCandidate> input, final Instant now) throws IOException {
+            final List<DataTreeCandidate> input, final Instant now) throws IOException {
         try (var writer = new StringWriter()) {
             boolean nonEmpty = false;
             try (var jsonWriter = new JsonWriter(writer)) {

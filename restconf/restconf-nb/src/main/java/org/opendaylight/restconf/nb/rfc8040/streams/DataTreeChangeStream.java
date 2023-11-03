@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -28,37 +27,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link ListenerAdapter} is responsible to track events, which occurred by changing data in data source.
+ * A {@link RestconfStream} reporting changes on a particular data tree.
  */
-public class ListenerAdapter extends AbstractStream<Collection<DataTreeCandidate>>
+public class DataTreeChangeStream extends RestconfStream<List<DataTreeCandidate>>
         implements ClusteredDOMDataTreeChangeListener {
-    private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataTreeChangeStream.class);
 
     private final DatabindProvider databindProvider;
     private final @NonNull LogicalDatastoreType datastore;
     private final @NonNull YangInstanceIdentifier path;
 
-    /**
-     * Creates new {@link ListenerAdapter} listener specified by path and stream name and register for subscribing.
-     *
-     * @param path       Path to data in data store.
-     * @param streamName The name of the stream.
-     * @param outputType Type of output on notification (JSON, XML).
-     */
-    ListenerAdapter(final ListenersBroker listenersBroker, final String streamName,
+    DataTreeChangeStream(final ListenersBroker listenersBroker, final String streamName,
             final NotificationOutputType outputType, final DatabindProvider databindProvider,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
-        super(listenersBroker, streamName, outputType, getFormatterFactory(outputType));
+        super(listenersBroker, streamName, outputType, switch (outputType) {
+            case JSON -> JSONDataTreeCandidateFormatter.FACTORY;
+            case XML -> XMLDataTreeCandidateFormatter.FACTORY;
+        });
         this.databindProvider = requireNonNull(databindProvider);
         this.datastore = requireNonNull(datastore);
         this.path = requireNonNull(path);
-    }
-
-    private static DataTreeCandidateFormatterFactory getFormatterFactory(final NotificationOutputType outputType) {
-        return switch (outputType) {
-            case JSON -> JSONDataTreeCandidateFormatter.FACTORY;
-            case XML -> XMLDataTreeCandidateFormatter.FACTORY;
-        };
     }
 
     @Override
