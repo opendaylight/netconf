@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import java.util.concurrent.ScheduledExecutorService;
@@ -76,9 +77,15 @@ public final class SSESessionHandler implements StreamSessionHandler {
     /**
      * Handling of SSE session close event. Removal of subscription at listener and stopping of the ping process.
      */
-    public synchronized void close() {
+    @VisibleForTesting
+    synchronized void close() {
         listener.removeSubscriber(this);
         stopPingProcess();
+    }
+
+    @Override
+    public synchronized boolean isConnected() {
+        return !sink.isClosed();
     }
 
     /**
@@ -102,6 +109,12 @@ public final class SSESessionHandler implements StreamSessionHandler {
         } else {
             close();
         }
+    }
+
+    @Override
+    public synchronized void endOfStream() {
+        stopPingProcess();
+        sink.close();
     }
 
     /**
@@ -134,11 +147,6 @@ public final class SSESessionHandler implements StreamSessionHandler {
         if (pingProcess != null && !pingProcess.isDone() && !pingProcess.isCancelled()) {
             pingProcess.cancel(true);
         }
-    }
-
-    @Override
-    public synchronized boolean isConnected() {
-        return !sink.isClosed();
     }
 
     // TODO:return some type of identification of connection

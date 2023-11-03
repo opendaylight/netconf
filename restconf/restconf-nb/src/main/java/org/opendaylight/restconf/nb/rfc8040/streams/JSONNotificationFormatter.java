@@ -7,8 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static java.util.Objects.requireNonNull;
-
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -22,40 +21,31 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamW
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 final class JSONNotificationFormatter extends NotificationFormatter {
-    private static final @NonNull String NOTIFICATION_NAME;
+    private static final @NonNull String NOTIFICATION_NAME =
+        $YangModuleInfoImpl.getInstance().getName().getLocalName() + ":notification";
+    @VisibleForTesting
+    static final JSONNotificationFormatter EMPTY = new JSONNotificationFormatter(TextParameters.EMPTY);
 
-    static {
-        final var ietfRestconfName = $YangModuleInfoImpl.getInstance().getName();
-        NOTIFICATION_NAME = ietfRestconfName.getLocalName() + ":notification";
-    }
+    static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory(EMPTY) {
+        @Override
+        JSONNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+                throws XPathExpressionException {
+            return new JSONNotificationFormatter(textParams, xpathFilter);
+        }
 
-    private final JSONCodecFactorySupplier codecSupplier;
+        @Override
+        JSONNotificationFormatter newFormatter(final TextParameters textParams) {
+            return new JSONNotificationFormatter(textParams);
+        }
+    };
 
-    private JSONNotificationFormatter(final TextParameters textParams, final JSONCodecFactorySupplier codecSupplier) {
+    private JSONNotificationFormatter(final TextParameters textParams) {
         super(textParams);
-        this.codecSupplier = requireNonNull(codecSupplier);
     }
 
-    private JSONNotificationFormatter(final TextParameters textParams, final String xpathFilter,
-            final JSONCodecFactorySupplier codecSupplier) throws XPathExpressionException {
+    private JSONNotificationFormatter(final TextParameters textParams, final String xpathFilter)
+            throws XPathExpressionException {
         super(textParams, xpathFilter);
-        this.codecSupplier = requireNonNull(codecSupplier);
-    }
-
-    static NotificationFormatterFactory createFactory(final JSONCodecFactorySupplier codecSupplier) {
-        final var empty = new JSONNotificationFormatter(TextParameters.EMPTY, codecSupplier);
-        return new NotificationFormatterFactory(empty) {
-            @Override
-            JSONNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
-                    throws XPathExpressionException {
-                return new JSONNotificationFormatter(textParams, xpathFilter, codecSupplier);
-            }
-
-            @Override
-            JSONNotificationFormatter newFormatter(final TextParameters textParams) {
-                return new JSONNotificationFormatter(textParams, codecSupplier);
-            }
-        };
     }
 
     @Override
@@ -67,7 +57,8 @@ final class JSONNotificationFormatter extends NotificationFormatter {
                     .name(NOTIFICATION_NAME).beginObject()
                         .name("event-time").value(toRFC3339(now));
                 writeNotificationBody(JSONNormalizedNodeStreamWriter.createNestedWriter(
-                    codecSupplier.getShared(schemaContext), input.getType(), null, jsonWriter), input.getBody());
+                    JSONCodecFactorySupplier.RFC7951.getShared(schemaContext), input.getType(), null, jsonWriter),
+                    input.getBody());
                 jsonWriter.endObject().endObject();
             }
             return writer.toString();

@@ -13,16 +13,13 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
-import com.google.common.util.concurrent.ListenableFuture;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import javax.xml.xpath.XPathExpressionException;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
@@ -37,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Base superclass for all stream types.
  */
-abstract class AbstractStream<T> implements AutoCloseable {
+abstract class AbstractStream<T> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractStream.class);
 
     private final EventFormatterFactory<T> formatterFactory;
@@ -96,25 +93,6 @@ abstract class AbstractStream<T> implements AutoCloseable {
     }
 
     /**
-     * Return all subscribers of listener.
-     *
-     * @return Set of all subscribers.
-     */
-    final synchronized Set<StreamSessionHandler> getSubscribers() {
-        return new HashSet<>(subscribers);
-    }
-
-    @Override
-    public final synchronized void close() throws InterruptedException, ExecutionException {
-        if (registration != null) {
-            registration.close();
-            registration = null;
-        }
-        deleteDataInDS().get();
-        subscribers.clear();
-    }
-
-    /**
      * Registers {@link StreamSessionHandler} subscriber.
      *
      * @param subscriber SSE or WS session handler.
@@ -127,15 +105,41 @@ abstract class AbstractStream<T> implements AutoCloseable {
     }
 
     /**
-     * Removes {@link StreamSessionHandler} subscriber.
+     * Removes {@link StreamSessionHandler} subscriber. If this was the last subscriber also shut down this stream and
+     * initiate its removal from global state.
      *
      * @param subscriber SSE or WS session handler.
      */
     synchronized void removeSubscriber(final StreamSessionHandler subscriber) {
         subscribers.remove(subscriber);
         LOG.debug("Subscriber {} is removed", subscriber);
-        if (!hasSubscribers()) {
-            listenersBroker.removeAndCloseListener(this);
+        if (subscribers.isEmpty()) {
+            closeRegistration();
+            listenersBroker.removeStream(dataBroker, this);
+        }
+    }
+
+    /**
+     * Signal the end-of-stream condition to subscribers, shut down this stream and initiate its removal from global
+     * state.
+     */
+    final synchronized void endOfStream() {
+        closeRegistration();
+
+        final var it = subscribers.iterator();
+        while (it.hasNext()) {
+            it.next().endOfStream();
+            it.remove();
+        }
+
+        listenersBroker.removeStream(dataBroker, this);
+    }
+
+    @Holding("this")
+    private void closeRegistration() {
+        if (registration != null) {
+            registration.close();
+            registration = null;
         }
     }
 
@@ -234,20 +238,9 @@ abstract class AbstractStream<T> implements AutoCloseable {
      */
     @SuppressWarnings("checkstyle:hiddenField")
     // FIXME: this is pure lifecycle nightmare just because ...
-    public void setCloseVars(final DOMDataBroker dataBroker, final DatabindProvider databindProvider) {
+    public synchronized void setCloseVars(final DOMDataBroker dataBroker, final DatabindProvider databindProvider) {
         this.dataBroker = dataBroker;
         this.databindProvider = databindProvider;
-    }
-
-    /**
-     * Delete data in DS.
-     */
-    // FIXME: here we touch datastore, which probably should be done by whoever instantiated us or created the resource,
-    //        or they should be giving us the transaction
-    private ListenableFuture<?> deleteDataInDS() {
-        final var wTx = dataBroker.newWriteOnlyTransaction();
-        wTx.delete(LogicalDatastoreType.OPERATIONAL, RestconfStateStreams.restconfStateStreamPath(streamName));
-        return wTx.commit();
     }
 
     @Override

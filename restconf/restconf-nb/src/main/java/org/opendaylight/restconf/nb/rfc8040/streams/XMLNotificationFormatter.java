@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Instant;
@@ -18,8 +19,8 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStr
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 final class XMLNotificationFormatter extends NotificationFormatter {
-    private static final XMLNotificationFormatter EMPTY = new XMLNotificationFormatter(TextParameters.EMPTY);
-
+    @VisibleForTesting
+    static final XMLNotificationFormatter EMPTY = new XMLNotificationFormatter(TextParameters.EMPTY);
     static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory(EMPTY) {
         @Override
         XMLNotificationFormatter newFormatter(final TextParameters textParams) {

@@ -164,7 +164,7 @@ public final class RestconfInvokeOperationsServiceImpl {
             } else if (CreateNotificationStream.QNAME.equals(type)) {
                 return listenersBroker.createNotificationStream(input, localDatabind.modelContext());
             } else if (SubscribeDeviceNotification.QNAME.equals(type)) {
-                return listenersBroker.createDeviceNotificationListener(input,
+                return listenersBroker.createDeviceNotificationStream(input,
                     listenersBroker.prepareUriByStreamName(uriInfo, "").toString(), mountPointService);
             }
         }

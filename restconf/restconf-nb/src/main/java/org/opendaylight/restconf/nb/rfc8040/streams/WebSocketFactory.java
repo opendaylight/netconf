@@ -55,7 +55,7 @@ record WebSocketFactory(
         final var path = req.getRequestURI().getPath();
         if (path.startsWith(STREAMS_PREFIX)) {
             final var streamName = path.substring(STREAMS_PREFIX.length());
-            final var listener = listenersBroker.listenerFor(streamName);
+            final var listener = listenersBroker.getStream(streamName);
             if (listener != null) {
                 LOG.debug("Listener for stream with name {} has been found, web-socket session handler will be created",
                     streamName);

@@ -7,23 +7,22 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.locks.StampedLock;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -31,22 +30,19 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStreamInput;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -55,11 +51,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
@@ -103,6 +97,22 @@ public abstract sealed class ListenersBroker {
                 .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.STREAMS_SUBPATH + '/' + streamName)
                 .build();
         }
+    }
+
+    /**
+     * Factory interface for creating instances of {@link AbstractStream}.
+     *
+     * @param <T> {@link AbstractStream} type
+     */
+    @FunctionalInterface
+    public interface StreamFactory<T extends AbstractStream<?>> {
+        /**
+         * Create a stream with the supplied name.
+         *
+         * @param name Stream name
+         * @return An {@link AbstractStream}
+         */
+        @NonNull T createStream(@NonNull String name);
     }
 
     /**
@@ -177,26 +187,15 @@ public abstract sealed class ListenersBroker {
 
     private static final Logger LOG = LoggerFactory.getLogger(ListenersBroker.class);
 
-    // Prefixes for stream names
-    private static final String DATA_SUBSCRIPTION = "data-change-event-subscription";
-    private static final String NOTIFICATION_STREAM = "notification-stream";
-    private static final String DEVICE_NOTIFICATION_STREAM = "device-notification-stream";
-
-    private static final QNameModule SAL_REMOTE_AUGMENT = NotificationOutputTypeGrouping.QNAME.getModule();
-
-    private static final QNameModule DEVICE_NOTIFICATION_MODULE = SubscribeDeviceNotificationInput.QNAME.getModule();
     private static final QName DATASTORE_QNAME =
-        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.DATASTORE_PARAM_NAME).intern();
-    private static final QName SCOPE_QNAME =
-        QName.create(SAL_REMOTE_AUGMENT, RestconfStreamsConstants.SCOPE_PARAM_NAME).intern();
+        QName.create(CreateDataChangeEventSubscriptionInput1.QNAME, "datastore").intern();
     private static final QName OUTPUT_TYPE_QNAME =
-        QName.create(SAL_REMOTE_AUGMENT, "notification-output-type").intern();
+        QName.create(NotificationOutputTypeGrouping.QNAME, "notification-output-type").intern();
     private static final QName DEVICE_NOTIFICATION_PATH_QNAME =
-        QName.create(DEVICE_NOTIFICATION_MODULE, "path").intern();
+        QName.create(SubscribeDeviceNotificationInput.QNAME, "path").intern();
     private static final QName DEVICE_NOTIFICATION_STREAM_PATH =
         QName.create(DEVICE_NOTIFICATION_PATH_QNAME, "stream-path").intern();
     private static final NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(DATASTORE_QNAME);
-    private static final NodeIdentifier SCOPE_NODEID = NodeIdentifier.create(SCOPE_QNAME);
     private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(OUTPUT_TYPE_QNAME);
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
         NodeIdentifier.create(DEVICE_NOTIFICATION_PATH_QNAME);
@@ -209,355 +208,74 @@ public abstract sealed class ListenersBroker {
     private static final NodeIdentifier STREAM_NAME_NODEID =
         NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionOutput.QNAME, "stream-name").intern());
 
-    private final StampedLock dataChangeListenersLock = new StampedLock();
-    private final StampedLock notificationListenersLock = new StampedLock();
-    private final StampedLock deviceNotificationListenersLock = new StampedLock();
-    private final BiMap<String, ListenerAdapter> dataChangeListeners = HashBiMap.create();
-    private final BiMap<String, NotificationListenerAdapter> notificationListeners = HashBiMap.create();
-    private final BiMap<String, DeviceNotificationListenerAdaptor> deviceNotificationListeners = HashBiMap.create();
+    private final ConcurrentMap<String, AbstractStream<?>> streams = new ConcurrentHashMap<>();
 
     private ListenersBroker() {
         // Hidden on purpose
     }
 
     /**
-     * Gets {@link ListenerAdapter} specified by stream identification.
+     * Get an {@link AbstractStream} by its name.
      *
      * @param streamName Stream name.
-     * @return {@link ListenerAdapter} specified by stream name or {@code null} if listener with specified stream name
-     *         does not exist.
-     * @throws NullPointerException in {@code streamName} is {@code null}
+     * @return An {@link AbstractStream}, or {@code null} if the stream with specified name does not exist.
+     * @throws NullPointerException if {@code streamName} is {@code null}
      */
-    public final @Nullable ListenerAdapter dataChangeListenerFor(final String streamName) {
-        requireNonNull(streamName);
-
-        final long stamp = dataChangeListenersLock.readLock();
-        try {
-            return dataChangeListeners.get(streamName);
-        } finally {
-            dataChangeListenersLock.unlockRead(stamp);
-        }
+    public final @Nullable AbstractStream<?> getStream(final String streamName) {
+        return streams.get(streamName);
     }
 
     /**
-     * Gets {@link NotificationListenerAdapter} specified by stream name.
+     * Create an {@link AbstractStream} with a unique name. This method will atomically generate a stream name, create
+     * the corresponding instance and register it
      *
-     * @param streamName Stream name.
-     * @return {@link NotificationListenerAdapter} specified by stream name or {@code null} if listener with specified
-     *         stream name does not exist.
-     * @throws NullPointerException in {@code streamName} is {@code null}
+     * @param <T> Stream type
+     * @param factory Factory for creating the actual stream instance
+     * @return An {@link AbstractStream} instance
+     * @throws NullPointerException if {@code factory} is {@code null}
      */
-    public final @Nullable NotificationListenerAdapter notificationListenerFor(final String streamName) {
-        requireNonNull(streamName);
+    public final <T extends AbstractStream<?>> @NonNull T createStream(final StreamFactory<T> factory) {
+        String name;
+        T stream;
+        do {
+            // Use Type 4 (random) UUID. While we could just use it as a plain string, be nice to observers and anchor
+            // it into UUID URN namespace as defined by RFC4122
+            name = "urn:uuid:" + UUID.randomUUID().toString();
+            stream = factory.createStream(name);
+        } while (streams.putIfAbsent(name, stream) != null);
 
-        final long stamp = notificationListenersLock.readLock();
-        try {
-            return notificationListeners.get(streamName);
-        } finally {
-            notificationListenersLock.unlockRead(stamp);
-        }
+        return stream;
     }
 
     /**
-     * Get listener for device path.
+     * Remove a particular stream and remove its entry from operational datastore.
      *
-     * @param streamName name.
-     * @return {@link DeviceNotificationListenerAdaptor} specified by stream name or {@code null} if listener with
-     *         specified stream name does not exist.
-     * @throws NullPointerException in {@code path} is {@code null}
+     * @param stream Stream to remove
      */
-    public final @Nullable DeviceNotificationListenerAdaptor deviceNotificationListenerFor(final String streamName) {
-        requireNonNull(streamName);
-
-        final long stamp = deviceNotificationListenersLock.readLock();
-        try {
-            return deviceNotificationListeners.get(streamName);
-        } finally {
-            deviceNotificationListenersLock.unlockRead(stamp);
-        }
-    }
-
-    /**
-     * Get listener for stream-name.
-     *
-     * @param streamName Stream name.
-     * @return {@link NotificationListenerAdapter} or {@link ListenerAdapter} object wrapped in {@link Optional}
-     *     or {@link Optional#empty()} if listener with specified stream name doesn't exist.
-     */
-    public final @Nullable AbstractStream<?> listenerFor(final String streamName) {
-        if (streamName.startsWith(NOTIFICATION_STREAM)) {
-            return notificationListenerFor(streamName);
-        } else if (streamName.startsWith(DATA_SUBSCRIPTION)) {
-            return dataChangeListenerFor(streamName);
-        } else if (streamName.startsWith(DEVICE_NOTIFICATION_STREAM)) {
-            return deviceNotificationListenerFor(streamName);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Creates new {@link ListenerAdapter} listener using input stream name and path if such listener
-     * hasn't been created yet.
-     *
-     * @param path       Path to data in data repository.
-     * @param outputType Specific type of output for notifications - XML or JSON.
-     * @return Created or existing data-change listener adapter.
-     */
-    public final ListenerAdapter registerDataChangeListener(final EffectiveModelContext modelContext,
-            final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final Scope scope,
-            final NotificationOutputType outputType) {
-        final var sb = new StringBuilder(DATA_SUBSCRIPTION)
-            .append('/').append(createStreamNameFromUri(IdentifierCodec.serialize(path, modelContext)))
-            .append('/').append(RestconfStreamsConstants.DATASTORE_PARAM_NAME).append('=').append(datastore)
-            .append('/').append(RestconfStreamsConstants.SCOPE_PARAM_NAME).append('=').append(scope);
-        if (outputType != NotificationOutputType.XML) {
-            sb.append('/').append(outputType.getName());
+    final void removeStream(final DOMDataBroker dataBroker, final AbstractStream<?> stream) {
+        // Defensive check to see if we are still tracking the stream
+        final var streamName = stream.getStreamName();
+        if (streams.get(streamName) != stream) {
+            LOG.warn("Stream {} does not match expected instance {}, skipping datastore update", streamName, stream);
+            return;
         }
 
-        final long stamp = dataChangeListenersLock.writeLock();
-        try {
-            return dataChangeListeners.computeIfAbsent(sb.toString(),
-                streamName -> new ListenerAdapter(streamName, outputType, this, datastore, path));
-        } finally {
-            dataChangeListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    /**
-     * Creates new {@link NotificationDefinition} listener using input stream name and schema path
-     * if such listener haven't been created yet.
-     *
-     * @param refSchemaCtx reference {@link EffectiveModelContext}
-     * @param notifications {@link QName}s of accepted YANG notifications
-     * @param outputType Specific type of output for notifications - XML or JSON.
-     * @return Created or existing notification listener adapter.
-     */
-    public final NotificationListenerAdapter registerNotificationListener(final EffectiveModelContext refSchemaCtx,
-            final ImmutableSet<QName> notifications, final NotificationOutputType outputType) {
-        final var sb = new StringBuilder(NOTIFICATION_STREAM).append('/');
-        var haveFirst = false;
-        for (var qname : notifications) {
-            final var module = refSchemaCtx.findModuleStatement(qname.getModule())
-                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown module",
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
-            final var stmt = module.findSchemaTreeNode(qname)
-                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an notification",
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
-            if (!(stmt instanceof NotificationEffectiveStatement)) {
-                throw new RestconfDocumentedException(qname + " refers to a non-notification",
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+        // Now issue a delete operation while the name is still protected by being associated in the map.
+        final var tx = dataBroker.newWriteOnlyTransaction();
+        tx.delete(LogicalDatastoreType.OPERATIONAL, RestconfStateStreams.restconfStateStreamPath(streamName));
+        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                LOG.debug("Stream {} removed", streamName);
+                streams.remove(streamName, stream);
             }
 
-            if (haveFirst) {
-                sb.append(',');
-            } else {
-                haveFirst = true;
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.warn("Failed to remove stream {}, operational datastore may be inconsistent", streamName, cause);
+                streams.remove(streamName, stream);
             }
-            sb.append(module.argument().getLocalName()).append(':').append(qname.getLocalName());
-        }
-        if (outputType != NotificationOutputType.XML) {
-            sb.append('/').append(outputType.getName());
-        }
-
-        final long stamp = notificationListenersLock.writeLock();
-        try {
-            return notificationListeners.computeIfAbsent(sb.toString(),
-                streamName -> new NotificationListenerAdapter(streamName, outputType, this, notifications));
-        } finally {
-            notificationListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    /**
-     * Creates new {@link DeviceNotificationListenerAdaptor} listener using input stream name and schema path
-     * if such listener haven't been created yet.
-     *
-     * @param deviceName Device name.
-     * @param outputType Specific type of output for notifications - XML or JSON.
-     * @param refSchemaCtx Schema context of node
-     * @param mountPointService Mount point service
-     * @return Created or existing device notification listener adapter.
-     */
-    private DeviceNotificationListenerAdaptor registerDeviceNotificationListener(final String deviceName,
-            final NotificationOutputType outputType, final EffectiveModelContext refSchemaCtx,
-            final DOMMountPointService mountPointService, final YangInstanceIdentifier path) {
-        final var sb = new StringBuilder(DEVICE_NOTIFICATION_STREAM).append('/')
-            .append(deviceName);
-
-        final long stamp = deviceNotificationListenersLock.writeLock();
-        try {
-            return deviceNotificationListeners.computeIfAbsent(sb.toString(),
-                streamName -> new DeviceNotificationListenerAdaptor(streamName, outputType, this, refSchemaCtx,
-                    mountPointService, path));
-        } finally {
-            deviceNotificationListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    /**
-     * Removal and closing of all data-change-event and notification listeners.
-     */
-    public final synchronized void removeAndCloseAllListeners() {
-        final long stampNotifications = notificationListenersLock.writeLock();
-        final long stampDataChanges = dataChangeListenersLock.writeLock();
-        try {
-            removeAndCloseAllDataChangeListenersTemplate();
-            removeAndCloseAllNotificationListenersTemplate();
-        } finally {
-            dataChangeListenersLock.unlockWrite(stampDataChanges);
-            notificationListenersLock.unlockWrite(stampNotifications);
-        }
-    }
-
-    /**
-     * Closes and removes all data-change listeners.
-     */
-    public final void removeAndCloseAllDataChangeListeners() {
-        final long stamp = dataChangeListenersLock.writeLock();
-        try {
-            removeAndCloseAllDataChangeListenersTemplate();
-        } finally {
-            dataChangeListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    private void removeAndCloseAllDataChangeListenersTemplate() {
-        dataChangeListeners.values().forEach(listenerAdapter -> {
-            try {
-                listenerAdapter.close();
-            } catch (Exception e) {
-                LOG.error("Failed to close data-change listener {}.", listenerAdapter, e);
-                throw new IllegalStateException("Failed to close data-change listener %s.".formatted(listenerAdapter),
-                    e);
-            }
-        });
-        dataChangeListeners.clear();
-    }
-
-    /**
-     * Closes and removes all notification listeners.
-     */
-    public final void removeAndCloseAllNotificationListeners() {
-        final long stamp = notificationListenersLock.writeLock();
-        try {
-            removeAndCloseAllNotificationListenersTemplate();
-        } finally {
-            notificationListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    private void removeAndCloseAllNotificationListenersTemplate() {
-        notificationListeners.values().forEach(listenerAdapter -> {
-            try {
-                listenerAdapter.close();
-            } catch (Exception e) {
-                LOG.error("Failed to close notification listener {}.", listenerAdapter, e);
-                throw new IllegalStateException("Failed to close notification listener %s.".formatted(listenerAdapter),
-                    e);
-            }
-        });
-        notificationListeners.clear();
-    }
-
-    /**
-     * Removes and closes data-change listener of type {@link ListenerAdapter} specified in parameter.
-     *
-     * @param listener Listener to be closed and removed.
-     */
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    public final void removeAndCloseDataChangeListener(final ListenerAdapter listener) {
-        final long stamp = dataChangeListenersLock.writeLock();
-        try {
-            removeAndCloseDataChangeListenerTemplate(listener);
-        } catch (Exception exception) {
-            LOG.error("Data-change listener {} cannot be closed.", listener, exception);
-        } finally {
-            dataChangeListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    /**
-     * Removes and closes data-change listener of type {@link ListenerAdapter} specified in parameter.
-     *
-     * @param listener Listener to be closed and removed.
-     */
-    private void removeAndCloseDataChangeListenerTemplate(final ListenerAdapter listener) {
-        try {
-            requireNonNull(listener).close();
-            if (dataChangeListeners.inverse().remove(listener) == null) {
-                LOG.warn("There isn't any data-change event stream that would match listener adapter {}.", listener);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error("Data-change listener {} cannot be closed.", listener, e);
-            throw new IllegalStateException("Data-change listener %s cannot be closed.".formatted(listener), e);
-        }
-    }
-
-    /**
-     * Removes and closes notification listener of type {@link NotificationListenerAdapter} specified in parameter.
-     *
-     * @param listener Listener to be closed and removed.
-     */
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    public final void removeAndCloseNotificationListener(final NotificationListenerAdapter listener) {
-        final long stamp = notificationListenersLock.writeLock();
-        try {
-            removeAndCloseNotificationListenerTemplate(listener);
-        } catch (Exception e) {
-            LOG.error("Notification listener {} cannot be closed.", listener, e);
-        } finally {
-            notificationListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    /**
-     * Removes and closes device notification listener of type {@link NotificationListenerAdapter}
-     * specified in parameter.
-     *
-     * @param listener Listener to be closed and removed.
-     */
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    public final void removeAndCloseDeviceNotificationListener(final DeviceNotificationListenerAdaptor listener) {
-        final long stamp = deviceNotificationListenersLock.writeLock();
-        try {
-            requireNonNull(listener);
-            if (deviceNotificationListeners.inverse().remove(listener) == null) {
-                LOG.warn("There isn't any device notification stream that would match listener adapter {}.", listener);
-            }
-        } catch (final Exception exception) {
-            LOG.error("Device Notification listener {} cannot be closed.", listener, exception);
-        } finally {
-            deviceNotificationListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    private void removeAndCloseNotificationListenerTemplate(final NotificationListenerAdapter listener) {
-        try {
-            requireNonNull(listener).close();
-            if (notificationListeners.inverse().remove(listener) == null) {
-                LOG.warn("There isn't any notification stream that would match listener adapter {}.", listener);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error("Notification listener {} cannot be closed.", listener, e);
-            throw new IllegalStateException("Notification listener %s cannot be closed.".formatted(listener), e);
-        }
-    }
-
-    /**
-     * Removal and closing of general listener (data-change or notification listener).
-     *
-     * @param stream Stream to be closed and removed from cache.
-     */
-    final void removeAndCloseListener(final AbstractStream<?> stream) {
-        requireNonNull(stream);
-        if (stream instanceof ListenerAdapter dataChange) {
-            removeAndCloseDataChangeListener(dataChange);
-        } else if (stream instanceof NotificationListenerAdapter notification) {
-            removeAndCloseNotificationListener(notification);
-        }
+        }, MoreExecutors.directExecutor());
     }
 
     /**
@@ -567,22 +285,22 @@ public abstract sealed class ListenersBroker {
      * @param uri URI for creation of stream name.
      * @return String representation of stream name.
      */
-    private static String createStreamNameFromUri(final String uri) {
-        String result = requireNonNull(uri);
-        while (true) {
-            if (result.startsWith(URLConstants.BASE_PATH)) {
-                result = result.substring(URLConstants.BASE_PATH.length());
-            } else if (result.startsWith("/")) {
-                result = result.substring(1);
-            } else {
-                break;
-            }
-        }
-        if (result.endsWith("/")) {
-            result = result.substring(0, result.length() - 1);
-        }
-        return result;
-    }
+//    private static String createStreamNameFromUri(final String uri) {
+//        String result = requireNonNull(uri);
+//        while (true) {
+//            if (result.startsWith(URLConstants.BASE_PATH)) {
+//                result = result.substring(URLConstants.BASE_PATH.length());
+//            } else if (result.startsWith("/")) {
+//                result = result.substring(1);
+//            } else {
+//                break;
+//            }
+//        }
+//        if (result.endsWith("/")) {
+//            result = result.substring(0, result.length() - 1);
+//        }
+//        return result;
+//    }
 
     /**
      * Prepare URL from base name and stream name.
@@ -593,97 +311,20 @@ public abstract sealed class ListenersBroker {
      */
     public abstract @NonNull URI prepareUriByStreamName(UriInfo uriInfo, String streamName);
 
-    /**
-     * Register listener by streamName in identifier to listen to yang notifications, and put or delete information
-     * about listener to DS according to ietf-restconf-monitoring.
-     *
-     * @param identifier              Name of the stream.
-     * @param uriInfo                 URI information.
-     * @param notificationQueryParams Query parameters of notification.
-     * @param handlersHolder          Holder of handlers for notifications.
-     * @return Stream location for listening.
-     */
-    public final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
-            final ReceiveEventsParams notificationQueryParams, final HandlersHolder handlersHolder) {
-        final String streamName = createStreamNameFromUri(identifier);
-        if (isNullOrEmpty(streamName)) {
-            throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-
-        final var notificationListenerAdapter = notificationListenerFor(streamName);
-        if (notificationListenerAdapter == null) {
-            throw new RestconfDocumentedException("Stream with name %s was not found.".formatted(streamName),
-                ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
-        }
-
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
-        notificationListenerAdapter.setQueryParams(notificationQueryParams);
-        notificationListenerAdapter.listen(handlersHolder.notificationService());
-        final DOMDataBroker dataBroker = handlersHolder.dataBroker();
-        notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.databindProvider());
-        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(streamName,
-            notificationListenerAdapter.qnames(), notificationListenerAdapter.getOutputType(), uri);
-
-        // FIXME: how does this correlate with the transaction notificationListenerAdapter.close() will do?
-        final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeDataToDS(writeTransaction, mapToStreams);
-        submitData(writeTransaction);
-        return uri;
-    }
-
-    /**
-     * Register listener by streamName in identifier to listen to data change notifications, and put or delete
-     * information about listener to DS according to ietf-restconf-monitoring.
-     *
-     * @param identifier              Identifier as stream name.
-     * @param uriInfo                 Base URI information.
-     * @param notificationQueryParams Query parameters of notification.
-     * @param handlersHolder          Holder of handlers for notifications.
-     * @return Location for listening.
-     */
-    public final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
-            final ReceiveEventsParams notificationQueryParams, final HandlersHolder handlersHolder) {
-        final var streamName = createStreamNameFromUri(identifier);
-        final var listener = dataChangeListenerFor(streamName);
-        if (listener == null) {
-            throw new RestconfDocumentedException("No listener found for stream " + streamName,
-                ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
-        }
-
-        listener.setQueryParams(notificationQueryParams);
-
-        final var dataBroker = handlersHolder.dataBroker();
-        final var schemaHandler = handlersHolder.databindProvider();
-        listener.setCloseVars(dataBroker, schemaHandler);
-        listener.listen(dataBroker);
-
-        final var uri = prepareUriByStreamName(uriInfo, streamName);
-        final var schemaContext = schemaHandler.currentContext().modelContext();
-        final var serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
-
-        final var mapToStreams = RestconfStateStreams.dataChangeStreamEntry(listener.getPath(),
-                listener.getOutputType(), uri, schemaContext, serializedPath);
-        final var writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeDataToDS(writeTransaction, mapToStreams);
-        submitData(writeTransaction);
-        return uri;
-    }
-
     // FIXME: callers are utter duplicates, refactor them
-    private static void writeDataToDS(final DOMDataTreeWriteOperations tx, final MapEntryNode mapToStreams) {
-        // FIXME: use put() here
-        tx.merge(LogicalDatastoreType.OPERATIONAL, RestconfStateStreams.restconfStateStreamPath(mapToStreams.name()),
-            mapToStreams);
-    }
-
-    private static void submitData(final DOMDataTreeWriteTransaction readWriteTransaction) {
-        try {
-            readWriteTransaction.commit().get();
-        } catch (final InterruptedException | ExecutionException e) {
-            throw new RestconfDocumentedException("Problem while putting data to DS.", e);
-        }
-    }
-
+//    private static void writeDataToDS(final DOMDataTreeWriteOperations tx, final MapEntryNode mapToStreams) {
+//        // FIXME: use put() here
+//        tx.merge(LogicalDatastoreType.OPERATIONAL, RestconfStateStreams.restconfStateStreamPath(mapToStreams.name()),
+//            mapToStreams);
+//    }
+//
+//    private static void submitData(final DOMDataTreeWriteTransaction readWriteTransaction) {
+//        try {
+//            readWriteTransaction.commit().get();
+//        } catch (final InterruptedException | ExecutionException e) {
+//            throw new RestconfDocumentedException("Problem while putting data to DS.", e);
+//        }
+//    }
 
     /**
      * Create data-change-event stream with POST operation via RPC.
@@ -716,10 +357,11 @@ public abstract sealed class ListenersBroker {
     public final RestconfFuture<Optional<ContainerNode>> createDataChangeNotifiStream(final ContainerNode input,
             final EffectiveModelContext modelContext) {
         final var datastoreName = extractStringLeaf(input, DATASTORE_NODEID);
-        final var scopeName = extractStringLeaf(input, SCOPE_NODEID);
-        final var adapter = registerDataChangeListener(modelContext,
-            datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName) : LogicalDatastoreType.CONFIGURATION,
-            preparePath(input), scopeName != null ? Scope.ofName(scopeName) : Scope.BASE, prepareOutputType(input));
+        final var datastore = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
+            : LogicalDatastoreType.CONFIGURATION;
+        final var path = preparePath(input);
+        final var outputType = prepareOutputType(input);
+        final var adapter = createStream(name -> new ListenerAdapter(name, outputType, this, datastore, path));
 
         // building of output
         return RestconfFuture.of(Optional.of(Builders.containerBuilder()
@@ -727,6 +369,44 @@ public abstract sealed class ListenersBroker {
             .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, adapter.getStreamName()))
             .build()));
     }
+
+//    /**
+//     * Register listener by streamName in identifier to listen to data change notifications, and put or delete
+//     * information about listener to DS according to ietf-restconf-monitoring.
+//     *
+//     * @param identifier              Identifier as stream name.
+//     * @param uriInfo                 Base URI information.
+//     * @param notificationQueryParams Query parameters of notification.
+//     * @param handlersHolder          Holder of handlers for notifications.
+//     * @return Location for listening.
+//     */
+//    public final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
+//            final ReceiveEventsParams notificationQueryParams, final HandlersHolder handlersHolder) {
+//        final var streamName = createStreamNameFromUri(identifier);
+//        final var listener = dataChangeListenerFor(streamName);
+//        if (listener == null) {
+//            throw new RestconfDocumentedException("No listener found for stream " + streamName,
+//                ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+//        }
+//
+//        listener.setQueryParams(notificationQueryParams);
+//
+//        final var dataBroker = handlersHolder.dataBroker();
+//        final var schemaHandler = handlersHolder.databindProvider();
+//        listener.setCloseVars(dataBroker, schemaHandler);
+//        listener.listen(dataBroker);
+//
+//        final var uri = prepareUriByStreamName(uriInfo, streamName);
+//        final var schemaContext = schemaHandler.currentContext().modelContext();
+//        final var serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
+//
+//        final var mapToStreams = RestconfStateStreams.dataChangeStreamEntry(listener.getPath(),
+//                listener.getOutputType(), uri, schemaContext, serializedPath);
+//        final var writeTransaction = dataBroker.newWriteOnlyTransaction();
+//        writeDataToDS(writeTransaction, mapToStreams);
+//        submitData(writeTransaction);
+//        return uri;
+//    }
 
     // FIXME: this really should be a normal RPC implementation
     public final RestconfFuture<Optional<ContainerNode>> createNotificationStream(final ContainerNode input,
@@ -744,14 +424,72 @@ public abstract sealed class ListenersBroker {
             }
         }
 
+// FIXME: use this block to create a stream description
+//        final var module = refSchemaCtx.findModuleStatement(qname.getModule())
+//            .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown module",
+//                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+//        final var stmt = module.findSchemaTreeNode(qname)
+//            .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an notification",
+//                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+//        if (!(stmt instanceof NotificationEffectiveStatement)) {
+//            throw new RestconfDocumentedException(qname + " refers to a non-notification",
+//                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+//        }
+//
+//        if (haveFirst) {
+//            sb.append(',');
+//        } else {
+//            haveFirst = true;
+//        }
+//        sb.append(module.argument().getLocalName()).append(':').append(qname.getLocalName());
+
         // registration of the listener
-        final var adapter = registerNotificationListener(modelContext, qnames, prepareOutputType(input));
+        final var outputType = prepareOutputType(input);
+        final var adapter = createStream(name -> new NotificationListenerAdapter(name, outputType, this, qnames));
 
         return RestconfFuture.of(Optional.of(Builders.containerBuilder()
             .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
             .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, adapter.getStreamName()))
             .build()));
     }
+
+    /**
+     * Register listener by streamName in identifier to listen to yang notifications, and put or delete information
+     * about listener to DS according to ietf-restconf-monitoring.
+     *
+     * @param identifier              Name of the stream.
+     * @param uriInfo                 URI information.
+     * @param notificationQueryParams Query parameters of notification.
+     * @param handlersHolder          Holder of handlers for notifications.
+     * @return Stream location for listening.
+     */
+//    public final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
+//            final ReceiveEventsParams notificationQueryParams, final HandlersHolder handlersHolder) {
+//        final String streamName = createStreamNameFromUri(identifier);
+//        if (isNullOrEmpty(streamName)) {
+//            throw new RestconfDocumentedException("Stream name is empty", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+//        }
+//
+//        final var notificationListenerAdapter = notificationListenerFor(streamName);
+//        if (notificationListenerAdapter == null) {
+//            throw new RestconfDocumentedException("Stream with name %s was not found".formatted(streamName),
+//                ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
+//        }
+//
+//        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+//        notificationListenerAdapter.setQueryParams(notificationQueryParams);
+//        notificationListenerAdapter.listen(handlersHolder.notificationService());
+//        final DOMDataBroker dataBroker = handlersHolder.dataBroker();
+//        notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.databindProvider());
+//        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(streamName,
+//            notificationListenerAdapter.qnames(), notificationListenerAdapter.getOutputType(), uri);
+//
+//        // FIXME: how does this correlate with the transaction notificationListenerAdapter.close() will do?
+//        final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+//        writeDataToDS(writeTransaction, mapToStreams);
+//        submitData(writeTransaction);
+//        return uri;
+//    }
 
     /**
      * Create device notification stream.
@@ -762,7 +500,7 @@ public abstract sealed class ListenersBroker {
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
     // FIXME: this should be an RPC invocation
-    public final RestconfFuture<Optional<ContainerNode>> createDeviceNotificationListener(final ContainerNode input,
+    public final RestconfFuture<Optional<ContainerNode>> createDeviceNotificationStream(final ContainerNode input,
             final String baseUrl, final DOMMountPointService mountPointService) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
@@ -779,7 +517,6 @@ public abstract sealed class ListenersBroker {
             throw new RestconfDocumentedException("Target list uses multiple keys", ErrorType.APPLICATION,
                 ErrorTag.INVALID_VALUE);
         }
-        final String deviceName = listId.values().iterator().next().toString();
 
         final DOMMountPoint mountPoint = mountPointService.getMountPoint(path)
             .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
@@ -802,8 +539,13 @@ public abstract sealed class ListenersBroker {
                 ErrorTag.OPERATION_FAILED);
         }
 
-        final var notificationListenerAdapter = registerDeviceNotificationListener(deviceName,
-            prepareOutputType(input), mountModelContext, mountPointService, mountPoint.getIdentifier());
+// FIXME: use this for description?
+//        final String deviceName = listId.values().iterator().next().toString();
+
+        final var outputType = prepareOutputType(input);
+        final var notificationListenerAdapter = createStream(
+            streamName -> new DeviceNotificationListenerAdaptor(streamName, outputType, this, mountModelContext,
+                mountPointService, mountPoint.getIdentifier()));
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 
         return RestconfFuture.of(Optional.of(Builders.containerBuilder()

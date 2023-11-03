@@ -144,6 +144,14 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
         }
     }
 
+    @Override
+    public synchronized void endOfStream() {
+        if (session != null && session.isOpen()) {
+            session.close();
+        }
+        stopPingProcess();
+    }
+
     /**
      * Sensing of string message to remote endpoint of {@link org.eclipse.jetty.websocket.api.Session}. If the maximum
      * fragment length is set to non-zero positive value and input message exceeds this value, message is fragmented
@@ -159,7 +167,7 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
         }
 
         if (session != null && session.isOpen()) {
-            final RemoteEndpoint remoteEndpoint = session.getRemote();
+            final var remoteEndpoint = session.getRemote();
             if (maximumFragmentLength == 0 || message.length() <= maximumFragmentLength) {
                 sendDataMessage(message, remoteEndpoint);
             } else {
@@ -206,7 +214,7 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
     }
 
     private static List<String> splitMessageToFragments(final String inputMessage, final int maximumFragmentLength) {
-        final List<String> parts = new ArrayList<>();
+        final var parts = new ArrayList<String>();
         int length = inputMessage.length();
         for (int i = 0; i < length; i += maximumFragmentLength) {
             parts.add(inputMessage.substring(i, Math.min(length, i + maximumFragmentLength)));

@@ -57,7 +57,7 @@ public final class RestconfDataStreamServiceImpl {
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void getSSE(@PathParam("streamName") final String streamName, @Context final SseEventSink sink,
             @Context final Sse sse) {
-        final var listener = listenersBroker.listenerFor(streamName);
+        final var listener = listenersBroker.getStream(streamName);
         if (listener == null) {
             LOG.debug("Listener for stream with name {} was not found.", streamName);
             throw new WebApplicationException("No such stream: " + streamName, Status.NOT_FOUND);

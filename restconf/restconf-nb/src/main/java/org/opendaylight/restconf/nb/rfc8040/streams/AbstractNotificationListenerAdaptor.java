@@ -13,7 +13,6 @@ import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +24,6 @@ import org.slf4j.LoggerFactory;
 abstract class AbstractNotificationListenerAdaptor extends AbstractStream<DOMNotification>
         implements DOMNotificationListener {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationListenerAdaptor.class);
-    private static final NotificationFormatterFactory JSON_FORMATTER_FACTORY =
-        JSONNotificationFormatter.createFactory(JSONCodecFactorySupplier.RFC7951);
 
     AbstractNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType,
             final ListenersBroker listenersBroker) {
@@ -35,7 +32,7 @@ abstract class AbstractNotificationListenerAdaptor extends AbstractStream<DOMNot
 
     private static NotificationFormatterFactory getFormatterFactory(final NotificationOutputType outputType) {
         return switch (outputType) {
-            case JSON -> JSON_FORMATTER_FACTORY;
+            case JSON -> JSONNotificationFormatter.FACTORY;
             case XML -> XMLNotificationFormatter.FACTORY;
         };
     }

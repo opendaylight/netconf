@@ -19,16 +19,12 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@link DeviceNotificationListenerAdaptor} is responsible to track events on notifications.
  */
 public final class DeviceNotificationListenerAdaptor extends AbstractNotificationListenerAdaptor
         implements DOMMountPointListener {
-    private static final Logger LOG = LoggerFactory.getLogger(DeviceNotificationListenerAdaptor.class);
-
     private final @NonNull EffectiveModelContext effectiveModel;
     private final @NonNull DOMMountPointService mountPointService;
     private final @NonNull YangInstanceIdentifier instanceIdentifier;
@@ -71,20 +67,8 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
     @Override
     public void onMountPointRemoved(final YangInstanceIdentifier path) {
         if (instanceIdentifier.equals(path)) {
-            getSubscribers().forEach(subscriber -> {
-                if (subscriber.isConnected()) {
-                    subscriber.sendDataMessage("Device disconnected");
-                }
-                if (subscriber instanceof SSESessionHandler sseSessionHandler) {
-                    try {
-                        sseSessionHandler.close();
-                    } catch (IllegalStateException e) {
-                        LOG.warn("Ignoring exception while closing sse session");
-                    }
-                }
-            });
-            listenersBroker.removeAndCloseDeviceNotificationListener(this);
             resetListenerRegistration();
+            endOfStream();
         }
     }
 }

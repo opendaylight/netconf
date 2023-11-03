@@ -22,4 +22,9 @@ public interface StreamSessionHandler {
      * @param data Message data to be send.
      */
     void sendDataMessage(String data);
+
+    /**
+     * Called when the stream has reached its end. The handler should close all underlying resources.
+     */
+    void endOfStream();
 }
