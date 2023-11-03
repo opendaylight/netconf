@@ -25,10 +25,11 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl.HandlersHolder;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -83,7 +84,82 @@ public abstract sealed class ListenersBroker {
         }
     }
 
+    /**
+     * Holder of all handlers for notifications.
+     */
+    // FIXME: why do we even need this class?!
+    private record HandlersHolder(
+            @NonNull DOMDataBroker dataBroker,
+            @NonNull DOMNotificationService notificationService,
+            @NonNull DatabindProvider databindProvider) {
+
+        HandlersHolder {
+            requireNonNull(dataBroker);
+            requireNonNull(notificationService);
+            requireNonNull(databindProvider);
+        }
+    }
+
+//    private static final QName LOCATION_QNAME = QName.create(Notifi.QNAME, "location").intern();
+//    private static final NodeIdentifier LOCATION_NODEID = NodeIdentifier.create(LOCATION_QNAME);
+//    private static final String STREAMS_PATH = "ietf-restconf-monitoring:restconf-state/streams";
+//    private static final String STREAM_PATH_PART = "/stream=";
+//    private static final String STREAM_PATH = STREAMS_PATH + STREAM_PATH_PART;
+//    private static final String STREAM_ACCESS_PATH_PART = "/access=";
+//    private static final String STREAM_LOCATION_PATH_PART = "/location";
+//
+//    private final ListenersBroker listenersBroker;
+//    private final HandlersHolder handlersHolder;
+//
+//  // FIXME: NETCONF:1102: do not instantiate this service
+//  new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider,
+//      listenersBroker),
+//
+//    /**
+//     * Initialize holder of handlers with holders as parameters.
+//     *
+//     * @param dataBroker {@link DOMDataBroker}
+//     * @param notificationService {@link DOMNotificationService}
+//     * @param databindProvider a {@link DatabindProvider}
+//     * @param listenersBroker a {@link ListenersBroker}
+//     */
+//    public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
+//            final DOMNotificationService notificationService, final DatabindProvider databindProvider,
+//            final ListenersBroker listenersBroker) {
+//        handlersHolder = new HandlersHolder(dataBroker, notificationService, databindProvider);
+//        this.listenersBroker = requireNonNull(listenersBroker);
+//    }
+//
+//    @Override
+//    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
+//        final var params = QueryParams.newReceiveEventsParams(uriInfo);
+//
+//        final URI location;
+//        if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
+//            location = listenersBroker.subscribeToDataStream(identifier, uriInfo, params, handlersHolder);
+//        } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
+//            location = listenersBroker.subscribeToYangStream(identifier, uriInfo, params, handlersHolder);
+//        } else {
+//            final String msg = "Bad type of notification of sal-remote";
+//            LOG.warn(msg);
+//            throw new RestconfDocumentedException(msg);
+//        }
+//
+//        return Response.ok()
+//            .location(location)
+//            .entity(new NormalizedNodePayload(
+//                Inference.ofDataTreePath(handlersHolder.databindProvider().currentContext().modelContext(),
+//                    Notifi.QNAME, LOCATION_QNAME),
+//                ImmutableNodes.leafNode(LOCATION_NODEID, location.toString())))
+//            .build();
+//    }
+
     private static final Logger LOG = LoggerFactory.getLogger(ListenersBroker.class);
+
+    // Prefixes for stream names
+    private static final String DATA_SUBSCRIPTION = "data-change-event-subscription";
+    private static final String NOTIFICATION_STREAM = "notification-stream";
+    private static final String DEVICE_NOTIFICATION_STREAM = "device-notification-stream";
 
     private final StampedLock dataChangeListenersLock = new StampedLock();
     private final StampedLock notificationListenersLock = new StampedLock();
@@ -161,11 +237,11 @@ public abstract sealed class ListenersBroker {
      *     or {@link Optional#empty()} if listener with specified stream name doesn't exist.
      */
     public final @Nullable AbstractStream<?> listenerFor(final String streamName) {
-        if (streamName.startsWith(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
+        if (streamName.startsWith(NOTIFICATION_STREAM)) {
             return notificationListenerFor(streamName);
-        } else if (streamName.startsWith(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
+        } else if (streamName.startsWith(DATA_SUBSCRIPTION)) {
             return dataChangeListenerFor(streamName);
-        } else if (streamName.startsWith(RestconfStreamsConstants.DEVICE_NOTIFICATION_STREAM)) {
+        } else if (streamName.startsWith(DEVICE_NOTIFICATION_STREAM)) {
             return deviceNotificationListenerFor(streamName);
         } else {
             return null;
@@ -183,7 +259,7 @@ public abstract sealed class ListenersBroker {
     public final ListenerAdapter registerDataChangeListener(final EffectiveModelContext modelContext,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final Scope scope,
             final NotificationOutputType outputType) {
-        final var sb = new StringBuilder(RestconfStreamsConstants.DATA_SUBSCRIPTION)
+        final var sb = new StringBuilder(DATA_SUBSCRIPTION)
             .append('/').append(createStreamNameFromUri(IdentifierCodec.serialize(path, modelContext)))
             .append('/').append(RestconfStreamsConstants.DATASTORE_PARAM_NAME).append('=').append(datastore)
             .append('/').append(RestconfStreamsConstants.SCOPE_PARAM_NAME).append('=').append(scope);
@@ -211,7 +287,7 @@ public abstract sealed class ListenersBroker {
      */
     public final NotificationListenerAdapter registerNotificationListener(final EffectiveModelContext refSchemaCtx,
             final ImmutableSet<QName> notifications, final NotificationOutputType outputType) {
-        final var sb = new StringBuilder(RestconfStreamsConstants.NOTIFICATION_STREAM).append('/');
+        final var sb = new StringBuilder(NOTIFICATION_STREAM).append('/');
         var haveFirst = false;
         for (var qname : notifications) {
             final var module = refSchemaCtx.findModuleStatement(qname.getModule())
@@ -258,7 +334,7 @@ public abstract sealed class ListenersBroker {
     public final DeviceNotificationListenerAdaptor registerDeviceNotificationListener(final String deviceName,
             final NotificationOutputType outputType, final EffectiveModelContext refSchemaCtx,
             final DOMMountPointService mountPointService, final YangInstanceIdentifier path) {
-        final var sb = new StringBuilder(RestconfStreamsConstants.DEVICE_NOTIFICATION_STREAM).append('/')
+        final var sb = new StringBuilder(DEVICE_NOTIFICATION_STREAM).append('/')
             .append(deviceName);
 
         final long stamp = deviceNotificationListenersLock.writeLock();
