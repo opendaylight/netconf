@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableSet;
@@ -77,6 +78,10 @@ public abstract sealed class ListenersBroker {
      * A ListenersBroker working with Server-Sent Events.
      */
     public static final class ServerSentEvents extends ListenersBroker {
+        public ServerSentEvents(final DOMDataBroker dataBroker) {
+            super(dataBroker);
+        }
+
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
             return uriInfo.getBaseUriBuilder()
@@ -89,6 +94,10 @@ public abstract sealed class ListenersBroker {
      * A ListenersBroker working with WebSockets.
      */
     public static final class WebSockets extends ListenersBroker {
+        public WebSockets(final DOMDataBroker dataBroker) {
+            super(dataBroker);
+        }
+
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
             final var scheme = switch (uriInfo.getAbsolutePath().getScheme()) {
@@ -215,9 +224,10 @@ public abstract sealed class ListenersBroker {
     private final BiMap<String, ListenerAdapter> dataChangeListeners = HashBiMap.create();
     private final BiMap<String, NotificationListenerAdapter> notificationListeners = HashBiMap.create();
     private final BiMap<String, DeviceNotificationListenerAdaptor> deviceNotificationListeners = HashBiMap.create();
+    private final DOMDataBroker dataBroker;
 
-    private ListenersBroker() {
-        // Hidden on purpose
+    private ListenersBroker(final DOMDataBroker dataBroker) {
+        this.dataBroker = requireNonNull(dataBroker);
     }
 
     /**
@@ -228,7 +238,7 @@ public abstract sealed class ListenersBroker {
      *         does not exist.
      * @throws NullPointerException in {@code streamName} is {@code null}
      */
-    public final @Nullable ListenerAdapter dataChangeListenerFor(final String streamName) {
+    private @Nullable ListenerAdapter dataChangeListenerFor(final String streamName) {
         requireNonNull(streamName);
 
         final long stamp = dataChangeListenersLock.readLock();
@@ -247,7 +257,7 @@ public abstract sealed class ListenersBroker {
      *         stream name does not exist.
      * @throws NullPointerException in {@code streamName} is {@code null}
      */
-    public final @Nullable NotificationListenerAdapter notificationListenerFor(final String streamName) {
+    private @Nullable NotificationListenerAdapter notificationListenerFor(final String streamName) {
         requireNonNull(streamName);
 
         final long stamp = notificationListenersLock.readLock();
@@ -266,7 +276,7 @@ public abstract sealed class ListenersBroker {
      *         specified stream name does not exist.
      * @throws NullPointerException in {@code path} is {@code null}
      */
-    public final @Nullable DeviceNotificationListenerAdaptor deviceNotificationListenerFor(final String streamName) {
+    private @Nullable DeviceNotificationListenerAdaptor deviceNotificationListenerFor(final String streamName) {
         requireNonNull(streamName);
 
         final long stamp = deviceNotificationListenersLock.readLock();
@@ -281,8 +291,8 @@ public abstract sealed class ListenersBroker {
      * Get listener for stream-name.
      *
      * @param streamName Stream name.
-     * @return {@link NotificationListenerAdapter} or {@link ListenerAdapter} object wrapped in {@link Optional}
-     *     or {@link Optional#empty()} if listener with specified stream name doesn't exist.
+     * @return {@link NotificationListenerAdapter} or {@link ListenerAdapter}, or {@code null} if listener with
+     *         specified stream name doesn't exist.
      */
     public final @Nullable AbstractStream<?> listenerFor(final String streamName) {
         if (streamName.startsWith(NOTIFICATION_STREAM)) {
@@ -304,7 +314,8 @@ public abstract sealed class ListenersBroker {
      * @param outputType Specific type of output for notifications - XML or JSON.
      * @return Created or existing data-change listener adapter.
      */
-    public final ListenerAdapter registerDataChangeListener(final EffectiveModelContext modelContext,
+    @VisibleForTesting
+    final ListenerAdapter registerDataChangeListener(final EffectiveModelContext modelContext,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final Scope scope,
             final NotificationOutputType outputType) {
         final var sb = new StringBuilder(DATA_SUBSCRIPTION)
@@ -317,11 +328,26 @@ public abstract sealed class ListenersBroker {
 
         final long stamp = dataChangeListenersLock.writeLock();
         try {
-            return dataChangeListeners.computeIfAbsent(sb.toString(),
-                streamName -> new ListenerAdapter(streamName, outputType, this, datastore, path));
+            return lockedRegisterDataChangeListener(sb.toString(), datastore, path, outputType);
         } finally {
             dataChangeListenersLock.unlockWrite(stamp);
         }
+    }
+
+    private ListenerAdapter lockedRegisterDataChangeListener(final String streamName,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
+            final NotificationOutputType outputType) {
+        final var existing = dataChangeListeners.get(streamName);
+        if (existing != null) {
+            return existing;
+        }
+
+        final var created = new ListenerAdapter(streamName, outputType, this, datastore, path);
+        dataChangeListeners.put(streamName, created);
+
+        // FIXME: populate the datastore
+
+        return created;
     }
 
     /**
@@ -333,7 +359,8 @@ public abstract sealed class ListenersBroker {
      * @param outputType Specific type of output for notifications - XML or JSON.
      * @return Created or existing notification listener adapter.
      */
-    public final NotificationListenerAdapter registerNotificationListener(final EffectiveModelContext refSchemaCtx,
+    @VisibleForTesting
+    final NotificationListenerAdapter registerNotificationListener(final EffectiveModelContext refSchemaCtx,
             final ImmutableSet<QName> notifications, final NotificationOutputType outputType) {
         final var sb = new StringBuilder(NOTIFICATION_STREAM).append('/');
         var haveFirst = false;
@@ -396,103 +423,21 @@ public abstract sealed class ListenersBroker {
     }
 
     /**
-     * Removal and closing of all data-change-event and notification listeners.
-     */
-    public final synchronized void removeAndCloseAllListeners() {
-        final long stampNotifications = notificationListenersLock.writeLock();
-        final long stampDataChanges = dataChangeListenersLock.writeLock();
-        try {
-            removeAndCloseAllDataChangeListenersTemplate();
-            removeAndCloseAllNotificationListenersTemplate();
-        } finally {
-            dataChangeListenersLock.unlockWrite(stampDataChanges);
-            notificationListenersLock.unlockWrite(stampNotifications);
-        }
-    }
-
-    /**
-     * Closes and removes all data-change listeners.
-     */
-    public final void removeAndCloseAllDataChangeListeners() {
-        final long stamp = dataChangeListenersLock.writeLock();
-        try {
-            removeAndCloseAllDataChangeListenersTemplate();
-        } finally {
-            dataChangeListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    private void removeAndCloseAllDataChangeListenersTemplate() {
-        dataChangeListeners.values().forEach(listenerAdapter -> {
-            try {
-                listenerAdapter.close();
-            } catch (Exception e) {
-                LOG.error("Failed to close data-change listener {}.", listenerAdapter, e);
-                throw new IllegalStateException("Failed to close data-change listener %s.".formatted(listenerAdapter),
-                    e);
-            }
-        });
-        dataChangeListeners.clear();
-    }
-
-    /**
-     * Closes and removes all notification listeners.
-     */
-    public final void removeAndCloseAllNotificationListeners() {
-        final long stamp = notificationListenersLock.writeLock();
-        try {
-            removeAndCloseAllNotificationListenersTemplate();
-        } finally {
-            notificationListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    private void removeAndCloseAllNotificationListenersTemplate() {
-        notificationListeners.values().forEach(listenerAdapter -> {
-            try {
-                listenerAdapter.close();
-            } catch (Exception e) {
-                LOG.error("Failed to close notification listener {}.", listenerAdapter, e);
-                throw new IllegalStateException("Failed to close notification listener %s.".formatted(listenerAdapter),
-                    e);
-            }
-        });
-        notificationListeners.clear();
-    }
-
-    /**
      * Removes and closes data-change listener of type {@link ListenerAdapter} specified in parameter.
      *
      * @param listener Listener to be closed and removed.
      */
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    public final void removeAndCloseDataChangeListener(final ListenerAdapter listener) {
+    private void removeAndCloseDataChangeListener(final ListenerAdapter listener) {
         final long stamp = dataChangeListenersLock.writeLock();
-        try {
-            removeAndCloseDataChangeListenerTemplate(listener);
-        } catch (Exception exception) {
-            LOG.error("Data-change listener {} cannot be closed.", listener, exception);
-        } finally {
-            dataChangeListenersLock.unlockWrite(stamp);
-        }
-    }
-
-    /**
-     * Removes and closes data-change listener of type {@link ListenerAdapter} specified in parameter.
-     *
-     * @param listener Listener to be closed and removed.
-     */
-    private void removeAndCloseDataChangeListenerTemplate(final ListenerAdapter listener) {
         try {
             requireNonNull(listener).close();
             if (dataChangeListeners.inverse().remove(listener) == null) {
                 LOG.warn("There isn't any data-change event stream that would match listener adapter {}.", listener);
             }
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error("Data-change listener {} cannot be closed.", listener, e);
-            throw new IllegalStateException("Data-change listener %s cannot be closed.".formatted(listener), e);
+        } catch (InterruptedException | ExecutionException exception) {
+            LOG.error("Data-change listener {} cannot be closed.", listener, exception);
+        } finally {
+            dataChangeListenersLock.unlockWrite(stamp);
         }
     }
 
@@ -502,7 +447,7 @@ public abstract sealed class ListenersBroker {
      * @param listener Listener to be closed and removed.
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public final void removeAndCloseNotificationListener(final NotificationListenerAdapter listener) {
+    private void removeAndCloseNotificationListener(final NotificationListenerAdapter listener) {
         final long stamp = notificationListenersLock.writeLock();
         try {
             removeAndCloseNotificationListenerTemplate(listener);
@@ -520,7 +465,7 @@ public abstract sealed class ListenersBroker {
      * @param listener Listener to be closed and removed.
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public final void removeAndCloseDeviceNotificationListener(final DeviceNotificationListenerAdaptor listener) {
+    final void removeAndCloseDeviceNotificationListener(final DeviceNotificationListenerAdaptor listener) {
         final long stamp = deviceNotificationListenersLock.writeLock();
         try {
             requireNonNull(listener);
@@ -619,7 +564,7 @@ public abstract sealed class ListenersBroker {
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         notificationListenerAdapter.setQueryParams(notificationQueryParams);
         notificationListenerAdapter.listen(handlersHolder.notificationService());
-        final DOMDataBroker dataBroker = handlersHolder.dataBroker();
+//        final DOMDataBroker dataBroker = handlersHolder.dataBroker();
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.databindProvider());
         final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(streamName,
             notificationListenerAdapter.qnames(), notificationListenerAdapter.getOutputType(), uri);
@@ -652,7 +597,6 @@ public abstract sealed class ListenersBroker {
 
         listener.setQueryParams(notificationQueryParams);
 
-        final var dataBroker = handlersHolder.dataBroker();
         final var schemaHandler = handlersHolder.databindProvider();
         listener.setCloseVars(dataBroker, schemaHandler);
         listener.listen(dataBroker);
@@ -683,7 +627,6 @@ public abstract sealed class ListenersBroker {
             throw new RestconfDocumentedException("Problem while putting data to DS.", e);
         }
     }
-
 
     /**
      * Create data-change-event stream with POST operation via RPC.

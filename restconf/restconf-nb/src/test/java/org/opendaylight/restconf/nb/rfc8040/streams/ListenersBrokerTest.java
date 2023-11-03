@@ -14,10 +14,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
 import java.util.function.Function;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -37,13 +39,16 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ListenersBrokerTest {
-    private static EffectiveModelContext SCHEMA_CTX;
+    private static EffectiveModelContext SCHEMA_CTX = YangParserTestUtils.parseYangResourceDirectory("/streams");
 
-    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
+    @Mock
+    private DOMDataBroker dataBroker;
 
-    @BeforeClass
-    public static void setUp() {
-        SCHEMA_CTX = YangParserTestUtils.parseYangResourceDirectory("/streams");
+    private ListenersBroker listenersBroker;
+
+    @Before
+    public void before() {
+        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
     }
 
     @Test

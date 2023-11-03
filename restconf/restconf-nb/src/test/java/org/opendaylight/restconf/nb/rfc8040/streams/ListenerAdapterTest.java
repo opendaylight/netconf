@@ -148,10 +148,10 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
-    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
     private DatabindProvider databindProvider;
+    private ListenersBroker listenersBroker;
 
     @BeforeClass
     public static void beforeClass() {
@@ -168,6 +168,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
         databindProvider = () -> DatabindContext.ofModel(SCHEMA_CONTEXT);
+        listenersBroker = new ListenersBroker.ServerSentEvents(domDataBroker);
     }
 
     class ListenerAdapterTester extends ListenerAdapter {
