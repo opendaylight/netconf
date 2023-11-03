@@ -15,23 +15,22 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 /**
- * {@link DeviceNotificationListenerAdaptor} is responsible to track events on notifications.
+ * A {@link RestconfStream} reporting YANG notifications coming from a mounted device.
  */
-public final class DeviceNotificationListenerAdaptor extends AbstractNotificationListenerAdaptor
-        implements DOMMountPointListener {
+public final class DeviceNotificationStream extends AbstractNotificationStream implements DOMMountPointListener {
     private final @NonNull EffectiveModelContext effectiveModel;
     private final @NonNull DOMMountPointService mountPointService;
     private final @NonNull YangInstanceIdentifier instanceIdentifier;
 
-    private ListenerRegistration<DOMMountPointListener> reg;
+    private Registration reg;
 
-    DeviceNotificationListenerAdaptor(final ListenersBroker listenersBroker, final String streamName,
+    DeviceNotificationStream(final ListenersBroker listenersBroker, final String streamName,
             final NotificationOutputType outputType, final EffectiveModelContext effectiveModel,
             final DOMMountPointService mountPointService, final YangInstanceIdentifier instanceIdentifier) {
         super(listenersBroker, streamName, outputType);

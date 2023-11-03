@@ -32,7 +32,7 @@ import org.mockito.ArgumentCaptor;
 
 public class WebSocketSessionHandlerTest {
     private static final class WebSocketTestSessionState {
-        private final AbstractStream<?> listener;
+        private final RestconfStream<?> listener;
         private final ScheduledExecutorService executorService;
         private final WebSocketSessionHandler webSocketSessionHandler;
         private final int heartbeatInterval;
@@ -40,7 +40,7 @@ public class WebSocketSessionHandlerTest {
         private final ScheduledFuture pingFuture;
 
         WebSocketTestSessionState(final int maxFragmentSize, final int heartbeatInterval) {
-            listener = mock(AbstractStream.class);
+            listener = mock(RestconfStream.class);
             executorService = mock(ScheduledExecutorService.class);
             this.heartbeatInterval = heartbeatInterval;
             this.maxFragmentSize = maxFragmentSize;

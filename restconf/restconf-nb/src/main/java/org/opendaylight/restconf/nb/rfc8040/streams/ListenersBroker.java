@@ -60,8 +60,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This singleton class is responsible for creation, removal and searching for {@link ListenerAdapter} or
- * {@link NotificationListenerAdapter} listeners.
+ * This singleton class is responsible for creation, removal and searching for {@link DataTreeChangeStream} or
+ * {@link NotificationStream} listeners.
  */
 // FIXME: furthermore, this should be tied to ietf-restconf-monitoring, as the Strings used in its maps are stream
 //        names. We essentially need a component which deals with allocation of stream names and their lifecycle and
@@ -108,17 +108,17 @@ public abstract sealed class ListenersBroker {
     }
 
     /**
-     * Factory interface for creating instances of {@link AbstractStream}.
+     * Factory interface for creating instances of {@link RestconfStream}.
      *
-     * @param <T> {@link AbstractStream} type
+     * @param <T> {@link RestconfStream} type
      */
     @FunctionalInterface
-    public interface StreamFactory<T extends AbstractStream<?>> {
+    public interface StreamFactory<T extends RestconfStream<?>> {
         /**
          * Create a stream with the supplied name.
          *
          * @param name Stream name
-         * @return An {@link AbstractStream}
+         * @return An {@link RestconfStream}
          */
         @NonNull T createStream(@NonNull String name);
     }
@@ -216,7 +216,7 @@ public abstract sealed class ListenersBroker {
     private static final NodeIdentifier STREAM_NAME_NODEID =
         NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionOutput.QNAME, "stream-name").intern());
 
-    private final ConcurrentMap<String, AbstractStream<?>> streams = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
     private final DOMDataBroker dataBroker;
 
     private ListenersBroker(final DOMDataBroker dataBroker) {
@@ -224,26 +224,26 @@ public abstract sealed class ListenersBroker {
     }
 
     /**
-     * Get an {@link AbstractStream} by its name.
+     * Get a {@link RestconfStream} by its name.
      *
      * @param streamName Stream name.
-     * @return An {@link AbstractStream}, or {@code null} if the stream with specified name does not exist.
+     * @return A {@link RestconfStream}, or {@code null} if the stream with specified name does not exist.
      * @throws NullPointerException if {@code streamName} is {@code null}
      */
-    public final @Nullable AbstractStream<?> getStream(final String streamName) {
+    public final @Nullable RestconfStream<?> getStream(final String streamName) {
         return streams.get(streamName);
     }
 
     /**
-     * Create an {@link AbstractStream} with a unique name. This method will atomically generate a stream name, create
+     * Create a {@link RestconfStream} with a unique name. This method will atomically generate a stream name, create
      * the corresponding instance and register it
      *
      * @param <T> Stream type
      * @param factory Factory for creating the actual stream instance
-     * @return An {@link AbstractStream} instance
+     * @return A {@link RestconfStream} instance
      * @throws NullPointerException if {@code factory} is {@code null}
      */
-    public final <T extends AbstractStream<?>> @NonNull T createStream(final StreamFactory<T> factory) {
+    public final <T extends RestconfStream<?>> @NonNull T createStream(final StreamFactory<T> factory) {
         String name;
         T stream;
         do {
@@ -261,7 +261,7 @@ public abstract sealed class ListenersBroker {
      *
      * @param stream Stream to remove
      */
-    final void removeStream(final AbstractStream<?> stream) {
+    final void removeStream(final RestconfStream<?> stream) {
         // Defensive check to see if we are still tracking the stream
         final var streamName = stream.getStreamName();
         if (streams.get(streamName) != stream) {
@@ -371,7 +371,7 @@ public abstract sealed class ListenersBroker {
             : LogicalDatastoreType.CONFIGURATION;
         final var path = preparePath(input);
         final var outputType = prepareOutputType(input);
-        final var adapter = createStream(name -> new ListenerAdapter(this, name, outputType, databindProvider,
+        final var adapter = createStream(name -> new DataTreeChangeStream(this, name, outputType, databindProvider,
             datastore, path));
 
         // building of output
@@ -457,7 +457,7 @@ public abstract sealed class ListenersBroker {
 
         // registration of the listener
         final var outputType = prepareOutputType(input);
-        final var adapter = createStream(name -> new NotificationListenerAdapter(this, name, outputType,
+        final var adapter = createStream(name -> new NotificationStream(this, name, outputType,
             databindProvider, qnames));
 
         return RestconfFuture.of(Optional.of(Builders.containerBuilder()
@@ -557,7 +557,7 @@ public abstract sealed class ListenersBroker {
 
         final var outputType = prepareOutputType(input);
         final var notificationListenerAdapter = createStream(
-            streamName -> new DeviceNotificationListenerAdaptor(this, streamName, outputType, mountModelContext,
+            streamName -> new DeviceNotificationStream(this, streamName, outputType, mountModelContext,
                 mountPointService, mountPoint.getIdentifier()));
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 

@@ -7,10 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import java.util.Collection;
+import java.util.List;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 
-abstract class DataTreeCandidateFormatterFactory extends EventFormatterFactory<Collection<DataTreeCandidate>> {
+abstract class DataTreeCandidateFormatterFactory extends EventFormatterFactory<List<DataTreeCandidate>> {
     DataTreeCandidateFormatterFactory(final DataTreeCandidateFormatter emptyFormatter) {
         super(emptyFormatter);
     }

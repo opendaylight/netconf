@@ -13,7 +13,7 @@ import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter
 import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.XML_OUTPUT_FACTORY;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 /**
  * Base formatter for DataTreeCandidates which only handles exporting to a document for filter checking purpose.
  */
-abstract class DataTreeCandidateFormatter extends EventFormatter<Collection<DataTreeCandidate>> {
+abstract class DataTreeCandidateFormatter extends EventFormatter<List<DataTreeCandidate>> {
     DataTreeCandidateFormatter(final TextParameters textParams) {
         super(textParams);
     }
@@ -41,7 +41,7 @@ abstract class DataTreeCandidateFormatter extends EventFormatter<Collection<Data
 
     @Override
     final void fillDocument(final Document doc, final EffectiveModelContext schemaContext,
-            final Collection<DataTreeCandidate> input) throws IOException {
+            final List<DataTreeCandidate> input) throws IOException {
         final Element notificationElement = NotificationFormatter.createNotificationElement(doc);
         final Element notificationEventElement = doc.createElementNS(
             SAL_REMOTE_NAMESPACE, DATA_CHANGED_NOTIFICATION_ELEMENT);
