@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.CreateDataChangeEventSubscriptionInput1.Scope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -29,10 +30,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @ExtendWith(MockitoExtension.class)
 class WebSocketFactoryTest extends AbstractNotificationListenerTest {
-    private static final String REGISTERED_STREAM_NAME = "data-change-event-subscription/"
-            + "toaster:toaster/datastore=CONFIGURATION/scope=SUBTREE/JSON";
-
-    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
+    private static final String REGISTERED_STREAM_NAME =
+        "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=SUBTREE/JSON";
 
     @Mock
     private ScheduledExecutorService execService;
@@ -40,11 +39,15 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
     private ServletUpgradeRequest upgradeRequest;
     @Mock
     private ServletUpgradeResponse upgradeResponse;
+    @Mock
+    private DOMDataBroker dataBroker;
 
+    private ListenersBroker listenersBroker;
     private WebSocketFactory webSocketFactory;
 
     @BeforeEach
     void prepareListenersBroker() {
+        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
         webSocketFactory = new WebSocketFactory(execService, listenersBroker, 5000, 2000);
 
         listenersBroker.registerDataChangeListener(MODEL_CONTEXT, LogicalDatastoreType.CONFIGURATION,

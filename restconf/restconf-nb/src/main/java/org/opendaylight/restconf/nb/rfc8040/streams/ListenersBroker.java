@@ -77,6 +77,10 @@ public abstract sealed class ListenersBroker {
      * A ListenersBroker working with Server-Sent Events.
      */
     public static final class ServerSentEvents extends ListenersBroker {
+        public ServerSentEvents(final DOMDataBroker dataBroker) {
+            super(dataBroker);
+        }
+
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
             return uriInfo.getBaseUriBuilder()
@@ -89,6 +93,10 @@ public abstract sealed class ListenersBroker {
      * A ListenersBroker working with WebSockets.
      */
     public static final class WebSockets extends ListenersBroker {
+        public WebSockets(final DOMDataBroker dataBroker) {
+            super(dataBroker);
+        }
+
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
             final var scheme = switch (uriInfo.getAbsolutePath().getScheme()) {
@@ -215,9 +223,10 @@ public abstract sealed class ListenersBroker {
     private final BiMap<String, ListenerAdapter> dataChangeListeners = HashBiMap.create();
     private final BiMap<String, NotificationListenerAdapter> notificationListeners = HashBiMap.create();
     private final BiMap<String, DeviceNotificationListenerAdaptor> deviceNotificationListeners = HashBiMap.create();
+    private final DOMDataBroker dataBroker;
 
-    private ListenersBroker() {
-        // Hidden on purpose
+    private ListenersBroker(final DOMDataBroker dataBroker) {
+        this.dataBroker = requireNonNull(dataBroker);
     }
 
     /**
@@ -619,7 +628,7 @@ public abstract sealed class ListenersBroker {
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
         notificationListenerAdapter.setQueryParams(notificationQueryParams);
         notificationListenerAdapter.listen(handlersHolder.notificationService());
-        final DOMDataBroker dataBroker = handlersHolder.dataBroker();
+//        final DOMDataBroker dataBroker = handlersHolder.dataBroker();
         notificationListenerAdapter.setCloseVars(dataBroker, handlersHolder.databindProvider());
         final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(streamName,
             notificationListenerAdapter.qnames(), notificationListenerAdapter.getOutputType(), uri);
@@ -652,7 +661,6 @@ public abstract sealed class ListenersBroker {
 
         listener.setQueryParams(notificationQueryParams);
 
-        final var dataBroker = handlersHolder.dataBroker();
         final var schemaHandler = handlersHolder.databindProvider();
         listener.setCloseVars(dataBroker, schemaHandler);
         listener.listen(dataBroker);
