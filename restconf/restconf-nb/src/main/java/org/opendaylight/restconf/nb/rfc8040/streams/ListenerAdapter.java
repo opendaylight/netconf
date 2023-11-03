@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * {@link ListenerAdapter} is responsible to track events, which occurred by changing data in data source.
  */
-public class ListenerAdapter extends AbstractCommonSubscriber<Collection<DataTreeCandidate>>
+public class ListenerAdapter extends AbstractStream<Collection<DataTreeCandidate>>
         implements ClusteredDOMDataTreeChangeListener {
     private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapter.class);
     private static final DataTreeCandidateFormatterFactory JSON_FORMATTER_FACTORY =

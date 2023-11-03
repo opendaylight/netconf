@@ -38,7 +38,8 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
     private static final byte[] PING_PAYLOAD = "ping".getBytes(Charset.defaultCharset());
 
     private final ScheduledExecutorService executorService;
-    private final BaseListenerInterface listener;
+    // FIXME: this really should include formatter etc.
+    private final AbstractStream<?> listener;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
@@ -61,7 +62,7 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
      * @param heartbeatInterval     Interval in milliseconds of sending of ping control frames to remote endpoint
      *                              to keep session up. Ping control frames are disabled if this parameter is set to 0.
      */
-    WebSocketSessionHandler(final ScheduledExecutorService executorService, final BaseListenerInterface listener,
+    WebSocketSessionHandler(final ScheduledExecutorService executorService, final AbstractStream<?> listener,
             final int maximumFragmentLength, final int heartbeatInterval) {
         this.executorService = executorService;
         this.listener = listener;
