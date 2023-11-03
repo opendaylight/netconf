@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
@@ -68,8 +67,9 @@ public abstract class RestconfStream<T> {
     private final @NonNull ListenersBroker listenersBroker;
     private final @NonNull String name;
 
+    // 'null' indicates we have been shut down
     @GuardedBy("this")
-    private final Set<StreamSessionHandler> subscribers = new HashSet<>();
+    private Subscribers<T> subscribers = Subscribers.empty();
     @GuardedBy("this")
     private Registration registration;
 
@@ -153,6 +153,9 @@ public abstract class RestconfStream<T> {
      * @param subscriber SSE or WS session handler.
      */
     synchronized void removeSubscriber(final StreamSessionHandler subscriber) {
+
+
+
         subscribers.remove(subscriber);
         LOG.debug("Subscriber {} is removed", subscriber);
         if (subscribers.isEmpty()) {
@@ -165,16 +168,20 @@ public abstract class RestconfStream<T> {
      * Signal the end-of-stream condition to subscribers, shut down this stream and initiate its removal from global
      * state.
      */
-    final synchronized void endOfStream() {
-        closeRegistration();
-
-        final var it = subscribers.iterator();
-        while (it.hasNext()) {
-            it.next().endOfStream();
-            it.remove();
+    final void endOfStream() {
+        // Atomic assertion we are ending plus locked clean up
+        final Subscribers<T> local;
+        synchronized (this) {
+            local = subscribers;
+            subscribers = null;
+            closeRegistration();
         }
 
-        listenersBroker.removeStream(this);
+        // Notify all subscribers without holding locks
+        if (local != null) {
+            local.iterator().forEachRemaining(subscriber -> subscriber.handler().endOfStream());
+            listenersBroker.removeStream(this);
+        }
     }
 
     @Holding("this")
