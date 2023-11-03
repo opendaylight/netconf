@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -22,9 +21,9 @@ import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFa
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
-// Non-final for mocking
-public class CallHomeTopology extends AbstractNetconfTopology {
-    public CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory,
+// non-final for mocking
+class CallHomeTopology extends AbstractNetconfTopology {
+    CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory,
             final EventExecutor eventExecutor, final ScheduledThreadPool scheduledThreadPool,
             final ThreadPool processingThreadPool, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
@@ -35,12 +34,11 @@ public class CallHomeTopology extends AbstractNetconfTopology {
             baseSchemas);
     }
 
-    void disconnectNode(final NodeId nodeId) {
+    void disableNode(final NodeId nodeId) {
         deleteNode(nodeId);
     }
 
-    @VisibleForTesting
-    public void connectNode(final Node node) {
+    void enableNode(final Node node) {
         ensureNode(node);
     }
 }
