@@ -14,8 +14,11 @@ import java.net.SocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
@@ -24,10 +27,8 @@ import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.callhome.protocol.AuthorizedKeysDecoder;
-import org.opendaylight.netconf.callhome.protocol.CallHomeAuthorization;
-import org.opendaylight.netconf.callhome.protocol.CallHomeAuthorization.Builder;
-import org.opendaylight.netconf.callhome.protocol.CallHomeAuthorizationProvider;
+import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshAuthProvider;
+import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshAuthSettings;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.NetconfCallhomeServer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.AllowedDevices;
@@ -36,24 +37,32 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.device.transport.Ssh;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParams;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(CallHomeAuthProviderImpl.class);
+@Component(service = CallHomeSshAuthProvider.class, immediate = true)
+@Singleton
+public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvider, AutoCloseable {
+    private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountSshAuthProvider.class);
 
-    private final @NonNull GlobalConfig globalConfig = new GlobalConfig();
-    private final @NonNull DeviceConfig deviceConfig = new DeviceConfig();
-    private final @NonNull DeviceOp deviceOp = new DeviceOp();
-    private final ListenerRegistration<GlobalConfig> configReg;
-    private final ListenerRegistration<DeviceConfig> deviceReg;
-    private final ListenerRegistration<DeviceOp> deviceOpReg;
+    private final GlobalConfig globalConfig = new GlobalConfig();
+    private final DeviceConfig deviceConfig = new DeviceConfig();
+    private final DeviceOp deviceOp = new DeviceOp();
+    private final Registration configReg;
+    private final Registration deviceReg;
+    private final Registration deviceOpReg;
 
-    private final CallhomeStatusReporter statusReporter;
+    private final CallHomeMountStatusReporter statusReporter;
 
-    CallHomeAuthProviderImpl(final DataBroker broker) {
+    @Activate
+    @Inject
+    public CallHomeMountSshAuthProvider(final @Reference DataBroker broker,
+            final @Reference CallHomeMountStatusReporter statusReporter) {
         configReg = broker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                 InstanceIdentifier.create(NetconfCallhomeServer.class).child(Global.class)),
@@ -68,17 +77,18 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         deviceOpReg = broker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, allowedDeviceWildcard),
             deviceOp);
-        statusReporter = new CallhomeStatusReporter(broker);
+
+        this.statusReporter = statusReporter;
     }
 
     @Override
-    public CallHomeAuthorization provideAuth(final SocketAddress remoteAddress, final PublicKey serverKey) {
+    public CallHomeSshAuthSettings provideAuth(final SocketAddress remoteAddress, final PublicKey serverKey) {
         Device deviceSpecific = deviceConfig.get(serverKey);
-        String sessionName;
+        String id;
         Credentials deviceCred;
 
         if (deviceSpecific != null) {
-            sessionName = deviceSpecific.getUniqueId();
+            id = deviceSpecific.getUniqueId();
             if (deviceSpecific.getTransport() instanceof Ssh ssh) {
                 final SshClientParams clientParams = ssh.getSshClientParams();
                 deviceCred = clientParams.getCredentials();
@@ -88,32 +98,29 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         } else {
             String syntheticId = fromRemoteAddress(remoteAddress);
             if (globalConfig.allowedUnknownKeys()) {
-                sessionName = syntheticId;
+                id = syntheticId;
                 deviceCred = null;
-                statusReporter.asForceListedDevice(syntheticId, serverKey);
+                statusReporter.reportNewSshDevice(syntheticId, serverKey, Device.DeviceStatus.DISCONNECTED);
             } else {
                 Device opDevice = deviceOp.get(serverKey);
                 if (opDevice == null) {
-                    statusReporter.asUnlistedDevice(syntheticId, serverKey);
+                    statusReporter.reportNewSshDevice(syntheticId, serverKey, Device.DeviceStatus.FAILEDNOTALLOWED);
                 } else {
                     LOG.info("Repeating rejection of unlisted device with id of {}", opDevice.getUniqueId());
                 }
-                return CallHomeAuthorization.rejected();
+                return null;
             }
         }
 
         final Credentials credentials = deviceCred != null ? deviceCred : globalConfig.getCredentials();
 
         if (credentials == null) {
-            LOG.info("No credentials found for {}, rejecting.", remoteAddress);
-            return CallHomeAuthorization.rejected();
+            LOG.info("No credentials found for {}, rejecting.", id);
+            return null;
         }
 
-        Builder authBuilder = CallHomeAuthorization.serverAccepted(sessionName, credentials.getUsername());
-        for (String password : credentials.getPasswords()) {
-            authBuilder.addPassword(password);
-        }
-        return authBuilder.build();
+        return new CallHomeSshAuthSettings.DefaultAuthSettings(id, credentials.getUsername(),
+            Set.copyOf(credentials.getPasswords()), null);
     }
 
     @Override
