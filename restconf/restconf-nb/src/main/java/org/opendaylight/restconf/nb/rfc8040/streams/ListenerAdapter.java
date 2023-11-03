@@ -20,9 +20,9 @@ import org.opendaylight.mdsal.dom.api.ClusteredDOMDataTreeChangeListener;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +33,8 @@ import org.slf4j.LoggerFactory;
 public class ListenerAdapter extends AbstractStream<Collection<DataTreeCandidate>>
         implements ClusteredDOMDataTreeChangeListener {
     private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapter.class);
-    private static final DataTreeCandidateFormatterFactory JSON_FORMATTER_FACTORY =
-            JSONDataTreeCandidateFormatter.createFactory(JSONCodecFactorySupplier.RFC7951);
 
+    private final DatabindProvider databindProvider;
     private final @NonNull LogicalDatastoreType datastore;
     private final @NonNull YangInstanceIdentifier path;
 
@@ -46,17 +45,18 @@ public class ListenerAdapter extends AbstractStream<Collection<DataTreeCandidate
      * @param streamName The name of the stream.
      * @param outputType Type of output on notification (JSON, XML).
      */
-    ListenerAdapter(final String streamName, final NotificationOutputType outputType,
-            final ListenersBroker listenersBroker, final LogicalDatastoreType datastore,
-            final YangInstanceIdentifier path) {
-        super(streamName, outputType, getFormatterFactory(outputType), listenersBroker);
+    ListenerAdapter(final ListenersBroker listenersBroker, final String streamName,
+            final NotificationOutputType outputType, final DatabindProvider databindProvider,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
+        super(listenersBroker, streamName, outputType, getFormatterFactory(outputType));
+        this.databindProvider = requireNonNull(databindProvider);
         this.datastore = requireNonNull(datastore);
         this.path = requireNonNull(path);
     }
 
     private static DataTreeCandidateFormatterFactory getFormatterFactory(final NotificationOutputType outputType) {
         return switch (outputType) {
-            case JSON -> JSON_FORMATTER_FACTORY;
+            case JSON -> JSONDataTreeCandidateFormatter.FACTORY;
             case XML -> XMLDataTreeCandidateFormatter.FACTORY;
         };
     }

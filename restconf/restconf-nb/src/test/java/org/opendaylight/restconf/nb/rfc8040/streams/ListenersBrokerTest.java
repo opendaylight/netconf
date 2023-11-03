@@ -22,6 +22,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -46,16 +48,18 @@ class ListenersBrokerTest {
     private DOMDataBroker dataBroker;
 
     private ListenersBroker listenersBroker;
+    private DatabindProvider databindProvider;
 
     @BeforeEach
     public void before() {
         listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
+        databindProvider = () -> DatabindContext.ofModel(SCHEMA_CTX);
     }
 
     @Test
     void createStreamTest() {
         final var output = assertInstanceOf(ContainerNode.class, listenersBroker.createDataChangeNotifiStream(
-            prepareDomPayload("create-data-change-event-subscription", "toaster", "path"),
+            databindProvider, prepareDomPayload("create-data-change-event-subscription", "toaster", "path"),
             SCHEMA_CTX).getOrThrow().orElse(null));
 
         assertEquals(new NodeIdentifier(CreateDataChangeEventSubscriptionOutput.QNAME), output.name());
@@ -74,7 +78,7 @@ class ListenersBrokerTest {
     void createStreamWrongValueTest() {
         final var payload = prepareDomPayload("create-data-change-event-subscription", "String value", "path");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> listenersBroker.createDataChangeNotifiStream(payload, SCHEMA_CTX)).getErrors();
+            () -> listenersBroker.createDataChangeNotifiStream(databindProvider, payload, SCHEMA_CTX)).getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
@@ -86,7 +90,7 @@ class ListenersBrokerTest {
     void createStreamWrongInputRpcTest() {
         final var payload = prepareDomPayload("create-data-change-event-subscription2", "toaster", "path2");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> listenersBroker.createDataChangeNotifiStream(payload, SCHEMA_CTX)).getErrors();
+            () -> listenersBroker.createDataChangeNotifiStream(databindProvider, payload, SCHEMA_CTX)).getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
