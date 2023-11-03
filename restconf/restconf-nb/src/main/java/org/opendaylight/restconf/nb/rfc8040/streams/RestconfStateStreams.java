@@ -13,9 +13,6 @@ import com.google.common.annotations.VisibleForTesting;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -35,33 +32,20 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * Utilities for creating the content of {@code /ietf-restconf-monitoring:restconf-state/streams}.
  */
 public final class RestconfStateStreams {
-    private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.of(
-        NodeIdentifier.create(RestconfState.QNAME), NodeIdentifier.create(Streams.QNAME),
-        NodeIdentifier.create(Stream.QNAME));
-
     @VisibleForTesting
     static final QName DESCRIPTION_QNAME = qnameOf("description");
     @VisibleForTesting
     static final QName ENCODING_QNAME = qnameOf("encoding");
     @VisibleForTesting
     static final QName LOCATION_QNAME = qnameOf("location");
-    @VisibleForTesting
     static final QName NAME_QNAME = qnameOf("name");
 
     private RestconfStateStreams() {
         // Hidden on purpose
     }
 
-    public static @NonNull YangInstanceIdentifier restconfStateStreamPath(final String streamName) {
-        return restconfStateStreamPath(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName));
-    }
-
-    public static @NonNull YangInstanceIdentifier restconfStateStreamPath(final NodeIdentifierWithPredicates arg) {
-        return RESTCONF_STATE_STREAMS.node(arg);
-    }
-
     /**
-     * Map data of yang notification to normalized node according to ietf-restconf-monitoring.
+     * Map data of YANG notification stream to a {@link MapEntryNode} according to {@code ietf-restconf-monitoring}.
      *
      * @param streamName stream name
      * @param qnames Notification QNames to listen on

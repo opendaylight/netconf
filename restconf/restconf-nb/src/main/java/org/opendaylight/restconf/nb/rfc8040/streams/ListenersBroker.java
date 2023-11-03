@@ -32,6 +32,9 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
@@ -189,6 +192,10 @@ public abstract sealed class ListenersBroker {
 //    }
 
     private static final Logger LOG = LoggerFactory.getLogger(ListenersBroker.class);
+    private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.of(
+        NodeIdentifier.create(RestconfState.QNAME),
+        NodeIdentifier.create(Streams.QNAME),
+        NodeIdentifier.create(Stream.QNAME));
 
     private static final QName DATASTORE_QNAME =
         QName.create(CreateDataChangeEventSubscriptionInput1.QNAME, "datastore").intern();
@@ -266,7 +273,7 @@ public abstract sealed class ListenersBroker {
 
         // Now issue a delete operation while the name is still protected by being associated in the map.
         final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.delete(LogicalDatastoreType.OPERATIONAL, RestconfStateStreams.restconfStateStreamPath(streamName));
+        tx.delete(LogicalDatastoreType.OPERATIONAL, restconfStateStreamPath(streamName));
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -280,6 +287,11 @@ public abstract sealed class ListenersBroker {
                 streams.remove(streamName, stream);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private static @NonNull YangInstanceIdentifier restconfStateStreamPath(final String streamName) {
+        return RESTCONF_STATE_STREAMS
+            .node(NodeIdentifierWithPredicates.of(Stream.QNAME, RestconfStateStreams.NAME_QNAME, streamName));
     }
 
     /**
