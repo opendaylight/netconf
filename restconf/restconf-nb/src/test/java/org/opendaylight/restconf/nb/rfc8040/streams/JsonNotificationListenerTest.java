@@ -9,14 +9,16 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -36,13 +38,21 @@ import org.slf4j.LoggerFactory;
 public class JsonNotificationListenerTest extends AbstractNotificationListenerTest {
     private static final Logger LOG = LoggerFactory.getLogger(JsonNotificationListenerTest.class);
 
-    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
+    @Mock
+    private DOMDataBroker dataBroker;
+    @Mock
+    private DOMNotification notificationData;
+
+    private ListenersBroker listenersBroker;
+
+    @Before
+    public void before() {
+        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
+    }
 
     @Test
     public void notifi_leafTest() throws Exception {
         final QName schemaPathNotifi = QName.create(MODULE, "notifi-leaf");
-
-        final DOMNotification notificationData = mock(DOMNotification.class);
 
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
         final ContainerNode notifiBody = mockCont(schemaPathNotifi, leaf);
@@ -64,8 +74,6 @@ public class JsonNotificationListenerTest extends AbstractNotificationListenerTe
     public void notifi_cont_leafTest() throws Exception {
         final QName schemaPathNotifi = QName.create(MODULE, "notifi-cont");
 
-        final DOMNotification notificationData = mock(DOMNotification.class);
-
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
         final ContainerNode cont = mockCont(QName.create(MODULE, "cont"), leaf);
         final ContainerNode notifiBody = mockCont(schemaPathNotifi, cont);
@@ -85,8 +93,6 @@ public class JsonNotificationListenerTest extends AbstractNotificationListenerTe
     @Test
     public void notifi_list_Test() throws Exception {
         final QName schemaPathNotifi = QName.create(MODULE, "notifi-list");
-
-        final DOMNotification notificationData = mock(DOMNotification.class);
 
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
         final MapEntryNode entry = mockMapEntry(QName.create(MODULE, "lst"), leaf);
@@ -111,8 +117,6 @@ public class JsonNotificationListenerTest extends AbstractNotificationListenerTe
     public void notifi_grpTest() throws Exception {
         final QName schemaPathNotifi = QName.create(MODULE, "notifi-grp");
 
-        final DOMNotification notificationData = mock(DOMNotification.class);
-
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf"));
         final ContainerNode notifiBody = mockCont(schemaPathNotifi, leaf);
 
@@ -129,8 +133,6 @@ public class JsonNotificationListenerTest extends AbstractNotificationListenerTe
     @Test
     public void notifi_augmTest() throws Exception {
         final QName schemaPathNotifi = QName.create(MODULE, "notifi-augm");
-
-        final DOMNotification notificationData = mock(DOMNotification.class);
 
         final LeafNode<String> leaf = mockLeaf(QName.create(MODULE, "lf-augm"));
         final ContainerNode notifiBody = mockCont(schemaPathNotifi, leaf);
