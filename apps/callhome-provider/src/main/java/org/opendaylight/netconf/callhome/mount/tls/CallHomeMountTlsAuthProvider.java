@@ -9,6 +9,8 @@ package org.opendaylight.netconf.callhome.mount.tls;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
+import io.netty.channel.Channel;
+import io.netty.handler.ssl.SslHandler;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +20,6 @@ import java.security.cert.CertificateFactory;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -33,7 +34,9 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.callhome.protocol.tls.TlsAllowedDevicesMonitor;
+import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsAuthProvider;
+import org.opendaylight.netconf.client.SslHandlerFactory;
+import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.NetconfCallhomeServer;
@@ -49,20 +52,25 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+@Component(service = CallHomeTlsAuthProvider.class, immediate = true)
 @Singleton
-@Component(service = TlsAllowedDevicesMonitor.class, immediate = true, property = "type=default")
-public final class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMonitor, AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(TlsAllowedDevicesMonitorImpl.class);
+public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvider, AutoCloseable {
+    private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountTlsAuthProvider.class);
 
     private final ConcurrentMap<String, String> deviceToPrivateKey = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, String> deviceToCertificate = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, PublicKey> certificateToPublicKey = new ConcurrentHashMap<>();
     private final Registration allowedDevicesReg;
     private final Registration certificatesReg;
+    private final SslHandlerFactory sslHandlerFactory;
 
     @Inject
     @Activate
-    public TlsAllowedDevicesMonitorImpl(@Reference final DataBroker dataBroker) {
+    public CallHomeMountTlsAuthProvider(
+            final @Reference SslHandlerFactoryProvider sslHandlerFactoryProvider,
+            final @Reference DataBroker dataBroker) {
+        this.sslHandlerFactory = sslHandlerFactoryProvider.getSslHandlerFactory(null);
         allowedDevicesReg = dataBroker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                 InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class)),
@@ -81,34 +89,33 @@ public final class TlsAllowedDevicesMonitorImpl implements TlsAllowedDevicesMoni
     }
 
     @Override
-    public Optional<String> findDeviceIdByPublicKey(final PublicKey key) {
+    public String idFor(final PublicKey key) {
         // Find certificate names by the public key
-        final Set<String> certificates = certificateToPublicKey.entrySet().stream()
+        final var certificates = certificateToPublicKey.entrySet().stream()
             .filter(v -> key.equals(v.getValue()))
             .map(Map.Entry::getKey)
             .collect(Collectors.toSet());
 
         // Find devices names associated with a certificate name
-        final Set<String> deviceNames = deviceToCertificate.entrySet().stream()
+        final var deviceNames = deviceToCertificate.entrySet().stream()
             .filter(v -> certificates.contains(v.getValue()))
             .map(Map.Entry::getKey)
-            .collect(Collectors.toSet());
+            .toList();
 
         // In real world scenario it is not possible to have multiple certificates with the same private/public key,
-        // but in theor/synthetic tests it is practically possible to generate mulitple certificates from a single
+        // but in theory/synthetic tests it is practically possible to generate multiple certificates from a single
         // private key. In such case it's not possible to pin certificate to particular device.
         if (deviceNames.size() > 1) {
             LOG.error("Unable to find device by provided certificate. Possible reason: one certificate configured "
                 + "with multiple devices/names or multiple certificates contain same public key");
-            return Optional.empty();
-        } else {
-            return deviceNames.stream().findFirst();
+            return null;
         }
+        return deviceNames.isEmpty() ? null : deviceNames.get(0);
     }
 
     @Override
-    public Set<String> findAllowedKeys() {
-        return Set.copyOf(deviceToPrivateKey.values());
+    public SslHandler createSslHandler(final Channel channel) {
+        return sslHandlerFactory.createSslHandler(Set.copyOf(deviceToPrivateKey.values()));
     }
 
     private final class CertificatesMonitor implements ClusteredDataTreeChangeListener<Keystore> {
