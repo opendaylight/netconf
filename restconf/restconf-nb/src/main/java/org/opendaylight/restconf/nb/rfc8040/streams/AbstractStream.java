@@ -14,7 +14,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import javax.xml.xpath.XPathExpressionException;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -22,7 +21,6 @@ import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -49,17 +47,14 @@ abstract class AbstractStream<T> {
     // FIXME: NETCONF-1102: this should be tied to a subscriber
     private @NonNull EventFormatter<T> formatter;
 
-    // FIXME: these really should not live here
-    protected DatabindProvider databindProvider;
-
-    AbstractStream(final String streamName, final NotificationOutputType outputType,
-            final EventFormatterFactory<T> formatterFactory, final ListenersBroker listenersBroker) {
+    AbstractStream(final ListenersBroker listenersBroker, final String streamName,
+            final NotificationOutputType outputType, final EventFormatterFactory<T> formatterFactory) {
+        this.listenersBroker = requireNonNull(listenersBroker);
         this.streamName = requireNonNull(streamName);
         checkArgument(!streamName.isEmpty());
 
         this.outputType = requireNonNull(outputType);
         this.formatterFactory = requireNonNull(formatterFactory);
-        this.listenersBroker = requireNonNull(listenersBroker);
         formatter = formatterFactory.emptyFormatter();
     }
 
@@ -212,11 +207,10 @@ abstract class AbstractStream<T> {
      * @param data Data of incoming notifications.
      */
     synchronized void post(final String data) {
-        final Iterator<StreamSessionHandler> iterator = subscribers.iterator();
+        final var iterator = subscribers.iterator();
         while (iterator.hasNext()) {
-            final StreamSessionHandler subscriber = iterator.next();
-            final boolean isConnected = subscriber.isConnected();
-            if (isConnected) {
+            final var subscriber = iterator.next();
+            if (subscriber.isConnected()) {
                 subscriber.sendDataMessage(data);
                 LOG.debug("Data was sent to subscriber {} on connection {}:", this, subscriber);
             } else {
@@ -226,17 +220,6 @@ abstract class AbstractStream<T> {
                 LOG.debug("Subscriber for {} was removed - web-socket session is not open.", this);
             }
         }
-    }
-
-    /**
-     * Data broker for delete data in DS on close().
-     *
-     * @param databindProvider for formatting notifications
-     */
-    @SuppressWarnings("checkstyle:hiddenField")
-    // FIXME: this is pure lifecycle nightmare just because ...
-    public synchronized void setCloseVars(final DatabindProvider databindProvider) {
-        this.databindProvider = databindProvider;
     }
 
     @Override

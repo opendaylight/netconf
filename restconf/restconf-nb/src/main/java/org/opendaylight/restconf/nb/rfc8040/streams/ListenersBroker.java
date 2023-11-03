@@ -363,14 +363,16 @@ public abstract sealed class ListenersBroker {
      *     </pre>
      */
     // FIXME: this really should be a normal RPC implementation
-    public final RestconfFuture<Optional<ContainerNode>> createDataChangeNotifiStream(final ContainerNode input,
+    public final RestconfFuture<Optional<ContainerNode>> createDataChangeNotifiStream(
+            final DatabindProvider databindProvider, final ContainerNode input,
             final EffectiveModelContext modelContext) {
         final var datastoreName = extractStringLeaf(input, DATASTORE_NODEID);
         final var datastore = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
             : LogicalDatastoreType.CONFIGURATION;
         final var path = preparePath(input);
         final var outputType = prepareOutputType(input);
-        final var adapter = createStream(name -> new ListenerAdapter(name, outputType, this, datastore, path));
+        final var adapter = createStream(name -> new ListenerAdapter(this, name, outputType, databindProvider,
+            datastore, path));
 
         // building of output
         return RestconfFuture.of(Optional.of(Builders.containerBuilder()
@@ -418,7 +420,8 @@ public abstract sealed class ListenersBroker {
 //    }
 
     // FIXME: this really should be a normal RPC implementation
-    public final RestconfFuture<Optional<ContainerNode>> createNotificationStream(final ContainerNode input,
+    public final RestconfFuture<Optional<ContainerNode>> createNotificationStream(
+            final DatabindProvider databindProvider, final ContainerNode input,
             final EffectiveModelContext modelContext) {
         final var qnames = ((LeafSetNode<String>) input.getChildByArg(NOTIFICATIONS)).body().stream()
             .map(LeafSetEntryNode::body)
@@ -454,7 +457,8 @@ public abstract sealed class ListenersBroker {
 
         // registration of the listener
         final var outputType = prepareOutputType(input);
-        final var adapter = createStream(name -> new NotificationListenerAdapter(name, outputType, this, qnames));
+        final var adapter = createStream(name -> new NotificationListenerAdapter(this, name, outputType,
+            databindProvider, qnames));
 
         return RestconfFuture.of(Optional.of(Builders.containerBuilder()
             .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
@@ -553,7 +557,7 @@ public abstract sealed class ListenersBroker {
 
         final var outputType = prepareOutputType(input);
         final var notificationListenerAdapter = createStream(
-            streamName -> new DeviceNotificationListenerAdaptor(streamName, outputType, this, mountModelContext,
+            streamName -> new DeviceNotificationListenerAdaptor(this, streamName, outputType, mountModelContext,
                 mountPointService, mountPoint.getIdentifier()));
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 

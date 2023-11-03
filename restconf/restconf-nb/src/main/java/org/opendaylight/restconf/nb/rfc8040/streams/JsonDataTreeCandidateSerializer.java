@@ -30,13 +30,10 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     private static final XMLNamespace SAL_REMOTE_NS = DataChangedNotification.QNAME.getNamespace();
     private static final Absolute DATA_CHANGE_EVENT = Absolute.of(DataChangedNotification.QNAME, DataChangeEvent.QNAME);
 
-    private final JSONCodecFactorySupplier codecSupplier;
     private final JsonWriter jsonWriter;
 
-    JsonDataTreeCandidateSerializer(final EffectiveModelContext context,
-            final JSONCodecFactorySupplier codecSupplier, final JsonWriter jsonWriter) {
+    JsonDataTreeCandidateSerializer(final EffectiveModelContext context, final JsonWriter jsonWriter) {
         super(context);
-        this.codecSupplier = requireNonNull(codecSupplier);
         this.jsonWriter = requireNonNull(jsonWriter);
     }
 
@@ -47,7 +44,7 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
 
         final var modificationType = candidate.modificationType();
         if (modificationType != ModificationType.UNMODIFIED) {
-            final var codecs = codecSupplier.getShared(parent.getEffectiveModelContext());
+            final var codecs = JSONCodecFactorySupplier.RFC7951.getShared(parent.getEffectiveModelContext());
             try (var writer = createNestedWriter(codecs, DATA_CHANGE_EVENT, SAL_REMOTE_NS, jsonWriter)) {
                 writer.startLeafNode(PATH_NID);
                 writer.scalarValue(YangInstanceIdentifier.of(dataPath));

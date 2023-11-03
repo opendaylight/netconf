@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -19,7 +17,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -27,36 +24,29 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
     private static final @NonNull String DATA_CHANGED_EVENT_NAME = DataChangeEvent.QNAME.getLocalName();
     private static final @NonNull String DATA_CHANGED_NOTIFICATION_NAME =
         $YangModuleInfoImpl.getInstance().getName().getLocalName() + ":" + DataChangedNotification.QNAME.getLocalName();
+    private static final JSONDataTreeCandidateFormatter EMPTY =
+        new JSONDataTreeCandidateFormatter(TextParameters.EMPTY);
 
-    private final JSONCodecFactorySupplier codecSupplier;
+    static final DataTreeCandidateFormatterFactory FACTORY = new DataTreeCandidateFormatterFactory(EMPTY) {
+        @Override
+        DataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
+            return new JSONDataTreeCandidateFormatter(textParams);
+        }
 
-    private JSONDataTreeCandidateFormatter(final TextParameters textParams,
-            final JSONCodecFactorySupplier codecSupplier) {
+        @Override
+        DataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+                throws XPathExpressionException {
+            return new JSONDataTreeCandidateFormatter(textParams, xpathFilter);
+        }
+    };
+
+    private JSONDataTreeCandidateFormatter(final TextParameters textParams) {
         super(textParams);
-        this.codecSupplier = requireNonNull(codecSupplier);
     }
 
-    private JSONDataTreeCandidateFormatter(final TextParameters textParams, final String xpathFilter,
-            final JSONCodecFactorySupplier codecSupplier) throws XPathExpressionException {
+    private JSONDataTreeCandidateFormatter(final TextParameters textParams, final String xpathFilter)
+            throws XPathExpressionException {
         super(textParams, xpathFilter);
-        this.codecSupplier = requireNonNull(codecSupplier);
-    }
-
-    public static DataTreeCandidateFormatterFactory createFactory(
-            final JSONCodecFactorySupplier codecSupplier) {
-        final var empty = new JSONDataTreeCandidateFormatter(TextParameters.EMPTY, codecSupplier);
-        return new DataTreeCandidateFormatterFactory(empty) {
-            @Override
-            DataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
-                return new JSONDataTreeCandidateFormatter(textParams, codecSupplier);
-            }
-
-            @Override
-            DataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
-                    throws XPathExpressionException {
-                return new JSONDataTreeCandidateFormatter(textParams, xpathFilter, codecSupplier);
-            }
-        };
     }
 
     @Override
@@ -71,7 +61,7 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
                         .name(DATA_CHANGED_NOTIFICATION_NAME).beginObject()
                             .name(DATA_CHANGED_EVENT_NAME).beginArray();
 
-                final var serializer = new JsonDataTreeCandidateSerializer(schemaContext, codecSupplier, jsonWriter);
+                final var serializer = new JsonDataTreeCandidateSerializer(schemaContext, jsonWriter);
                 for (var candidate : input) {
                     nonEmpty |= serializer.serialize(candidate, params);
                 }

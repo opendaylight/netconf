@@ -31,10 +31,10 @@ public final class DeviceNotificationListenerAdaptor extends AbstractNotificatio
 
     private ListenerRegistration<DOMMountPointListener> reg;
 
-    DeviceNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType,
-            final ListenersBroker listenersBroker, final EffectiveModelContext effectiveModel,
+    DeviceNotificationListenerAdaptor(final ListenersBroker listenersBroker, final String streamName,
+            final NotificationOutputType outputType, final EffectiveModelContext effectiveModel,
             final DOMMountPointService mountPointService, final YangInstanceIdentifier instanceIdentifier) {
-        super(streamName, outputType, listenersBroker);
+        super(listenersBroker, streamName, outputType);
         this.effectiveModel = requireNonNull(effectiveModel);
         this.mountPointService = requireNonNull(mountPointService);
         this.instanceIdentifier = requireNonNull(instanceIdentifier);

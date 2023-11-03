@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -37,6 +38,8 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
     private ServletUpgradeResponse upgradeResponse;
     @Mock
     private DOMDataBroker dataBroker;
+    @Mock
+    private DatabindProvider databindProvider;
 
     private ListenersBroker listenersBroker;
     private WebSocketFactory webSocketFactory;
@@ -47,8 +50,8 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
         listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
         webSocketFactory = new WebSocketFactory(execService, listenersBroker, 5000, 2000);
 
-        streamName = listenersBroker.createStream(name -> new ListenerAdapter(name, NotificationOutputType.JSON,
-            listenersBroker, LogicalDatastoreType.CONFIGURATION,
+        streamName = listenersBroker.createStream(name -> new ListenerAdapter(listenersBroker, name,
+            NotificationOutputType.JSON, databindProvider, LogicalDatastoreType.CONFIGURATION,
             YangInstanceIdentifier.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"))))
             .getStreamName();
     }

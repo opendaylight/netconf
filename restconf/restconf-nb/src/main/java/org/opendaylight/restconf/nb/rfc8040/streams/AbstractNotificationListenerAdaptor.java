@@ -25,9 +25,9 @@ abstract class AbstractNotificationListenerAdaptor extends AbstractStream<DOMNot
         implements DOMNotificationListener {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationListenerAdaptor.class);
 
-    AbstractNotificationListenerAdaptor(final String streamName, final NotificationOutputType outputType,
-            final ListenersBroker listenersBroker) {
-        super(streamName, outputType, getFormatterFactory(outputType), listenersBroker);
+    AbstractNotificationListenerAdaptor(final ListenersBroker listenersBroker, final String streamName,
+            final NotificationOutputType outputType) {
+        super(listenersBroker, streamName, outputType, getFormatterFactory(outputType));
     }
 
     private static NotificationFormatterFactory getFormatterFactory(final NotificationOutputType outputType) {

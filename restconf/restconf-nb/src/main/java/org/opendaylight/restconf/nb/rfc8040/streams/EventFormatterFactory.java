@@ -31,6 +31,4 @@ abstract class EventFormatterFactory<T> {
         throws XPathExpressionException;
 
     abstract @NonNull EventFormatter<T> newFormatter(@NonNull TextParameters textParamaters);
-
-
 }
