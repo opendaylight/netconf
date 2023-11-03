@@ -69,7 +69,7 @@ public abstract class RestconfStream<T> {
     private final @NonNull String name;
 
     @GuardedBy("this")
-    private final Set<StreamSessionHandler> subscribers = new HashSet<>();
+    private final Subscribers<T> subscribers = Subscribers.empty();
     @GuardedBy("this")
     private Registration registration;
 
