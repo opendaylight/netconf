@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -21,8 +22,11 @@ import javax.xml.xpath.XPathExpressionException;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -33,7 +37,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Features of subscribing part of both notifications.
  */
-abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData implements BaseListenerInterface {
+abstract class AbstractCommonSubscriber<T> implements BaseListenerInterface {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
     private final EventFormatterFactory<T> formatterFactory;
@@ -48,6 +52,10 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
 
     // FIXME: NETCONF-1102: this should be tied to a subscriber
     private @NonNull EventFormatter<T> formatter;
+
+    // FIXME: these really should not live here
+    protected DatabindProvider databindProvider;
+    private DOMDataBroker dataBroker;
 
     AbstractCommonSubscriber(final String streamName, final NotificationOutputType outputType,
             final EventFormatterFactory<T> formatterFactory, final ListenersBroker listenersBroker) {
@@ -86,7 +94,7 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
             registration.close();
             registration = null;
         }
-        deleteDataInDS(streamName).get();
+        deleteDataInDS().get();
         subscribers.clear();
     }
 
@@ -192,6 +200,30 @@ abstract class AbstractCommonSubscriber<T> extends AbstractNotificationsData imp
                 LOG.debug("Subscriber for {} was removed - web-socket session is not open.", this);
             }
         }
+    }
+
+    /**
+     * Data broker for delete data in DS on close().
+     *
+     * @param dataBroker creating new write transaction for delete data on close
+     * @param databindProvider for formatting notifications
+     */
+    @SuppressWarnings("checkstyle:hiddenField")
+    // FIXME: this is pure lifecycle nightmare just because ...
+    public void setCloseVars(final DOMDataBroker dataBroker, final DatabindProvider databindProvider) {
+        this.dataBroker = dataBroker;
+        this.databindProvider = databindProvider;
+    }
+
+    /**
+     * Delete data in DS.
+     */
+    // FIXME: here we touch datastore, which probably should be done by whoever instantiated us or created the resource,
+    //        or they should be giving us the transaction
+    private ListenableFuture<?> deleteDataInDS() {
+        final var wTx = dataBroker.newWriteOnlyTransaction();
+        wTx.delete(LogicalDatastoreType.OPERATIONAL, RestconfStateStreams.restconfStateStreamPath(streamName));
+        return wTx.commit();
     }
 
     @Override
