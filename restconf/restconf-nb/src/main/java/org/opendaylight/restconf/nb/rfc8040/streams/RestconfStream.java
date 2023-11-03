@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
@@ -31,13 +29,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Base superclass for all stream types.
  */
-abstract class AbstractStream<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractStream.class);
+abstract class RestconfStream<T> {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
 
-    private final EventFormatterFactory<T> formatterFactory;
-    private final NotificationOutputType outputType;
-    private final String streamName;
-    protected final @NonNull ListenersBroker listenersBroker;
+    private final @NonNull ListenersBroker listenersBroker;
+    private final @NonNull String name;
 
     @GuardedBy("this")
     private final Set<StreamSessionHandler> subscribers = new HashSet<>();
@@ -45,14 +41,14 @@ abstract class AbstractStream<T> {
     private Registration registration;
 
     // FIXME: NETCONF-1102: this should be tied to a subscriber
+    private final EventFormatterFactory<T> formatterFactory;
+    private final NotificationOutputType outputType;
     private @NonNull EventFormatter<T> formatter;
 
-    AbstractStream(final ListenersBroker listenersBroker, final String streamName,
-            final NotificationOutputType outputType, final EventFormatterFactory<T> formatterFactory) {
+    RestconfStream(final ListenersBroker listenersBroker, final String name, final NotificationOutputType outputType,
+            final EventFormatterFactory<T> formatterFactory) {
         this.listenersBroker = requireNonNull(listenersBroker);
-        this.streamName = requireNonNull(streamName);
-        checkArgument(!streamName.isEmpty());
-
+        this.name = requireNonNull(name);
         this.outputType = requireNonNull(outputType);
         this.formatterFactory = requireNonNull(formatterFactory);
         formatter = formatterFactory.emptyFormatter();
@@ -63,8 +59,8 @@ abstract class AbstractStream<T> {
      *
      * @return Stream name.
      */
-    public final String getStreamName() {
-        return streamName;
+    public final @NonNull String name() {
+        return name;
     }
 
     /**
@@ -77,22 +73,14 @@ abstract class AbstractStream<T> {
     }
 
     /**
-     * Checks if exists at least one {@link StreamSessionHandler} subscriber.
-     *
-     * @return {@code true} if exist at least one {@link StreamSessionHandler} subscriber, {@code false} otherwise.
-     */
-    final synchronized boolean hasSubscribers() {
-        return !subscribers.isEmpty();
-    }
-
-    /**
      * Registers {@link StreamSessionHandler} subscriber.
      *
      * @param subscriber SSE or WS session handler.
      */
     synchronized void addSubscriber(final StreamSessionHandler subscriber) {
-        final boolean isConnected = subscriber.isConnected();
-        checkState(isConnected);
+        if (!subscriber.isConnected()) {
+            throw new IllegalStateException(subscriber + " is not connected");
+        }
         LOG.debug("Subscriber {} is added.", subscriber);
         subscribers.add(subscriber);
     }
@@ -144,7 +132,7 @@ abstract class AbstractStream<T> {
     public final void setQueryParams(final ReceiveEventsParams params) {
         final var startTime = params.startTime();
         if (startTime != null) {
-            throw new RestconfDocumentedException("Stream " + streamName + " does not support replay",
+            throw new RestconfDocumentedException("Stream " + name + " does not support replay",
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
@@ -228,6 +216,6 @@ abstract class AbstractStream<T> {
     }
 
     ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-        return helper.add("stream-name", streamName).add("output-type", getOutputType());
+        return helper.add("name", name).add("output-type", getOutputType());
     }
 }

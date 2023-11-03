@@ -28,7 +28,7 @@ public final class SSESessionHandler implements StreamSessionHandler {
 
     private final ScheduledExecutorService executorService;
     // FIXME: this really should include subscription details like formatter etc.
-    private final AbstractStream<?> listener;
+    private final RestconfStream<?> listener;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
     private final SseEventSink sink;
@@ -53,7 +53,7 @@ public final class SSESessionHandler implements StreamSessionHandler {
      *            session up. Ping control frames are disabled if this parameter is set to 0.
      */
     public SSESessionHandler(final ScheduledExecutorService executorService, final SseEventSink sink, final Sse sse,
-            final AbstractStream<?> listener, final int maximumFragmentLength, final int heartbeatInterval) {
+            final RestconfStream<?> listener, final int maximumFragmentLength, final int heartbeatInterval) {
         this.executorService = executorService;
         this.sse = sse;
         this.sink = sink;

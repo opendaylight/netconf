@@ -18,23 +18,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract base class for functionality shared between {@link NotificationListenerAdapter} and
- * {@link DeviceNotificationListenerAdaptor}.
+ * Abstract base class for functionality shared between {@link NotificationStream} and
+ * {@link DeviceNotificationStream}.
  */
-abstract class AbstractNotificationListenerAdaptor extends AbstractStream<DOMNotification>
-        implements DOMNotificationListener {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationListenerAdaptor.class);
+abstract class AbstractNotificationStream extends RestconfStream<DOMNotification> implements DOMNotificationListener {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationStream.class);
 
-    AbstractNotificationListenerAdaptor(final ListenersBroker listenersBroker, final String streamName,
+    AbstractNotificationStream(final ListenersBroker listenersBroker, final String name,
             final NotificationOutputType outputType) {
-        super(listenersBroker, streamName, outputType, getFormatterFactory(outputType));
-    }
-
-    private static NotificationFormatterFactory getFormatterFactory(final NotificationOutputType outputType) {
-        return switch (outputType) {
+        super(listenersBroker, name, outputType, switch (outputType) {
             case JSON -> JSONNotificationFormatter.FACTORY;
             case XML -> XMLNotificationFormatter.FACTORY;
-        };
+        });
     }
 
     @Override
