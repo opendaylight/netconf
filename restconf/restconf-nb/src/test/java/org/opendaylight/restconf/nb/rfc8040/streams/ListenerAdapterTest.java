@@ -148,10 +148,10 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
-    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
     private DatabindProvider databindProvider;
+    private ListenersBroker listenersBroker;
 
     @BeforeClass
     public static void beforeClass() {
@@ -168,6 +168,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
         databindProvider = () -> DatabindContext.ofModel(SCHEMA_CONTEXT);
+        listenersBroker = new ListenersBroker.ServerSentEvents(domDataBroker);
     }
 
     class ListenerAdapterTester extends ListenerAdapter {
@@ -235,15 +236,15 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonNotifsLeaves() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
+        var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
             true, false, false, false, listenersBroker);
-        adapter.setCloseVars(domDataBroker, databindProvider);
+        adapter.setCloseVars(databindProvider);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
         final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
         changeService.registerDataTreeChangeListener(root, adapter);
 
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+        var writeTransaction = dataBroker.newWriteOnlyTransaction();
         final var iid = InstanceIdentifier.create(PatchCont.class);
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
             .addAugmentation(new PatchCont1Builder()
@@ -274,15 +275,15 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonNotifsChangedLeaves() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
+        var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
                 false, false, true, false, listenersBroker);
-        adapter.setCloseVars(domDataBroker, databindProvider);
+        adapter.setCloseVars(databindProvider);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
         final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
         changeService.registerDataTreeChangeListener(root, adapter);
 
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+        var writeTransaction = dataBroker.newWriteOnlyTransaction();
         final var iid = InstanceIdentifier.create(PatchCont.class);
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
             .addAugmentation(new PatchCont1Builder()
@@ -323,7 +324,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void testJsonChildNodesOnly() throws Exception {
         final var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
             NotificationOutputType.JSON, false, false, false, true, listenersBroker);
-        adapter.setCloseVars(domDataBroker, databindProvider);
+        adapter.setCloseVars(databindProvider);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
         final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
@@ -356,14 +357,14 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlLeavesOnly() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
+        var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
             true, false, false, false, listenersBroker);
-        adapter.setCloseVars(domDataBroker, databindProvider);
+        adapter.setCloseVars(databindProvider);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
         final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
         changeService.registerDataTreeChangeListener(root, adapter);
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+        var writeTransaction = dataBroker.newWriteOnlyTransaction();
         final var iid = InstanceIdentifier.create(PatchCont.class);
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
             .addAugmentation(new PatchCont1Builder()
@@ -407,9 +408,9 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlChangedLeavesOnly() throws Exception {
-        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
+        var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML,
                 false, false, true, false, listenersBroker);
-        adapter.setCloseVars(domDataBroker, databindProvider);
+        adapter.setCloseVars(databindProvider);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
         final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
@@ -468,7 +469,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void testXmlChildNodesOnly() throws Exception {
         final var adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
             NotificationOutputType.XML, false, false, false, true, listenersBroker);
-        adapter.setCloseVars(domDataBroker, databindProvider);
+        adapter.setCloseVars(databindProvider);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
         final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
@@ -573,14 +574,14 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
             final String jsonNotifCreate, final String jsonNotifUpdate, final String jsonNotifDelete) throws Exception {
         final var adapter = new ListenerAdapterTester(pathYiid, "Casey",
                 NotificationOutputType.JSON, false, skipData, false, false, listenersBroker);
-        adapter.setCloseVars(domDataBroker, databindProvider);
+        adapter.setCloseVars(databindProvider);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
         final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, pathYiid);
         changeService.registerDataTreeChangeListener(root, adapter);
 
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
+        var writeTransaction = dataBroker.newWriteOnlyTransaction();
+        var builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
         final var iid = InstanceIdentifier.create(PatchCont.class)
                 .child(MyList1.class, new MyList1Key("Althea"));
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
@@ -603,14 +604,14 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
             final String xmlNotifCreate, final String xmlNotifUpdate, final String xmlNotifDelete) throws Exception {
         final var adapter = new ListenerAdapterTester(pathYiid, "Casey", NotificationOutputType.XML,
                 false, skipData, false, false, listenersBroker);
-        adapter.setCloseVars(domDataBroker, databindProvider);
+        adapter.setCloseVars(databindProvider);
 
         final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
         final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, pathYiid);
         changeService.registerDataTreeChangeListener(root, adapter);
 
-        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
+        var writeTransaction = dataBroker.newWriteOnlyTransaction();
+        var builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
         final var iid = InstanceIdentifier.create(PatchCont.class)
                 .child(MyList1.class, new MyList1Key("Althea"));
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build());

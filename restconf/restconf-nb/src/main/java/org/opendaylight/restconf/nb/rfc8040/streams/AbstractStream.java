@@ -20,7 +20,6 @@ import javax.xml.xpath.XPathExpressionException;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
@@ -52,7 +51,6 @@ abstract class AbstractStream<T> {
 
     // FIXME: these really should not live here
     protected DatabindProvider databindProvider;
-    private DOMDataBroker dataBroker;
 
     AbstractStream(final String streamName, final NotificationOutputType outputType,
             final EventFormatterFactory<T> formatterFactory, final ListenersBroker listenersBroker) {
@@ -115,7 +113,7 @@ abstract class AbstractStream<T> {
         LOG.debug("Subscriber {} is removed", subscriber);
         if (subscribers.isEmpty()) {
             closeRegistration();
-            listenersBroker.removeStream(dataBroker, this);
+            listenersBroker.removeStream(this);
         }
     }
 
@@ -132,7 +130,7 @@ abstract class AbstractStream<T> {
             it.remove();
         }
 
-        listenersBroker.removeStream(dataBroker, this);
+        listenersBroker.removeStream(this);
     }
 
     @Holding("this")
@@ -233,13 +231,11 @@ abstract class AbstractStream<T> {
     /**
      * Data broker for delete data in DS on close().
      *
-     * @param dataBroker creating new write transaction for delete data on close
      * @param databindProvider for formatting notifications
      */
     @SuppressWarnings("checkstyle:hiddenField")
     // FIXME: this is pure lifecycle nightmare just because ...
-    public synchronized void setCloseVars(final DOMDataBroker dataBroker, final DatabindProvider databindProvider) {
-        this.dataBroker = dataBroker;
+    public synchronized void setCloseVars(final DatabindProvider databindProvider) {
         this.databindProvider = databindProvider;
     }
 

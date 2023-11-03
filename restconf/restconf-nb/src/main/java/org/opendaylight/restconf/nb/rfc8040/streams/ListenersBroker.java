@@ -71,6 +71,10 @@ public abstract sealed class ListenersBroker {
      * A ListenersBroker working with Server-Sent Events.
      */
     public static final class ServerSentEvents extends ListenersBroker {
+        public ServerSentEvents(final DOMDataBroker dataBroker) {
+            super(dataBroker);
+        }
+
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
             return uriInfo.getBaseUriBuilder()
@@ -83,6 +87,10 @@ public abstract sealed class ListenersBroker {
      * A ListenersBroker working with WebSockets.
      */
     public static final class WebSockets extends ListenersBroker {
+        public WebSockets(final DOMDataBroker dataBroker) {
+            super(dataBroker);
+        }
+
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
             final var scheme = switch (uriInfo.getAbsolutePath().getScheme()) {
@@ -209,9 +217,10 @@ public abstract sealed class ListenersBroker {
         NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionOutput.QNAME, "stream-name").intern());
 
     private final ConcurrentMap<String, AbstractStream<?>> streams = new ConcurrentHashMap<>();
+    private final DOMDataBroker dataBroker;
 
-    private ListenersBroker() {
-        // Hidden on purpose
+    private ListenersBroker(final DOMDataBroker dataBroker) {
+        this.dataBroker = requireNonNull(dataBroker);
     }
 
     /**
@@ -252,7 +261,7 @@ public abstract sealed class ListenersBroker {
      *
      * @param stream Stream to remove
      */
-    final void removeStream(final DOMDataBroker dataBroker, final AbstractStream<?> stream) {
+    final void removeStream(final AbstractStream<?> stream) {
         // Defensive check to see if we are still tracking the stream
         final var streamName = stream.getStreamName();
         if (streams.get(streamName) != stream) {

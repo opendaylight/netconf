@@ -22,26 +22,29 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @ExtendWith(MockitoExtension.class)
 class WebSocketFactoryTest extends AbstractNotificationListenerTest {
-    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
-
     @Mock
     private ScheduledExecutorService execService;
     @Mock
     private ServletUpgradeRequest upgradeRequest;
     @Mock
     private ServletUpgradeResponse upgradeResponse;
+    @Mock
+    private DOMDataBroker dataBroker;
 
+    private ListenersBroker listenersBroker;
     private WebSocketFactory webSocketFactory;
     private String streamName;
 
     @BeforeEach
     void prepareListenersBroker() {
+        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
         webSocketFactory = new WebSocketFactory(execService, listenersBroker, 5000, 2000);
 
         streamName = listenersBroker.createStream(name -> new ListenerAdapter(name, NotificationOutputType.JSON,
