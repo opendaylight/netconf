@@ -37,7 +37,7 @@ public class SSESessionHandlerTest {
     @Mock
     private ScheduledExecutorService executorService;
     @Mock
-    private BaseListenerInterface listener;
+    private AbstractStream<?> listener;
     @Mock
     private ScheduledFuture<?> pingFuture;
     @Mock

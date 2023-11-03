@@ -160,7 +160,7 @@ public abstract sealed class ListenersBroker {
      * @return {@link NotificationListenerAdapter} or {@link ListenerAdapter} object wrapped in {@link Optional}
      *     or {@link Optional#empty()} if listener with specified stream name doesn't exist.
      */
-    public final @Nullable BaseListenerInterface listenerFor(final String streamName) {
+    public final @Nullable AbstractStream<?> listenerFor(final String streamName) {
         if (streamName.startsWith(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
             return notificationListenerFor(streamName);
         } else if (streamName.startsWith(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
@@ -425,14 +425,14 @@ public abstract sealed class ListenersBroker {
     /**
      * Removal and closing of general listener (data-change or notification listener).
      *
-     * @param listener Listener to be closed and removed from cache.
+     * @param stream Stream to be closed and removed from cache.
      */
-    final void removeAndCloseListener(final BaseListenerInterface listener) {
-        requireNonNull(listener);
-        if (listener instanceof ListenerAdapter) {
-            removeAndCloseDataChangeListener((ListenerAdapter) listener);
-        } else if (listener instanceof NotificationListenerAdapter) {
-            removeAndCloseNotificationListener((NotificationListenerAdapter) listener);
+    final void removeAndCloseListener(final AbstractStream<?> stream) {
+        requireNonNull(stream);
+        if (stream instanceof ListenerAdapter dataChange) {
+            removeAndCloseDataChangeListener(dataChange);
+        } else if (stream instanceof NotificationListenerAdapter notification) {
+            removeAndCloseNotificationListener(notification);
         }
     }
 
