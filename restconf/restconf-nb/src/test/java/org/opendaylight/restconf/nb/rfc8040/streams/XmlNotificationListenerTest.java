@@ -13,9 +13,12 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -32,7 +35,15 @@ import org.xmlunit.assertj.XmlAssert;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class XmlNotificationListenerTest extends AbstractNotificationListenerTest {
-    private final ListenersBroker listenersBroker = new ListenersBroker.ServerSentEvents();
+    @Mock
+    private DOMDataBroker dataBroker;
+
+    private ListenersBroker listenersBroker;
+
+    @Before
+    public void before() {
+        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
+    }
 
     @Test
     public void notifi_leafTest() throws Exception {
