@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -38,12 +40,12 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
     private static final byte[] PING_PAYLOAD = "ping".getBytes(Charset.defaultCharset());
 
     private final ScheduledExecutorService executorService;
-    // FIXME: this really should include formatter etc.
-    private final RestconfStream<?> listener;
+    private final RestconfStream<?> stream;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
     private Session session;
+    private Subscriber<?> subscriber;
     private ScheduledFuture<?> pingProcess;
 
     /**
@@ -52,7 +54,7 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
      * @param executorService       Executor that is used for periodical sending of web-socket ping messages to keep
      *                              session up even if the notifications doesn't flow from server to clients or clients
      *                              don't implement ping-pong service.
-     * @param listener              YANG notification or data-change event listener to which client on this web-socket
+     * @param stream                YANG notification or data-change event listener to which client on this web-socket
      *                              session subscribes to.
      * @param maximumFragmentLength Maximum fragment length in number of Unicode code units (characters).
      *                              If this parameter is set to 0, the maximum fragment length is disabled and messages
@@ -62,10 +64,10 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
      * @param heartbeatInterval     Interval in milliseconds of sending of ping control frames to remote endpoint
      *                              to keep session up. Ping control frames are disabled if this parameter is set to 0.
      */
-    WebSocketSessionHandler(final ScheduledExecutorService executorService, final RestconfStream<?> listener,
+    WebSocketSessionHandler(final ScheduledExecutorService executorService, final RestconfStream<?> stream,
             final int maximumFragmentLength, final int heartbeatInterval) {
-        this.executorService = executorService;
-        this.listener = listener;
+        this.executorService = requireNonNull(executorService);
+        this.stream = requireNonNull(stream);
         this.maximumFragmentLength = maximumFragmentLength;
         this.heartbeatInterval = heartbeatInterval;
     }
@@ -82,7 +84,8 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
     public synchronized void onWebSocketConnected(final Session webSocketSession) {
         if (session == null || !session.isOpen()) {
             session = webSocketSession;
-            listener.addSubscriber(this);
+            subscriber = stream.addSubscriber(this);
+
             LOG.debug("A new web-socket session {} has been successfully registered.", webSocketSession);
             if (heartbeatInterval != 0) {
                 // sending of PING frame can be long if there is an error on web-socket - from this reason
@@ -108,7 +111,7 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
         if (session != null) {
             LOG.debug("Web-socket session has been closed with status code {} and reason message: {}.",
                     statusCode, reason);
-            listener.removeSubscriber(this);
+            stream.removeSubscriber(subscriber);
             stopPingProcess();
         }
     }
@@ -130,7 +133,7 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
         }
         if (session != null) {
             LOG.info("Trying to close web-socket session {} gracefully after error.", session);
-            listener.removeSubscriber(this);
+            stream.removeSubscriber(this);
             if (session.isOpen()) {
                 session.close();
             }

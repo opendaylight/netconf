@@ -12,13 +12,14 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
-import java.util.HashSet;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
-import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
@@ -62,15 +63,25 @@ public abstract class RestconfStream<T> {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
+    private static final VarHandle SUBSCRIBERS;
+
+    static {
+        try {
+            SUBSCRIBERS = MethodHandles.lookup().findVarHandle(RestconfStream.class, "subscribers", Subscribers.class);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     // ImmutableMap because it retains iteration order
     private final @NonNull ImmutableMap<EncodingName, ? extends EventFormatterFactory<T>> encodings;
     private final @NonNull ListenersBroker listenersBroker;
     private final @NonNull String name;
 
-    @GuardedBy("this")
-    private final Set<StreamSessionHandler> subscribers = new HashSet<>();
-    @GuardedBy("this")
+    // Accessed via SUBSCRIBERS, 'null' indicates we have been shut down
+    @SuppressWarnings("unused")
+    private volatile Subscribers<T> subscribers = Subscribers.empty();
+
     private Registration registration;
 
     // FIXME: NETCONF-1102: this should be tied to a subscriber
@@ -136,53 +147,102 @@ public abstract class RestconfStream<T> {
     /**
      * Registers {@link StreamSessionHandler} subscriber.
      *
-     * @param subscriber SSE or WS session handler.
+     * @param handler SSE or WS session handler.
+     * @return A new {@link Subscriber}, or {@code null} if the subscriber cannot be added
+     * @throws NullPointerException if any argument is {@code null}
      */
-    synchronized void addSubscriber(final StreamSessionHandler subscriber) {
-        if (!subscriber.isConnected()) {
-            throw new IllegalStateException(subscriber + " is not connected");
+    @Nullable Subscriber<?> addSubscriber(final StreamSessionHandler handler) {
+        if (!handler.isConnected()) {
+            throw new IllegalStateException(handler + " is not connected");
         }
-        LOG.debug("Subscriber {} is added.", subscriber);
-        subscribers.add(subscriber);
+
+        // Lockless add of a subscriber. If we observe a null this stream is dead before the new subscriber could be
+        // added.
+        final var toAdd = new Subscriber<>(formatter, handler);
+        var observed = acquireSubscribers();
+        while (observed != null) {
+            final var next = observed.add(toAdd);
+            final var witness = (Subscribers<T>) SUBSCRIBERS.compareAndExchangeRelease(this, observed, next);
+            if (witness == observed) {
+                LOG.debug("Subscriber {} is added.", handler);
+                return toAdd;
+            }
+
+            // We have raced: retry the operation
+            observed = witness;
+        }
+        return null;
     }
 
     /**
-     * Removes {@link StreamSessionHandler} subscriber. If this was the last subscriber also shut down this stream and
-     * initiate its removal from global state.
+     * Removes a {@link Subscriber}. If this was the last subscriber also shut down this stream and initiate its removal
+     * from global state.
      *
-     * @param subscriber SSE or WS session handler.
+     * @param subscriber The {@link Subscriber} to remove
+     * @throws NullPointerException if {@code subscriber} is {@code null}
      */
-    synchronized void removeSubscriber(final StreamSessionHandler subscriber) {
-        subscribers.remove(subscriber);
-        LOG.debug("Subscriber {} is removed", subscriber);
-        if (subscribers.isEmpty()) {
-            closeRegistration();
-            listenersBroker.removeStream(this);
+    void removeSubscriber(final Subscriber<?> subscriber) {
+        final var toRemove = requireNonNull(subscriber);
+        var observed = acquireSubscribers();
+        while (observed != null) {
+            final var next = observed.remove(toRemove);
+            final var witness = (Subscribers<T>) SUBSCRIBERS.compareAndExchangeRelease(this, observed, next);
+            if (witness == observed) {
+                LOG.debug("Subscriber {} is removed", subscriber);
+                if (next == null) {
+                    // We have lost the last subscriber, terminate.
+                    terminate();
+                }
+                return;
+            }
+
+            // We have raced: retry the operation
+            observed = witness;
         }
+    }
+
+    private Subscribers<T> acquireSubscribers() {
+        return (Subscribers<T>) SUBSCRIBERS.getAcquire(this);
     }
 
     /**
      * Signal the end-of-stream condition to subscribers, shut down this stream and initiate its removal from global
      * state.
      */
-    final synchronized void endOfStream() {
-        closeRegistration();
-
-        final var it = subscribers.iterator();
-        while (it.hasNext()) {
-            it.next().endOfStream();
-            it.remove();
+    final void endOfStream() {
+        // Atomic assertion we are ending plus locked clean up
+        final var local = (Subscribers<T>) SUBSCRIBERS.getAndSetRelease(this, null);
+        if (local != null) {
+            terminate();
+            local.iterator().forEachRemaining(subscriber -> subscriber.handler().endOfStream());
         }
-
-        listenersBroker.removeStream(this);
     }
 
-    @Holding("this")
-    private void closeRegistration() {
+
+    /**
+     * Post data to subscribed SSE session handlers.
+     *
+     * @param data Data of incoming notifications.
+     */
+    void post(final String data) {
+        final var local = acquireSubscribers();
+        if (local != null) {
+            for (var sub : local) {
+                final var handler = sub.handler();
+                if (handler.isConnected()) {
+                    handler.sendDataMessage(data);
+                    LOG.debug("Data was sent to subscriber {} on connection {}:", this, handler);
+                }
+            }
+        }
+    }
+
+    private void terminate() {
         if (registration != null) {
             registration.close();
             registration = null;
         }
+        listenersBroker.removeStream(this);
     }
 
     /**
@@ -248,27 +308,6 @@ public abstract class RestconfStream<T> {
     @Holding("this")
     final boolean isListening() {
         return registration != null;
-    }
-
-    /**
-     * Post data to subscribed SSE session handlers.
-     *
-     * @param data Data of incoming notifications.
-     */
-    synchronized void post(final String data) {
-        final var iterator = subscribers.iterator();
-        while (iterator.hasNext()) {
-            final var subscriber = iterator.next();
-            if (subscriber.isConnected()) {
-                subscriber.sendDataMessage(data);
-                LOG.debug("Data was sent to subscriber {} on connection {}:", this, subscriber);
-            } else {
-                // removal is probably not necessary, because it will be removed explicitly soon after invocation of
-                // onWebSocketClosed(..) in handler; but just to be sure ...
-                iterator.remove();
-                LOG.debug("Subscriber for {} was removed - web-socket session is not open.", this);
-            }
-        }
     }
 
     @Override

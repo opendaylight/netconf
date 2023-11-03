@@ -71,7 +71,7 @@ public class SSESessionHandlerTest {
     @Test
     public void onSSEConnectedWithDisabledPing() {
         final int heartbeatInterval = 0;
-        final SSESessionHandler sseSessionHandler = setup(1000, heartbeatInterval);
+        final var sseSessionHandler = setup(1000, heartbeatInterval);
 
         sseSessionHandler.init();
         verify(listener).addSubscriber(sseSessionHandler);
@@ -80,30 +80,30 @@ public class SSESessionHandlerTest {
 
     @Test
     public void onSSEClosedWithOpenSession() {
-        final SSESessionHandler sseSessionHandler = setup(200, 10000);
+        final var sseSessionHandler = setup(200, 10000);
 
         sseSessionHandler.init();
         verify(listener).addSubscriber(sseSessionHandler);
 
         sseSessionHandler.close();
-        verify(listener).removeSubscriber(sseSessionHandler);
+        verify(listener).removeSubscriber(any());
     }
 
     @Test
     public void onSSECloseWithEnabledPingAndLivingSession() throws IOException {
-        final SSESessionHandler sseSessionHandler = setup(150, 8000);
+        final var sseSessionHandler = setup(150, 8000);
         sseSessionHandler.init();
         doReturn(false).when(pingFuture).isCancelled();
         doReturn(false).when(pingFuture).isDone();
 
         sseSessionHandler.close();
-        verify(listener).removeSubscriber(sseSessionHandler);
+        verify(listener).removeSubscriber(any());
         verify(pingFuture).cancel(anyBoolean());
     }
 
     @Test
     public void onSSECloseWithEnabledPingAndDeadSession() {
-        final SSESessionHandler sseSessionHandler = setup(150, 8000);
+        final var sseSessionHandler = setup(150, 8000);
         sseSessionHandler.init();
 
         sseSessionHandler.close();
@@ -113,26 +113,26 @@ public class SSESessionHandlerTest {
 
     @Test
     public void onSSECloseWithDisabledPingAndDeadSession() {
-        final SSESessionHandler sseSessionHandler = setup(150, 8000);
+        final var sseSessionHandler = setup(150, 8000);
         sseSessionHandler.init();
         doReturn(true).when(pingFuture).isDone();
 
         sseSessionHandler.close();
-        verify(listener).removeSubscriber(sseSessionHandler);
+        verify(listener).removeSubscriber(any());
         verify(pingFuture, never()).cancel(anyBoolean());
     }
 
     @Test
     public void sendDataMessageWithDisabledFragmentation() throws IOException {
-        final SSESessionHandler sseSessionHandler = setup(0, 0);
+        final var sseSessionHandler = setup(0, 0);
         doReturn(false).when(eventSink).isClosed();
         sseSessionHandler.init();
         final String testMessage = generateRandomStringOfLength(100);
         sseSessionHandler.sendDataMessage(testMessage);
 
-        ArgumentCaptor<OutboundEvent> cap = ArgumentCaptor.forClass(OutboundEvent.class);
+        final var cap = ArgumentCaptor.forClass(OutboundEvent.class);
         verify(eventSink, times(1)).send(cap.capture());
-        OutboundEvent event = cap.getAllValues().get(0);
+        final var event = cap.getAllValues().get(0);
         assertNotNull(event);
         assertEquals(event.getData(), testMessage);
     }
@@ -145,8 +145,7 @@ public class SSESessionHandlerTest {
 
         final String testMessage = generateRandomStringOfLength(11);
         sseSessionHandler.sendDataMessage(testMessage);
-        ArgumentCaptor<OutboundEvent> cap = ArgumentCaptor.forClass(OutboundEvent.class);
-        verify(eventSink, times(0)).send(cap.capture());
+        verify(eventSink, times(0)).send(any());
     }
 
     @Test

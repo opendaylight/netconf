@@ -27,14 +27,14 @@ public final class SSESessionHandler implements StreamSessionHandler {
     private static final CharMatcher CR_OR_LF = CharMatcher.anyOf("\r\n");
 
     private final ScheduledExecutorService executorService;
-    // FIXME: this really should include subscription details like formatter etc.
-    private final RestconfStream<?> listener;
+    private final RestconfStream<?> stream;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
     private final SseEventSink sink;
     private final Sse sse;
 
     private ScheduledFuture<?> pingProcess;
+    private Subscriber<?> subscriber;
 
     /**
      * Creation of the new server-sent events session handler.
@@ -57,7 +57,7 @@ public final class SSESessionHandler implements StreamSessionHandler {
         this.executorService = executorService;
         this.sse = sse;
         this.sink = sink;
-        this.listener = listener;
+        stream = listener;
         this.maximumFragmentLength = maximumFragmentLength;
         this.heartbeatInterval = heartbeatInterval;
     }
@@ -66,12 +66,18 @@ public final class SSESessionHandler implements StreamSessionHandler {
      * Initialization of SSE connection. SSE session handler is registered at data-change-event / YANG notification
      * listener and the heartbeat ping process is started if it is enabled.
      */
-    public synchronized void init() {
-        listener.addSubscriber(this);
+    public synchronized boolean init() {
+        final var local = stream.addSubscriber(this);
+        if (local == null) {
+            return false;
+        }
+
+        subscriber = local;
         if (heartbeatInterval != 0) {
             pingProcess = executorService.scheduleWithFixedDelay(this::sendPingMessage, heartbeatInterval,
-                    heartbeatInterval, TimeUnit.MILLISECONDS);
+                heartbeatInterval, TimeUnit.MILLISECONDS);
         }
+        return true;
     }
 
     /**
@@ -79,8 +85,11 @@ public final class SSESessionHandler implements StreamSessionHandler {
      */
     @VisibleForTesting
     synchronized void close() {
-        listener.removeSubscriber(this);
-        stopPingProcess();
+        final var local = subscriber;
+        if (local != null) {
+            stream.removeSubscriber(local);
+            stopPingProcess();
+        }
     }
 
     @Override
