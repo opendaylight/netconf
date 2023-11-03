@@ -13,6 +13,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -29,6 +31,7 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.opendaylight.yangtools.concepts.Registration;
 
 public class WebSocketSessionHandlerTest {
     private static final class WebSocketTestSessionState {
@@ -82,27 +85,28 @@ public class WebSocketSessionHandlerTest {
 
     @Test
     public void onWebSocketConnectedWithAlreadyOpenSession() {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final Session session = mock(Session.class);
+        final var webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
+        final var session = mock(Session.class);
         when(session.isOpen()).thenReturn(true);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        verify(webSocketTestSessionState.listener, times(1)).addSubscriber(any());
+        verify(webSocketTestSessionState.listener).addSubscriber(any());
     }
 
     @Test
     public void onWebSocketClosedWithOpenSession() {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(200, 10000);
-        final Session session = mock(Session.class);
+        final var webSocketTestSessionState = new WebSocketTestSessionState(200, 10000);
+        final var session = mock(Session.class);
+        final var reg = mock(Registration.class);
 
+        doReturn(reg).when(webSocketTestSessionState.listener)
+            .addSubscriber(webSocketTestSessionState.webSocketSessionHandler);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        verify(webSocketTestSessionState.listener).addSubscriber(
-                webSocketTestSessionState.webSocketSessionHandler);
+        verify(webSocketTestSessionState.listener).addSubscriber(webSocketTestSessionState.webSocketSessionHandler);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketClosed(200, "Simulated close");
-        verify(webSocketTestSessionState.listener).removeSubscriber(
-                webSocketTestSessionState.webSocketSessionHandler);
+        verify(reg).close();
     }
 
     @Test
@@ -114,58 +118,68 @@ public class WebSocketSessionHandlerTest {
 
     @Test
     public void onWebSocketErrorWithEnabledPingAndLivingSession() {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final Session session = mock(Session.class);
+        final var webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
+        final var session = mock(Session.class);
+        final var reg = mock(Registration.class);
+
         when(session.isOpen()).thenReturn(true);
-        final Throwable sampleError = new IllegalStateException("Simulated error");
+        when(webSocketTestSessionState.listener.addSubscriber(webSocketTestSessionState.webSocketSessionHandler))
+            .thenReturn(reg);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
         when(webSocketTestSessionState.pingFuture.isCancelled()).thenReturn(false);
         when(webSocketTestSessionState.pingFuture.isDone()).thenReturn(false);
 
+        final var sampleError = new IllegalStateException("Simulated error");
+        doNothing().when(reg).close();
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
-        verify(webSocketTestSessionState.listener).removeSubscriber(
-                webSocketTestSessionState.webSocketSessionHandler);
+        verify(reg).close();
         verify(session).close();
         verify(webSocketTestSessionState.pingFuture).cancel(anyBoolean());
     }
 
     @Test
     public void onWebSocketErrorWithEnabledPingAndDeadSession() {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final Session session = mock(Session.class);
+        final var webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
+        final var session = mock(Session.class);
+        final var reg = mock(Registration.class);
+
         when(session.isOpen()).thenReturn(false);
-        final Throwable sampleError = new IllegalStateException("Simulated error");
+        when(webSocketTestSessionState.listener.addSubscriber(webSocketTestSessionState.webSocketSessionHandler))
+            .thenReturn(reg);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
+        final var sampleError = new IllegalStateException("Simulated error");
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
-        verify(webSocketTestSessionState.listener).removeSubscriber(
-                webSocketTestSessionState.webSocketSessionHandler);
+        verify(reg).close();
         verify(session, never()).close();
         verify(webSocketTestSessionState.pingFuture).cancel(anyBoolean());
     }
 
     @Test
     public void onWebSocketErrorWithDisabledPingAndDeadSession() {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final Session session = mock(Session.class);
+        final var webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
+        final var session = mock(Session.class);
+        final var reg = mock(Registration.class);
+
         when(session.isOpen()).thenReturn(false);
-        final Throwable sampleError = new IllegalStateException("Simulated error");
+        when(webSocketTestSessionState.listener.addSubscriber(webSocketTestSessionState.webSocketSessionHandler))
+            .thenReturn(reg);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
         when(webSocketTestSessionState.pingFuture.isCancelled()).thenReturn(false);
         when(webSocketTestSessionState.pingFuture.isDone()).thenReturn(true);
 
+        final var sampleError = new IllegalStateException("Simulated error");
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
-        verify(webSocketTestSessionState.listener).removeSubscriber(
-                webSocketTestSessionState.webSocketSessionHandler);
+        verify(reg).close();
         verify(session, never()).close();
         verify(webSocketTestSessionState.pingFuture, never()).cancel(anyBoolean());
     }
 
     @Test
     public void sendDataMessageWithDisabledFragmentation() throws IOException {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(0, 0);
-        final Session session = mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+        final var webSocketTestSessionState = new WebSocketTestSessionState(0, 0);
+        final var session = mock(Session.class);
+        final var remoteEndpoint = mock(RemoteEndpoint.class);
         when(session.isOpen()).thenReturn(true);
         when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);

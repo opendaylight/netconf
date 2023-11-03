@@ -15,15 +15,12 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for functionality shared between {@link NotificationStream} and
  * {@link DeviceNotificationStream}.
  */
 abstract class AbstractNotificationStream extends RestconfStream<DOMNotification> implements DOMNotificationListener {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationStream.class);
     private static final ImmutableMap<EncodingName, NotificationFormatterFactory> ENCODINGS = ImmutableMap.of(
         EncodingName.RFC8040_JSON, JSONNotificationFormatter.FACTORY,
         EncodingName.RFC8040_XML, XMLNotificationFormatter.FACTORY);
@@ -36,17 +33,8 @@ abstract class AbstractNotificationStream extends RestconfStream<DOMNotification
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
     public final void onNotification(final DOMNotification notification) {
-        final var eventInstant = notification instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now();
-        final String data;
-        try {
-            data = formatter().eventData(effectiveModel(), notification, eventInstant);
-        } catch (Exception e) {
-            LOG.error("Failed to process notification {}", notification, e);
-            return;
-        }
-        if (data != null) {
-            post(data);
-        }
+        sendDataMessage(effectiveModel(), notification,
+            notification instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now());
     }
 
     abstract @NonNull EffectiveModelContext effectiveModel();
