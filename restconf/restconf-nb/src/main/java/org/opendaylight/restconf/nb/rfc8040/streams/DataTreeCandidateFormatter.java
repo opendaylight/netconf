@@ -7,17 +7,14 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
-import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.DATA_CHANGE_EVENT_ELEMENT;
-import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.SAL_REMOTE_NAMESPACE;
-import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.XML_OUTPUT_FACTORY;
-
 import java.io.IOException;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathExpressionException;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
@@ -30,6 +27,10 @@ import org.w3c.dom.Element;
  * Base formatter for DataTreeCandidates which only handles exporting to a document for filter checking purpose.
  */
 abstract class DataTreeCandidateFormatter extends EventFormatter<List<DataTreeCandidate>> {
+    private static final String DATA_CHANGE_EVENT_ELEMENT = DataChangeEvent.QNAME.getLocalName();
+    static final String DATA_CHANGED_NOTIFICATION_ELEMENT = DataChangedNotification.QNAME.getLocalName();
+    static final String DATA_CHANGED_NOTIFICATION_NS = DataChangedNotification.QNAME.getNamespace().toString();
+
     DataTreeCandidateFormatter(final TextParameters textParams) {
         super(textParams);
     }
@@ -44,7 +45,7 @@ abstract class DataTreeCandidateFormatter extends EventFormatter<List<DataTreeCa
             final List<DataTreeCandidate> input) throws IOException {
         final Element notificationElement = NotificationFormatter.createNotificationElement(doc);
         final Element notificationEventElement = doc.createElementNS(
-            SAL_REMOTE_NAMESPACE, DATA_CHANGED_NOTIFICATION_ELEMENT);
+            DATA_CHANGED_NOTIFICATION_NS, DATA_CHANGED_NOTIFICATION_ELEMENT);
 
         for (DataTreeCandidate candidate : input) {
             final Element dataChangedElement = doc.createElement(DATA_CHANGE_EVENT_ELEMENT);

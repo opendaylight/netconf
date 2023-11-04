@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -53,6 +54,8 @@ abstract class EventFormatter<T> implements Immutable {
         }
         DBF = f;
     }
+
+    static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
 
     private final TextParameters textParams;
     private final XPathExpression filter;

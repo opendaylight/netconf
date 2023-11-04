@@ -7,9 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
-import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.SAL_REMOTE_NAMESPACE;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Instant;
@@ -53,8 +50,8 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
         try {
             final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now);
             xmlStreamWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, DATA_CHANGED_NOTIFICATION_ELEMENT,
-                SAL_REMOTE_NAMESPACE);
-            xmlStreamWriter.writeDefaultNamespace(SAL_REMOTE_NAMESPACE);
+                DATA_CHANGED_NOTIFICATION_NS);
+            xmlStreamWriter.writeDefaultNamespace(DATA_CHANGED_NOTIFICATION_NS);
 
             final var serializer = new XmlDataTreeCandidateSerializer(schemaContext, xmlStreamWriter);
             for (var candidate : input) {
