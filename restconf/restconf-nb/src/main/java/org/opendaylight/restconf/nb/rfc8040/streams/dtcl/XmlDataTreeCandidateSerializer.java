@@ -5,13 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.dtcl;
 
 import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
 import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.nb.rfc8040.streams.AbstractWebsocketSerializer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -37,7 +38,7 @@ final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<E
     }
 
     @Override
-    void serializeData(final Inference parent, final Collection<PathArgument> dataPath,
+    protected void serializeData(final Inference parent, final Collection<PathArgument> dataPath,
             final DataTreeCandidateNode candidate, final boolean skipData) throws Exception {
         final var modificationType = candidate.modificationType();
         if (modificationType != ModificationType.UNMODIFIED) {

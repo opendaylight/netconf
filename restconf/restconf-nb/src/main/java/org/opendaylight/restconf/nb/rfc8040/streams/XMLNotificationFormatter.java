@@ -23,12 +23,12 @@ final class XMLNotificationFormatter extends NotificationFormatter {
     static final XMLNotificationFormatter EMPTY = new XMLNotificationFormatter(TextParameters.EMPTY);
     static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory(EMPTY) {
         @Override
-        XMLNotificationFormatter newFormatter(final TextParameters textParams) {
+        protected XMLNotificationFormatter newFormatter(final TextParameters textParams) {
             return new XMLNotificationFormatter(textParams);
         }
 
         @Override
-        XMLNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+        protected XMLNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
                 throws XPathExpressionException {
             return new XMLNotificationFormatter(textParams, xpathFilter);
         }
@@ -44,7 +44,7 @@ final class XMLNotificationFormatter extends NotificationFormatter {
     }
 
     @Override
-    String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+    protected String createText(final TextParameters params, final EffectiveModelContext schemaContext,
             final DOMNotification input, final Instant now) throws IOException {
         final var writer = new StringWriter();
 

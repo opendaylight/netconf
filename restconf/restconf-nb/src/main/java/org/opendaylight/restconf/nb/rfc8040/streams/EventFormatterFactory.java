@@ -12,10 +12,10 @@ import static java.util.Objects.requireNonNull;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 
-abstract class EventFormatterFactory<T> {
+public abstract class EventFormatterFactory<T> {
     private final @NonNull EventFormatter<T> emptyFormatter;
 
-    EventFormatterFactory(final EventFormatter<T> emptyFormatter) {
+    protected EventFormatterFactory(final EventFormatter<T> emptyFormatter) {
         this.emptyFormatter = requireNonNull(emptyFormatter);
     }
 
@@ -27,8 +27,8 @@ abstract class EventFormatterFactory<T> {
         return textParamaters.equals(TextParameters.EMPTY) ? emptyFormatter : newFormatter(textParamaters);
     }
 
-    abstract @NonNull EventFormatter<T> getFormatter(@NonNull TextParameters textParamaters, String xpathFilter)
-        throws XPathExpressionException;
+    protected abstract @NonNull EventFormatter<T> getFormatter(@NonNull TextParameters textParamaters,
+        String xpathFilter) throws XPathExpressionException;
 
-    abstract @NonNull EventFormatter<T> newFormatter(@NonNull TextParameters textParamaters);
+    protected abstract @NonNull EventFormatter<T> newFormatter(@NonNull TextParameters textParamaters);
 }
