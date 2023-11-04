@@ -41,17 +41,18 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class AbstractWebsocketSerializer<T extends Exception> {
+public abstract class AbstractWebsocketSerializer<T extends Exception> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractWebsocketSerializer.class);
+
     static final @NonNull QName PATH_QNAME = QName.create(DataChangeEvent.QNAME, "path").intern();
-    static final @NonNull NodeIdentifier PATH_NID = NodeIdentifier.create(PATH_QNAME);
-    static final @NonNull QName OPERATION_QNAME = QName.create(DataChangeEvent.QNAME, "operation").intern();
-    static final @NonNull NodeIdentifier OPERATION_NID = NodeIdentifier.create(OPERATION_QNAME);
+    protected static final @NonNull NodeIdentifier PATH_NID = NodeIdentifier.create(PATH_QNAME);
+    protected static final @NonNull QName OPERATION_QNAME = QName.create(DataChangeEvent.QNAME, "operation").intern();
+    protected static final @NonNull NodeIdentifier OPERATION_NID = NodeIdentifier.create(OPERATION_QNAME);
     static final @NonNull String DATA_NAME = Data.QNAME.getLocalName();
 
     private final EffectiveModelContext context;
 
-    AbstractWebsocketSerializer(final EffectiveModelContext context) {
+    protected AbstractWebsocketSerializer(final EffectiveModelContext context) {
         this.context = requireNonNull(context);
     }
 
@@ -185,8 +186,8 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         serializeData(stack.toInference(), dataPath, candidate, skipData);
     }
 
-    abstract void serializeData(Inference parent, Collection<PathArgument> dataPath, DataTreeCandidateNode candidate,
-        boolean skipData) throws T;
+    protected abstract void serializeData(Inference parent, Collection<PathArgument> dataPath,
+        DataTreeCandidateNode candidate, boolean skipData) throws T;
 
     private static boolean isNotUpdate(final DataTreeCandidateNode node) {
         final var before = node.dataBefore();
@@ -195,7 +196,7 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         return before != null && after != null && before.body().equals(after.body());
     }
 
-    static final @Nullable NormalizedNode getDataAfter(final DataTreeCandidateNode candidate) {
+    protected static final @Nullable NormalizedNode getDataAfter(final DataTreeCandidateNode candidate) {
         final var data = candidate.dataAfter();
         if (data instanceof MapEntryNode mapEntry) {
             return ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).withChild(mapEntry).build();
@@ -203,7 +204,7 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
         return data;
     }
 
-    static final @NonNull String modificationTypeToOperation(final DataTreeCandidateNode candidate) {
+    protected static final @NonNull String modificationTypeToOperation(final DataTreeCandidateNode candidate) {
         final var operation = switch (candidate.modificationType()) {
             case APPEARED, SUBTREE_MODIFIED, WRITE -> candidate.dataBefore() != null ? Operation.Updated
                 : Operation.Created;

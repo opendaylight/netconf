@@ -37,7 +37,7 @@ final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<E
     }
 
     @Override
-    void serializeData(final Inference parent, final Collection<PathArgument> dataPath,
+    protected void serializeData(final Inference parent, final Collection<PathArgument> dataPath,
             final DataTreeCandidateNode candidate, final boolean skipData) throws Exception {
         final var modificationType = candidate.modificationType();
         if (modificationType != ModificationType.UNMODIFIED) {
