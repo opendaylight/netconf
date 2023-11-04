@@ -29,7 +29,7 @@ import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
 
-abstract class EventFormatter<T> implements Immutable {
+public abstract class EventFormatter<T> implements Immutable {
     private static final XPathFactory XPF = XPathFactory.newInstance();
 
     // FIXME: NETCONF-369: XPath operates without namespace context, therefore we need an namespace-unaware builder.
@@ -55,17 +55,17 @@ abstract class EventFormatter<T> implements Immutable {
         DBF = f;
     }
 
-    static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
+    protected static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
 
     private final TextParameters textParams;
     private final XPathExpression filter;
 
-    EventFormatter(final TextParameters textParams)  {
+    protected EventFormatter(final TextParameters textParams)  {
         this.textParams = requireNonNull(textParams);
         filter = null;
     }
 
-    EventFormatter(final TextParameters params, final String xpathFilter) throws XPathExpressionException {
+    protected EventFormatter(final TextParameters params, final String xpathFilter) throws XPathExpressionException {
         textParams = requireNonNull(params);
 
         final XPath xpath;
@@ -89,7 +89,7 @@ abstract class EventFormatter<T> implements Immutable {
      * @param input data to export
      * @throws IOException if any IOException occurs during export to the document
      */
-    abstract void fillDocument(Document doc, EffectiveModelContext schemaContext, T input) throws IOException;
+    protected abstract void fillDocument(Document doc, EffectiveModelContext schemaContext, T input) throws IOException;
 
     /**
      * Format the input data into string representation of the data provided.
@@ -101,8 +101,8 @@ abstract class EventFormatter<T> implements Immutable {
      * @return String representation of the formatted data
      * @throws Exception if the underlying formatters fail to export the data to the requested format
      */
-    abstract String createText(TextParameters params, EffectiveModelContext schemaContext, T input, Instant now)
-        throws Exception;
+    protected abstract String createText(TextParameters params, EffectiveModelContext schemaContext, T input,
+        Instant now) throws Exception;
 
     private boolean filterMatches(final EffectiveModelContext schemaContext, final T input, final Instant now)
             throws IOException {
@@ -134,7 +134,7 @@ abstract class EventFormatter<T> implements Immutable {
      * @param now time stamp
      * @return Data specified by RFC3339.
      */
-    static String toRFC3339(final Instant now) {
+    protected static final String toRFC3339(final Instant now) {
         return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(now, ZoneId.systemDefault()));
     }
 }

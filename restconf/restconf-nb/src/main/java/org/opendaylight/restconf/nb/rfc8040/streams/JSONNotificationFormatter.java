@@ -28,13 +28,13 @@ final class JSONNotificationFormatter extends NotificationFormatter {
 
     static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory(EMPTY) {
         @Override
-        JSONNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+        protected JSONNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
                 throws XPathExpressionException {
             return new JSONNotificationFormatter(textParams, xpathFilter);
         }
 
         @Override
-        JSONNotificationFormatter newFormatter(final TextParameters textParams) {
+        protected JSONNotificationFormatter newFormatter(final TextParameters textParams) {
             return new JSONNotificationFormatter(textParams);
         }
     };
@@ -49,7 +49,7 @@ final class JSONNotificationFormatter extends NotificationFormatter {
     }
 
     @Override
-    String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+    protected String createText(final TextParameters params, final EffectiveModelContext schemaContext,
             final DOMNotification input, final Instant now) throws IOException {
         try (var writer = new StringWriter()) {
             try (var jsonWriter = new JsonWriter(writer)) {

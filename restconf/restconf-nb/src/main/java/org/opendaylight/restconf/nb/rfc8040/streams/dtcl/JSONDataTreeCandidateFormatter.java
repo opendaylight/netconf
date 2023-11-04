@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.dtcl;
 
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.util.List;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.nb.rfc8040.streams.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
@@ -29,12 +30,12 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
 
     static final DataTreeCandidateFormatterFactory FACTORY = new DataTreeCandidateFormatterFactory(EMPTY) {
         @Override
-        DataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
+        protected DataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
             return new JSONDataTreeCandidateFormatter(textParams);
         }
 
         @Override
-        DataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+        protected DataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
                 throws XPathExpressionException {
             return new JSONDataTreeCandidateFormatter(textParams, xpathFilter);
         }
@@ -50,7 +51,7 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
     }
 
     @Override
-    String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+    protected String createText(final TextParameters params, final EffectiveModelContext schemaContext,
             final List<DataTreeCandidate> input, final Instant now) throws IOException {
         try (var writer = new StringWriter()) {
             boolean nonEmpty = false;

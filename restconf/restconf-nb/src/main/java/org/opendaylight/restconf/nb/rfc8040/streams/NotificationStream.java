@@ -55,7 +55,7 @@ public final class NotificationStream extends AbstractNotificationStream {
     }
 
     @Override
-    ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return super.addToStringAttributes(helper.add("paths", paths));
     }
 }

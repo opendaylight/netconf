@@ -311,7 +311,7 @@ public abstract class RestconfStream<T> {
         return addToStringAttributes(MoreObjects.toStringHelper(this)).toString();
     }
 
-    ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return helper.add("name", name).add("output-type", outputType.getName());
     }
 }
