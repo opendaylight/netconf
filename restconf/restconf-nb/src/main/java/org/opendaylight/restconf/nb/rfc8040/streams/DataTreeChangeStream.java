@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +33,9 @@ import org.slf4j.LoggerFactory;
 public class DataTreeChangeStream extends RestconfStream<List<DataTreeCandidate>>
         implements ClusteredDOMDataTreeChangeListener {
     private static final Logger LOG = LoggerFactory.getLogger(DataTreeChangeStream.class);
+    private static final ImmutableMap<EncodingName, DataTreeCandidateFormatterFactory> ENCODINGS = ImmutableMap.of(
+        EncodingName.RFC8040_JSON, JSONDataTreeCandidateFormatter.FACTORY,
+        EncodingName.RFC8040_XML, XMLDataTreeCandidateFormatter.FACTORY);
 
     private final DatabindProvider databindProvider;
     private final @NonNull LogicalDatastoreType datastore;
@@ -40,10 +44,7 @@ public class DataTreeChangeStream extends RestconfStream<List<DataTreeCandidate>
     DataTreeChangeStream(final ListenersBroker listenersBroker, final String name,
             final NotificationOutputType outputType, final DatabindProvider databindProvider,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
-        super(listenersBroker, name, outputType, switch (outputType) {
-            case JSON -> JSONDataTreeCandidateFormatter.FACTORY;
-            case XML -> XMLDataTreeCandidateFormatter.FACTORY;
-        });
+        super(listenersBroker, name, ENCODINGS, outputType);
         this.databindProvider = requireNonNull(databindProvider);
         this.datastore = requireNonNull(datastore);
         this.path = requireNonNull(path);
