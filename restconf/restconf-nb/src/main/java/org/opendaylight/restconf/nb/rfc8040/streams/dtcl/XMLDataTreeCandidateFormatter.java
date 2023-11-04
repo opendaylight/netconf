@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.dtcl;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -14,6 +14,7 @@ import java.util.List;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
+import org.opendaylight.restconf.nb.rfc8040.streams.TextParameters;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -22,13 +23,13 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
     static final DataTreeCandidateFormatterFactory FACTORY = new DataTreeCandidateFormatterFactory(EMPTY) {
         @Override
-        XMLDataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+        protected XMLDataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
                 throws XPathExpressionException {
             return new XMLDataTreeCandidateFormatter(textParams, xpathFilter);
         }
 
         @Override
-        XMLDataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
+        protected XMLDataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
             return new XMLDataTreeCandidateFormatter(textParams);
         }
     };
@@ -43,7 +44,7 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
     }
 
     @Override
-    String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+    protected String createText(final TextParameters params, final EffectiveModelContext schemaContext,
             final List<DataTreeCandidate> input, final Instant now) throws Exception {
         final var writer = new StringWriter();
         boolean nonEmpty = false;

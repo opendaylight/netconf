@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.dtcl;
 
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter.createNestedWriter;
@@ -13,6 +13,7 @@ import static org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNode
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Collection;
+import org.opendaylight.restconf.nb.rfc8040.streams.AbstractWebsocketSerializer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
@@ -38,7 +39,7 @@ final class JsonDataTreeCandidateSerializer extends AbstractWebsocketSerializer<
     }
 
     @Override
-    void serializeData(final Inference parent, final Collection<PathArgument> dataPath,
+    protected void serializeData(final Inference parent, final Collection<PathArgument> dataPath,
             final DataTreeCandidateNode candidate, final boolean skipData) throws IOException {
         jsonWriter.beginObject();
 

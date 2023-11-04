@@ -42,8 +42,8 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
     }
 
     @Override
-    final void fillDocument(final Document doc, final EffectiveModelContext schemaContext, final DOMNotification input)
-            throws IOException {
+    protected final void fillDocument(final Document doc, final EffectiveModelContext schemaContext,
+            final DOMNotification input) throws IOException {
         final var notificationElement = createNotificationElement(doc,
             input instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now());
         final var notificationEventElement = doc.createElementNS(CREATE_NOTIFICATION_STREAM_NS,
