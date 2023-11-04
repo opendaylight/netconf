@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
+import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
@@ -23,13 +24,13 @@ import org.slf4j.LoggerFactory;
  */
 abstract class AbstractNotificationStream extends RestconfStream<DOMNotification> implements DOMNotificationListener {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationStream.class);
+    private static final ImmutableMap<EncodingName, NotificationFormatterFactory> ENCODINGS = ImmutableMap.of(
+        EncodingName.RFC8040_JSON, JSONNotificationFormatter.FACTORY,
+        EncodingName.RFC8040_XML, XMLNotificationFormatter.FACTORY);
 
     AbstractNotificationStream(final ListenersBroker listenersBroker, final String name,
             final NotificationOutputType outputType) {
-        super(listenersBroker, name, outputType, switch (outputType) {
-            case JSON -> JSONNotificationFormatter.FACTORY;
-            case XML -> XMLNotificationFormatter.FACTORY;
-        });
+        super(listenersBroker, name, ENCODINGS, outputType);
     }
 
     @Override

@@ -11,14 +11,17 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.collect.ImmutableMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.xml.xpath.XPathExpressionException;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -27,11 +30,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base superclass for all stream types.
+ * A RESTCONF notification event stream. Each stream produces a number of events encoded in at least one encoding. The
+ * set of supported encodings is available through {@link #encodings()}.
+ *
+ * @param <T> Type of processed events
  */
-abstract class RestconfStream<T> {
+public abstract class RestconfStream<T> {
+    /**
+     * An opinionated view on what values we can produce for {@link Access#getEncoding()}. The name can only be composed
+     * of one or more characters matching {@code [a-zA-Z]}.
+     *
+     * @param name Encoding name, as visible via the stream's {@code access} list
+     */
+    public record EncodingName(@NonNull String name) {
+        private static final Pattern PATTERN = Pattern.compile("[a-zA-Z]+");
+
+        /**
+         * Well-known JSON encoding defined by RFC8040's {@code ietf-restconf-monitoring.yang}.
+         */
+        public static final @NonNull EncodingName RFC8040_JSON = new EncodingName("json");
+        /**
+         * Well-known XML encoding defined by RFC8040's {@code ietf-restconf-monitoring.yang}.
+         */
+        public static final @NonNull EncodingName RFC8040_XML = new EncodingName("xml");
+
+        public EncodingName {
+            if (!PATTERN.matcher(name).matches()) {
+                throw new IllegalArgumentException("name must match " + PATTERN);
+            }
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
 
+    // ImmutableMap because it retains iteration order
+    private final @NonNull ImmutableMap<EncodingName, ? extends EventFormatterFactory<T>> encodings;
     private final @NonNull ListenersBroker listenersBroker;
     private final @NonNull String name;
 
@@ -45,12 +78,22 @@ abstract class RestconfStream<T> {
     private final NotificationOutputType outputType;
     private @NonNull EventFormatter<T> formatter;
 
-    RestconfStream(final ListenersBroker listenersBroker, final String name, final NotificationOutputType outputType,
-            final EventFormatterFactory<T> formatterFactory) {
+    protected RestconfStream(final ListenersBroker listenersBroker, final String name,
+            final ImmutableMap<EncodingName, ? extends EventFormatterFactory<T>> encodings,
+            final NotificationOutputType outputType) {
         this.listenersBroker = requireNonNull(listenersBroker);
         this.name = requireNonNull(name);
-        this.outputType = requireNonNull(outputType);
-        this.formatterFactory = requireNonNull(formatterFactory);
+        if (encodings.isEmpty()) {
+            throw new IllegalArgumentException("Stream '" + name + "' must support at least one encoding");
+        }
+        this.encodings = encodings;
+
+        final var encodingName = switch (outputType) {
+            case JSON -> EncodingName.RFC8040_JSON;
+            case XML -> EncodingName.RFC8040_XML;
+        };
+        this.outputType = outputType;
+        formatterFactory = formatterFactory(encodingName);
         formatter = formatterFactory.emptyFormatter();
     }
 
@@ -64,12 +107,30 @@ abstract class RestconfStream<T> {
     }
 
     /**
-     * Get output type.
+     * Get supported {@link EncodingName}s. The set is guaranteed to contain at least one element and does not contain
+     * {@code null}s.
      *
-     * @return Output type (JSON or XML).
+     * @return Supported encodings.
      */
-    final String getOutputType() {
-        return outputType.getName();
+    @SuppressWarnings("null")
+    final @NonNull Set<EncodingName> encodings() {
+        return encodings.keySet();
+    }
+
+    /**
+     * Return the {@link EventFormatterFactory} for an encoding.
+     *
+     * @param encoding An {@link EncodingName}
+     * @return The {@link EventFormatterFactory} for the selected encoding
+     * @throws NullPointerException if {@code encoding} is {@code null}
+     * @throws IllegalAccessError if {@code encoding} is not supported
+     */
+    final @NonNull EventFormatterFactory<T> formatterFactory(final EncodingName encoding) {
+        final var factory = encodings.get(requireNonNull(encoding));
+        if (factory == null) {
+            throw new IllegalArgumentException("Stream '" + name + "' does not support " + encoding);
+        }
+        return factory;
     }
 
     /**
@@ -216,6 +277,6 @@ abstract class RestconfStream<T> {
     }
 
     ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-        return helper.add("name", name).add("output-type", getOutputType());
+        return helper.add("name", name).add("output-type", outputType.getName());
     }
 }
