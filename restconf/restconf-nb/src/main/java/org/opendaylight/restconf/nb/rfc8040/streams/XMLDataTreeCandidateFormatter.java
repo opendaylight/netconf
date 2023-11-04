@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.DATA_CHANGED_NOTIFICATION_ELEMENT;
 import static org.opendaylight.restconf.nb.rfc8040.streams.NotificationFormatter.SAL_REMOTE_NAMESPACE;
 
 import java.io.IOException;

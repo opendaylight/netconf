@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 import java.io.IOException;
 import java.io.Writer;
 import java.time.Instant;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
@@ -20,7 +19,6 @@ import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -33,10 +31,6 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
     private static final String NOTIFICATION_ELEMENT = "notification";
 
     static final String SAL_REMOTE_NAMESPACE = DataChangedNotification.QNAME.getNamespace().toString();
-    static final String DATA_CHANGED_NOTIFICATION_ELEMENT = DataChangedNotification.QNAME.getLocalName();
-    static final String DATA_CHANGE_EVENT_ELEMENT = DataChangeEvent.QNAME.getLocalName();
-
-    static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
 
     NotificationFormatter(final TextParameters textParams) {
         super(textParams);
