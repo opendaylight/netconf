@@ -83,7 +83,7 @@ public final class PathsSteam extends InputStream {
         for (final var rpc : module.getRpcs()) {
             // TODO connect path with payload
             final var post = new PostEntity(rpc, "controller", module.getName());
-            final String resolvedPath = "rests/operations/" + "/" + module.getName() + ":"
+            final String resolvedPath = "/rests/operations/" + "/" + module.getName() + ":"
                 + rpc.getQName().getLocalName();
             final var entity = new PathEntity(resolvedPath, post);
             result.add(entity);
