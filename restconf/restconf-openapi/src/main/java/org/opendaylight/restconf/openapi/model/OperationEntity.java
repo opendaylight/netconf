@@ -54,6 +54,10 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits PostE
         if (summary != null) {
             generator.writeStringField("summary", summary);
         }
+        generateRequestBody(generator);
+        generateResponses(generator);
+        generateTags(generator);
+        generateParams(generator);
         generator.writeEndObject();
     }
 
@@ -64,8 +68,28 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits PostE
     }
 
     @Nullable String description() {
-        return null;
+        return schema.getDescription().orElse("");
     }
 
     @Nullable abstract String summary();
+
+    void generateRequestBody(final @NonNull JsonGenerator generator) throws IOException {
+        // No-op
+    }
+
+    void generateResponses(final @NonNull JsonGenerator generator) throws IOException {
+        // No-op
+    }
+
+    void generateTags(final @NonNull JsonGenerator generator) throws IOException {
+        generator.writeArrayFieldStart("tags");
+        generator.writeString(deviceName + " " + moduleName);
+        generator.writeEndArray();
+    }
+
+    void generateParams(final @NonNull JsonGenerator generator) throws IOException {
+        generator.writeArrayFieldStart("parameters");
+        // need empty array here
+        generator.writeEndArray();
+    }
 }
