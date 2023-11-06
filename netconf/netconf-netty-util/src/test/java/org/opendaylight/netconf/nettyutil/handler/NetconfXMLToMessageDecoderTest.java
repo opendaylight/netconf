@@ -10,6 +10,8 @@ package org.opendaylight.netconf.nettyutil.handler;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import io.netty.buffer.Unpooled;
@@ -112,6 +114,10 @@ public class NetconfXMLToMessageDecoderTest {
         buffer.writeBytes("<msg/>".getBytes());
         decoder.decode(null, buffer, out);
         assertEquals(2, out.size());
-        assertThat(out.get(1), instanceOf(NetconfMessage.class));
+        final var successOutput = out.get(1);
+        assertThat(successOutput, instanceOf(NetconfMessage.class));
+        assertFalse(successOutput instanceof FailedNetconfMessage);
+        final var netconfMessage = (NetconfMessage) successOutput;
+        assertNotNull(netconfMessage.getDocument());
     }
 }
