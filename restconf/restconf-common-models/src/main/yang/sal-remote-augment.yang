@@ -11,7 +11,8 @@ module sal-remote-augment {
     description
       "Revised version with the following changes:
        - datastore parameter is documented to default to CONFIGURATION
-       - scope parameter to create-data-change-event-subscription is obsolete";
+       - scope parameter to create-data-change-event-subscription is obsolete
+       - notification-output-type parameter is obsolete";
   }
 
   revision 2014-07-08 {
@@ -20,6 +21,7 @@ module sal-remote-augment {
 
   grouping notification-output-type-grouping {
     leaf notification-output-type {
+      status obsolete;
       description "Input parameter which type of output will be parsed on notification";
       type enumeration {
         enum JSON;

@@ -12,11 +12,6 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
  */
 public interface StreamSessionHandler {
     /**
-     * Identification of created session.
-     */
-    boolean isConnected();
-
-    /**
      * Interface for sending String message through one of implementation.
      *
      * @param data Message data to be send.

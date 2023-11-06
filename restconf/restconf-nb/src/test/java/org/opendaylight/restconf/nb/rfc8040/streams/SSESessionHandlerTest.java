@@ -7,8 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -19,26 +19,27 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import org.glassfish.jersey.media.sse.OutboundEvent;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.Registration;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class SSESessionHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class SSESessionHandlerTest {
     @Mock
     private ScheduledExecutorService executorService;
     @Mock
-    private RestconfStream<?> listener;
+    private RestconfStream<?> stream;
     @Mock
     private ScheduledFuture<?> pingFuture;
     @Mock
@@ -48,21 +49,27 @@ public class SSESessionHandlerTest {
     @Mock
     private Registration reg;
 
-    private SSESessionHandler setup(final int maxFragmentSize, final int heartbeatInterval) {
-        doAnswer(inv -> new OutboundEvent.Builder().data(String.class, inv.getArgument(0, String.class)).build())
-            .when(sse).newEvent(any());
-
-        final var sseSessionHandler = new SSESessionHandler(executorService, eventSink, sse, listener, maxFragmentSize,
-            heartbeatInterval);
-        doReturn(reg).when(listener).addSubscriber(sseSessionHandler);
-        doReturn(pingFuture).when(executorService)
-            .scheduleWithFixedDelay(any(Runnable.class), eq((long) heartbeatInterval), eq((long) heartbeatInterval),
-                eq(TimeUnit.MILLISECONDS));
+    private SSESessionHandler setup(final int maxFragmentSize, final int heartbeatInterval) throws Exception {
+        final var sseSessionHandler = new SSESessionHandler(executorService, eventSink, sse, stream,
+            EncodingName.RFC8040_XML, new ReceiveEventsParams(null, null, null, null, null, null, null),
+            maxFragmentSize, heartbeatInterval);
+        doReturn(reg).when(stream).addSubscriber(eq(sseSessionHandler), any(), any());
         return sseSessionHandler;
     }
 
+    private void setupEvent() {
+        doAnswer(inv -> new OutboundEvent.Builder().data(String.class, inv.getArgument(0, String.class)).build())
+          .when(sse).newEvent(any());
+    }
+
+    private void setupPing(final long maxFragmentSize, final long heartbeatInterval) {
+        doReturn(pingFuture).when(executorService)
+            .scheduleWithFixedDelay(any(Runnable.class), eq(heartbeatInterval), eq(heartbeatInterval),
+                eq(TimeUnit.MILLISECONDS));
+    }
+
     @Test
-    public void onSSEConnectedWithEnabledPing() {
+    void onSSEConnectedWithEnabledPing() throws Exception {
         final int heartbeatInterval = 1000;
         final var sseSessionHandler = setup(1000, heartbeatInterval);
 
@@ -72,29 +79,28 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void onSSEConnectedWithDisabledPing() {
+    void onSSEConnectedWithDisabledPing() throws Exception {
         final int heartbeatInterval = 0;
         final var sseSessionHandler = setup(1000, heartbeatInterval);
 
         sseSessionHandler.init();
-        verify(listener).addSubscriber(sseSessionHandler);
         verifyNoMoreInteractions(executorService);
     }
 
     @Test
-    public void onSSEClosedWithOpenSession() {
+    void onSSEClosedWithOpenSession() throws Exception {
         final var sseSessionHandler = setup(200, 10000);
 
         sseSessionHandler.init();
-        verify(listener).addSubscriber(sseSessionHandler);
 
         sseSessionHandler.close();
         verify(reg).close();
     }
 
     @Test
-    public void onSSECloseWithEnabledPingAndLivingSession() throws IOException {
+    void onSSECloseWithEnabledPingAndLivingSession() throws Exception {
         final var sseSessionHandler = setup(150, 8000);
+        setupPing(150, 8000);
         sseSessionHandler.init();
         doReturn(false).when(pingFuture).isCancelled();
         doReturn(false).when(pingFuture).isDone();
@@ -105,8 +111,9 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void onSSECloseWithEnabledPingAndDeadSession() {
+    void onSSECloseWithEnabledPingAndDeadSession() throws Exception {
         final var sseSessionHandler = setup(150, 8000);
+        setupPing(150, 8000);
         sseSessionHandler.init();
 
         sseSessionHandler.close();
@@ -115,10 +122,9 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void onSSECloseWithDisabledPingAndDeadSession() {
+    void onSSECloseWithDisabledPingAndDeadSession() throws Exception {
         final var sseSessionHandler = setup(150, 8000);
         sseSessionHandler.init();
-        doReturn(true).when(pingFuture).isDone();
 
         sseSessionHandler.close();
         verify(reg).close();
@@ -126,9 +132,10 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void sendDataMessageWithDisabledFragmentation() throws IOException {
+    void sendDataMessageWithDisabledFragmentation() throws Exception {
         final var sseSessionHandler = setup(0, 0);
         doReturn(false).when(eventSink).isClosed();
+        setupEvent();
         sseSessionHandler.init();
         final String testMessage = generateRandomStringOfLength(100);
         sseSessionHandler.sendDataMessage(testMessage);
@@ -141,8 +148,8 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void sendDataMessageWithDisabledFragAndDeadSession() throws IOException {
-        final SSESessionHandler sseSessionHandler = setup(0, 0);
+    void sendDataMessageWithDisabledFragAndDeadSession() throws Exception {
+        final var sseSessionHandler = setup(0, 0);
         doReturn(true).when(eventSink).isClosed();
         sseSessionHandler.init();
 
@@ -152,9 +159,10 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void sendDataMessageWithEnabledFragAndSmallMessage() throws IOException {
-        final SSESessionHandler sseSessionHandler = setup(100, 0);
+    void sendDataMessageWithEnabledFragAndSmallMessage() throws Exception {
+        final var sseSessionHandler = setup(100, 0);
         doReturn(false).when(eventSink).isClosed();
+        setupEvent();
         sseSessionHandler.init();
 
         // in both cases, fragmentation should not be applied
@@ -163,7 +171,7 @@ public class SSESessionHandlerTest {
         sseSessionHandler.sendDataMessage(testMessage1);
         sseSessionHandler.sendDataMessage(testMessage2);
 
-        ArgumentCaptor<OutboundEvent> cap = ArgumentCaptor.forClass(OutboundEvent.class);
+        final var cap = ArgumentCaptor.forClass(OutboundEvent.class);
         // without fragmentation there will be 2 write calls
         verify(eventSink, times(2)).send(cap.capture());
         OutboundEvent event1 = cap.getAllValues().get(0);
@@ -179,8 +187,8 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void sendDataMessageWithZeroLength() {
-        final SSESessionHandler sseSessionHandler = setup(100, 0);
+    void sendDataMessageWithZeroLength() throws Exception {
+        final var sseSessionHandler = setup(100, 0);
         sseSessionHandler.init();
 
         sseSessionHandler.sendDataMessage("");
@@ -188,15 +196,16 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void sendDataMessageWithEnabledFragAndLargeMessage1() throws IOException {
-        final SSESessionHandler sseSessionHandler = setup(100, 0);
+    void sendDataMessageWithEnabledFragAndLargeMessage1() throws Exception {
+        final var sseSessionHandler = setup(100, 0);
         doReturn(false).when(eventSink).isClosed();
+        setupEvent();
         sseSessionHandler.init();
 
         // there should be 10 fragments of length 100 characters
         final String testMessage = generateRandomStringOfLength(1000);
         sseSessionHandler.sendDataMessage(testMessage);
-        ArgumentCaptor<OutboundEvent> cap = ArgumentCaptor.forClass(OutboundEvent.class);
+        final var cap = ArgumentCaptor.forClass(OutboundEvent.class);
         // SSE automatically send fragmented packet ended with new line character due to eventOutput
         // have only 1 write call
         verify(eventSink, times(1)).send(cap.capture());
@@ -207,8 +216,8 @@ public class SSESessionHandlerTest {
     }
 
     private static String generateRandomStringOfLength(final int length) {
-        final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
-        final StringBuilder sb = new StringBuilder(length);
+        final var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
+        final var sb = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
             int index = (int) (alphabet.length() * Math.random());
             sb.append(alphabet.charAt(index));
