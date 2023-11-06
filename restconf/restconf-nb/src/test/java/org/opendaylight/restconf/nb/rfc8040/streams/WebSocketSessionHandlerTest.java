@@ -31,6 +31,7 @@ import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.Registration;
 
 public class WebSocketSessionHandlerTest {
@@ -47,8 +48,8 @@ public class WebSocketSessionHandlerTest {
             executorService = mock(ScheduledExecutorService.class);
             this.heartbeatInterval = heartbeatInterval;
             this.maxFragmentSize = maxFragmentSize;
-            webSocketSessionHandler = new WebSocketSessionHandler(executorService, listener, maxFragmentSize,
-                    heartbeatInterval);
+            webSocketSessionHandler = new WebSocketSessionHandler(executorService, listener,
+                new EncodingName("encoding"), null, maxFragmentSize, heartbeatInterval);
             pingFuture = mock(ScheduledFuture.class);
             when(executorService.scheduleWithFixedDelay(any(Runnable.class), eq((long) heartbeatInterval),
                 eq((long) heartbeatInterval), eq(TimeUnit.MILLISECONDS))).thenReturn(pingFuture);

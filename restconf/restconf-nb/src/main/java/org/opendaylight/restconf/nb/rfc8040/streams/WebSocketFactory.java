@@ -15,6 +15,7 @@ import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,23 +54,39 @@ record WebSocketFactory(
     @Override
     public Object createWebSocket(final ServletUpgradeRequest req, final ServletUpgradeResponse resp) {
         final var path = req.getRequestURI().getPath();
-        if (path.startsWith(STREAMS_PREFIX)) {
-            final var streamName = path.substring(STREAMS_PREFIX.length());
-            final var listener = listenersBroker.getStream(streamName);
-            if (listener != null) {
-                LOG.debug("Listener for stream with name {} has been found, web-socket session handler will be created",
-                    streamName);
-                resp.setSuccess(true);
-                resp.setStatusCode(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
-                // note: every web-socket manages PING process individually because this approach scales better than
-                //       sending PING frames at once over all web-socket sessions
-                return new WebSocketSessionHandler(executorService, listener, maximumFragmentLength, heartbeatInterval);
-            }
-
-            LOG.debug("Listener for stream with name {} was not found.", streamName);
-        } else {
+        if (!path.startsWith(STREAMS_PREFIX)) {
             LOG.debug("Request path '{}' does not start with '{}'", path, STREAMS_PREFIX);
+            return notFound(resp);
         }
+
+        final var stripped = path.substring(STREAMS_PREFIX.length());
+        final int slash = stripped.indexOf('/');
+        if (slash < 0) {
+            LOG.debug("Request path '{}' does not contain encoding", path);
+            return notFound(resp);
+        }
+        if (slash == 0) {
+            LOG.debug("Request path '{}' contains empty encoding", path);
+            return notFound(resp);
+        }
+        final var streamName = path.substring(slash + 1);
+        final var stream = listenersBroker.getStream(streamName);
+        if (stream != null) {
+            LOG.debug("Listener for stream with name {} was not found.", streamName);
+            return notFound(resp);
+        }
+
+        LOG.debug("Listener for stream with name {} has been found, web-socket session handler will be created",
+            streamName);
+        resp.setSuccess(true);
+        resp.setStatusCode(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
+        // note: every web-socket manages PING process individually because this approach scales better than
+        //       sending PING frames at once over all web-socket sessions
+        return new WebSocketSessionHandler(executorService, stream, new EncodingName(path.substring(0, slash)), null,
+            maximumFragmentLength, heartbeatInterval);
+    }
+
+    private static Object notFound(final ServletUpgradeResponse resp) {
         resp.setSuccess(false);
         resp.setStatusCode(HttpServletResponse.SC_NOT_FOUND);
         return null;

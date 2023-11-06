@@ -158,15 +158,16 @@ public final class RestconfInvokeOperationsServiceImpl {
         final var type = reqPath.getSchemaNode().getQName();
         final var mountPoint = reqPath.getMountPoint();
         if (mountPoint == null) {
+            final var baseURI = uriInfo.getBaseUri();
             // Hacked-up integration of streams
             if (CreateDataChangeEventSubscription.QNAME.equals(type)) {
-                return listenersBroker.createDataChangeNotifiStream(databindProvider, uriInfo, input,
+                return listenersBroker.createDataChangeNotifiStream(databindProvider, baseURI, input,
                     localDatabind.modelContext());
             } else if (CreateNotificationStream.QNAME.equals(type)) {
-                return listenersBroker.createNotificationStream(databindProvider, uriInfo, input,
+                return listenersBroker.createNotificationStream(databindProvider, baseURI, input,
                     localDatabind.modelContext());
             } else if (SubscribeDeviceNotification.QNAME.equals(type)) {
-                return listenersBroker.createDeviceNotificationStream(uriInfo, input, localDatabind.modelContext(),
+                return listenersBroker.createDeviceNotificationStream(baseURI, input, localDatabind.modelContext(),
                     mountPointService);
             }
         }

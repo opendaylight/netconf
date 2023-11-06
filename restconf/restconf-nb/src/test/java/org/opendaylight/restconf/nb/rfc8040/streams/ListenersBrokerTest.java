@@ -93,9 +93,11 @@ class ListenersBrokerTest {
         doReturn(uriBuilder).when(uriBuilder).replacePath(uriCaptor.capture());
         doAnswer(inv -> new URI(uriCaptor.getValue())).when(uriBuilder).build();
 
-        final var output = assertInstanceOf(ContainerNode.class, listenersBroker.createDataChangeNotifiStream(
-            databindProvider, uriInfo, prepareDomPayload("create-data-change-event-subscription", "toaster", "path"),
-            SCHEMA_CTX).getOrThrow().orElse(null));
+        final var output = assertInstanceOf(ContainerNode.class,
+            listenersBroker.createDataChangeNotifiStream(databindProvider, new URI("baseURI"),
+                prepareDomPayload("create-data-change-event-subscription", "toaster", "path"), SCHEMA_CTX)
+            .getOrThrow()
+            .orElse(null));
 
         assertEquals(new NodeIdentifier(CreateDataChangeEventSubscriptionOutput.QNAME), output.name());
         assertEquals(1, output.size());

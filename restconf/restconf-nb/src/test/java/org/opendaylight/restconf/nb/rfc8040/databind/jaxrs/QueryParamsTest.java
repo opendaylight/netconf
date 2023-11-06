@@ -23,6 +23,7 @@ import java.util.function.Function;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -32,6 +33,7 @@ import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -74,15 +76,19 @@ public class QueryParamsTest {
      */
     @Test
     public void checkParametersTypesNegativeTest() {
-        assertUnknownParam(QueryParams::newReceiveEventsParams);
+        assertUnknownParam(QueryParamsTest::newReceiveEventsParams);
         assertUnknownParam(QueryParams::newReadDataParams);
         assertUnknownParam(uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo));
 
-        assertInvalidParam(QueryParams::newReceiveEventsParams, ContentParam.ALL);
+        assertInvalidParam(QueryParamsTest::newReceiveEventsParams, ContentParam.ALL);
         assertInvalidParam(QueryParams::newReadDataParams, InsertParam.LAST);
         assertInvalidParam(
             uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo),
             ContentParam.ALL);
+    }
+
+    private static @NonNull ReceiveEventsParams newReceiveEventsParams(final UriInfo uriInfo) {
+        return QueryParams.newReceiveEventsParamsMulti(uriInfo.getQueryParameters());
     }
 
     /**

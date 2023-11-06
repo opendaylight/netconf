@@ -11,7 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
@@ -64,7 +66,27 @@ public final class QueryParams {
         // Utility class
     }
 
-    public static @NonNull ReceiveEventsParams newReceiveEventsParams(final UriInfo uriInfo) {
+    public static @NonNull ReceiveEventsParams newReceiveEventsParamsMulti(
+            final Map<String, List<String>> queryParameters) {
+        final var builder = ImmutableMap.<String, String>builderWithExpectedSize(queryParameters.size());
+        for (var entry : queryParameters.entrySet()) {
+            final var values = entry.getValue();
+            switch (values.size()) {
+                case 0:
+                    // No-op
+                    break;
+                case 1:
+                    builder.put(entry.getKey(), values.get(0));
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                        "Parameter " + entry.getKey() + " can appear at most once in request URI");
+            }
+        }
+        return newReceiveEventsParams(builder.build());
+    }
+
+    public static @NonNull ReceiveEventsParams newReceiveEventsParams(final Map<String, String> queryParameters) {
         StartTimeParam startTime = null;
         StopTimeParam stopTime = null;
         FilterParam filter = null;
@@ -73,50 +95,42 @@ public final class QueryParams {
         ChangedLeafNodesOnlyParam changedLeafNodesOnly = null;
         ChildNodesOnlyParam childNodesOnly = null;
 
-        for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            final String paramName = entry.getKey();
-            final List<String> paramValues = entry.getValue();
+        for (var entry : queryParameters.entrySet()) {
+            final var paramName = entry.getKey();
+            final var paramValue = entry.getValue();
 
-            try {
-                switch (paramName) {
-                    case FilterParam.uriName:
-                        filter = optionalParam(FilterParam::forUriValue, paramName, paramValues);
-                        break;
-                    case StartTimeParam.uriName:
-                        startTime = optionalParam(StartTimeParam::forUriValue, paramName, paramValues);
-                        break;
-                    case StopTimeParam.uriName:
-                        stopTime = optionalParam(StopTimeParam::forUriValue, paramName, paramValues);
-                        break;
-                    case LeafNodesOnlyParam.uriName:
-                        leafNodesOnly = optionalParam(LeafNodesOnlyParam::forUriValue, paramName, paramValues);
-                        break;
-                    case SkipNotificationDataParam.uriName:
-                        skipNotificationData = optionalParam(SkipNotificationDataParam::forUriValue, paramName,
-                            paramValues);
-                        break;
-                    case ChangedLeafNodesOnlyParam.uriName:
-                        changedLeafNodesOnly = optionalParam(ChangedLeafNodesOnlyParam::forUriValue, paramName,
-                            paramValues);
-                        break;
-                    case ChildNodesOnlyParam.uriName:
-                        childNodesOnly = optionalParam(ChildNodesOnlyParam::forUriValue, paramName, paramValues);
-                        break;
-                    default:
-                        throw unhandledParam("notification", paramName);
-                }
-            } catch (IllegalArgumentException e) {
-                throw new RestconfDocumentedException("Invalid " + paramName + " value: " + e.getMessage(),
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
+            switch (paramName) {
+                case FilterParam.uriName:
+                    filter = optionalParam(FilterParam::forUriValue, paramName, paramValue);
+                    break;
+                case StartTimeParam.uriName:
+                    startTime = optionalParam(StartTimeParam::forUriValue, paramName, paramValue);
+                    break;
+                case StopTimeParam.uriName:
+                    stopTime = optionalParam(StopTimeParam::forUriValue, paramName, paramValue);
+                    break;
+                case LeafNodesOnlyParam.uriName:
+                    leafNodesOnly = optionalParam(LeafNodesOnlyParam::forUriValue, paramName, paramValue);
+                    break;
+                case SkipNotificationDataParam.uriName:
+                    skipNotificationData = optionalParam(SkipNotificationDataParam::forUriValue, paramName,
+                        paramValue);
+                    break;
+                case ChangedLeafNodesOnlyParam.uriName:
+                    changedLeafNodesOnly = optionalParam(ChangedLeafNodesOnlyParam::forUriValue, paramName,
+                        paramValue);
+                    break;
+                case ChildNodesOnlyParam.uriName:
+                    childNodesOnly = optionalParam(ChildNodesOnlyParam::forUriValue, paramName, paramValue);
+                    break;
+                default:
+                    final var kind = KNOWN_PARAMS.contains(paramName) ? "Invalid" : "Uknown";
+                    throw new IllegalArgumentException(kind + " parameter: " + paramName);
             }
         }
 
-        try {
-            return new ReceiveEventsParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
-                changedLeafNodesOnly, childNodesOnly);
-        } catch (IllegalArgumentException e) {
-            throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);
-        }
+        return new ReceiveEventsParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
+            changedLeafNodesOnly, childNodesOnly);
     }
 
     public static QueryParameters newQueryParameters(final ReadDataParams params,
@@ -245,4 +259,14 @@ public final class QueryParams {
         final String str = optionalParam(name, values);
         return str == null ? null : factory.apply(str);
     }
+
+    private static <T> @Nullable T optionalParam(final Function<String, @NonNull T> factory, final String name,
+            final String value) {
+        try {
+            return factory.apply(requireNonNull(value));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid " + name + " value: " + value, e);
+        }
+    }
+
 }

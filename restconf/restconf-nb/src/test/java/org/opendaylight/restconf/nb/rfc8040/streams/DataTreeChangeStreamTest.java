@@ -229,8 +229,8 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
     DataTreeChangeStream createStream(final YangInstanceIdentifier path, final String streamName,
                 final NotificationOutputType outputType, final boolean leafNodesOnly,
                 final boolean skipNotificationData, final boolean changedLeafNodesOnly, final boolean childNodesOnly) {
-        final var ret = new DataTreeChangeStream(listenersBroker, streamName, outputType, databindProvider,
-            LogicalDatastoreType.CONFIGURATION, path);
+        final var ret = new DataTreeChangeStream(streamName, databindProvider, LogicalDatastoreType.CONFIGURATION,
+            path);
         ret.setQueryParams(new ReceiveEventsParams(null, null, null,
             leafNodesOnly ? LeafNodesOnlyParam.of(true) : null,
             skipNotificationData ? SkipNotificationDataParam.of(true) : null,

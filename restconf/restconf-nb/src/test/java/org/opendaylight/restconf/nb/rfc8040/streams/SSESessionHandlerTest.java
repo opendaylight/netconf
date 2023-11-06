@@ -62,7 +62,7 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void onSSEConnectedWithEnabledPing() {
+    public void onSSEConnectedWithEnabledPing() throws Exception {
         final int heartbeatInterval = 1000;
         final var sseSessionHandler = setup(1000, heartbeatInterval);
 
@@ -72,7 +72,7 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void onSSEConnectedWithDisabledPing() {
+    public void onSSEConnectedWithDisabledPing() throws Exception {
         final int heartbeatInterval = 0;
         final var sseSessionHandler = setup(1000, heartbeatInterval);
 
@@ -82,7 +82,7 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void onSSEClosedWithOpenSession() {
+    public void onSSEClosedWithOpenSession() throws Exception {
         final var sseSessionHandler = setup(200, 10000);
 
         sseSessionHandler.init();
@@ -105,7 +105,7 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void onSSECloseWithEnabledPingAndDeadSession() {
+    public void onSSECloseWithEnabledPingAndDeadSession() throws Exception {
         final var sseSessionHandler = setup(150, 8000);
         sseSessionHandler.init();
 
@@ -115,7 +115,7 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void onSSECloseWithDisabledPingAndDeadSession() {
+    public void onSSECloseWithDisabledPingAndDeadSession() throws Exception {
         final var sseSessionHandler = setup(150, 8000);
         sseSessionHandler.init();
         doReturn(true).when(pingFuture).isDone();
@@ -179,7 +179,7 @@ public class SSESessionHandlerTest {
     }
 
     @Test
-    public void sendDataMessageWithZeroLength() {
+    public void sendDataMessageWithZeroLength() throws Exception {
         final SSESessionHandler sseSessionHandler = setup(100, 0);
         sseSessionHandler.init();
 

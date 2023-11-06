@@ -14,7 +14,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -30,10 +29,9 @@ public final class DeviceNotificationStream extends AbstractNotificationStream i
 
     private Registration reg;
 
-    DeviceNotificationStream(final ListenersBroker listenersBroker, final String name,
-            final NotificationOutputType outputType, final EffectiveModelContext effectiveModel,
+    DeviceNotificationStream(final String name, final EffectiveModelContext effectiveModel,
             final DOMMountPointService mountPointService, final YangInstanceIdentifier instanceIdentifier) {
-        super(listenersBroker, name, outputType);
+        super(name);
         this.effectiveModel = requireNonNull(effectiveModel);
         this.mountPointService = requireNonNull(mountPointService);
         this.instanceIdentifier = requireNonNull(instanceIdentifier);

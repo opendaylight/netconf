@@ -26,12 +26,13 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @ExtendWith(MockitoExtension.class)
 class WebSocketFactoryTest extends AbstractNotificationListenerTest {
+    private static final QName TOASTER = QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster");
+
     @Mock
     private ScheduledExecutorService execService;
     @Mock
@@ -58,9 +59,8 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
         webSocketFactory = new WebSocketFactory(execService, listenersBroker, 5000, 2000);
 
         streamName = listenersBroker.createStream("description", "streams",
-            name -> new DataTreeChangeStream(listenersBroker, name, NotificationOutputType.JSON, databindProvider,
-                LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(
-                    QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"))))
+            name -> new DataTreeChangeStream(name, databindProvider, LogicalDatastoreType.CONFIGURATION,
+                YangInstanceIdentifier.of(TOASTER)))
             .getOrThrow()
             .name();
     }

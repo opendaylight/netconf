@@ -13,11 +13,13 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -33,7 +35,9 @@ import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
@@ -44,8 +48,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controll
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStreamInput;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.CreateDataChangeEventSubscriptionInput1;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -58,7 +60,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -82,14 +83,6 @@ public abstract sealed class ListenersBroker {
         public ServerSentEvents(final DOMDataBroker dataBroker) {
             super(dataBroker);
         }
-
-        @Override
-        public String baseStreamLocation(final UriInfo uriInfo) {
-            return uriInfo.getBaseUriBuilder()
-                .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.STREAMS_SUBPATH)
-                .build()
-                .toString();
-        }
     }
 
     /**
@@ -101,19 +94,13 @@ public abstract sealed class ListenersBroker {
         }
 
         @Override
-        public String baseStreamLocation(final UriInfo uriInfo) {
-            final var scheme = switch (uriInfo.getAbsolutePath().getScheme()) {
+        String streamsScheme(final URI baseURI) {
+            return switch (super.streamsScheme(baseURI)) {
                 // Secured HTTP goes to Secured WebSockets
                 case "https" -> "wss";
                 // Unsecured HTTP and others go to unsecured WebSockets
                 default -> "ws";
             };
-
-            return uriInfo.getBaseUriBuilder()
-                .scheme(scheme)
-                .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.STREAMS_SUBPATH)
-                .build()
-                .toString();
         }
     }
 
@@ -150,9 +137,6 @@ public abstract sealed class ListenersBroker {
 
     private static final NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(
         QName.create(CreateDataChangeEventSubscriptionInput1.QNAME, "datastore").intern());
-    @Deprecated(forRemoval = true)
-    private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(
-        QName.create(NotificationOutputTypeGrouping.QNAME, "notification-output-type").intern());
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
         NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "path").intern());
     private static final NodeIdentifier DEVICE_NOTIFICATION_STREAM_PATH_NODEID =
@@ -214,8 +198,8 @@ public abstract sealed class ListenersBroker {
         final var ret = new SettableRestconfFuture<T>();
         final var tx = dataBroker.newWriteOnlyTransaction();
 
-        tx.put(LogicalDatastoreType.OPERATIONAL, restconfStateStreamPath(streamName),
-            streamEntry(streamName, description, baseStreamLocation + '/' + streamName, ""));
+        tx.put(LogicalDatastoreType.OPERATIONAL, restconfStateStreamPath(streamName), streamEntry(streamName,
+            description, new Uri(baseStreamLocation + '/' + streamName), finalStream.encodings()));
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -273,8 +257,21 @@ public abstract sealed class ListenersBroker {
      *
      * @param uriInfo request URL information
      * @return location URL
+     * @throws IllegalArgumentException if the result would have been malformed
      */
-    public abstract @NonNull String baseStreamLocation(UriInfo uriInfo);
+    public final @NonNull String baseStreamLocation(final URI baseURI) {
+        try {
+            return new URI(streamsScheme(baseURI), baseURI.getRawUserInfo(), baseURI.getHost(), baseURI.getPort(),
+                URLConstants.BASE_PATH + '/' + URLConstants.STREAMS_SUBPATH, null, null)
+                .toString();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Cannot derive streams location", e);
+        }
+    }
+
+    String streamsScheme(final URI baseURI) {
+        return baseURI.getScheme();
+    }
 
     /**
      * Create data-change-event stream with POST operation via RPC.
@@ -304,18 +301,17 @@ public abstract sealed class ListenersBroker {
      */
     // FIXME: this really should be a normal RPC implementation
     public final RestconfFuture<Optional<ContainerNode>> createDataChangeNotifiStream(
-            final DatabindProvider databindProvider, final UriInfo uriInfo, final ContainerNode input,
+            final DatabindProvider databindProvider, final URI baseURI, final ContainerNode input,
             final EffectiveModelContext modelContext) {
         final var datastoreName = extractStringLeaf(input, DATASTORE_NODEID);
         final var datastore = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
             : LogicalDatastoreType.CONFIGURATION;
         final var path = preparePath(input);
 
-        final var outputType = prepareOutputType(input);
         return createStream(
             "Events occuring in " + datastore + " datastore under /" + IdentifierCodec.serialize(path, modelContext),
-            baseStreamLocation(uriInfo),
-            name -> new DataTreeChangeStream(this, name, outputType, databindProvider, datastore, path))
+            baseStreamLocation(baseURI),
+            name -> new DataTreeChangeStream(name, databindProvider, datastore, path))
             .transform(stream -> Optional.of(Builders.containerBuilder()
                 .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
@@ -348,7 +344,7 @@ public abstract sealed class ListenersBroker {
 
     // FIXME: this really should be a normal RPC implementation
     public final RestconfFuture<Optional<ContainerNode>> createNotificationStream(
-            final DatabindProvider databindProvider, final UriInfo uriInfo, final ContainerNode input,
+            final DatabindProvider databindProvider, final URI baseURI, final ContainerNode input,
             final EffectiveModelContext modelContext) {
         final var qnames = ((LeafSetNode<String>) input.getChildByArg(NOTIFICATIONS)).body().stream()
             .map(LeafSetEntryNode::body)
@@ -380,10 +376,8 @@ public abstract sealed class ListenersBroker {
         }
         description.append("\n}");
 
-        // registration of the listener
-        final var outputType = prepareOutputType(input);
-        return createStream(description.toString(), baseStreamLocation(uriInfo),
-            name -> new NotificationStream(this, name, outputType, databindProvider, qnames))
+        return createStream(description.toString(), baseStreamLocation(baseURI),
+            name -> new NotificationStream(name, databindProvider, qnames))
             .transform(stream -> Optional.of(Builders.containerBuilder()
                 .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
@@ -398,7 +392,7 @@ public abstract sealed class ListenersBroker {
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
     // FIXME: this should be an RPC invocation
-    public final RestconfFuture<Optional<ContainerNode>> createDeviceNotificationStream(final UriInfo uriInfo,
+    public final RestconfFuture<Optional<ContainerNode>> createDeviceNotificationStream(final URI baseURI,
             final ContainerNode input, final EffectiveModelContext modelContext,
             final DOMMountPointService mountPointService) {
         // parsing out of container with settings and path
@@ -438,13 +432,12 @@ public abstract sealed class ListenersBroker {
                 ErrorTag.OPERATION_FAILED);
         }
 
-        final var baseStreamsUri = baseStreamLocation(uriInfo);
-        final var outputType = prepareOutputType(input);
+        final var baseStreamsUri = baseStreamLocation(baseURI);
         return createStream(
             "All YANG notifications occuring on mount point /" + IdentifierCodec.serialize(path, modelContext),
             baseStreamsUri,
-            streamName -> new DeviceNotificationStream(this, streamName, outputType, mountModelContext,
-                mountPointService, mountPoint.getIdentifier()))
+            streamName -> new DeviceNotificationStream(streamName, mountModelContext, mountPointService,
+                mountPoint.getIdentifier()))
             .transform(stream -> {
                 stream.listen(mountNotifService, notificationPaths);
                 return Optional.of(Builders.containerBuilder()
@@ -453,18 +446,6 @@ public abstract sealed class ListenersBroker {
                         baseStreamsUri + '/' + stream.name()))
                     .build());
             });
-    }
-
-    /**
-     * Prepare {@link NotificationOutputType}.
-     *
-     * @param data Container with stream settings (RPC create-stream).
-     * @return Parsed {@link NotificationOutputType}.
-     */
-    @Deprecated(forRemoval = true)
-    private static NotificationOutputType prepareOutputType(final ContainerNode data) {
-        final String outputName = extractStringLeaf(data, OUTPUT_TYPE_NODEID);
-        return outputName != null ? NotificationOutputType.valueOf(outputName) : NotificationOutputType.XML;
     }
 
     /**
@@ -490,24 +471,25 @@ public abstract sealed class ListenersBroker {
     }
 
     @VisibleForTesting
-    static @NonNull MapEntryNode streamEntry(final String name, final String description, final String location,
-            final String outputType) {
-        return Builders.mapEntryBuilder()
+    static @NonNull MapEntryNode streamEntry(final String name, final String description, final Uri location,
+            final Set<EncodingName> encodings) {
+        final var builder = Builders.mapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, name))
             .withChild(ImmutableNodes.leafNode(NAME_QNAME, name))
-            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, description))
-            .withChild(createAccessList(outputType, location))
-            .build();
-    }
+            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, description));
 
-    private static MapNode createAccessList(final String outputType, final String location) {
-        return Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(Access.QNAME))
-            .withChild(Builders.mapEntryBuilder()
-                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, outputType))
-                .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, outputType))
-                .withChild(ImmutableNodes.leafNode(LOCATION_QNAME, location))
-                .build())
-            .build();
+        for (var encoding : encodings) {
+            final var encodingName = encoding.name();
+            builder.withChild(Builders.mapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(Access.QNAME))
+                .withChild(Builders.mapEntryBuilder()
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, encodingName))
+                    .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, encodingName))
+                    .withChild(ImmutableNodes.leafNode(LOCATION_QNAME, location.getValue()))
+                    .build())
+                .build());
+        }
+
+        return builder.build();
     }
 }

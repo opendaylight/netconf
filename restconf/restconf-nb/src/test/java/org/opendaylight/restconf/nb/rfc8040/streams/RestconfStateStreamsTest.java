@@ -13,8 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -37,19 +39,20 @@ class RestconfStateStreamsTest {
     // FIXME: assemble these from dependencies
     private static EffectiveModelContext schemaContext =
         YangParserTestUtils.parseYangResourceDirectory("/modules/restconf-module-testing");
-    private static EffectiveModelContext schemaContextMonitoring =
-        YangParserTestUtils.parseYangResourceDirectory("/modules");
+//    private static EffectiveModelContext schemaContextMonitoring =
+//        YangParserTestUtils.parseYangResourceDirectory("/modules");
 
     @Test
     void toStreamEntryNodeTest() throws Exception {
-        final var path = ParserIdentifier.toInstanceIdentifier(
-                "nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
+//        final var path = ParserIdentifier.toInstanceIdentifier(
+//                "nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
         final var outputType = "XML";
         final var uri = "uri";
         final var streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
         assertMappedData(prepareMap(streamName, uri, outputType),
-            ListenersBroker.streamEntry(streamName, "description", "location", outputType));
+            ListenersBroker.streamEntry(streamName, "description", new Uri("location"),
+                Set.of(new EncodingName(outputType))));
     }
 
     @Test
@@ -58,7 +61,8 @@ class RestconfStateStreamsTest {
         final var uri = "uri";
 
         assertMappedData(prepareMap("notifi", uri, outputType),
-            ListenersBroker.streamEntry("notifi", "description", "location", outputType));
+            ListenersBroker.streamEntry("notifi", "description", new Uri("location"),
+                Set.of(new EncodingName(outputType))));
     }
 
     private static Map<QName, Object> prepareMap(final String name, final String uri, final String outputType) {
