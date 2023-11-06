@@ -39,13 +39,14 @@ public final class OpenApiInputStream extends InputStream {
     private boolean eof;
 
     public OpenApiInputStream(final EffectiveModelContext context, final String openApiVersion, final Info info,
-            final List<Server> servers, final List<Map<String, List<String>>> security) throws IOException {
+            final List<Server> servers, final List<Map<String, List<String>>> security, final String deviceName,
+            final String urlPrefix) throws IOException {
         final OpenApiBodyWriter writer = new OpenApiBodyWriter(generator, stream);
         stack.add(new OpenApiVersionStream(new OpenApiVersionEntity(), writer));
         stack.add(new InfoStream(new InfoEntity(info.version(), info.title(), info.description()), writer));
         stack.add(new ServersStream(new ServersEntity(
             List.of(new ServerEntity(servers.iterator().next().url()))), writer));
-        stack.add(new PathsSteam(context, writer, generator, stream));
+        stack.add(new PathsSteam(context, writer, generator, stream, deviceName, urlPrefix));
         stack.add(new SchemasStream(context, writer, generator, stream));
         stack.add(new SecurityStream(writer));
     }
