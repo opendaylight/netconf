@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 
-abstract class EventFormatterFactory<T> {
+public abstract class EventFormatterFactory<T> {
     private final @NonNull EventFormatter<T> emptyFormatter;
 
     EventFormatterFactory(final EventFormatter<T> emptyFormatter) {

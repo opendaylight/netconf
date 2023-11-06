@@ -21,7 +21,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import org.opendaylight.restconf.nb.rfc8040.streams.EventFormatterFactory;
 import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.opendaylight.restconf.nb.rfc8040.streams.SSESessionHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.slf4j.Logger;
@@ -53,20 +55,29 @@ public final class RestconfDataStreamServiceImpl {
      * @param streamName path to target
      */
     @GET
-    @Path("/{streamName:.+}")
+    @Path("/{encodingName:[a-zA-Z]+}/{streamName:.+}")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void getSSE(@PathParam("streamName") final String streamName, @Context final SseEventSink sink,
+    public void getSSE(@PathParam("encodingName") final EncodingName encodingName,
+            @PathParam("streamName") final String streamName, @Context final SseEventSink sink,
             @Context final Sse sse) {
-        final var listener = listenersBroker.getStream(streamName);
-        if (listener == null) {
+        final var stream = listenersBroker.getStream(streamName);
+        if (stream == null) {
             LOG.debug("Listener for stream with name {} was not found.", streamName);
             throw new WebApplicationException("No such stream: " + streamName, Status.NOT_FOUND);
         }
 
+        final EventFormatterFactory<?> formatter;
+        try {
+            formatter = stream.formatterFactory(encodingName);
+        } catch (IllegalArgumentException e) {
+            throw new WebApplicationException(e.getMessage(), e, Status.NOT_FOUND);
+        }
+
+
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
         // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
         //        handler.init()/handler.close()
-        final var handler = new SSESessionHandler(executorService, sink, sse, listener, maximumFragmentLength,
+        final var handler = new SSESessionHandler(executorService, sink, sse, stream, maximumFragmentLength,
             heartbeatInterval);
         handler.init();
     }

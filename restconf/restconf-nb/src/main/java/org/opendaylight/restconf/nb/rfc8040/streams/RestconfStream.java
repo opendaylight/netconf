@@ -134,9 +134,9 @@ public abstract class RestconfStream<T> {
      * @param encoding An {@link EncodingName}
      * @return The {@link EventFormatterFactory} for the selected encoding
      * @throws NullPointerException if {@code encoding} is {@code null}
-     * @throws IllegalAccessError if {@code encoding} is not supported
+     * @throws IllegalArgumentException if {@code encoding} is not supported
      */
-    final @NonNull EventFormatterFactory<T> formatterFactory(final EncodingName encoding) {
+    public final @NonNull EventFormatterFactory<T> formatterFactory(final EncodingName encoding) {
         final var factory = encodings.get(requireNonNull(encoding));
         if (factory == null) {
             throw new IllegalArgumentException("Stream '" + name + "' does not support " + encoding);
