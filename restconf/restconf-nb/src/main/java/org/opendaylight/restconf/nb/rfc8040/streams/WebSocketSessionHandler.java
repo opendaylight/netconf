@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Strings;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import javax.xml.xpath.XPathExpressionException;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.websocket.api.CloseException;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
@@ -27,6 +30,8 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +47,8 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
 
     private final ScheduledExecutorService executorService;
     private final RestconfStream<?> stream;
+    private final EncodingName encodingName;
+    private final ReceiveEventsParams params;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
@@ -66,9 +73,13 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
      *                              to keep session up. Ping control frames are disabled if this parameter is set to 0.
      */
     WebSocketSessionHandler(final ScheduledExecutorService executorService, final RestconfStream<?> stream,
+            final EncodingName encodingName, final @Nullable ReceiveEventsParams params,
             final int maximumFragmentLength, final int heartbeatInterval) {
         this.executorService = requireNonNull(executorService);
         this.stream = requireNonNull(stream);
+        this.encodingName = requireNonNull(encodingName);
+        // FIXME: NETCONF-1102: require params
+        this.params = params;
         this.maximumFragmentLength = maximumFragmentLength;
         this.heartbeatInterval = heartbeatInterval;
     }
@@ -85,7 +96,14 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
     public synchronized void onWebSocketConnected(final Session webSocketSession) {
         if (session == null || !session.isOpen()) {
             session = webSocketSession;
-            subscriber = stream.addSubscriber(this);
+            try {
+                subscriber = stream.addSubscriber(this, encodingName, params);
+            } catch (IllegalArgumentException | XPathExpressionException | UnsupportedEncodingException e) {
+                LOG.info("Closing web-socket session {}", webSocketSession, e);
+                webSocketSession.close(404, "Unsupported encoding " + encodingName);
+                session = null;
+                return;
+            }
 
             LOG.debug("A new web-socket session {} has been successfully registered.", webSocketSession);
             if (heartbeatInterval != 0) {
@@ -230,10 +248,5 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
             parts.add(inputMessage.substring(i, Math.min(length, i + maximumFragmentLength)));
         }
         return parts;
-    }
-
-    @Override
-    public synchronized boolean isConnected() {
-        return session != null && session.isOpen();
     }
 }

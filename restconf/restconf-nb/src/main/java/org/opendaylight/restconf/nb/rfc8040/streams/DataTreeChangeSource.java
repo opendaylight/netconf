@@ -20,71 +20,59 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.Sink;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.Source;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 
 /**
  * A {@link RestconfStream} reporting changes on a particular data tree.
  */
-public final class DataTreeChangeStream extends RestconfStream<List<DataTreeCandidate>>
-        implements ClusteredDOMDataTreeChangeListener {
+public final class DataTreeChangeSource extends Source<List<DataTreeCandidate>> {
     private static final ImmutableMap<EncodingName, DataTreeCandidateFormatterFactory> ENCODINGS = ImmutableMap.of(
         EncodingName.RFC8040_JSON, JSONDataTreeCandidateFormatter.FACTORY,
         EncodingName.RFC8040_XML, XMLDataTreeCandidateFormatter.FACTORY);
 
-    private final DatabindProvider databindProvider;
+    private final @NonNull DOMDataTreeChangeService changeService;
+    private final @NonNull DatabindProvider databindProvider;
     private final @NonNull LogicalDatastoreType datastore;
     private final @NonNull YangInstanceIdentifier path;
 
-    DataTreeChangeStream(final ListenersBroker listenersBroker, final String name,
-            final NotificationOutputType outputType, final DatabindProvider databindProvider,
+    DataTreeChangeSource(final DatabindProvider databindProvider, final DOMDataBroker dataBroker,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
-        super(listenersBroker, name, ENCODINGS, outputType);
+        super(ENCODINGS);
         this.databindProvider = requireNonNull(databindProvider);
         this.datastore = requireNonNull(datastore);
         this.path = requireNonNull(path);
-    }
 
-    @Override
-    public void onInitialData() {
-        // No-op
-    }
-
-    @Override
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    public void onDataTreeChanged(final List<DataTreeCandidate> dataTreeCandidates) {
-        sendDataMessage(databindProvider.currentContext().modelContext(), dataTreeCandidates, Instant.now());
-    }
-
-    /**
-     * Get path pointed to data in data store.
-     *
-     * @return Path pointed to data in data store.
-     */
-    public YangInstanceIdentifier getPath() {
-        return path;
-    }
-
-    /**
-     * Register data change listener in DOM data broker and set it to listener on stream.
-     *
-     * @param domDataBroker data broker for register data change listener
-     */
-    public synchronized void listen(final DOMDataBroker domDataBroker) {
-        if (!isListening()) {
-            final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
-            if (changeService == null) {
-                throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService");
-            }
-
-            setRegistration(changeService.registerDataTreeChangeListener(
-                new DOMDataTreeIdentifier(datastore, path), this));
+        final var dtcs = dataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
+        if (dtcs == null) {
+            throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService");
         }
+        changeService = dtcs;
     }
 
     @Override
-    ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+    protected Registration start(final Sink<List<DataTreeCandidate>> sink) {
+        return changeService.registerDataTreeChangeListener(new DOMDataTreeIdentifier(datastore, path),
+            new ClusteredDOMDataTreeChangeListener() {
+                @Override
+                public void onDataTreeChanged(final List<DataTreeCandidate> changes) {
+                    // FIXME: format one change at a time?
+                    sink.publish(databindProvider.currentContext().modelContext(), changes, Instant.now());
+                }
+
+                @Override
+                public void onInitialData() {
+                    // No-op
+                }
+            });
+    }
+
+    @Override
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return super.addToStringAttributes(helper.add("path", path));
     }
 }

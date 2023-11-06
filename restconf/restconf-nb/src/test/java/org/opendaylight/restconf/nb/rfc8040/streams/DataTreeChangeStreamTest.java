@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import java.io.IOException;
@@ -29,8 +30,8 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
@@ -38,6 +39,7 @@ import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.PatchCont1Builder;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice1.PatchCase1Builder;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice2.PatchCase11Builder;
@@ -64,11 +66,6 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
     private static final class TestHandler implements StreamSessionHandler {
         private CountDownLatch notificationLatch = new CountDownLatch(1);
         private volatile String lastNotification;
-
-        @Override
-        public boolean isConnected() {
-            return true;
-        }
 
         @Override
         public void endOfStream() {
@@ -223,32 +220,34 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
         databindProvider = () -> DatabindContext.ofModel(SCHEMA_CONTEXT);
-        listenersBroker = new ListenersBroker.ServerSentEvents(domDataBroker);
+        listenersBroker = new ListenersBroker.ServerSentEvents(domDataBroker, mock(DOMNotificationService.class),
+            mock(DOMMountPointService.class));
     }
 
-    DataTreeChangeStream createStream(final YangInstanceIdentifier path, final String streamName,
-                final NotificationOutputType outputType, final boolean leafNodesOnly,
-                final boolean skipNotificationData, final boolean changedLeafNodesOnly, final boolean childNodesOnly) {
-        final var ret = new DataTreeChangeStream(listenersBroker, streamName, outputType, databindProvider,
-            LogicalDatastoreType.CONFIGURATION, path);
-        ret.setQueryParams(new ReceiveEventsParams(null, null, null,
-            leafNodesOnly ? LeafNodesOnlyParam.of(true) : null,
-            skipNotificationData ? SkipNotificationDataParam.of(true) : null,
-            changedLeafNodesOnly ? ChangedLeafNodesOnlyParam.of(true) : null,
-            childNodesOnly ? ChildNodesOnlyParam.of(true) : null));
-        return ret;
+    TestHandler createHandler(final YangInstanceIdentifier path, final String streamName,
+            final NotificationOutputType outputType, final boolean leafNodesOnly, final boolean skipNotificationData,
+            final boolean changedLeafNodesOnly, final boolean childNodesOnly) throws Exception {
+        final var stream = listenersBroker.createStream("test", "baseURI",
+            new DataTreeChangeSource(databindProvider, domDataBroker, LogicalDatastoreType.CONFIGURATION, path))
+            .getOrThrow();
+        final var handler = new TestHandler();
+        stream.addSubscriber(handler,
+            switch (outputType) {
+                case JSON -> EncodingName.RFC8040_JSON;
+                case XML -> EncodingName.RFC8040_XML;
+            },
+            new ReceiveEventsParams(null, null, null,
+                leafNodesOnly ? LeafNodesOnlyParam.of(true) : null,
+                skipNotificationData ? SkipNotificationDataParam.of(true) : null,
+                changedLeafNodesOnly ? ChangedLeafNodesOnlyParam.of(true) : null,
+                childNodesOnly ? ChildNodesOnlyParam.of(true) : null));
+        return handler;
     }
 
     @Test
     public void testJsonNotifsLeaves() throws Exception {
-        final var adapter = createStream(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
+        final var handler = createHandler(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON,
             true, false, false, false);
-        final var handler = new TestHandler();
-        adapter.addSubscriber(handler);
-
-        final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
-        final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
 
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
         final var iid = InstanceIdentifier.create(PatchCont.class);
@@ -281,14 +280,8 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonNotifsChangedLeaves() throws Exception {
-        final var adapter = createStream(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON, false, false, true,
+        final var handler = createHandler(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON, false, false, true,
             false);
-        final var handler = new TestHandler();
-        adapter.addSubscriber(handler);
-
-        final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
-        final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
 
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
         final var iid = InstanceIdentifier.create(PatchCont.class);
@@ -329,14 +322,8 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonChildNodesOnly() throws Exception {
-        final var adapter = createStream(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON, false, false, false,
+        final var handler = createHandler(PATCH_CONT_YIID, "Casey", NotificationOutputType.JSON, false, false, false,
             true);
-        final var handler = new TestHandler();
-        adapter.addSubscriber(handler);
-
-        final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
-        final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
 
         final var iid = InstanceIdentifier.create(PatchCont.class).child(MyList1.class, new MyList1Key("Althea"));
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
@@ -365,14 +352,9 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlLeavesOnly() throws Exception {
-        final var adapter = createStream(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML, true, false, false,
+        final var handler = createHandler(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML, true, false, false,
             false);
-        final var handler = new TestHandler();
-        adapter.addSubscriber(handler);
 
-        final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
-        final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
         final var iid = InstanceIdentifier.create(PatchCont.class);
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
@@ -417,14 +399,9 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlChangedLeavesOnly() throws Exception {
-        final var adapter = createStream(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML, false, false, true,
+        final var handler = createHandler(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML, false, false, true,
             false);
-        final var handler = new TestHandler();
-        adapter.addSubscriber(handler);
 
-        final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
-        final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
         final var iid = InstanceIdentifier.create(PatchCont.class);
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, new PatchContBuilder()
@@ -477,14 +454,8 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testXmlChildNodesOnly() throws Exception {
-        final var adapter = createStream(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML, false, false, false,
+        final var handler = createHandler(PATCH_CONT_YIID, "Casey", NotificationOutputType.XML, false, false, false,
             true);
-        final var handler = new TestHandler();
-        adapter.addSubscriber(handler);
-
-        final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
-        final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
-        changeService.registerDataTreeChangeListener(root, adapter);
 
         final var iid = InstanceIdentifier.create(PatchCont.class).child(MyList1.class, new MyList1Key("Althea"));
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
@@ -583,13 +554,8 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
     private void jsonNotifications(final YangInstanceIdentifier pathYiid, final boolean skipData,
             final String jsonNotifCreate, final String jsonNotifUpdate, final String jsonNotifDelete) throws Exception {
-        final var stream = createStream(pathYiid, "Casey", NotificationOutputType.JSON, false, skipData, false, false);
-        final var handler = new TestHandler();
-        stream.addSubscriber(handler);
-
-        final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
-        final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, pathYiid);
-        changeService.registerDataTreeChangeListener(root, stream);
+        final var handler = createHandler(pathYiid, "Casey", NotificationOutputType.JSON, false, skipData, false,
+            false);
 
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
         var builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
@@ -613,13 +579,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
 
     private void xmlNotifications(final YangInstanceIdentifier pathYiid, final boolean skipData,
             final String xmlNotifCreate, final String xmlNotifUpdate, final String xmlNotifDelete) throws Exception {
-        final var adapter = createStream(pathYiid, "Casey", NotificationOutputType.XML, false, skipData, false, false);
-        final var handler = new TestHandler();
-        adapter.addSubscriber(handler);
-
-        final var changeService = domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
-        final var root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, pathYiid);
-        changeService.registerDataTreeChangeListener(root, adapter);
+        final var handler = createHandler(pathYiid, "Casey", NotificationOutputType.XML, false, skipData, false, false);
 
         var writeTransaction = dataBroker.newWriteOnlyTransaction();
         var builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");

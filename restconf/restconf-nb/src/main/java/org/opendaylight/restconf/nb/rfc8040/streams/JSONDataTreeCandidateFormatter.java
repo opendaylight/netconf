@@ -29,12 +29,12 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
 
     static final DataTreeCandidateFormatterFactory FACTORY = new DataTreeCandidateFormatterFactory(EMPTY) {
         @Override
-        DataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
+        public DataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
             return new JSONDataTreeCandidateFormatter(textParams);
         }
 
         @Override
-        DataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+        public DataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
                 throws XPathExpressionException {
             return new JSONDataTreeCandidateFormatter(textParams, xpathFilter);
         }

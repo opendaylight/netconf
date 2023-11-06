@@ -7,8 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -22,129 +22,128 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.Registration;
 
-public class WebSocketSessionHandlerTest {
-    private static final class WebSocketTestSessionState {
-        private final RestconfStream<?> listener;
-        private final ScheduledExecutorService executorService;
+@ExtendWith(MockitoExtension.class)
+class WebSocketSessionHandlerTest {
+    private final class WebSocketTestSessionState {
         private final WebSocketSessionHandler webSocketSessionHandler;
         private final int heartbeatInterval;
         private final int maxFragmentSize;
-        private final ScheduledFuture pingFuture;
 
         WebSocketTestSessionState(final int maxFragmentSize, final int heartbeatInterval) {
-            listener = mock(RestconfStream.class);
-            executorService = mock(ScheduledExecutorService.class);
             this.heartbeatInterval = heartbeatInterval;
             this.maxFragmentSize = maxFragmentSize;
-            webSocketSessionHandler = new WebSocketSessionHandler(executorService, listener, maxFragmentSize,
-                    heartbeatInterval);
-            pingFuture = mock(ScheduledFuture.class);
-            when(executorService.scheduleWithFixedDelay(any(Runnable.class), eq((long) heartbeatInterval),
-                eq((long) heartbeatInterval), eq(TimeUnit.MILLISECONDS))).thenReturn(pingFuture);
+            webSocketSessionHandler = new WebSocketSessionHandler(executorService, stream,
+                ENCODING, null, maxFragmentSize, heartbeatInterval);
+
+            if (heartbeatInterval != 0) {
+                doReturn(pingFuture).when(executorService).scheduleWithFixedDelay(any(Runnable.class),
+                    eq((long) heartbeatInterval), eq((long) heartbeatInterval), eq(TimeUnit.MILLISECONDS));
+            }
         }
     }
 
+    static final EncodingName ENCODING = new EncodingName("encoding");
+
+    @Mock
+    private RestconfStream<?> stream;
+    @Mock
+    private ScheduledExecutorService executorService;
+    @Mock
+    private ScheduledFuture pingFuture;
+    @Mock
+    private Session session;
+
     @Test
-    public void onWebSocketConnectedWithEnabledPing() {
+    void onWebSocketConnectedWithEnabledPing() throws Exception {
         final int heartbeatInterval = 1000;
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(
-                1000, heartbeatInterval);
-        final Session session = mock(Session.class);
+        final var webSocketTestSessionState = new WebSocketTestSessionState(1000, heartbeatInterval);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        verify(webSocketTestSessionState.listener).addSubscriber(
-                webSocketTestSessionState.webSocketSessionHandler);
-        verify(webSocketTestSessionState.executorService).scheduleWithFixedDelay(any(Runnable.class),
+        verify(stream).addSubscriber(webSocketTestSessionState.webSocketSessionHandler, ENCODING, null);
+        verify(executorService).scheduleWithFixedDelay(any(Runnable.class),
                 eq((long) webSocketTestSessionState.heartbeatInterval),
                 eq((long) webSocketTestSessionState.heartbeatInterval), eq(TimeUnit.MILLISECONDS));
     }
 
     @Test
-    public void onWebSocketConnectedWithDisabledPing() {
+    void onWebSocketConnectedWithDisabledPing() throws Exception {
         final int heartbeatInterval = 0;
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(
-                1000, heartbeatInterval);
-        final Session session = mock(Session.class);
+        final var webSocketTestSessionState = new WebSocketTestSessionState(1000, heartbeatInterval);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        verify(webSocketTestSessionState.listener).addSubscriber(
-                webSocketTestSessionState.webSocketSessionHandler);
-        verifyNoMoreInteractions(webSocketTestSessionState.executorService);
+        verify(stream).addSubscriber(webSocketTestSessionState.webSocketSessionHandler, ENCODING, null);
+        verifyNoMoreInteractions(executorService);
     }
 
     @Test
-    public void onWebSocketConnectedWithAlreadyOpenSession() {
+    void onWebSocketConnectedWithAlreadyOpenSession() throws Exception {
         final var webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final var session = mock(Session.class);
         when(session.isOpen()).thenReturn(true);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        verify(webSocketTestSessionState.listener).addSubscriber(any());
+        verify(stream).addSubscriber(any(), any(), any());
     }
 
     @Test
-    public void onWebSocketClosedWithOpenSession() {
+    void onWebSocketClosedWithOpenSession() throws Exception  {
         final var webSocketTestSessionState = new WebSocketTestSessionState(200, 10000);
-        final var session = mock(Session.class);
         final var reg = mock(Registration.class);
 
-        doReturn(reg).when(webSocketTestSessionState.listener)
-            .addSubscriber(webSocketTestSessionState.webSocketSessionHandler);
+        doReturn(reg).when(stream).addSubscriber(webSocketTestSessionState.webSocketSessionHandler, ENCODING, null);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        verify(webSocketTestSessionState.listener).addSubscriber(webSocketTestSessionState.webSocketSessionHandler);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketClosed(200, "Simulated close");
         verify(reg).close();
     }
 
     @Test
-    public void onWebSocketClosedWithNotInitialisedSession() {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(300, 12000);
+    void onWebSocketClosedWithNotInitialisedSession() {
+        final var webSocketTestSessionState = new WebSocketTestSessionState(0, 0);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketClosed(500, "Simulated close");
-        verifyNoMoreInteractions(webSocketTestSessionState.listener);
+        verifyNoMoreInteractions(stream);
     }
 
     @Test
-    public void onWebSocketErrorWithEnabledPingAndLivingSession() {
+    void onWebSocketErrorWithEnabledPingAndLivingSession() throws Exception {
         final var webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final var session = mock(Session.class);
         final var reg = mock(Registration.class);
 
         when(session.isOpen()).thenReturn(true);
-        when(webSocketTestSessionState.listener.addSubscriber(webSocketTestSessionState.webSocketSessionHandler))
+        when(stream.addSubscriber(webSocketTestSessionState.webSocketSessionHandler, ENCODING, null))
             .thenReturn(reg);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        when(webSocketTestSessionState.pingFuture.isCancelled()).thenReturn(false);
-        when(webSocketTestSessionState.pingFuture.isDone()).thenReturn(false);
+        when(pingFuture.isCancelled()).thenReturn(false);
+        when(pingFuture.isDone()).thenReturn(false);
 
         final var sampleError = new IllegalStateException("Simulated error");
         doNothing().when(reg).close();
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
         verify(reg).close();
         verify(session).close();
-        verify(webSocketTestSessionState.pingFuture).cancel(anyBoolean());
+        verify(pingFuture).cancel(anyBoolean());
     }
 
     @Test
-    public void onWebSocketErrorWithEnabledPingAndDeadSession() {
+    void onWebSocketErrorWithEnabledPingAndDeadSession() throws Exception {
         final var webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final var session = mock(Session.class);
         final var reg = mock(Registration.class);
 
         when(session.isOpen()).thenReturn(false);
-        when(webSocketTestSessionState.listener.addSubscriber(webSocketTestSessionState.webSocketSessionHandler))
+        when(stream.addSubscriber(webSocketTestSessionState.webSocketSessionHandler, ENCODING, null))
             .thenReturn(reg);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
@@ -152,33 +151,30 @@ public class WebSocketSessionHandlerTest {
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
         verify(reg).close();
         verify(session, never()).close();
-        verify(webSocketTestSessionState.pingFuture).cancel(anyBoolean());
+        verify(pingFuture).cancel(anyBoolean());
     }
 
     @Test
-    public void onWebSocketErrorWithDisabledPingAndDeadSession() {
+    void onWebSocketErrorWithDisabledPingAndDeadSession() throws Exception {
         final var webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final var session = mock(Session.class);
         final var reg = mock(Registration.class);
 
         when(session.isOpen()).thenReturn(false);
-        when(webSocketTestSessionState.listener.addSubscriber(webSocketTestSessionState.webSocketSessionHandler))
+        when(stream.addSubscriber(webSocketTestSessionState.webSocketSessionHandler, ENCODING, null))
             .thenReturn(reg);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        when(webSocketTestSessionState.pingFuture.isCancelled()).thenReturn(false);
-        when(webSocketTestSessionState.pingFuture.isDone()).thenReturn(true);
+        when(pingFuture.isDone()).thenReturn(true);
 
         final var sampleError = new IllegalStateException("Simulated error");
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
         verify(reg).close();
         verify(session, never()).close();
-        verify(webSocketTestSessionState.pingFuture, never()).cancel(anyBoolean());
+        verify(pingFuture, never()).cancel(anyBoolean());
     }
 
     @Test
-    public void sendDataMessageWithDisabledFragmentation() throws IOException {
+    void sendDataMessageWithDisabledFragmentation() throws Exception {
         final var webSocketTestSessionState = new WebSocketTestSessionState(0, 0);
-        final var session = mock(Session.class);
         final var remoteEndpoint = mock(RemoteEndpoint.class);
         when(session.isOpen()).thenReturn(true);
         when(session.getRemote()).thenReturn(remoteEndpoint);
@@ -190,12 +186,10 @@ public class WebSocketSessionHandlerTest {
     }
 
     @Test
-    public void sendDataMessageWithDisabledFragAndDeadSession() {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(0, 0);
-        final Session session = mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+    void sendDataMessageWithDisabledFragAndDeadSession() {
+        final var webSocketTestSessionState = new WebSocketTestSessionState(0, 0);
+        final var remoteEndpoint = mock(RemoteEndpoint.class);
         when(session.isOpen()).thenReturn(false);
-        when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
         final String testMessage = generateRandomStringOfLength(11);
@@ -204,10 +198,9 @@ public class WebSocketSessionHandlerTest {
     }
 
     @Test
-    public void sendDataMessageWithEnabledFragAndSmallMessage() throws IOException {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
-        final Session session = mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+    void sendDataMessageWithEnabledFragAndSmallMessage() throws Exception {
+        final var webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
+        final var remoteEndpoint = mock(RemoteEndpoint.class);
         when(session.isOpen()).thenReturn(true);
         when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
@@ -223,12 +216,9 @@ public class WebSocketSessionHandlerTest {
     }
 
     @Test
-    public void sendDataMessageWithZeroLength() {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
-        final Session session = mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
-        when(session.isOpen()).thenReturn(true);
-        when(session.getRemote()).thenReturn(remoteEndpoint);
+    void sendDataMessageWithZeroLength() {
+        final var webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
+        final var remoteEndpoint = mock(RemoteEndpoint.class);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
         webSocketTestSessionState.webSocketSessionHandler.sendDataMessage("");
@@ -236,10 +226,9 @@ public class WebSocketSessionHandlerTest {
     }
 
     @Test
-    public void sendDataMessageWithEnabledFragAndLargeMessage1() throws IOException {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
-        final Session session = mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+    void sendDataMessageWithEnabledFragAndLargeMessage1() throws Exception {
+        final var webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
+        final var remoteEndpoint = mock(RemoteEndpoint.class);
         when(session.isOpen()).thenReturn(true);
         when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
@@ -247,23 +236,22 @@ public class WebSocketSessionHandlerTest {
         // there should be 10 fragments of length 100 characters
         final String testMessage = generateRandomStringOfLength(1000);
         webSocketTestSessionState.webSocketSessionHandler.sendDataMessage(testMessage);
-        final ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
-        final ArgumentCaptor<Boolean> isLastCaptor = ArgumentCaptor.forClass(Boolean.class);
+        final var messageCaptor = ArgumentCaptor.forClass(String.class);
+        final var isLastCaptor = ArgumentCaptor.forClass(Boolean.class);
         verify(remoteEndpoint, times(10)).sendPartialString(
                 messageCaptor.capture(), isLastCaptor.capture());
 
-        final List<String> allMessages = messageCaptor.getAllValues();
-        final List<Boolean> isLastFlags = isLastCaptor.getAllValues();
+        final var allMessages = messageCaptor.getAllValues();
+        final var isLastFlags = isLastCaptor.getAllValues();
         assertTrue(allMessages.stream().allMatch(s -> s.length() == webSocketTestSessionState.maxFragmentSize));
         assertTrue(isLastFlags.subList(0, 9).stream().noneMatch(isLast -> isLast));
         assertTrue(isLastFlags.get(9));
     }
 
     @Test
-    public void sendDataMessageWithEnabledFragAndLargeMessage2() throws IOException {
-        final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
-        final Session session = mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+    void sendDataMessageWithEnabledFragAndLargeMessage2() throws Exception {
+        final var webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
+        final var remoteEndpoint = mock(RemoteEndpoint.class);
         when(session.isOpen()).thenReturn(true);
         when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
@@ -271,13 +259,13 @@ public class WebSocketSessionHandlerTest {
         // there should be 10 fragments, the last fragment should be the shortest one
         final String testMessage = generateRandomStringOfLength(950);
         webSocketTestSessionState.webSocketSessionHandler.sendDataMessage(testMessage);
-        final ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
-        final ArgumentCaptor<Boolean> isLastCaptor = ArgumentCaptor.forClass(Boolean.class);
+        final var messageCaptor = ArgumentCaptor.forClass(String.class);
+        final var isLastCaptor = ArgumentCaptor.forClass(Boolean.class);
         verify(remoteEndpoint, times(10)).sendPartialString(
                 messageCaptor.capture(), isLastCaptor.capture());
 
-        final List<String> allMessages = messageCaptor.getAllValues();
-        final List<Boolean> isLastFlags = isLastCaptor.getAllValues();
+        final var allMessages = messageCaptor.getAllValues();
+        final var isLastFlags = isLastCaptor.getAllValues();
         assertTrue(allMessages.subList(0, 9).stream().allMatch(s ->
                 s.length() == webSocketTestSessionState.maxFragmentSize));
         assertEquals(50, allMessages.get(9).length());
@@ -287,7 +275,7 @@ public class WebSocketSessionHandlerTest {
 
     private static String generateRandomStringOfLength(final int length) {
         final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
-        final StringBuilder sb = new StringBuilder(length);
+        final var sb = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
             int index = (int) (alphabet.length() * Math.random());
             sb.append(alphabet.charAt(index));
