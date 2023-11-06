@@ -23,12 +23,12 @@ final class XMLNotificationFormatter extends NotificationFormatter {
     static final XMLNotificationFormatter EMPTY = new XMLNotificationFormatter(TextParameters.EMPTY);
     static final NotificationFormatterFactory FACTORY = new NotificationFormatterFactory(EMPTY) {
         @Override
-        XMLNotificationFormatter newFormatter(final TextParameters textParams) {
+        public XMLNotificationFormatter newFormatter(final TextParameters textParams) {
             return new XMLNotificationFormatter(textParams);
         }
 
         @Override
-        XMLNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+        public XMLNotificationFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
                 throws XPathExpressionException {
             return new XMLNotificationFormatter(textParams, xpathFilter);
         }

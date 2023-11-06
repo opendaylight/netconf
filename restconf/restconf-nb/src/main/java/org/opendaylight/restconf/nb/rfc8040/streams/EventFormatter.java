@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-abstract class EventFormatter<T> implements Immutable {
+public abstract class EventFormatter<T> implements Immutable {
     private static final XPathFactory XPF = XPathFactory.newInstance();
 
     // FIXME: NETCONF-369: XPath operates without namespace context, therefore we need an namespace-unaware builder.

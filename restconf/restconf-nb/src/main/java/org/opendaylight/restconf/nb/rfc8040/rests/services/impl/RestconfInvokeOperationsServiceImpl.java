@@ -24,7 +24,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
@@ -55,16 +54,12 @@ public final class RestconfInvokeOperationsServiceImpl {
 
     private final DatabindProvider databindProvider;
     private final MdsalRestconfServer server;
-    @Deprecated(forRemoval = true)
-    private final DOMMountPointService mountPointService;
     private final ListenersBroker listenersBroker;
 
     public RestconfInvokeOperationsServiceImpl(final DatabindProvider databindProvider,
-            final MdsalRestconfServer server, final DOMMountPointService mountPointService,
-            final ListenersBroker listenersBroker) {
+            final MdsalRestconfServer server, final ListenersBroker listenersBroker) {
         this.databindProvider = requireNonNull(databindProvider);
         this.server = requireNonNull(server);
-        this.mountPointService = requireNonNull(mountPointService);
         this.listenersBroker = requireNonNull(listenersBroker);
     }
 
@@ -158,16 +153,16 @@ public final class RestconfInvokeOperationsServiceImpl {
         final var type = reqPath.getSchemaNode().getQName();
         final var mountPoint = reqPath.getMountPoint();
         if (mountPoint == null) {
+            final var baseURI = uriInfo.getBaseUri();
             // Hacked-up integration of streams
             if (CreateDataChangeEventSubscription.QNAME.equals(type)) {
-                return listenersBroker.createDataChangeNotifiStream(databindProvider, uriInfo, input,
+                return listenersBroker.createDataChangeNotifiStream(databindProvider, baseURI, input,
                     localDatabind.modelContext());
             } else if (CreateNotificationStream.QNAME.equals(type)) {
-                return listenersBroker.createNotificationStream(databindProvider, uriInfo, input,
+                return listenersBroker.createNotificationStream(databindProvider, baseURI, input,
                     localDatabind.modelContext());
             } else if (SubscribeDeviceNotification.QNAME.equals(type)) {
-                return listenersBroker.createDeviceNotificationStream(uriInfo, input, localDatabind.modelContext(),
-                    mountPointService);
+                return listenersBroker.createDeviceNotificationStream(baseURI, input, localDatabind.modelContext());
             }
         }
 
