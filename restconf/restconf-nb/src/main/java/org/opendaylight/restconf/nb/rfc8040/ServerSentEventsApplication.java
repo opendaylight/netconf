@@ -10,6 +10,8 @@ package org.opendaylight.restconf.nb.rfc8040;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
@@ -18,15 +20,17 @@ import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
  * JAX-RS binding for Server-Sent Events.
  */
 final class ServerSentEventsApplication extends Application {
-    private final RestconfDataStreamServiceImpl singleton;
+    private final Set<Object> singletons;
 
-    ServerSentEventsApplication(final ScheduledThreadPool scheduledThreadPool, final ListenersBroker listenersBroker,
-            final StreamsConfiguration configuration) {
-        singleton = new RestconfDataStreamServiceImpl(scheduledThreadPool, listenersBroker, configuration);
+    ServerSentEventsApplication(final DatabindProvider databindProvider, final ScheduledThreadPool scheduledThreadPool,
+            final ListenersBroker listenersBroker, final StreamsConfiguration configuration) {
+        singletons = Set.of(
+            new RestconfDocumentedExceptionMapper(databindProvider),
+            new RestconfDataStreamServiceImpl(scheduledThreadPool, listenersBroker, configuration));
     }
 
     @Override
     public Set<Object> getSingletons() {
-        return Set.of(singleton);
+        return singletons;
     }
 }

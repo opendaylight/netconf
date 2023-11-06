@@ -99,7 +99,8 @@ public final class JaxRsNorthbound implements AutoCloseable {
         if (streamsConfiguration.useSSE()) {
             listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
             streamServlet = servletSupport.createHttpServletBuilder(
-                new ServerSentEventsApplication(scheduledThreadPool, listenersBroker, streamsConfiguration))
+                new ServerSentEventsApplication(databindProvider, scheduledThreadPool, listenersBroker,
+                    streamsConfiguration))
                 .build();
         } else {
             listenersBroker = new ListenersBroker.WebSockets(dataBroker);

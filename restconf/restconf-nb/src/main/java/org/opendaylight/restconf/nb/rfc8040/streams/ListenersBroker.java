@@ -377,9 +377,8 @@ public abstract sealed class ListenersBroker {
         final var datastore = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
             : LogicalDatastoreType.CONFIGURATION;
         final var path = preparePath(input);
-        final var outputType = prepareOutputType(input);
-        final var adapter = createStream(name -> new DataTreeChangeStream(this, name, outputType, databindProvider,
-            datastore, path));
+        final var adapter = createStream(name -> new DataTreeChangeStream(this, name, databindProvider, datastore,
+            path));
 
         // building of output
         return RestconfFuture.of(Optional.of(Builders.containerBuilder()
@@ -463,9 +462,8 @@ public abstract sealed class ListenersBroker {
 //        sb.append(module.argument().getLocalName()).append(':').append(qname.getLocalName());
 
         // registration of the listener
-        final var outputType = prepareOutputType(input);
-        final var adapter = createStream(name -> new NotificationStream(this, name, outputType,
-            databindProvider, qnames));
+//        final var outputType = prepareOutputType(input);
+        final var adapter = createStream(name -> new NotificationStream(this, name, databindProvider, qnames));
 
         return RestconfFuture.of(Optional.of(Builders.containerBuilder()
             .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
@@ -562,9 +560,8 @@ public abstract sealed class ListenersBroker {
 // FIXME: use this for description?
 //        final String deviceName = listId.values().iterator().next().toString();
 
-        final var outputType = prepareOutputType(input);
         final var notificationListenerAdapter = createStream(
-            streamName -> new DeviceNotificationStream(this, streamName, outputType, mountModelContext,
+            streamName -> new DeviceNotificationStream(this, streamName, mountModelContext,
                 mountPointService, mountPoint.getIdentifier()));
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 

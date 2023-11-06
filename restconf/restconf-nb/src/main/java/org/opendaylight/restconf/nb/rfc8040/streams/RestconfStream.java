@@ -14,19 +14,15 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
+import java.time.Instant;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.xml.xpath.XPathExpressionException;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +58,18 @@ public abstract class RestconfStream<T> {
         }
     }
 
+    /**
+     * Exception thrown when a particular encoding is not supported by this stream
+     */
+    public static final class UnsupportedEncodingException extends Exception {
+        @java.io.Serial
+        private static final long serialVersionUID = 1L;
+
+        public UnsupportedEncodingException(final String message) {
+            super(message);
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
     private static final VarHandle SUBSCRIBERS;
 
@@ -84,28 +92,14 @@ public abstract class RestconfStream<T> {
 
     private Registration registration;
 
-    // FIXME: NETCONF-1102: this should be tied to a subscriber
-    private final EventFormatterFactory<T> formatterFactory;
-    private final NotificationOutputType outputType;
-    private @NonNull EventFormatter<T> formatter;
-
     protected RestconfStream(final ListenersBroker listenersBroker, final String name,
-            final ImmutableMap<EncodingName, ? extends EventFormatterFactory<T>> encodings,
-            final NotificationOutputType outputType) {
+            final ImmutableMap<EncodingName, ? extends EventFormatterFactory<T>> encodings) {
         this.listenersBroker = requireNonNull(listenersBroker);
         this.name = requireNonNull(name);
         if (encodings.isEmpty()) {
             throw new IllegalArgumentException("Stream '" + name + "' must support at least one encoding");
         }
         this.encodings = encodings;
-
-        final var encodingName = switch (outputType) {
-            case JSON -> EncodingName.RFC8040_JSON;
-            case XML -> EncodingName.RFC8040_XML;
-        };
-        this.outputType = outputType;
-        formatterFactory = formatterFactory(encodingName);
-        formatter = formatterFactory.emptyFormatter();
     }
 
     /**
@@ -134,12 +128,13 @@ public abstract class RestconfStream<T> {
      * @param encoding An {@link EncodingName}
      * @return The {@link EventFormatterFactory} for the selected encoding
      * @throws NullPointerException if {@code encoding} is {@code null}
-     * @throws IllegalAccessError if {@code encoding} is not supported
+     * @throws UnsupportedEncodingException if {@code encoding} is not supported
      */
-    final @NonNull EventFormatterFactory<T> formatterFactory(final EncodingName encoding) {
+    final @NonNull EventFormatterFactory<T> formatterFactory(final EncodingName encoding)
+            throws UnsupportedEncodingException {
         final var factory = encodings.get(requireNonNull(encoding));
         if (factory == null) {
-            throw new IllegalArgumentException("Stream '" + name + "' does not support " + encoding);
+            throw new UnsupportedEncodingException("Stream '" + name + "' does not support " + encoding);
         }
         return factory;
     }
@@ -148,10 +143,15 @@ public abstract class RestconfStream<T> {
      * Registers {@link StreamSessionHandler} subscriber.
      *
      * @param handler SSE or WS session handler.
+     * @param encoding Requested event stream encoding
      * @return A new {@link Registration}, or {@code null} if the subscriber cannot be added
-     * @throws NullPointerException if {@code handler} is {@code null}
+     * @throws NullPointerException if any argument is {@code null}
      */
-    @Nullable Registration addSubscriber(final StreamSessionHandler handler) {
+    @Nullable Registration addSubscriber(final StreamSessionHandler handler, final EncodingName encoding)
+            throws UnsupportedEncodingException {
+        final var factory = formatterFactory(encoding);
+
+
         // Lockless add of a subscriber. If we observe a null this stream is dead before the new subscriber could be
         // added.
         final var toAdd = new Subscriber<>(this, handler, formatter);
@@ -214,22 +214,17 @@ public abstract class RestconfStream<T> {
         }
     }
 
-
     /**
      * Post data to subscribed SSE session handlers.
      *
-     * @param data Data of incoming notifications.
+     * @param modelContext An {@link EffectiveModelContext} used to format the input
+     * @param input Input data
+     * @param now Current time
      */
-    void post(final String data) {
+    void eventData(final EffectiveModelContext modelContext, final T input, final Instant now) {
         final var local = acquireSubscribers();
         if (local != null) {
-            for (var sub : local) {
-                final var handler = sub.handler();
-                if (handler.isConnected()) {
-                    handler.sendDataMessage(data);
-                    LOG.debug("Data was sent to subscriber {} on connection {}:", this, handler);
-                }
-            }
+            local.publish(modelContext, input, now);
         }
     }
 
@@ -239,51 +234,6 @@ public abstract class RestconfStream<T> {
             registration = null;
         }
         listenersBroker.removeStream(this);
-    }
-
-    /**
-     * Set query parameters for listener.
-     *
-     * @param params NotificationQueryParams to use.
-     */
-    public final void setQueryParams(final ReceiveEventsParams params) {
-        final var startTime = params.startTime();
-        if (startTime != null) {
-            throw new RestconfDocumentedException("Stream " + name + " does not support replay",
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-
-        final var leafNodes = params.leafNodesOnly();
-        final var skipData = params.skipNotificationData();
-        final var changedLeafNodes = params.changedLeafNodesOnly();
-        final var childNodes = params.childNodesOnly();
-
-        final var textParams = new TextParameters(
-            leafNodes != null && leafNodes.value(),
-            skipData != null && skipData.value(),
-            changedLeafNodes != null && changedLeafNodes.value(),
-            childNodes != null && childNodes.value());
-
-        final var filter = params.filter();
-        final var filterValue = filter == null ? null : filter.paramValue();
-
-        final EventFormatter<T> newFormatter;
-        if (filterValue != null && !filterValue.isEmpty()) {
-            try {
-                newFormatter = formatterFactory.getFormatter(textParams, filterValue);
-            } catch (XPathExpressionException e) {
-                throw new IllegalArgumentException("Failed to get filter", e);
-            }
-        } else {
-            newFormatter = formatterFactory.getFormatter(textParams);
-        }
-
-        // Single assign
-        formatter = newFormatter;
-    }
-
-    final @NonNull EventFormatter<T> formatter() {
-        return formatter;
     }
 
     /**
@@ -312,6 +262,6 @@ public abstract class RestconfStream<T> {
     }
 
     ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-        return helper.add("name", name).add("output-type", outputType.getName());
+        return helper.add("name", name);
     }
 }

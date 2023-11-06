@@ -13,7 +13,6 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.ClusteredDOMDataTreeChangeListener;
@@ -21,18 +20,14 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link RestconfStream} reporting changes on a particular data tree.
  */
 public class DataTreeChangeStream extends RestconfStream<List<DataTreeCandidate>>
         implements ClusteredDOMDataTreeChangeListener {
-    private static final Logger LOG = LoggerFactory.getLogger(DataTreeChangeStream.class);
     private static final ImmutableMap<EncodingName, DataTreeCandidateFormatterFactory> ENCODINGS = ImmutableMap.of(
         EncodingName.RFC8040_JSON, JSONDataTreeCandidateFormatter.FACTORY,
         EncodingName.RFC8040_XML, XMLDataTreeCandidateFormatter.FACTORY);
@@ -42,9 +37,9 @@ public class DataTreeChangeStream extends RestconfStream<List<DataTreeCandidate>
     private final @NonNull YangInstanceIdentifier path;
 
     DataTreeChangeStream(final ListenersBroker listenersBroker, final String name,
-            final NotificationOutputType outputType, final DatabindProvider databindProvider,
-            final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
-        super(listenersBroker, name, ENCODINGS, outputType);
+            final DatabindProvider databindProvider, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path) {
+        super(listenersBroker, name, ENCODINGS);
         this.databindProvider = requireNonNull(databindProvider);
         this.datastore = requireNonNull(datastore);
         this.path = requireNonNull(path);
@@ -58,18 +53,7 @@ public class DataTreeChangeStream extends RestconfStream<List<DataTreeCandidate>
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
     public void onDataTreeChanged(final List<DataTreeCandidate> dataTreeCandidates) {
-        final var now = Instant.now();
-        final String data;
-        try {
-            data = formatter().eventData(databindProvider.currentContext().modelContext(), dataTreeCandidates, now);
-        } catch (final Exception e) {
-            LOG.error("Failed to process notification {}",
-                    dataTreeCandidates.stream().map(Object::toString).collect(Collectors.joining(",")), e);
-            return;
-        }
-        if (data != null) {
-            post(data);
-        }
+        eventData(databindProvider.currentContext().modelContext(), dataTreeCandidates, Instant.now());
     }
 
     /**
