@@ -27,7 +27,6 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -36,6 +35,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -66,7 +66,8 @@ public class RestconfInvokeOperationsServiceImplTest {
         .withChild(ImmutableNodes.leafNode(QName.create(RPC, "content"), "operation result"))
         .build();
 
-    private static DatabindContext CONTEXT;
+    private static final DatabindContext CONTEXT =
+        DatabindContext.ofModel(YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc"));
 
     @Mock
     private DOMDataBroker dataBroker;
@@ -76,20 +77,17 @@ public class RestconfInvokeOperationsServiceImplTest {
     private DOMMountPoint mountPoint;
     @Mock
     private DOMMountPointService mountPointService;
+    @Mock
+    private DOMNotificationService notificationService;
 
     private RestconfInvokeOperationsServiceImpl invokeOperationsService;
     private MdsalRestconfServer server;
 
-    @BeforeClass
-    public static void beforeClass() {
-        CONTEXT = DatabindContext.ofModel(YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc"));
-    }
-
     @Before
     public void setup() {
         server = new MdsalRestconfServer(dataBroker, rpcService, mountPointService);
-        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(() -> CONTEXT, server, mountPointService,
-            new ListenersBroker.WebSockets(dataBroker));
+        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(() -> CONTEXT, server,
+            new ListenersBroker.WebSockets(dataBroker, notificationService, mountPointService));
     }
 
     @Test
