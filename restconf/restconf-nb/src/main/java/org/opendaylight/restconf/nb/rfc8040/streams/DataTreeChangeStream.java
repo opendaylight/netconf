@@ -20,7 +20,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 
@@ -38,9 +37,9 @@ public final class DataTreeChangeStream extends RestconfStream<List<DataTreeCand
     private final @NonNull YangInstanceIdentifier path;
 
     DataTreeChangeStream(final ListenersBroker listenersBroker, final String name,
-            final NotificationOutputType outputType, final DatabindProvider databindProvider,
-            final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
-        super(listenersBroker, name, ENCODINGS, outputType);
+            final DatabindProvider databindProvider, final LogicalDatastoreType datastore,
+            final YangInstanceIdentifier path) {
+        super(listenersBroker, name, ENCODINGS);
         this.databindProvider = requireNonNull(databindProvider);
         this.datastore = requireNonNull(datastore);
         this.path = requireNonNull(path);
@@ -55,15 +54,6 @@ public final class DataTreeChangeStream extends RestconfStream<List<DataTreeCand
     @SuppressWarnings("checkstyle:IllegalCatch")
     public void onDataTreeChanged(final List<DataTreeCandidate> dataTreeCandidates) {
         sendDataMessage(databindProvider.currentContext().modelContext(), dataTreeCandidates, Instant.now());
-    }
-
-    /**
-     * Get path pointed to data in data store.
-     *
-     * @return Path pointed to data in data store.
-     */
-    public YangInstanceIdentifier getPath() {
-        return path;
     }
 
     /**
