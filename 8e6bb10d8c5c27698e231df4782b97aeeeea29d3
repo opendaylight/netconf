@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "241ea7f3_8e06b1e8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SecuritySchemasStream.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-11-06T09:44:31Z",
+      "side": 1,
+      "message": "Its called securitySchemes as in https://swagger.io/docs/specification/authentication/.",
+      "revId": "8e6bb10d8c5c27698e231df4782b97aeeeea29d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
