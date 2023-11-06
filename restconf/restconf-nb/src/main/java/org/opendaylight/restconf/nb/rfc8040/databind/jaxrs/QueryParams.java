@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 import javax.ws.rs.core.UriInfo;
@@ -36,7 +35,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
-import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
@@ -64,61 +62,6 @@ public final class QueryParams {
         // Utility class
     }
 
-    public static @NonNull ReceiveEventsParams newReceiveEventsParams(final UriInfo uriInfo) {
-        StartTimeParam startTime = null;
-        StopTimeParam stopTime = null;
-        FilterParam filter = null;
-        LeafNodesOnlyParam leafNodesOnly = null;
-        SkipNotificationDataParam skipNotificationData = null;
-        ChangedLeafNodesOnlyParam changedLeafNodesOnly = null;
-        ChildNodesOnlyParam childNodesOnly = null;
-
-        for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            final String paramName = entry.getKey();
-            final List<String> paramValues = entry.getValue();
-
-            try {
-                switch (paramName) {
-                    case FilterParam.uriName:
-                        filter = optionalParam(FilterParam::forUriValue, paramName, paramValues);
-                        break;
-                    case StartTimeParam.uriName:
-                        startTime = optionalParam(StartTimeParam::forUriValue, paramName, paramValues);
-                        break;
-                    case StopTimeParam.uriName:
-                        stopTime = optionalParam(StopTimeParam::forUriValue, paramName, paramValues);
-                        break;
-                    case LeafNodesOnlyParam.uriName:
-                        leafNodesOnly = optionalParam(LeafNodesOnlyParam::forUriValue, paramName, paramValues);
-                        break;
-                    case SkipNotificationDataParam.uriName:
-                        skipNotificationData = optionalParam(SkipNotificationDataParam::forUriValue, paramName,
-                            paramValues);
-                        break;
-                    case ChangedLeafNodesOnlyParam.uriName:
-                        changedLeafNodesOnly = optionalParam(ChangedLeafNodesOnlyParam::forUriValue, paramName,
-                            paramValues);
-                        break;
-                    case ChildNodesOnlyParam.uriName:
-                        childNodesOnly = optionalParam(ChildNodesOnlyParam::forUriValue, paramName, paramValues);
-                        break;
-                    default:
-                        throw unhandledParam("notification", paramName);
-                }
-            } catch (IllegalArgumentException e) {
-                throw new RestconfDocumentedException("Invalid " + paramName + " value: " + e.getMessage(),
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
-            }
-        }
-
-        try {
-            return new ReceiveEventsParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
-                changedLeafNodesOnly, childNodesOnly);
-        } catch (IllegalArgumentException e) {
-            throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);
-        }
-    }
-
     public static QueryParameters newQueryParameters(final ReadDataParams params,
             final InstanceIdentifierContext identifier) {
         final var fields = params.fields();
@@ -144,9 +87,9 @@ public final class QueryParams {
         WithDefaultsParam withDefaults = null;
         PrettyPrintParam prettyPrint = null;
 
-        for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            final String paramName = entry.getKey();
-            final List<String> paramValues = entry.getValue();
+        for (var entry : uriInfo.getQueryParameters().entrySet()) {
+            final var paramName = entry.getKey();
+            final var paramValues = entry.getValue();
 
             try {
                 switch (paramName) {

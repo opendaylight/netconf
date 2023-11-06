@@ -32,6 +32,7 @@ import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -74,11 +75,11 @@ public class QueryParamsTest {
      */
     @Test
     public void checkParametersTypesNegativeTest() {
-        assertUnknownParam(QueryParams::newReceiveEventsParams);
+        assertInvalidIAE(ReceiveEventsParams::ofQueryParameters);
         assertUnknownParam(QueryParams::newReadDataParams);
         assertUnknownParam(uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo));
 
-        assertInvalidParam(QueryParams::newReceiveEventsParams, ContentParam.ALL);
+        assertInvalidIAE(ReceiveEventsParams::ofQueryParameters, ContentParam.ALL);
         assertInvalidParam(QueryParams::newReadDataParams, InsertParam.LAST);
         assertInvalidParam(
             uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo),
@@ -190,6 +191,19 @@ public class QueryParamsTest {
         final var params = new MultivaluedHashMap<String, String>();
         params.putSingle(param.paramName(), "odl-test-value");
         assertParamsThrows(ErrorTag.MALFORMED_MESSAGE, paramsMethod, params);
+    }
+
+    private static void assertInvalidIAE(final Function<Map<String, String>, ?> paramsMethod,
+            final RestconfQueryParam<?> param) {
+        final var ex = assertThrows(IllegalArgumentException.class,
+            () -> paramsMethod.apply(Map.of(param.paramName(), "odl-test-value")));
+        assertEquals("Invalid parameter: " + param.paramName(), ex.getMessage());
+    }
+
+    private static void assertInvalidIAE(final Function<Map<String, String>, ?> paramsMethod) {
+        final var ex = assertThrows(IllegalArgumentException.class,
+            () -> paramsMethod.apply(Map.of("odl-unknown-param", "odl-test-value")));
+        assertEquals("Invalid parameter: odl-unknown-param", ex.getMessage());
     }
 
     private static void assertUnknownParam(final Function<UriInfo, ?> paramsMethod) {

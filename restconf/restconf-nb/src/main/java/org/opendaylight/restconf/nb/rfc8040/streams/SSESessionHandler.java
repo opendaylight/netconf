@@ -7,14 +7,20 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
+import java.io.UnsupportedEncodingException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
+import javax.xml.xpath.XPathExpressionException;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +35,12 @@ public final class SSESessionHandler implements StreamSessionHandler {
 
     private final ScheduledExecutorService executorService;
     private final RestconfStream<?> stream;
-    private final int maximumFragmentLength;
-    private final int heartbeatInterval;
+    private final EncodingName encoding;
+    private final ReceiveEventsParams params;
     private final SseEventSink sink;
     private final Sse sse;
+    private final int maximumFragmentLength;
+    private final int heartbeatInterval;
 
     private ScheduledFuture<?> pingProcess;
     private Registration subscriber;
@@ -43,8 +51,7 @@ public final class SSESessionHandler implements StreamSessionHandler {
      * @param executorService Executor that is used for periodical sending of SSE ping messages to keep session up even
      *            if the notifications doesn't flow from server to clients or clients don't implement ping-pong
      *            service.
-     * @param listener YANG notification or data-change event listener to which client on this SSE session subscribes
-     *            to.
+     * @param stream YANG notification or data-change event listener to which client on this SSE session subscribes to.
      * @param maximumFragmentLength Maximum fragment length in number of Unicode code units (characters). If this
      *            parameter is set to 0, the maximum fragment length is disabled and messages up to 64 KB can be sent
      *            (exceeded notification length ends in error). If the parameter is set to non-zero positive value,
@@ -54,11 +61,14 @@ public final class SSESessionHandler implements StreamSessionHandler {
      *            session up. Ping control frames are disabled if this parameter is set to 0.
      */
     public SSESessionHandler(final ScheduledExecutorService executorService, final SseEventSink sink, final Sse sse,
-            final RestconfStream<?> listener, final int maximumFragmentLength, final int heartbeatInterval) {
-        this.executorService = executorService;
-        this.sse = sse;
-        this.sink = sink;
-        stream = listener;
+            final RestconfStream<?> stream, final EncodingName encoding, final ReceiveEventsParams params,
+            final int maximumFragmentLength, final int heartbeatInterval) {
+        this.executorService = requireNonNull(executorService);
+        this.sse = requireNonNull(sse);
+        this.sink = requireNonNull(sink);
+        this.stream = requireNonNull(stream);
+        this.encoding = requireNonNull(encoding);
+        this.params = requireNonNull(params);
         this.maximumFragmentLength = maximumFragmentLength;
         this.heartbeatInterval = heartbeatInterval;
     }
@@ -66,9 +76,13 @@ public final class SSESessionHandler implements StreamSessionHandler {
     /**
      * Initialization of SSE connection. SSE session handler is registered at data-change-event / YANG notification
      * listener and the heartbeat ping process is started if it is enabled.
+     *
+     * @throws UnsupportedEncodingException if the subscriber cannot be instantiated
+     * @throws XPathExpressionException if the subscriber cannot be instantiated
+     * @throws IllegalArgumentException if the subscriber cannot be instantiated
      */
-    public synchronized boolean init() {
-        final var local = stream.addSubscriber(this);
+    public synchronized boolean init() throws UnsupportedEncodingException, XPathExpressionException {
+        final var local = stream.addSubscriber(this, encoding, params);
         if (local == null) {
             return false;
         }
@@ -91,11 +105,6 @@ public final class SSESessionHandler implements StreamSessionHandler {
             local.close();
             stopPingProcess();
         }
-    }
-
-    @Override
-    public synchronized boolean isConnected() {
-        return !sink.isClosed();
     }
 
     /**

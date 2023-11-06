@@ -14,14 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.net.URI;
 import java.util.UUID;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +30,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
@@ -58,17 +59,18 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 @ExtendWith(MockitoExtension.class)
 class ListenersBrokerTest {
     private static final EffectiveModelContext SCHEMA_CTX = YangParserTestUtils.parseYangResourceDirectory("/streams");
+    private static final URI BASE_URI = URI.create("baseURI");
 
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
+    private DOMDataTreeChangeService treeChange;
+    @Mock
+    private DOMMountPointService mountPointService;
+    @Mock
+    private DOMNotificationService notificationService;
+    @Mock
     private DOMDataTreeWriteTransaction tx;
-    @Mock
-    private UriInfo uriInfo;
-    @Mock
-    private UriBuilder uriBuilder;
-    @Captor
-    private ArgumentCaptor<String> uriCaptor;
     @Captor
     private ArgumentCaptor<YangInstanceIdentifier> pathCaptor;
     @Captor
@@ -79,23 +81,24 @@ class ListenersBrokerTest {
 
     @BeforeEach
     public void before() {
-        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
+        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker, notificationService, mountPointService);
         databindProvider = () -> DatabindContext.ofModel(SCHEMA_CTX);
     }
 
     @Test
     void createStreamTest() {
+        doReturn(ImmutableClassToInstanceMap.of(DOMDataTreeChangeService.class, treeChange))
+            .when(dataBroker).getExtensions();
+
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(tx).put(eq(LogicalDatastoreType.OPERATIONAL), pathCaptor.capture(), dataCaptor.capture());
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        doReturn(uriBuilder).when(uriInfo).getBaseUriBuilder();
-        doReturn(uriBuilder).when(uriBuilder).replacePath(uriCaptor.capture());
-        doAnswer(inv -> new URI(uriCaptor.getValue())).when(uriBuilder).build();
-
-        final var output = assertInstanceOf(ContainerNode.class, listenersBroker.createDataChangeNotifiStream(
-            databindProvider, uriInfo, prepareDomPayload("create-data-change-event-subscription", "toaster", "path"),
-            SCHEMA_CTX).getOrThrow().orElse(null));
+        final var output = assertInstanceOf(ContainerNode.class,
+            listenersBroker.createDataChangeNotifiStream(databindProvider, BASE_URI,
+                prepareDomPayload("create-data-change-event-subscription", "toaster", "path"), SCHEMA_CTX)
+            .getOrThrow()
+            .orElse(null));
 
         assertEquals(new NodeIdentifier(CreateDataChangeEventSubscriptionOutput.QNAME), output.name());
         assertEquals(1, output.size());
@@ -113,6 +116,7 @@ class ListenersBrokerTest {
         final var rcName = QName.create(rcStream, "name");
         final var streamId = NodeIdentifierWithPredicates.of(rcStream, rcName, name);
         final var rcEncoding = QName.create(rcStream, "encoding");
+        final var rcLocation = QName.create(rcStream, "location");
 
         assertEquals(YangInstanceIdentifier.of(
             new NodeIdentifier(QName.create(rcStream, "restconf-state")),
@@ -127,20 +131,24 @@ class ListenersBrokerTest {
             .withChild(Builders.mapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(Access.QNAME))
                 .withChild(Builders.mapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, rcEncoding, ""))
-                    .withChild(ImmutableNodes.leafNode(rcEncoding, ""))
-                    .withChild(ImmutableNodes.leafNode(QName.create(rcStream, "location"),
-                        "rests/streams/" + name))
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, rcEncoding, "json"))
+                    .withChild(ImmutableNodes.leafNode(rcEncoding, "json"))
+                    .withChild(ImmutableNodes.leafNode(rcLocation, "rests/streams/json/" + name))
+                    .build())
+                .withChild(Builders.mapEntryBuilder()
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, rcEncoding, "xml"))
+                    .withChild(ImmutableNodes.leafNode(rcEncoding, "xml"))
+                    .withChild(ImmutableNodes.leafNode(rcLocation, "rests/streams/xml/" + name))
                     .build())
                 .build())
-            .build(), dataCaptor.getValue());
+            .build().prettyTree().toString(), dataCaptor.getValue().prettyTree().toString());
     }
 
     @Test
     void createStreamWrongValueTest() {
         final var payload = prepareDomPayload("create-data-change-event-subscription", "String value", "path");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> listenersBroker.createDataChangeNotifiStream(databindProvider, uriInfo, payload, SCHEMA_CTX))
+            () -> listenersBroker.createDataChangeNotifiStream(databindProvider, BASE_URI, payload, SCHEMA_CTX))
             .getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -153,7 +161,7 @@ class ListenersBrokerTest {
     void createStreamWrongInputRpcTest() {
         final var payload = prepareDomPayload("create-data-change-event-subscription2", "toaster", "path2");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> listenersBroker.createDataChangeNotifiStream(databindProvider, uriInfo, payload, SCHEMA_CTX))
+            () -> listenersBroker.createDataChangeNotifiStream(databindProvider, BASE_URI, payload, SCHEMA_CTX))
             .getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);

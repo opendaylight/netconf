@@ -27,8 +27,12 @@ import org.slf4j.LoggerFactory;
  * @param <T> event type
  */
 abstract sealed class Subscribers<T> {
-    private static final class Empty<T> extends Subscribers<T> {
-        static final @NonNull Empty<?> INSTANCE = new Empty<>();
+    static final class Empty<T> extends Subscribers<T> {
+        private static final @NonNull Empty<?> INSTANCE = new Empty<>();
+
+        private Empty() {
+            // Hidden on purpose
+        }
 
         @Override
         Subscribers<T> add(final Subscriber<T> toAdd) {
