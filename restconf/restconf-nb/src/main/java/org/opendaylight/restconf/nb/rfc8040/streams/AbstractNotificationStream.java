@@ -13,7 +13,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -25,9 +24,8 @@ abstract class AbstractNotificationStream extends RestconfStream<DOMNotification
         EncodingName.RFC8040_JSON, JSONNotificationFormatter.FACTORY,
         EncodingName.RFC8040_XML, XMLNotificationFormatter.FACTORY);
 
-    AbstractNotificationStream(final ListenersBroker listenersBroker, final String name,
-            final NotificationOutputType outputType) {
-        super(listenersBroker, name, ENCODINGS, outputType);
+    AbstractNotificationStream(final ListenersBroker listenersBroker, final String name) {
+        super(listenersBroker, name, ENCODINGS);
     }
 
     @Override

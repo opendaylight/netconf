@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
@@ -64,7 +65,7 @@ public final class QueryParams {
         // Utility class
     }
 
-    public static @NonNull ReceiveEventsParams newReceiveEventsParams(final UriInfo uriInfo) {
+    public static @NonNull ReceiveEventsParams newReceiveEventsParams(final Map<String, List<String>> queryParameters) {
         StartTimeParam startTime = null;
         StopTimeParam stopTime = null;
         FilterParam filter = null;
@@ -73,9 +74,9 @@ public final class QueryParams {
         ChangedLeafNodesOnlyParam changedLeafNodesOnly = null;
         ChildNodesOnlyParam childNodesOnly = null;
 
-        for (Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            final String paramName = entry.getKey();
-            final List<String> paramValues = entry.getValue();
+        for (var entry : queryParameters.entrySet()) {
+            final var paramName = entry.getKey();
+            final var paramValues = entry.getValue();
 
             try {
                 switch (paramName) {
@@ -111,12 +112,8 @@ public final class QueryParams {
             }
         }
 
-        try {
-            return new ReceiveEventsParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
-                changedLeafNodesOnly, childNodesOnly);
-        } catch (IllegalArgumentException e) {
-            throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);
-        }
+        return new ReceiveEventsParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
+            changedLeafNodesOnly, childNodesOnly);
     }
 
     public static QueryParameters newQueryParameters(final ReadDataParams params,

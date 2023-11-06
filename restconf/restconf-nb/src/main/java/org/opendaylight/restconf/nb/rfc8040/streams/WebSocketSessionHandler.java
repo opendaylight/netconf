@@ -20,6 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.websocket.api.CloseException;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
@@ -27,6 +28,8 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +45,8 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
 
     private final ScheduledExecutorService executorService;
     private final RestconfStream<?> stream;
+    private final EncodingName encodingName;
+    private final ReceiveEventsParams params;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
@@ -66,9 +71,12 @@ public final class WebSocketSessionHandler implements StreamSessionHandler {
      *                              to keep session up. Ping control frames are disabled if this parameter is set to 0.
      */
     WebSocketSessionHandler(final ScheduledExecutorService executorService, final RestconfStream<?> stream,
+            final EncodingName encodingName, final @Nullable ReceiveEventsParams params,
             final int maximumFragmentLength, final int heartbeatInterval) {
         this.executorService = requireNonNull(executorService);
         this.stream = requireNonNull(stream);
+        this.encodingName = requireNonNull(encodingName);
+        this.params = params;
         this.maximumFragmentLength = maximumFragmentLength;
         this.heartbeatInterval = heartbeatInterval;
     }

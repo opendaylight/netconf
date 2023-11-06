@@ -13,7 +13,6 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableSet;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -26,9 +25,8 @@ public final class NotificationStream extends AbstractNotificationStream {
     private final ImmutableSet<QName> paths;
 
     NotificationStream(final ListenersBroker listenersBroker, final String name,
-            final NotificationOutputType outputType, final DatabindProvider databindProvider,
-            final ImmutableSet<QName> paths) {
-        super(listenersBroker, name, outputType);
+            final DatabindProvider databindProvider, final ImmutableSet<QName> paths) {
+        super(listenersBroker, name);
         this.databindProvider = requireNonNull(databindProvider);
         this.paths = requireNonNull(paths);
     }
