@@ -22,13 +22,13 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
     static final DataTreeCandidateFormatterFactory FACTORY = new DataTreeCandidateFormatterFactory(EMPTY) {
         @Override
-        XMLDataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
+        public XMLDataTreeCandidateFormatter getFormatter(final TextParameters textParams, final String xpathFilter)
                 throws XPathExpressionException {
             return new XMLDataTreeCandidateFormatter(textParams, xpathFilter);
         }
 
         @Override
-        XMLDataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
+        public XMLDataTreeCandidateFormatter newFormatter(final TextParameters textParams) {
             return new XMLDataTreeCandidateFormatter(textParams);
         }
     };
