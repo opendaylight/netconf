@@ -29,16 +29,21 @@ public final class PathsSteam extends InputStream {
     private final JsonGenerator generator;
     private final OpenApiBodyWriter writer;
     private final ByteArrayOutputStream stream;
+    private final String deviceName;
+    private final String urlPrefix;
 
     private Reader reader;
     private boolean eof;
 
     public PathsSteam(final EffectiveModelContext context, final OpenApiBodyWriter writer,
-            final JsonGenerator generator, final ByteArrayOutputStream stream) {
+            final JsonGenerator generator, final ByteArrayOutputStream stream, final String deviceName,
+            final String urlPrefix) {
         iterator = context.getModules().iterator();
         this.generator = generator;
         this.writer = writer;
         this.stream = stream;
+        this.deviceName = deviceName;
+        this.urlPrefix = urlPrefix;
     }
 
     @Override
@@ -77,13 +82,13 @@ public final class PathsSteam extends InputStream {
         return super.read(array, off, len);
     }
 
-    private static Deque<PathEntity> toPaths(final Module module) {
+    private Deque<PathEntity> toPaths(final Module module) {
         final var result = new ArrayDeque<PathEntity>();
         // RPC operations (via post) - RPCs have their own path
         for (final var rpc : module.getRpcs()) {
             // TODO connect path with payload
-            final var post = new PostEntity(rpc, "controller", module.getName());
-            final String resolvedPath = "rests/operations/" + "/" + module.getName() + ":"
+            final var post = new PostEntity(rpc, deviceName, module.getName());
+            final String resolvedPath = "/rests/operations" + urlPrefix + "/" + module.getName() + ":"
                 + rpc.getQName().getLocalName();
             final var entity = new PathEntity(resolvedPath, post);
             result.add(entity);
