@@ -497,7 +497,7 @@ public class RestconfDataServiceImplTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(true).when(readWrite).cancel();
         final Response response = dataService.patchData(patch, uriInfo);
-        assertEquals(200, response.getStatus());
+        assertEquals(409, response.getStatus());
         final PatchStatusContext status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
 
         assertFalse(status.isOk());
