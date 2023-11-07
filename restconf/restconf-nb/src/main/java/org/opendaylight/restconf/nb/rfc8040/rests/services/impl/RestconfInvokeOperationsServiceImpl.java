@@ -160,13 +160,14 @@ public final class RestconfInvokeOperationsServiceImpl {
         if (mountPoint == null) {
             // Hacked-up integration of streams
             if (CreateDataChangeEventSubscription.QNAME.equals(type)) {
-                return listenersBroker.createDataChangeNotifiStream(databindProvider, input,
+                return listenersBroker.createDataChangeNotifiStream(databindProvider, uriInfo, input,
                     localDatabind.modelContext());
             } else if (CreateNotificationStream.QNAME.equals(type)) {
-                return listenersBroker.createNotificationStream(databindProvider, input, localDatabind.modelContext());
+                return listenersBroker.createNotificationStream(databindProvider, uriInfo, input,
+                    localDatabind.modelContext());
             } else if (SubscribeDeviceNotification.QNAME.equals(type)) {
-                return listenersBroker.createDeviceNotificationStream(input,
-                    listenersBroker.prepareUriByStreamName(uriInfo, "").toString(), mountPointService);
+                return listenersBroker.createDeviceNotificationStream(uriInfo, input, localDatabind.modelContext(),
+                    mountPointService);
             }
         }
 

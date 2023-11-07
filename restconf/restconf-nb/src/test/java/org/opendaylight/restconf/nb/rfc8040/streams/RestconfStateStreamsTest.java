@@ -7,22 +7,18 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Deviation;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -35,49 +31,42 @@ import org.slf4j.LoggerFactory;
 /**
  * Unit tests for {@link RestconfStateStreams}.
  */
-public class RestconfStateStreamsTest {
+class RestconfStateStreamsTest {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStateStreamsTest.class);
 
-    private static EffectiveModelContext schemaContext;
-    private static EffectiveModelContext schemaContextMonitoring;
-
-    @BeforeClass
-    public static void loadTestSchemaContextAndModules() throws Exception {
-        // FIXME: assemble these from dependencies
-        schemaContext = YangParserTestUtils.parseYangResourceDirectory("/modules/restconf-module-testing");
-        schemaContextMonitoring = YangParserTestUtils.parseYangResourceDirectory("/modules");
-    }
+    // FIXME: assemble these from dependencies
+    private static EffectiveModelContext schemaContext =
+        YangParserTestUtils.parseYangResourceDirectory("/modules/restconf-module-testing");
+    private static EffectiveModelContext schemaContextMonitoring =
+        YangParserTestUtils.parseYangResourceDirectory("/modules");
 
     @Test
-    public void toStreamEntryNodeTest() throws Exception {
-        final YangInstanceIdentifier path = ParserIdentifier.toInstanceIdentifier(
+    void toStreamEntryNodeTest() throws Exception {
+        final var path = ParserIdentifier.toInstanceIdentifier(
                 "nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
-        final String outputType = "XML";
-        final URI uri = new URI("uri");
-        final String streamName = "/nested-module:depth1-cont/depth2-leaf1";
+        final var outputType = "XML";
+        final var uri = "uri";
+        final var streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
         assertMappedData(prepareMap(streamName, uri, outputType),
-            RestconfStateStreams.dataChangeStreamEntry(path, outputType, uri, schemaContextMonitoring, streamName));
+            ListenersBroker.streamEntry(streamName, "description", "location", outputType));
     }
 
     @Test
-    public void toStreamEntryNodeNotifiTest() throws Exception {
-        final String outputType = "JSON";
-        final URI uri = new URI("uri");
+    void toStreamEntryNodeNotifiTest() throws Exception {
+        final var outputType = "JSON";
+        final var uri = "uri";
 
-        final var map = prepareMap("notifi", uri, outputType);
-        map.put(RestconfStateStreams.DESCRIPTION_QNAME, "(urn:nested:module?revision=2014-06-03)notifi");
-
-        assertMappedData(map, RestconfStateStreams.notificationStreamEntry("notifi",
-            Set.of(QName.create("urn:nested:module", "2014-06-03", "notifi")), outputType, uri));
+        assertMappedData(prepareMap("notifi", uri, outputType),
+            ListenersBroker.streamEntry("notifi", "description", "location", outputType));
     }
 
-    private static Map<QName, Object> prepareMap(final String name, final URI uri, final String outputType) {
-        final var map = new HashMap<QName, Object>();
-        map.put(RestconfStateStreams.NAME_QNAME, name);
-        map.put(RestconfStateStreams.LOCATION_QNAME, uri.toString());
-        map.put(RestconfStateStreams.ENCODING_QNAME, outputType);
-        return map;
+    private static Map<QName, Object> prepareMap(final String name, final String uri, final String outputType) {
+        return Map.of(
+            ListenersBroker.NAME_QNAME, name,
+            ListenersBroker.LOCATION_QNAME, uri,
+            ListenersBroker.ENCODING_QNAME, outputType,
+            ListenersBroker.DESCRIPTION_QNAME, "description");
     }
 
     private static void assertMappedData(final Map<QName, Object> map, final MapEntryNode mappedData) {
@@ -96,6 +85,7 @@ public class RestconfStateStreamsTest {
      * @param containerNode
      *             modules
      */
+    // FIXME: what is this supposed to verify?
     private static void verifyDeviations(final ContainerNode containerNode) {
         int deviationsFound = 0;
         for (var child : containerNode.body()) {
@@ -118,8 +108,9 @@ public class RestconfStateStreamsTest {
      * @param containerNode
      *             modules
      */
+    // FIXME: what is this supposed to verify?
     private static void verifyLoadedModules(final ContainerNode containerNode) {
-        final Map<String, String> loadedModules = new HashMap<>();
+        final var loadedModules = new HashMap<String, String>();
 
         for (var child : containerNode.body()) {
             if (child instanceof LeafNode) {
@@ -150,12 +141,12 @@ public class RestconfStateStreamsTest {
         }
 
         final var expectedModules = schemaContext.getModules();
-        assertEquals("Number of loaded modules is not as expected", expectedModules.size(), loadedModules.size());
+        assertEquals(expectedModules.size(), loadedModules.size());
         for (var m : expectedModules) {
             final String name = m.getName();
             final String revision = loadedModules.get(name);
             assertNotNull("Expected module not found", revision);
-            assertEquals("Incorrect revision of loaded module", Revision.ofNullable(revision), m.getRevision());
+            assertEquals(Revision.ofNullable(revision), m.getRevision());
 
             loadedModules.remove(name);
         }

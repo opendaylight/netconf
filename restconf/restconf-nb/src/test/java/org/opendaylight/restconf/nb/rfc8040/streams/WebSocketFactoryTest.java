@@ -21,8 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -39,6 +41,8 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
+    private DOMDataTreeWriteTransaction tx;
+    @Mock
     private DatabindProvider databindProvider;
 
     private ListenersBroker listenersBroker;
@@ -47,12 +51,17 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
 
     @BeforeEach
     void prepareListenersBroker() {
+        doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
+
         listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
         webSocketFactory = new WebSocketFactory(execService, listenersBroker, 5000, 2000);
 
-        streamName = listenersBroker.createStream(name -> new DataTreeChangeStream(listenersBroker, name,
-            NotificationOutputType.JSON, databindProvider, LogicalDatastoreType.CONFIGURATION,
-            YangInstanceIdentifier.of(QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"))))
+        streamName = listenersBroker.createStream("description", "streams",
+            name -> new DataTreeChangeStream(listenersBroker, name, NotificationOutputType.JSON, databindProvider,
+                LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(
+                    QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"))))
+            .getOrThrow()
             .name();
     }
 

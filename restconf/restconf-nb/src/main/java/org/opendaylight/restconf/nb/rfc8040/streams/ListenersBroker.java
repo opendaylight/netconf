@@ -9,10 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,11 +30,14 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
@@ -54,6 +57,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -79,10 +84,11 @@ public abstract sealed class ListenersBroker {
         }
 
         @Override
-        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+        public String baseStreamLocation(final UriInfo uriInfo) {
             return uriInfo.getBaseUriBuilder()
-                .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.STREAMS_SUBPATH + '/' + streamName)
-                .build();
+                .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.STREAMS_SUBPATH)
+                .build()
+                .toString();
         }
     }
 
@@ -95,7 +101,7 @@ public abstract sealed class ListenersBroker {
         }
 
         @Override
-        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+        public String baseStreamLocation(final UriInfo uriInfo) {
             final var scheme = switch (uriInfo.getAbsolutePath().getScheme()) {
                 // Secured HTTP goes to Secured WebSockets
                 case "https" -> "wss";
@@ -105,8 +111,9 @@ public abstract sealed class ListenersBroker {
 
             return uriInfo.getBaseUriBuilder()
                 .scheme(scheme)
-                .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.STREAMS_SUBPATH + '/' + streamName)
-                .build();
+                .replacePath(URLConstants.BASE_PATH + '/' + URLConstants.STREAMS_SUBPATH)
+                .build()
+                .toString();
         }
     }
 
@@ -126,89 +133,31 @@ public abstract sealed class ListenersBroker {
         @NonNull T createStream(@NonNull String name);
     }
 
-    /**
-     * Holder of all handlers for notifications.
-     */
-    // FIXME: why do we even need this class?!
-    private record HandlersHolder(
-            @NonNull DOMDataBroker dataBroker,
-            @NonNull DOMNotificationService notificationService,
-            @NonNull DatabindProvider databindProvider) {
-
-        HandlersHolder {
-            requireNonNull(dataBroker);
-            requireNonNull(notificationService);
-            requireNonNull(databindProvider);
-        }
-    }
-
-//    private static final QName LOCATION_QNAME = QName.create(Notifi.QNAME, "location").intern();
-//    private static final NodeIdentifier LOCATION_NODEID = NodeIdentifier.create(LOCATION_QNAME);
-//
-//    private final ListenersBroker listenersBroker;
-//    private final HandlersHolder handlersHolder;
-//
-//  // FIXME: NETCONF:1102: do not instantiate this service
-//  new RestconfStreamsSubscriptionServiceImpl(dataBroker, notificationService, databindProvider,
-//      listenersBroker),
-//
-//    /**
-//     * Initialize holder of handlers with holders as parameters.
-//     *
-//     * @param dataBroker {@link DOMDataBroker}
-//     * @param notificationService {@link DOMNotificationService}
-//     * @param databindProvider a {@link DatabindProvider}
-//     * @param listenersBroker a {@link ListenersBroker}
-//     */
-//    public RestconfStreamsSubscriptionServiceImpl(final DOMDataBroker dataBroker,
-//            final DOMNotificationService notificationService, final DatabindProvider databindProvider,
-//            final ListenersBroker listenersBroker) {
-//        handlersHolder = new HandlersHolder(dataBroker, notificationService, databindProvider);
-//        this.listenersBroker = requireNonNull(listenersBroker);
-//    }
-//
-//    @Override
-//    public Response subscribeToStream(final String identifier, final UriInfo uriInfo) {
-//        final var params = QueryParams.newReceiveEventsParams(uriInfo);
-//
-//        final URI location;
-//        if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-//            location = listenersBroker.subscribeToDataStream(identifier, uriInfo, params, handlersHolder);
-//        } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-//            location = listenersBroker.subscribeToYangStream(identifier, uriInfo, params, handlersHolder);
-//        } else {
-//            final String msg = "Bad type of notification of sal-remote";
-//            LOG.warn(msg);
-//            throw new RestconfDocumentedException(msg);
-//        }
-//
-//        return Response.ok()
-//            .location(location)
-//            .entity(new NormalizedNodePayload(
-//                Inference.ofDataTreePath(handlersHolder.databindProvider().currentContext().modelContext(),
-//                    Notifi.QNAME, LOCATION_QNAME),
-//                ImmutableNodes.leafNode(LOCATION_NODEID, location.toString())))
-//            .build();
-//    }
-
     private static final Logger LOG = LoggerFactory.getLogger(ListenersBroker.class);
     private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.of(
         NodeIdentifier.create(RestconfState.QNAME),
         NodeIdentifier.create(Streams.QNAME),
         NodeIdentifier.create(Stream.QNAME));
 
-    private static final QName DATASTORE_QNAME =
-        QName.create(CreateDataChangeEventSubscriptionInput1.QNAME, "datastore").intern();
-    private static final QName OUTPUT_TYPE_QNAME =
-        QName.create(NotificationOutputTypeGrouping.QNAME, "notification-output-type").intern();
-    private static final QName DEVICE_NOTIFICATION_PATH_QNAME =
-        QName.create(SubscribeDeviceNotificationInput.QNAME, "path").intern();
-    private static final QName DEVICE_NOTIFICATION_STREAM_PATH =
-        QName.create(DEVICE_NOTIFICATION_PATH_QNAME, "stream-path").intern();
-    private static final NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(DATASTORE_QNAME);
-    private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(OUTPUT_TYPE_QNAME);
+    @VisibleForTesting
+    static final QName NAME_QNAME =  QName.create(Stream.QNAME, "name").intern();
+    @VisibleForTesting
+    static final QName DESCRIPTION_QNAME = QName.create(Stream.QNAME, "description").intern();
+    @VisibleForTesting
+    static final QName ENCODING_QNAME =  QName.create(Stream.QNAME, "encoding").intern();
+    @VisibleForTesting
+    static final QName LOCATION_QNAME =  QName.create(Stream.QNAME, "location").intern();
+
+    private static final NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(
+        QName.create(CreateDataChangeEventSubscriptionInput1.QNAME, "datastore").intern());
+    @Deprecated(forRemoval = true)
+    private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(
+        QName.create(NotificationOutputTypeGrouping.QNAME, "notification-output-type").intern());
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
-        NodeIdentifier.create(DEVICE_NOTIFICATION_PATH_QNAME);
+        NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "path").intern());
+    private static final NodeIdentifier DEVICE_NOTIFICATION_STREAM_PATH_NODEID =
+        NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "stream-path").intern());
+
     private static final NodeIdentifier SAL_REMOTE_OUTPUT_NODEID =
         NodeIdentifier.create(CreateDataChangeEventSubscriptionOutput.QNAME);
     private static final NodeIdentifier NOTIFICATIONS =
@@ -238,14 +187,16 @@ public abstract sealed class ListenersBroker {
 
     /**
      * Create a {@link RestconfStream} with a unique name. This method will atomically generate a stream name, create
-     * the corresponding instance and register it
+     * the corresponding instance and register it.
      *
      * @param <T> Stream type
+     * @param baseStreamLocation base streams location
      * @param factory Factory for creating the actual stream instance
      * @return A {@link RestconfStream} instance
      * @throws NullPointerException if {@code factory} is {@code null}
      */
-    public final <T extends RestconfStream<?>> @NonNull T createStream(final StreamFactory<T> factory) {
+    final <T extends RestconfStream<?>> @NonNull RestconfFuture<T> createStream(final String description,
+            final String baseStreamLocation, final StreamFactory<T> factory) {
         String name;
         T stream;
         do {
@@ -255,7 +206,31 @@ public abstract sealed class ListenersBroker {
             stream = factory.createStream(name);
         } while (streams.putIfAbsent(name, stream) != null);
 
-        return stream;
+        // final captures for use with FutureCallback
+        final var streamName = name;
+        final var finalStream = stream;
+
+        // Now issue a put operation
+        final var ret = new SettableRestconfFuture<T>();
+        final var tx = dataBroker.newWriteOnlyTransaction();
+
+        tx.put(LogicalDatastoreType.OPERATIONAL, restconfStateStreamPath(streamName),
+            streamEntry(streamName, description, baseStreamLocation + '/' + streamName, ""));
+        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                LOG.debug("Stream {} added", streamName);
+                ret.set(finalStream);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.debug("Failed to add stream {}", streamName, cause);
+                streams.remove(streamName, finalStream);
+                ret.setFailure(new RestconfDocumentedException("Failed to allocate stream " + streamName, cause));
+            }
+        }, MoreExecutors.directExecutor());
+        return ret;
     }
 
     /**
@@ -290,57 +265,16 @@ public abstract sealed class ListenersBroker {
     }
 
     private static @NonNull YangInstanceIdentifier restconfStateStreamPath(final String streamName) {
-        return RESTCONF_STATE_STREAMS
-            .node(NodeIdentifierWithPredicates.of(Stream.QNAME, RestconfStateStreams.NAME_QNAME, streamName));
+        return RESTCONF_STATE_STREAMS.node(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, streamName));
     }
 
     /**
-     * Creates string representation of stream name from URI. Removes slash from URI in start and end positions,
-     * and optionally {@link URLConstants#BASE_PATH} prefix.
+     * Return the base location URL of the streams service based on request URI.
      *
-     * @param uri URI for creation of stream name.
-     * @return String representation of stream name.
+     * @param uriInfo request URL information
+     * @return location URL
      */
-//    private static String createStreamNameFromUri(final String uri) {
-//        String result = requireNonNull(uri);
-//        while (true) {
-//            if (result.startsWith(URLConstants.BASE_PATH)) {
-//                result = result.substring(URLConstants.BASE_PATH.length());
-//            } else if (result.startsWith("/")) {
-//                result = result.substring(1);
-//            } else {
-//                break;
-//            }
-//        }
-//        if (result.endsWith("/")) {
-//            result = result.substring(0, result.length() - 1);
-//        }
-//        return result;
-//    }
-
-    /**
-     * Prepare URL from base name and stream name.
-     *
-     * @param uriInfo base URL information
-     * @param streamName name of stream for create
-     * @return final URL
-     */
-    public abstract @NonNull URI prepareUriByStreamName(UriInfo uriInfo, String streamName);
-
-    // FIXME: callers are utter duplicates, refactor them
-//    private static void writeDataToDS(final DOMDataTreeWriteOperations tx, final MapEntryNode mapToStreams) {
-//        // FIXME: use put() here
-//        tx.merge(LogicalDatastoreType.OPERATIONAL, RestconfStateStreams.restconfStateStreamPath(mapToStreams.name()),
-//            mapToStreams);
-//    }
-//
-//    private static void submitData(final DOMDataTreeWriteTransaction readWriteTransaction) {
-//        try {
-//            readWriteTransaction.commit().get();
-//        } catch (final InterruptedException | ExecutionException e) {
-//            throw new RestconfDocumentedException("Problem while putting data to DS.", e);
-//        }
-//    }
+    public abstract @NonNull String baseStreamLocation(UriInfo uriInfo);
 
     /**
      * Create data-change-event stream with POST operation via RPC.
@@ -352,7 +286,6 @@ public abstract sealed class ListenersBroker {
      *                      "input": {
      *                          "path": "/toaster:toaster/toaster:toasterStatus",
      *                          "sal-remote-augment:datastore": "OPERATIONAL",
-     *                          "sal-remote-augment:scope": "ONE"
      *                      }
      *                  }
      *              }
@@ -371,23 +304,25 @@ public abstract sealed class ListenersBroker {
      */
     // FIXME: this really should be a normal RPC implementation
     public final RestconfFuture<Optional<ContainerNode>> createDataChangeNotifiStream(
-            final DatabindProvider databindProvider, final ContainerNode input,
+            final DatabindProvider databindProvider, final UriInfo uriInfo, final ContainerNode input,
             final EffectiveModelContext modelContext) {
         final var datastoreName = extractStringLeaf(input, DATASTORE_NODEID);
         final var datastore = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
             : LogicalDatastoreType.CONFIGURATION;
         final var path = preparePath(input);
-        final var outputType = prepareOutputType(input);
-        final var adapter = createStream(name -> new DataTreeChangeStream(this, name, outputType, databindProvider,
-            datastore, path));
 
-        // building of output
-        return RestconfFuture.of(Optional.of(Builders.containerBuilder()
-            .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
-            .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, adapter.name()))
-            .build()));
+        final var outputType = prepareOutputType(input);
+        return createStream(
+            "Events occuring in " + datastore + " datastore under /" + IdentifierCodec.serialize(path, modelContext),
+            baseStreamLocation(uriInfo),
+            name -> new DataTreeChangeStream(this, name, outputType, databindProvider, datastore, path))
+            .transform(stream -> Optional.of(Builders.containerBuilder()
+                .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
+                .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
+                .build()));
     }
 
+// FIXME: NETCONF-1102: this part needs to be invoked from subscriber
 //    /**
 //     * Register listener by streamName in identifier to listen to data change notifications, and put or delete
 //     * information about listener to DS according to ietf-restconf-monitoring.
@@ -408,27 +343,12 @@ public abstract sealed class ListenersBroker {
 //        }
 //
 //        listener.setQueryParams(notificationQueryParams);
-//
-//        final var dataBroker = handlersHolder.dataBroker();
-//        final var schemaHandler = handlersHolder.databindProvider();
-//        listener.setCloseVars(schemaHandler);
 //        listener.listen(dataBroker);
-//
-//        final var uri = prepareUriByStreamName(uriInfo, streamName);
-//        final var schemaContext = schemaHandler.currentContext().modelContext();
-//        final var serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
-//
-//        final var mapToStreams = RestconfStateStreams.dataChangeStreamEntry(listener.getPath(),
-//                listener.getOutputType(), uri, schemaContext, serializedPath);
-//        final var writeTransaction = dataBroker.newWriteOnlyTransaction();
-//        writeDataToDS(writeTransaction, mapToStreams);
-//        submitData(writeTransaction);
-//        return uri;
 //    }
 
     // FIXME: this really should be a normal RPC implementation
     public final RestconfFuture<Optional<ContainerNode>> createNotificationStream(
-            final DatabindProvider databindProvider, final ContainerNode input,
+            final DatabindProvider databindProvider, final UriInfo uriInfo, final ContainerNode input,
             final EffectiveModelContext modelContext) {
         final var qnames = ((LeafSetNode<String>) input.getChildByArg(NOTIFICATIONS)).body().stream()
             .map(LeafSetEntryNode::body)
@@ -436,92 +356,51 @@ public abstract sealed class ListenersBroker {
             .sorted()
             .collect(ImmutableSet.toImmutableSet());
 
+        final var description = new StringBuilder("YANG notifications matching any of {");
+        var haveFirst = false;
         for (var qname : qnames) {
-            if (modelContext.findNotification(qname).isEmpty()) {
-                throw new RestconfDocumentedException(qname + " refers to an unknown notification",
+            final var module = modelContext.findModuleStatement(qname.getModule())
+                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown module",
+                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+            final var stmt = module.findSchemaTreeNode(qname)
+                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown notification",
+                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+            if (!(stmt instanceof NotificationEffectiveStatement)) {
+                throw new RestconfDocumentedException(qname + " refers to a non-notification",
                     ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
             }
-        }
 
-// FIXME: use this block to create a stream description
-//        final var module = refSchemaCtx.findModuleStatement(qname.getModule())
-//            .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown module",
-//                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
-//        final var stmt = module.findSchemaTreeNode(qname)
-//            .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an notification",
-//                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
-//        if (!(stmt instanceof NotificationEffectiveStatement)) {
-//            throw new RestconfDocumentedException(qname + " refers to a non-notification",
-//                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
-//        }
-//
-//        if (haveFirst) {
-//            sb.append(',');
-//        } else {
-//            haveFirst = true;
-//        }
-//        sb.append(module.argument().getLocalName()).append(':').append(qname.getLocalName());
+            if (haveFirst) {
+                description.append(",\n");
+            } else {
+                haveFirst = true;
+            }
+            description.append("\n  ")
+                .append(module.argument().getLocalName()).append(':').append(qname.getLocalName());
+        }
+        description.append("\n}");
 
         // registration of the listener
         final var outputType = prepareOutputType(input);
-        final var adapter = createStream(name -> new NotificationStream(this, name, outputType,
-            databindProvider, qnames));
-
-        return RestconfFuture.of(Optional.of(Builders.containerBuilder()
-            .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
-            .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, adapter.name()))
-            .build()));
+        return createStream(description.toString(), baseStreamLocation(uriInfo),
+            name -> new NotificationStream(this, name, outputType, databindProvider, qnames))
+            .transform(stream -> Optional.of(Builders.containerBuilder()
+                .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
+                .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
+                .build()));
     }
-
-    /**
-     * Register listener by streamName in identifier to listen to yang notifications, and put or delete information
-     * about listener to DS according to ietf-restconf-monitoring.
-     *
-     * @param identifier              Name of the stream.
-     * @param uriInfo                 URI information.
-     * @param notificationQueryParams Query parameters of notification.
-     * @param handlersHolder          Holder of handlers for notifications.
-     * @return Stream location for listening.
-     */
-//    public final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
-//            final ReceiveEventsParams notificationQueryParams, final HandlersHolder handlersHolder) {
-//        final String streamName = createStreamNameFromUri(identifier);
-//        if (isNullOrEmpty(streamName)) {
-//            throw new RestconfDocumentedException("Stream name is empty", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-//        }
-//
-//        final var notificationListenerAdapter = notificationListenerFor(streamName);
-//        if (notificationListenerAdapter == null) {
-//            throw new RestconfDocumentedException("Stream with name %s was not found".formatted(streamName),
-//                ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
-//        }
-//
-//        final URI uri = prepareUriByStreamName(uriInfo, streamName);
-//        notificationListenerAdapter.setQueryParams(notificationQueryParams);
-//        notificationListenerAdapter.listen(handlersHolder.notificationService());
-//        final DOMDataBroker dataBroker = handlersHolder.dataBroker();
-//        notificationListenerAdapter.setCloseVars(handlersHolder.databindProvider());
-//        final MapEntryNode mapToStreams = RestconfStateStreams.notificationStreamEntry(streamName,
-//            notificationListenerAdapter.qnames(), notificationListenerAdapter.getOutputType(), uri);
-//
-//        // FIXME: how does this correlate with the transaction notificationListenerAdapter.close() will do?
-//        final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-//        writeDataToDS(writeTransaction, mapToStreams);
-//        submitData(writeTransaction);
-//        return uri;
-//    }
 
     /**
      * Create device notification stream.
      *
-     * @param baseUrl base Url
      * @param input RPC input
      * @param mountPointService dom mount point service
      * @return {@link DOMRpcResult} - Output of RPC - example in JSON
      */
     // FIXME: this should be an RPC invocation
-    public final RestconfFuture<Optional<ContainerNode>> createDeviceNotificationStream(final ContainerNode input,
-            final String baseUrl, final DOMMountPointService mountPointService) {
+    public final RestconfFuture<Optional<ContainerNode>> createDeviceNotificationStream(final UriInfo uriInfo,
+            final ContainerNode input, final EffectiveModelContext modelContext,
+            final DOMMountPointService mountPointService) {
         // parsing out of container with settings and path
         // FIXME: ugly cast
         final var path = (YangInstanceIdentifier) input.findChildByArg(DEVICE_NOTIFICATION_PATH_NODEID)
@@ -559,20 +438,21 @@ public abstract sealed class ListenersBroker {
                 ErrorTag.OPERATION_FAILED);
         }
 
-// FIXME: use this for description?
-//        final String deviceName = listId.values().iterator().next().toString();
-
+        final var baseStreamsUri = baseStreamLocation(uriInfo);
         final var outputType = prepareOutputType(input);
-        final var notificationListenerAdapter = createStream(
+        return createStream(
+            "All YANG notifications occuring on mount point /" + IdentifierCodec.serialize(path, modelContext),
+            baseStreamsUri,
             streamName -> new DeviceNotificationStream(this, streamName, outputType, mountModelContext,
-                mountPointService, mountPoint.getIdentifier()));
-        notificationListenerAdapter.listen(mountNotifService, notificationPaths);
-
-        return RestconfFuture.of(Optional.of(Builders.containerBuilder()
-            .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
-            .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH,
-                baseUrl + notificationListenerAdapter.name()))
-            .build()));
+                mountPointService, mountPoint.getIdentifier()))
+            .transform(stream -> {
+                stream.listen(mountNotifService, notificationPaths);
+                return Optional.of(Builders.containerBuilder()
+                    .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
+                    .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH_NODEID,
+                        baseStreamsUri + '/' + stream.name()))
+                    .build());
+            });
     }
 
     /**
@@ -581,6 +461,7 @@ public abstract sealed class ListenersBroker {
      * @param data Container with stream settings (RPC create-stream).
      * @return Parsed {@link NotificationOutputType}.
      */
+    @Deprecated(forRemoval = true)
     private static NotificationOutputType prepareOutputType(final ContainerNode data) {
         final String outputName = extractStringLeaf(data, OUTPUT_TYPE_NODEID);
         return outputName != null ? NotificationOutputType.valueOf(outputName) : NotificationOutputType.XML;
@@ -606,5 +487,27 @@ public abstract sealed class ListenersBroker {
     private static @Nullable String extractStringLeaf(final ContainerNode data, final NodeIdentifier childName) {
         return data.childByArg(childName) instanceof LeafNode<?> leafNode && leafNode.body() instanceof String str
             ? str : null;
+    }
+
+    @VisibleForTesting
+    static @NonNull MapEntryNode streamEntry(final String name, final String description, final String location,
+            final String outputType) {
+        return Builders.mapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, name))
+            .withChild(ImmutableNodes.leafNode(NAME_QNAME, name))
+            .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, description))
+            .withChild(createAccessList(outputType, location))
+            .build();
+    }
+
+    private static MapNode createAccessList(final String outputType, final String location) {
+        return Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(Access.QNAME))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, outputType))
+                .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, outputType))
+                .withChild(ImmutableNodes.leafNode(LOCATION_QNAME, location))
+                .build())
+            .build();
     }
 }

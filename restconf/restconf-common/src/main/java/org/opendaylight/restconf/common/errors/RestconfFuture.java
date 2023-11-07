@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
 
 /**
@@ -45,8 +46,41 @@ public sealed class RestconfFuture<V> extends AbstractFuture<@NonNull V> permits
         return false;
     }
 
-    public final void addCallback(final RestconfCallback<? super V> callback) {
+    /**
+     * Add a callback to invoke when this future completes, or immediately if it is already complete.
+     *
+     * @param callback Callback to invoke
+     * @return This future
+     * @throws NullPointerException if {@code callback} is {@code null}
+     */
+    public final @NonNull RestconfFuture<V> addCallback(final RestconfCallback<? super V> callback) {
         Futures.addCallback(this, callback, MoreExecutors.directExecutor());
+        return this;
+    }
+
+    /**
+     * Transform the result of this future using the specified function.
+     *
+     * @param <T> Resulting type
+     * @param function Function to apply
+     * @return Transformed future
+     * @throws NullPointerException if {@code function} is {@code null}
+     */
+    public final <T> @NonNull RestconfFuture<T> transform(final Function<@NonNull V, @NonNull T> function) {
+        final var fun = requireNonNull(function);
+        final var ret = new RestconfFuture<T>();
+        addCallback(new RestconfCallback<>() {
+            @Override
+            public void onSuccess(final V result) {
+                ret.set(requireNonNull(fun.apply(result)));
+            }
+
+            @Override
+            protected void onFailure(final RestconfDocumentedException failure) {
+                ret.setException(failure);
+            }
+        });
+        return ret;
     }
 
     /**
