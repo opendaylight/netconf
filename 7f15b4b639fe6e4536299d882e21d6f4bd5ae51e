@@ -16,6 +16,24 @@
       "message": "IIRC we have decided to try binary type.",
       "revId": "7f15b4b639fe6e4536299d882e21d6f4bd5ae51e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "146cd858_1257a882",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-11-07T12:40:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc8bc792_5230a5fe",
+      "revId": "7f15b4b639fe6e4536299d882e21d6f4bd5ae51e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
