@@ -43,10 +43,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
+import org.opendaylight.restconf.common.ErrorTags;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
@@ -268,7 +270,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
         final PatchStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(context, strategy,
             iid.getSchemaContext());
-        return Response.status(Status.OK)
+        return Response.status(getStatusCode(patchStatusContext))
             .entity(patchStatusContext)
             .build();
     }
@@ -478,6 +480,25 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                         + "' specified in the URI doesn't match the value '" + dataKeyValue
                         + "' specified in the message body. ";
                 throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            }
+        }
+    }
+
+    private static Status getStatusCode(final PatchStatusContext result) {
+        if (result.isOk()) {
+            return Status.OK;
+        } else {
+            if (result.getGlobalErrors() == null || result.getGlobalErrors().isEmpty()) {
+                return result.getEditCollection().stream()
+                    .filter(patchStatus -> !patchStatus.isOk() && !patchStatus.getEditErrors().isEmpty())
+                    .findFirst()
+                    .map(PatchStatusEntity::getEditErrors)
+                    .flatMap(errors -> errors.stream().findFirst())
+                    .map(error -> ErrorTags.statusOf(error.getErrorTag()))
+                    .orElse(Status.INTERNAL_SERVER_ERROR);
+            } else {
+                final var error = result.getGlobalErrors().iterator().next();
+                return ErrorTags.statusOf(error.getErrorTag());
             }
         }
     }
