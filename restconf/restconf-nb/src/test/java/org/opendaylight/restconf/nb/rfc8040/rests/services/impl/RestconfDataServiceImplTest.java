@@ -473,7 +473,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
         dataService.yangPatchData(JUKEBOX_SCHEMA, patch, null, asyncResponse);
         final var response = responseCaptor.getValue();
-        assertEquals(200, response.getStatus());
+        assertEquals(409, response.getStatus());
         final var status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
 
         assertFalse(status.ok());
