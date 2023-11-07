@@ -20,6 +20,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -48,10 +49,12 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
@@ -68,6 +71,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
+import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.CreateOrReplaceResult;
@@ -697,9 +701,28 @@ public final class RestconfDataServiceImpl {
             .addCallback(new JaxRsRestconfCallback<>(ar) {
                 @Override
                 Response transform(final PatchStatusContext result) {
-                    return Response.ok().entity(result).build();
+                    return Response.status(getStatusCode(result)).entity(result).build();
                 }
             });
+    }
+
+    private static Status getStatusCode(final PatchStatusContext result) {
+        if (result.ok()) {
+           return Status.OK;
+        } else {
+            if (result.globalErrors() == null || result.globalErrors().isEmpty()) {
+               return result.editCollection().stream()
+                    .filter(patchStatus -> !patchStatus.isOk() && !patchStatus.getEditErrors().isEmpty())
+                    .findFirst()
+                    .map(PatchStatusEntity::getEditErrors)
+                    .flatMap(errors -> errors.stream().findFirst())
+                    .map(error -> ErrorTags.statusOf(error.getErrorTag()))
+                    .orElse(Status.INTERNAL_SERVER_ERROR);
+            } else {
+                final var error = result.globalErrors().iterator().next();
+                return ErrorTags.statusOf(error.getErrorTag());
+            }
+        }
     }
 
     private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,
