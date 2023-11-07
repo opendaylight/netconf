@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "220a083f_4f074430",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SecuritySchemesStream.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-07T09:56:33Z",
+      "side": 1,
+      "message": "should be final",
+      "revId": "9b69d5a9515fc3de5ae90e324ff2a520640f7dba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "690aeaf1_df443b72",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SecurityEntity.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-07T09:56:33Z",
+      "side": 1,
+      "message": "should be var",
+      "revId": "9b69d5a9515fc3de5ae90e324ff2a520640f7dba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cecd95da_250080c2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SecurityEntity.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-07T09:56:33Z",
+      "side": 1,
+      "message": "var",
+      "revId": "9b69d5a9515fc3de5ae90e324ff2a520640f7dba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e371d249_94f9ebf1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SecurityEntity.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-07T09:56:33Z",
+      "side": 1,
+      "message": "var",
+      "revId": "9b69d5a9515fc3de5ae90e324ff2a520640f7dba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
