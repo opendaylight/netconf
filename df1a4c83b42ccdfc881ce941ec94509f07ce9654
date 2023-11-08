@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "442e9a7b_c9e4dabc",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-08T09:33:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4aa54dd6_1b003620",
+      "revId": "df1a4c83b42ccdfc881ce941ec94509f07ce9654",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce3ed3fc_be821ed7",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "41a3c333_1450392b",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-08T09:33:59Z",
+      "side": 1,
+      "message": "Redundant \u0027final\u0027 modifier",
+      "parentUuid": "ce3ed3fc_be821ed7",
+      "revId": "df1a4c83b42ccdfc881ce941ec94509f07ce9654",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a54e1e97_35b1bb81",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-11-07T16:25:43Z",
       "side": 1,
       "message": "final",
+      "revId": "df1a4c83b42ccdfc881ce941ec94509f07ce9654",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b4591b6_3ae65c7c",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-08T09:33:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a54e1e97_35b1bb81",
       "revId": "df1a4c83b42ccdfc881ce941ec94509f07ce9654",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
