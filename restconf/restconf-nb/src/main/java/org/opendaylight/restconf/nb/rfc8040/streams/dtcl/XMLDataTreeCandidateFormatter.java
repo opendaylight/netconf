@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.dtcl;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -14,10 +14,11 @@ import java.util.List;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.xpath.XPathExpressionException;
+import org.opendaylight.restconf.nb.rfc8040.streams.TextParameters;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
+final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
     private static final XMLDataTreeCandidateFormatter EMPTY = new XMLDataTreeCandidateFormatter(TextParameters.EMPTY);
 
     static final DataTreeCandidateFormatterFactory FACTORY = new DataTreeCandidateFormatterFactory(EMPTY) {
@@ -43,12 +44,12 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
     }
 
     @Override
-    String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+    protected String createText(final TextParameters params, final EffectiveModelContext schemaContext,
             final List<DataTreeCandidate> input, final Instant now) throws Exception {
         final var writer = new StringWriter();
         boolean nonEmpty = false;
         try {
-            final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now);
+            final var xmlStreamWriter = createStreamWriterWithNotification(writer, now);
             xmlStreamWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, DATA_CHANGED_NOTIFICATION_ELEMENT,
                 DATA_CHANGED_NOTIFICATION_NS);
             xmlStreamWriter.writeDefaultNamespace(DATA_CHANGED_NOTIFICATION_NS);

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.dtcl;
 
 import static java.util.Objects.requireNonNull;
 
@@ -16,10 +16,10 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.ClusteredDOMDataTreeChangeListener;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.Sink;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.Source;
@@ -40,18 +40,13 @@ public final class DataTreeChangeSource extends Source<List<DataTreeCandidate>> 
     private final @NonNull LogicalDatastoreType datastore;
     private final @NonNull YangInstanceIdentifier path;
 
-    DataTreeChangeSource(final DatabindProvider databindProvider, final DOMDataBroker dataBroker,
+    public DataTreeChangeSource(final DatabindProvider databindProvider, final DOMDataTreeChangeService changeService,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         super(ENCODINGS);
         this.databindProvider = requireNonNull(databindProvider);
+        this.changeService = requireNonNull(changeService);
         this.datastore = requireNonNull(datastore);
         this.path = requireNonNull(path);
-
-        final var dtcs = dataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
-        if (dtcs == null) {
-            throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService");
-        }
-        changeService = dtcs;
     }
 
     @Override

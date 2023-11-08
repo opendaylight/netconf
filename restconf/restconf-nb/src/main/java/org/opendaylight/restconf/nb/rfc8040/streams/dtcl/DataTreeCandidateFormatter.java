@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.dtcl;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -13,6 +13,8 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathExpressionException;
+import org.opendaylight.restconf.nb.rfc8040.streams.EventFormatter;
+import org.opendaylight.restconf.nb.rfc8040.streams.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
@@ -38,7 +40,7 @@ abstract class DataTreeCandidateFormatter extends EventFormatter<List<DataTreeCa
     }
 
     @Override
-    final void fillDocument(final Document doc, final EffectiveModelContext schemaContext,
+    protected final void fillDocument(final Document doc, final EffectiveModelContext schemaContext,
             final List<DataTreeCandidate> input) throws IOException {
         final var notificationElement = createNotificationElement(doc, Instant.now());
         final var notificationEventElement = doc.createElementNS(DATA_CHANGED_NOTIFICATION_NS,

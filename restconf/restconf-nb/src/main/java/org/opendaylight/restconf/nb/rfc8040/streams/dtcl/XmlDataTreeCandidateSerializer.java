@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.dtcl;
 
 import static java.util.Objects.requireNonNull;
 
@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
-final class XmlDataTreeCandidateSerializer extends AbstractWebsocketSerializer<Exception> {
+final class XmlDataTreeCandidateSerializer extends DataTreeCandidateSerializer<Exception> {
     private static final @NonNull NodeIdentifier DATA_CHANGE_EVENT_NID = NodeIdentifier.create(DataChangeEvent.QNAME);
 
     private final XMLStreamWriter xmlWriter;

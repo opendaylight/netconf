@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.devnotif;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,7 +17,9 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.Sink;
+import org.opendaylight.restconf.nb.rfc8040.streams.notif.AbstractNotificationSource;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
@@ -35,7 +37,8 @@ public final class DeviceNotificationSource extends AbstractNotificationSource i
     private final DOMMountPointService mountPointService;
     private final YangInstanceIdentifier devicePath;
 
-    DeviceNotificationSource(final DOMMountPointService mountPointService, final YangInstanceIdentifier devicePath) {
+    public DeviceNotificationSource(final DOMMountPointService mountPointService,
+            final YangInstanceIdentifier devicePath) {
         this.mountPointService = requireNonNull(mountPointService);
         this.devicePath = requireNonNull(devicePath);
     }
@@ -85,8 +88,8 @@ public final class DeviceNotificationSource extends AbstractNotificationSource i
             return endOfStream(sink);
         }
 
-        final var notifReg = optNotification.orElseThrow().registerNotificationListener(
-            new Listener(sink, () -> modelContext), paths);
+        final var notifReg = optNotification.orElseThrow()
+            .registerNotificationListener(new Listener(sink, () -> modelContext), paths);
 
         // Notifications are running now.
         // If we get removed we need to close those. But since we are running lockless and we need to set up

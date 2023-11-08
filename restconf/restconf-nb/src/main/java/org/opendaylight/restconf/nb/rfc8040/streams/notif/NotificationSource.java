@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.notif;
 
 import static java.util.Objects.requireNonNull;
 
@@ -28,7 +28,7 @@ public final class NotificationSource extends AbstractNotificationSource {
     private final DOMNotificationService notificationService;
     private final ImmutableSet<QName> qnames;
 
-    NotificationSource(final DatabindProvider databindProvider, final DOMNotificationService notificationService,
+    public NotificationSource(final DatabindProvider databindProvider, final DOMNotificationService notificationService,
             final ImmutableSet<QName> qnames) {
         this.databindProvider = requireNonNull(databindProvider);
         this.notificationService = requireNonNull(notificationService);
