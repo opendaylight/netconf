@@ -56,7 +56,7 @@ final class JSONNotificationFormatter extends NotificationFormatter {
                 jsonWriter.beginObject()
                     .name(NOTIFICATION_NAME).beginObject()
                         .name("event-time").value(toRFC3339(now));
-                writeNotificationBody(JSONNormalizedNodeStreamWriter.createNestedWriter(
+                writeBody(JSONNormalizedNodeStreamWriter.createNestedWriter(
                     JSONCodecFactorySupplier.RFC7951.getShared(schemaContext), input.getType(), null, jsonWriter),
                     input.getBody());
                 jsonWriter.endObject().endObject();

@@ -8,20 +8,17 @@
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Base formatter for DataTreeCandidates which only handles exporting to a document for filter checking purpose.
@@ -43,36 +40,28 @@ abstract class DataTreeCandidateFormatter extends EventFormatter<List<DataTreeCa
     @Override
     final void fillDocument(final Document doc, final EffectiveModelContext schemaContext,
             final List<DataTreeCandidate> input) throws IOException {
-        final Element notificationElement = NotificationFormatter.createNotificationElement(doc);
-        final Element notificationEventElement = doc.createElementNS(
-            DATA_CHANGED_NOTIFICATION_NS, DATA_CHANGED_NOTIFICATION_ELEMENT);
+        final var notificationElement = createNotificationElement(doc, Instant.now());
+        final var notificationEventElement = doc.createElementNS(DATA_CHANGED_NOTIFICATION_NS,
+            DATA_CHANGED_NOTIFICATION_ELEMENT);
 
-        for (DataTreeCandidate candidate : input) {
-            final Element dataChangedElement = doc.createElement(DATA_CHANGE_EVENT_ELEMENT);
+        for (var candidate : input) {
+            final var dataChangedElement = doc.createElement(DATA_CHANGE_EVENT_ELEMENT);
             try {
-                final Element dataElement = doc.createElement("data");
-                final DOMResult domResult = new DOMResult(dataElement);
-                final XMLStreamWriter writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(domResult);
-
-                writeCandidate(XMLStreamNormalizedNodeStreamWriter.create(writer, schemaContext,
-                    candidate.getRootPath()), candidate);
-
+                final var dataElement = doc.createElement("data");
+                final var dataAfter = candidate.getRootNode().dataAfter();
+                if (dataAfter != null) {
+                    try (var writer = XMLStreamNormalizedNodeStreamWriter.create(
+                        XML_OUTPUT_FACTORY.createXMLStreamWriter(new DOMResult(dataElement)), schemaContext,
+                        candidate.getRootPath())) {
+                        writeBody(writer, dataAfter);
+                    }
+                }
                 dataChangedElement.appendChild(dataElement);
-            } catch (final XMLStreamException e) {
+            } catch (XMLStreamException e) {
                 throw new IOException("Failed to write notification content", e);
             }
             notificationElement.appendChild(notificationEventElement);
         }
         doc.appendChild(notificationElement);
-    }
-
-    static void writeCandidate(final NormalizedNodeStreamWriter writer, final DataTreeCandidate candidate)
-            throws IOException {
-        final var dataAfter = candidate.getRootNode().dataAfter();
-        if (dataAfter != null) {
-            try (var nodeWriter = NormalizedNodeWriter.forStreamWriter(writer)) {
-                nodeWriter.write(dataAfter);
-            }
-        }
     }
 }
