@@ -11,10 +11,10 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -30,8 +30,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
@@ -40,6 +39,8 @@ import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
+import org.opendaylight.restconf.server.mdsal.streams.dtcl.DataTreeChangeSource;
+import org.opendaylight.restconf.server.spi.RestconfStreamRegistry;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.PatchCont1Builder;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice1.PatchCase1Builder;
 import org.opendaylight.yang.gen.v1.augment.instance.identifier.patch.module.rev220218.patch.cont.patch.choice2.PatchCase11Builder;
@@ -203,7 +204,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
     private DatabindProvider databindProvider;
-    private ListenersBroker listenersBroker;
+    private RestconfStreamRegistry streamRegistry;
 
     @BeforeClass
     public static void beforeClass() {
@@ -220,15 +221,16 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
         databindProvider = () -> DatabindContext.ofModel(SCHEMA_CONTEXT);
-        listenersBroker = new ListenersBroker.ServerSentEvents(domDataBroker, mock(DOMNotificationService.class),
-            mock(DOMMountPointService.class));
+        streamRegistry = new MdsalRestconfStreamRegistry(domDataBroker);
     }
 
     TestHandler createHandler(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType, final boolean leafNodesOnly, final boolean skipNotificationData,
             final boolean changedLeafNodesOnly, final boolean childNodesOnly) throws Exception {
-        final var stream = listenersBroker.createStream("test", "baseURI",
-            new DataTreeChangeSource(databindProvider, domDataBroker, LogicalDatastoreType.CONFIGURATION, path))
+        final var stream = streamRegistry.createStream(URI.create("baseURI"),
+            new DataTreeChangeSource(databindProvider,
+                domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class),
+                LogicalDatastoreType.CONFIGURATION, path), "test")
             .getOrThrow();
         final var handler = new TestHandler();
         stream.addSubscriber(handler,

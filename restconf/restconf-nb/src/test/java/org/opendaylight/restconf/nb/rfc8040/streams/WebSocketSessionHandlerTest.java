@@ -22,8 +22,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
@@ -39,18 +37,18 @@ import org.opendaylight.yangtools.concepts.Registration;
 class WebSocketSessionHandlerTest {
     private final class WebSocketTestSessionState {
         private final WebSocketSessionHandler webSocketSessionHandler;
-        private final int heartbeatInterval;
+        private final long heartbeatInterval;
         private final int maxFragmentSize;
 
-        WebSocketTestSessionState(final int maxFragmentSize, final int heartbeatInterval) {
+        WebSocketTestSessionState(final int maxFragmentSize, final long heartbeatInterval) {
             this.heartbeatInterval = heartbeatInterval;
             this.maxFragmentSize = maxFragmentSize;
-            webSocketSessionHandler = new WebSocketSessionHandler(executorService, stream,
-                ENCODING, null, maxFragmentSize, heartbeatInterval);
+            webSocketSessionHandler = new WebSocketSessionHandler(pingExecutor, stream, ENCODING, null, maxFragmentSize,
+                heartbeatInterval);
 
             if (heartbeatInterval != 0) {
-                doReturn(pingFuture).when(executorService).scheduleWithFixedDelay(any(Runnable.class),
-                    eq((long) heartbeatInterval), eq((long) heartbeatInterval), eq(TimeUnit.MILLISECONDS));
+                doReturn(pingRegistration).when(pingExecutor).startPingProcess(any(Runnable.class),
+                    eq(heartbeatInterval), eq(TimeUnit.MILLISECONDS));
             }
         }
     }
@@ -60,9 +58,9 @@ class WebSocketSessionHandlerTest {
     @Mock
     private RestconfStream<?> stream;
     @Mock
-    private ScheduledExecutorService executorService;
+    private PingExecutor pingExecutor;
     @Mock
-    private ScheduledFuture pingFuture;
+    private Registration pingRegistration;
     @Mock
     private Session session;
 
@@ -73,9 +71,8 @@ class WebSocketSessionHandlerTest {
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
         verify(stream).addSubscriber(webSocketTestSessionState.webSocketSessionHandler, ENCODING, null);
-        verify(executorService).scheduleWithFixedDelay(any(Runnable.class),
-                eq((long) webSocketTestSessionState.heartbeatInterval),
-                eq((long) webSocketTestSessionState.heartbeatInterval), eq(TimeUnit.MILLISECONDS));
+        verify(pingExecutor).startPingProcess(any(Runnable.class), eq(webSocketTestSessionState.heartbeatInterval),
+                eq(TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -85,7 +82,7 @@ class WebSocketSessionHandlerTest {
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
         verify(stream).addSubscriber(webSocketTestSessionState.webSocketSessionHandler, ENCODING, null);
-        verifyNoMoreInteractions(executorService);
+        verifyNoMoreInteractions(pingExecutor);
     }
 
     @Test
@@ -126,15 +123,12 @@ class WebSocketSessionHandlerTest {
         when(stream.addSubscriber(webSocketTestSessionState.webSocketSessionHandler, ENCODING, null))
             .thenReturn(reg);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        when(pingFuture.isCancelled()).thenReturn(false);
-        when(pingFuture.isDone()).thenReturn(false);
 
         final var sampleError = new IllegalStateException("Simulated error");
         doNothing().when(reg).close();
+        doNothing().when(pingRegistration).close();
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
-        verify(reg).close();
         verify(session).close();
-        verify(pingFuture).cancel(anyBoolean());
     }
 
     @Test
@@ -148,10 +142,10 @@ class WebSocketSessionHandlerTest {
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
         final var sampleError = new IllegalStateException("Simulated error");
+        doNothing().when(reg).close();
+        doNothing().when(pingRegistration).close();
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
-        verify(reg).close();
         verify(session, never()).close();
-        verify(pingFuture).cancel(anyBoolean());
     }
 
     @Test
@@ -163,13 +157,11 @@ class WebSocketSessionHandlerTest {
         when(stream.addSubscriber(webSocketTestSessionState.webSocketSessionHandler, ENCODING, null))
             .thenReturn(reg);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        when(pingFuture.isDone()).thenReturn(true);
 
         final var sampleError = new IllegalStateException("Simulated error");
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
         verify(reg).close();
         verify(session, never()).close();
-        verify(pingFuture, never()).cancel(anyBoolean());
     }
 
     @Test

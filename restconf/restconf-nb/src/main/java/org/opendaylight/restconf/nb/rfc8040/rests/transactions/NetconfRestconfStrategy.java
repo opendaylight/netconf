@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -38,7 +39,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     public NetconfRestconfStrategy(final EffectiveModelContext modelContext,
             final NetconfDataTreeService netconfService, final @Nullable DOMRpcService rpcService) {
-        super(modelContext, rpcService);
+        super(modelContext, ImmutableMap.of(), rpcService);
         this.netconfService = requireNonNull(netconfService);
     }
 
