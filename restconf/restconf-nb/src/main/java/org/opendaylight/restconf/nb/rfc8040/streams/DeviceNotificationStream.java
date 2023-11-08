@@ -30,7 +30,7 @@ public final class DeviceNotificationStream extends AbstractNotificationStream i
 
     private Registration reg;
 
-    DeviceNotificationStream(final ListenersBroker listenersBroker, final String name,
+    public DeviceNotificationStream(final ListenersBroker listenersBroker, final String name,
             final NotificationOutputType outputType, final EffectiveModelContext effectiveModel,
             final DOMMountPointService mountPointService, final YangInstanceIdentifier instanceIdentifier) {
         super(listenersBroker, name, outputType);

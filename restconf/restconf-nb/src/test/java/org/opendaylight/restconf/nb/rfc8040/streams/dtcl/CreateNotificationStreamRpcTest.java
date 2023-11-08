@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.nb.rfc8040.streams.dtcl;
 
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,14 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
-import java.net.URI;
+import java.security.Principal;
 import java.util.UUID;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +33,9 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
+import org.opendaylight.restconf.nb.rfc8040.streams.notif.CreateNotificationStreamRpc;
+import org.opendaylight.restconf.server.RpcImplementation.RpcInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -52,23 +52,18 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class ListenersBrokerTest {
+class CreateNotificationStreamRpcTest {
     private static final EffectiveModelContext SCHEMA_CTX = YangParserTestUtils.parseYangResourceDirectory("/streams");
 
+    @Mock
+    private Principal principal;
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
     private DOMDataTreeWriteTransaction tx;
-    @Mock
-    private UriInfo uriInfo;
-    @Mock
-    private UriBuilder uriBuilder;
-    @Captor
-    private ArgumentCaptor<String> uriCaptor;
     @Captor
     private ArgumentCaptor<YangInstanceIdentifier> pathCaptor;
     @Captor
@@ -76,11 +71,13 @@ class ListenersBrokerTest {
 
     private ListenersBroker listenersBroker;
     private DatabindProvider databindProvider;
+    private CreateNotificationStreamRpc rpc;
 
     @BeforeEach
     public void before() {
         listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
         databindProvider = () -> DatabindContext.ofModel(SCHEMA_CTX);
+        rpc = new CreateNotificationStreamRpc(databindProvider, listenersBroker);
     }
 
     @Test
@@ -89,13 +86,8 @@ class ListenersBrokerTest {
         doNothing().when(tx).put(eq(LogicalDatastoreType.OPERATIONAL), pathCaptor.capture(), dataCaptor.capture());
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        doReturn(uriBuilder).when(uriInfo).getBaseUriBuilder();
-        doReturn(uriBuilder).when(uriBuilder).replacePath(uriCaptor.capture());
-        doAnswer(inv -> new URI(uriCaptor.getValue())).when(uriBuilder).build();
-
-        final var output = assertInstanceOf(ContainerNode.class, listenersBroker.createDataChangeNotifiStream(
-            databindProvider, uriInfo, prepareDomPayload("create-data-change-event-subscription", "toaster", "path"),
-            SCHEMA_CTX).getOrThrow().orElse(null));
+        final var output = assertInstanceOf(ContainerNode.class, rpc.invoke(principal, "/rests",
+            prepareDomPayload("create-data-change-event-subscription", "toaster", "path")).getOrThrow().output());
 
         assertEquals(new NodeIdentifier(CreateDataChangeEventSubscriptionOutput.QNAME), output.name());
         assertEquals(1, output.size());
@@ -140,7 +132,7 @@ class ListenersBrokerTest {
     void createStreamWrongValueTest() {
         final var payload = prepareDomPayload("create-data-change-event-subscription", "String value", "path");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> listenersBroker.createDataChangeNotifiStream(databindProvider, uriInfo, payload, SCHEMA_CTX))
+            () -> rpc.invoke(principal, "/rests", payload))
             .getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -153,7 +145,7 @@ class ListenersBrokerTest {
     void createStreamWrongInputRpcTest() {
         final var payload = prepareDomPayload("create-data-change-event-subscription2", "toaster", "path2");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> listenersBroker.createDataChangeNotifiStream(databindProvider, uriInfo, payload, SCHEMA_CTX))
+            () -> rpc.invoke(principal, "/rests", payload))
             .getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -162,13 +154,12 @@ class ListenersBrokerTest {
         assertEquals("Instance identifier was not normalized correctly", error.getErrorMessage());
     }
 
-    private static ContainerNode prepareDomPayload(final String rpcName, final String toasterValue,
-            final String inputOutputName) {
+    private RpcInput prepareDomPayload(final String rpcName, final String toasterValue, final String inputName) {
         final var rpcModule = SCHEMA_CTX.findModules("sal-remote").iterator().next();
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), rpcName);
 
         ContainerLike containerSchemaNode = null;
-        for (final RpcDefinition rpc : rpcModule.getRpcs()) {
+        for (var rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 containerSchemaNode = rpc.getInput();
                 break;
@@ -176,7 +167,7 @@ class ListenersBrokerTest {
         }
         assertNotNull(containerSchemaNode);
 
-        final QName lfQName = QName.create(rpcModule.getQNameModule(), inputOutputName);
+        final QName lfQName = QName.create(rpcModule.getQNameModule(), inputName);
         assertInstanceOf(LeafSchemaNode.class, containerSchemaNode.dataChildByName(lfQName));
 
         final Object o;
@@ -187,9 +178,9 @@ class ListenersBrokerTest {
             o = toasterValue;
         }
 
-        return Builders.containerBuilder()
+        return new RpcInput(databindProvider.currentContext(), Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(containerSchemaNode.getQName()))
             .withChild(ImmutableNodes.leafNode(lfQName, o))
-            .build();
+            .build());
     }
 }

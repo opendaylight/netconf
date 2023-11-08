@@ -10,10 +10,8 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -23,47 +21,26 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscriptionOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStreamInput;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.CreateDataChangeEventSubscriptionInput1;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,24 +125,9 @@ public abstract sealed class ListenersBroker {
     @VisibleForTesting
     static final QName LOCATION_QNAME =  QName.create(Stream.QNAME, "location").intern();
 
-    private static final NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(
-        QName.create(CreateDataChangeEventSubscriptionInput1.QNAME, "datastore").intern());
     @Deprecated(forRemoval = true)
     private static final NodeIdentifier OUTPUT_TYPE_NODEID = NodeIdentifier.create(
         QName.create(NotificationOutputTypeGrouping.QNAME, "notification-output-type").intern());
-    private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
-        NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "path").intern());
-    private static final NodeIdentifier DEVICE_NOTIFICATION_STREAM_PATH_NODEID =
-        NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "stream-path").intern());
-
-    private static final NodeIdentifier SAL_REMOTE_OUTPUT_NODEID =
-        NodeIdentifier.create(CreateDataChangeEventSubscriptionOutput.QNAME);
-    private static final NodeIdentifier NOTIFICATIONS =
-        NodeIdentifier.create(QName.create(CreateNotificationStreamInput.QNAME, "notifications").intern());
-    private static final NodeIdentifier PATH_NODEID =
-        NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionInput.QNAME, "path").intern());
-    private static final NodeIdentifier STREAM_NAME_NODEID =
-        NodeIdentifier.create(QName.create(CreateDataChangeEventSubscriptionOutput.QNAME, "stream-name").intern());
 
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
     private final DOMDataBroker dataBroker;
@@ -195,7 +157,7 @@ public abstract sealed class ListenersBroker {
      * @return A {@link RestconfStream} instance
      * @throws NullPointerException if {@code factory} is {@code null}
      */
-    final <T extends RestconfStream<?>> @NonNull RestconfFuture<T> createStream(final String description,
+    public final <T extends RestconfStream<?>> @NonNull RestconfFuture<T> createStream(final String description,
             final String baseStreamLocation, final StreamFactory<T> factory) {
         String name;
         T stream;
@@ -276,52 +238,6 @@ public abstract sealed class ListenersBroker {
      */
     public abstract @NonNull String baseStreamLocation(UriInfo uriInfo);
 
-    /**
-     * Create data-change-event stream with POST operation via RPC.
-     *
-     * @param input Input of RPC - example in JSON (data-change-event stream):
-     *              <pre>
-     *              {@code
-     *                  {
-     *                      "input": {
-     *                          "path": "/toaster:toaster/toaster:toasterStatus",
-     *                          "sal-remote-augment:datastore": "OPERATIONAL",
-     *                      }
-     *                  }
-     *              }
-     *              </pre>
-     * @param modelContext Reference to {@link EffectiveModelContext}.
-     * @return {@link DOMRpcResult} - Output of RPC - example in JSON:
-     *     <pre>
-     *     {@code
-     *         {
-     *             "output": {
-     *                 "stream-name": "toaster:toaster/toaster:toasterStatus/datastore=OPERATIONAL/scope=ONE"
-     *             }
-     *         }
-     *     }
-     *     </pre>
-     */
-    // FIXME: this really should be a normal RPC implementation
-    public final RestconfFuture<Optional<ContainerNode>> createDataChangeNotifiStream(
-            final DatabindProvider databindProvider, final UriInfo uriInfo, final ContainerNode input,
-            final EffectiveModelContext modelContext) {
-        final var datastoreName = extractStringLeaf(input, DATASTORE_NODEID);
-        final var datastore = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
-            : LogicalDatastoreType.CONFIGURATION;
-        final var path = preparePath(input);
-
-        final var outputType = prepareOutputType(input);
-        return createStream(
-            "Events occuring in " + datastore + " datastore under /" + IdentifierCodec.serialize(path, modelContext),
-            baseStreamLocation(uriInfo),
-            name -> new DataTreeChangeStream(this, name, outputType, databindProvider, datastore, path))
-            .transform(stream -> Optional.of(Builders.containerBuilder()
-                .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
-                .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
-                .build()));
-    }
-
 // FIXME: NETCONF-1102: this part needs to be invoked from subscriber
 //    /**
 //     * Register listener by streamName in identifier to listen to data change notifications, and put or delete
@@ -346,115 +262,6 @@ public abstract sealed class ListenersBroker {
 //        listener.listen(dataBroker);
 //    }
 
-    // FIXME: this really should be a normal RPC implementation
-    public final RestconfFuture<Optional<ContainerNode>> createNotificationStream(
-            final DatabindProvider databindProvider, final UriInfo uriInfo, final ContainerNode input,
-            final EffectiveModelContext modelContext) {
-        final var qnames = ((LeafSetNode<String>) input.getChildByArg(NOTIFICATIONS)).body().stream()
-            .map(LeafSetEntryNode::body)
-            .map(QName::create)
-            .sorted()
-            .collect(ImmutableSet.toImmutableSet());
-
-        final var description = new StringBuilder("YANG notifications matching any of {");
-        var haveFirst = false;
-        for (var qname : qnames) {
-            final var module = modelContext.findModuleStatement(qname.getModule())
-                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown module",
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
-            final var stmt = module.findSchemaTreeNode(qname)
-                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown notification",
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
-            if (!(stmt instanceof NotificationEffectiveStatement)) {
-                throw new RestconfDocumentedException(qname + " refers to a non-notification",
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
-            }
-
-            if (haveFirst) {
-                description.append(",\n");
-            } else {
-                haveFirst = true;
-            }
-            description.append("\n  ")
-                .append(module.argument().getLocalName()).append(':').append(qname.getLocalName());
-        }
-        description.append("\n}");
-
-        // registration of the listener
-        final var outputType = prepareOutputType(input);
-        return createStream(description.toString(), baseStreamLocation(uriInfo),
-            name -> new NotificationStream(this, name, outputType, databindProvider, qnames))
-            .transform(stream -> Optional.of(Builders.containerBuilder()
-                .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
-                .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
-                .build()));
-    }
-
-    /**
-     * Create device notification stream.
-     *
-     * @param input RPC input
-     * @param mountPointService dom mount point service
-     * @return {@link DOMRpcResult} - Output of RPC - example in JSON
-     */
-    // FIXME: this should be an RPC invocation
-    public final RestconfFuture<Optional<ContainerNode>> createDeviceNotificationStream(final UriInfo uriInfo,
-            final ContainerNode input, final EffectiveModelContext modelContext,
-            final DOMMountPointService mountPointService) {
-        // parsing out of container with settings and path
-        // FIXME: ugly cast
-        final var path = (YangInstanceIdentifier) input.findChildByArg(DEVICE_NOTIFICATION_PATH_NODEID)
-                .map(DataContainerChild::body)
-                .orElseThrow(() -> new RestconfDocumentedException("No path specified", ErrorType.APPLICATION,
-                    ErrorTag.DATA_MISSING));
-
-        if (!(path.getLastPathArgument() instanceof NodeIdentifierWithPredicates listId)) {
-            throw new RestconfDocumentedException("Path does not refer to a list item", ErrorType.APPLICATION,
-                ErrorTag.INVALID_VALUE);
-        }
-        if (listId.size() != 1) {
-            throw new RestconfDocumentedException("Target list uses multiple keys", ErrorType.APPLICATION,
-                ErrorTag.INVALID_VALUE);
-        }
-
-        final DOMMountPoint mountPoint = mountPointService.getMountPoint(path)
-            .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
-                ErrorTag.OPERATION_FAILED));
-
-        final DOMNotificationService mountNotifService = mountPoint.getService(DOMNotificationService.class)
-            .orElseThrow(() -> new RestconfDocumentedException("Mount point does not support notifications",
-                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED));
-
-        final var mountModelContext = mountPoint.getService(DOMSchemaService.class)
-            .orElseThrow(() -> new RestconfDocumentedException("Mount point schema not available",
-                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED))
-            .getGlobalContext();
-        final var notificationPaths = mountModelContext.getModuleStatements().values().stream()
-            .flatMap(module -> module.streamEffectiveSubstatements(NotificationEffectiveStatement.class))
-            .map(notification -> Absolute.of(notification.argument()))
-            .collect(ImmutableSet.toImmutableSet());
-        if (notificationPaths.isEmpty()) {
-            throw new RestconfDocumentedException("Device does not support notification", ErrorType.APPLICATION,
-                ErrorTag.OPERATION_FAILED);
-        }
-
-        final var baseStreamsUri = baseStreamLocation(uriInfo);
-        final var outputType = prepareOutputType(input);
-        return createStream(
-            "All YANG notifications occuring on mount point /" + IdentifierCodec.serialize(path, modelContext),
-            baseStreamsUri,
-            streamName -> new DeviceNotificationStream(this, streamName, outputType, mountModelContext,
-                mountPointService, mountPoint.getIdentifier()))
-            .transform(stream -> {
-                stream.listen(mountNotifService, notificationPaths);
-                return Optional.of(Builders.containerBuilder()
-                    .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
-                    .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH_NODEID,
-                        baseStreamsUri + '/' + stream.name()))
-                    .build());
-            });
-    }
-
     /**
      * Prepare {@link NotificationOutputType}.
      *
@@ -465,23 +272,6 @@ public abstract sealed class ListenersBroker {
     private static NotificationOutputType prepareOutputType(final ContainerNode data) {
         final String outputName = extractStringLeaf(data, OUTPUT_TYPE_NODEID);
         return outputName != null ? NotificationOutputType.valueOf(outputName) : NotificationOutputType.XML;
-    }
-
-    /**
-     * Prepare {@link YangInstanceIdentifier} of stream source.
-     *
-     * @param data Container with stream settings (RPC create-stream).
-     * @return Parsed {@link YangInstanceIdentifier} of data element from which the data-change-event notifications
-     *         are going to be generated.
-     */
-    private static YangInstanceIdentifier preparePath(final ContainerNode data) {
-        final var pathLeaf = data.childByArg(PATH_NODEID);
-        if (pathLeaf != null && pathLeaf.body() instanceof YangInstanceIdentifier pathValue) {
-            return pathValue;
-        }
-
-        throw new RestconfDocumentedException("Instance identifier was not normalized correctly",
-            ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
     }
 
     private static @Nullable String extractStringLeaf(final ContainerNode data, final NodeIdentifier childName) {

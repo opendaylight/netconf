@@ -25,7 +25,7 @@ public final class NotificationStream extends AbstractNotificationStream {
     private final DatabindProvider databindProvider;
     private final ImmutableSet<QName> paths;
 
-    NotificationStream(final ListenersBroker listenersBroker, final String name,
+    public NotificationStream(final ListenersBroker listenersBroker, final String name,
             final NotificationOutputType outputType, final DatabindProvider databindProvider,
             final ImmutableSet<QName> paths) {
         super(listenersBroker, name, outputType);

@@ -44,7 +44,6 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -88,8 +87,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     @Before
     public void setup() {
         server = new MdsalRestconfServer(dataBroker, rpcService, mountPointService);
-        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(() -> CONTEXT, server, mountPointService,
-            new ListenersBroker.WebSockets(dataBroker));
+        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(() -> CONTEXT, server);
     }
 
     @Test

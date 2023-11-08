@@ -37,7 +37,7 @@ public final class DataTreeChangeStream extends RestconfStream<List<DataTreeCand
     private final @NonNull LogicalDatastoreType datastore;
     private final @NonNull YangInstanceIdentifier path;
 
-    DataTreeChangeStream(final ListenersBroker listenersBroker, final String name,
+    public DataTreeChangeStream(final ListenersBroker listenersBroker, final String name,
             final NotificationOutputType outputType, final DatabindProvider databindProvider,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         super(listenersBroker, name, ENCODINGS, outputType);
