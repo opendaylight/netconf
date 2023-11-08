@@ -28,7 +28,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfInvokeOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
-import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
 
 final class RestconfApplication extends Application {
     private final Set<Object> singletons;
@@ -36,11 +35,11 @@ final class RestconfApplication extends Application {
     RestconfApplication(final DatabindProvider databindProvider, final MdsalRestconfServer server,
             final DOMMountPointService mountPointService, final DOMDataBroker dataBroker,
             final DOMActionService actionService, final DOMNotificationService notificationService,
-            final DOMSchemaService domSchemaService, final ListenersBroker listenersBroker) {
+            final DOMSchemaService domSchemaService) {
         singletons = Set.of(
             new RestconfDocumentedExceptionMapper(databindProvider),
             new RestconfDataServiceImpl(databindProvider, server, actionService),
-            new RestconfInvokeOperationsServiceImpl(databindProvider, server, listenersBroker),
+            new RestconfInvokeOperationsServiceImpl(server),
             new RestconfOperationsServiceImpl(databindProvider, server),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
             new RestconfImpl(databindProvider));

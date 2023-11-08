@@ -139,7 +139,7 @@ public final class RestconfStream<T> {
             }
         }
     };
-    private final @NonNull ListenersBroker listenersBroker;
+    private final @NonNull MdsalRestconfStreamRegistry registry;
     private final @NonNull Source<T> source;
     private final @NonNull String name;
 
@@ -150,8 +150,8 @@ public final class RestconfStream<T> {
     @GuardedBy("this")
     private Registration registration;
 
-    RestconfStream(final ListenersBroker listenersBroker, final Source<T> source, final String name) {
-        this.listenersBroker = requireNonNull(listenersBroker);
+    RestconfStream(final MdsalRestconfStreamRegistry registry, final Source<T> source, final String name) {
+        this.registry = requireNonNull(registry);
         this.source = requireNonNull(source);
         this.name = requireNonNull(name);
     }
@@ -292,7 +292,7 @@ public final class RestconfStream<T> {
                 registration = null;
             }
         }
-        listenersBroker.removeStream(this);
+        registry.removeStream(this);
     }
 
     @Override
