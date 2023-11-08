@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53c86e84_7a2fb6a7",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-11-08T12:00:47Z",
+      "side": 1,
+      "message": "Improve this msg.",
+      "revId": "54042835228ac819e2bf2f19358e4f69fd245cc2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
