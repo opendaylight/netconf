@@ -245,9 +245,9 @@ public final class DefinitionGenerator {
             dataNodeProperties.items(items);
             dataNodeProperties.description(schemaNode.getDescription().orElse(""));
             if (node.getElementCountConstraint().isPresent()) {
-                final var minElements = node.getElementCountConstraint().orElse(null).getMinElements();
+                final var minElements = node.getElementCountConstraint().orElseThrow().getMinElements();
                 dataNodeProperties.minItems(minElements);
-                dataNodeProperties.maxItems(node.getElementCountConstraint().orElse(null).getMaxElements());
+                dataNodeProperties.maxItems(node.getElementCountConstraint().orElseThrow().getMaxElements());
                 if (minElements != null) {
                     dataNodeProperties.example(createExamples(node, minElements));
                 }
@@ -353,6 +353,7 @@ public final class DefinitionGenerator {
 
         return processRef(nodeName, discriminator, schemaNode);
     }
+
 
     /**
      * Processes the nodes.
@@ -541,6 +542,8 @@ public final class DefinitionGenerator {
         processMandatory((MandatoryAware) leafNode, name, required);
         return property.build();
     }
+
+
 
     private static String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
             final Property.Builder property, final SchemaInferenceStack stack) {
