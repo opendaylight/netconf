@@ -167,8 +167,8 @@ public final class RestconfDataServiceImpl {
         }
         if (node == null) {
             throw new RestconfDocumentedException(
-                    "Request could not be completed because the relevant data model content does not exist",
-                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+                "Request could not be completed because the relevant data model content does not exist",
+                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
         }
 
         return switch (readParams.content()) {
