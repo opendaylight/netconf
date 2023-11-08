@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.net.URI;
 import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
@@ -25,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -46,8 +44,6 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
-    private DOMDataTreeChangeService changeService;
-    @Mock
     private DOMDataTreeWriteTransaction tx;
     @Mock
     private DatabindProvider databindProvider;
@@ -62,12 +58,10 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
 
     @BeforeEach
     void prepareListenersBroker() {
-        doReturn(ImmutableClassToInstanceMap.of(DOMDataTreeChangeService.class, changeService)).when(dataBroker)
-            .getExtensions();
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker, notificationService, mountPointService);
+        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker);
         webSocketFactory = new WebSocketFactory(execService, listenersBroker, 5000, 2000);
 
         streamName = listenersBroker.createStream("description", "streams",

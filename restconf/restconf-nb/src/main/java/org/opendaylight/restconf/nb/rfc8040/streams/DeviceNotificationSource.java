@@ -35,7 +35,7 @@ public final class DeviceNotificationSource extends AbstractNotificationSource i
     private final DOMMountPointService mountPointService;
     private final YangInstanceIdentifier devicePath;
 
-    DeviceNotificationSource(final DOMMountPointService mountPointService, final YangInstanceIdentifier devicePath) {
+    public DeviceNotificationSource(final DOMMountPointService mountPointService, final YangInstanceIdentifier devicePath) {
         this.mountPointService = requireNonNull(mountPointService);
         this.devicePath = requireNonNull(devicePath);
     }

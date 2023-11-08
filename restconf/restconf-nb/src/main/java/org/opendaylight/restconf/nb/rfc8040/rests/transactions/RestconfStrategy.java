@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -42,6 +43,8 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
+import org.opendaylight.restconf.server.RpcImplementation;
+import org.opendaylight.restconf.server.RpcImplementation.RpcOutput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -111,10 +114,13 @@ public abstract class RestconfStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
 
     private final @NonNull EffectiveModelContext modelContext;
-    private final @Nullable DOMRpcService rpcService;
+    private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
+    private final DOMRpcService rpcService;
 
-    RestconfStrategy(final EffectiveModelContext modelContext, final @Nullable DOMRpcService rpcService) {
+    RestconfStrategy(final EffectiveModelContext modelContext, final ImmutableMap<QName, RpcImplementation> localRpcs,
+            final @Nullable DOMRpcService rpcService) {
         this.modelContext = requireNonNull(modelContext);
+        this.localRpcs = requireNonNull(localRpcs);
         this.rpcService = rpcService;
     }
 
@@ -1038,42 +1044,46 @@ public abstract class RestconfStrategy {
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
     }
 
-    public @NonNull RestconfFuture<Optional<ContainerNode>> invokeRpc(final QName type, final ContainerNode input) {
-        final var ret = new SettableRestconfFuture<Optional<ContainerNode>>();
-
-        final var local = rpcService;
+    public @NonNull RestconfFuture<RpcOutput> invokeRpc(final QName type, final ContainerNode input) {
+        final var local = localRpcs.get(type);
         if (local != null) {
-            Futures.addCallback(local.invokeRpc(requireNonNull(type), requireNonNull(input)),
-                new FutureCallback<DOMRpcResult>() {
-                    @Override
-                    public void onSuccess(final DOMRpcResult response) {
-                        final var errors = response.errors();
-                        if (errors.isEmpty()) {
-                            ret.set(Optional.ofNullable(response.value()));
-                        } else {
-                            LOG.debug("RPC invocation reported {}", response.errors());
-                            ret.setFailure(new RestconfDocumentedException("RPC implementation reported errors", null,
-                                response.errors()));
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(final Throwable cause) {
-                        LOG.debug("RPC invocation failed, cause");
-                        if (cause instanceof RestconfDocumentedException ex) {
-                            ret.setFailure(ex);
-                        } else {
-                            // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
-                            ret.setFailure(new RestconfDocumentedException(cause,
-                                new RestconfError(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage())));
-                        }
-                    }
-                }, MoreExecutors.directExecutor());
-        } else {
+            return local.invoke(null, null, null);
+        }
+        if (rpcService == null) {
             LOG.debug("RPC invocation is not available");
-            ret.setFailure(new RestconfDocumentedException("RPC invocation is not available",
+            return RestconfFuture.failed(new RestconfDocumentedException("RPC invocation is not available",
                 ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED));
         }
+
+        final var ret = new SettableRestconfFuture<RpcOutput>();
+        Futures.addCallback(rpcService.invokeRpc(requireNonNull(type), requireNonNull(input)),
+            new FutureCallback<DOMRpcResult>() {
+            @Override
+            public void onSuccess(final DOMRpcResult response) {
+                final var errors = response.errors();
+                if (errors.isEmpty()) {
+                    // FIXME: current databind
+                    ret.set(new RpcOutput(null, response.value()));
+                } else {
+                    LOG.debug("RPC invocation reported {}", response.errors());
+                    ret.setFailure(new RestconfDocumentedException("RPC implementation reported errors", null,
+                        response.errors()));
+                }
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.debug("RPC invocation failed, cause");
+                if (cause instanceof RestconfDocumentedException ex) {
+                    ret.setFailure(ex);
+                } else {
+                    // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
+                    ret.setFailure(new RestconfDocumentedException(cause,
+                        new RestconfError(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage())));
+                }
+            }
+        }, MoreExecutors.directExecutor());
         return ret;
     }
 }

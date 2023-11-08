@@ -28,7 +28,7 @@ public final class NotificationSource extends AbstractNotificationSource {
     private final DOMNotificationService notificationService;
     private final ImmutableSet<QName> qnames;
 
-    NotificationSource(final DatabindProvider databindProvider, final DOMNotificationService notificationService,
+    public NotificationSource(final DatabindProvider databindProvider, final DOMNotificationService notificationService,
             final ImmutableSet<QName> qnames) {
         this.databindProvider = requireNonNull(databindProvider);
         this.notificationService = requireNonNull(notificationService);

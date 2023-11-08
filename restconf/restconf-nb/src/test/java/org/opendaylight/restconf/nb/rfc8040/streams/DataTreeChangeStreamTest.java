@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import java.io.IOException;
@@ -30,8 +29,6 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
@@ -220,8 +217,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
         databindProvider = () -> DatabindContext.ofModel(SCHEMA_CONTEXT);
-        listenersBroker = new ListenersBroker.ServerSentEvents(domDataBroker, mock(DOMNotificationService.class),
-            mock(DOMMountPointService.class));
+        listenersBroker = new ListenersBroker.ServerSentEvents(domDataBroker);
     }
 
     TestHandler createHandler(final YangInstanceIdentifier path, final String streamName,
