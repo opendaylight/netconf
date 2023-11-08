@@ -12,9 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.net.URI;
-import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.server.mdsal.streams.dtcl.DataTreeChangeSource;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -38,7 +37,7 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
     private static final QName TOASTER = QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster");
 
     @Mock
-    private ScheduledExecutorService execService;
+    private PingExecutor pingExecutor;
     @Mock
     private ServletUpgradeRequest upgradeRequest;
     @Mock
@@ -46,9 +45,9 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
-    private DOMDataTreeChangeService changeService;
-    @Mock
     private DOMDataTreeWriteTransaction tx;
+    @Mock
+    private DOMDataTreeChangeService changeService;
     @Mock
     private DatabindProvider databindProvider;
     @Mock
@@ -62,17 +61,16 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
 
     @BeforeEach
     void prepareListenersBroker() {
-        doReturn(ImmutableClassToInstanceMap.of(DOMDataTreeChangeService.class, changeService)).when(dataBroker)
-            .getExtensions();
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        listenersBroker = new ListenersBroker.ServerSentEvents(dataBroker, notificationService, mountPointService);
-        webSocketFactory = new WebSocketFactory(execService, listenersBroker, 5000, 2000);
+        listenersBroker = new ListenersBroker(dataBroker);
+        webSocketFactory = new WebSocketFactory(listenersBroker, pingExecutor, 5000, 2000);
 
-        streamName = listenersBroker.createStream("description", "streams",
-            new DataTreeChangeSource(databindProvider, dataBroker, LogicalDatastoreType.CONFIGURATION,
-                YangInstanceIdentifier.of(TOASTER)))
+        streamName = listenersBroker.createStream(URI.create("https://localhost:8181/rests"),
+            new DataTreeChangeSource(databindProvider, changeService, LogicalDatastoreType.CONFIGURATION,
+                YangInstanceIdentifier.of(TOASTER)),
+            "description")
             .getOrThrow()
             .name();
     }

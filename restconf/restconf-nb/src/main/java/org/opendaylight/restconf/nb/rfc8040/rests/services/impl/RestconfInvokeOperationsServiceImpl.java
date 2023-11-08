@@ -9,9 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.POST;
@@ -24,25 +22,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStream;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opendaylight.restconf.server.spi.OperationOutput;
 
 /**
  * An operation resource represents a protocol operation defined with the YANG {@code rpc} statement. It is invoked
@@ -50,17 +35,10 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 public final class RestconfInvokeOperationsServiceImpl {
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfInvokeOperationsServiceImpl.class);
-
-    private final DatabindProvider databindProvider;
     private final MdsalRestconfServer server;
-    private final ListenersBroker listenersBroker;
 
-    public RestconfInvokeOperationsServiceImpl(final DatabindProvider databindProvider,
-            final MdsalRestconfServer server, final ListenersBroker listenersBroker) {
-        this.databindProvider = requireNonNull(databindProvider);
+    public RestconfInvokeOperationsServiceImpl(final MdsalRestconfServer server) {
         this.server = requireNonNull(server);
-        this.listenersBroker = requireNonNull(listenersBroker);
     }
 
     /**
@@ -124,48 +102,14 @@ public final class RestconfInvokeOperationsServiceImpl {
 
     private void invokeRpc(final String identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
-        final var databind = databindProvider.currentContext();
-        final var reqPath = server.bindRequestPath(databind, identifier);
-
-        final ContainerNode input;
-        try {
-            input = body.toContainerNode(reqPath.inference());
-        } catch (IOException e) {
-            LOG.debug("Error reading input", e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
-        }
-
-        hackInvokeRpc(databind, reqPath, uriInfo, input).addCallback(new JaxRsRestconfCallback<>(ar) {
-            @Override
-            Response transform(final Optional<ContainerNode> result) {
-                return result
-                    .filter(output -> !output.isEmpty())
-                    .map(output -> Response.ok().entity(new NormalizedNodePayload(reqPath.inference(), output)).build())
-                    .orElseGet(() -> Response.noContent().build());
-            }
-        });
-    }
-
-    private RestconfFuture<Optional<ContainerNode>> hackInvokeRpc(final DatabindContext localDatabind,
-            final InstanceIdentifierContext reqPath, final UriInfo uriInfo, final ContainerNode input) {
-        // RPC type
-        final var type = reqPath.getSchemaNode().getQName();
-        final var mountPoint = reqPath.getMountPoint();
-        if (mountPoint == null) {
-            final var baseURI = uriInfo.getBaseUri();
-            // Hacked-up integration of streams
-            if (CreateDataChangeEventSubscription.QNAME.equals(type)) {
-                return listenersBroker.createDataChangeNotifiStream(databindProvider, baseURI, input,
-                    localDatabind.modelContext());
-            } else if (CreateNotificationStream.QNAME.equals(type)) {
-                return listenersBroker.createNotificationStream(databindProvider, baseURI, input,
-                    localDatabind.modelContext());
-            } else if (SubscribeDeviceNotification.QNAME.equals(type)) {
-                return listenersBroker.createDeviceNotificationStream(baseURI, input, localDatabind.modelContext());
-            }
-        }
-
-        return server.getRestconfStrategy(reqPath.getSchemaContext(), mountPoint).invokeRpc(type, input);
+        server.invokeRpc(uriInfo.getBaseUri(), identifier, body)
+            .addCallback(new JaxRsRestconfCallback<OperationOutput>(ar) {
+                @Override
+                Response transform(final OperationOutput result) {
+                    final var body = result.output();
+                    return body == null ? Response.noContent().build()
+                        : Response.ok().entity(new NormalizedNodePayload(result.operation(), body)).build();
+                }
+            });
     }
 }

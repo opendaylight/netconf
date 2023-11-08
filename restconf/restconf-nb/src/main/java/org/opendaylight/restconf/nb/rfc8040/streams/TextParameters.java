@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * Text formatting parameters.
@@ -18,7 +18,10 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  *                             changed nodes
  * @param childNodesOnly {@code true} if this query should only notify about child node changes
  */
-@NonNullByDefault
-record TextParameters(boolean leafNodesOnly, boolean skipData, boolean changedLeafNodesOnly, boolean childNodesOnly) {
-    static final TextParameters EMPTY = new TextParameters(false, false, false, false);
+public record TextParameters(
+        boolean leafNodesOnly,
+        boolean skipData,
+        boolean changedLeafNodesOnly,
+        boolean childNodesOnly) {
+    public static final @NonNull TextParameters EMPTY = new TextParameters(false, false, false, false);
 }

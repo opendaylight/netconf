@@ -1,0 +1,75 @@
+/*
+ * Copyright (c) 2014, 2016 Cisco Systems, Inc. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.restconf.server.mdsal.streams.dtcl;
+
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.collect.ImmutableMap;
+import java.time.Instant;
+import java.util.List;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.ClusteredDOMDataTreeChangeListener;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.EncodingName;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.Sink;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.Source;
+import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
+
+/**
+ * A {@link RestconfStream} reporting changes on a particular data tree.
+ */
+@VisibleForTesting
+public final class DataTreeChangeSource extends Source<List<DataTreeCandidate>> {
+    private static final ImmutableMap<EncodingName, DataTreeCandidateFormatterFactory> ENCODINGS = ImmutableMap.of(
+        EncodingName.RFC8040_JSON, JSONDataTreeCandidateFormatter.FACTORY,
+        EncodingName.RFC8040_XML, XMLDataTreeCandidateFormatter.FACTORY);
+
+    private final @NonNull DOMDataTreeChangeService changeService;
+    private final @NonNull DatabindProvider databindProvider;
+    private final @NonNull LogicalDatastoreType datastore;
+    private final @NonNull YangInstanceIdentifier path;
+
+    public DataTreeChangeSource(final DatabindProvider databindProvider, final DOMDataTreeChangeService changeService,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
+        super(ENCODINGS);
+        this.databindProvider = requireNonNull(databindProvider);
+        this.changeService = requireNonNull(changeService);
+        this.datastore = requireNonNull(datastore);
+        this.path = requireNonNull(path);
+    }
+
+    @Override
+    protected Registration start(final Sink<List<DataTreeCandidate>> sink) {
+        return changeService.registerDataTreeChangeListener(new DOMDataTreeIdentifier(datastore, path),
+            new ClusteredDOMDataTreeChangeListener() {
+                @Override
+                public void onDataTreeChanged(final List<DataTreeCandidate> changes) {
+                    // FIXME: format one change at a time?
+                    sink.publish(databindProvider.currentContext().modelContext(), changes, Instant.now());
+                }
+
+                @Override
+                public void onInitialData() {
+                    // No-op
+                }
+            });
+    }
+
+    @Override
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        return super.addToStringAttributes(helper.add("path", path));
+    }
+}
