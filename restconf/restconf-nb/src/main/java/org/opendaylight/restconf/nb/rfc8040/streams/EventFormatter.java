@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.io.Writer;
 import java.time.Instant;
@@ -63,17 +64,17 @@ public abstract class EventFormatter<T> implements Immutable {
         DBF = f;
     }
 
-    static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
+    protected static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
 
     private final TextParameters textParams;
     private final XPathExpression filter;
 
-    EventFormatter(final TextParameters textParams)  {
+    protected EventFormatter(final TextParameters textParams)  {
         this.textParams = requireNonNull(textParams);
         filter = null;
     }
 
-    EventFormatter(final TextParameters params, final String xpathFilter) throws XPathExpressionException {
+    protected EventFormatter(final TextParameters params, final String xpathFilter) throws XPathExpressionException {
         textParams = requireNonNull(params);
 
         final XPath xpath;
@@ -84,8 +85,9 @@ public abstract class EventFormatter<T> implements Immutable {
         filter = xpath.compile(xpathFilter);
     }
 
-    final @Nullable String eventData(final EffectiveModelContext schemaContext, final T input, final Instant now)
-            throws Exception {
+    @VisibleForTesting
+    public final @Nullable String eventData(final EffectiveModelContext schemaContext, final T input,
+            final Instant now) throws Exception {
         return filterMatches(schemaContext, input, now) ? createText(textParams, schemaContext, input, now) : null;
     }
 
@@ -97,7 +99,7 @@ public abstract class EventFormatter<T> implements Immutable {
      * @param input data to export
      * @throws IOException if any IOException occurs during export to the document
      */
-    abstract void fillDocument(Document doc, EffectiveModelContext schemaContext, T input) throws IOException;
+    protected abstract void fillDocument(Document doc, EffectiveModelContext schemaContext, T input) throws IOException;
 
     /**
      * Format the input data into string representation of the data provided.
@@ -109,8 +111,8 @@ public abstract class EventFormatter<T> implements Immutable {
      * @return String representation of the formatted data
      * @throws Exception if the underlying formatters fail to export the data to the requested format
      */
-    abstract String createText(TextParameters params, EffectiveModelContext schemaContext, T input, Instant now)
-        throws Exception;
+    protected abstract String createText(TextParameters params, EffectiveModelContext schemaContext, T input,
+        Instant now) throws Exception;
 
     private boolean filterMatches(final EffectiveModelContext schemaContext, final T input, final Instant now)
             throws IOException {
@@ -142,11 +144,11 @@ public abstract class EventFormatter<T> implements Immutable {
      * @param now time stamp
      * @return Data specified by RFC3339.
      */
-    static final String toRFC3339(final Instant now) {
+    protected static final String toRFC3339(final Instant now) {
         return DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(now, ZoneId.systemDefault()));
     }
 
-    static final @NonNull Element createNotificationElement(final Document doc, final Instant now) {
+    protected static final @NonNull Element createNotificationElement(final Document doc, final Instant now) {
         final var notificationElement = doc.createElementNS(NamespaceURN.NOTIFICATION, "notification");
         final var eventTimeElement = doc.createElement("eventTime");
         eventTimeElement.setTextContent(toRFC3339(now));
@@ -154,8 +156,8 @@ public abstract class EventFormatter<T> implements Immutable {
         return notificationElement;
     }
 
-    static final @NonNull XMLStreamWriter createStreamWriterWithNotification(final Writer writer, final Instant now)
-            throws XMLStreamException {
+    protected static final @NonNull XMLStreamWriter createStreamWriterWithNotification(final Writer writer,
+            final Instant now) throws XMLStreamException {
         final var xmlStreamWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(writer);
         xmlStreamWriter.setDefaultNamespace(NamespaceURN.NOTIFICATION);
 
@@ -168,7 +170,8 @@ public abstract class EventFormatter<T> implements Immutable {
         return xmlStreamWriter;
     }
 
-    static final void writeBody(final NormalizedNodeStreamWriter writer, final NormalizedNode body) throws IOException {
+    protected static final void writeBody(final NormalizedNodeStreamWriter writer, final NormalizedNode body)
+            throws IOException {
         try (var nodeWriter = NormalizedNodeWriter.forStreamWriter(writer)) {
             nodeWriter.write(body);
         }

@@ -10,7 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 /**
  * Interface for session handler that is responsible for sending of data over established session.
  */
-public interface StreamSessionHandler {
+interface StreamSessionHandler {
     /**
      * Interface for sending String message through one of implementation.
      *

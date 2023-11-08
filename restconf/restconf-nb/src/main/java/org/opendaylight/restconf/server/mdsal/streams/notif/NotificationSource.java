@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.server.mdsal.streams.notif;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,7 +23,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
 /**
  * A {@link Source} reporting YANG notifications.
  */
-public final class NotificationSource extends AbstractNotificationSource {
+final class NotificationSource extends AbstractNotificationSource {
     private final DatabindProvider databindProvider;
     private final DOMNotificationService notificationService;
     private final ImmutableSet<QName> qnames;
@@ -33,15 +33,6 @@ public final class NotificationSource extends AbstractNotificationSource {
         this.databindProvider = requireNonNull(databindProvider);
         this.notificationService = requireNonNull(notificationService);
         this.qnames = requireNonNull(qnames);
-    }
-
-    /**
-     * Return notification QNames.
-     *
-     * @return The YANG notification {@link QName}s this listener is bound to
-     */
-    public ImmutableSet<QName> qnames() {
-        return qnames;
     }
 
     @Override

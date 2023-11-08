@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.server.mdsal.streams.notif;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,15 +20,14 @@ import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStream.Source;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextProvider;
 
 /**
- * Abstract base class for functionality shared between {@link NotificationSource} and
- * {@link DeviceNotificationSource}.
+ * Abstract base class for functionality shared between {@link DOMNotification}-based sources.
  */
-abstract class AbstractNotificationSource extends Source<DOMNotification> {
-    static final class Listener implements DOMNotificationListener {
+public abstract class AbstractNotificationSource extends Source<DOMNotification> {
+    protected static final class Listener implements DOMNotificationListener {
         private final Sink<DOMNotification> sink;
         private final EffectiveModelContextProvider modelContext;
 
-        Listener(final Sink<DOMNotification> sink, final EffectiveModelContextProvider modelContext) {
+        public Listener(final Sink<DOMNotification> sink, final EffectiveModelContextProvider modelContext) {
             this.sink = requireNonNull(sink);
             this.modelContext = requireNonNull(modelContext);
         }
@@ -44,7 +43,7 @@ abstract class AbstractNotificationSource extends Source<DOMNotification> {
         EncodingName.RFC8040_JSON, JSONNotificationFormatter.FACTORY,
         EncodingName.RFC8040_XML, XMLNotificationFormatter.FACTORY);
 
-    AbstractNotificationSource() {
+    protected AbstractNotificationSource() {
         super(ENCODINGS);
     }
 }
