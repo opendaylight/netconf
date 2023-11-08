@@ -8,27 +8,18 @@
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.time.Instant;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathExpressionException;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
-import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStream;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
-    private static final String NOTIFICATION_ELEMENT = "notification";
     private static final String CREATE_NOTIFICATION_STREAM_ELEMENT = CreateNotificationStream.QNAME.getLocalName();
     private static final String CREATE_NOTIFICATION_STREAM_NS =
         CreateNotificationStream.QNAME.getNamespace().toString();
@@ -46,15 +37,15 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
             throws IOException {
         final var notificationElement = createNotificationElement(doc,
             input instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now());
+        // FIXME: what is this really?!
         final var notificationEventElement = doc.createElementNS(CREATE_NOTIFICATION_STREAM_NS,
             CREATE_NOTIFICATION_STREAM_ELEMENT);
-        final var dataElement = doc.createElement(NOTIFICATION_ELEMENT);
-        final DOMResult result = new DOMResult(dataElement);
+        final var dataElement = doc.createElement("notification");
         try {
-            final XMLStreamWriter writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
+            final var writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(new DOMResult(dataElement));
             try {
-                writeNotificationBody(XMLStreamNormalizedNodeStreamWriter.create(writer, schemaContext,
-                        input.getType()), input.getBody());
+                writeBody(XMLStreamNormalizedNodeStreamWriter.create(writer, schemaContext, input.getType()),
+                    input.getBody());
             } finally {
                 writer.close();
             }
@@ -63,44 +54,5 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
         }
         notificationElement.appendChild(notificationEventElement);
         doc.appendChild(notificationElement);
-    }
-
-    static void writeNotificationBody(final NormalizedNodeStreamWriter writer, final ContainerNode body)
-            throws IOException {
-        try (NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(writer)) {
-            nodeWriter.write(body);
-        }
-    }
-
-    /**
-     * Generating base element of every notification.
-     *
-     * @param doc base {@link Document}
-     * @return element of {@link Document}
-     */
-    static @NonNull Element createNotificationElement(final Document doc) {
-        return createNotificationElement(doc, Instant.now());
-    }
-
-    static @NonNull Element createNotificationElement(final Document doc, final Instant now) {
-        final var notificationElement = doc.createElementNS(NamespaceURN.NOTIFICATION, NOTIFICATION_ELEMENT);
-        final Element eventTimeElement = doc.createElement("eventTime");
-        eventTimeElement.setTextContent(toRFC3339(now));
-        notificationElement.appendChild(eventTimeElement);
-        return notificationElement;
-    }
-
-    static @NonNull XMLStreamWriter createStreamWriterWithNotification(final Writer writer, final Instant now)
-            throws XMLStreamException {
-        final var xmlStreamWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(writer);
-        xmlStreamWriter.setDefaultNamespace(NamespaceURN.NOTIFICATION);
-
-        xmlStreamWriter.writeStartElement(NamespaceURN.NOTIFICATION, NOTIFICATION_ELEMENT);
-        xmlStreamWriter.writeDefaultNamespace(NamespaceURN.NOTIFICATION);
-
-        xmlStreamWriter.writeStartElement("eventTime");
-        xmlStreamWriter.writeCharacters(toRFC3339(now));
-        xmlStreamWriter.writeEndElement();
-        return xmlStreamWriter;
     }
 }

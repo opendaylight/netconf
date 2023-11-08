@@ -50,10 +50,8 @@ final class XMLNotificationFormatter extends NotificationFormatter {
 
         try {
             final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now);
-            final var nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlStreamWriter, schemaContext,
-                input.getType());
-
-            try (var nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter)) {
+            try (var nnWriter = NormalizedNodeWriter.forStreamWriter(XMLStreamNormalizedNodeStreamWriter.create(
+                    xmlStreamWriter, schemaContext, input.getType()))) {
                 nnWriter.write(input.getBody());
                 nnWriter.flush();
 
