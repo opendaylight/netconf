@@ -16,6 +16,24 @@
       "message": "@param toRemove subscriber to remove",
       "revId": "91ba6e412c3561394fffc327a39d5c9cdfd40b0b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ca349aa_bd098234",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/Subscribers.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-11-08T10:14:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3103ab25_37f4149e",
+      "revId": "91ba6e412c3561394fffc327a39d5c9cdfd40b0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
