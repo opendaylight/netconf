@@ -245,9 +245,9 @@ public final class DefinitionGenerator {
             dataNodeProperties.items(items);
             dataNodeProperties.description(schemaNode.getDescription().orElse(""));
             if (node.getElementCountConstraint().isPresent()) {
-                final var minElements = node.getElementCountConstraint().orElse(null).getMinElements();
+                final var minElements = node.getElementCountConstraint().orElseThrow().getMinElements();
                 dataNodeProperties.minItems(minElements);
-                dataNodeProperties.maxItems(node.getElementCountConstraint().orElse(null).getMaxElements());
+                dataNodeProperties.maxItems(node.getElementCountConstraint().orElseThrow().getMaxElements());
                 if (minElements != null) {
                     dataNodeProperties.example(createExamples(node, minElements));
                 }
