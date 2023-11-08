@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.server.mdsal.streams.dtcl;
 
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
@@ -14,13 +14,14 @@ import java.time.Instant;
 import java.util.List;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.nb.rfc8040.streams.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
+final class JSONDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
     private static final @NonNull String DATA_CHANGED_EVENT_NAME = DataChangeEvent.QNAME.getLocalName();
     private static final @NonNull String DATA_CHANGED_NOTIFICATION_NAME =
         $YangModuleInfoImpl.getInstance().getName().getLocalName() + ":" + DataChangedNotification.QNAME.getLocalName();
@@ -50,7 +51,7 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
     }
 
     @Override
-    String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+    protected String createText(final TextParameters params, final EffectiveModelContext schemaContext,
             final List<DataTreeCandidate> input, final Instant now) throws IOException {
         try (var writer = new StringWriter()) {
             boolean nonEmpty = false;
@@ -61,7 +62,7 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
                         .name(DATA_CHANGED_NOTIFICATION_NAME).beginObject()
                             .name(DATA_CHANGED_EVENT_NAME).beginArray();
 
-                final var serializer = new JsonDataTreeCandidateSerializer(schemaContext, jsonWriter);
+                final var serializer = new JSONDataTreeCandidateSerializer(schemaContext, jsonWriter);
                 for (var candidate : input) {
                     nonEmpty |= serializer.serialize(candidate, params);
                 }

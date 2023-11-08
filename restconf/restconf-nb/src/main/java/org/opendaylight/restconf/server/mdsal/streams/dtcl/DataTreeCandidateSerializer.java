@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.server.mdsal.streams.dtcl;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.Deque;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.nb.rfc8040.streams.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent.Operation;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.data.change.event.Data;
@@ -41,8 +42,8 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class AbstractWebsocketSerializer<T extends Exception> {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractWebsocketSerializer.class);
+abstract class DataTreeCandidateSerializer<T extends Exception> {
+    private static final Logger LOG = LoggerFactory.getLogger(DataTreeCandidateSerializer.class);
     static final @NonNull QName PATH_QNAME = QName.create(DataChangeEvent.QNAME, "path").intern();
     static final @NonNull NodeIdentifier PATH_NID = NodeIdentifier.create(PATH_QNAME);
     static final @NonNull QName OPERATION_QNAME = QName.create(DataChangeEvent.QNAME, "operation").intern();
@@ -51,11 +52,11 @@ abstract class AbstractWebsocketSerializer<T extends Exception> {
 
     private final EffectiveModelContext context;
 
-    AbstractWebsocketSerializer(final EffectiveModelContext context) {
+    DataTreeCandidateSerializer(final EffectiveModelContext context) {
         this.context = requireNonNull(context);
     }
 
-    public final boolean serialize(final DataTreeCandidate candidate, final TextParameters params) throws T {
+    final boolean serialize(final DataTreeCandidate candidate, final TextParameters params) throws T {
         final var skipData = params.skipData();
         final var changedLeafNodesOnly = params.changedLeafNodesOnly();
         if (changedLeafNodesOnly || params.leafNodesOnly()) {

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.streams;
+package org.opendaylight.restconf.server.mdsal.streams.notif;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -14,6 +14,8 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.restconf.nb.rfc8040.streams.EventFormatter;
+import org.opendaylight.restconf.nb.rfc8040.streams.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStream;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -33,8 +35,8 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
     }
 
     @Override
-    final void fillDocument(final Document doc, final EffectiveModelContext schemaContext, final DOMNotification input)
-            throws IOException {
+    protected final void fillDocument(final Document doc, final EffectiveModelContext schemaContext,
+            final DOMNotification input) throws IOException {
         final var notificationElement = createNotificationElement(doc,
             input instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now());
         // FIXME: what is this really?!

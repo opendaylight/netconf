@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -25,9 +26,11 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
+import org.opendaylight.restconf.server.RpcImplementation;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -42,9 +45,14 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final DOMDataBroker dataBroker;
 
     public MdsalRestconfStrategy(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker,
-            final @Nullable DOMRpcService rpcService) {
-        super(modelContext, rpcService);
+            final @Nullable DOMRpcService rpcService, final ImmutableMap<QName, RpcImplementation> localRpcs) {
+        super(modelContext, localRpcs, rpcService);
         this.dataBroker = requireNonNull(dataBroker);
+    }
+
+    public MdsalRestconfStrategy(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker,
+            final @Nullable DOMRpcService rpcService) {
+        this(modelContext, dataBroker, rpcService, ImmutableMap.of());
     }
 
     @Override

@@ -11,8 +11,11 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -27,6 +30,8 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.server.RpcImplementation;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -54,6 +59,7 @@ public final class MdsalRestconfServer {
         }
     }
 
+    private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
     private final @NonNull DOMMountPointService mountPointService;
     private final @NonNull DOMDataBroker dataBroker;
     private final @Nullable DOMRpcService rpcService;
@@ -64,10 +70,17 @@ public final class MdsalRestconfServer {
     @Inject
     @Activate
     public MdsalRestconfServer(@Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
-            @Reference final DOMMountPointService mountPointService) {
+            @Reference final DOMMountPointService mountPointService,
+            @Reference final List<RpcImplementation> localRpcs) {
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcService = requireNonNull(rpcService);
         this.mountPointService = requireNonNull(mountPointService);
+        this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
+    }
+
+    public MdsalRestconfServer(final DOMDataBroker dataBroker, final DOMRpcService rpcService,
+            final DOMMountPointService mountPointService, final RpcImplementation... localRpcs) {
+        this(dataBroker, rpcService, mountPointService, List.of(localRpcs));
     }
 
     @NonNull InstanceIdentifierContext bindRequestPath(final DatabindContext databind, final String identifier) {
@@ -105,7 +118,7 @@ public final class MdsalRestconfServer {
             return local;
         }
 
-        final var created = new MdsalRestconfStrategy(modelContext, dataBroker, rpcService);
+        final var created = new MdsalRestconfStrategy(modelContext, dataBroker, rpcService, localRpcs);
         LOCAL_STRATEGY.setRelease(this, created);
         return created;
     }
