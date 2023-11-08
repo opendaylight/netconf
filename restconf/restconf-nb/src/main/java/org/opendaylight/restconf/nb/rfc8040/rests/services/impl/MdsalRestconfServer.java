@@ -11,8 +11,13 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
+import java.net.URI;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -22,11 +27,22 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.OperationOutput;
+import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -37,11 +53,10 @@ import org.slf4j.LoggerFactory;
 /**
  * A RESTCONF server implemented on top of MD-SAL.
  */
-// FIXME: factor out the 'RestconfServer' interface once we're ready
 // FIXME: this should live in 'org.opendaylight.restconf.server.mdsal' package
 @Singleton
-@Component(service = MdsalRestconfServer.class)
-public final class MdsalRestconfServer {
+@Component(service = { MdsalRestconfServer.class, RestconfServer.class })
+public final class MdsalRestconfServer implements RestconfServer {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfServer.class);
     private static final VarHandle LOCAL_STRATEGY;
 
@@ -54,7 +69,9 @@ public final class MdsalRestconfServer {
         }
     }
 
+    private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
     private final @NonNull DOMMountPointService mountPointService;
+    private final @NonNull DatabindProvider databindProvider;
     private final @NonNull DOMDataBroker dataBroker;
     private final @Nullable DOMRpcService rpcService;
 
@@ -63,13 +80,28 @@ public final class MdsalRestconfServer {
 
     @Inject
     @Activate
-    public MdsalRestconfServer(@Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
-            @Reference final DOMMountPointService mountPointService) {
+    public MdsalRestconfServer(@Reference final DatabindProvider databindProvider,
+            @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
+            @Reference final DOMMountPointService mountPointService,
+            @Reference final List<RpcImplementation> localRpcs) {
+        this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcService = requireNonNull(rpcService);
         this.mountPointService = requireNonNull(mountPointService);
+        this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
     }
 
+    public MdsalRestconfServer(final DatabindProvider databind, final DOMDataBroker dataBroker,
+            final DOMRpcService rpcService, final DOMMountPointService mountPointService,
+            final RpcImplementation... localRpcs) {
+        this(databind, dataBroker, rpcService, mountPointService, List.of(localRpcs));
+    }
+
+    @NonNull InstanceIdentifierContext bindRequestPath(final String identifier) {
+        return bindRequestPath(databindProvider.currentContext(), identifier);
+    }
+
+    @Deprecated
     @NonNull InstanceIdentifierContext bindRequestPath(final DatabindContext databind, final String identifier) {
         // FIXME: go through ApiPath first. That part should eventually live in callers
         // FIXME: DatabindContext looks like it should be internal
@@ -77,9 +109,28 @@ public final class MdsalRestconfServer {
             mountPointService));
     }
 
-    @SuppressWarnings("static-method")
-    @NonNull InstanceIdentifierContext bindRequestRoot(final DatabindContext databind) {
-        return InstanceIdentifierContext.ofLocalRoot(databind.modelContext());
+    @Override
+    public RestconfFuture<OperationOutput> invokeRpc(final URI restconfURI, final String apiPath,
+            final OperationInputBody body) {
+        final var currentContext = databindProvider.currentContext();
+        final var reqPath = bindRequestPath(currentContext, apiPath);
+        final var inference = reqPath.inference();
+        final ContainerNode input;
+        try {
+            input = body.toContainerNode(inference);
+        } catch (IOException e) {
+            LOG.debug("Error reading input", e);
+            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+        }
+
+        return getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint())
+            .invokeRpc(restconfURI, reqPath.getSchemaNode().getQName(),
+                new OperationInput(currentContext, inference, input));
+    }
+
+    @NonNull InstanceIdentifierContext bindRequestRoot() {
+        return InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext().modelContext());
     }
 
     @VisibleForTesting
@@ -105,7 +156,7 @@ public final class MdsalRestconfServer {
             return local;
         }
 
-        final var created = new MdsalRestconfStrategy(modelContext, dataBroker, rpcService);
+        final var created = new MdsalRestconfStrategy(modelContext, dataBroker, rpcService, localRpcs);
         LOCAL_STRATEGY.setRelease(this, created);
         return created;
     }

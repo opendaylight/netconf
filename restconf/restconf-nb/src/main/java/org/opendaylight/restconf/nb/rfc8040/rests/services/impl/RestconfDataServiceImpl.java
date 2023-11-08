@@ -130,7 +130,7 @@ public final class RestconfDataServiceImpl {
     })
     public Response readData(@Context final UriInfo uriInfo) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
-        return readData(server.bindRequestRoot(databindProvider.currentContext()), readParams);
+        return readData(server.bindRequestRoot(), readParams);
     }
 
     /**
@@ -152,7 +152,7 @@ public final class RestconfDataServiceImpl {
     public Response readData(@Encoded @PathParam("identifier") final String identifier,
             @Context final UriInfo uriInfo) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
-        return readData(server.bindRequestPath(databindProvider.currentContext(), identifier), readParams);
+        return readData(server.bindRequestPath(identifier), readParams);
     }
 
     private Response readData(final InstanceIdentifierContext reqPath, final ReadDataParams readParams) {
@@ -169,8 +169,8 @@ public final class RestconfDataServiceImpl {
         }
         if (node == null) {
             throw new RestconfDocumentedException(
-                    "Request could not be completed because the relevant data model content does not exist",
-                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+                "Request could not be completed because the relevant data model content does not exist",
+                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
         }
 
         return switch (readParams.content()) {
@@ -273,7 +273,7 @@ public final class RestconfDataServiceImpl {
 
     private void putData(final @Nullable String identifier, final UriInfo uriInfo, final ResourceBody body,
             final AsyncResponse ar) {
-        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
+        final var reqPath = server.bindRequestPath(identifier);
         final var insert = QueryParams.parseInsert(reqPath.getSchemaContext(), uriInfo);
         final var req = bindResourceRequest(reqPath, body);
 
@@ -325,7 +325,7 @@ public final class RestconfDataServiceImpl {
     })
     public void postDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
+        final var reqPath = server.bindRequestPath(identifier);
         if (reqPath.getSchemaNode() instanceof ActionDefinition) {
             try (var jsonBody = new JsonOperationInputBody(body)) {
                 invokeAction(reqPath, jsonBody, ar);
@@ -375,7 +375,7 @@ public final class RestconfDataServiceImpl {
     })
     public void postDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
+        final var reqPath = server.bindRequestPath(identifier);
         if (reqPath.getSchemaNode() instanceof ActionDefinition) {
             try (var xmlBody = new XmlOperationInputBody(body)) {
                 invokeAction(reqPath, xmlBody, ar);
@@ -449,7 +449,7 @@ public final class RestconfDataServiceImpl {
     @Path("/data/{identifier:.+}")
     public void deleteData(@Encoded @PathParam("identifier") final String identifier,
             @Suspended final AsyncResponse ar) {
-        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
+        final var reqPath = server.bindRequestPath(identifier);
         final var strategy = server.getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
 
         strategy.delete(reqPath.getInstanceIdentifier()).addCallback(new JaxRsRestconfCallback<>(ar) {
@@ -550,7 +550,7 @@ public final class RestconfDataServiceImpl {
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     private void plainPatchData(final ResourceBody body, final AsyncResponse ar) {
-        plainPatchData(server.bindRequestRoot(databindProvider.currentContext()), body, ar);
+        plainPatchData(server.bindRequestRoot(), body, ar);
     }
 
     /**
@@ -562,7 +562,7 @@ public final class RestconfDataServiceImpl {
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     private void plainPatchData(final String identifier, final ResourceBody body, final AsyncResponse ar) {
-        plainPatchData(server.bindRequestPath(databindProvider.currentContext(), identifier), body, ar);
+        plainPatchData(server.bindRequestPath(identifier), body, ar);
     }
 
     /**
@@ -680,13 +680,13 @@ public final class RestconfDataServiceImpl {
     }
 
     private void yangPatchData(final @NonNull PatchBody body, final AsyncResponse ar) {
-        final var context = databindProvider.currentContext().modelContext();
+        final var context = server.bindRequestRoot().getSchemaContext();
         yangPatchData(context, parsePatchBody(context, YangInstanceIdentifier.of(), body), null, ar);
     }
 
     private void yangPatchData(final String identifier, final @NonNull PatchBody body,
             final AsyncResponse ar) {
-        final var reqPath = server.bindRequestPath(databindProvider.currentContext(), identifier);
+        final var reqPath = server.bindRequestPath(identifier);
         final var modelContext = reqPath.getSchemaContext();
         yangPatchData(modelContext, parsePatchBody(modelContext, reqPath.getInstanceIdentifier(), body),
             reqPath.getMountPoint(), ar);
@@ -707,19 +707,17 @@ public final class RestconfDataServiceImpl {
     private static Status getStatusCode(final PatchStatusContext result) {
         if (result.ok()) {
             return Status.OK;
+        } else if (result.globalErrors() == null || result.globalErrors().isEmpty()) {
+            return result.editCollection().stream()
+                .filter(patchStatus -> !patchStatus.isOk() && !patchStatus.getEditErrors().isEmpty())
+                .findFirst()
+                .map(PatchStatusEntity::getEditErrors)
+                .flatMap(errors -> errors.stream().findFirst())
+                .map(error -> ErrorTags.statusOf(error.getErrorTag()))
+                .orElse(Status.INTERNAL_SERVER_ERROR);
         } else {
-            if (result.globalErrors() == null || result.globalErrors().isEmpty()) {
-                return result.editCollection().stream()
-                    .filter(patchStatus -> !patchStatus.isOk() && !patchStatus.getEditErrors().isEmpty())
-                    .findFirst()
-                    .map(PatchStatusEntity::getEditErrors)
-                    .flatMap(errors -> errors.stream().findFirst())
-                    .map(error -> ErrorTags.statusOf(error.getErrorTag()))
-                    .orElse(Status.INTERNAL_SERVER_ERROR);
-            } else {
-                final var error = result.globalErrors().iterator().next();
-                return ErrorTags.statusOf(error.getErrorTag());
-            }
+            final var error = result.globalErrors().iterator().next();
+            return ErrorTags.statusOf(error.getErrorTag());
         }
     }
 

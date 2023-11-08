@@ -11,33 +11,23 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import org.opendaylight.restconf.server.spi.RestconfStream;
 
 /**
  * Web-socket servlet listening on ws or wss schemas for created data-change-event or notification streams.
  */
-@Singleton
-public final class WebSocketInitializer extends WebSocketServlet {
+final class WebSocketInitializer extends WebSocketServlet {
     @java.io.Serial
     private static final long serialVersionUID = 1L;
 
     private final transient WebSocketFactory creator;
     private final int idleTimeoutMillis;
 
-    /**
-     * Creation of the web-socket initializer.
-     *
-     * @param scheduledThreadPool    ODL thread pool used for fetching of scheduled executors.
-     * @param configuration          Web-socket configuration holder.
-     */
-    @Inject
-    public WebSocketInitializer(final ScheduledThreadPool scheduledThreadPool,
-            final ListenersBroker listenersBroker, final StreamsConfiguration configuration) {
-        creator = new WebSocketFactory(scheduledThreadPool.getExecutor(), listenersBroker,
+    WebSocketInitializer(final RestconfStream.Registry streamRegistry, final PingExecutor pingExecutor,
+            final StreamsConfiguration configuration) {
+        creator = new WebSocketFactory(streamRegistry, pingExecutor,
             configuration.maximumFragmentLength(), configuration.heartbeatInterval());
         idleTimeoutMillis = configuration.idleTimeout();
     }

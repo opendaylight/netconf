@@ -25,6 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.module._1.rev140101.Module1Data;
 import org.opendaylight.yang.gen.v1.module._2.rev140102.Module2Data;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -82,8 +83,9 @@ public class RestconfOperationsServiceImplTest {
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
 
-        opService = new RestconfOperationsServiceImpl(() -> DatabindContext.ofModel(SCHEMA),
-            new MdsalRestconfServer(dataBroker, rpcService, mountPointService));
+        final DatabindProvider databindProvider = () -> DatabindContext.ofModel(SCHEMA);
+        opService = new RestconfOperationsServiceImpl(
+            new MdsalRestconfServer(databindProvider, dataBroker, rpcService, mountPointService));
     }
 
     @Test

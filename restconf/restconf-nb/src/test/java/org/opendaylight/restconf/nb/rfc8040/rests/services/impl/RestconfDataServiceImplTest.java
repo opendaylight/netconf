@@ -61,6 +61,7 @@ import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -129,8 +130,9 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
 
-        dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA),
-            new MdsalRestconfServer(dataBroker, rpcService, mountPointService), actionService);
+        final DatabindProvider databindProvider = () -> DatabindContext.ofModel(JUKEBOX_SCHEMA);
+        dataService = new RestconfDataServiceImpl(databindProvider,
+            new MdsalRestconfServer(databindProvider, dataBroker, rpcService, mountPointService), actionService);
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
