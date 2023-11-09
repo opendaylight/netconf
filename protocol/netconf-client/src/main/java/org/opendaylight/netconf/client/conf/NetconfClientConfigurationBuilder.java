@@ -63,7 +63,7 @@ public class NetconfClientConfigurationBuilder {
      *
      * @param address remote address
      * @return current builder instance
-     * @deprecated due to design change. Only used with {@link org.opendaylight.netconf.client.NetconfClientDispatcher},
+     * @deprecated due to design change. Only used with NetconfClientDispatcher,
      *     ignored when building configuration for {@link org.opendaylight.netconf.client.NetconfClientFactory} which
      *     expects remote address defined via TCP transport configuration {@link #withTcpParameters(TcpClientGrouping)}
      */
@@ -129,7 +129,7 @@ public class NetconfClientConfigurationBuilder {
      *
      * @param authHandler authentication handler
      * @return current builder instance
-     * @deprecated due to design change. Only used with {@link org.opendaylight.netconf.client.NetconfClientDispatcher},
+     * @deprecated due to design change. Only used with NetconfClientDispatcher,
      *     ignored when building configuration for {@link org.opendaylight.netconf.client.NetconfClientFactory} which
      *     expects SSH transport overlay configuration via {@link #withSshParameters(SshClientGrouping)}
      */
@@ -145,7 +145,7 @@ public class NetconfClientConfigurationBuilder {
      *
      * @param sslHandlerFactory ssh handler instance
      * @return current builder instance
-     * @deprecated due to design change. Only used with {@link org.opendaylight.netconf.client.NetconfClientDispatcher},
+     * @deprecated due to design change. Only used with NetconfClientDispatcher,
      *     ignored when building configuration for {@link org.opendaylight.netconf.client.NetconfClientFactory} which
      *     expects TLS transport overlay configuration via {@link #withTlsParameters(TlsClientGrouping)}
      */
@@ -161,7 +161,7 @@ public class NetconfClientConfigurationBuilder {
      *
      * @param sshClient ssh client instance
      * @return current builder instance
-     * @deprecated due to design change. Only used with {@link org.opendaylight.netconf.client.NetconfClientDispatcher},
+     * @deprecated due to design change. Only used with NetconfClientDispatcher,
      *     ignored when building configuration for {@link org.opendaylight.netconf.client.NetconfClientFactory} which
      *     expects SSH transport overlay configuration via {@link #withSshParameters(SshClientGrouping)}
      */
