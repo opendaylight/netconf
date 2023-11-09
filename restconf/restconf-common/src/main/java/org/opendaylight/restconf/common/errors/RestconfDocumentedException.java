@@ -31,6 +31,7 @@ public class RestconfDocumentedException extends RuntimeException {
     private static final long serialVersionUID = 3L;
 
     private final List<RestconfError> errors;
+    private final int transactionNumber;
 
     // FIXME: this field should be non-null
     private final transient @Nullable EffectiveModelContext modelContext;
@@ -57,6 +58,19 @@ public class RestconfDocumentedException extends RuntimeException {
     public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
                                        final Throwable cause) {
         this(cause, new RestconfError(errorType, errorTag, message, null, cause.getMessage(), null));
+    }
+
+    /**
+     * Constructs an instance with an error message, error type, error tag and exception cause.
+     *
+     * @param message A string which provides a plain text string describing the error.
+     * @param errorType The enumerated type indicating the layer where the error occurred.
+     * @param errorTag The enumerated tag representing a more specific error cause.
+     * @param transactionNumber Identifier for the executed operation within multiple asynchronous transactions.
+     */
+    public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
+            final int transactionNumber) {
+        this(null, transactionNumber, new RestconfError(errorType, errorTag, message, null, null));
     }
 
     /**
@@ -91,7 +105,7 @@ public class RestconfDocumentedException extends RuntimeException {
      * @param cause The underlying exception cause.
      */
     public RestconfDocumentedException(final String message, final Throwable cause) {
-        this(cause, new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message, null,
+        this(cause, 0, new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, message, null,
             cause.getMessage(), null));
     }
 
@@ -99,7 +113,7 @@ public class RestconfDocumentedException extends RuntimeException {
      * Constructs an instance with the given error.
      */
     public RestconfDocumentedException(final RestconfError error) {
-        this(null, error);
+        this(null, 0, error);
     }
 
     /**
@@ -114,7 +128,7 @@ public class RestconfDocumentedException extends RuntimeException {
         } else {
             this.errors = List.copyOf(errors);
         }
-
+        transactionNumber = 0;
         modelContext = null;
     }
 
@@ -142,6 +156,14 @@ public class RestconfDocumentedException extends RuntimeException {
         super(cause);
         errors = List.of(error);
         modelContext = null;
+        transactionNumber = 0;
+    }
+
+    public RestconfDocumentedException(final Throwable cause, final int transactionNumber, final RestconfError error) {
+        super(cause);
+        errors = List.of(error);
+        modelContext = null;
+        this.transactionNumber = transactionNumber;
     }
 
     public RestconfDocumentedException(final Throwable cause, final RestconfError error,
@@ -149,6 +171,7 @@ public class RestconfDocumentedException extends RuntimeException {
         super(cause);
         errors = List.of(error);
         this.modelContext = requireNonNull(modelContext);
+        transactionNumber = 0;
     }
 
     public RestconfDocumentedException(final Throwable cause, final List<RestconfError> errors) {
@@ -158,6 +181,7 @@ public class RestconfDocumentedException extends RuntimeException {
         }
         this.errors = List.copyOf(errors);
         modelContext = null;
+        transactionNumber = 0;
     }
 
     @Override
@@ -177,5 +201,9 @@ public class RestconfDocumentedException extends RuntimeException {
 
     public List<RestconfError> getErrors() {
         return errors;
+    }
+
+    public int transactionNumber() {
+        return transactionNumber;
     }
 }
