@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
@@ -26,38 +27,40 @@ import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntry;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificate;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveKeystoreEntry;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveKeystoreEntryInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveKeystoreEntryOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveKeystoreEntryOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemovePrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemovePrivateKeyInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemovePrivateKeyOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemovePrivateKeyOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveTrustedCertificate;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveTrustedCertificateInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveTrustedCertificateOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveTrustedCertificateOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredentialBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredentialKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddKeystoreEntry;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddKeystoreEntryInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddKeystoreEntryOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddKeystoreEntryOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddPrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddPrivateKeyInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddPrivateKeyOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddPrivateKeyOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddTrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddTrustedCertificateInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddTrustedCertificateOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddTrustedCertificateOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemoveKeystoreEntry;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemoveKeystoreEntryInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemoveKeystoreEntryOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemoveKeystoreEntryOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemovePrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemovePrivateKeyInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemovePrivateKeyOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemovePrivateKeyOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemoveTrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemoveTrustedCertificateInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemoveTrustedCertificateOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemoveTrustedCertificateOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKeyKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.keystore.entry.KeyCredential;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.keystore.entry.KeyCredentialBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.keystore.entry.KeyCredentialKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.rpc._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.rpc.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificateBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificateKey;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.Rpc;
@@ -143,8 +146,9 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final List<KeyCredential> keypairs = input.nonnullKeyCredential().values().stream()
-            .map(keypair -> new KeyCredentialBuilder(keypair)
-                .setPrivateKey(encryptionService.encrypt(keypair.getPrivateKey()))
+            .map(keypair -> new KeyCredentialBuilder()
+                .setKeyId(keypair.getKeyId())
+                .setPrivateKey(encryptionService.encrypt(keypair.getPrivateKey().getBytes(StandardCharsets.UTF_8)))
                 .setPassphrase(encryptionService.encrypt(keypair.getPassphrase()))
                 .build())
             .collect(Collectors.toList());
@@ -179,8 +183,15 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
 
         for (TrustedCertificate certificate : input.nonnullTrustedCertificate().values()) {
+            final var base64certificate = new TrustedCertificateBuilder()
+                .setName(certificate.getName())
+                .setCertificate(certificate.getCertificate().getBytes(StandardCharsets.UTF_8))
+                .build();
+
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
-                KEYSTORE_IID.child(TrustedCertificate.class, certificate.key()), certificate);
+                KEYSTORE_IID.child(org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109
+                    .trusted.certificates.TrustedCertificate.class,
+                base64certificate.key()), base64certificate);
         }
 
         final SettableFuture<RpcResult<AddTrustedCertificateOutput>> rpcResult = SettableFuture.create();
@@ -208,7 +219,9 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
 
         for (final String name : input.getName()) {
             writeTransaction.delete(LogicalDatastoreType.CONFIGURATION,
-                KEYSTORE_IID.child(TrustedCertificate.class, new TrustedCertificateKey(name)));
+                KEYSTORE_IID.child(org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109
+                    .trusted.certificates.TrustedCertificate.class,
+                    new TrustedCertificateKey(name)));
         }
 
         final SettableFuture<RpcResult<RemoveTrustedCertificateOutput>> rpcResult = SettableFuture.create();
@@ -235,8 +248,17 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
 
         for (PrivateKey key: input.nonnullPrivateKey().values()) {
+            final var base64key = new PrivateKeyBuilder()
+                .setName(key.getName())
+                .setData(key.getData().getBytes(StandardCharsets.UTF_8))
+                .setCertificateChain(key.getCertificateChain().stream()
+                    .map(cert -> cert.getBytes(StandardCharsets.UTF_8)).toList())
+                .build();
+
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
-                KEYSTORE_IID.child(PrivateKey.class, key.key()), key);
+                KEYSTORE_IID.child(org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109
+                    ._private.keys.PrivateKey.class,
+                base64key.key()), base64key);
         }
 
         final SettableFuture<RpcResult<AddPrivateKeyOutput>> rpcResult = SettableFuture.create();
@@ -263,7 +285,9 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
 
         for (final String name : input.getName()) {
             writeTransaction.delete(LogicalDatastoreType.CONFIGURATION,
-                KEYSTORE_IID.child(PrivateKey.class, new PrivateKeyKey(name)));
+                KEYSTORE_IID.child(org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109
+                    ._private.keys.PrivateKey.class,
+                    new PrivateKeyKey(name)));
         }
 
         final SettableFuture<RpcResult<RemovePrivateKeyOutput>> rpcResult = SettableFuture.create();
