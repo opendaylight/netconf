@@ -18,13 +18,13 @@ import java.util.Base64;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntry;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredentialBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddKeystoreEntry;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddKeystoreEntryInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddKeystoreEntryOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddKeystoreEntryOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.keystore.entry.KeyCredential;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.keystore.entry.KeyCredentialBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -54,9 +54,10 @@ final class DefaultAddKeystoreEntry extends AbstractRpc implements AddKeystoreEn
         for (var credential : plain.values()) {
             final var keyId = credential.getKeyId();
             try {
-                encrypted.add(new KeyCredentialBuilder(credential)
-                    .setPrivateKey(encryptString(credential.getPrivateKey()))
-                    .setPassphrase(encryptString(credential.getPassphrase()))
+                encrypted.add(new KeyCredentialBuilder()
+                    .setKeyId(credential.getKeyId())
+                    .setPrivateKey(encryptToBytes(credential.getPrivateKey()))
+                    .setPassphrase(encryptToBytes(credential.getPassphrase()))
                     .build());
             } catch (GeneralSecurityException e) {
                 LOG.debug("Cannot decrypt key credential {}}", credential, e);
@@ -78,7 +79,7 @@ final class DefaultAddKeystoreEntry extends AbstractRpc implements AddKeystoreEn
         }, MoreExecutors.directExecutor());
     }
 
-    private String encryptString(final String plain) throws GeneralSecurityException {
-        return Base64.getEncoder().encodeToString(encryptionService.encrypt(plain.getBytes(StandardCharsets.UTF_8)));
+    private byte[] encryptToBytes(final String plain) throws GeneralSecurityException {
+        return Base64.getEncoder().encode(encryptionService.encrypt(plain.getBytes(StandardCharsets.UTF_8)));
     }
 }
