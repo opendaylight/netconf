@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
@@ -28,13 +29,13 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKeyKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificateBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificateKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -144,15 +145,16 @@ public class DefaultSslHandlerFactoryProviderTest {
             }
             final Element element = (Element)node;
             final String keyName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
-            final String keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent();
+            final byte[] keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent()
+                .getBytes(US_ASCII);
             final NodeList certNodes = element.getElementsByTagName(XML_ELEMENT_CERT_CHAIN);
-            final List<String> certChain = new ArrayList<>();
+            final List<byte[]> certChain = new ArrayList<>();
             for (int j = 0; j < certNodes.getLength(); j++) {
                 final Node certNode = certNodes.item(j);
                 if (certNode.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
                 }
-                certChain.add(certNode.getTextContent());
+                certChain.add(certNode.getTextContent().getBytes(US_ASCII));
             }
 
             final PrivateKey privateKey = new PrivateKeyBuilder()
@@ -178,7 +180,8 @@ public class DefaultSslHandlerFactoryProviderTest {
             }
             final Element element = (Element)node;
             final String certName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
-            final String certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent();
+            final byte[] certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent()
+                .getBytes(US_ASCII);
 
             final TrustedCertificate certificate = new TrustedCertificateBuilder()
                     .withKey(new TrustedCertificateKey(certName))
