@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.callhome.mount.tls;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
-
 import io.netty.channel.Channel;
 import io.netty.handler.ssl.SslHandler;
 import java.io.ByteArrayInputStream;
@@ -37,8 +35,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsAuthProvider;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.NetconfCallhomeServer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.AllowedDevices;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.Device;
@@ -51,7 +49,6 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 @Component(service = CallHomeTlsAuthProvider.class, immediate = true)
 @Singleton
@@ -157,8 +154,8 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
             }
         }
 
-        private PublicKey buildPublicKey(final String encoded) {
-            final byte[] decoded = Base64.getMimeDecoder().decode(encoded.getBytes(US_ASCII));
+        private PublicKey buildPublicKey(final byte[] encoded) {
+            final byte[] decoded = Base64.getMimeDecoder().decode(encoded);
             try {
                 final CertificateFactory factory = CertificateFactory.getInstance("X.509");
                 try (InputStream in = new ByteArrayInputStream(decoded)) {

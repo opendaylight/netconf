@@ -10,6 +10,7 @@ package org.opendaylight.netconf.client.mdsal;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.util.Optional;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -70,7 +71,8 @@ public final class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
         final String passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
         try {
             keyPair = Optional.of(new PKIUtil().decodePrivateKey(
-                new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey()).replace("\\n", "\n")),
+                new StringReader(new String(encryptionService.decrypt(dsKeypair.getPrivateKey()),
+                    StandardCharsets.US_ASCII).replace("\\n", "\n")),
                 encryptionService.decrypt(passPhrase)));
         } catch (IOException exception) {
             LOG.warn("Unable to decode private key, id={}", pairId, exception);

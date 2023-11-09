@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.client.mdsal.api;
 
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.keystore.entry.KeyCredential;
 
 public interface CredentialProvider {
     /**
