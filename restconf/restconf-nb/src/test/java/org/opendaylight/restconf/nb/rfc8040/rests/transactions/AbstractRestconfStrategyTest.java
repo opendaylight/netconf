@@ -320,6 +320,28 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy testPatchDataCreateAndDeleteStrategy();
 
     @Test
+    public final void testPatchDataAlreadyExistCreatedAndDelete() {
+        final var patchContext = new PatchContext("patchCD", List.of(
+            new PatchEntity("edit1", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
+            new PatchEntity("edit2", Operation.Delete, CREATE_AND_DELETE_TARGET)));
+        final var patchStatusContext = testPatchDataAlreadyExistCreatedAndDeleteStrategy()
+            .patchData(patchContext).getOrThrow();
+
+        assertFalse(patchStatusContext.ok());
+        assertNull(patchStatusContext.globalErrors());
+        assertEquals(1, patchStatusContext.editCollection().size());
+
+        final var create = patchStatusContext.editCollection().get(0);
+        assertFalse(create.isOk());
+        assertNotNull(create.getEditErrors());
+        final var error = create.getEditErrors().iterator().next();
+        assertEquals(ErrorTag.DATA_EXISTS, error.getErrorTag());
+        assertEquals("Data already exists", error.getErrorMessage());
+    }
+
+    abstract @NonNull RestconfStrategy testPatchDataAlreadyExistCreatedAndDeleteStrategy();
+
+    @Test
     public final void testPatchMergePutContainer() {
         patch(new PatchContext("patchM", List.of(new PatchEntity("edit1", Operation.Merge, PLAYER_IID, EMPTY_JUKEBOX))),
             testPatchMergePutContainerStrategy(), false);

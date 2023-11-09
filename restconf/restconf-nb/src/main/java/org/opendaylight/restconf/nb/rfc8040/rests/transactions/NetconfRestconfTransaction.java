@@ -31,6 +31,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -219,7 +220,17 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             } else {
                 // ... otherwise just add operation to the execution chain
                 operationFuture = Futures.transformAsync(resultsFutures.get(resultsFutures.size() - 1),
-                    future -> operation.get(),
+                    result -> {
+                        // If a transaction fails, stop other transactions and store the RpcError.
+                        if (result != null && !(result.errors().isEmpty() || allWarnings(result.errors()))) {
+                            final var rpcError = result.errors().iterator().next();
+                            // FIXME: Create a YangInstanceIdentifier from RpcError and include it in
+                            //        RestconfDocumentedException.
+                            return Futures.immediateFailedFuture(new RestconfDocumentedException(rpcError.getMessage(),
+                                rpcError.getErrorType(), rpcError.getTag(), resultsFutures.size()));
+                        }
+                        return operation.get();
+                    },
                     MoreExecutors.directExecutor());
             }
             // ... finally save operation related future to the list

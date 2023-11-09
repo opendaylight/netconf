@@ -18,6 +18,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -185,6 +186,14 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     @Override
     RestconfStrategy testPatchDataCreateAndDeleteStrategy() {
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, PLAYER_IID);
+        doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
+            CREATE_AND_DELETE_TARGET);
+        return new MdsalRestconfStrategy(JUKEBOX_SCHEMA, mockDataBroker, null);
+    }
+
+    @Override
+    @NonNull RestconfStrategy testPatchDataAlreadyExistCreatedAndDeleteStrategy() {
+        doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, PLAYER_IID);
         doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             CREATE_AND_DELETE_TARGET);
         return new MdsalRestconfStrategy(JUKEBOX_SCHEMA, mockDataBroker, null);
