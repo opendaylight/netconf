@@ -42,7 +42,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 @Component(service = CallHomeTlsAuthProvider.class, immediate = true)
 @Singleton
 public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvider, AutoCloseable {
