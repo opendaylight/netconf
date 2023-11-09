@@ -166,7 +166,8 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         }
         final var passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
         try {
-            return decodePrivateKey(decryptString(dsKeypair.getPrivateKey()), decryptString(passPhrase));
+            return decodePrivateKey(decryptString(new String(dsKeypair.getPrivateKey(), StandardCharsets.UTF_8)),
+                decryptString(passPhrase));
         } catch (IOException e) {
             throw new IllegalStateException("Could not decode private key with keyId=" + keyId, e);
         }

@@ -26,9 +26,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.Mutable;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -134,7 +134,7 @@ public abstract class AbstractNetconfKeystore {
 
             final byte[] keyBytes;
             try {
-                keyBytes = base64Decode(key.requireData());
+                keyBytes = base64Decode(new String(key.requireData(), StandardCharsets.UTF_8));
             } catch (IllegalArgumentException e) {
                 LOG.debug("Failed to decode private key {}", keyName, e);
                 failure = updateFailure(failure, e);
@@ -162,7 +162,7 @@ public abstract class AbstractNetconfKeystore {
             for (int i = 0, size = certChain.size(); i < size; i++) {
                 final byte[] bytes;
                 try {
-                    bytes = base64Decode(certChain.get(i));
+                    bytes = base64Decode(new String(certChain.get(i), StandardCharsets.UTF_8));
                 } catch (IllegalArgumentException e) {
                     LOG.debug("Failed to decode certificate chain item {} for private key {}", i, keyName, e);
                     failure = updateFailure(failure, e);
@@ -190,7 +190,7 @@ public abstract class AbstractNetconfKeystore {
 
             final byte[] bytes;
             try {
-                bytes = base64Decode(cert.requireCertificate());
+                bytes = base64Decode(new String(cert.requireCertificate(), StandardCharsets.UTF_8));
             } catch (IllegalArgumentException e) {
                 LOG.debug("Failed to decode trusted certificate {}", certName, e);
                 failure = updateFailure(failure, e);

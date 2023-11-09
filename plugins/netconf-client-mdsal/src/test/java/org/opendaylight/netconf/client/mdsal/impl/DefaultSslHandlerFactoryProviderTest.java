@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +30,13 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKeyKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificateBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificateKey;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -143,12 +144,13 @@ class DefaultSslHandlerFactoryProviderTest {
         for (int i = 0; i < nodeList.getLength(); i++) {
             if (nodeList.item(i) instanceof Element element) {
                 final var keyName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
-                final var keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent();
+                final var keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent()
+                    .getBytes(StandardCharsets.UTF_8);
                 final var certNodes = element.getElementsByTagName(XML_ELEMENT_CERT_CHAIN);
-                final var certChain = new ArrayList<String>();
+                final var certChain = new ArrayList<byte[]>();
                 for (int j = 0; j < certNodes.getLength(); j++) {
                     if (certNodes.item(j) instanceof Element certNode) {
-                        certChain.add(certNode.getTextContent());
+                        certChain.add(certNode.getTextContent().getBytes(StandardCharsets.UTF_8));
                     }
                 }
 
@@ -171,7 +173,8 @@ class DefaultSslHandlerFactoryProviderTest {
         for (int i = 0; i < nodeList.getLength(); i++) {
             if (nodeList.item(i) instanceof Element element) {
                 final var certName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
-                final var certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent();
+                final var certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent()
+                    .getBytes(StandardCharsets.UTF_8);
 
                 trustedCertificates.add(new TrustedCertificateBuilder()
                     .withKey(new TrustedCertificateKey(certName))
