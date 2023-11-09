@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "583bac1a_f22a03c9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/ComponentsEntity.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-09T08:32:40Z",
+      "side": 1,
+      "message": "Does not related to security patch",
+      "parentUuid": "7508319c_8f4017f1",
+      "revId": "ed6b1ef49ee04cf4e32c4cbe2cb5129c92f96309",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "347602a9_6fc235f1",
@@ -48,6 +66,42 @@
       "writtenOn": "2023-11-08T13:39:11Z",
       "side": 1,
       "message": "is this needed?",
+      "revId": "ed6b1ef49ee04cf4e32c4cbe2cb5129c92f96309",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b50c661_6ed393de",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/ComponentsEntity.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-09T08:32:40Z",
+      "side": 1,
+      "message": "Potentially needed for Schema implementation, does not related to security",
+      "parentUuid": "347602a9_6fc235f1",
+      "revId": "ed6b1ef49ee04cf4e32c4cbe2cb5129c92f96309",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92421286_d4707ae3",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/ComponentsEntity.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-09T08:32:40Z",
+      "side": 1,
+      "message": "Potentially needed for Schema implementation, does not related to security",
+      "parentUuid": "cd290705_644b6bde",
       "revId": "ed6b1ef49ee04cf4e32c4cbe2cb5129c92f96309",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
