@@ -170,7 +170,7 @@ class NetconfClientFactoryImplTest {
             final var clientConfig = NetconfClientConfigurationBuilder.create()
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
                 .withTcpParameters(tcpClientParams)
-                .withTransportSslHandlerFactory(channel -> clientContext.newHandler(channel.alloc()))
+                .withSslHandlerFactory(channel -> clientContext.newHandler(channel.alloc()))
                 .withSessionListener(sessionListener).build();
             assertNotNull(factory.createClient(clientConfig));
             verify(serverTransportListener, timeout(1000L))
