@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * Default implementation of NetconfClientConfigurationBuildFactory.
  */
-@Component(service = NetconfClientConfigurationBuilderFactory.class, property = "type=default")
+@Component
 @Singleton
 public final class NetconfClientConfigurationBuilderFactoryImpl implements NetconfClientConfigurationBuilderFactory {
     private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
@@ -54,9 +54,9 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
     @Inject
     @Activate
     public NetconfClientConfigurationBuilderFactoryImpl(
-        @Reference final AAAEncryptionService encryptionService,
-        @Reference final CredentialProvider credentialProvider,
-        @Reference final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
+            @Reference final AAAEncryptionService encryptionService,
+            @Reference final CredentialProvider credentialProvider,
+            @Reference final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
         this.encryptionService = requireNonNull(encryptionService);
         this.credentialProvider = requireNonNull(credentialProvider);
         this.sslHandlerFactoryProvider = requireNonNull(sslHandlerFactoryProvider);
@@ -73,11 +73,9 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             builder.withProtocol(NetconfClientProtocol.SSH);
             setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
-            builder.withProtocol(NetconfClientProtocol.TLS).withTransportSslHandlerFactory(channel -> {
-                final var sslHandlerBuilder =
-                    sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification());
-                return sslHandlerBuilder.createSslHandler();
-            });
+            builder.withProtocol(NetconfClientProtocol.TLS).withSslHandlerFactory(
+                channel -> sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification())
+                    .createSslHandler());
         } else {
             throw new IllegalArgumentException("Unsupported protocol type: " + protocol.getName());
         }
@@ -102,17 +100,15 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
             sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
                 loginPassword.getUsername(), loginPassword.getPassword()));
-
         } else if (credentials instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
             sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
                 loginPassword.getUsername(), encryptionService.decrypt(loginPassword.getPassword())));
-
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyBased = keyAuth.getKeyBased();
             sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder().setUsername(keyBased.getUsername()).build());
             confBuilder.withSshConfigurator(factoryMgr -> {
-                final var keyPair = getKeyPair(keyBased.getKeyId(), credentialProvider, encryptionService);
+                final var keyPair = getKeyPair(keyBased.getKeyId());
                 factoryMgr.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
                 final var factory = new UserAuthPublicKeyFactory();
                 factory.setSignatureFactories(factoryMgr.getSignatureFactories());
@@ -125,19 +121,17 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
     }
 
     private static ClientIdentity loginPasswordIdentity(final String username, final String password) {
-        requireNonNull(username, "username is undefined");
-        requireNonNull(password, "password is undefined");
         return new ClientIdentityBuilder()
-            .setUsername(username)
+            .setUsername(requireNonNull(username, "username is undefined"))
             .setPassword(new PasswordBuilder()
-                .setPasswordType(new CleartextPasswordBuilder().setCleartextPassword(password).build())
+                .setPasswordType(new CleartextPasswordBuilder()
+                    .setCleartextPassword(requireNonNull(password, "password is undefined"))
+                    .build())
                 .build())
             .build();
     }
 
-    private static KeyPair getKeyPair(final String keyId,
-        final CredentialProvider credentialProvider, final AAAEncryptionService encryptionService) {
-
+    private KeyPair getKeyPair(final String keyId) {
         // public key retrieval logic taken from DatastoreBackedPublicKeyAuth
         final var dsKeypair = credentialProvider.credentialForId(keyId);
         if (dsKeypair == null) {

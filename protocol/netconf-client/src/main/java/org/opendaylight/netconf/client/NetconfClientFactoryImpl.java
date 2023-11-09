@@ -72,7 +72,7 @@ public class NetconfClientFactoryImpl implements NetconfClientFactory {
                     configuration.getTcpParameters(), configuration.getTlsParameters());
             } else {
                 TLSClient.connect(new ClientTransportChannelListener(future, channelInitializer), bootstrap,
-                    configuration.getTcpParameters(), configuration.getTransportSslHandlerFactory());
+                    configuration.getTcpParameters(), configuration.getSslHandlerFactory());
             }
         } else if (SSH.equals(protocol)) {
             factory.connectClient(TransportConstants.SSH_SUBSYSTEM,
