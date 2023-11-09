@@ -11,17 +11,20 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddPrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddPrivateKeyInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddPrivateKeyOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddPrivateKeyOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKeyBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
 
 final class DefaultAddPrivateKey extends AbstractRpc implements AddPrivateKey {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAddPrivateKey.class);
@@ -40,8 +43,15 @@ final class DefaultAddPrivateKey extends AbstractRpc implements AddPrivateKey {
         LOG.debug("Adding private keys: {}", keys);
         final var tx = newTransaction();
         for (var key : keys.values()) {
+            final var base64key = new PrivateKeyBuilder()
+                .setName(key.getName())
+                .setData(key.getData().getBytes(StandardCharsets.US_ASCII))
+                .setCertificateChain(key.getCertificateChain().stream()
+                    .map(cert -> cert.getBytes(StandardCharsets.US_ASCII)).toList())
+                .build();
+
             tx.put(LogicalDatastoreType.CONFIGURATION,
-                InstanceIdentifier.create(Keystore.class).child(PrivateKey.class, key.key()), key);
+                InstanceIdentifier.create(Keystore.class).child(PrivateKey.class, base64key.key()), base64key);
         }
 
         return tx.commit().transform(commitInfo -> {
