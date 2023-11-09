@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -451,7 +452,9 @@ public class RestconfDataServiceImplTest {
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
         doReturn(immediateTrueFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
-        final PatchStatusContext status = dataService.patchData(patch, uriInfo);
+        final Response response = dataService.patchData(patch, uriInfo);
+        assertEquals(200, response.getStatus());
+        final PatchStatusContext status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
         assertEquals("replace data", status.getEditCollection().get(1).getEditId());
@@ -475,8 +478,9 @@ public class RestconfDataServiceImplTest {
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidBase);
         doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
-
-        final PatchStatusContext status = dataService.patchData(patch, uriInfo);
+        final Response response = dataService.patchData(patch, uriInfo);
+        assertEquals(200, response.getStatus());
+        final PatchStatusContext status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
         assertNull(status.getGlobalErrors());
@@ -501,7 +505,9 @@ public class RestconfDataServiceImplTest {
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(true).when(readWrite).cancel();
-        final PatchStatusContext status = dataService.patchData(patch, uriInfo);
+        final Response response = dataService.patchData(patch, uriInfo);
+        assertEquals(200, response.getStatus());
+        final PatchStatusContext status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
 
         assertFalse(status.isOk());
         assertEquals(3, status.getEditCollection().size());
