@@ -31,6 +31,7 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -218,6 +219,18 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
             .delete(LogicalDatastoreType.CONFIGURATION, CREATE_AND_DELETE_TARGET);
         return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService, null);
     }
+
+    @Override
+    RestconfStrategy testPatchDataAlreadyExistCreatedAndDeleteStrategy() {
+        final var rpcError = RpcResultBuilder.newError(ErrorType.PROTOCOL,
+            ErrorTag.DATA_EXISTS, "Data already exists", null, "", null);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(netconfService)
+            .create(LogicalDatastoreType.CONFIGURATION, PLAYER_IID, EMPTY_JUKEBOX, Optional.empty());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, CREATE_AND_DELETE_TARGET);
+        return new NetconfRestconfStrategy(JUKEBOX_SCHEMA, netconfService, null);
+    }
+
 
     @Override
     RestconfStrategy testPatchMergePutContainerStrategy() {

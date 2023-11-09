@@ -532,8 +532,18 @@ public abstract class RestconfStrategy {
             @Override
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false,
-                    TransactionUtil.decodeException(cause, "PATCH", null, modelContext).getErrors()));
+                if (cause instanceof RestconfDocumentedException rde && rde.transactionNumber() >= 2) {
+                    // it is also necessary to include the subtraction of the lock operation.
+                    final var patchStatusIndex = rde.transactionNumber() - 2;
+                    final var patchEditId = patch.entities().get(patchStatusIndex).getEditId();
+                    editCollection.clear();
+                    editCollection.add(new PatchStatusEntity(patchEditId, false, rde.getErrors()));
+                    ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false,
+                        null));
+                } else {
+                    ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false,
+                        TransactionUtil.decodeException(cause, "PATCH", null, modelContext).getErrors()));
+                }
             }
         }, MoreExecutors.directExecutor());
 
