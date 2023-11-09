@@ -116,7 +116,7 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build());
         assertConfig(config);
         assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
-        assertNotNull(config.getTransportSslHandlerFactory());
+        assertNotNull(config.getSslHandlerFactory());
     }
 
     @Test
