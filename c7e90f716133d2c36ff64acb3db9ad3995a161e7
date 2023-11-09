@@ -16,6 +16,24 @@
       "message": "IMHO we need to keep JavaDoc for each method for understanding purpose of each YANG model\ne.g. here\n/**\n     * Test that request parameters are correctly numbered.\n     *\n     * \u003cp\u003e\n     * It means we should have name and name1, etc. when we have the same parameter in path multiple times.\n     */",
       "revId": "c7e90f716133d2c36ff64acb3db9ad3995a161e7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40c46249_a83c0315",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/YangDocumentTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-09T11:28:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7490499_3c87b6f9",
+      "revId": "c7e90f716133d2c36ff64acb3db9ad3995a161e7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
