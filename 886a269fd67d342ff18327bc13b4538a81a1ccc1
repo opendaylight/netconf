@@ -16,6 +16,24 @@
       "message": "check isCancelled()",
       "revId": "886a269fd67d342ff18327bc13b4538a81a1ccc1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "381185e4_ed060e20",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-11-09T17:40:30Z",
+      "side": 1,
+      "message": "boolean isDone()\n\nReturns true if this task completed. Completion may be due to normal termination, an exception, or cancellation -- in all of these cases, this method will return true.\n\nReturns:\ntrue if this task completed\n\nhttps://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Future.html?is-external\u003dtrue#isDone--",
+      "parentUuid": "7d00add5_ab913354",
+      "revId": "886a269fd67d342ff18327bc13b4538a81a1ccc1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
