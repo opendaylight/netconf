@@ -41,28 +41,26 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         if (patchStatusContext.isOk()) {
             reportSuccess(jsonWriter);
         } else {
-            if (patchStatusContext.getGlobalErrors() != null) {
-                reportErrors(patchStatusContext.getGlobalErrors(), jsonWriter);
-            }
-
-            jsonWriter.name("edit-status");
-            jsonWriter.beginObject();
-            jsonWriter.name("edit");
-            jsonWriter.beginArray();
-            for (final PatchStatusEntity patchStatusEntity : patchStatusContext.getEditCollection()) {
-                jsonWriter.beginObject();
-                jsonWriter.name("edit-id").value(patchStatusEntity.getEditId());
-                if (patchStatusEntity.getEditErrors() != null) {
-                    reportErrors(patchStatusEntity.getEditErrors(), jsonWriter);
-                } else {
-                    if (patchStatusEntity.isOk()) {
+            final var globalErrors = patchStatusContext.getGlobalErrors();
+            if (globalErrors != null) {
+                reportErrors(globalErrors, jsonWriter);
+            } else {
+                jsonWriter.name("edit-status").beginObject();
+                jsonWriter.name("edit");
+                jsonWriter.beginArray();
+                for (final PatchStatusEntity patchStatusEntity : patchStatusContext.getEditCollection()) {
+                    jsonWriter.beginObject();
+                    jsonWriter.name("edit-id").value(patchStatusEntity.getEditId());
+                    if (patchStatusEntity.getEditErrors() != null) {
+                        reportErrors(patchStatusEntity.getEditErrors(), jsonWriter);
+                    } else if (patchStatusEntity.isOk()) {
                         reportSuccess(jsonWriter);
                     }
+                    jsonWriter.endObject();
                 }
+                jsonWriter.endArray();
                 jsonWriter.endObject();
             }
-            jsonWriter.endArray();
-            jsonWriter.endObject();
         }
         jsonWriter.endObject();
         jsonWriter.endObject();
