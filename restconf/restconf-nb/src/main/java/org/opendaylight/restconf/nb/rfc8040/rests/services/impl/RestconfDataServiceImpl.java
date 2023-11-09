@@ -256,17 +256,21 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public PatchStatusContext patchData(final String identifier, final PatchContext context, final UriInfo uriInfo) {
+    public Response patchData(final String identifier, final PatchContext context, final UriInfo uriInfo) {
         return patchData(context, uriInfo);
     }
 
     @Override
-    public PatchStatusContext patchData(final PatchContext context, final UriInfo uriInfo) {
+    public Response patchData(final PatchContext context, final UriInfo uriInfo) {
         final InstanceIdentifierContext iid = RestconfDocumentedException.throwIfNull(context,
             ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, "No patch documented provided")
             .getInstanceIdentifierContext();
         final RestconfStrategy strategy = getRestconfStrategy(iid.getMountPoint());
-        return PatchDataTransactionUtil.patchData(context, strategy, iid.getSchemaContext());
+        final PatchStatusContext patchStatusContext = PatchDataTransactionUtil.patchData(context, strategy,
+            iid.getSchemaContext());
+        return Response.status(Status.OK)
+            .entity(patchStatusContext)
+            .build();
     }
 
     @Override

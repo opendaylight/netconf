@@ -22,7 +22,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
@@ -155,7 +154,7 @@ public interface RestconfDataService {
      *            edits
      * @param uriInfo
      *            URI info
-     * @return {@link PatchStatusContext}
+     * @return {@link Response}
      */
     @PATCH
     @Path("/data/{identifier:.+}")
@@ -167,7 +166,7 @@ public interface RestconfDataService {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    PatchStatusContext patchData(@Encoded @PathParam("identifier") String identifier, PatchContext context,
+    Response patchData(@Encoded @PathParam("identifier") String identifier, PatchContext context,
                                  @Context UriInfo uriInfo);
 
     /**
@@ -177,7 +176,7 @@ public interface RestconfDataService {
      *            edits
      * @param uriInfo
      *            URI info
-     * @return {@link PatchStatusContext}
+     * @return {@link Response}
      */
     @PATCH
     @Path("/data")
@@ -189,7 +188,7 @@ public interface RestconfDataService {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    PatchStatusContext patchData(PatchContext context, @Context UriInfo uriInfo);
+    Response patchData(PatchContext context, @Context UriInfo uriInfo);
 
 
     /**
