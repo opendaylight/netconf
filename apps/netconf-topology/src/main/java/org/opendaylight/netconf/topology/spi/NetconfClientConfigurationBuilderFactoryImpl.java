@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * Default implementation of NetconfClientConfigurationBuildFactory.
  */
-@Component(service = NetconfClientConfigurationBuilderFactory.class, property = "type=default")
+@Component(service = NetconfClientConfigurationBuilderFactory.class)
 @Singleton
 public final class NetconfClientConfigurationBuilderFactoryImpl implements NetconfClientConfigurationBuilderFactory {
     private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
@@ -73,7 +73,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             builder.withProtocol(NetconfClientProtocol.SSH);
             setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
-            builder.withProtocol(NetconfClientProtocol.TLS).withTransportSslHandlerFactory(channel -> {
+            builder.withProtocol(NetconfClientProtocol.TLS).withSslHandlerFactory(channel -> {
                 final var sslHandlerBuilder =
                     sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification());
                 return sslHandlerBuilder.createSslHandler();
