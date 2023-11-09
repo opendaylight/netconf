@@ -39,10 +39,10 @@ import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.keystore.legacy.CertifiedPrivateKey;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystore;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.keystore.entry.KeyCredential;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yangtools.concepts.AbstractObjectRegistration;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.Mutable;
@@ -163,7 +163,7 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
 
             final byte[] keyBytes;
             try {
-                keyBytes = base64Decode(key.requireData());
+                keyBytes = base64Decode(new String(key.requireData(), StandardCharsets.US_ASCII));
             } catch (IllegalArgumentException e) {
                 LOG.debug("Failed to decode private key {}", keyName, e);
                 failure = updateFailure(failure, e);
@@ -191,7 +191,7 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             for (int i = 0, size = certChain.size(); i < size; i++) {
                 final byte[] bytes;
                 try {
-                    bytes = base64Decode(certChain.get(i));
+                    bytes = base64Decode(new String(certChain.get(i), StandardCharsets.US_ASCII));
                 } catch (IllegalArgumentException e) {
                     LOG.debug("Failed to decode certificate chain item {} for private key {}", i, keyName, e);
                     failure = updateFailure(failure, e);
@@ -219,7 +219,7 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
 
             final byte[] bytes;
             try {
-                bytes = base64Decode(cert.requireCertificate());
+                bytes = base64Decode(new String(cert.requireCertificate(), StandardCharsets.US_ASCII));
             } catch (IllegalArgumentException e) {
                 LOG.debug("Failed to decode trusted certificate {}", certName, e);
                 failure = updateFailure(failure, e);
@@ -243,7 +243,8 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             final var keyId = cred.requireKeyId();
             final String passPhrase;
             try {
-                passPhrase = decryptString(requireNonNullElse(cred.getPassphrase(), ""));
+                passPhrase = decryptString(requireNonNullElse(new String(cred.getPassphrase(), StandardCharsets.UTF_8),
+                    ""));
             } catch (GeneralSecurityException e) {
                 LOG.debug("Failed to decrypt pass phrase for {}", keyId, e);
                 failure = updateFailure(failure, e);
@@ -252,7 +253,7 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
 
             final String privateKey;
             try {
-                privateKey = decryptString(cred.getPrivateKey());
+                privateKey = decryptString(new String(cred.getPrivateKey(), StandardCharsets.UTF_8));
             } catch (GeneralSecurityException e) {
                 LOG.debug("Failed to decrypt private key for {}", keyId, e);
                 failure = updateFailure(failure, e);
