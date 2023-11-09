@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0224750f_805764ba",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-09T09:54:27Z",
+      "side": 1,
+      "message": "yes, because we are not using netty future (prior type of currentTask) for both scheduled task and client connection task anymore. Once netconf client output changed to google\u0027s ListenableFuture you need to align incompatible types.\n\nPlease propose more elegant solution. left as is for now.\n\ncurrent artifact requires refactoring but it\u0027s out of scope for current task.",
+      "parentUuid": "eb73abee_97fb7861",
+      "range": {
+        "startLine": 271,
+        "startChar": 22,
+        "endLine": 271,
+        "endChar": 54
+      },
+      "revId": "17b2a226c2c91ea5357d527f6766eaa4b88681f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "369bf53b_a2e79684",
         "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
         "patchSetId": 16
@@ -37,6 +61,30 @@
       "writtenOn": "2023-11-02T13:00:23Z",
       "side": 1,
       "message": "no",
+      "range": {
+        "startLine": 155,
+        "startChar": 8,
+        "endLine": 155,
+        "endChar": 17
+      },
+      "revId": "17b2a226c2c91ea5357d527f6766eaa4b88681f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c2e1b19_5a84e6fa",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-09T09:54:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "369bf53b_a2e79684",
       "range": {
         "startLine": 155,
         "startChar": 8,
@@ -60,6 +108,30 @@
       "writtenOn": "2023-11-02T13:00:23Z",
       "side": 1,
       "message": "change in order of operations?",
+      "range": {
+        "startLine": 188,
+        "startChar": 8,
+        "endLine": 188,
+        "endChar": 43
+      },
+      "revId": "17b2a226c2c91ea5357d527f6766eaa4b88681f5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9bc50f7_cff3f78e",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-09T09:54:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "16cd502e_785c5a1f",
       "range": {
         "startLine": 188,
         "startChar": 8,
