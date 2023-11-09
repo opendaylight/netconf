@@ -64,7 +64,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             @Reference final SchemaResourceManager schemaRepositoryProvider, @Reference final DataBroker dataBroker,
             @Reference final DOMMountPointService mountPointService,
             @Reference final AAAEncryptionService encryptionService,
-            @Reference(target = "(type=default)") final NetconfClientConfigurationBuilderFactory builderFactory,
+            @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
             @Reference final RpcProviderService rpcProviderService, @Reference final BaseNetconfSchemas baseSchemas,
             @Reference final DeviceActionFactory deviceActionFactory) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, clientFactory, timer, processingThreadPool.getExecutor(),
