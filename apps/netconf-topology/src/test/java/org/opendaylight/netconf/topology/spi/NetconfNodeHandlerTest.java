@@ -134,7 +134,7 @@ public class NetconfNodeHandlerTest {
     public void before() {
         // Instantiate the handler
         handler = new NetconfNodeHandler(clientFactory, timer, BASE_SCHEMAS, schemaManager, processingExecutor,
-            new DefaultNetconfClientConfigurationBuilderFactory(encryptionService, credentialProvider,
+            new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
                 sslHandlerFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
