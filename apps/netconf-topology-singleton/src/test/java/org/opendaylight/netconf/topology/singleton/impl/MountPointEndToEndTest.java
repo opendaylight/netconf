@@ -104,8 +104,8 @@ import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
-import org.opendaylight.netconf.topology.spi.DefaultNetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
+import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -268,7 +268,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             }
         };
 
-        builderFactory = new DefaultNetconfClientConfigurationBuilderFactory(mockEncryptionService, credentialProvider,
+        builderFactory = new NetconfClientConfigurationBuilderFactoryImpl(mockEncryptionService, credentialProvider,
             sslHandlerFactoryProvider);
 
         doReturn(mockRpcReg).when(mockRpcProviderService).registerRpcImplementations(any());

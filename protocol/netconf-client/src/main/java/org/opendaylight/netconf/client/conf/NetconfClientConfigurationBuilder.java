@@ -9,16 +9,13 @@ package org.opendaylight.netconf.client.conf;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.net.InetSocketAddress;
 import java.util.List;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
+import org.opendaylight.netconf.transport.tls.SslHandlerFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.SshClientGrouping;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.rev230417.TcpClientGrouping;
@@ -27,51 +24,31 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.
 /**
  * Builder for {@link NetconfClientConfiguration}.
  */
-public class NetconfClientConfigurationBuilder {
-
+public final class NetconfClientConfigurationBuilder {
     public static final int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 5000;
     public static final NetconfClientConfiguration.NetconfClientProtocol DEFAULT_CLIENT_PROTOCOL =
         NetconfClientConfiguration.NetconfClientProtocol.TCP;
 
-    private InetSocketAddress address;
     private long connectionTimeoutMillis = DEFAULT_CONNECTION_TIMEOUT_MILLIS;
-    private NetconfHelloMessageAdditionalHeader additionalHeader;
-    private NetconfClientSessionListener sessionListener;
-    private AuthenticationHandler authHandler;
-    private NetconfClientConfiguration.NetconfClientProtocol clientProtocol = DEFAULT_CLIENT_PROTOCOL;
-    private SslHandlerFactory sslHandlerFactory;
-    private NetconfSshClient sshClient;
-    private List<Uri> odlHelloCapabilities;
     private @NonNegative int maximumIncomingChunkSize =
         NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
+    private NetconfHelloMessageAdditionalHeader additionalHeader;
+    private NetconfClientSessionListener sessionListener;
+    private NetconfClientConfiguration.NetconfClientProtocol clientProtocol = DEFAULT_CLIENT_PROTOCOL;
+    private List<Uri> odlHelloCapabilities;
     private String name;
     private TcpClientGrouping tcpParameters;
     private TlsClientGrouping tlsParameters;
-    private org.opendaylight.netconf.transport.tls.SslHandlerFactory transportSslHandlerFactory;
+    private SslHandlerFactory sslHandlerFactory;
     private SshClientGrouping sshParameters;
     private ClientFactoryManagerConfigurator sshConfigurator;
 
-    protected NetconfClientConfigurationBuilder() {
+    private NetconfClientConfigurationBuilder() {
+        // on purpose
     }
 
     public static NetconfClientConfigurationBuilder create() {
         return new NetconfClientConfigurationBuilder();
-    }
-
-    /**
-     * Set remote address.
-     *
-     * @param address remote address
-     * @return current builder instance
-     * @deprecated due to design change. Only used with NetconfClientDispatcher,
-     *     ignored when building configuration for {@link org.opendaylight.netconf.client.NetconfClientFactory} which
-     *     expects remote address defined via TCP transport configuration {@link #withTcpParameters(TcpClientGrouping)}
-     */
-    @Deprecated
-    @SuppressWarnings("checkstyle:hiddenField")
-    public NetconfClientConfigurationBuilder withAddress(final InetSocketAddress address) {
-        this.address = address;
-        return this;
     }
 
     /**
@@ -94,7 +71,7 @@ public class NetconfClientConfigurationBuilder {
      */
     @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withProtocol(
-        final NetconfClientConfiguration.NetconfClientProtocol clientProtocol) {
+            final NetconfClientConfiguration.NetconfClientProtocol clientProtocol) {
         this.clientProtocol = clientProtocol;
         return this;
     }
@@ -107,7 +84,7 @@ public class NetconfClientConfigurationBuilder {
      */
     @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withAdditionalHeader(
-        final NetconfHelloMessageAdditionalHeader additionalHeader) {
+            final NetconfHelloMessageAdditionalHeader additionalHeader) {
         this.additionalHeader = additionalHeader;
         return this;
     }
@@ -121,54 +98,6 @@ public class NetconfClientConfigurationBuilder {
     @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withSessionListener(final NetconfClientSessionListener sessionListener) {
         this.sessionListener = sessionListener;
-        return this;
-    }
-
-    /**
-     * Set authentication handler. Used for SSH authentication.
-     *
-     * @param authHandler authentication handler
-     * @return current builder instance
-     * @deprecated due to design change. Only used with NetconfClientDispatcher,
-     *     ignored when building configuration for {@link org.opendaylight.netconf.client.NetconfClientFactory} which
-     *     expects SSH transport overlay configuration via {@link #withSshParameters(SshClientGrouping)}
-     */
-    @Deprecated
-    @SuppressWarnings("checkstyle:hiddenField")
-    public NetconfClientConfigurationBuilder withAuthHandler(final AuthenticationHandler authHandler) {
-        this.authHandler = authHandler;
-        return this;
-    }
-
-    /**
-     * Set SSL Handler factory.
-     *
-     * @param sslHandlerFactory ssh handler instance
-     * @return current builder instance
-     * @deprecated due to design change. Only used with NetconfClientDispatcher,
-     *     ignored when building configuration for {@link org.opendaylight.netconf.client.NetconfClientFactory} which
-     *     expects TLS transport overlay configuration via {@link #withTlsParameters(TlsClientGrouping)}
-     */
-    @Deprecated
-    @SuppressWarnings("checkstyle:hiddenField")
-    public NetconfClientConfigurationBuilder withSslHandlerFactory(final SslHandlerFactory sslHandlerFactory) {
-        this.sslHandlerFactory = sslHandlerFactory;
-        return this;
-    }
-
-    /**
-     * Set SSH client instance for use as SSH transport overlay.
-     *
-     * @param sshClient ssh client instance
-     * @return current builder instance
-     * @deprecated due to design change. Only used with NetconfClientDispatcher,
-     *     ignored when building configuration for {@link org.opendaylight.netconf.client.NetconfClientFactory} which
-     *     expects SSH transport overlay configuration via {@link #withSshParameters(SshClientGrouping)}
-     */
-    @Deprecated
-    @SuppressWarnings("checkstyle:hiddenField")
-    public NetconfClientConfigurationBuilder withSshClient(final NetconfSshClient sshClient) {
-        this.sshClient = sshClient;
         return this;
     }
 
@@ -205,7 +134,7 @@ public class NetconfClientConfigurationBuilder {
      */
     @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withMaximumIncomingChunkSize(
-        final @NonNegative int maximumIncomingChunkSize) {
+            final @NonNegative int maximumIncomingChunkSize) {
         checkArgument(maximumIncomingChunkSize > 0);
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
         return this;
@@ -238,13 +167,12 @@ public class NetconfClientConfigurationBuilder {
     /**
      * Set SslHandlerFactory for TLS transport.
      *
-     * @param transportSslHandlerFactory ssl handler factory
+     * @param sslHandlerFactory ssl handler factory
      * @return current builder instance
      */
     @SuppressWarnings("checkstyle:hiddenField")
-    public NetconfClientConfigurationBuilder withTransportSslHandlerFactory(
-            final org.opendaylight.netconf.transport.tls.SslHandlerFactory transportSslHandlerFactory) {
-        this.transportSslHandlerFactory = transportSslHandlerFactory;
+    public NetconfClientConfigurationBuilder withSslHandlerFactory(final SslHandlerFactory sslHandlerFactory) {
+        this.sslHandlerFactory = sslHandlerFactory;
         return this;
     }
 
@@ -273,63 +201,13 @@ public class NetconfClientConfigurationBuilder {
         return this;
     }
 
-    final InetSocketAddress getAddress() {
-        return address;
-    }
-
-    final long getConnectionTimeoutMillis() {
-        return connectionTimeoutMillis;
-    }
-
-    final NetconfHelloMessageAdditionalHeader getAdditionalHeader() {
-        return additionalHeader;
-    }
-
-    final NetconfClientSessionListener getSessionListener() {
-        return sessionListener;
-    }
-
-    final AuthenticationHandler getAuthHandler() {
-        return authHandler;
-    }
-
-    final NetconfClientConfiguration.NetconfClientProtocol getProtocol() {
-        return clientProtocol;
-    }
-
-    final SslHandlerFactory getSslHandlerFactory() {
-        return sslHandlerFactory;
-    }
-
-    public NetconfSshClient getSshClient() {
-        return sshClient;
-    }
-
-    final List<Uri> getOdlHelloCapabilities() {
-        return odlHelloCapabilities;
-    }
-
-    final @NonNegative int getMaximumIncomingChunkSize() {
-        return maximumIncomingChunkSize;
-    }
-
-    final String getName() {
-        return name;
-    }
-
     /**
      * Builds configuration based on parameters provided.
      *
      * @return immutable configuration instance
      */
     public NetconfClientConfiguration build() {
-        return tcpParameters == null
-            // legacy configuration
-            ? new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
-                sessionListener, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities,
-                maximumIncomingChunkSize, name)
-            // new configuration
-            : new NetconfClientConfiguration(clientProtocol, tcpParameters, tlsParameters, transportSslHandlerFactory,
+        return new NetconfClientConfiguration(clientProtocol, tcpParameters, tlsParameters, sslHandlerFactory,
                 sshParameters, sshConfigurator, sessionListener, odlHelloCapabilities, connectionTimeoutMillis,
                 maximumIncomingChunkSize, additionalHeader, name);
     }
