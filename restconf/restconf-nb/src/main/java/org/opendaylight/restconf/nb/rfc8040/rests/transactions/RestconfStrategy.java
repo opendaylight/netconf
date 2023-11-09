@@ -57,6 +57,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -451,6 +452,7 @@ public abstract class RestconfStrategy {
         final var tx = prepareWriteExecution();
 
         boolean noError = true;
+        final var additionalTransaction = new ArrayList<Integer>();
         for (var patchEntity : patch.entities()) {
             if (noError) {
                 final var targetNode = patchEntity.getTargetNode();
@@ -459,6 +461,7 @@ public abstract class RestconfStrategy {
                 switch (patchEntity.getOperation()) {
                     case Create:
                         try {
+                            additionalTransaction.add(getPossibleTransactions(patchEntity.getNode()));
                             tx.create(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
@@ -468,6 +471,7 @@ public abstract class RestconfStrategy {
                         break;
                     case Delete:
                         try {
+                            additionalTransaction.add(1);
                             tx.delete(targetNode);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
@@ -477,6 +481,7 @@ public abstract class RestconfStrategy {
                         break;
                     case Merge:
                         try {
+                            additionalTransaction.add(2);
                             tx.ensureParentsByMerge(targetNode);
                             tx.merge(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
@@ -487,6 +492,7 @@ public abstract class RestconfStrategy {
                         break;
                     case Replace:
                         try {
+                            additionalTransaction.add(getPossibleTransactions(patchEntity.getNode()));
                             tx.replace(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
@@ -496,6 +502,7 @@ public abstract class RestconfStrategy {
                         break;
                     case Remove:
                         try {
+                            additionalTransaction.add(1);
                             tx.remove(targetNode);
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {
@@ -532,12 +539,46 @@ public abstract class RestconfStrategy {
             @Override
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false,
-                    TransactionUtil.decodeException(cause, "PATCH", null, modelContext).getErrors()));
+                if (cause instanceof RestconfDocumentedException rde && rde.transactionNumber() >= 2) {
+                    // it is also necessary to include the subtraction of the lock operation.
+                    final var patchStatusIndex = getPatchStatusPosition(additionalTransaction,
+                        rde.transactionNumber() - 2);
+                    final var patchEditId = patch.entities().get(patchStatusIndex).getEditId();
+                    // replace failed operation with correct status
+                    editCollection.set(patchStatusIndex, new PatchStatusEntity(patchEditId, false, rde.getErrors()));
+                    // remove elements above failed operation
+                    editCollection.subList(patchStatusIndex + 1, editCollection.size()).clear();
+                    ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false,
+                        null));
+                } else {
+                    ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false,
+                        TransactionUtil.decodeException(cause, "PATCH", null, modelContext).getErrors()));
+                }
             }
         }, MoreExecutors.directExecutor());
 
         return ret;
+    }
+
+    private static int getPossibleTransactions(final NormalizedNode node) {
+        if (node instanceof MapNode || node instanceof LeafSetNode) {
+            return ((NormalizedNodeContainer<?>) node).body().size() + 1;
+        } else {
+            return 1;
+        }
+    }
+
+    private static int getPatchStatusPosition(final List<Integer> transaction, final int transactionNumber) {
+        int result = 0;
+        int transactionCounter = 0;
+        for (final Integer i : transaction) {
+            if (transactionCounter + i > transactionNumber) {
+                break;
+            }
+            result++;
+            transactionCounter += i;
+        }
+        return result;
     }
 
     private void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,

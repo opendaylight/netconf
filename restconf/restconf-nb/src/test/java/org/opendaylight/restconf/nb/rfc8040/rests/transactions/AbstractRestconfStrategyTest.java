@@ -291,18 +291,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPatchDataReplaceMergeAndRemove() {
-        final var buildArtistList = Builders.mapBuilder()
-            .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
-            .withChild(Builders.mapEntryBuilder()
-                .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"))
-                .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of artist"))
-                .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "description of artist"))
-                .build())
-            .build();
-
         patch(new PatchContext("patchRMRm",
-            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_IID, buildArtistList),
-                new PatchEntity("edit2", Operation.Merge, ARTIST_IID, buildArtistList),
+            List.of(new PatchEntity("edit1", Operation.Replace, ARTIST_IID, BUILD_ARTIST_LIST),
+                new PatchEntity("edit2", Operation.Merge, ARTIST_IID, BUILD_ARTIST_LIST),
                 new PatchEntity("edit3", Operation.Remove, ARTIST_IID))),
             testPatchDataReplaceMergeAndRemoveStrategy(), false);
     }
@@ -318,6 +309,35 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     abstract @NonNull RestconfStrategy testPatchDataCreateAndDeleteStrategy();
+
+    @Test
+    public final void testPatchReplaceDataAlreadyExistCreatedAndDelete() {
+        final var patchContext = new PatchContext("patchCD", List.of(
+            new PatchEntity("edit1", Operation.Replace, ARTIST_IID, BUILD_ARTIST_LIST),
+            new PatchEntity("edit2", Operation.Create, PLAYER_IID, EMPTY_JUKEBOX),
+            new PatchEntity("edit3", Operation.Delete, CREATE_AND_DELETE_TARGET)));
+        final var patchStatusContext = testPatchReplaceDataAlreadyExistCreatedAndDeleteStrategy()
+            .patchData(patchContext).getOrThrow();
+
+        assertFalse(patchStatusContext.ok());
+        assertNull(patchStatusContext.globalErrors());
+        assertEquals(2, patchStatusContext.editCollection().size());
+
+        final var replace = patchStatusContext.editCollection().get(0);
+        assertTrue(replace.isOk());
+        assertEquals("edit1", replace.getEditId());
+        assertNull(replace.getEditErrors());
+
+        final var create = patchStatusContext.editCollection().get(1);
+        assertFalse(create.isOk());
+        assertEquals("edit2", create.getEditId());
+        assertNotNull(create.getEditErrors());
+        final var error = create.getEditErrors().iterator().next();
+        assertEquals(ErrorTag.DATA_EXISTS, error.getErrorTag());
+        assertEquals("Data already exists", error.getErrorMessage());
+    }
+
+    abstract @NonNull RestconfStrategy testPatchReplaceDataAlreadyExistCreatedAndDeleteStrategy();
 
     @Test
     public final void testPatchMergePutContainer() {

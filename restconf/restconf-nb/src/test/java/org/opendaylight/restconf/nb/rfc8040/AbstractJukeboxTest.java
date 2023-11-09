@@ -17,6 +17,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -65,6 +66,17 @@ public abstract class AbstractJukeboxTest {
         .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
         .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
         .build();
+
+    public static final MapEntryNode ARTIST_ENTRY = Builders.mapEntryBuilder()
+        .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"))
+        .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of artist"))
+        .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "description of artist"))
+        .build();
+    protected static final SystemMapNode BUILD_ARTIST_LIST = Builders.mapBuilder()
+        .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
+        .withChild(ARTIST_ENTRY)
+        .build();
+
 
     protected static EffectiveModelContext JUKEBOX_SCHEMA;
 
