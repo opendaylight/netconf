@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
@@ -41,9 +40,9 @@ import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.connection.parameters.protocol.Specification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.connection.parameters.protocol.specification.TlsCase;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
@@ -96,7 +95,7 @@ public final class DefaultSslHandlerFactoryProvider
         private KeyFactory dsaFactory;
         private KeyFactory rsaFactory;
 
-        java.security.PrivateKey getJavaPrivateKey(final String base64PrivateKey) throws GeneralSecurityException {
+        java.security.PrivateKey getJavaPrivateKey(final byte[] base64PrivateKey) throws GeneralSecurityException {
             final var keySpec = new PKCS8EncodedKeySpec(base64Decode(base64PrivateKey));
 
             if (rsaFactory == null) {
@@ -114,7 +113,7 @@ public final class DefaultSslHandlerFactoryProvider
             return dsaFactory.generatePrivate(keySpec);
         }
 
-        private X509Certificate getCertificate(final String base64Certificate) throws GeneralSecurityException {
+        private X509Certificate getCertificate(final byte[] base64Certificate) throws GeneralSecurityException {
             // TODO: https://stackoverflow.com/questions/43809909/is-certificatefactory-getinstancex-509-thread-safe
             //        indicates this is thread-safe in most cases, but can we get a better assurance?
             if (certFactory == null) {
@@ -227,8 +226,8 @@ public final class DefaultSslHandlerFactoryProvider
         return keyStore;
     }
 
-    private static byte[] base64Decode(final String base64) {
-        return Base64.getMimeDecoder().decode(base64.getBytes(StandardCharsets.US_ASCII));
+    private static byte[] base64Decode(final byte[] base64) {
+        return Base64.getMimeDecoder().decode(base64);
     }
 
     @Override

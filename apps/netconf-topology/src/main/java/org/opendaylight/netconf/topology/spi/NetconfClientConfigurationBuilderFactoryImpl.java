@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.util.List;
 import javax.inject.Inject;
@@ -146,7 +147,8 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         final var passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
         try {
             return new PKIUtil().decodePrivateKey(
-                new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey()).replace("\\n", "\n")),
+                new StringReader(new String(encryptionService.decrypt(dsKeypair.getPrivateKey()),
+                    StandardCharsets.US_ASCII).replace("\\n", "\n")),
                 encryptionService.decrypt(passPhrase));
         } catch (IOException e) {
             throw new IllegalStateException("Could not decode private key with keyId=" + keyId, e);
