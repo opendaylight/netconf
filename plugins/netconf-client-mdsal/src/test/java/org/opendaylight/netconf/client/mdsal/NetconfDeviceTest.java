@@ -28,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.net.InetSocketAddress;
@@ -375,6 +376,51 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         verify(schemaContextProviderFactory, timeout(5000).times(2)).createEffectiveModelContext(anyCollection());
         // onDeviceConnected called once
         verify(facade, timeout(5000)).onDeviceConnected(
+            any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
+    }
+
+    @Test
+    public void testNetconfDeviceReconnectRaceWithSchemaSetup() throws Exception {
+        final RemoteDeviceHandler facade = getFacade();
+
+        final EffectiveModelContextFactory schemaContextProviderFactory = mock(EffectiveModelContextFactory.class);
+        final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
+        doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(anyCollection());
+
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
+            schemaRegistry, getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice device = spy(new NetconfDeviceBuilder()
+            .setReconnectOnSchemasChange(true)
+            .setSchemaResourcesDTO(schemaResourcesDTO)
+            .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
+            .setId(getId())
+            .setSalFacade(facade)
+            .setBaseSchemas(BASE_SCHEMAS)
+            .build());
+        final var mockSchemaFuturesList = mock(ListenableFuture.class);
+        doReturn(true).when(mockSchemaFuturesList).isDone();
+        doReturn(mockSchemaFuturesList).when(device).schemaFuturesList();
+
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
+            List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+        final NetconfDeviceCommunicator listener = getListener();
+
+        // session up, start schema resolution
+        device.onRemoteSessionUp(sessionCaps, listener);
+        // session down, session up & schema setup simulating the following scenario:
+        //   1. session down
+        //   2. schemaFuturesList is done and cannot be cancelled
+        //   3. session up
+        //   4. handleSalInitializationSuccess
+        device.onRemoteSessionDown();
+        device.onRemoteSessionUp(sessionCaps, listener);
+        schemaFuture.set(SCHEMA_CONTEXT);
+        // onDeviceDisconnected called once
+        verify(facade, timeout(5000)).onDeviceDisconnected();
+        // schema setup performed twice
+        verify(schemaContextProviderFactory, timeout(5000).times(2)).createEffectiveModelContext(anyCollection());
+        // onDeviceConnected called twice because this is 2nd time its up
+        verify(facade, timeout(5000).times(2)).onDeviceConnected(
             any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
     }
 
