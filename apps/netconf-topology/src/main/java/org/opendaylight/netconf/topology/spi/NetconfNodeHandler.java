@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
@@ -77,9 +76,8 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private Future<?> currentTask;
 
     public NetconfNodeHandler(final NetconfClientDispatcher clientDispatcher, final EventExecutor eventExecutor,
-            final ScheduledExecutorService keepaliveExecutor, final BaseNetconfSchemas baseSchemas,
-            final SchemaResourceManager schemaManager, final Executor processingExecutor,
-            final NetconfClientConfigurationBuilderFactory builderFactory,
+            final BaseNetconfSchemas baseSchemas, final SchemaResourceManager schemaManager,
+            final Executor processingExecutor, final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
@@ -104,7 +102,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
         if (keepaliveDelay > 0) {
             LOG.info("Adding keepalive facade, for device {}", nodeId);
-            salFacade = keepAliveFacade = new KeepaliveSalFacade(deviceId, this, keepaliveExecutor, keepaliveDelay,
+            salFacade = keepAliveFacade = new KeepaliveSalFacade(deviceId, this, eventExecutor, keepaliveDelay,
                 node.requireDefaultRequestTimeoutMillis().toJava());
         } else {
             salFacade = this;
