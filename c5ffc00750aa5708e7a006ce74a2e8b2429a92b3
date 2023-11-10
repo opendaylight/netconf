@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c584e80_ab19bcb8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PostEntity.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-11-10T13:10:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a92481b9_469ba763",
+      "revId": "c5ffc00750aa5708e7a006ce74a2e8b2429a92b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "16f5ac2e_7178ee7b",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-11-10T09:57:13Z",
       "side": 1,
       "message": "Let\u0027s make \u0027type\u0027 constant as it has used few times",
+      "revId": "c5ffc00750aa5708e7a006ce74a2e8b2429a92b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f60e841_008c6b86",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PostEntity.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-11-10T13:10:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "16f5ac2e_7178ee7b",
       "revId": "c5ffc00750aa5708e7a006ce74a2e8b2429a92b3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
