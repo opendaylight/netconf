@@ -39,8 +39,8 @@ final class RestconfApplication extends Application {
             new RestconfDocumentedExceptionMapper(databindProvider),
             new RestconfDataServiceImpl(databindProvider, server, actionService),
             new RestconfOperationsServiceImpl(server),
-            new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
-            new RestconfImpl(databindProvider));
+            new RestconfImpl(server),
+            new RestconfSchemaServiceImpl(domSchemaService, mountPointService));
     }
 
     @Override
