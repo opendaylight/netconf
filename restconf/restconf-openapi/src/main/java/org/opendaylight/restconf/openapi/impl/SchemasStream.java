@@ -22,10 +22,12 @@ import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.SchemaEntity;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public final class SchemasStream extends InputStream {
     private final Iterator<? extends Module> iterator;
     private final OpenApiBodyWriter writer;
+    private final EffectiveModelContext context;
     private final JsonGenerator generator;
     private final ByteArrayOutputStream stream;
 
@@ -37,6 +39,7 @@ public final class SchemasStream extends InputStream {
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
             final JsonGenerator generator, final ByteArrayOutputStream stream) {
         iterator = context.getModules().iterator();
+        this.context = context;
         this.writer = writer;
         this.generator = generator;
         this.stream = stream;
@@ -90,15 +93,27 @@ public final class SchemasStream extends InputStream {
         return super.read(array, off, len);
     }
 
-    private static Deque<SchemaEntity> toComponents(final Module module) {
+    private Deque<SchemaEntity> toComponents(final Module module) {
         final var result = new ArrayDeque<SchemaEntity>();
+        final var definitionNames = new DefinitionNames();
+        final var stack = SchemaInferenceStack.of(context);
         for (final var rpc : module.getRpcs()) {
+            stack.enterSchemaTree(rpc.getQName());
             final var moduleName = module.getName();
             final var rpcName = rpc.getQName().getLocalName();
-            final var input = new SchemaEntity(rpc.getInput(), moduleName + "_" + rpcName + "_input", "object");
-            result.add(input);
-            final var output = new SchemaEntity(rpc.getOutput(), moduleName + "_" + rpcName + "_output", "object");
-            result.add(output);
+            final var rpcInput = rpc.getInput();
+            if (!rpcInput.getChildNodes().isEmpty()) {
+                final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + "_input", "object",
+                    stack, moduleName, false, definitionNames);
+                result.add(input);
+            }
+            final var rpcOutput = rpc.getOutput();
+            if (!rpcOutput.getChildNodes().isEmpty()) {
+                final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + "_output", "object",
+                    stack, moduleName, false, definitionNames);
+                result.add(output);
+            }
+            stack.exit();
         }
 
         // actions
