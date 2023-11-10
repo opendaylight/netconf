@@ -14,27 +14,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Restconf;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 /**
  * Service for getting the revision of {@code ietf-yang-library}.
  */
 @Path("/")
 public final class RestconfImpl {
-    private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
-    private static final String YANG_LIBRARY_REVISION = YangLibrary.QNAME.getRevision().orElseThrow().toString();
+    private final MdsalRestconfServer server;
 
-    private final DatabindProvider databindProvider;
-
-    public RestconfImpl(final DatabindProvider databindProvider) {
-        this.databindProvider = requireNonNull(databindProvider);
+    public RestconfImpl(final MdsalRestconfServer server) {
+        this.server = requireNonNull(server);
     }
 
     /**
@@ -52,15 +42,6 @@ public final class RestconfImpl {
         MediaType.TEXT_XML
     })
     public NormalizedNodePayload getLibraryVersion() {
-        final EffectiveModelContext context = databindProvider.currentContext().modelContext();
-
-        final SchemaInferenceStack stack = SchemaInferenceStack.of(context);
-        // FIXME: use rc:data instantiation once the stack supports it
-        stack.enterGrouping(Restconf.QNAME);
-        stack.enterDataTree(Restconf.QNAME);
-        stack.enterDataTree(YANG_LIBRARY_VERSION);
-
-        return new NormalizedNodePayload(stack.toInference(),
-            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION));
+        return server.yangLibraryVersionGET();
     }
 }
