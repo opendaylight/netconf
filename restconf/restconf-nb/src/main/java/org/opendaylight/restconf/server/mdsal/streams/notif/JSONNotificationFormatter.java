@@ -15,11 +15,10 @@ import java.time.Instant;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.$YangModuleInfoImpl;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 final class JSONNotificationFormatter extends NotificationFormatter {
     private static final @NonNull String NOTIFICATION_NAME =
@@ -50,16 +49,15 @@ final class JSONNotificationFormatter extends NotificationFormatter {
     }
 
     @Override
-    protected String createText(final TextParameters params, final EffectiveModelContext schemaContext,
+    protected String createText(final TextParameters params, final DatabindContext databind,
             final DOMNotification input, final Instant now) throws IOException {
         try (var writer = new StringWriter()) {
             try (var jsonWriter = new JsonWriter(writer)) {
                 jsonWriter.beginObject()
                     .name(NOTIFICATION_NAME).beginObject()
                         .name("event-time").value(toRFC3339(now));
-                writeBody(JSONNormalizedNodeStreamWriter.createNestedWriter(
-                    JSONCodecFactorySupplier.RFC7951.getShared(schemaContext), input.getType(), null, jsonWriter),
-                    input.getBody());
+                writeBody(JSONNormalizedNodeStreamWriter.createNestedWriter(databind.jsonCodecs(), input.getType(),
+                    null, jsonWriter), input.getBody());
                 jsonWriter.endObject().endObject();
             }
             return writer.toString();

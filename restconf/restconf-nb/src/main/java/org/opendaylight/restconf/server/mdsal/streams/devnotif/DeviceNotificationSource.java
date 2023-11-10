@@ -17,6 +17,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.server.mdsal.streams.notif.AbstractNotificationSource;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
@@ -87,8 +88,9 @@ final class DeviceNotificationSource extends AbstractNotificationSource implemen
             return endOfStream(sink);
         }
 
+        final var databind = DatabindContext.ofModel(modelContext);
         final var notifReg = optNotification.orElseThrow()
-            .registerNotificationListener(new Listener(sink, () -> modelContext), paths);
+            .registerNotificationListener(new Listener(sink, () -> databind), paths);
 
         // Notifications are running now.
         // If we get removed we need to close those. But since we are running lockless and we need to set up

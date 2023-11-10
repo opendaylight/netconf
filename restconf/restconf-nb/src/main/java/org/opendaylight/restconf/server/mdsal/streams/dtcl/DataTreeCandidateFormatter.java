@@ -13,13 +13,13 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathExpressionException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.server.spi.EventFormatter;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
 
 /**
@@ -40,7 +40,7 @@ abstract class DataTreeCandidateFormatter extends EventFormatter<List<DataTreeCa
     }
 
     @Override
-    protected final void fillDocument(final Document doc, final EffectiveModelContext schemaContext,
+    protected final void fillDocument(final Document doc, final DatabindContext databind,
             final List<DataTreeCandidate> input) throws IOException {
         final var notificationElement = createNotificationElement(doc, Instant.now());
         final var notificationEventElement = doc.createElementNS(DATA_CHANGED_NOTIFICATION_NS,
@@ -53,7 +53,7 @@ abstract class DataTreeCandidateFormatter extends EventFormatter<List<DataTreeCa
                 final var dataAfter = candidate.getRootNode().dataAfter();
                 if (dataAfter != null) {
                     try (var writer = XMLStreamNormalizedNodeStreamWriter.create(
-                        XML_OUTPUT_FACTORY.createXMLStreamWriter(new DOMResult(dataElement)), schemaContext,
+                        XML_OUTPUT_FACTORY.createXMLStreamWriter(new DOMResult(dataElement)), databind.modelContext(),
                         candidate.getRootPath())) {
                         writeBody(writer, dataAfter);
                     }
