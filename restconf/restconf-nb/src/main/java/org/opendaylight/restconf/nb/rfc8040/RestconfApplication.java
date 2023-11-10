@@ -25,7 +25,6 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocu
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfInvokeOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 
@@ -39,7 +38,6 @@ final class RestconfApplication extends Application {
         singletons = Set.of(
             new RestconfDocumentedExceptionMapper(databindProvider),
             new RestconfDataServiceImpl(databindProvider, server, actionService),
-            new RestconfInvokeOperationsServiceImpl(server),
             new RestconfOperationsServiceImpl(server),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
             new RestconfImpl(databindProvider));
