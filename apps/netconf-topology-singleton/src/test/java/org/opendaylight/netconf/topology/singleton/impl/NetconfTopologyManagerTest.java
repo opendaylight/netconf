@@ -127,10 +127,10 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any());
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
-                keepaliveExecutor, processingService, actorSystem, eventExecutor, clientDispatcher,
-                mountPointService, encryptionService, rpcProviderService, deviceActionFactory,
-                new DefaultSchemaResourceManager(new DefaultYangParserFactory()), builderFactory,
-                TOPOLOGY_ID, Uint16.ZERO) {
+                processingService, actorSystem, eventExecutor, clientDispatcher, mountPointService, encryptionService,
+                rpcProviderService, deviceActionFactory,
+                new DefaultSchemaResourceManager(new DefaultYangParserFactory()), builderFactory, TOPOLOGY_ID,
+                Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,

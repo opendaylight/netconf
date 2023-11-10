@@ -307,10 +307,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 YangTextSchemaSource.class, 1));
 
         masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
-                masterClusterSingletonServiceProvider, mockKeepaliveExecutor, MoreExecutors.directExecutor(),
-                masterSystem, eventExecutor, mockClientDispatcher, masterMountPointService,
-                mockEncryptionService, mockRpcProviderService, deviceActionFactory, resourceManager, builderFactory,
-                TOPOLOGY_ID, Uint16.ZERO) {
+                masterClusterSingletonServiceProvider,  MoreExecutors.directExecutor(), masterSystem, eventExecutor,
+                mockClientDispatcher, masterMountPointService, mockEncryptionService, mockRpcProviderService,
+                deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                     final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -344,10 +343,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 .registerClusterSingletonService(any());
 
         slaveNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, slaveDataBroker,
-                mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, MoreExecutors.directExecutor(),
-                slaveSystem, eventExecutor, mockClientDispatcher, slaveMountPointService,
-                mockEncryptionService, mockRpcProviderService, deviceActionFactory, resourceManager, builderFactory,
-                TOPOLOGY_ID, Uint16.ZERO) {
+                mockSlaveClusterSingletonServiceProvider, MoreExecutors.directExecutor(), slaveSystem, eventExecutor,
+                mockClientDispatcher, slaveMountPointService, mockEncryptionService, mockRpcProviderService,
+                deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,

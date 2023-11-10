@@ -19,10 +19,9 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.Executor;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -42,8 +41,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 public class CallHomeMountDispatcherTest {
     private String topologyId;
     private EventExecutor mockExecutor;
-    private ScheduledThreadPool mockKeepAlive;
-    private ThreadPool mockProcessingExecutor;
+    private Executor mockProcessingExecutor;
     private SchemaResourceManager mockSchemaRepoProvider;
 
     private CallHomeMountDispatcher instance;
@@ -60,8 +58,7 @@ public class CallHomeMountDispatcherTest {
     public void setup() {
         topologyId = "";
         mockExecutor = mock(EventExecutor.class);
-        mockKeepAlive = mock(ScheduledThreadPool.class);
-        mockProcessingExecutor = mock(ThreadPool.class);
+        mockProcessingExecutor = mock(Executor.class);
         mockSchemaRepoProvider = mock(SchemaResourceManager.class);
         mockDataBroker = mock(DataBroker.class);
         mockMount = mock(DOMMountPointService.class);
@@ -71,9 +68,8 @@ public class CallHomeMountDispatcherTest {
         mockBuilderFactory = mock(NetconfClientConfigurationBuilderFactory .class);
         mockBaseSchemas = mock(BaseNetconfSchemas.class);
 
-        instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
-                mockProcessingExecutor, mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount,
-                mockBuilderFactory) {
+        instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockProcessingExecutor, mockSchemaRepoProvider,
+                mockBaseSchemas, mockDataBroker, mockMount, mockBuilderFactory) {
             @Override
             CallHomeMountSessionManager sessionManager() {
                 return mockSessMgr;

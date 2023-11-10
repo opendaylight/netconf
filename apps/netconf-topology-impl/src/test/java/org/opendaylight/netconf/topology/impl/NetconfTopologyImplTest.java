@@ -15,13 +15,12 @@ import static org.mockito.Mockito.verify;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.List;
+import java.util.concurrent.Executor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
@@ -69,10 +68,6 @@ class NetconfTopologyImplTest {
     @Mock
     private EventExecutor mockedEventExecutor;
     @Mock
-    private ScheduledThreadPool mockedKeepaliveExecutor;
-    @Mock
-    private ThreadPool mockedProcessingExecutor;
-    @Mock
     private SchemaResourceManager mockedResourceManager;
     @Mock
     private DataBroker dataBroker;
@@ -96,12 +91,11 @@ class NetconfTopologyImplTest {
 
     @Test
     void testOnDataTreeChange() throws Exception {
-        doReturn(MoreExecutors.newDirectExecutorService()).when(mockedProcessingExecutor).getExecutor();
         doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(), mockedClientDispatcher,
-            mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker,
+            mockedEventExecutor, MoreExecutors.newDirectExecutorService(), mockedResourceManager, dataBroker,
             mountPointService, encryptionService, builderFactory, rpcProviderService,
             new DefaultBaseNetconfSchemas(new DefaultYangParserFactory()));
         //verify initialization of topology
@@ -155,15 +149,13 @@ class NetconfTopologyImplTest {
 
     private static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
         TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                final ThreadPool processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
-                final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                final AAAEncryptionService encryptionService,
+                final EventExecutor eventExecutor, final Executor processingExecutor,
+                final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
+                final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
                 final NetconfClientConfigurationBuilderFactory builderFactory,
                 final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas) {
-            super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, builderFactory,
-                rpcProviderService, baseSchemas);
+            super(topologyId, clientDispatcher, eventExecutor, processingExecutor, schemaRepositoryProvider, dataBroker,
+                mountPointService, encryptionService, builderFactory, rpcProviderService, baseSchemas);
         }
 
         @Override

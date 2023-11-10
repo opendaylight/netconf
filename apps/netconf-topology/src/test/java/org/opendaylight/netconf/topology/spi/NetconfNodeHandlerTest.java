@@ -135,8 +135,8 @@ public class NetconfNodeHandlerTest {
     @Before
     public void before() {
         // Instantiate the handler
-        handler = new NetconfNodeHandler(clientDispatcher, eventExecutor, keepaliveExecutor, BASE_SCHEMAS,
-            schemaManager, processingExecutor,
+        handler = new NetconfNodeHandler(clientDispatcher, eventExecutor, BASE_SCHEMAS, schemaManager,
+            processingExecutor,
             new DefaultNetconfClientConfigurationBuilderFactory(encryptionService, credentialProvider,
                 sslHandlerFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
