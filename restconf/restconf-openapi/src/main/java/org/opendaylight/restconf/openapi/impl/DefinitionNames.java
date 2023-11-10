@@ -33,7 +33,7 @@ public class DefinitionNames {
         return discriminator;
     }
 
-    String pickDiscriminator(final SchemaNode node, final List<String> clearNames) {
+    public String pickDiscriminator(final SchemaNode node, final List<String> clearNames) {
         String discriminator = "";
         for (final String clearName: clearNames) {
             if (names.contains(clearName)) {
@@ -55,7 +55,7 @@ public class DefinitionNames {
         }
     }
 
-    boolean isListedNode(final SchemaNode node) {
+    public boolean isListedNode(final SchemaNode node) {
         return discriminators.containsKey(node);
     }
 
