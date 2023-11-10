@@ -10,7 +10,7 @@ package org.opendaylight.netconf.northbound;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.osgi.NetconfMonitoringServiceImpl;
@@ -29,7 +29,7 @@ public final class DefaultNetconfMonitoringService extends NetconfMonitoringServ
     @Activate
     public DefaultNetconfMonitoringService(final Map<String, ?> properties) {
         super(OSGiNetconfServer.extractProp(properties, OP_PROVIDER_PROP, NetconfOperationServiceFactory.class),
-            OSGiNetconfServer.extractProp(properties, THREAD_POOL_PROP, ScheduledThreadPool.class),
+            OSGiNetconfServer.extractProp(properties, THREAD_POOL_PROP, ScheduledExecutorService.class),
             OSGiNetconfServer.extractProp(properties, UPDATE_INTERVAL_PROP, Long.class));
     }
 
@@ -39,8 +39,8 @@ public final class DefaultNetconfMonitoringService extends NetconfMonitoringServ
         super.close();
     }
 
-    static Map<String, ?> props(final NetconfOperationServiceFactory opProvider, final ScheduledThreadPool threadPool,
-            final long updateInterval) {
+    static Map<String, ?> props(final NetconfOperationServiceFactory opProvider,
+            final ScheduledExecutorService threadPool, final long updateInterval) {
         return Map.of(
             "type", "netconf-server-monitoring",
             OP_PROVIDER_PROP, requireNonNull(opProvider),

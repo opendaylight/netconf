@@ -7,22 +7,22 @@
  */
 package org.opendaylight.netconf.server.osgi;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableList;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.server.api.monitoring.SessionListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SessionsBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
@@ -34,36 +34,58 @@ import org.slf4j.LoggerFactory;
  * listeners about session start and end. It also publishes on regular interval list of sessions,
  * where events like rpc or notification happened.
  */
-class NetconfSessionMonitoringService implements SessionListener, AutoCloseable {
+abstract sealed class NetconfSessionMonitoringService implements SessionListener, AutoCloseable {
+    static final class WithoutUpdates extends NetconfSessionMonitoringService {
+        WithoutUpdates() {
+            LOG.info("/netconf-state/sessions will not be updated.");
+        }
+
+        @Override
+        void startTask() {
+           // No-op
+        }
+
+        @Override
+        void stopTask() {
+            // No-op
+        }
+    }
+
+    static final class WithUpdates extends NetconfSessionMonitoringService {
+        private final ScheduledExecutorService executor;
+        private final long period;
+        private final TimeUnit timeUnit;
+
+        private ScheduledFuture<?> task;
+
+        WithUpdates(final ScheduledExecutorService executor, final long period, final TimeUnit timeUnit) {
+            this.executor = requireNonNull(executor);
+            this.period = period;
+            this.timeUnit = requireNonNull(timeUnit);
+            LOG.info("/netconf-state/sessions will be updated every {} {}.", period, timeUnit);
+        }
+
+        @Override
+        void startTask() {
+            if (task == null) {
+                task = executor.scheduleAtFixedRate(this::updateSessionStats, period, period, timeUnit);
+            }
+        }
+
+        @Override
+        void stopTask() {
+            if (task != null) {
+                task.cancel(false);
+                task = null;
+            }
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionMonitoringService.class);
 
     private final Set<NetconfManagementSession> sessions = new HashSet<>();
     private final Set<NetconfManagementSession> changedSessions = new HashSet<>();
     private final Set<NetconfMonitoringService.SessionsListener> listeners = new HashSet<>();
-    private final ScheduledExecutorService executor;
-    private final long updateInterval;
-    private boolean running;
-
-    /**
-     * Constructor for {@code NetconfSessionMonitoringService}.
-     *
-     * @param schedulingThreadPool thread pool for scheduling session stats updates. If not present, updates won't be
-     *                             scheduled.
-     * @param updateInterval       update interval. If is less than 0, updates won't be scheduled
-     */
-    NetconfSessionMonitoringService(final Optional<ScheduledThreadPool> schedulingThreadPool,
-            final long updateInterval) {
-        this.updateInterval = updateInterval;
-        if (schedulingThreadPool.isPresent() && updateInterval > 0) {
-            executor = schedulingThreadPool.orElseThrow().getExecutor();
-            LOG.info("/netconf-state/sessions will be updated every {} seconds.", updateInterval);
-        } else {
-            LOG.info(
-                "Scheduling thread pool is present = {}, update interval {}: /netconf-state/sessions won't be updated.",
-                schedulingThreadPool.isPresent(), updateInterval);
-            executor = null;
-        }
-    }
 
     synchronized Sessions getSessions() {
         return new SessionsBuilder()
@@ -73,32 +95,40 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
     }
 
     @Override
-    public synchronized void onSessionUp(final NetconfManagementSession session) {
+    public final synchronized void onSessionUp(final NetconfManagementSession session) {
         LOG.debug("Session {} up", session);
-        Preconditions.checkState(!sessions.contains(session), "Session %s was already added", session);
-        sessions.add(session);
-        notifySessionUp(session);
+        if (!sessions.add(session)) {
+            throw new IllegalStateException("Session " + session + " was already added");
+        }
+
+        final var mgmt = session.toManagementSession();
+        for (var listener : listeners) {
+            listener.onSessionStarted(mgmt);
+        }
     }
 
     @Override
-    public synchronized void onSessionDown(final NetconfManagementSession session) {
+    public final synchronized void onSessionDown(final NetconfManagementSession session) {
         LOG.debug("Session {} down", session);
-        Preconditions.checkState(sessions.contains(session), "Session %s not present", session);
-        sessions.remove(session);
+        if (!sessions.remove(session)) {
+            throw new IllegalStateException("Session " + session + " not present");
+        }
         changedSessions.remove(session);
-        notifySessionDown(session);
+
+        final var mgmt = session.toManagementSession();
+        for (var listener : listeners) {
+            listener.onSessionEnded(mgmt);
+        }
     }
 
     @Override
-    public synchronized void onSessionEvent(final SessionEvent event) {
+    public final synchronized void onSessionEvent(final SessionEvent event) {
         changedSessions.add(event.getSession());
     }
 
-    synchronized Registration registerListener(final NetconfMonitoringService.SessionsListener listener) {
+    final synchronized Registration registerListener(final NetconfMonitoringService.SessionsListener listener) {
         listeners.add(listener);
-        if (!running) {
-            startUpdateSessionStats();
-        }
+        startTask();
         return new AbstractRegistration() {
             @Override
             protected void removeRegistration() {
@@ -108,50 +138,28 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
     }
 
     @Override
-    public synchronized void close() {
-        stopUpdateSessionStats();
+    public final synchronized void close() {
+        stopTask();
         listeners.clear();
         sessions.clear();
     }
 
-    private synchronized void updateSessionStats() {
-        if (changedSessions.isEmpty()) {
-            return;
-        }
-        final var changed = changedSessions.stream()
+    @Holding("this")
+    abstract void startTask();
+
+    @Holding("this")
+    abstract void stopTask();
+
+    final synchronized void updateSessionStats() {
+        if (!changedSessions.isEmpty()) {
+            final var updatedSessions = changedSessions.stream()
                 .map(NetconfManagementSession::toManagementSession)
                 .collect(ImmutableList.toImmutableList());
-        for (NetconfMonitoringService.SessionsListener listener : listeners) {
-            listener.onSessionsUpdated(changed);
-        }
-        changedSessions.clear();
-    }
+            changedSessions.clear();
 
-    private void notifySessionUp(final NetconfManagementSession managementSession) {
-        Session session = managementSession.toManagementSession();
-        for (NetconfMonitoringService.SessionsListener listener : listeners) {
-            listener.onSessionStarted(session);
-        }
-    }
-
-    private void notifySessionDown(final NetconfManagementSession managementSession) {
-        Session session = managementSession.toManagementSession();
-        for (NetconfMonitoringService.SessionsListener listener : listeners) {
-            listener.onSessionEnded(session);
-        }
-    }
-
-    private void startUpdateSessionStats() {
-        if (executor != null) {
-            executor.scheduleAtFixedRate(this::updateSessionStats, 1, updateInterval, TimeUnit.SECONDS);
-            running = true;
-        }
-    }
-
-    private void stopUpdateSessionStats() {
-        if (executor != null) {
-            executor.shutdownNow();
-            running = false;
+            for (var listener : listeners) {
+                listener.onSessionsUpdated(updatedSessions);
+            }
         }
     }
 }

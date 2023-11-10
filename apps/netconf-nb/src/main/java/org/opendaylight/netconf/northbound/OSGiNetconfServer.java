@@ -57,7 +57,8 @@ public final class OSGiNetconfServer {
             final Configuration configuration) {
         mappers.onAddNetconfOperationServiceFactory(mapperAggregatorRegistry);
         monitoring = monitoringFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfMonitoringService.props(
-            mapperAggregatorRegistry, sshScheduledExecutor, configuration.monitoring$_$update$_$interval())));
+            mapperAggregatorRegistry, sshScheduledExecutor.getExecutor(),
+            configuration.monitoring$_$update$_$interval())));
         serverTransportInitializer = new ServerTransportInitializer(NetconfServerSessionNegotiatorFactory.builder()
             .setTimer(timer)
             .setAggregatedOpService(mappers)

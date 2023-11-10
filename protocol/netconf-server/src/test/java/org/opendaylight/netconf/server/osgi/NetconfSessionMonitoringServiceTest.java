@@ -14,21 +14,19 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
@@ -58,6 +56,8 @@ public class NetconfSessionMonitoringServiceTest {
     private NetconfManagementSession sessionMock2;
     @Mock
     private NetconfMonitoringService.SessionsListener listener;
+    @Captor
+    private ArgumentCaptor<Collection<Session>> sessionCollectionCaptor;
 
     private NetconfSessionMonitoringService monitoringService;
 
@@ -68,7 +68,7 @@ public class NetconfSessionMonitoringServiceTest {
         doNothing().when(listener).onSessionStarted(any());
         doNothing().when(listener).onSessionEnded(any());
 
-        monitoringService = new NetconfSessionMonitoringService(Optional.empty(), 0);
+        monitoringService = new NetconfSessionMonitoringService.WithoutUpdates();
         monitoringService.registerListener(listener);
     }
 
@@ -91,38 +91,38 @@ public class NetconfSessionMonitoringServiceTest {
     @Test
     public void testOnSessionUpAndDown() {
         monitoringService.onSessionUp(sessionMock1);
-        ArgumentCaptor<Session> sessionUpCaptor = ArgumentCaptor.forClass(Session.class);
+        final var sessionUpCaptor = ArgumentCaptor.forClass(Session.class);
         verify(listener).onSessionStarted(sessionUpCaptor.capture());
-        final Session sesionUp = sessionUpCaptor.getValue();
+        final var sesionUp = sessionUpCaptor.getValue();
         assertEquals(SESSION_1.getSessionId(), sesionUp.getSessionId());
         assertEquals(SESSION_1.getSourceHost(), sesionUp.getSourceHost());
         assertEquals(SESSION_1.getUsername(), sesionUp.getUsername());
 
         monitoringService.onSessionDown(sessionMock1);
-        ArgumentCaptor<Session> sessionDownCaptor = ArgumentCaptor.forClass(Session.class);
+        final var sessionDownCaptor = ArgumentCaptor.forClass(Session.class);
         verify(listener).onSessionEnded(sessionDownCaptor.capture());
-        final Session sessionDown = sessionDownCaptor.getValue();
+        final var sessionDown = sessionDownCaptor.getValue();
         assertEquals(SESSION_1.getSessionId(), sessionDown.getSessionId());
         assertEquals(SESSION_1.getSourceHost(), sessionDown.getSourceHost());
         assertEquals(SESSION_1.getUsername(), sessionDown.getUsername());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testListenerUpdateSession() {
-        ScheduledThreadPool threadPool = mock(ScheduledThreadPool.class);
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        doReturn(executor).when(threadPool).getExecutor();
-        monitoringService = new NetconfSessionMonitoringService(Optional.of(threadPool), 1);
-        monitoringService.registerListener(listener);
-        monitoringService.onSessionUp(sessionMock1);
-        monitoringService.onSessionUp(sessionMock2);
-        monitoringService.onSessionEvent(SessionEvent.inRpcSuccess(sessionMock1));
-        final var captor = ArgumentCaptor.forClass(Collection.class);
-        verify(listener, timeout(2000)).onSessionsUpdated(captor.capture());
-        final Collection<Session> value = captor.getValue();
-        assertTrue(value.contains(SESSION_1));
-        assertFalse(value.contains(SESSION_2));
-        monitoringService.close();
+        final var executor = Executors.newScheduledThreadPool(1);
+        try {
+            try (var service = new NetconfSessionMonitoringService.WithUpdates(executor, 1, TimeUnit.SECONDS)) {
+                service.registerListener(listener);
+                service.onSessionUp(sessionMock1);
+                service.onSessionUp(sessionMock2);
+                service.onSessionEvent(SessionEvent.inRpcSuccess(sessionMock1));
+                verify(listener, timeout(2000)).onSessionsUpdated(sessionCollectionCaptor.capture());
+                final var value = sessionCollectionCaptor.getValue();
+                assertTrue(value.contains(SESSION_1));
+                assertFalse(value.contains(SESSION_2));
+            }
+        } finally {
+            executor.shutdown();
+        }
     }
 }
