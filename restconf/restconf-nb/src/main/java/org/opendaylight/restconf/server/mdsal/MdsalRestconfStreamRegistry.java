@@ -16,12 +16,9 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.restconf.server.spi.AbstractRestconfStreamRegistry;
+import org.opendaylight.restconf.server.spi.LocalRestconfState;
 import org.opendaylight.restconf.server.spi.RestconfStream;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.osgi.service.component.annotations.Activate;
@@ -37,9 +34,7 @@ public final class MdsalRestconfStreamRegistry extends AbstractRestconfStreamReg
     public static final String FACTORY_NAME = "org.opendaylight.restconf.nb.rfc8040.streams.ListenersBroker";
 
     private static final YangInstanceIdentifier RESTCONF_STATE_STREAMS = YangInstanceIdentifier.of(
-        NodeIdentifier.create(RestconfState.QNAME),
-        NodeIdentifier.create(Streams.QNAME),
-        NodeIdentifier.create(Stream.QNAME));
+        LocalRestconfState.RESTCONF_STATE_NODEID, STREAMS_NODEID, STREAM_NODEID);
     private static final String USE_WEBSOCKETS_PROP = ".useWebsockets";
 
     private final DOMDataBroker dataBroker;
