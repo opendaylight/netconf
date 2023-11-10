@@ -13,7 +13,6 @@ import akka.actor.ActorSystem;
 import io.netty.util.concurrent.EventExecutor;
 import java.time.Duration;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
@@ -27,7 +26,6 @@ public class NetconfTopologySetup {
     private final DataBroker dataBroker;
     private final InstanceIdentifier<Node> instanceIdentifier;
     private final Node node;
-    private final ScheduledExecutorService keepaliveExecutor;
     private final Executor processingExecutor;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
@@ -42,7 +40,6 @@ public class NetconfTopologySetup {
         dataBroker = builder.getDataBroker();
         instanceIdentifier = builder.getInstanceIdentifier();
         node = builder.getNode();
-        keepaliveExecutor = builder.getKeepaliveExecutor();
         processingExecutor = builder.getProcessingExecutor();
         actorSystem = builder.getActorSystem();
         eventExecutor = builder.getEventExecutor();
@@ -71,10 +68,6 @@ public class NetconfTopologySetup {
 
     public Executor getProcessingExecutor() {
         return processingExecutor;
-    }
-
-    public ScheduledExecutorService getKeepaliveExecutor() {
-        return keepaliveExecutor;
     }
 
     public ActorSystem getActorSystem() {
@@ -110,7 +103,6 @@ public class NetconfTopologySetup {
         private DataBroker dataBroker;
         private InstanceIdentifier<Node> instanceIdentifier;
         private Node node;
-        private ScheduledExecutorService keepaliveExecutor;
         private Executor processingExecutor;
         private ActorSystem actorSystem;
         private EventExecutor eventExecutor;
@@ -172,15 +164,6 @@ public class NetconfTopologySetup {
 
         public NetconfTopologySetup build() {
             return new NetconfTopologySetup(this);
-        }
-
-        ScheduledExecutorService getKeepaliveExecutor() {
-            return keepaliveExecutor;
-        }
-
-        public NetconfTopologySetupBuilder setKeepaliveExecutor(final ScheduledExecutorService keepaliveExecutor) {
-            this.keepaliveExecutor = keepaliveExecutor;
-            return this;
         }
 
         Executor getProcessingExecutor() {
