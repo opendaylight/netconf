@@ -11,9 +11,16 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ContainerLike;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 /**
  * Archetype for a Schema.
@@ -22,11 +29,17 @@ public final class SchemaEntity extends OpenApiEntity {
     private final @NonNull SchemaNode value;
     private final @NonNull String title;
     private final @NonNull String type;
+    private final @NonNull SchemaInferenceStack stack;
+    private final String parentName;
 
-    public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title, @NonNull final String type) {
+    public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title, @NonNull final String type,
+        @NonNull final SchemaInferenceStack stack, final String parentName) {
         this.value = requireNonNull(value);
         this.title = requireNonNull(title);
         this.type = requireNonNull(type);
+        this.stack = requireNonNull(stack);
+        this.parentName = requireNonNull(parentName);
+
     }
 
     @Override
@@ -89,10 +102,24 @@ public final class SchemaEntity extends OpenApiEntity {
     }
 
     private void generateProperties(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
+
+        final List<String> required = new ArrayList<>();
+        final var childNodes = ((ContainerLike)value).getChildNodes();
+        stack.enterSchemaTree(value.getQName());
+        if (!childNodes.isEmpty()){
+            generator.writeObjectFieldStart("properties");
+            for (final var node: childNodes) {
+                new PropertyEntity(node, generator, stack, required, parentName);
+            }
+            generator.writeEndObject();
+        }
+        stack.exit();
     }
 
     private void generateXml(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
+        generator.writeObjectFieldStart("xml");
+        generator.writeStringField("name", value.getQName().getLocalName());
+        generator.writeStringField("namespace", value.getQName().getNamespace().toString());
+        generator.writeEndObject();
     }
 }
