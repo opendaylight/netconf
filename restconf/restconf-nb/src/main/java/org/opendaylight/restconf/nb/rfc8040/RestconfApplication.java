@@ -40,7 +40,7 @@ final class RestconfApplication extends Application {
             new RestconfDataServiceImpl(databindProvider, server, actionService),
             new RestconfOperationsServiceImpl(server),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
-            new RestconfImpl(databindProvider));
+            new RestconfImpl(server));
     }
 
     @Override
