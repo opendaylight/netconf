@@ -40,7 +40,8 @@ public abstract sealed class OperationInputBody extends AbstractBody
      * @return The document body, or an empty container node
      * @throws IOException when an I/O error occurs
      */
-    public @NonNull ContainerNode toContainerNode(final @NonNull Inference inference) throws IOException {
+    public @NonNull ContainerNode toContainerNode(final DatabindContext databind, final @NonNull Inference inference)
+            throws IOException {
         try (var is = new PushbackInputStream(acquireStream())) {
             final var firstByte = is.read();
             if (firstByte == -1) {
@@ -52,14 +53,14 @@ public abstract sealed class OperationInputBody extends AbstractBody
 
             final var holder = new NormalizationResultHolder();
             try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
-                streamTo(is, inference, streamWriter);
+                streamTo(databind, inference, is, streamWriter);
             }
             return (ContainerNode) holder.getResult().data();
         }
     }
 
-    abstract void streamTo(@NonNull InputStream inputStream, @NonNull Inference inference,
-        @NonNull NormalizedNodeStreamWriter writer) throws IOException;
+    abstract void streamTo(@NonNull DatabindContext databind, @NonNull Inference inference,
+        @NonNull InputStream inputStream, @NonNull NormalizedNodeStreamWriter writer) throws IOException;
 
     static final @NonNull QName extractInputQName(final SchemaInferenceStack stack) {
         final var stmt = stack.currentStatement();

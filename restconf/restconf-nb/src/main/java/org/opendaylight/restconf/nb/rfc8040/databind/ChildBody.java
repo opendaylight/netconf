@@ -29,11 +29,11 @@ public abstract sealed class ChildBody extends AbstractBody permits JsonChildBod
         super(inputStream);
     }
 
-    public final @NonNull PrefixAndBody toPayload(final @NonNull YangInstanceIdentifier parentPath,
-            final @NonNull Inference parentInference) {
-        return toPayload(acquireStream(), parentPath, parentInference);
+    public final @NonNull PrefixAndBody toPayload(final @NonNull DatabindContext databind,
+            final @NonNull Inference parentInference, final @NonNull YangInstanceIdentifier parentPath) {
+        return toPayload(databind, parentInference, parentPath, acquireStream());
     }
 
-    abstract @NonNull PrefixAndBody toPayload(@NonNull InputStream inputStream,
-        @NonNull YangInstanceIdentifier parentPath, @NonNull Inference parentInference);
+    abstract @NonNull PrefixAndBody toPayload(@NonNull DatabindContext databind, @NonNull Inference parentInference,
+        @NonNull YangInstanceIdentifier parentPath, @NonNull InputStream inputStream);
 }

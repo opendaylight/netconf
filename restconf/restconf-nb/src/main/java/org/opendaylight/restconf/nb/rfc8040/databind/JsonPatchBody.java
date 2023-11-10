@@ -48,7 +48,7 @@ public final class JsonPatchBody extends PatchBody {
     }
 
     @Override
-    PatchContext toPatchContext(final EffectiveModelContext context, final YangInstanceIdentifier urlPath,
+    PatchContext toPatchContext(final DatabindContext databind, final YangInstanceIdentifier urlPath,
             final InputStream inputStream) throws IOException {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
@@ -58,9 +58,9 @@ public final class JsonPatchBody extends PatchBody {
         }
     }
 
-    private static ImmutableList<PatchEntity> read(final JsonReader in, final EffectiveModelContext context,
+    private static ImmutableList<PatchEntity> read(final JsonReader in, final DatabindContext databind,
             final YangInstanceIdentifier urlPath, final AtomicReference<String> patchId) throws IOException {
-        final var schemaTree = DataSchemaContextTree.from(context);
+        final var schemaTree = DataSchemaContextTree.from(databind.modelContext());
         final var edits = ImmutableList.<PatchEntity>builder();
         final var edit = new PatchEdit();
 

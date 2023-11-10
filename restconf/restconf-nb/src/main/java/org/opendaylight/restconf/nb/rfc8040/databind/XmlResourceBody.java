@@ -34,9 +34,9 @@ public final class XmlResourceBody extends ResourceBody {
     }
 
     @Override
-    void streamTo(final InputStream inputStream, final Inference inference, final PathArgument name,
-            final NormalizedNodeStreamWriter writer) throws IOException {
-        try (var xmlParser = XmlParserStream.create(writer, inference)) {
+    void streamTo(final DatabindContext databind, final Inference inference, final PathArgument name,
+            final InputStream inputStream, final NormalizedNodeStreamWriter writer) throws IOException {
+        try (var xmlParser = XmlParserStream.create(writer, databind.xmlCodecs(), inference)) {
             final var doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
             final var docRoot = doc.getDocumentElement();
             final var docRootName = docRoot.getLocalName();

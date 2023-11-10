@@ -17,7 +17,6 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * A YANG Patch body.
@@ -27,17 +26,17 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         super(inputStream);
     }
 
-    public final @NonNull PatchContext toPatchContext(final @NonNull EffectiveModelContext context,
+    public final @NonNull PatchContext toPatchContext(final @NonNull DatabindContext databind,
             final @NonNull YangInstanceIdentifier urlPath) throws IOException {
         try (var is = acquireStream()) {
-            return toPatchContext(context, urlPath, is);
+            return toPatchContext(databind, urlPath, is);
         }
     }
 
-    abstract @NonNull PatchContext toPatchContext(@NonNull EffectiveModelContext context,
+    abstract @NonNull PatchContext toPatchContext(@NonNull DatabindContext databind,
         @NonNull YangInstanceIdentifier urlPath, @NonNull InputStream inputStream) throws IOException;
 
-    static final YangInstanceIdentifier parsePatchTarget(final EffectiveModelContext context,
+    static final YangInstanceIdentifier parsePatchTarget(final DatabindContext databind,
             final YangInstanceIdentifier urlPath, final String target) {
         if (target.equals("/")) {
             verify(!urlPath.isEmpty(),
@@ -49,10 +48,10 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         if (urlPath.isEmpty()) {
             targetUrl = target.startsWith("/") ? target.substring(1) : target;
         } else {
-            targetUrl = IdentifierCodec.serialize(urlPath, context) + target;
+            targetUrl = IdentifierCodec.serialize(urlPath, databind.modelContext()) + target;
         }
 
-        return ParserIdentifier.toInstanceIdentifier(targetUrl, context, null).getInstanceIdentifier();
+        return ParserIdentifier.toInstanceIdentifier(targetUrl, databind.modelContext(), null).getInstanceIdentifier();
     }
 
     /**

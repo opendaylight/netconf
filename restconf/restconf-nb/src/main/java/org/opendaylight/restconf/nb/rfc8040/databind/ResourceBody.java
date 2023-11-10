@@ -54,14 +54,14 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
      * @param inference An {@link Inference} the statement corresponding to the body
      * @throws RestconfDocumentedException if the body cannot be decoded or it does not match {@code path}
      */
-    // TODO: pass down DatabindContext corresponding to inference
     @SuppressWarnings("checkstyle:illegalCatch")
-    public @NonNull NormalizedNode toNormalizedNode(final @NonNull YangInstanceIdentifier path,
-            final @NonNull Inference inference, final @NonNull SchemaNode schemaNode) {
+    public @NonNull NormalizedNode toNormalizedNode(final DatabindContext databind,
+            final @NonNull Inference inference, final @NonNull SchemaNode schemaNode,
+            final @NonNull YangInstanceIdentifier path) {
         final var expected = path.isEmpty() ? DATA_NID : path.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
         try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
-            streamTo(acquireStream(), inference, expected, streamWriter);
+            streamTo(databind, inference, expected, acquireStream(), streamWriter);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
@@ -89,8 +89,8 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
         return data;
     }
 
-    abstract void streamTo(@NonNull InputStream inputStream, @NonNull Inference inference, @NonNull PathArgument name,
-        @NonNull NormalizedNodeStreamWriter writer) throws IOException;
+    abstract void streamTo(@NonNull DatabindContext databind, @NonNull Inference inference, @NonNull PathArgument name,
+        @NonNull InputStream inputStream, @NonNull NormalizedNodeStreamWriter writer) throws IOException;
 
     /**
      * Valid top level node name.

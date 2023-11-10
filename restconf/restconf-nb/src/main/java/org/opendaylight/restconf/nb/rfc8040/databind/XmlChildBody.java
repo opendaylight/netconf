@@ -48,10 +48,10 @@ public final class XmlChildBody extends ChildBody {
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final InputStream inputStream, final YangInstanceIdentifier parentPath,
-            final Inference parentInference) {
+    PrefixAndBody toPayload(final DatabindContext databind, final Inference parentInference,
+            final YangInstanceIdentifier parentPath, final InputStream inputStream) {
         try {
-            return parse(parentPath, parentInference, UntrustedXML.newDocumentBuilder().parse(inputStream));
+            return parse(databind, parentInference, parentPath, UntrustedXML.newDocumentBuilder().parse(inputStream));
         } catch (final RestconfDocumentedException e) {
             throw e;
         } catch (final Exception e) {
@@ -62,8 +62,9 @@ public final class XmlChildBody extends ChildBody {
         }
     }
 
-    private static @NonNull PrefixAndBody parse(final YangInstanceIdentifier path, final Inference pathInference,
-            final Document doc) throws XMLStreamException, IOException, SAXException, URISyntaxException {
+    private static @NonNull PrefixAndBody parse(final DatabindContext databind, final Inference pathInference,
+            final YangInstanceIdentifier path, final Document doc)
+                throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final DataSchemaNode parentNode;
         if (pathInference.isEmpty()) {
             parentNode = pathInference.getEffectiveModelContext();
@@ -110,7 +111,7 @@ public final class XmlChildBody extends ChildBody {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final var xmlParser = XmlParserStream.create(writer, stack.toInference());
+        final var xmlParser = XmlParserStream.create(writer, databind.xmlCodecs(), stack.toInference());
         xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
         var parsed = resultHolder.getResult().data();
 

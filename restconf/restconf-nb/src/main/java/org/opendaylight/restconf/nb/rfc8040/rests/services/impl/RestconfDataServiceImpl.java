@@ -56,6 +56,7 @@ import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
@@ -389,16 +390,18 @@ public final class RestconfDataServiceImpl {
     }
 
     private void postData(final ChildBody body, final UriInfo uriInfo, final AsyncResponse ar) {
-        postData(Inference.ofDataTreePath(databindProvider.currentContext().modelContext()),
+        final var databind = databindProvider.currentContext();
+        postData(databind, Inference.ofDataTreePath(databind.modelContext()),
             YangInstanceIdentifier.of(), body, uriInfo, null, ar);
     }
 
-    private void postData(final Inference inference, final YangInstanceIdentifier parentPath, final ChildBody body,
-            final UriInfo uriInfo, final @Nullable DOMMountPoint mountPoint, final AsyncResponse ar) {
+    private void postData(final DatabindContext databind, final Inference inference,
+            final YangInstanceIdentifier parentPath, final ChildBody body, final UriInfo uriInfo,
+            final @Nullable DOMMountPoint mountPoint, final AsyncResponse ar) {
         final var modelContext = inference.getEffectiveModelContext();
         final var insert = QueryParams.parseInsert(modelContext, uriInfo);
         final var strategy = server.getRestconfStrategy(modelContext, mountPoint);
-        final var payload = body.toPayload(parentPath, inference);
+        final var payload = body.toPayload(databind, inference, parentPath);
         final var data = payload.body();
         final var path = concat(parentPath, payload.prefix());
 
