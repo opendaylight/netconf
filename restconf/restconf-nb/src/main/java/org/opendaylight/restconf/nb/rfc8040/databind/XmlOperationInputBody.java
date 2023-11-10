@@ -28,14 +28,15 @@ public final class XmlOperationInputBody extends OperationInputBody {
     }
 
     @Override
-    void streamTo(final InputStream inputStream, final Inference inference, final NormalizedNodeStreamWriter writer)
-            throws IOException {
+    void streamTo(final DatabindContext databind, final Inference inference, final InputStream inputStream,
+            final NormalizedNodeStreamWriter writer) throws IOException {
         // Adjust inference to point to input
         final var stack = inference.toSchemaInferenceStack();
         stack.enterDataTree(extractInputQName(stack));
 
         try {
-            XmlParserStream.create(writer, stack.toInference()).parse(UntrustedXML.createXMLStreamReader(inputStream));
+            XmlParserStream.create(writer, databind.xmlCodecs(), stack.toInference())
+                .parse(UntrustedXML.createXMLStreamReader(inputStream));
         } catch (XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
             throwIfYangError(e);

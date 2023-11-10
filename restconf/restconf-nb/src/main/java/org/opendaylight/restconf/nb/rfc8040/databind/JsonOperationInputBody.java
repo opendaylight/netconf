@@ -17,7 +17,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
@@ -31,11 +30,10 @@ public final class JsonOperationInputBody extends OperationInputBody {
     }
 
     @Override
-    void streamTo(final InputStream inputStream, final Inference inference, final NormalizedNodeStreamWriter writer)
-            throws IOException {
+    void streamTo(final DatabindContext databind, final Inference inference, final InputStream inputStream,
+            final NormalizedNodeStreamWriter writer) throws IOException {
         try {
-            JsonParserStream.create(writer,
-                JSONCodecFactorySupplier.RFC7951.getShared(inference.getEffectiveModelContext()), inference)
+            JsonParserStream.create(writer, databind.jsonCodecs(), inference)
                 .parse(new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)));
         } catch (JsonParseException e) {
             LOG.debug("Error parsing JSON input", e);
