@@ -10,6 +10,8 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -28,6 +30,7 @@ import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -44,6 +47,9 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractRestconfStreamRegistry implements RestconfStream.Registry {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractRestconfStreamRegistry.class);
+
+    protected static final NodeIdentifier STREAMS_NODEID = NodeIdentifier.create(Streams.QNAME);
+    protected static final NodeIdentifier STREAM_NODEID = NodeIdentifier.create(Stream.QNAME);
 
     @VisibleForTesting
     public static final QName NAME_QNAME =  QName.create(Stream.QNAME, "name").intern();
@@ -187,5 +193,14 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, description))
             .withChild(accessBuilder.build())
             .build();
+    }
+
+    @Override
+    public final String toString() {
+        return addToStringAttributes(MoreObjects.toStringHelper(this)).toString();
+    }
+
+    protected ToStringHelper addToStringAttributes(final @NonNull ToStringHelper helper) {
+        return helper.addValue(useWebsockets ? "websockets" : "sse");
     }
 }
