@@ -42,10 +42,10 @@ import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.Restconf;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -65,7 +65,6 @@ import org.slf4j.LoggerFactory;
 public final class MdsalRestconfServer implements RestconfServer {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfServer.class);
     private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
-    private static final String YANG_LIBRARY_REVISION = YangLibrary.QNAME.getRevision().orElseThrow().toString();
     private static final VarHandle LOCAL_STRATEGY;
 
     static {
@@ -118,12 +117,14 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     public @NonNull NormalizedNodePayload yangLibraryVersionGET() {
-        final var stack = SchemaInferenceStack.of(databindProvider.currentContext().modelContext());
+        final var modelContext = databindProvider.currentContext().modelContext();
+        final var stack = SchemaInferenceStack.of(modelContext);
         stack.enterYangData(YangApi.NAME);
         stack.enterDataTree(Restconf.QNAME);
         stack.enterDataTree(YANG_LIBRARY_VERSION);
         return new NormalizedNodePayload(stack.toInference(),
-            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION));
+            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, modelContext.findModuleStatements("ietf-yang-library")
+                .iterator().next().localQNameModule().getRevision().map(Revision::toString).orElse("")));
     }
 
     @Override
