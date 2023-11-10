@@ -34,6 +34,24 @@
       "parentUuid": "e55580b8_f0a15b13",
       "revId": "a4721b61fe2e7df0fa36a62f152498799e1692db",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "923cffc6_ef46404b",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-11-10T11:45:39Z",
+      "side": 1,
+      "message": "IMO \"There are two more futures chained after this. What if sourceResolverFuture is already completed and cannot be canceled?\" is solved by using \"list of futures\".",
+      "parentUuid": "a8df93a2_90c6ad0f",
+      "revId": "a4721b61fe2e7df0fa36a62f152498799e1692db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
