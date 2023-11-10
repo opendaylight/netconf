@@ -13,16 +13,15 @@ import static org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNode
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Collection;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -32,8 +31,8 @@ final class JSONDataTreeCandidateSerializer extends DataTreeCandidateSerializer<
 
     private final JsonWriter jsonWriter;
 
-    JSONDataTreeCandidateSerializer(final EffectiveModelContext context, final JsonWriter jsonWriter) {
-        super(context);
+    JSONDataTreeCandidateSerializer(final DatabindContext databind, final JsonWriter jsonWriter) {
+        super(databind);
         this.jsonWriter = requireNonNull(jsonWriter);
     }
 
@@ -44,7 +43,7 @@ final class JSONDataTreeCandidateSerializer extends DataTreeCandidateSerializer<
 
         final var modificationType = candidate.modificationType();
         if (modificationType != ModificationType.UNMODIFIED) {
-            final var codecs = JSONCodecFactorySupplier.RFC7951.getShared(parent.getEffectiveModelContext());
+            final var codecs = databind.jsonCodecs();
             try (var writer = createNestedWriter(codecs, DATA_CHANGE_EVENT, SAL_REMOTE_NS, jsonWriter)) {
                 writer.startLeafNode(PATH_NID);
                 writer.scalarValue(YangInstanceIdentifier.of(dataPath));

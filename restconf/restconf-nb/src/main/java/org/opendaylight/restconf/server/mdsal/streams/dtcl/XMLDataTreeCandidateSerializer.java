@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Collection;
 import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -22,7 +23,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWrit
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.tree.api.ModificationType;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -31,8 +31,8 @@ final class XMLDataTreeCandidateSerializer extends DataTreeCandidateSerializer<E
 
     private final XMLStreamWriter xmlWriter;
 
-    XMLDataTreeCandidateSerializer(final EffectiveModelContext context, final XMLStreamWriter xmlWriter) {
-        super(context);
+    XMLDataTreeCandidateSerializer(final DatabindContext databind, final XMLStreamWriter xmlWriter) {
+        super(databind);
         this.xmlWriter = requireNonNull(xmlWriter);
     }
 
@@ -41,7 +41,7 @@ final class XMLDataTreeCandidateSerializer extends DataTreeCandidateSerializer<E
             final DataTreeCandidateNode candidate, final boolean skipData) throws Exception {
         final var modificationType = candidate.modificationType();
         if (modificationType != ModificationType.UNMODIFIED) {
-            final var stack = SchemaInferenceStack.of(parent.getEffectiveModelContext());
+            final var stack = SchemaInferenceStack.of(databind.modelContext());
             stack.enterSchemaTree(DataChangedNotification.QNAME);
 
             final var writer = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, stack.toInference());

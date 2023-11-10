@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.Deque;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent.Operation;
@@ -36,7 +37,6 @@ import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
@@ -50,10 +50,10 @@ abstract class DataTreeCandidateSerializer<T extends Exception> {
     static final @NonNull NodeIdentifier OPERATION_NID = NodeIdentifier.create(OPERATION_QNAME);
     static final @NonNull String DATA_NAME = Data.QNAME.getLocalName();
 
-    private final EffectiveModelContext context;
+    final @NonNull DatabindContext databind;
 
-    DataTreeCandidateSerializer(final EffectiveModelContext context) {
-        this.context = requireNonNull(context);
+    DataTreeCandidateSerializer(final DatabindContext databind) {
+        this.databind = requireNonNull(databind);
     }
 
     final boolean serialize(final DataTreeCandidate candidate, final TextParameters params) throws T {
@@ -170,8 +170,9 @@ abstract class DataTreeCandidateSerializer<T extends Exception> {
 
     private void serializeData(final Collection<PathArgument> dataPath, final DataTreeCandidateNode candidate,
             final boolean skipData) throws T {
-        var stack = SchemaInferenceStack.of(context);
-        DataSchemaContext current = DataSchemaContextTree.from(context).getRoot();
+        final var modelContext = databind.modelContext();
+        var stack = SchemaInferenceStack.of(modelContext);
+        DataSchemaContext current = DataSchemaContextTree.from(modelContext).getRoot();
         for (var arg : dataPath) {
             final var next = current instanceof DataSchemaContext.Composite composite ? composite.enterChild(stack, arg)
                 : null;

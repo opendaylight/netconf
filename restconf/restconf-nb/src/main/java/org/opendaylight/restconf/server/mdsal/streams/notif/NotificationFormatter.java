@@ -14,11 +14,11 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.server.spi.EventFormatter;
 import org.opendaylight.restconf.server.spi.TextParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateNotificationStream;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
 
 abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
@@ -35,8 +35,8 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
     }
 
     @Override
-    protected final void fillDocument(final Document doc, final EffectiveModelContext schemaContext,
-            final DOMNotification input) throws IOException {
+    protected final void fillDocument(final Document doc, final DatabindContext databind, final DOMNotification input)
+            throws IOException {
         final var notificationElement = createNotificationElement(doc,
             input instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now());
         // FIXME: what is this really?!
@@ -46,7 +46,7 @@ abstract class NotificationFormatter extends EventFormatter<DOMNotification> {
         try {
             final var writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(new DOMResult(dataElement));
             try {
-                writeBody(XMLStreamNormalizedNodeStreamWriter.create(writer, schemaContext, input.getType()),
+                writeBody(XMLStreamNormalizedNodeStreamWriter.create(writer, databind.modelContext(), input.getType()),
                     input.getBody());
             } finally {
                 writer.close();

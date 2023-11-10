@@ -25,9 +25,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,12 +70,12 @@ public final class RestconfStream<T> {
         /**
          * Publish a set of events generated from input data.
          *
-         * @param modelContext An {@link EffectiveModelContext} used to format the input
+         * @param databind A {@link DatabindContext} used to format the input
          * @param input Input data
          * @param now Current time
          * @throws NullPointerException if any argument is {@code null}
          */
-        void publish(EffectiveModelContext modelContext, T input, Instant now);
+        void publish(DatabindContext databind, T input, Instant now);
 
         /**
          * Called when the stream has reached its end.
@@ -167,10 +167,10 @@ public final class RestconfStream<T> {
 
     private final @NonNull Sink<T> sink = new Sink<>() {
         @Override
-        public void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
+        public void publish(final DatabindContext databind, final T input, final Instant now) {
             final var local = acquireSubscribers();
             if (local != null) {
-                local.publish(modelContext, input, now);
+                local.publish(databind, input, now);
             } else {
                 LOG.debug("Ignoring publish() on terminated stream {}", RestconfStream.this);
             }

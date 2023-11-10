@@ -16,7 +16,7 @@ import com.google.common.collect.ListMultimap;
 import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ abstract sealed class Subscribers<T> {
         }
 
         @Override
-        void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
+        void publish(final DatabindContext databind, final T input, final Instant now) {
             // No-op
         }
     }
@@ -80,8 +80,8 @@ abstract sealed class Subscribers<T> {
         }
 
         @Override
-        void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
-            final var formatted = format(subscriber.formatter(), modelContext, input, now);
+        void publish(final DatabindContext databind, final T input, final Instant now) {
+            final var formatted = format(subscriber.formatter(), databind, input, now);
             if (formatted != null) {
                 subscriber.sender().sendDataMessage(formatted);
             }
@@ -118,9 +118,9 @@ abstract sealed class Subscribers<T> {
         }
 
         @Override
-        void publish(final EffectiveModelContext modelContext, final T input, final Instant now) {
+        void publish(final DatabindContext databind, final T input, final Instant now) {
             for (var entry : subscribers.asMap().entrySet()) {
-                final var formatted = format(entry.getKey(), modelContext, input, now);
+                final var formatted = format(entry.getKey(), databind, input, now);
                 if (formatted != null) {
                     for (var subscriber : entry.getValue()) {
                         subscriber.sender().sendDataMessage(formatted);
@@ -174,18 +174,18 @@ abstract sealed class Subscribers<T> {
     /**
      * Publish an event to all {@link Subscriber}s in this file.
      *
-     * @param modelContext An {@link EffectiveModelContext} used to format the input
+     * @param databindt A {@link DatabindContext} used to format the input
      * @param input Input data
      * @param now Current time
      * @throws NullPointerException if any argument is {@code null}
      */
-    abstract void publish(EffectiveModelContext modelContext, T input, Instant now);
+    abstract void publish(DatabindContext databindt, T input, Instant now);
 
     @SuppressWarnings("checkstyle:illegalCatch")
-    private static <T> @Nullable String format(final EventFormatter<T> formatter,
-            final EffectiveModelContext modelContext, final T input, final Instant now) {
+    private static <T> @Nullable String format(final EventFormatter<T> formatter, final DatabindContext databind,
+            final T input, final Instant now) {
         try {
-            return formatter.eventData(modelContext, input, now);
+            return formatter.eventData(databind, input, now);
         } catch (Exception e) {
             LOG.warn("Failed to format", e);
             return null;

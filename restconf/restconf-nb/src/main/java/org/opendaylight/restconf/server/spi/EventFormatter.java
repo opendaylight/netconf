@@ -30,11 +30,11 @@ import javax.xml.xpath.XPathFactory;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.NamespaceURN;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -86,20 +86,20 @@ public abstract class EventFormatter<T> implements Immutable {
     }
 
     @VisibleForTesting
-    public final @Nullable String eventData(final EffectiveModelContext schemaContext, final T input,
+    public final @Nullable String eventData(final DatabindContext databind, final T input,
             final Instant now) throws Exception {
-        return filterMatches(schemaContext, input, now) ? createText(textParams, schemaContext, input, now) : null;
+        return filterMatches(databind, input, now) ? createText(textParams, databind, input, now) : null;
     }
 
     /**
      * Export the provided input into the provided document so we can verify whether a filter matches the content.
      *
      * @param doc the document to fill
-     * @param schemaContext context to use for the export
+     * @param databind context to use for the export
      * @param input data to export
      * @throws IOException if any IOException occurs during export to the document
      */
-    protected abstract void fillDocument(Document doc, EffectiveModelContext schemaContext, T input) throws IOException;
+    protected abstract void fillDocument(Document doc, DatabindContext databind, T input) throws IOException;
 
     /**
      * Format the input data into string representation of the data provided.
@@ -111,10 +111,10 @@ public abstract class EventFormatter<T> implements Immutable {
      * @return String representation of the formatted data
      * @throws Exception if the underlying formatters fail to export the data to the requested format
      */
-    protected abstract String createText(TextParameters params, EffectiveModelContext schemaContext, T input,
-        Instant now) throws Exception;
+    protected abstract String createText(TextParameters params, DatabindContext databind, T input, Instant now)
+        throws Exception;
 
-    private boolean filterMatches(final EffectiveModelContext schemaContext, final T input, final Instant now)
+    private boolean filterMatches(final DatabindContext databind, final T input, final Instant now)
             throws IOException {
         if (filter == null) {
             return true;
@@ -126,7 +126,7 @@ public abstract class EventFormatter<T> implements Immutable {
         } catch (final ParserConfigurationException e) {
             throw new IOException("Failed to create a new document", e);
         }
-        fillDocument(doc, schemaContext, input);
+        fillDocument(doc, databind, input);
 
         final Boolean eval;
         try {
