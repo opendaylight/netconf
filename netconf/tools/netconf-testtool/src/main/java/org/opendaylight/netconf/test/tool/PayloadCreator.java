@@ -13,6 +13,7 @@ import java.io.StringWriter;
 import java.util.List;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeFields;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -58,6 +59,9 @@ final class PayloadCreator {
     private static final NodeIdentifier CREDENTIALS_NODE_IDENTIFIER =
         // Note: this is an instantiated container, we need to use the proper namespace
         NodeIdentifier.create(Credentials.QNAME.bindTo(NetconfNodeFields.QNAME.getModule()).intern());
+    private static final NodeIdentifier LOGIN_PASSWORD_UNENCRYPTED_NODE_IDENTIFIER =
+        // Note: this is an instantiated container, we need to use the proper namespace
+        NodeIdentifier.create(LoginPasswordUnencrypted.QNAME.bindTo(NetconfNodeFields.QNAME.getModule()).intern());
     private static final NodeIdentifier TCP_ONLY_NODE_IDENTIFIER =
         NodeIdentifier.create(QName.create(NetconfNodeFields.QNAME, "tcp-only").intern());
     private static final NodeIdentifier KEEPALIVE_DELAY_NODE_IDENTIFIER =
@@ -139,13 +143,15 @@ final class PayloadCreator {
 
     private static ChoiceNode containerCredentials(final String username, final String password) {
         return Builders.choiceBuilder().withNodeIdentifier(CREDENTIALS_NODE_IDENTIFIER)
-                .withChild(Builders.<String>leafBuilder()
-                        .withNodeIdentifier(USERNAME_NODE_IDENTIFIER)
-                        .withValue(username)
-                        .build())
-                .withChild(Builders.<String>leafBuilder()
-                        .withNodeIdentifier(PASSWORD_NODE_IDENTIFIER)
-                        .withValue(password)
+                .withChild(Builders.containerBuilder().withNodeIdentifier(LOGIN_PASSWORD_UNENCRYPTED_NODE_IDENTIFIER)
+                        .withChild(Builders.<String>leafBuilder()
+                                .withNodeIdentifier(USERNAME_NODE_IDENTIFIER)
+                                .withValue(username)
+                                .build())
+                        .withChild(Builders.<String>leafBuilder()
+                                .withNodeIdentifier(PASSWORD_NODE_IDENTIFIER)
+                                .withValue(password)
+                                .build())
                         .build())
                 .build();
     }
