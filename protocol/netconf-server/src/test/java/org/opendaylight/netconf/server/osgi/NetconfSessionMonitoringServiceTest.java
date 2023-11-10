@@ -14,21 +14,17 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.netconf.server.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionEvent;
@@ -68,7 +64,7 @@ public class NetconfSessionMonitoringServiceTest {
         doNothing().when(listener).onSessionStarted(any());
         doNothing().when(listener).onSessionEnded(any());
 
-        monitoringService = new NetconfSessionMonitoringService(Optional.empty(), 0);
+        monitoringService = new NetconfSessionMonitoringService();
         monitoringService.registerListener(listener);
     }
 
@@ -110,19 +106,21 @@ public class NetconfSessionMonitoringServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testListenerUpdateSession() {
-        ScheduledThreadPool threadPool = mock(ScheduledThreadPool.class);
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        doReturn(executor).when(threadPool).getExecutor();
-        monitoringService = new NetconfSessionMonitoringService(Optional.of(threadPool), 1);
-        monitoringService.registerListener(listener);
-        monitoringService.onSessionUp(sessionMock1);
-        monitoringService.onSessionUp(sessionMock2);
-        monitoringService.onSessionEvent(SessionEvent.inRpcSuccess(sessionMock1));
-        final var captor = ArgumentCaptor.forClass(Collection.class);
-        verify(listener, timeout(2000)).onSessionsUpdated(captor.capture());
-        final Collection<Session> value = captor.getValue();
-        assertTrue(value.contains(SESSION_1));
-        assertFalse(value.contains(SESSION_2));
-        monitoringService.close();
+        final var executor = Executors.newScheduledThreadPool(1);
+        try {
+            try (var monitoringService = new NetconfSessionMonitoringService(executor, 1)) {
+                monitoringService.registerListener(listener);
+                monitoringService.onSessionUp(sessionMock1);
+                monitoringService.onSessionUp(sessionMock2);
+                monitoringService.onSessionEvent(SessionEvent.inRpcSuccess(sessionMock1));
+                final var captor = ArgumentCaptor.forClass(Collection.class);
+                verify(listener, timeout(2000)).onSessionsUpdated(captor.capture());
+                final var value = captor.getValue();
+                assertTrue(value.contains(SESSION_1));
+                assertFalse(value.contains(SESSION_2));
+            }
+        } finally {
+            executor.shutdown();
+        }
     }
 }

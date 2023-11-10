@@ -7,8 +7,10 @@
  */
 package org.opendaylight.netconf.server.osgi;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
+import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionListener;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
@@ -22,22 +24,20 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     private final NetconfCapabilityMonitoringService capabilityMonitoring;
     private final NetconfSessionMonitoringService sessionMonitoring;
 
-    public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider) {
-        this(opProvider, Optional.empty(), 0);
-    }
-
-    public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider,
-                                        final ScheduledThreadPool threadPool,
-                                        final long updateInterval) {
-        this(opProvider, Optional.ofNullable(threadPool), updateInterval);
-    }
-
-    public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider,
-                                        final Optional<ScheduledThreadPool> threadPool,
-                                        final long updateInterval) {
+    private NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider,
+            final NetconfSessionMonitoringService sessionMonitoring) {
         capabilityMonitoring = new NetconfCapabilityMonitoringService(opProvider);
-        sessionMonitoring = new NetconfSessionMonitoringService(threadPool, updateInterval);
+        this.sessionMonitoring = requireNonNull(sessionMonitoring);
+    }
 
+    public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider) {
+        this(opProvider, new NetconfSessionMonitoringService());
+    }
+
+    public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider,
+            final ScheduledExecutorService threadPool, final long updateInterval) {
+        this(opProvider, updateInterval > 0 ? new NetconfSessionMonitoringService(threadPool, updateInterval)
+            : new NetconfSessionMonitoringService());
     }
 
     @Override
