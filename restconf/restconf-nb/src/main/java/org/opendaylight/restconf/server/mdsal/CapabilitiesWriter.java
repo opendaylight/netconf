@@ -8,16 +8,13 @@
 package org.opendaylight.restconf.server.mdsal;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.$YangModuleInfoImpl.qnameOf;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.Holding;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -25,23 +22,11 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
-import org.opendaylight.restconf.api.query.AbstractReplayParam;
-import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
-import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
-import org.opendaylight.restconf.api.query.DepthParam;
-import org.opendaylight.restconf.api.query.FieldsParam;
-import org.opendaylight.restconf.api.query.FilterParam;
-import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
-import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.server.spi.LocalRestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.osgi.service.component.annotations.Activate;
@@ -59,12 +44,10 @@ import org.slf4j.LoggerFactory;
 public final class CapabilitiesWriter
         implements AutoCloseable, EffectiveModelContextListener, DOMTransactionChainListener {
     private static final Logger LOG = LoggerFactory.getLogger(CapabilitiesWriter.class);
-
-    @VisibleForTesting
-    static final @NonNull NodeIdentifier CAPABILITY = NodeIdentifier.create(qnameOf("capability"));
-
     private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of(
-        NodeIdentifier.create(RestconfState.QNAME), NodeIdentifier.create(Capabilities.QNAME), CAPABILITY);
+        LocalRestconfState.RESTCONF_STATE_NODEID,
+        LocalRestconfState.CAPABILITIES_NODEID,
+        LocalRestconfState.CAPABILITY_NODEID);
 
     private final DOMDataBroker dataBroker;
 
@@ -163,7 +146,7 @@ public final class CapabilitiesWriter
         }
 
         final var tx = txChain.newWriteOnlyTransaction();
-        tx.put(LogicalDatastoreType.OPERATIONAL, PATH, mapCapabilities());
+        tx.put(LogicalDatastoreType.OPERATIONAL, PATH, LocalRestconfState.CAPABILITY);
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -185,27 +168,5 @@ public final class CapabilitiesWriter
     private synchronized void markUnwritten() {
         LOG.debug("State of ietf-restconf-monitoring removed");
         written = false;
-    }
-
-    /**
-     * Create a {@code restconf-state} container.
-     *
-     * @return A container holding capabilities
-     */
-    @VisibleForTesting
-    static @NonNull LeafSetNode<String> mapCapabilities() {
-        return Builders.<String>leafSetBuilder()
-            .withNodeIdentifier(CAPABILITY)
-            .withChildValue(DepthParam.capabilityUri().toString())
-            .withChildValue(FieldsParam.capabilityUri().toString())
-            .withChildValue(FilterParam.capabilityUri().toString())
-            .withChildValue(AbstractReplayParam.capabilityUri().toString())
-            .withChildValue(WithDefaultsParam.capabilityUri().toString())
-            .withChildValue(PrettyPrintParam.capabilityUri().toString())
-            .withChildValue(LeafNodesOnlyParam.capabilityUri().toString())
-            .withChildValue(ChangedLeafNodesOnlyParam.capabilityUri().toString())
-            .withChildValue(SkipNotificationDataParam.capabilityUri().toString())
-            .withChildValue(ChildNodesOnlyParam.capabilityUri().toString())
-            .build();
     }
 }
