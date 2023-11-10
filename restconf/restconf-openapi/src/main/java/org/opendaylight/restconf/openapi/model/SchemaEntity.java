@@ -11,9 +11,14 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.openapi.impl.DefinitionNames;
+import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 /**
  * Archetype for a Schema.
@@ -22,11 +27,21 @@ public final class SchemaEntity extends OpenApiEntity {
     private final @NonNull SchemaNode value;
     private final @NonNull String title;
     private final @NonNull String type;
+    private final @NonNull SchemaInferenceStack stack;
+    private final boolean isParentConfig;
+    private final @NonNull String parentName;
+    private final @NonNull DefinitionNames definitionNames;
 
-    public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title, @NonNull final String type) {
+    public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title, @NonNull final String type,
+            @NonNull final SchemaInferenceStack context, final String parentName, final boolean isParentConfig,
+            @NonNull final DefinitionNames definitionNames) {
         this.value = requireNonNull(value);
         this.title = requireNonNull(title);
         this.type = requireNonNull(type);
+        this.stack = requireNonNull(context.copy());
+        this.parentName = requireNonNull(parentName);
+        this.isParentConfig = isParentConfig;
+        this.definitionNames = definitionNames;
     }
 
     @Override
@@ -43,7 +58,6 @@ public final class SchemaEntity extends OpenApiEntity {
             generator.writeStringField("$ref", reference);
         }
         generateEnum(generator);
-        generateRequired(generator);
         generateDiscriminator(generator);
         generateExamples(generator);
         generateExternalDocs(generator);
@@ -72,8 +86,15 @@ public final class SchemaEntity extends OpenApiEntity {
         // No-op
     }
 
-    private void generateRequired(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
+    private void generateRequired(final @NonNull JsonGenerator generator, final List<String> required)
+            throws IOException {
+        if (!required.isEmpty()) {
+            generator.writeArrayFieldStart("required");
+            for (final var req : required) {
+                generator.writeString(req);
+            }
+            generator.writeEndArray();
+        }
     }
 
     private void generateDiscriminator(final @NonNull JsonGenerator generator) throws IOException {
@@ -89,10 +110,22 @@ public final class SchemaEntity extends OpenApiEntity {
     }
 
     private void generateProperties(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
+
+        final var required = new ArrayList<String>();
+        final var childNodes = ((ContainerLike) value).getChildNodes();
+        stack.enterSchemaTree(value.getQName());
+        generator.writeObjectFieldStart("properties");
+        for (final var node : childNodes) {
+            new PropertyEntity(node, generator, stack, required, parentName, isParentConfig, definitionNames);
+        }
+        generator.writeEndObject();
+        generateRequired(generator, required);
     }
 
     private void generateXml(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
+        generator.writeObjectFieldStart("xml");
+        generator.writeStringField("name", value.getQName().getLocalName());
+        generator.writeStringField("namespace", value.getQName().getNamespace().toString());
+        generator.writeEndObject();
     }
 }
