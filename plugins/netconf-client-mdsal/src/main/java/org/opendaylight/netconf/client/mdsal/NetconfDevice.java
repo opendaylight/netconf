@@ -11,6 +11,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
@@ -35,6 +36,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.CapabilityURN;
@@ -247,14 +249,19 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     private synchronized void cleanupInitialization() {
         connected = false;
-        if (schemaFuturesList != null && !schemaFuturesList.isDone()) {
-            if (!schemaFuturesList.cancel(true)) {
-                LOG.warn("The cleanup of Schema Futures for device {} was unsuccessful.", id);
-            }
+        final var future = schemaFuturesList();
+        if (future != null) {
+            future.cancel(true)
         }
         notificationHandler.onRemoteSchemaDown();
         sourceRegistrations.forEach(Registration::close);
         sourceRegistrations.clear();
+    }
+
+    @Holding("this")
+    @VisibleForTesting
+    ListenableFuture<List<Object>> schemaFuturesList() {
+        return schemaFuturesList;
     }
 
     private synchronized void setConnected(final boolean connected) {
