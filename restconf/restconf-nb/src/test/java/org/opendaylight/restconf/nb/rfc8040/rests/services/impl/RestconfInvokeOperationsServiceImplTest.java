@@ -85,13 +85,13 @@ public class RestconfInvokeOperationsServiceImplTest {
     @Mock
     private DOMNotificationService notificationService;
 
-    private RestconfInvokeOperationsServiceImpl invokeOperationsService;
+    private RestconfOperationsServiceImpl invokeOperationsService;
     private MdsalRestconfServer server;
 
     @Before
     public void setup() {
         server = new MdsalRestconfServer(() -> CONTEXT, dataBroker, rpcService, mountPointService);
-        invokeOperationsService = new RestconfInvokeOperationsServiceImpl(server);
+        invokeOperationsService = new RestconfOperationsServiceImpl(server);
     }
 
     @Test
