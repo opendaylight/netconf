@@ -24,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
@@ -58,10 +59,12 @@ public final class RestconfInvokeOperationsServiceImpl {
     @Deprecated(forRemoval = true)
     private final DOMMountPointService mountPointService;
     private final ListenersBroker listenersBroker;
+    private final DOMDataBroker domDataBroker;
 
     public RestconfInvokeOperationsServiceImpl(final DatabindProvider databindProvider,
             final MdsalRestconfServer server, final DOMMountPointService mountPointService,
-            final ListenersBroker listenersBroker) {
+            final ListenersBroker listenersBroker, final DOMDataBroker dataBroker) {
+        this.domDataBroker = dataBroker;
         this.databindProvider = requireNonNull(databindProvider);
         this.server = requireNonNull(server);
         this.mountPointService = requireNonNull(mountPointService);

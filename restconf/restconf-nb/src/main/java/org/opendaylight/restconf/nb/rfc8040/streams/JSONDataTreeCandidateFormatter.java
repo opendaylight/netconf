@@ -51,7 +51,7 @@ public final class JSONDataTreeCandidateFormatter extends DataTreeCandidateForma
 
     @Override
     String createText(final TextParameters params, final EffectiveModelContext schemaContext,
-            final List<DataTreeCandidate> input, final Instant now) throws IOException {
+            final List<DataTreeCandidate> input, final Instant now, final String deviceId) throws IOException {
         try (var writer = new StringWriter()) {
             boolean nonEmpty = false;
             try (var jsonWriter = new JsonWriter(writer)) {

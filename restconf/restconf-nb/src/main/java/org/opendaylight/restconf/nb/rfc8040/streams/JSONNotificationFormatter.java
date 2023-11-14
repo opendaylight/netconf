@@ -50,7 +50,7 @@ final class JSONNotificationFormatter extends NotificationFormatter {
 
     @Override
     String createText(final TextParameters params, final EffectiveModelContext schemaContext,
-            final DOMNotification input, final Instant now) throws IOException {
+            final DOMNotification input, final Instant now, final String deviceId) throws IOException {
         try (var writer = new StringWriter()) {
             try (var jsonWriter = new JsonWriter(writer)) {
                 jsonWriter.beginObject()

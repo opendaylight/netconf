@@ -76,9 +76,11 @@ abstract class EventFormatter<T> implements Immutable {
         filter = xpath.compile(xpathFilter);
     }
 
-    final @Nullable String eventData(final EffectiveModelContext schemaContext, final T input, final Instant now)
+    final @Nullable String eventData(final EffectiveModelContext schemaContext, final T input, final Instant now,
+            final String deviceId)
             throws Exception {
-        return filterMatches(schemaContext, input, now) ? createText(textParams, schemaContext, input, now) : null;
+        return filterMatches(schemaContext, input, now) ? createText(textParams, schemaContext, input, now, deviceId)
+                : null;
     }
 
     /**
@@ -101,7 +103,8 @@ abstract class EventFormatter<T> implements Immutable {
      * @return String representation of the formatted data
      * @throws Exception if the underlying formatters fail to export the data to the requested format
      */
-    abstract String createText(TextParameters params, EffectiveModelContext schemaContext, T input, Instant now)
+    abstract String createText(TextParameters params, EffectiveModelContext schemaContext, T input, Instant now,
+            String deviceId)
         throws Exception;
 
     private boolean filterMatches(final EffectiveModelContext schemaContext, final T input, final Instant now)

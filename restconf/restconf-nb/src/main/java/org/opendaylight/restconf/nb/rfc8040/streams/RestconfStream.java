@@ -66,10 +66,9 @@ public abstract class RestconfStream<T> {
     // ImmutableMap because it retains iteration order
     private final @NonNull ImmutableMap<EncodingName, ? extends EventFormatterFactory<T>> encodings;
     private final @NonNull ListenersBroker listenersBroker;
-    private final @NonNull String name;
+    protected final @NonNull String name;
 
-    @GuardedBy("this")
-    private final Set<StreamSessionHandler> subscribers = new HashSet<>();
+    private static final Set<StreamSessionHandler> SUBSCRIBERS = new HashSet<>();
     @GuardedBy("this")
     private Registration registration;
 
@@ -143,7 +142,11 @@ public abstract class RestconfStream<T> {
             throw new IllegalStateException(subscriber + " is not connected");
         }
         LOG.debug("Subscriber {} is added.", subscriber);
-        subscribers.add(subscriber);
+        SUBSCRIBERS.add(subscriber);
+    }
+
+    synchronized Set<StreamSessionHandler> getSubscribers() {
+        return new HashSet<>(SUBSCRIBERS);
     }
 
     /**
@@ -153,9 +156,9 @@ public abstract class RestconfStream<T> {
      * @param subscriber SSE or WS session handler.
      */
     synchronized void removeSubscriber(final StreamSessionHandler subscriber) {
-        subscribers.remove(subscriber);
+        SUBSCRIBERS.remove(subscriber);
         LOG.debug("Subscriber {} is removed", subscriber);
-        if (subscribers.isEmpty()) {
+        if (SUBSCRIBERS.isEmpty()) {
             closeRegistration();
             listenersBroker.removeStream(this);
         }
@@ -168,13 +171,20 @@ public abstract class RestconfStream<T> {
     final synchronized void endOfStream() {
         closeRegistration();
 
-        final var it = subscribers.iterator();
+        final var it = SUBSCRIBERS.iterator();
         while (it.hasNext()) {
             it.next().endOfStream();
             it.remove();
         }
 
         listenersBroker.removeStream(this);
+    }
+
+    public final void resetRegistration() {
+        if (registration != null) {
+            registration.close();
+            registration = null;
+        }
     }
 
     @Holding("this")
@@ -256,7 +266,7 @@ public abstract class RestconfStream<T> {
      * @param data Data of incoming notifications.
      */
     synchronized void post(final String data) {
-        final var iterator = subscribers.iterator();
+        final var iterator = SUBSCRIBERS.iterator();
         while (iterator.hasNext()) {
             final var subscriber = iterator.next();
             if (subscriber.isConnected()) {

@@ -61,7 +61,8 @@ public class DataTreeChangeStream extends RestconfStream<List<DataTreeCandidate>
         final var now = Instant.now();
         final String data;
         try {
-            data = formatter().eventData(databindProvider.currentContext().modelContext(), dataTreeCandidates, now);
+            data = formatter().eventData(databindProvider.currentContext().modelContext(), dataTreeCandidates, now,
+                    null);
         } catch (final Exception e) {
             LOG.error("Failed to process notification {}",
                     dataTreeCandidates.stream().map(Object::toString).collect(Collectors.joining(",")), e);

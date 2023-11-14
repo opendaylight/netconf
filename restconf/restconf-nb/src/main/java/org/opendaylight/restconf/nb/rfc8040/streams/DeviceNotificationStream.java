@@ -9,31 +9,50 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev231103.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link RestconfStream} reporting YANG notifications coming from a mounted device.
  */
 public final class DeviceNotificationStream extends AbstractNotificationStream implements DOMMountPointListener {
+    private static final Logger LOG = LoggerFactory.getLogger(DeviceNotificationStream.class);
     private final @NonNull EffectiveModelContext effectiveModel;
     private final @NonNull DOMMountPointService mountPointService;
     private final @NonNull YangInstanceIdentifier instanceIdentifier;
+    private final @NonNull DOMDataBroker domDataBroker;
 
     private Registration reg;
 
     DeviceNotificationStream(final ListenersBroker listenersBroker, final String name,
             final NotificationOutputType outputType, final EffectiveModelContext effectiveModel,
-            final DOMMountPointService mountPointService, final YangInstanceIdentifier instanceIdentifier) {
+            final DOMMountPointService mountPointService, final YangInstanceIdentifier instanceIdentifier,
+            final DOMDataBroker domDataBroker) {
         super(listenersBroker, name, outputType);
+        this.domDataBroker = domDataBroker;
         this.effectiveModel = requireNonNull(effectiveModel);
         this.mountPointService = requireNonNull(mountPointService);
         this.instanceIdentifier = requireNonNull(instanceIdentifier);
@@ -60,14 +79,57 @@ public final class DeviceNotificationStream extends AbstractNotificationStream i
 
     @Override
     public void onMountPointCreated(final YangInstanceIdentifier path) {
-        // No-op
+        if (instanceIdentifier.equals(path)) {
+            try {
+                reRegisterDeviceNotification(path);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
     public void onMountPointRemoved(final YangInstanceIdentifier path) {
         if (instanceIdentifier.equals(path)) {
-            resetListenerRegistration();
-            endOfStream();
+            getSubscribers().forEach(subscriber -> {
+                if (subscriber.isConnected()) {
+                    subscriber.sendDataMessage("Device disconnected");
+                }
+            });
         }
+    }
+
+    private void reRegisterDeviceNotification(YangInstanceIdentifier path)
+            throws ExecutionException, InterruptedException {
+        final DOMMountPoint mountPoint = mountPointService.getMountPoint(path)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED));
+        final DOMSchemaService domSchemaService =  mountPoint.getService(
+                DOMSchemaService.class).orElseThrow(() ->
+                new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED));
+        final Collection<? extends NotificationDefinition> notificationDefinitions = domSchemaService.getGlobalContext()
+                .getNotifications();
+        final DOMNotificationService domNotificationService   = mountPoint.getService(DOMNotificationService.class)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED));
+        final Optional<NormalizedNode> normalizedNodeOptional =
+                this.domDataBroker.newReadOnlyTransaction().read(LogicalDatastoreType.CONFIGURATION, path).get();
+        final Optional<NormalizedNode> normalizedNodeOptionalOperational =
+                this.domDataBroker.newReadOnlyTransaction().read(LogicalDatastoreType.OPERATIONAL, path).get();
+        LOG.info("data {} {}", normalizedNodeOptional.toString(), normalizedNodeOptionalOperational.toString());
+        final Set<Absolute> absolutes = notificationDefinitions.stream()
+                .map(notificationDefinition -> Absolute.of(notificationDefinition.getQName()))
+                .collect(Collectors.toUnmodifiableSet());
+        resetListenerRegistration();
+        resetRegistration();
+        listen(domNotificationService, absolutes);
+        getSubscribers().forEach(subscriber -> {
+            if (subscriber.isConnected()) {
+                subscriber.sendDataMessage("Device connected");
+            }
+        });
     }
 }
