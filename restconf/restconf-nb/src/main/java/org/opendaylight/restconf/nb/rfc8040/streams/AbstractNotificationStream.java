@@ -39,7 +39,7 @@ abstract class AbstractNotificationStream extends RestconfStream<DOMNotification
         final var eventInstant = notification instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now();
         final String data;
         try {
-            data = formatter().eventData(effectiveModel(), notification, eventInstant);
+            data = formatter().eventData(effectiveModel(), notification, eventInstant, name);
         } catch (Exception e) {
             LOG.error("Failed to process notification {}", notification, e);
             return;

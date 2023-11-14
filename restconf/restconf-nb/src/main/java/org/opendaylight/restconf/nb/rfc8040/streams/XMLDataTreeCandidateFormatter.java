@@ -44,7 +44,7 @@ public final class XMLDataTreeCandidateFormatter extends DataTreeCandidateFormat
 
     @Override
     String createText(final TextParameters params, final EffectiveModelContext schemaContext,
-            final List<DataTreeCandidate> input, final Instant now) throws Exception {
+            final List<DataTreeCandidate> input, final Instant now, final String deviceId) throws Exception {
         final var writer = new StringWriter();
         boolean nonEmpty = false;
         try {

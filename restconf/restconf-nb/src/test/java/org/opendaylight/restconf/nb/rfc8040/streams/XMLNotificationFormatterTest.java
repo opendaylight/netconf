@@ -145,7 +145,7 @@ class XMLNotificationFormatterTest extends AbstractNotificationListenerTest {
     }
 
     private String prepareXmlResult(final QName schemaPathNotifi) throws Exception {
-        final var ret = XMLNotificationFormatter.EMPTY.eventData(MODEL_CONTEXT, notificationData, Instant.now());
+        final var ret = XMLNotificationFormatter.EMPTY.eventData(MODEL_CONTEXT, notificationData, Instant.now(), null);
         assertNotNull(ret);
         return ret;
     }

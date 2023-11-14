@@ -147,7 +147,7 @@ class JSONNotificationFormatterTest extends AbstractNotificationListenerTest {
     }
 
     private String prepareJson(final QName schemaPathNotifi) throws Exception {
-        final var ret = JSONNotificationFormatter.EMPTY.eventData(MODEL_CONTEXT, notificationData, Instant.now());
+        final var ret = JSONNotificationFormatter.EMPTY.eventData(MODEL_CONTEXT, notificationData, Instant.now(), null);
         assertNotNull(ret);
         return ret;
     }

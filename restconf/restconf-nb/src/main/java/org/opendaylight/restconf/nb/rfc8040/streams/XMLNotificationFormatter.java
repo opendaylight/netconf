@@ -45,11 +45,11 @@ final class XMLNotificationFormatter extends NotificationFormatter {
 
     @Override
     String createText(final TextParameters params, final EffectiveModelContext schemaContext,
-            final DOMNotification input, final Instant now) throws IOException {
+            final DOMNotification input, final Instant now, final String deviceId) throws IOException {
         final var writer = new StringWriter();
 
         try {
-            final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now);
+            final var xmlStreamWriter = NotificationFormatter.createStreamWriterWithNotification(writer, now, deviceId);
             final var nnStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(xmlStreamWriter, schemaContext,
                 input.getType());
 

@@ -40,7 +40,8 @@ final class RestconfApplication extends Application {
         singletons = Set.of(
             new RestconfDocumentedExceptionMapper(databindProvider),
             new RestconfDataServiceImpl(databindProvider, server, actionService),
-            new RestconfInvokeOperationsServiceImpl(databindProvider, server, mountPointService, listenersBroker),
+            new RestconfInvokeOperationsServiceImpl(databindProvider, server, mountPointService, listenersBroker,
+                    dataBroker),
             new RestconfOperationsServiceImpl(databindProvider, server),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService),
             new RestconfImpl(databindProvider));

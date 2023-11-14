@@ -13,10 +13,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -28,6 +31,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
@@ -57,6 +61,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
@@ -512,6 +517,59 @@ public abstract sealed class ListenersBroker {
 //    }
 
     /**
+    * Create device notification stream.
+    *
+    * @param mountPointService dom mount point service
+     * @return {@link DOMRpcResult} - Output of RPC - example in JSON
+     */
+    public DOMRpcResult createDeviceNotificationListenerOnMountPoint(
+            final DOMMountPointService mountPointService,final String baseUrl, final DOMDataBroker domDataBroker,
+            final YangInstanceIdentifier path) {
+        final DOMMountPoint mountPoint = mountPointService.getMountPoint(path)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED));
+        if (!(path.getLastPathArgument() instanceof NodeIdentifierWithPredicates listId)) {
+            throw new RestconfDocumentedException("Path does not refer to a list item", ErrorType.APPLICATION,
+                    ErrorTag.INVALID_VALUE);
+        }
+        if (listId.size() != 1) {
+            throw new RestconfDocumentedException("Target list uses multiple keys", ErrorType.APPLICATION,
+                    ErrorTag.INVALID_VALUE);
+        }
+        final String deviceName = listId.values().iterator().next().toString();
+        final NotificationOutputType outputType = NotificationOutputType.JSON;
+        final EffectiveModelContext effectiveModelContext = mountPoint.getService(DOMSchemaService.class)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point schema not available",
+                        ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED))
+                .getGlobalContext();
+        Collection<? extends NotificationDefinition> notificationDefinitions = effectiveModelContext
+                .getNotifications();
+        if (notificationDefinitions == null || notificationDefinitions.isEmpty()) {
+            throw new RestconfDocumentedException("Device does not support notification", ErrorType.APPLICATION,
+                    ErrorTag.OPERATION_FAILED);
+        }
+        final DOMNotificationService domNotificationService   = mountPoint.getService(DOMNotificationService.class)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point not available", ErrorType.APPLICATION,
+                        ErrorTag.OPERATION_FAILED));
+        Set<Absolute> absolutes = notificationDefinitions.stream()
+                .map(notificationDefinition -> Absolute.of(notificationDefinition.getQName()))
+                .collect(Collectors.toUnmodifiableSet());
+
+
+        final DeviceNotificationStream notificationListenerAdapter = createStream(
+                streamName -> new DeviceNotificationStream(this, streamName, outputType, effectiveModelContext,
+                        mountPointService, path, domDataBroker));
+        notificationListenerAdapter.listen(domNotificationService, absolutes);
+
+        // building of output
+        return new DefaultDOMRpcResult(Builders.containerBuilder()
+                .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
+                .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH, "/" + deviceName
+                        + "?" + "notificationType=device"))
+                .build());
+    }
+
+    /**
      * Create device notification stream.
      *
      * @param baseUrl base Url
@@ -565,7 +623,7 @@ public abstract sealed class ListenersBroker {
         final var outputType = prepareOutputType(input);
         final var notificationListenerAdapter = createStream(
             streamName -> new DeviceNotificationStream(this, streamName, outputType, mountModelContext,
-                mountPointService, mountPoint.getIdentifier()));
+                mountPointService, mountPoint.getIdentifier(), dataBroker));
         notificationListenerAdapter.listen(mountNotifService, notificationPaths);
 
         return RestconfFuture.of(Optional.of(Builders.containerBuilder()
