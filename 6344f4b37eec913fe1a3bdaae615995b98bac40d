@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dc03c75_6c34db03",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-11-14T15:05:46Z",
+      "side": 1,
+      "message": "Preventing this second notification, so not to cause a check-state failure in [NetconfDeviceMount](https://github.com/opendaylight/netconf/blob/master/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceMount.java#L64),\n was the very reason of the following patch:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/108167/1",
+      "revId": "6344f4b37eec913fe1a3bdaae615995b98bac40d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
