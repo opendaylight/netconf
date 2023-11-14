@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "682bc5e9_db88197f",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/netconf-keystore.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-11-14T08:40:23Z",
+      "side": 1,
+      "message": "no longer accurate",
+      "range": {
+        "startLine": 27,
+        "startChar": 28,
+        "endLine": 27,
+        "endChar": 43
+      },
+      "revId": "7544501efe25efbce266e606ef7fc1b0a8bfc4b6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
