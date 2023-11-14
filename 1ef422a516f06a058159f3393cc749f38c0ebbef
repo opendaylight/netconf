@@ -211,6 +211,30 @@
       },
       "revId": "1ef422a516f06a058159f3393cc749f38c0ebbef",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e82781b0_412993ca",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataStreamServiceImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-11-14T08:18:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "179c065f_111c51dd",
+      "range": {
+        "startLine": 53,
+        "startChar": 12,
+        "endLine": 53,
+        "endChar": 56
+      },
+      "revId": "1ef422a516f06a058159f3393cc749f38c0ebbef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
