@@ -10,20 +10,22 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.client.NetconfClientFactory;
+import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
 import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
@@ -79,15 +81,14 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private ListenableFuture<?> currentTask;
 
     public NetconfNodeHandler(final NetconfClientFactory clientFactory,
-            final ScheduledExecutorService scheduledExecutor, final BaseNetconfSchemas baseSchemas,
+            final ListeningScheduledExecutorService scheduledExecutor, final BaseNetconfSchemas baseSchemas,
             final SchemaResourceManager schemaManager, final Executor processingExecutor,
             final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
         this.clientFactory = requireNonNull(clientFactory);
-        // FIXME: do not wrap this executor
-        this.scheduledExecutor = MoreExecutors.listeningDecorator(scheduledExecutor);
+        this.scheduledExecutor = requireNonNull(scheduledExecutor);
         this.delegate = requireNonNull(delegate);
         this.deviceId = requireNonNull(deviceId);
 
@@ -157,39 +158,54 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     @Holding("this")
     private void lockedConnect() {
+        final ListenableFuture<NetconfClientSession> clientFuture;
         try {
-            final var clientFuture = clientFactory.createClient(clientConfig);
-            clientFuture.addListener(() -> connectComplete(clientFuture), MoreExecutors.directExecutor());
-            currentTask = clientFuture;
+            clientFuture = clientFactory.createClient(clientConfig);
         } catch (UnsupportedConfigurationException e) {
             onDeviceFailed(e);
+            return;
         }
+        currentTask = clientFuture;
+        Futures.addCallback(clientFuture, new FutureCallback<>() {
+            @Override
+            public void onSuccess(final NetconfClientSession result) {
+                connectSuccessful(clientFuture);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                connectFailed(clientFuture, cause);
+            }
+        }, MoreExecutors.directExecutor());
     }
 
-    private void connectComplete(final ListenableFuture<?> future) {
-        // Locked manipulation of internal state
+    private synchronized void connectSuccessful(final ListenableFuture<?> future) {
+        // Just clear the task, if it matches our expectation
+        connectComplete(future);
+    }
+
+    private void connectFailed(final ListenableFuture<?> future, final Throwable cause) {
         synchronized (this) {
-            // A quick sanity check
-            if (currentTask != future) {
-                LOG.warn("Ignoring connection completion, expected {} actual {}", future, currentTask);
+            if (connectComplete(future) || cause instanceof CancellationException) {
+                // Mismatched future or the connection has been cancelled: nothing else to do
                 return;
             }
-            currentTask = null;
-            // ListenableFuture provide no detail on error unless you attempt to get() the result
-            // then only the original exception is rethrown wrapped with ExecutionException
-            try {
-                if (future.isCancelled() || future.isDone() && future.get() != null) {
-                    // Success or cancellation, nothing else to do.
-                    // In case of success the rest of the setup is driven by RemoteDeviceHandler callbacks
-                    return;
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                LOG.debug("Connection attempt {} to {} failed", attempts, deviceId, e);
-            }
+            LOG.debug("Connection attempt {} to {} failed", attempts, deviceId, cause);
         }
 
         // We are invoking callbacks, do not hold locks
         reconnectOrFail();
+    }
+
+    @Holding("this")
+    private boolean connectComplete(final ListenableFuture<?> future) {
+        // A quick sanity check
+        if (currentTask == future) {
+            currentTask = null;
+            return false;
+        }
+        LOG.warn("Ignoring connection completion, expected {} actual {}", future, currentTask);
+        return true;
     }
 
     @Override
@@ -267,7 +283,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
         // Schedule a task for the right time. We always go through the executor to eliminate the special case of
         // immediate reconnect. While we could check and got to lockedConnect(), it makes for a rare special case.
-        // That special case makes for more code paths to test and introduces additional uncertainty whether
+        // That special case makes for more code paths to test and introduces additional uncertainty as to whether
         // the attempt was executed on this thread or not.
         currentTask = scheduledExecutor.schedule(this::reconnect, delayMillis, TimeUnit.MILLISECONDS);
         return null;

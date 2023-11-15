@@ -10,14 +10,13 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.netty.util.concurrent.EventExecutor;
+import com.google.common.util.concurrent.ListeningScheduledExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -45,29 +44,27 @@ public abstract class AbstractNetconfTopology {
 
     private final HashMap<NodeId, NetconfNodeHandler> activeConnectors = new HashMap<>();
     private final NetconfClientFactory clientFactory;
-    private final EventExecutor eventExecutor;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager schemaManager;
     private final BaseNetconfSchemas baseSchemas;
     private final NetconfClientConfigurationBuilderFactory builderFactory;
 
-    protected final ScheduledExecutorService scheduledExecutor;
+    protected final ListeningScheduledExecutorService scheduledExecutor;
     protected final Executor processingExecutor;
     protected final DataBroker dataBroker;
     protected final DOMMountPointService mountPointService;
     protected final String topologyId;
 
-    protected AbstractNetconfTopology(final String topologyId, final NetconfClientFactory clientDispatcher,
-            final EventExecutor eventExecutor, final ScheduledThreadPool scheduledThreadPool,
-            final ThreadPool processingThreadPool, final SchemaResourceManager schemaManager,
-            final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final NetconfClientConfigurationBuilderFactory builderFactory,
+    protected AbstractNetconfTopology(final String topologyId, final NetconfClientFactory clientFactory,
+            final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
+            final SchemaResourceManager schemaManager, final DataBroker dataBroker,
+            final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas) {
         this.topologyId = requireNonNull(topologyId);
-        this.clientFactory = clientDispatcher;
-        this.eventExecutor = eventExecutor;
-        this.scheduledExecutor = scheduledThreadPool.getExecutor();
-        this.processingExecutor = processingThreadPool.getExecutor();
+        this.clientFactory = requireNonNull(clientFactory);
+        // FIXME: can we get by with not wrapping this executor?
+        this.scheduledExecutor = MoreExecutors.listeningDecorator(scheduledExecutor);
+        this.processingExecutor = requireNonNull(processingExecutor);
         this.schemaManager = requireNonNull(schemaManager);
         this.deviceActionFactory = deviceActionFactory;
         this.dataBroker = requireNonNull(dataBroker);
