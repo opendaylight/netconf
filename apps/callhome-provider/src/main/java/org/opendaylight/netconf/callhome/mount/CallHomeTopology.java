@@ -8,9 +8,8 @@
 package org.opendaylight.netconf.callhome.mount;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.netty.util.concurrent.EventExecutor;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
@@ -25,14 +24,12 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 // Non-final for mocking
 public class CallHomeTopology extends AbstractNetconfTopology {
     public CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory,
-            final EventExecutor eventExecutor, final ScheduledThreadPool scheduledThreadPool,
-            final ThreadPool processingThreadPool, final SchemaResourceManager schemaRepositoryProvider,
-            final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final NetconfClientConfigurationBuilderFactory builderFactory, final BaseNetconfSchemas baseSchemas,
-            final DeviceActionFactory deviceActionFactory) {
-        super(topologyId, clientFactory, eventExecutor, scheduledThreadPool, processingThreadPool,
-            schemaRepositoryProvider, dataBroker, mountPointService, builderFactory, deviceActionFactory,
-            baseSchemas);
+            final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
+            final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
+            final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
+            final BaseNetconfSchemas baseSchemas, final DeviceActionFactory deviceActionFactory) {
+        super(topologyId, clientFactory, scheduledExecutor, processingExecutor, schemaRepositoryProvider, dataBroker,
+            mountPointService, builderFactory, deviceActionFactory, baseSchemas);
     }
 
     void disconnectNode(final NodeId nodeId) {

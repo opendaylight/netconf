@@ -12,8 +12,9 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import io.netty.util.concurrent.EventExecutor;
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -43,9 +44,8 @@ public class CallHomeMountFactory implements NetconfClientFactory, CallHomeNetco
 
     private final CallHomeMountSessionManager sessionManager = new CallHomeMountSessionManager();
     private final String topologyId;
-    private final EventExecutor eventExecutor;
-    private final ScheduledThreadPool scheduledThreadPool;
-    private final ThreadPool processingThreadPool;
+    private final ScheduledExecutorService scheduledExecutor;
+    private final Executor processingExecutor;
     private final SchemaResourceManager schemaRepositoryProvider;
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
@@ -57,18 +57,16 @@ public class CallHomeMountFactory implements NetconfClientFactory, CallHomeNetco
     private final BaseNetconfSchemas baseSchemas;
 
 
-    public CallHomeMountFactory(final String topologyId, final EventExecutor eventExecutor,
-            final ScheduledThreadPool scheduledThreadPool, final ThreadPool processingThreadPool,
-            final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
-            final DataBroker dataBroker, final DOMMountPointService mountService,
+    public CallHomeMountFactory(final String topologyId, final ScheduledExecutorService scheduledExecutor,
+            final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
+            final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker, final DOMMountPointService mountService,
             final NetconfClientConfigurationBuilderFactory builderFactory) {
-        this(topologyId, eventExecutor, scheduledThreadPool, processingThreadPool, schemaRepositoryProvider,
-            baseSchemas, dataBroker, mountService, builderFactory, null);
+        this(topologyId, scheduledExecutor, processingExecutor, schemaRepositoryProvider, baseSchemas, dataBroker,
+            mountService, builderFactory, null);
     }
 
     @Activate
     public CallHomeMountFactory(
-            @Reference(target = "(type=global-event-executor)") final EventExecutor eventExecutor,
             @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
                 final ScheduledThreadPool scheduledThreadPool,
             @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingThreadPool,
@@ -77,20 +75,19 @@ public class CallHomeMountFactory implements NetconfClientFactory, CallHomeNetco
             @Reference final DOMMountPointService mountService,
             @Reference(target = "(type=legacy)") final NetconfClientConfigurationBuilderFactory builderFactory,
             @Reference final DeviceActionFactory deviceActionFactory) {
-        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, eventExecutor, scheduledThreadPool, processingThreadPool,
-            schemaRepositoryProvider, baseSchemas, dataBroker, mountService, builderFactory, deviceActionFactory);
+        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, scheduledThreadPool.getExecutor(),
+            processingThreadPool.getExecutor(), schemaRepositoryProvider, baseSchemas, dataBroker, mountService,
+            builderFactory, deviceActionFactory);
     }
 
-    public CallHomeMountFactory(final String topologyId, final EventExecutor eventExecutor,
-            final ScheduledThreadPool scheduledThreadPool, final ThreadPool processingThreadPool,
-            final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
-            final DataBroker dataBroker, final DOMMountPointService mountService,
+    public CallHomeMountFactory(final String topologyId, final ScheduledExecutorService scheduledExecutor,
+            final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
+            final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker, final DOMMountPointService mountService,
             final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory) {
         this.topologyId = topologyId;
-        this.eventExecutor = eventExecutor;
-        this.scheduledThreadPool = scheduledThreadPool;
-        this.processingThreadPool = processingThreadPool;
+        this.scheduledExecutor = scheduledExecutor;
+        this.processingExecutor = processingExecutor;
         this.schemaRepositoryProvider = schemaRepositoryProvider;
         this.deviceActionFactory = deviceActionFactory;
         this.baseSchemas = requireNonNull(baseSchemas);
@@ -130,8 +127,8 @@ public class CallHomeMountFactory implements NetconfClientFactory, CallHomeNetco
 
     @VisibleForTesting
     void createTopology() {
-        topology = new CallHomeTopology(topologyId, this, eventExecutor, scheduledThreadPool, processingThreadPool,
-                schemaRepositoryProvider, dataBroker, mountService, builderFactory, baseSchemas, deviceActionFactory);
+        topology = new CallHomeTopology(topologyId, this, scheduledExecutor, processingExecutor,
+            schemaRepositoryProvider, dataBroker, mountService, builderFactory, baseSchemas, deviceActionFactory);
     }
 
     @VisibleForTesting
