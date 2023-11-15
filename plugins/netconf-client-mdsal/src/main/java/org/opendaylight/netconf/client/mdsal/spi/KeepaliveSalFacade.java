@@ -231,12 +231,12 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         synchronized void enableKeepalive() {
             recordActivity();
-            if (!suppressed) {
-                // unscheduled -> unsuppressed
-                reschedule();
-            } else {
+            if (suppressed) {
                 // suppressed -> unsuppressed
                 suppressed = false;
+            } else {
+                // unscheduled -> unsuppressed
+                reschedule();
             }
         }
 
