@@ -308,9 +308,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public void run() {
+            // Note: this will loop to onFailure()
             rpcResultFuture.cancel(true);
-            userFuture.cancel(false);
-            enableKeepalive();
         }
 
         @Override
