@@ -16,19 +16,16 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainClosedException;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opendaylight.yangtools.concepts.Registration;
 
 /**
  * {@link DOMTransactionChain} implementation for Netconf connector.
  */
 abstract class AbstractTxChain implements DOMTransactionChain, TxListener {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractTxChain.class);
-
     /**
      * Submitted transactions that haven't completed yet.
      */
-    private final Map<DOMDataTreeWriteTransaction, AutoCloseable> pendingTransactions = new HashMap<>();
+    private final Map<DOMDataTreeWriteTransaction, Registration> pendingTransactions = new HashMap<>();
 
     final DOMDataBroker dataBroker;
     final DOMTransactionChainListener listener;
@@ -101,13 +98,8 @@ abstract class AbstractTxChain implements DOMTransactionChain, TxListener {
         checkState(currentTransaction == null, "Last write transaction has not finished yet");
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     private void removePendingTx(final AbstractWriteTx transaction) {
-        try {
-            pendingTransactions.remove(transaction).close();
-        } catch (final Exception e) {
-            LOG.error("Can't remove transaction listener registration", e);
-        }
+        pendingTransactions.remove(transaction).close();
     }
 
     private void notifyChainListenerSuccess() {

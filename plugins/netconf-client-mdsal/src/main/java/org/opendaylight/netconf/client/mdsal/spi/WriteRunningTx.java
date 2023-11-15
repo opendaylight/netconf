@@ -40,14 +40,10 @@ import org.slf4j.LoggerFactory;
  *   <li>Unlock running datastore on tx commit</li>
  * </ol>
  */
-class WriteRunningTx extends AbstractWriteTx {
+final class WriteRunningTx extends AbstractWriteTx {
     private static final Logger LOG  = LoggerFactory.getLogger(WriteRunningTx.class);
 
     private final List<Change> changes = new ArrayList<>();
-
-    WriteRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps, final boolean rollbackSupport) {
-        this(id, netOps, rollbackSupport, true);
-    }
 
     WriteRunningTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
             final boolean isLockAllowed) {

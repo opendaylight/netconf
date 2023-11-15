@@ -16,7 +16,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +29,8 @@ import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -55,27 +56,25 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     volatile boolean finished = false;
     final boolean isLockAllowed;
 
-    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "Behavior-only subclasses")
     AbstractWriteTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
             final boolean isLockAllowed) {
         netOps = netconfOps;
         this.id = id;
         this.rollbackSupport = rollbackSupport;
         this.isLockAllowed = isLockAllowed;
-        init();
     }
 
-    static boolean isSuccess(final DOMRpcResult result) {
-        return result.errors().isEmpty();
-    }
-
-    void checkNotFinished() {
+    final void checkNotFinished() {
         checkState(!isFinished(), "%s: Transaction %s already finished", id, getIdentifier());
     }
 
-    boolean isFinished() {
+    final boolean isFinished() {
         return finished;
     }
+
+    abstract void init();
+
+    abstract void cleanup();
 
     @Override
     public synchronized boolean cancel() {
@@ -88,19 +87,14 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         return true;
     }
 
-    // FIXME: only called from ctor which needs @SuppressDBWarnings. Refactor class hierarchy without this method (here)
-    abstract void init();
-
-    abstract void cleanup();
-
     @Override
-    public Object getIdentifier() {
+    public final Object getIdentifier() {
         return this;
     }
 
     @Override
-    public synchronized void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                                 final NormalizedNode data) {
+    public final synchronized void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+            final NormalizedNode data) {
         checkEditable(store);
 
         // Trying to write only mixin nodes (not visible when serialized).
@@ -110,14 +104,14 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             return;
         }
 
-        final DataContainerChild editStructure = netOps.createEditConfigStructure(Optional.ofNullable(data),
-                        Optional.of(EffectiveOperation.REPLACE), path);
+        final var editStructure = netOps.createEditConfigStructure(Optional.ofNullable(data),
+            Optional.of(EffectiveOperation.REPLACE), path);
         editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "put");
     }
 
     @Override
-    public synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-                                   final NormalizedNode data) {
+    public final synchronized void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+            final NormalizedNode data) {
         checkEditable(store);
 
         // Trying to write only mixin nodes (not visible when serialized).
@@ -127,8 +121,7 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             return;
         }
 
-        final DataContainerChild editStructure =  netOps.createEditConfigStructure(Optional.ofNullable(data),
-            Optional.empty(), path);
+        final var editStructure =  netOps.createEditConfigStructure(Optional.ofNullable(data), Optional.empty(), path);
         editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "merge");
     }
 
@@ -142,7 +135,7 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     }
 
     @Override
-    public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    public final synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         checkEditable(store);
         final DataContainerChild editStructure = netOps.createEditConfigStructure(Optional.empty(),
                         Optional.of(EffectiveOperation.DELETE), path);
@@ -150,6 +143,7 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     }
 
     @Override
+    // Non-final for testing
     public FluentFuture<? extends CommitInfo> commit() {
         final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
         Futures.addCallback(commitConfiguration(), new FutureCallback<RpcResult<Void>>() {
@@ -213,8 +207,8 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
                              DataContainerChild editStructure, Optional<EffectiveOperation> defaultOperation,
                              String operation);
 
-    ListenableFuture<RpcResult<Void>> resultsToTxStatus() {
-        final SettableFuture<RpcResult<Void>> transformed = SettableFuture.create();
+    final ListenableFuture<RpcResult<Void>> resultsToTxStatus() {
+        final var transformed = SettableFuture.<RpcResult<Void>>create();
 
         Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<List<DOMRpcResult>>() {
             @Override
@@ -268,8 +262,14 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         transformed.set(RpcResultBuilder.<Void>success().build());
     }
 
-    AutoCloseable addListener(final TxListener listener) {
+    // Non-final for testing
+    Registration addListener(final TxListener listener) {
         listeners.add(listener);
-        return () -> listeners.remove(listener);
+        return new AbstractRegistration() {
+            @Override
+            protected void removeRegistration() {
+                listeners.remove(listener);
+            }
+        };
     }
 }
