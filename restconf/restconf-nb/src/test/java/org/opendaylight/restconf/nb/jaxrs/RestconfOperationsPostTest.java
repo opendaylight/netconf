@@ -135,7 +135,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of(
-            QName.create("urn:ietf:params:xml:ns:yang:ietf-yang-library", "2016-06-21", "modules-state")));
+            QName.create("urn:ietf:params:xml:ns:yang:ietf-yang-library", "2019-01-04", "modules-state")));
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of()))).when(rpcService)
             .invokeRpc(RPC, INPUT);
 
@@ -160,7 +160,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of(
-            QName.create("urn:ietf:params:xml:ns:yang:ietf-yang-library", "2016-06-21", "modules-state")));
+            QName.create("urn:ietf:params:xml:ns:yang:ietf-yang-library", "2019-01-04", "modules-state")));
 
         final var error = assertError(
             ar -> restconf.operationsJsonPOST(

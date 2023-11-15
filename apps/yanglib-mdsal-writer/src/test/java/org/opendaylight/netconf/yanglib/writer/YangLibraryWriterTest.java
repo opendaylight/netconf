@@ -122,7 +122,8 @@ class YangLibraryWriterTest {
             writer.schemaSourceUrlProvider = URL_PROVIDER;
         }
         writer.onModelContextUpdated(parseYangResources(YangLibraryWriterTest.class,
-            "/test-module.yang", "/test-submodule.yang", "/test-more.yang", "/ietf-yang-library.yang"));
+            "/test-module.yang", "/test-submodule.yang", "/test-more.yang", "/ietf-yang-library@2019-01-04.yang",
+            "/ietf-datastores@2018-02-14.yang", "/ietf-yang-types.yang", "/ietf-inet-types.yang"));
 
         verify(writeTransaction).put(eq(OPERATIONAL), eq(YANG_LIBRARY_PATH), yangLibraryCaptor.capture());
         assertEquals(expectedData, yangLibraryCaptor.getValue());
@@ -188,6 +189,21 @@ class YangLibraryWriterTest {
                             .setNamespace(new Uri("urn:ietf:params:xml:ns:yang:ietf-yang-library"))
                             .setRevision(new RevisionIdentifier("2019-01-04"))
                             .setLocation(withUrls ? Set.of(new Uri("/url/to/ietf-yang-library/2019-01-04")) : null)
+                            .build(),
+                        new ModuleBuilder().setName(new YangIdentifier("ietf-datastores_2018-02-14"))
+                            .setNamespace(new Uri("urn:ietf:params:xml:ns:yang:ietf-datastores"))
+                            .setRevision(new RevisionIdentifier("2018-02-14"))
+                            .setLocation(withUrls ? Set.of(new Uri("/url/to/ietf-datastores/2018-02-14")) : null)
+                            .build(),
+                        new ModuleBuilder().setName(new YangIdentifier("ietf-inet-types_2010-09-24"))
+                            .setNamespace(new Uri("urn:ietf:params:xml:ns:yang:ietf-inet-types"))
+                            .setRevision(new RevisionIdentifier("2010-09-24"))
+                            .setLocation(withUrls ? Set.of(new Uri("/url/to/ietf-inet-types/2010-09-24")) : null)
+                            .build(),
+                        new ModuleBuilder().setName(new YangIdentifier("ietf-yang-types_2010-09-24"))
+                            .setNamespace(new Uri("urn:ietf:params:xml:ns:yang:ietf-yang-types"))
+                            .setRevision(new RevisionIdentifier("2010-09-24"))
+                            .setLocation(withUrls ? Set.of(new Uri("/url/to/ietf-yang-types/2010-09-24")) : null)
                             .build()))
                     .build()))
             .setSchema(BindingMap.of(new SchemaBuilder()
@@ -242,6 +258,30 @@ class YangLibraryWriterTest {
                     .setNamespace(new Uri("urn:ietf:params:xml:ns:yang:ietf-yang-library"))
                     .setRevision(new CommonLeafs.Revision(new RevisionIdentifier("2019-01-04")))
                     .setSchema(withUrls ? new Uri("/url/to/ietf-yang-library/2019-01-04") : null)
+                    .setConformanceType(Import)
+                    .build(),
+                new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104
+                    .module.list.ModuleBuilder()
+                    .setName(new YangIdentifier("ietf-datastores_2018-02-14"))
+                    .setNamespace(new Uri("urn:ietf:params:xml:ns:yang:ietf-datastores"))
+                    .setRevision(new CommonLeafs.Revision(new RevisionIdentifier("2018-02-14")))
+                    .setSchema(withUrls ? new Uri("/url/to/ietf-datastores/2018-02-14") : null)
+                    .setConformanceType(Import)
+                    .build(),
+                new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104
+                    .module.list.ModuleBuilder()
+                    .setName(new YangIdentifier("ietf-inet-types_2010-09-24"))
+                    .setNamespace(new Uri("urn:ietf:params:xml:ns:yang:ietf-inet-types"))
+                    .setRevision(new CommonLeafs.Revision(new RevisionIdentifier("2010-09-24")))
+                    .setSchema(withUrls ? new Uri("/url/to/ietf-inet-types/2010-09-24") : null)
+                    .setConformanceType(Import)
+                    .build(),
+                new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104
+                    .module.list.ModuleBuilder()
+                    .setName(new YangIdentifier("ietf-yang-types_2010-09-24"))
+                    .setNamespace(new Uri("urn:ietf:params:xml:ns:yang:ietf-yang-types"))
+                    .setRevision(new CommonLeafs.Revision(new RevisionIdentifier("2010-09-24")))
+                    .setSchema(withUrls ? new Uri("/url/to/ietf-yang-types/2010-09-24") : null)
                     .setConformanceType(Import)
                     .build()))
             .setModuleSetId("1")
