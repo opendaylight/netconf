@@ -46,7 +46,9 @@ public class WriteCandidateTxTest extends AbstractTestModelTest {
 
     @Test
     public void testSubmit() throws Exception {
-        final WriteCandidateTx tx = new WriteCandidateTx(id, netconfOps, true);
+        final WriteCandidateTx tx = new WriteCandidateTx(id, netconfOps, true, true);
+        tx.init();
+
         //check, if lock is called
         verify(rpc).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), any());
 

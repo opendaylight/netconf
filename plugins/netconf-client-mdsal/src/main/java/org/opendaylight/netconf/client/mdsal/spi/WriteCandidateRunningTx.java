@@ -20,12 +20,8 @@ import org.slf4j.LoggerFactory;
  *     <li>Running datastore is locked as the first thing and this lock has to succeed</li>
  * </ul>
  */
-class WriteCandidateRunningTx extends WriteCandidateTx {
+final class WriteCandidateRunningTx extends WriteCandidateTx {
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateRunningTx.class);
-
-    WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps, final boolean rollbackSupport) {
-        this(id, netOps, rollbackSupport, true);
-    }
 
     WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
             final boolean isLockAllowed) {

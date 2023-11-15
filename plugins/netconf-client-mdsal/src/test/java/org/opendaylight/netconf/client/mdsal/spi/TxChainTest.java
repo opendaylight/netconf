@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainClosedException;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.yangtools.concepts.Registration;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class TxChainTest {
@@ -40,17 +42,17 @@ public class TxChainTest {
     @Mock
     private AbstractWriteTx writeOnlyTx3;
     @Mock
-    private AutoCloseable registration1;
+    private Registration registration1;
     @Mock
-    private AutoCloseable registration2;
+    private Registration registration2;
     @Mock
-    private AutoCloseable registration3;
+    private Registration registration3;
     @Captor
     private ArgumentCaptor<TxListener> captor;
     private TxChain chain;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         when(broker.newReadOnlyTransaction()).thenReturn(readOnlyTx);
         when(broker.newWriteOnlyTransaction()).thenReturn(writeOnlyTx1)
                 .thenReturn(writeOnlyTx2).thenReturn(writeOnlyTx3);
@@ -60,57 +62,57 @@ public class TxChainTest {
         chain = new TxChain(broker, listener);
     }
 
-    @Test()
-    public void testNewReadOnlyTransactionPrevSubmitted() throws Exception {
+    @Test
+    public void testNewReadOnlyTransactionPrevSubmitted() {
         chain.newWriteOnlyTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
         captor.getValue().onTransactionSubmitted(writeOnlyTx1);
         chain.newReadOnlyTransaction();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testNewReadOnlyTransactionPrevNotSubmitted() throws Exception {
+    @Test
+    public void testNewReadOnlyTransactionPrevNotSubmitted() {
         chain.newWriteOnlyTransaction();
-        chain.newReadOnlyTransaction();
+        assertThrows(IllegalStateException.class, chain::newReadOnlyTransaction);
     }
 
     @Test
-    public void testNewReadWriteTransactionPrevSubmitted() throws Exception {
+    public void testNewReadWriteTransactionPrevSubmitted() {
         chain.newReadWriteTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
         captor.getValue().onTransactionSubmitted(writeOnlyTx1);
         chain.newReadWriteTransaction();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testNewReadWriteTransactionPrevNotSubmitted() throws Exception {
+    @Test
+    public void testNewReadWriteTransactionPrevNotSubmitted() {
         chain.newReadWriteTransaction();
-        chain.newReadWriteTransaction();
+        assertThrows(IllegalStateException.class, chain::newReadWriteTransaction);
     }
 
     @Test
-    public void testNewWriteOnlyTransactionPrevSubmitted() throws Exception {
+    public void testNewWriteOnlyTransactionPrevSubmitted() {
         chain.newWriteOnlyTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
         captor.getValue().onTransactionSubmitted(writeOnlyTx1);
         chain.newWriteOnlyTransaction();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testNewWriteOnlyTransactionPrevNotSubmitted() throws Exception {
+    @Test
+    public void testNewWriteOnlyTransactionPrevNotSubmitted() {
         chain.newWriteOnlyTransaction();
-        chain.newWriteOnlyTransaction();
+        assertThrows(IllegalStateException.class, chain::newWriteOnlyTransaction);
     }
 
-    @Test(expected = DOMTransactionChainClosedException.class)
-    public void testCloseAfterFinished() throws Exception {
+    @Test
+    public void testCloseAfterFinished() {
         chain.close();
         verify(listener).onTransactionChainSuccessful(chain);
-        chain.newReadOnlyTransaction();
+        assertThrows(DOMTransactionChainClosedException.class, chain::newReadOnlyTransaction);
     }
 
     @Test
-    public void testChainFail() throws Exception {
+    public void testChainFail() {
         final AbstractWriteTx writeTx = chain.newWriteOnlyTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
         writeTx.commit();
@@ -121,7 +123,7 @@ public class TxChainTest {
     }
 
     @Test
-    public void testChainSuccess() throws Exception {
+    public void testChainSuccess() {
         final AbstractWriteTx writeTx = chain.newWriteOnlyTransaction();
         chain.close();
         verify(writeOnlyTx1).addListener(captor.capture());
@@ -132,7 +134,7 @@ public class TxChainTest {
     }
 
     @Test
-    public void testCancel() throws Exception {
+    public void testCancel() {
         final AbstractWriteTx writeTx = chain.newWriteOnlyTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
         writeTx.cancel();
@@ -141,7 +143,7 @@ public class TxChainTest {
     }
 
     @Test
-    public void testMultiplePendingTransactions() throws Exception {
+    public void testMultiplePendingTransactions() {
         //create 1st tx
         final AbstractWriteTx writeTx1 = chain.newWriteOnlyTransaction();
         final ArgumentCaptor<TxListener> captor1 = ArgumentCaptor.forClass(TxListener.class);
@@ -180,7 +182,7 @@ public class TxChainTest {
     }
 
     @Test
-    public void testMultiplePendingTransactionsFail() throws Exception {
+    public void testMultiplePendingTransactionsFail() {
         //create 1st tx
         final AbstractWriteTx writeTx1 = chain.newWriteOnlyTransaction();
         final ArgumentCaptor<TxListener> captor1 = ArgumentCaptor.forClass(TxListener.class);

@@ -48,10 +48,6 @@ import org.slf4j.LoggerFactory;
 class WriteCandidateTx extends AbstractWriteTx {
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateTx.class);
 
-    WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport) {
-        this(id, netconfOps, rollbackSupport, true);
-    }
-
     WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
             final boolean isLockAllowed) {
         super(id, netconfOps, rollbackSupport, isLockAllowed);
@@ -71,7 +67,7 @@ class WriteCandidateTx extends AbstractWriteTx {
         final var lockCandidateCallback = new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
-                if (isSuccess(result)) {
+                if (result.errors().isEmpty()) {
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Lock candidate successful");
                     }

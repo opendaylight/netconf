@@ -64,15 +64,15 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
 
     @Override
     public DOMDataTreeWriteTransaction newWriteOnlyTransaction() {
+        final AbstractWriteTx ret;
         if (candidateSupported) {
-            if (runningWritable) {
-                return new WriteCandidateRunningTx(id, netconfOps, rollbackSupport, lockDatastore);
-            } else {
-                return new WriteCandidateTx(id, netconfOps, rollbackSupport, lockDatastore);
-            }
+            ret = runningWritable ? new WriteCandidateRunningTx(id, netconfOps, rollbackSupport, lockDatastore)
+                : new WriteCandidateTx(id, netconfOps, rollbackSupport, lockDatastore);
         } else {
-            return new WriteRunningTx(id, netconfOps, rollbackSupport, lockDatastore);
+            ret = new WriteRunningTx(id, netconfOps, rollbackSupport, lockDatastore);
         }
+        ret.init();
+        return ret;
     }
 
     @Override

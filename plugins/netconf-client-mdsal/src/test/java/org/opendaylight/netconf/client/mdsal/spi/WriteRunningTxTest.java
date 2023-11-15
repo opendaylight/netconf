@@ -47,7 +47,9 @@ public class WriteRunningTxTest extends AbstractTestModelTest {
 
     @Test
     public void testSubmit() throws Exception {
-        final WriteRunningTx tx = new WriteRunningTx(id, netconfOps, true);
+        final WriteRunningTx tx = new WriteRunningTx(id, netconfOps, true, true);
+        tx.init();
+
         //check, if lock is called
         verify(rpc).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), any());
         tx.put(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId(), TxTestUtils.getContainerNode());
