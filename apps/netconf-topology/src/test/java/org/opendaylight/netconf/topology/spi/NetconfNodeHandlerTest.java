@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
+import io.netty.util.Timer;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -79,6 +80,8 @@ public class NetconfNodeHandlerTest {
 
     // Core setup
     @Mock
+    private Timer timer;
+    @Mock
     private ScheduledExecutorService scheduledExecutor;
     @Mock
     private SchemaResourceManager schemaManager;
@@ -132,7 +135,7 @@ public class NetconfNodeHandlerTest {
     @Before
     public void before() {
         // Instantiate the handler
-        handler = new NetconfNodeHandler(clientFactory, scheduledExecutor, BASE_SCHEMAS,
+        handler = new NetconfNodeHandler(clientFactory, timer, scheduledExecutor, BASE_SCHEMAS,
             schemaManager, processingExecutor,
             new DefaultNetconfClientConfigurationBuilderFactory(encryptionService, credentialProvider,
                 sslHandlerFactoryProvider),

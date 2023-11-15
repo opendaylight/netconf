@@ -15,6 +15,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.netty.util.Timer;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
@@ -97,6 +98,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     private final BaseNetconfSchemas baseSchemas;
     private final DataBroker dataBroker;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
+    private final Timer timer;
     private final ScheduledExecutorService keepaliveExecutor;
     private final Executor processingExecutor;
     private final ActorSystem actorSystem;
@@ -115,6 +117,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     public NetconfTopologyManager(@Reference final BaseNetconfSchemas baseSchemas,
             @Reference final DataBroker dataBroker,
             @Reference final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
+            @Reference(target = "(type=global-timer)") final Timer timer,
             @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
                 final ScheduledThreadPool keepaliveExecutor,
             @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingExecutor,
@@ -127,7 +130,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             @Reference final SchemaResourceManager resourceManager,
             @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
             final Configuration configuration) {
-        this(baseSchemas, dataBroker, clusterSingletonServiceProvider, keepaliveExecutor.getExecutor(),
+        this(baseSchemas, dataBroker, clusterSingletonServiceProvider, timer, keepaliveExecutor.getExecutor(),
             processingExecutor.getExecutor(), actorSystemProvider.getActorSystem(), clientFactory, mountPointService,
             encryptionService, rpcProviderService, deviceActionFactory, resourceManager, builderFactory,
             configuration.topology$_$id(), Uint16.valueOf(configuration.write$_$transaction$_$idle$_$timeout()));
@@ -135,14 +138,14 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
 
     @Inject
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
-            final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
+            final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final Timer timer,
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final ActorSystemProvider actorSystemProvider, final NetconfClientFactory clientFactory,
             final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
             final RpcProviderService rpcProviderService, final DeviceActionFactory deviceActionFactory,
             final SchemaResourceManager resourceManager,
             final NetconfClientConfigurationBuilderFactory builderFactory) {
-        this(baseSchemas, dataBroker, clusterSingletonServiceProvider, keepaliveExecutor.getExecutor(),
+        this(baseSchemas, dataBroker, clusterSingletonServiceProvider, timer, keepaliveExecutor.getExecutor(),
             processingExecutor.getExecutor(), actorSystemProvider.getActorSystem(), clientFactory,
             mountPointService, encryptionService, rpcProviderService, deviceActionFactory, resourceManager,
             builderFactory, NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, Uint16.ZERO);
@@ -151,7 +154,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
         justification = "Non-final for mocking, but we register for DTCL and that leaks 'this'")
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
-            final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
+            final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final Timer timer,
             final ScheduledExecutorService keepaliveExecutor, final Executor processingExecutor,
             final ActorSystem actorSystem, final NetconfClientFactory clientFactory,
             final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
@@ -161,6 +164,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = requireNonNull(dataBroker);
         this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
+        this.timer = requireNonNull(timer);
         this.keepaliveExecutor = requireNonNull(keepaliveExecutor);
         this.processingExecutor = requireNonNull(processingExecutor);
         this.actorSystem = requireNonNull(actorSystem);
@@ -330,6 +334,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             .setInstanceIdentifier(instanceIdentifier)
             .setNode(node)
             .setActorSystem(actorSystem)
+            .setTimer(timer)
             .setKeepaliveExecutor(keepaliveExecutor)
             .setProcessingExecutor(processingExecutor)
             .setTopologyId(topologyId)
