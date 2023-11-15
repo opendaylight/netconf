@@ -7,27 +7,22 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.getSourceNode;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
 
 import com.google.common.util.concurrent.SettableFuture;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timer;
 import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
@@ -38,56 +33,55 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class KeepaliveSalFacadeResponseWaitingTest {
-
+@ExtendWith(MockitoExtension.class)
+class KeepaliveSalFacadeResponseWaitingTest {
     private static final RemoteDeviceId REMOTE_DEVICE_ID =
             new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
-    private static final @NonNull ContainerNode KEEPALIVE_PAYLOAD =
-        NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
-            getSourceNode(NETCONF_RUNNING_NODEID), NetconfMessageTransformUtil.EMPTY_FILTER);
-
-    private KeepaliveSalFacade keepaliveSalFacade;
-    private ScheduledExecutorService executorService;
-
-    private LocalNetconfSalFacade underlyingSalFacade;
+    private static final @NonNull ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(
+        NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID,
+        NetconfBaseOps.getSourceNode(NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID),
+        NetconfMessageTransformUtil.EMPTY_FILTER);
 
     @Mock
     private Rpcs.Normalized deviceRpc;
-
     @Mock
     private NetconfDeviceCommunicator listener;
+    private Timer timer;
 
-    @Before
-    public void setUp() throws Exception {
-        executorService = Executors.newScheduledThreadPool(2);
+    private KeepaliveSalFacade keepaliveSalFacade;
+    private LocalNetconfSalFacade underlyingSalFacade;
+
+    @BeforeEach
+    void beforeEach() {
+        timer = new HashedWheelTimer();
 
         underlyingSalFacade = new LocalNetconfSalFacade();
-        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorService, 2L, 10000L);
+        keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 2L, 10000L);
         keepaliveSalFacade.setListener(listener);
     }
 
-    @After
-    public void tearDown() {
-        executorService.shutdown();
+    @AfterEach
+    void afterEach() {
+        timer.stop();
     }
 
     /**
      * Not sending keepalive rpc test while the repsonse is processing.
      */
     @Test
-    public void testKeepaliveSalResponseWaiting() {
+    void testKeepaliveSalResponseWaiting() {
         //This settable future object will be never set to any value. The test wants to simulate waiting for the result
         //of the future object.
-        final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
+        final var settableFuture = SettableFuture.<DOMRpcResult>create();
         doReturn(settableFuture).when(deviceRpc).invokeRpc(null, null);
 
         //This settable future will be used to check the invokation of keepalive RPC. Should be never invoked.
-        final SettableFuture<DOMRpcResult> keepaliveSettableFuture = SettableFuture.create();
+        final var keepaliveSettableFuture = SettableFuture.<DOMRpcResult>create();
         keepaliveSettableFuture.set(new DefaultDOMRpcResult(Builders.containerBuilder()
             .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID)
             .build()));
@@ -103,7 +97,8 @@ public class KeepaliveSalFacadeResponseWaitingTest {
         verify(deviceRpc, after(2000).times(1)).invokeRpc(null, null);
 
         //verify the keepalive RPC invoke. Should be never happen.
-        verify(deviceRpc, after(2000).never()).invokeRpc(NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
+        verify(deviceRpc, after(2000).never())
+            .invokeRpc(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
     }
 
     private static final class LocalNetconfSalFacade implements RemoteDeviceHandler {
@@ -112,9 +107,7 @@ public class KeepaliveSalFacadeResponseWaitingTest {
         @Override
         public void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
                 final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
-            final var newRpcs = services.rpcs();
-            assertThat(newRpcs, instanceOf(Rpcs.Normalized.class));
-            rpcs = (Rpcs.Normalized) newRpcs;
+            rpcs = assertInstanceOf(Rpcs.Normalized.class, services.rpcs());
         }
 
         @Override
@@ -124,14 +117,17 @@ public class KeepaliveSalFacadeResponseWaitingTest {
 
         @Override
         public void onDeviceFailed(final Throwable throwable) {
+            // No-op
         }
 
         @Override
         public void onNotification(final DOMNotification domNotification) {
+            // No-op
         }
 
         @Override
         public void close() {
+            // No-op
         }
 
         public void invokeNullRpc() {

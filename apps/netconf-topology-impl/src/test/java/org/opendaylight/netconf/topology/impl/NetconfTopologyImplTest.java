@@ -13,6 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.MoreExecutors;
+import io.netty.util.Timer;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
@@ -66,6 +67,8 @@ class NetconfTopologyImplTest {
     @Mock
     private NetconfClientFactory mockedClientFactory;
     @Mock
+    private Timer timer;
+    @Mock
     private ScheduledExecutorService mockedScheduledExecutor;
     @Mock
     private SchemaResourceManager mockedResourceManager;
@@ -94,7 +97,7 @@ class NetconfTopologyImplTest {
         doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
 
-        topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(), mockedClientFactory,
+        topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(), mockedClientFactory, timer,
             mockedScheduledExecutor, MoreExecutors.directExecutor(), mockedResourceManager, dataBroker,
             mountPointService, encryptionService, builderFactory, rpcProviderService,
             new DefaultBaseNetconfSchemas(new DefaultYangParserFactory()));
@@ -148,13 +151,13 @@ class NetconfTopologyImplTest {
     }
 
     private static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
-        TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory,
+        TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
                 final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
                 final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
                 final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
                 final NetconfClientConfigurationBuilderFactory builderFactory,
                 final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas) {
-            super(topologyId, clientFactory, scheduledExecutor, processingExecutor, schemaRepositoryProvider,
+            super(topologyId, clientFactory, timer, scheduledExecutor, processingExecutor, schemaRepositoryProvider,
                 dataBroker, mountPointService, encryptionService, builderFactory, rpcProviderService, baseSchemas);
         }
 

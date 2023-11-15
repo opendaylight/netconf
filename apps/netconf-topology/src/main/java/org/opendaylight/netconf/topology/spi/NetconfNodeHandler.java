@@ -14,6 +14,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import io.netty.util.Timer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -106,6 +107,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final @NonNull NetconfClientConfiguration clientConfig;
     private final @NonNull NetconfDeviceCommunicator communicator;
     private final @NonNull RemoteDeviceHandler delegate;
+    private final @NonNull Timer timer;
     private final @NonNull ScheduledExecutorService scheduledExecutor;
     private final @NonNull RemoteDeviceId deviceId;
 
@@ -120,7 +122,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     @GuardedBy("this")
     private Task currentTask;
 
-    public NetconfNodeHandler(final NetconfClientFactory clientFactory,
+    public NetconfNodeHandler(final NetconfClientFactory clientFactory, final Timer timer,
             final ScheduledExecutorService scheduledExecutor, final BaseNetconfSchemas baseSchemas,
             final SchemaResourceManager schemaManager, final Executor processingExecutor,
             final NetconfClientConfigurationBuilderFactory builderFactory,
@@ -128,6 +130,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
         this.clientFactory = requireNonNull(clientFactory);
+        this.timer = requireNonNull(timer);
         this.scheduledExecutor = requireNonNull(scheduledExecutor);
         this.delegate = requireNonNull(delegate);
         this.deviceId = requireNonNull(deviceId);
@@ -148,7 +151,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         final long keepaliveDelay = node.requireKeepaliveDelay().toJava();
         if (keepaliveDelay > 0) {
             LOG.info("Adding keepalive facade, for device {}", nodeId);
-            salFacade = keepAliveFacade = new KeepaliveSalFacade(deviceId, this, scheduledExecutor, keepaliveDelay,
+            salFacade = keepAliveFacade = new KeepaliveSalFacade(deviceId, this, timer, keepaliveDelay,
                 node.requireDefaultRequestTimeoutMillis().toJava());
         } else {
             salFacade = this;

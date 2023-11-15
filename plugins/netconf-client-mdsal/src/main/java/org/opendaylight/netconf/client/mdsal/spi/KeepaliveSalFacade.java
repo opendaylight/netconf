@@ -19,8 +19,10 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import io.netty.util.Timeout;
+import io.netty.util.Timer;
+import io.netty.util.TimerTask;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.xml.transform.dom.DOMSource;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -57,7 +59,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     private static final long DEFAULT_TRANSACTION_TIMEOUT_MILLI = TimeUnit.MILLISECONDS.toMillis(60000);
 
     private final RemoteDeviceHandler salFacade;
-    private final ScheduledExecutorService executor;
+    private final Timer timer;
 
     private final long keepaliveDelaySeconds;
     private final long timeoutNanos;
@@ -68,20 +70,18 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     private volatile NetconfDeviceCommunicator listener;
     private volatile KeepaliveTask task;
 
-    public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
-            final ScheduledExecutorService executor, final long keepaliveDelaySeconds,
-            final long requestTimeoutMillis) {
-        this.id = id;
-        this.salFacade = salFacade;
-        this.executor = requireNonNull(executor);
+    public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler salFacade, final Timer timer,
+            final long keepaliveDelaySeconds, final long requestTimeoutMillis) {
+        this.id = requireNonNull(id);
+        this.salFacade = requireNonNull(salFacade);
+        this.timer = requireNonNull(timer);
         this.keepaliveDelaySeconds = keepaliveDelaySeconds;
         delayNanos = TimeUnit.SECONDS.toNanos(keepaliveDelaySeconds);
         timeoutNanos = TimeUnit.MILLISECONDS.toNanos(requestTimeoutMillis);
     }
 
-    public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler salFacade,
-            final ScheduledExecutorService executor) {
-        this(id, salFacade, executor, DEFAULT_DELAY, DEFAULT_TRANSACTION_TIMEOUT_MILLI);
+    public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler salFacade, final Timer timer) {
+        this(id, salFacade, timer, DEFAULT_DELAY, DEFAULT_TRANSACTION_TIMEOUT_MILLI);
     }
 
     /**
@@ -186,9 +186,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         return timeout.userFuture;
     }
 
-    private void scheduleTimeout(final ListenableFuture<?> future, final TimeoutTask timeout) {
-        final var timeoutFuture = executor.schedule(timeout, timeoutNanos, TimeUnit.NANOSECONDS);
-        future.addListener(() -> timeoutFuture.cancel(false), MoreExecutors.directExecutor());
+    private void scheduleTimeout(final ListenableFuture<?> future, final TimeoutTask timeoutTask) {
+        final var timeout = timer.newTimeout(timeoutTask, timeoutNanos, TimeUnit.NANOSECONDS);
+        future.addListener(() -> timeout.cancel(), MoreExecutors.directExecutor());
     }
 
     /**
@@ -197,7 +197,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
      * response received, or the rcp could not even be sent) immediate reconnect is triggered as netconf session
      * is considered inactive/failed.
      */
-    private final class KeepaliveTask implements Runnable, FutureCallback<DOMRpcResult> {
+    private final class KeepaliveTask implements TimerTask, FutureCallback<DOMRpcResult> {
         // Keepalive RPC static resources
         static final @NonNull ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(
             NETCONF_GET_CONFIG_NODEID, getSourceNode(NETCONF_RUNNING_NODEID), NetconfMessageTransformUtil.EMPTY_FILTER);
@@ -214,7 +214,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         }
 
         @Override
-        public void run() {
+        public void run(final Timeout timeout) {
             final long local = lastActivity;
             final long now = System.nanoTime();
             final long inFutureNanos = local + delayNanos - now;
@@ -300,11 +300,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         }
 
         private void reschedule(final long delay) {
-            executor.schedule(this, delay, TimeUnit.NANOSECONDS);
+            timer.newTimeout(this, delay, TimeUnit.NANOSECONDS);
         }
     }
 
-    private static class TimeoutTask implements Runnable {
+    private static class TimeoutTask implements TimerTask {
         private final ListenableFuture<?> future;
 
         TimeoutTask(final ListenableFuture<?> future) {
@@ -312,7 +312,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         }
 
         @Override
-        public final void run() {
+        public final void run(final Timeout timeout) {
             future.cancel(true);
         }
     }
