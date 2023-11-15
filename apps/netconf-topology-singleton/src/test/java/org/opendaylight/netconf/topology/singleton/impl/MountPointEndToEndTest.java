@@ -33,6 +33,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
+import io.netty.util.Timer;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
@@ -190,6 +191,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     @Mock
     private AAAEncryptionService mockEncryptionService;
     @Mock
+    private Timer mockTimer;
+    @Mock
     private ScheduledExecutorService mockKeepaliveExecutor;
     @Mock
     private DeviceActionFactory deviceActionFactory;
@@ -314,7 +317,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 YangTextSchemaSource.class, 1));
 
         masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
-                masterClusterSingletonServiceProvider, mockKeepaliveExecutor, MoreExecutors.directExecutor(),
+                masterClusterSingletonServiceProvider, mockTimer, mockKeepaliveExecutor, MoreExecutors.directExecutor(),
                 masterSystem, mockClientFactory, masterMountPointService, mockEncryptionService, mockRpcProviderService,
                 deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
@@ -350,9 +353,10 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 .registerClusterSingletonService(any());
 
         slaveNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, slaveDataBroker,
-                mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, MoreExecutors.directExecutor(),
-                slaveSystem, mockClientFactory, slaveMountPointService, mockEncryptionService, mockRpcProviderService,
-                deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
+                mockSlaveClusterSingletonServiceProvider, mockTimer, mockKeepaliveExecutor,
+                MoreExecutors.directExecutor(), slaveSystem, mockClientFactory, slaveMountPointService,
+                mockEncryptionService, mockRpcProviderService, deviceActionFactory, resourceManager, builderFactory,
+                TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -370,6 +374,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         slaveTxChain = slaveDataBroker.createTransactionChain(new TransactionChainListener() {
             @Override
             public void onTransactionChainSuccessful(final TransactionChain chain) {
+                // No-op
             }
 
             @Override

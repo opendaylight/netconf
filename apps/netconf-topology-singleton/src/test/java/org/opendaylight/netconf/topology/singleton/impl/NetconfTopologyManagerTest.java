@@ -25,6 +25,7 @@ import static org.opendaylight.mdsal.binding.api.DataObjectModification.Modifica
 
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
+import io.netty.util.Timer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,6 +110,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         dataBrokerTest.setup();
         dataBroker = spy(dataBrokerTest.getDataBroker());
 
+        final Timer timer = mock(Timer.class);
         final ScheduledExecutorService keepaliveExecutor = mock(ScheduledExecutorService.class);
         final ExecutorService processingService = mock(ExecutorService.class);
         final ActorSystem actorSystem = mock(ActorSystem.class);
@@ -125,8 +127,8 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any());
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
-                keepaliveExecutor, processingService, actorSystem, clientFactory, mountPointService, encryptionService,
-                rpcProviderService, deviceActionFactory,
+                timer, keepaliveExecutor, processingService, actorSystem, clientFactory, mountPointService,
+                encryptionService, rpcProviderService, deviceActionFactory,
                 new DefaultSchemaResourceManager(new DefaultYangParserFactory()), builderFactory,
                 TOPOLOGY_ID, Uint16.ZERO) {
             @Override
