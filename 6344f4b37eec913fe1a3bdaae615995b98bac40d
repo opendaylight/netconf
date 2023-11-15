@@ -16,6 +16,24 @@
       "message": "Preventing this second notification, so not to cause a check-state failure in [NetconfDeviceMount](https://github.com/opendaylight/netconf/blob/master/plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/spi/NetconfDeviceMount.java#L64),\n was the very reason of the following patch:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/108167/1",
       "revId": "6344f4b37eec913fe1a3bdaae615995b98bac40d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "370a5e90_6415ea7c",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/NetconfDeviceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-11-15T09:21:28Z",
+      "side": 1,
+      "message": "Yes, however this part of test:\n````\n400|        final var mockSchemaFuturesList \u003d mock(ListenableFuture.class);\n401|        doReturn(true).when(mockSchemaFuturesList).isDone();\n402|        doReturn(mockSchemaFuturesList).when(device).schemaFuturesList();\n```\n\nRemoves functionality that was provided in:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/108167\n\nRemoving this mocking will result in the test passing with just one invocation of the onDeviceConnected method.",
+      "parentUuid": "0dc03c75_6c34db03",
+      "revId": "6344f4b37eec913fe1a3bdaae615995b98bac40d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
