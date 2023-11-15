@@ -56,7 +56,9 @@ public class WriteCandidateRunningTxTest extends AbstractTestModelTest {
 
     @Test
     public void testSubmit() throws Exception {
-        final WriteCandidateRunningTx tx = new WriteCandidateRunningTx(id, netconfOps, true);
+        final WriteCandidateRunningTx tx = new WriteCandidateRunningTx(id, netconfOps, true, true);
+        tx.init();
+
         //check, if lock is called
         final ContainerNode candidateLock =
                 getLockContent(NETCONF_LOCK_QNAME, NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID);

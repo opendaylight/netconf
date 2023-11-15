@@ -64,7 +64,9 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testIgnoreNonVisibleData() {
-        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false);
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false, true);
+        tx.init();
+
         final var emptyList = ImmutableNodes.mapNodeBuilder(NETCONF_FILTER_NODEID).build();
         tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(NETCONF_FILTER_NODEID), emptyList);
         tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(NETCONF_FILTER_NODEID), emptyList);
@@ -74,8 +76,9 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testDiscardChanges() {
-        final var future = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false)
-            .commit();
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false, true);
+        tx.init();
+        final var future = tx.commit();
         assertThrows(ExecutionException.class, () -> Futures.getDone(future));
 
         // verify discard changes was sent
@@ -98,9 +101,10 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
                 new ErrorTag("a"), "m"))))
             .when(rpc).invokeNetconf(any(), any());
 
-        final var future = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false)
-            .commit();
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false, true);
+        tx.init();
 
+        final var future = tx.commit();
         assertThrows(ExecutionException.class, () -> Futures.getDone(future));
     }
 
@@ -112,7 +116,8 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
             .when(rpc).invokeNetconf(any(), any());
 
         final var tx = new WriteRunningTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchemaWithNotifications().getMountPointContext()), false);
+            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchemaWithNotifications().getMountPointContext()), false, true);
+        tx.init();
 
         tx.delete(LogicalDatastoreType.CONFIGURATION, STATE);
         tx.commit();
@@ -130,7 +135,9 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null)))
             .when(rpc).invokeNetconf(any(), any());
         final var tx = new WriteCandidateTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false);
+            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false, true);
+        tx.init();
+
         final var listener = mock(TxListener.class);
         tx.addListener(listener);
         tx.delete(LogicalDatastoreType.CONFIGURATION, STATE);
@@ -144,7 +151,9 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     @Test
     public void testListenerCancellation() throws Exception {
         final var tx = new WriteCandidateTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false);
+            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false, true);
+        tx.init();
+
         final var listener = mock(TxListener.class);
         tx.addListener(listener);
         tx.delete(LogicalDatastoreType.CONFIGURATION, STATE);
@@ -160,7 +169,9 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         final var cause = new IllegalStateException("Failed tx");
         doReturn(Futures.immediateFailedFuture(cause)).when(rpc).invokeNetconf(any(), any());
         final var tx = new WriteCandidateTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false);
+            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false, true);
+        tx.init();
+
         final var listener = mock(TxListener.class);
         tx.addListener(listener);
         tx.delete(LogicalDatastoreType.CONFIGURATION, STATE);
