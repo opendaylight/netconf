@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.netty.util.Timer;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
@@ -46,6 +47,7 @@ public abstract class AbstractNetconfTopology {
     private final SchemaResourceManager schemaManager;
     private final BaseNetconfSchemas baseSchemas;
     private final NetconfClientConfigurationBuilderFactory builderFactory;
+    private final Timer timer;
 
     protected final ScheduledExecutorService scheduledExecutor;
     protected final Executor processingExecutor;
@@ -54,12 +56,13 @@ public abstract class AbstractNetconfTopology {
     protected final String topologyId;
 
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientFactory clientFactory,
-            final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
+            final Timer timer, final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
             final SchemaResourceManager schemaManager, final DataBroker dataBroker,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas) {
         this.topologyId = requireNonNull(topologyId);
         this.clientFactory = requireNonNull(clientFactory);
+        this.timer = requireNonNull(timer);
         this.scheduledExecutor = requireNonNull(scheduledExecutor);
         this.processingExecutor = requireNonNull(processingExecutor);
         this.schemaManager = requireNonNull(schemaManager);
@@ -119,7 +122,7 @@ public abstract class AbstractNetconfTopology {
 
         final NetconfNodeHandler nodeHandler;
         try {
-            nodeHandler = new NetconfNodeHandler(clientFactory, scheduledExecutor, baseSchemas,
+            nodeHandler = new NetconfNodeHandler(clientFactory, timer, scheduledExecutor, baseSchemas,
                 schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade,
                 deviceId, nodeId, netconfNode, nodeOptional);
         } catch (IllegalArgumentException e) {

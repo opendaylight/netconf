@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl.utils;
 import static java.util.Objects.requireNonNull;
 
 import akka.actor.ActorSystem;
+import io.netty.util.Timer;
 import java.time.Duration;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,6 +28,7 @@ public final class NetconfTopologySetup {
     private final DataBroker dataBroker;
     private final InstanceIdentifier<Node> instanceIdentifier;
     private final Node node;
+    private final Timer timer;
     private final ScheduledExecutorService keepaliveExecutor;
     private final Executor processingExecutor;
     private final ActorSystem actorSystem;
@@ -41,6 +43,7 @@ public final class NetconfTopologySetup {
         dataBroker = builder.getDataBroker();
         instanceIdentifier = builder.getInstanceIdentifier();
         node = builder.getNode();
+        timer = builder.getTimer();
         keepaliveExecutor = builder.getKeepaliveExecutor();
         processingExecutor = builder.getProcessingExecutor();
         actorSystem = builder.getActorSystem();
@@ -73,6 +76,10 @@ public final class NetconfTopologySetup {
 
     public ScheduledExecutorService getKeepaliveExecutor() {
         return keepaliveExecutor;
+    }
+
+    public Timer getTimer() {
+        return timer;
     }
 
     public ActorSystem getActorSystem() {
@@ -108,6 +115,7 @@ public final class NetconfTopologySetup {
         private DataBroker dataBroker;
         private InstanceIdentifier<Node> instanceIdentifier;
         private Node node;
+        private Timer timer;
         private ScheduledExecutorService keepaliveExecutor;
         private Executor processingExecutor;
         private ActorSystem actorSystem;
@@ -169,6 +177,15 @@ public final class NetconfTopologySetup {
 
         public NetconfTopologySetup build() {
             return new NetconfTopologySetup(this);
+        }
+
+        Timer getTimer() {
+            return timer;
+        }
+
+        public Builder setTimer(final Timer timer) {
+            this.timer = requireNonNull(timer);
+            return this;
         }
 
         ScheduledExecutorService getKeepaliveExecutor() {

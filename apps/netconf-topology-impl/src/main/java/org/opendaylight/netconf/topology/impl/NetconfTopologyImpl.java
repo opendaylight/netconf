@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.topology.impl;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.netty.util.Timer;
 import java.util.Collection;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
@@ -60,6 +61,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     @Activate
     public NetconfTopologyImpl(
             @Reference(target = "(type=netconf-client-factory)") final NetconfClientFactory clientFactory,
+            @Reference(target = "(type=global-timer)") final Timer timer,
             @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
             final ScheduledThreadPool scheduledThreadPool,
             @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingThreadPool,
@@ -69,30 +71,30 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             @Reference(target = "(type=default)") final NetconfClientConfigurationBuilderFactory builderFactory,
             @Reference final RpcProviderService rpcProviderService, @Reference final BaseNetconfSchemas baseSchemas,
             @Reference final DeviceActionFactory deviceActionFactory) {
-        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, clientFactory, scheduledThreadPool.getExecutor(),
+        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, clientFactory, timer, scheduledThreadPool.getExecutor(),
             processingThreadPool.getExecutor(), schemaRepositoryProvider, dataBroker, mountPointService,
             encryptionService, builderFactory, rpcProviderService, baseSchemas, deviceActionFactory);
     }
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientclientFactory,
-            final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
+            final Timer timer, final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
             final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
             final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
             final NetconfClientConfigurationBuilderFactory builderFactory, final RpcProviderService rpcProviderService,
             final BaseNetconfSchemas baseSchemas) {
-        this(topologyId, clientclientFactory, scheduledExecutor, processingExecutor, schemaRepositoryProvider,
+        this(topologyId, clientclientFactory, timer, scheduledExecutor, processingExecutor, schemaRepositoryProvider,
             dataBroker, mountPointService, encryptionService, builderFactory, rpcProviderService, baseSchemas, null);
     }
 
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
         justification = "DTCL registration of 'this'")
-    public NetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory,
+    public NetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
             final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
             final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
             final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
             final NetconfClientConfigurationBuilderFactory builderFactory, final RpcProviderService rpcProviderService,
             final BaseNetconfSchemas baseSchemas, final DeviceActionFactory deviceActionFactory) {
-        super(topologyId, clientFactory, scheduledExecutor, processingExecutor,
+        super(topologyId, clientFactory, timer, scheduledExecutor, processingExecutor,
             schemaRepositoryProvider, dataBroker, mountPointService, builderFactory, deviceActionFactory, baseSchemas);
 
         LOG.debug("Registering datastore listener");

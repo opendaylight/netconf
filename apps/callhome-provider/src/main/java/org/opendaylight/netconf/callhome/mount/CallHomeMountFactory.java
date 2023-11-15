@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import io.netty.util.Timer;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,6 +45,7 @@ public class CallHomeMountFactory implements NetconfClientFactory, CallHomeNetco
 
     private final CallHomeMountSessionManager sessionManager = new CallHomeMountSessionManager();
     private final String topologyId;
+    private final Timer timer;
     private final ScheduledExecutorService scheduledExecutor;
     private final Executor processingExecutor;
     private final SchemaResourceManager schemaRepositoryProvider;
@@ -56,17 +58,17 @@ public class CallHomeMountFactory implements NetconfClientFactory, CallHomeNetco
     private final DeviceActionFactory deviceActionFactory;
     private final BaseNetconfSchemas baseSchemas;
 
-
-    public CallHomeMountFactory(final String topologyId, final ScheduledExecutorService scheduledExecutor,
-            final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
-            final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker, final DOMMountPointService mountService,
+    public CallHomeMountFactory(final String topologyId, final Timer timer,
+            final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
+            final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
+            final DataBroker dataBroker, final DOMMountPointService mountService,
             final NetconfClientConfigurationBuilderFactory builderFactory) {
-        this(topologyId, scheduledExecutor, processingExecutor, schemaRepositoryProvider, baseSchemas, dataBroker,
-            mountService, builderFactory, null);
+        this(topologyId, timer, scheduledExecutor, processingExecutor, schemaRepositoryProvider, baseSchemas,
+            dataBroker, mountService, builderFactory, null);
     }
 
     @Activate
-    public CallHomeMountFactory(
+    public CallHomeMountFactory(@Reference(target = "(type=global-timer)") final Timer timer,
             @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
                 final ScheduledThreadPool scheduledThreadPool,
             @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingThreadPool,
@@ -75,17 +77,19 @@ public class CallHomeMountFactory implements NetconfClientFactory, CallHomeNetco
             @Reference final DOMMountPointService mountService,
             @Reference(target = "(type=legacy)") final NetconfClientConfigurationBuilderFactory builderFactory,
             @Reference final DeviceActionFactory deviceActionFactory) {
-        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, scheduledThreadPool.getExecutor(),
+        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer, scheduledThreadPool.getExecutor(),
             processingThreadPool.getExecutor(), schemaRepositoryProvider, baseSchemas, dataBroker, mountService,
             builderFactory, deviceActionFactory);
     }
 
-    public CallHomeMountFactory(final String topologyId, final ScheduledExecutorService scheduledExecutor,
-            final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
-            final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker, final DOMMountPointService mountService,
+    public CallHomeMountFactory(final String topologyId, final Timer timer,
+            final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
+            final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
+            final DataBroker dataBroker, final DOMMountPointService mountService,
             final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory) {
         this.topologyId = topologyId;
+        this.timer = requireNonNull(timer);
         this.scheduledExecutor = scheduledExecutor;
         this.processingExecutor = processingExecutor;
         this.schemaRepositoryProvider = schemaRepositoryProvider;
@@ -127,7 +131,7 @@ public class CallHomeMountFactory implements NetconfClientFactory, CallHomeNetco
 
     @VisibleForTesting
     void createTopology() {
-        topology = new CallHomeTopology(topologyId, this, scheduledExecutor, processingExecutor,
+        topology = new CallHomeTopology(topologyId, this, timer, scheduledExecutor, processingExecutor,
             schemaRepositoryProvider, dataBroker, mountService, builderFactory, baseSchemas, deviceActionFactory);
     }
 
