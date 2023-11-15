@@ -20,6 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.SettableFuture;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -136,5 +137,19 @@ public class KeepaliveSalFacadeTest {
         ((Rpcs.Normalized) proxyRpc).invokeRpc(QName.create("foo", "bar"), mock(ContainerNode.class));
 
         verify(listener, times(1)).disconnect();
+    }
+
+    @Test
+    public void testKeepaliveRpcResponseTimeout() {
+        final var neverResolvedFuture = SettableFuture.create();
+        doReturn(neverResolvedFuture).when(deviceRpc).invokeNetconf(any(), any());
+
+        keepaliveSalFacade.onDeviceConnected(null, null, new RemoteDeviceServices(deviceRpc, null));
+
+        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class));
+
+        // Should disconnect the session because RPC result future is never resolved and keepalive delay is 1 sec
+        verify(listener, timeout(115000).times(1)).disconnect();
+        verify(deviceRpc, times(1)).invokeNetconf(any(), any());
     }
 }
