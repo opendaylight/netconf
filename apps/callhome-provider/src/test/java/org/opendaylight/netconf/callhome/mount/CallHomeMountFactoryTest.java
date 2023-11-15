@@ -16,14 +16,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import io.netty.util.concurrent.EventExecutor;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -36,44 +38,40 @@ import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CallHomeMountFactoryTest {
     private String topologyId;
-    private EventExecutor mockExecutor;
-    private ScheduledThreadPool mockKeepAlive;
-    private ThreadPool mockProcessingExecutor;
+    @Mock
+    private ScheduledExecutorService mockScheduledExecutor;
+    @Mock
+    private Executor mockProcessingExecutor;
+    @Mock
     private SchemaResourceManager mockSchemaRepoProvider;
+    @Mock
+    private DataBroker mockDataBroker;
+    @Mock
+    private DOMMountPointService mockMount;
+    @Mock
+    private CallHomeMountSessionManager mockSessMgr;
+    @Mock
+    private CallHomeTopology mockTopology;
+    @Mock
+    private CallHomeProtocolSessionContext mockProtoSess;
+    @Mock
+    private NetconfClientConfigurationBuilderFactory mockBuilderFactory;
+    @Mock
+    private BaseNetconfSchemas mockBaseSchemas;
 
     private CallHomeMountFactory instance;
-    private DataBroker mockDataBroker;
-    private DOMMountPointService mockMount;
-
-    private CallHomeMountSessionManager mockSessMgr;
-    private CallHomeTopology mockTopology;
-    private CallHomeProtocolSessionContext mockProtoSess;
-    private NetconfClientConfigurationBuilderFactory mockBuilderFactory;
-    private BaseNetconfSchemas mockBaseSchemas;
 
     @Before
     public void setup() {
         topologyId = "";
-        mockExecutor = mock(EventExecutor.class);
-        mockKeepAlive = mock(ScheduledThreadPool.class);
-        mockProcessingExecutor = mock(ThreadPool.class);
-        mockSchemaRepoProvider = mock(SchemaResourceManager.class);
-        mockDataBroker = mock(DataBroker.class);
-        mockMount = mock(DOMMountPointService.class);
-        mockSessMgr = mock(CallHomeMountSessionManager.class);
-        mockTopology = mock(CallHomeTopology.class);
-        mockProtoSess = mock(CallHomeProtocolSessionContext.class);
-        mockBuilderFactory = mock(NetconfClientConfigurationBuilderFactory .class);
-        mockBaseSchemas = mock(BaseNetconfSchemas.class);
 
-        instance = new CallHomeMountFactory(topologyId, mockExecutor, mockKeepAlive,
-                mockProcessingExecutor, mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount,
-                mockBuilderFactory) {
+        instance = new CallHomeMountFactory(topologyId, mockScheduledExecutor, mockProcessingExecutor,
+                mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount, mockBuilderFactory) {
             @Override
             CallHomeMountSessionManager sessionManager() {
                 return mockSessMgr;
@@ -129,10 +127,8 @@ public class CallHomeMountFactoryTest {
     @Test
     public void nodeIsInsertedIntoTopologyWhenSubsystemIsOpened() throws UnknownHostException {
         // given
-        final NodeId mockNodeId = mock(NodeId.class);
         final Node mockNode = mock(Node.class);
         final CallHomeMountSessionContext mockDevCtxt = mock(CallHomeMountSessionContext.class);
-        doReturn(mockNodeId).when(mockDevCtxt).getId();
         doReturn(mockNode).when(mockDevCtxt).getConfigNode();
         doReturn(mockDevCtxt).when(mockSessMgr).createSession(any(CallHomeProtocolSessionContext.class),
                 any(CallHomeChannelActivator.class), any(CallHomeMountSessionContext.CloseCallback.class));
