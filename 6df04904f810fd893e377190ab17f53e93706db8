@@ -16,6 +16,24 @@
       "message": "so the two patches combined endup performing a bunch of renames, like:\n- CallhomeStatusReporter -\u003e CallHomeMountStatusReporter\n- CallHomeAuthorization -\u003e CallHomeSshAuthSettings\n\nPlease squash them and undo the renames, so we retain proper history",
       "revId": "6df04904f810fd893e377190ab17f53e93706db8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6534e18d_d100188f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-15T12:04:55Z",
+      "side": 1,
+      "message": "There is no reason to keep old names bc\n\nthese names are no longer reflect implemented (Impl)\ninterfaces which are gone\n\nfor case with status reporter there will be \na difference with interface name in one letter case \nwhich is confusing, it will be like \nCallhomeStatusReporter implements CallHomeStatusReporter",
+      "parentUuid": "bd3332e9_1852cbbc",
+      "revId": "6df04904f810fd893e377190ab17f53e93706db8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
