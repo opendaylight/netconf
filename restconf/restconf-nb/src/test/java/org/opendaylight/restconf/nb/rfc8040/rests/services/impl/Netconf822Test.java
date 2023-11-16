@@ -35,7 +35,8 @@ public class Netconf822Test {
                 "foo:new": [null],
                 "foo:new1": [null]
               }
-            }""", OperationsContent.JSON.bodyFor(SchemaInferenceStack.of(SCHEMA).toInference()));
+            }""",
+            MdsalRestconfServer.operationsGET(OperationsContent.JSON, SchemaInferenceStack.of(SCHEMA).toInference()));
     }
 
     @Test
@@ -45,7 +46,8 @@ public class Netconf822Test {
               "ietf-restconf:operations" : {
                 "foo:new1": [null]
               }
-            }""", OperationsContent.JSON.bodyFor(SchemaInferenceStack.of(SCHEMA, NEW1).toInference()));
+            }""",
+            MdsalRestconfServer.operationsGET(OperationsContent.JSON, SchemaInferenceStack.of(SCHEMA, NEW1).toInference()));
     }
 
     @Test
@@ -56,7 +58,8 @@ public class Netconf822Test {
                         xmlns:ns0="foo" >
               <ns0:new/>
               <ns0:new1/>
-            </operations>""", OperationsContent.XML.bodyFor(SchemaInferenceStack.of(SCHEMA).toInference()));
+            </operations>""",
+            MdsalRestconfServer.operationsGET(OperationsContent.XML, SchemaInferenceStack.of(SCHEMA).toInference()));
     }
 
     @Test
@@ -66,6 +69,8 @@ public class Netconf822Test {
             <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"
                         xmlns:ns0="foo" >
               <ns0:new1/>
-            </operations>""", OperationsContent.XML.bodyFor(SchemaInferenceStack.of(SCHEMA, NEW1).toInference()));
+            </operations>""",
+            MdsalRestconfServer.operationsGET(OperationsContent.XML,
+                SchemaInferenceStack.of(SCHEMA, NEW1).toInference()));
     }
 }

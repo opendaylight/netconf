@@ -25,7 +25,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
  * RESTCONF {@code /operations} content for a {@code GET} operation as per
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC8040</a>.
  */
-enum OperationsContent {
+public enum OperationsContent {
     JSON("{ \"ietf-restconf:operations\" : { } }") {
         @Override
         String createBody(final List<Entry<String, List<String>>> rpcsByPrefix) {

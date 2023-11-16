@@ -50,6 +50,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -125,6 +126,21 @@ public final class MdsalRestconfServer implements RestconfServer {
         stack.enterDataTree(YANG_LIBRARY_VERSION);
         return new NormalizedNodePayload(stack.toInference(),
             ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION));
+    }
+
+    @Override
+    public String operationsGET(final OperationsContent contentType) {
+        return operationsGET(contentType, bindRequestRoot().inference());
+    }
+
+    @Override
+    public String operationsGET(final OperationsContent contentType, final String operation) {
+        return operationsGET(contentType, bindRequestPath(operation).inference());
+    }
+
+    @VisibleForTesting
+    static @NonNull String operationsGET(final OperationsContent contentType, final @NonNull Inference inference) {
+        return contentType.bodyFor(inference);
     }
 
     @Override

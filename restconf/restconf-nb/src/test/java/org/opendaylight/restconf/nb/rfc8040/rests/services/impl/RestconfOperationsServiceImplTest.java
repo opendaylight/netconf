@@ -96,7 +96,7 @@ public class RestconfOperationsServiceImplTest {
 
     @Test
     public void testOperationsXml() {
-        final var operationsXML = opService.getOperationsXML();
+        final var operationsXML = opService.operationsGetXML();
         assertEquals(EXPECTED_XML, operationsXML);
     }
 
@@ -108,7 +108,7 @@ public class RestconfOperationsServiceImplTest {
 
     @Test
     public void testMountPointOperationsXml() {
-        final var operationXML = opService.getOperationXML(DEVICE_ID);
+        final var operationXML = opService.operationsGetXML(DEVICE_ID);
         assertEquals(EXPECTED_XML, operationXML);
     }
 
@@ -125,7 +125,7 @@ public class RestconfOperationsServiceImplTest {
 
     @Test
     public void testMountPointSpecificOperationsXml() {
-        final var operationXML = opService.getOperationXML(DEVICE_RPC1_MODULE1_ID);
+        final var operationXML = opService.operationsGetXML(DEVICE_RPC1_MODULE1_ID);
         assertEquals("""
             <?xml version="1.0" encoding="UTF-8"?>
             <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"

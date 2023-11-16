@@ -57,7 +57,7 @@ public final class RestconfOperationsServiceImpl {
     @Path("/operations")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
     public String getOperationsJSON() {
-        return OperationsContent.JSON.bodyFor(server.bindRequestRoot().inference());
+        return server.operationsGET(OperationsContent.JSON);
     }
 
     /**
@@ -70,7 +70,7 @@ public final class RestconfOperationsServiceImpl {
     @Path("/operations/{identifier:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
     public String getOperationJSON(@PathParam("identifier") final String identifier) {
-        return OperationsContent.JSON.bodyFor(server.bindRequestPath(identifier).inference());
+        return server.operationsGET(OperationsContent.JSON, identifier);
     }
 
     /**
@@ -81,8 +81,8 @@ public final class RestconfOperationsServiceImpl {
     @GET
     @Path("/operations")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public String getOperationsXML() {
-        return OperationsContent.XML.bodyFor(server.bindRequestRoot().inference());
+    public String operationsGetXML() {
+        return server.operationsGET(OperationsContent.XML);
     }
 
     /**
@@ -94,8 +94,8 @@ public final class RestconfOperationsServiceImpl {
     @GET
     @Path("/operations/{identifier:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public String getOperationXML(@PathParam("identifier") final String identifier) {
-        return OperationsContent.XML.bodyFor(server.bindRequestPath(identifier).inference());
+    public String operationsGetXML(@PathParam("identifier") final String identifier) {
+        return server.operationsGET(OperationsContent.XML, identifier);
     }
 
     /**
@@ -121,10 +121,10 @@ public final class RestconfOperationsServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void invokeRpcXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+    public void operationsPostXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlOperationInputBody(body)) {
-            invokeRpc(identifier, uriInfo, ar, xmlBody);
+            operationsPOST(identifier, uriInfo, ar, xmlBody);
         }
     }
 
@@ -150,14 +150,14 @@ public final class RestconfOperationsServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void invokeRpcJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+    public void operationsPostJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonOperationInputBody(body)) {
-            invokeRpc(identifier, uriInfo, ar, jsonBody);
+            operationsPOST(identifier, uriInfo, ar, jsonBody);
         }
     }
 
-    private void invokeRpc(final String identifier, final UriInfo uriInfo, final AsyncResponse ar,
+    private void operationsPOST(final String identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
         server.operationsPOST(uriInfo.getBaseUri(), identifier, body)
             .addCallback(new JaxRsRestconfCallback<OperationOutput>(ar) {
