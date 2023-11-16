@@ -16,6 +16,24 @@
       "message": "No null check needed as boolean primitives cannot be null",
       "revId": "c4e37f31de66ed5c34960f569f2b0da9437d4221",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb510e43_b5c5afb2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-16T11:59:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "105e9fc3_c57d8b84",
+      "revId": "c4e37f31de66ed5c34960f569f2b0da9437d4221",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
