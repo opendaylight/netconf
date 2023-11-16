@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.junit.Before;
@@ -81,7 +80,7 @@ import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
-    private static final Uint16 ACTOR_RESPONSE_WAIT_TIME = Uint16.valueOf(10);
+    private static final Uint16 ACTOR_RESPONSE_WAIT_TIME = Uint16.TEN;
     private static final String TOPOLOGY_ID = "topologyID";
 
     private NetconfTopologyManager netconfTopologyManager;
@@ -92,6 +91,24 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     private ListenerRegistration<?> mockListenerReg;
     @Mock
     private Registration mockRpcReg;
+    @Mock
+    private Timer timer;
+    @Mock
+    private ExecutorService processingService;
+    @Mock
+    private ActorSystem actorSystem;
+    @Mock
+    private NetconfClientFactory clientFactory;
+    @Mock
+    private DOMMountPointService mountPointService;
+    @Mock
+    private AAAEncryptionService encryptionService;
+    @Mock
+    private DeviceActionFactory actionFactory;
+    @Mock
+    private RpcProviderService rpcProviderService;
+    @Mock
+    private NetconfClientConfigurationBuilderFactory builderFactory;
 
     private DataBroker dataBroker;
 
@@ -110,27 +127,14 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         dataBrokerTest.setup();
         dataBroker = spy(dataBrokerTest.getDataBroker());
 
-        final Timer timer = mock(Timer.class);
-        final ScheduledExecutorService keepaliveExecutor = mock(ScheduledExecutorService.class);
-        final ExecutorService processingService = mock(ExecutorService.class);
-        final ActorSystem actorSystem = mock(ActorSystem.class);
-        final NetconfClientFactory clientFactory = mock(NetconfClientFactory.class);
-        final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
-        final AAAEncryptionService encryptionService = mock(AAAEncryptionService.class);
-        final DeviceActionFactory deviceActionFactory = mock(DeviceActionFactory.class);
-        final RpcProviderService rpcProviderService = mock(RpcProviderService.class);
-        final NetconfClientConfigurationBuilderFactory builderFactory =
-            mock(NetconfClientConfigurationBuilderFactory.class);
-
         doNothing().when(mockListenerReg).close();
         doReturn(mockListenerReg).when(dataBroker).registerDataTreeChangeListener(any(), any());
         doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any());
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
-                timer, keepaliveExecutor, processingService, actorSystem, clientFactory, mountPointService,
-                encryptionService, rpcProviderService, deviceActionFactory,
-                new DefaultSchemaResourceManager(new DefaultYangParserFactory()), builderFactory,
-                TOPOLOGY_ID, Uint16.ZERO) {
+                timer, processingService, actorSystem, clientFactory, mountPointService, encryptionService,
+                rpcProviderService, actionFactory, new DefaultSchemaResourceManager(new DefaultYangParserFactory()),
+                builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,

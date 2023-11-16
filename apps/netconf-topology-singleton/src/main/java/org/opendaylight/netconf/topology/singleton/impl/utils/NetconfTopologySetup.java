@@ -13,7 +13,6 @@ import akka.actor.ActorSystem;
 import io.netty.util.Timer;
 import java.time.Duration;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
@@ -29,7 +28,6 @@ public final class NetconfTopologySetup {
     private final InstanceIdentifier<Node> instanceIdentifier;
     private final Node node;
     private final Timer timer;
-    private final ScheduledExecutorService keepaliveExecutor;
     private final Executor processingExecutor;
     private final ActorSystem actorSystem;
     private final NetconfClientFactory netconfClientFactory;
@@ -44,7 +42,6 @@ public final class NetconfTopologySetup {
         instanceIdentifier = builder.getInstanceIdentifier();
         node = builder.getNode();
         timer = builder.getTimer();
-        keepaliveExecutor = builder.getKeepaliveExecutor();
         processingExecutor = builder.getProcessingExecutor();
         actorSystem = builder.getActorSystem();
         netconfClientFactory = builder.getNetconfClientFactory();
@@ -72,10 +69,6 @@ public final class NetconfTopologySetup {
 
     public Executor getProcessingExecutor() {
         return processingExecutor;
-    }
-
-    public ScheduledExecutorService getKeepaliveExecutor() {
-        return keepaliveExecutor;
     }
 
     public Timer getTimer() {
@@ -116,7 +109,6 @@ public final class NetconfTopologySetup {
         private InstanceIdentifier<Node> instanceIdentifier;
         private Node node;
         private Timer timer;
-        private ScheduledExecutorService keepaliveExecutor;
         private Executor processingExecutor;
         private ActorSystem actorSystem;
         private String topologyId;
@@ -185,15 +177,6 @@ public final class NetconfTopologySetup {
 
         public Builder setTimer(final Timer timer) {
             this.timer = requireNonNull(timer);
-            return this;
-        }
-
-        ScheduledExecutorService getKeepaliveExecutor() {
-            return keepaliveExecutor;
-        }
-
-        public Builder setKeepaliveExecutor(final ScheduledExecutorService keepaliveExecutor) {
-            this.keepaliveExecutor = keepaliveExecutor;
             return this;
         }
 

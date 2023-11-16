@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -49,21 +48,19 @@ public abstract class AbstractNetconfTopology {
     private final NetconfClientConfigurationBuilderFactory builderFactory;
     private final Timer timer;
 
-    protected final ScheduledExecutorService scheduledExecutor;
     protected final Executor processingExecutor;
     protected final DataBroker dataBroker;
     protected final DOMMountPointService mountPointService;
     protected final String topologyId;
 
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientFactory clientFactory,
-            final Timer timer, final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
-            final SchemaResourceManager schemaManager, final DataBroker dataBroker,
-            final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
+            final Timer timer, final Executor processingExecutor, final SchemaResourceManager schemaManager,
+            final DataBroker dataBroker, final DOMMountPointService mountPointService,
+            final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas) {
         this.topologyId = requireNonNull(topologyId);
         this.clientFactory = requireNonNull(clientFactory);
         this.timer = requireNonNull(timer);
-        this.scheduledExecutor = requireNonNull(scheduledExecutor);
         this.processingExecutor = requireNonNull(processingExecutor);
         this.schemaManager = requireNonNull(schemaManager);
         this.deviceActionFactory = deviceActionFactory;
@@ -122,9 +119,8 @@ public abstract class AbstractNetconfTopology {
 
         final NetconfNodeHandler nodeHandler;
         try {
-            nodeHandler = new NetconfNodeHandler(clientFactory, timer, scheduledExecutor, baseSchemas,
-                schemaManager, processingExecutor, builderFactory, deviceActionFactory, deviceSalFacade,
-                deviceId, nodeId, netconfNode, nodeOptional);
+            nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemas, schemaManager, processingExecutor,
+                builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode, nodeOptional);
         } catch (IllegalArgumentException e) {
             // This is a workaround for NETCONF-1114 where the encrypted password's lexical structure is not enforced
             // in the datastore and it ends up surfacing when we decrypt the password.

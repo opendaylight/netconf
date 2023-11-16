@@ -16,7 +16,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.Timer;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -69,8 +68,6 @@ class NetconfTopologyImplTest {
     @Mock
     private Timer mockedTimer;
     @Mock
-    private ScheduledExecutorService mockedScheduledExecutor;
-    @Mock
     private SchemaResourceManager mockedResourceManager;
     @Mock
     private DataBroker dataBroker;
@@ -98,8 +95,8 @@ class NetconfTopologyImplTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(), mockedClientFactory,
-            mockedTimer, mockedScheduledExecutor, MoreExecutors.directExecutor(), mockedResourceManager, dataBroker,
-            mountPointService, encryptionService, builderFactory, rpcProviderService,
+            mockedTimer, MoreExecutors.directExecutor(), mockedResourceManager, dataBroker, mountPointService,
+            encryptionService, builderFactory, rpcProviderService,
             new DefaultBaseNetconfSchemas(new DefaultYangParserFactory()));
         //verify initialization of topology
         verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, TOPOLOGY_PATH,
@@ -152,12 +149,12 @@ class NetconfTopologyImplTest {
 
     private static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
         TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
-                final ScheduledExecutorService scheduledExecutor, final Executor processingExecutor,
-                final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
-                final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
+                final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
+                final DataBroker dataBroker, final DOMMountPointService mountPointService,
+                final AAAEncryptionService encryptionService,
                 final NetconfClientConfigurationBuilderFactory builderFactory,
                 final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas) {
-            super(topologyId, clientFactory, timer, scheduledExecutor, processingExecutor, schemaRepositoryProvider,
+            super(topologyId, clientFactory, timer, processingExecutor, schemaRepositoryProvider,
                 dataBroker, mountPointService, encryptionService, builderFactory, rpcProviderService, baseSchemas);
         }
 
