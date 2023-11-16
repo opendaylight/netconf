@@ -7,19 +7,18 @@
  */
 package org.opendaylight.netconf.api.messages;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Test;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
-public class HelloMessageTest {
+class HelloMessageTest {
     @Test
-    public void testConstructor() throws NetconfDocumentedException {
+    void testConstructor() {
         var caps = Set.of("cap1");
         var additionalHeader = new NetconfHelloMessageAdditionalHeader("name", "host", "1", "transp", "id");
         var message = HelloMessage.createClientHello(caps, Optional.of(additionalHeader));

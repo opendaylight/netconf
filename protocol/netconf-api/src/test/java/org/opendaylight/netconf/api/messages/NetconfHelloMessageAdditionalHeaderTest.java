@@ -7,16 +7,16 @@
  */
 package org.opendaylight.netconf.api.messages;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class NetconfHelloMessageAdditionalHeaderTest {
+class NetconfHelloMessageAdditionalHeaderTest {
     private final NetconfHelloMessageAdditionalHeader header =
         new NetconfHelloMessageAdditionalHeader("user", "1.1.1.1", "40", "tcp", "client");
 
     @Test
-    public void testGetters() {
+    void testGetters() {
         assertEquals(header.getAddress(), "1.1.1.1");
         assertEquals(header.getUserName(), "user");
         assertEquals(header.getPort(), "40");
@@ -25,7 +25,7 @@ public class NetconfHelloMessageAdditionalHeaderTest {
     }
 
     @Test
-    public void testStaticConstructor() {
+    void testStaticConstructor() {
         final var hdr = NetconfHelloMessageAdditionalHeader.fromString("[user;1.1.1.1:40;tcp;client;]");
         assertEquals(hdr.toString(), header.toString());
         assertEquals(hdr.toFormattedString(), header.toFormattedString());

@@ -7,17 +7,17 @@
  */
 package org.opendaylight.netconf.api.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXParseException;
 import org.xmlunit.builder.Input;
 import org.xmlunit.builder.Transform;
 
-public class XmlUtilTest {
+class XmlUtilTest {
     @Test
-    public void testXXEFlaw() {
+    void testXXEFlaw() {
         assertThrows(SAXParseException.class, () -> XmlUtil.readXmlToDocument("""
             <!DOCTYPE foo [\s\s
             <!ELEMENT foo ANY >
@@ -30,7 +30,7 @@ public class XmlUtilTest {
     }
 
     @Test
-    public void testEmptyLines() throws Exception {
+    void testEmptyLines() throws Exception {
         // Adapted from https://bugs.openjdk.org/secure/attachment/93338/XmlBugExample.java
         final var input = """
             <users>

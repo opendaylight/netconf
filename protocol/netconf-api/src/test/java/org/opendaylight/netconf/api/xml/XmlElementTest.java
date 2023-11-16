@@ -7,20 +7,19 @@
  */
 package org.opendaylight.netconf.api.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class XmlElementTest {
+class XmlElementTest {
     private static final String ELEMENT_AS_STRING = """
         <top xmlns="namespace" xmlns:a="attrNamespace" a:attr1="value1" attr2="value2">
           <inner>
@@ -29,20 +28,20 @@ public class XmlElementTest {
           <innerNamespace xmlns="innerNamespace">innerNamespaceValue</innerNamespace>
           <innerPrefixed xmlns:b="prefixedValueNamespace">b:valueWithPrefix</innerPrefixed>
         </top>""";
-    private Document document;
-    private Element element;
-    private XmlElement xmlElement;
 
-    @Before
-    public void setUp() throws Exception {
+    private final Document document;
+    private final Element element;
+    private final XmlElement xmlElement;
+
+    XmlElementTest() throws Exception {
         document = XmlUtil.readXmlToDocument(ELEMENT_AS_STRING);
         element = document.getDocumentElement();
         xmlElement = XmlElement.fromDomElement(element);
     }
 
     @Test
-    public void testConstruct() throws Exception {
-        final XmlElement fromString = XmlElement.fromString(ELEMENT_AS_STRING);
+    void testConstruct() throws Exception {
+        final var fromString = XmlElement.fromString(ELEMENT_AS_STRING);
         assertEquals(fromString, xmlElement);
         XmlElement.fromDomDocument(document);
         XmlElement.fromDomElement(element);
@@ -56,7 +55,7 @@ public class XmlElementTest {
     }
 
     @Test
-    public void testGetters() throws Exception {
+    void testGetters() throws Exception {
         assertEquals(element, xmlElement.getDomElement());
         assertEquals(element.getElementsByTagName("inner").getLength(),
                 xmlElement.getElementsByTagName("inner").getLength());
@@ -75,10 +74,10 @@ public class XmlElementTest {
         assertTrue(xmlElement.getOnlyChildElementOptionally("inner").isPresent());
         assertTrue(xmlElement.getOnlyChildElementWithSameNamespaceOptionally("inner").isPresent());
         assertEquals(0, xmlElement.getChildElements("unknown").size());
-        assertFalse(xmlElement.getOnlyChildElementOptionally("unknown").isPresent());
+        assertEquals(Optional.empty(), xmlElement.getOnlyChildElementOptionally("unknown"));
         assertEquals(1, xmlElement.getChildElementsWithinNamespace("innerNamespace", "innerNamespace").size());
         assertTrue(xmlElement.getOnlyChildElementOptionally("innerNamespace", "innerNamespace").isPresent());
-        assertFalse(xmlElement.getOnlyChildElementOptionally("innerNamespace", "unknownNamespace").isPresent());
+        assertEquals(Optional.empty(), xmlElement.getOnlyChildElementOptionally("innerNamespace", "unknownNamespace"));
 
         final var noNamespaceElement = XmlElement.fromString("<noNamespace/>");
         assertFalse(noNamespaceElement.hasNamespace());
@@ -95,7 +94,7 @@ public class XmlElementTest {
     }
 
     @Test
-    public void testExtractNamespaces() throws Exception {
+    void testExtractNamespaces() throws Exception {
         final var innerPrefixed = xmlElement.getOnlyChildElement("innerPrefixed");
         var namespaceOfTextContent = innerPrefixed.findNamespaceOfTextContent();
 

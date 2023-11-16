@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.google.common.collect.Iterators;
 import java.util.Iterator;
@@ -18,98 +19,88 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
 
 /**
  * Unit tests for NetconfDocumentedException.
  *
  * @author Thomas Pantelis
  */
-public class NetconfDocumentedExceptionTest {
+class NetconfDocumentedExceptionTest {
+    private static final XPathFactory FACTORY = XPathFactory.newInstance();
+    private static final NamespaceContext NS_CONTEXT = new NamespaceContext() {
+        @Override
+        public Iterator<String> getPrefixes(final String namespaceURI) {
+            return Iterators.singletonIterator("netconf");
+        }
 
-    private XPath xpath;
+        @Override
+        public String getPrefix(final String namespaceURI) {
+            assertEquals(NamespaceURN.BASE, namespaceURI);
+            return "netconf";
+        }
 
-    @Before
-    public void setUp() throws Exception {
-        final XPathFactory xPathfactory = XPathFactory.newInstance();
-        xpath = xPathfactory.newXPath();
-        xpath.setNamespaceContext(new NamespaceContext() {
-            @Override
-            public Iterator<String> getPrefixes(final String namespaceURI) {
-                return Iterators.singletonIterator("netconf");
-            }
+        @Override
+        public String getNamespaceURI(final String prefix) {
+            return NamespaceURN.BASE;
+        }
+    };
 
-            @Override
-            public String getPrefix(final String namespaceURI) {
-                return "netconf";
-            }
+    private final XPath xpath;
 
-            @Override
-            public String getNamespaceURI(final String prefix) {
-                return NamespaceURN.BASE;
-            }
-        });
+    NetconfDocumentedExceptionTest() {
+        xpath = FACTORY.newXPath();
+        xpath.setNamespaceContext(NS_CONTEXT);
     }
 
     @Test
-    public void testToAndFromXMLDocument() throws XPathExpressionException {
-        final String errorMessage = "mock error message";
-        DocumentedException ex = new NetconfDocumentedException(errorMessage, null, ErrorType.PROTOCOL,
-                ErrorTag.DATA_EXISTS, ErrorSeverity.WARNING, Map.of("foo", "bar"));
+    void testToAndFromXMLDocument() {
+        final var errorMessage = "mock error message";
+        final var doc = new NetconfDocumentedException(errorMessage, null, ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
+            ErrorSeverity.WARNING, Map.of("foo", "bar"))
+            .toXMLDocument();
+        assertNotNull(doc);
 
-        final Document doc = ex.toXMLDocument();
-        assertNotNull("Document is null", doc);
+        final var rootNode = doc.getDocumentElement();
+        assertEquals("urn:ietf:params:xml:ns:netconf:base:1.0", rootNode.getNamespaceURI());
+        assertEquals("rpc-reply", rootNode.getLocalName());
 
-        final Node rootNode = doc.getDocumentElement();
+        final var rpcErrorNode = assertNode("/netconf:rpc-reply/netconf:rpc-error", rootNode);
+        final var errorTypeNode = assertNode("netconf:error-type", rpcErrorNode);
+        assertEquals(ErrorType.PROTOCOL.elementBody(), errorTypeNode.getTextContent());
 
-        assertEquals("getNamespaceURI", "urn:ietf:params:xml:ns:netconf:base:1.0", rootNode.getNamespaceURI());
-        assertEquals("getLocalName", "rpc-reply", rootNode.getLocalName());
+        final var errorTagNode = assertNode("netconf:error-tag", rpcErrorNode);
+        assertEquals(ErrorTag.DATA_EXISTS.elementBody(), errorTagNode.getTextContent());
 
-        final Node rpcErrorNode = getNode("/netconf:rpc-reply/netconf:rpc-error", rootNode);
-        assertNotNull("rpc-error not found", rpcErrorNode);
+        final var errorSeverityNode = assertNode("netconf:error-severity", rpcErrorNode);
+        assertEquals(ErrorSeverity.WARNING.elementBody(), errorSeverityNode.getTextContent());
 
-        final Node errorTypeNode = getNode("netconf:error-type", rpcErrorNode);
-        assertNotNull("error-type not found", errorTypeNode);
-        assertEquals("error-type", ErrorType.PROTOCOL.elementBody(), errorTypeNode.getTextContent());
+        final var errorInfoNode = assertNode("netconf:error-info/netconf:foo", rpcErrorNode);
+        assertEquals("bar", errorInfoNode.getTextContent());
 
-        final Node errorTagNode = getNode("netconf:error-tag", rpcErrorNode);
-        assertNotNull("error-tag not found", errorTagNode);
-        assertEquals("error-tag", ErrorTag.DATA_EXISTS.elementBody(), errorTagNode.getTextContent());
-
-        final Node errorSeverityNode = getNode("netconf:error-severity", rpcErrorNode);
-        assertNotNull("error-severity not found", errorSeverityNode);
-        assertEquals("error-severity", ErrorSeverity.WARNING.elementBody(), errorSeverityNode.getTextContent());
-
-        final Node errorInfoNode = getNode("netconf:error-info/netconf:foo", rpcErrorNode);
-        assertNotNull("foo not found", errorInfoNode);
-        assertEquals("foo", "bar", errorInfoNode.getTextContent());
-
-        final Node errorMsgNode = getNode("netconf:error-message", rpcErrorNode);
-        assertNotNull("error-message not found", errorMsgNode);
-        assertEquals("error-message", errorMessage, errorMsgNode.getTextContent());
+        final var errorMsgNode = assertNode("netconf:error-message", rpcErrorNode);
+        assertEquals(errorMessage, errorMsgNode.getTextContent());
 
         // Test fromXMLDocument
-
-        ex = DocumentedException.fromXMLDocument(doc);
-
-        assertNotNull("NetconfDocumentedException is null", ex);
-        assertEquals("getErrorSeverity", ErrorSeverity.WARNING, ex.getErrorSeverity());
-        assertEquals("getErrorTag", ErrorTag.DATA_EXISTS, ex.getErrorTag());
-        assertEquals("getErrorType", ErrorType.PROTOCOL, ex.getErrorType());
-        assertEquals("getLocalizedMessage", errorMessage, ex.getLocalizedMessage());
-        assertEquals("getErrorInfo", Map.of("foo", "bar"), ex.getErrorInfo());
+        final var de = DocumentedException.fromXMLDocument(doc);
+        assertNotNull(de);
+        assertEquals(ErrorSeverity.WARNING, de.getErrorSeverity());
+        assertEquals(ErrorTag.DATA_EXISTS, de.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, de.getErrorType());
+        assertEquals(errorMessage, de.getLocalizedMessage());
+        assertEquals(Map.of("foo", "bar"), de.getErrorInfo());
     }
 
-    @SuppressWarnings("unchecked")
-    <T> T getNode(final String xpathExp, final Node node) throws XPathExpressionException {
-        return (T) xpath.compile(xpathExp).evaluate(node, XPathConstants.NODE);
+    Node assertNode(final String xpathExp, final Node item) {
+        try {
+            return assertInstanceOf(Node.class, xpath.compile(xpathExp).evaluate(item, XPathConstants.NODE));
+        } catch (XPathExpressionException e) {
+            throw new AssertionError(e);
+        }
     }
 }
 
