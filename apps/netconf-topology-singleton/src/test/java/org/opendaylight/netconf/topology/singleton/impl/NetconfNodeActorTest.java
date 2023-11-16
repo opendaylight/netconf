@@ -92,7 +92,6 @@ import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringActionException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
-import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
 import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
@@ -181,7 +180,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         doReturn(masterSchemaRepository).when(schemaResourceDTO).getSchemaRepository();
         doReturn(mockRegistry).when(schemaResourceDTO).getSchemaRegistry();
-        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create()
+        final NetconfTopologySetup setup = NetconfTopologySetup.builder()
             .setActorSystem(system)
             .setIdleTimeout(Duration.ofSeconds(1))
             .setSchemaResourceDTO(schemaResourceDTO)
@@ -221,7 +220,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final RemoteDeviceId newRemoteDeviceId = new RemoteDeviceId("netconf-topology2",
                 new InetSocketAddress(InetAddresses.forString("127.0.0.2"), 9999));
 
-        final NetconfTopologySetup newSetup = NetconfTopologySetupBuilder.create()
+        final NetconfTopologySetup newSetup = NetconfTopologySetup.builder()
             .setBaseSchemas(BASE_SCHEMAS)
             .setSchemaResourceDTO(schemaResourceDTO)
             .setActorSystem(system)
@@ -331,7 +330,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
-        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create()
+        final NetconfTopologySetup setup = NetconfTopologySetup.builder()
                 .setSchemaResourceDTO(schemaResourceDTO2)
                 .setBaseSchemas(BASE_SCHEMAS)
                 .setActorSystem(system)
@@ -414,7 +413,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(repository).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(repository).when(schemaResourceDTO2).getSchemaRepository();
-        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create()
+        final NetconfTopologySetup setup = NetconfTopologySetup.builder()
             .setActorSystem(system)
             .setSchemaResourceDTO(schemaResourceDTO2)
             .setIdleTimeout(Duration.ofSeconds(1))
@@ -664,7 +663,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
-        final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(NetconfTopologySetupBuilder.create()
+        final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(NetconfTopologySetup.builder()
                 .setSchemaResourceDTO(schemaResourceDTO2)
                 .setActorSystem(system)
                 .setBaseSchemas(BASE_SCHEMAS)

@@ -33,8 +33,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
-import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
@@ -183,16 +181,24 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final String TEST_ROOT_DIRECTORY = "test-cache-root";
     private static final String TEST_DEFAULT_SUBDIR = "test-schema";
 
-    @Mock private RpcProviderService mockRpcProviderService;
-    @Mock private Registration mockRpcReg;
-    @Mock private NetconfClientFactory mockClientFactory;
-    @Mock private AAAEncryptionService mockEncryptionService;
-    @Mock private ScheduledExecutorService mockKeepaliveExecutor;
-    @Mock private DeviceActionFactory deviceActionFactory;
-    @Mock private CredentialProvider credentialProvider;
-    @Mock private SslHandlerFactoryProvider sslHandlerFactoryProvider;
-
-    @Mock private DOMMountPointListener masterMountPointListener;
+    @Mock
+    private RpcProviderService mockRpcProviderService;
+    @Mock
+    private Registration mockRpcReg;
+    @Mock
+    private NetconfClientFactory mockClientFactory;
+    @Mock
+    private AAAEncryptionService mockEncryptionService;
+    @Mock
+    private ScheduledExecutorService mockKeepaliveExecutor;
+    @Mock
+    private DeviceActionFactory deviceActionFactory;
+    @Mock
+    private CredentialProvider credentialProvider;
+    @Mock
+    private SslHandlerFactoryProvider sslHandlerFactoryProvider;
+    @Mock
+    private DOMMountPointListener masterMountPointListener;
     private final DOMMountPointService masterMountPointService = new DOMMountPointServiceImpl();
     private Rpcs.Normalized deviceRpcService;
 
@@ -204,9 +210,12 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
     private volatile SettableFuture<MasterSalFacade> masterSalFacadeFuture = SettableFuture.create();
 
-    @Mock private ClusterSingletonServiceProvider mockSlaveClusterSingletonServiceProvider;
-    @Mock private ClusterSingletonServiceRegistration mockSlaveClusterSingletonServiceReg;
-    @Mock private DOMMountPointListener slaveMountPointListener;
+    @Mock
+    private ClusterSingletonServiceProvider mockSlaveClusterSingletonServiceProvider;
+    @Mock
+    private ClusterSingletonServiceRegistration mockSlaveClusterSingletonServiceReg;
+    @Mock
+    private DOMMountPointListener slaveMountPointListener;
     private final DOMMountPointService slaveMountPointService = new DOMMountPointServiceImpl();
     private DataBroker slaveDataBroker;
     private ActorSystem slaveSystem;
@@ -215,7 +224,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private TransactionChain slaveTxChain;
 
     private NetconfClientConfigurationBuilderFactory builderFactory;
-    private final EventExecutor eventExecutor = GlobalEventExecutor.INSTANCE;
     private EffectiveModelContext deviceSchemaContext;
     private YangModuleInfo topModuleInfo;
     private QName putTopRpcSchemaPath;
@@ -307,9 +315,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
                 masterClusterSingletonServiceProvider, mockKeepaliveExecutor, MoreExecutors.directExecutor(),
-                masterSystem, eventExecutor, mockClientFactory, masterMountPointService,
-                mockEncryptionService, mockRpcProviderService, deviceActionFactory, resourceManager, builderFactory,
-                TOPOLOGY_ID, Uint16.ZERO) {
+                masterSystem, mockClientFactory, masterMountPointService, mockEncryptionService, mockRpcProviderService,
+                deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                     final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -344,9 +351,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         slaveNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, slaveDataBroker,
                 mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, MoreExecutors.directExecutor(),
-                slaveSystem, eventExecutor, mockClientFactory, slaveMountPointService,
-                mockEncryptionService, mockRpcProviderService, deviceActionFactory, resourceManager, builderFactory,
-                TOPOLOGY_ID, Uint16.ZERO) {
+                slaveSystem, mockClientFactory, slaveMountPointService, mockEncryptionService, mockRpcProviderService,
+                deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,

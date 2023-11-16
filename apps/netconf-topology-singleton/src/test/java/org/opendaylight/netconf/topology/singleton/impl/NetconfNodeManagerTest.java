@@ -158,7 +158,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class, 1)))
         .collect(Collectors.toList());
 
-        NetconfTopologySetup masterSetup = new NetconfTopologySetup.NetconfTopologySetupBuilder()
+        NetconfTopologySetup masterSetup = NetconfTopologySetup.builder()
                 .setActorSystem(masterSystem)
                 .setDataBroker(mockDataBroker)
                 .setSchemaResourceDTO(new NetconfDevice.SchemaResourcesDTO(
@@ -174,7 +174,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         slaveSchemaRepository.registerSchemaSourceListener(
                 TextToIRTransformer.create(slaveSchemaRepository, slaveSchemaRepository));
 
-        NetconfTopologySetup slaveSetup = new NetconfTopologySetup.NetconfTopologySetupBuilder()
+        NetconfTopologySetup slaveSetup = NetconfTopologySetup.builder()
                 .setActorSystem(slaveSystem)
                 .setDataBroker(mockDataBroker)
                 .setSchemaResourceDTO(new NetconfDevice.SchemaResourcesDTO(

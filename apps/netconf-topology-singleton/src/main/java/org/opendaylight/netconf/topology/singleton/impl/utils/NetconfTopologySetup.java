@@ -10,10 +10,10 @@ package org.opendaylight.netconf.topology.singleton.impl.utils;
 import static java.util.Objects.requireNonNull;
 
 import akka.actor.ActorSystem;
-import io.netty.util.concurrent.EventExecutor;
 import java.time.Duration;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientFactory;
@@ -22,7 +22,7 @@ import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NetconfTopologySetup {
+public final class NetconfTopologySetup {
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
     private final DataBroker dataBroker;
     private final InstanceIdentifier<Node> instanceIdentifier;
@@ -30,14 +30,13 @@ public class NetconfTopologySetup {
     private final ScheduledExecutorService keepaliveExecutor;
     private final Executor processingExecutor;
     private final ActorSystem actorSystem;
-    private final EventExecutor eventExecutor;
     private final NetconfClientFactory netconfClientFactory;
     private final String topologyId;
     private final NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
     private final Duration idleTimeout;
     private final BaseNetconfSchemas baseSchemas;
 
-    NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
+    private NetconfTopologySetup(final Builder builder) {
         clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
         dataBroker = builder.getDataBroker();
         instanceIdentifier = builder.getInstanceIdentifier();
@@ -45,7 +44,6 @@ public class NetconfTopologySetup {
         keepaliveExecutor = builder.getKeepaliveExecutor();
         processingExecutor = builder.getProcessingExecutor();
         actorSystem = builder.getActorSystem();
-        eventExecutor = builder.getEventExecutor();
         netconfClientFactory = builder.getNetconfClientFactory();
         topologyId = builder.getTopologyId();
         schemaResourceDTO = builder.getSchemaResourceDTO();
@@ -81,10 +79,6 @@ public class NetconfTopologySetup {
         return actorSystem;
     }
 
-    public EventExecutor getEventExecutor() {
-        return eventExecutor;
-    }
-
     public String getTopologyId() {
         return topologyId;
     }
@@ -105,7 +99,11 @@ public class NetconfTopologySetup {
         return baseSchemas;
     }
 
-    public static class NetconfTopologySetupBuilder {
+    public static @NonNull Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
         private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
         private DataBroker dataBroker;
         private InstanceIdentifier<Node> instanceIdentifier;
@@ -113,22 +111,21 @@ public class NetconfTopologySetup {
         private ScheduledExecutorService keepaliveExecutor;
         private Executor processingExecutor;
         private ActorSystem actorSystem;
-        private EventExecutor eventExecutor;
         private String topologyId;
         private NetconfClientFactory netconfClientFactory;
         private NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
         private Duration idleTimeout;
         private BaseNetconfSchemas baseSchemas;
 
-        public NetconfTopologySetupBuilder() {
-
+        private Builder() {
+            // Hidden on purpose
         }
 
         BaseNetconfSchemas getBaseSchemas() {
             return requireNonNull(baseSchemas, "BaseSchemas not initialized");
         }
 
-        public NetconfTopologySetupBuilder setBaseSchemas(final BaseNetconfSchemas baseSchemas) {
+        public Builder setBaseSchemas(final BaseNetconfSchemas baseSchemas) {
             this.baseSchemas = requireNonNull(baseSchemas);
             return this;
         }
@@ -137,7 +134,7 @@ public class NetconfTopologySetup {
             return clusterSingletonServiceProvider;
         }
 
-        public NetconfTopologySetupBuilder setClusterSingletonServiceProvider(
+        public Builder setClusterSingletonServiceProvider(
                 final ClusterSingletonServiceProvider clusterSingletonServiceProvider) {
             this.clusterSingletonServiceProvider = clusterSingletonServiceProvider;
             return this;
@@ -147,7 +144,7 @@ public class NetconfTopologySetup {
             return dataBroker;
         }
 
-        public NetconfTopologySetupBuilder setDataBroker(final DataBroker dataBroker) {
+        public Builder setDataBroker(final DataBroker dataBroker) {
             this.dataBroker = dataBroker;
             return this;
         }
@@ -156,7 +153,7 @@ public class NetconfTopologySetup {
             return instanceIdentifier;
         }
 
-        public NetconfTopologySetupBuilder setInstanceIdentifier(final InstanceIdentifier<Node> instanceIdentifier) {
+        public Builder setInstanceIdentifier(final InstanceIdentifier<Node> instanceIdentifier) {
             this.instanceIdentifier = instanceIdentifier;
             return this;
         }
@@ -165,7 +162,7 @@ public class NetconfTopologySetup {
             return node;
         }
 
-        public NetconfTopologySetupBuilder setNode(final Node node) {
+        public Builder setNode(final Node node) {
             this.node = node;
             return this;
         }
@@ -178,7 +175,7 @@ public class NetconfTopologySetup {
             return keepaliveExecutor;
         }
 
-        public NetconfTopologySetupBuilder setKeepaliveExecutor(final ScheduledExecutorService keepaliveExecutor) {
+        public Builder setKeepaliveExecutor(final ScheduledExecutorService keepaliveExecutor) {
             this.keepaliveExecutor = keepaliveExecutor;
             return this;
         }
@@ -187,7 +184,7 @@ public class NetconfTopologySetup {
             return processingExecutor;
         }
 
-        public NetconfTopologySetupBuilder setProcessingExecutor(final Executor processingExecutor) {
+        public Builder setProcessingExecutor(final Executor processingExecutor) {
             this.processingExecutor = processingExecutor;
             return this;
         }
@@ -196,17 +193,8 @@ public class NetconfTopologySetup {
             return actorSystem;
         }
 
-        public NetconfTopologySetupBuilder setActorSystem(final ActorSystem actorSystem) {
+        public Builder setActorSystem(final ActorSystem actorSystem) {
             this.actorSystem = actorSystem;
-            return this;
-        }
-
-        EventExecutor getEventExecutor() {
-            return eventExecutor;
-        }
-
-        public NetconfTopologySetupBuilder setEventExecutor(final EventExecutor eventExecutor) {
-            this.eventExecutor = eventExecutor;
             return this;
         }
 
@@ -214,7 +202,7 @@ public class NetconfTopologySetup {
             return topologyId;
         }
 
-        public NetconfTopologySetupBuilder setTopologyId(final String topologyId) {
+        public Builder setTopologyId(final String topologyId) {
             this.topologyId = topologyId;
             return this;
         }
@@ -223,12 +211,12 @@ public class NetconfTopologySetup {
             return netconfClientFactory;
         }
 
-        public NetconfTopologySetupBuilder setNetconfClientFactory(final NetconfClientFactory clientFactory) {
+        public Builder setNetconfClientFactory(final NetconfClientFactory clientFactory) {
             netconfClientFactory = clientFactory;
             return this;
         }
 
-        public NetconfTopologySetupBuilder setSchemaResourceDTO(
+        public Builder setSchemaResourceDTO(
                 final NetconfDevice.SchemaResourcesDTO schemaResourceDTO) {
             this.schemaResourceDTO = schemaResourceDTO;
             return this;
@@ -238,17 +226,13 @@ public class NetconfTopologySetup {
             return schemaResourceDTO;
         }
 
-        public NetconfTopologySetupBuilder setIdleTimeout(final Duration idleTimeout) {
+        public Builder setIdleTimeout(final Duration idleTimeout) {
             this.idleTimeout = idleTimeout;
             return this;
         }
 
         Duration getIdleTimeout() {
             return idleTimeout;
-        }
-
-        public static NetconfTopologySetupBuilder create() {
-            return new NetconfTopologySetupBuilder();
         }
     }
 }
