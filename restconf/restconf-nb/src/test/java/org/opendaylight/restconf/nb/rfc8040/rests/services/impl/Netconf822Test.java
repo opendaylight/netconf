@@ -47,7 +47,8 @@ public class Netconf822Test {
                 "foo:new1": [null]
               }
             }""",
-            MdsalRestconfServer.operationsGET(OperationsContent.JSON, SchemaInferenceStack.of(SCHEMA, NEW1).toInference()));
+            MdsalRestconfServer.operationsGET(OperationsContent.JSON,
+                SchemaInferenceStack.of(SCHEMA, NEW1).toInference()));
     }
 
     @Test
