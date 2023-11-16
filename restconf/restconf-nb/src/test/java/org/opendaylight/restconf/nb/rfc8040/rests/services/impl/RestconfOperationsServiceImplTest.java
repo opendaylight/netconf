@@ -49,7 +49,7 @@ public class RestconfOperationsServiceImplTest {
         <?xml version="1.0" encoding="UTF-8"?>
         <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"
                     xmlns:ns0="module:1"
-                    xmlns:ns1="module:2" >
+                    xmlns:ns1="module:2">
           <ns0:dummy-rpc1-module1/>
           <ns0:dummy-rpc2-module1/>
           <ns1:dummy-rpc1-module2/>
@@ -129,7 +129,7 @@ public class RestconfOperationsServiceImplTest {
         assertEquals("""
             <?xml version="1.0" encoding="UTF-8"?>
             <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"
-                        xmlns:ns0="module:1" >
+                        xmlns:ns0="module:1">
               <ns0:dummy-rpc1-module1/>
             </operations>""", operationXML);
     }

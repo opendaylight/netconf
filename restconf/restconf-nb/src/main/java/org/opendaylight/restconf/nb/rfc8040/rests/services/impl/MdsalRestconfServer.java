@@ -11,14 +11,18 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -37,6 +41,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.server.api.OperationsContent;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.OperationOutput;
@@ -47,13 +52,14 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -103,10 +109,10 @@ public final class MdsalRestconfServer implements RestconfServer {
         this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
     }
 
-    public MdsalRestconfServer(final DatabindProvider databind, final DOMDataBroker dataBroker,
+    public MdsalRestconfServer(final DatabindProvider databindProvider, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMMountPointService mountPointService,
             final RpcImplementation... localRpcs) {
-        this(databind, dataBroker, rpcService, mountPointService, List.of(localRpcs));
+        this(databindProvider, dataBroker, rpcService, mountPointService, List.of(localRpcs));
     }
 
     @NonNull InstanceIdentifierContext bindRequestPath(final String identifier) {
@@ -132,52 +138,57 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public String operationsGET(final OperationsContent contentType) {
-        return operationsGET(contentType, bindRequestRoot().inference());
+    public OperationsContent operationsGET() {
+        return operationsGET(databindProvider.currentContext().modelContext());
     }
 
     @Override
-    public String operationsGET(final OperationsContent contentType, final String operation) {
-        return operationsGET(contentType, bindRequestPath(operation).inference());
+    public OperationsContent operationsGET(final String operation) {
+        // get current module RPCs/actions by RPC/action name
+        final var inference = bindRequestPath(operation).inference();
+        if (inference.isEmpty()) {
+            return operationsGET(inference.getEffectiveModelContext());
+        }
+
+        final var stmt = inference.toSchemaInferenceStack().currentStatement();
+        if (stmt instanceof RpcEffectiveStatement rpc) {
+            final var qname = rpc.argument();
+            return new OperationsContent(inference.getEffectiveModelContext(),
+                ImmutableSetMultimap.of(qname.getModule(), qname));
+        }
+        LOG.debug("Operation '{}' resulted in non-RPC {}", operation, stmt);
+        return null;
     }
 
-    @VisibleForTesting
-    static @NonNull String operationsGET(final OperationsContent contentType, final @NonNull Inference inference) {
-        final var modelContext = inference.getEffectiveModelContext();
-        if (modelContext.getModuleStatements().isEmpty()) {
+    private static @NonNull OperationsContent operationsGET(final EffectiveModelContext modelContext) {
+        final var modules = modelContext.getModuleStatements();
+        if (modules.isEmpty()) {
             // No modules, or defensive return empty content
-            return contentType.emptyBody;
-        }
-        if (inference.isEmpty()) {
-            // empty stack == get all RPCs/actions
-            return contentType.createBody(contentType.getModuleRpcs(modelContext, modelContext.getModuleStatements()));
+            return new OperationsContent(modelContext, ImmutableSetMultimap.of());
         }
 
-        // get current module RPCs/actions by RPC/action name
-        final var stack = inference.toSchemaInferenceStack();
-        final var currentModule = stack.currentModule();
-        final var currentModuleKey = Map.of(currentModule.localQNameModule(), currentModule);
-
-        final QName qname;
-        final var stmt = stack.currentStatement();
-        if (stmt instanceof RpcEffectiveStatement rpc) {
-            qname = rpc.argument();
-        } else if (stmt instanceof ActionEffectiveStatement action) {
-            qname = action.argument();
-        } else {
-            throw new IllegalArgumentException("Unhandled statement " + stmt);
+        // RPCs by their XMLNamespace/Revision
+        final var table = HashBasedTable.<XMLNamespace, Revision, ImmutableSet<QName>>create();
+        for (var entry : modules.entrySet()) {
+            final var module = entry.getValue();
+            final var rpcNames = module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
+                .map(RpcEffectiveStatement::argument)
+                .collect(ImmutableSet.toImmutableSet());
+            if (!rpcNames.isEmpty()) {
+                final var namespace = entry.getKey();
+                table.put(namespace.getNamespace(), namespace.getRevision().orElse(null), rpcNames);
+            }
         }
 
-        final var operName = qname.getLocalName();
-        // FIXME: This is weird: it only handles rpc statements, not action statements. What is going on here?!
-        //        There is a reason this sort of method should handle both RPCs and actions, which is the invocation
-        //        remapping -- e.g. RFC8528 specifies how 'action' invocation is mappend to 'rpc' invocation.
-        //        There is something fishy going on here and we either have a bug, or the spec needs to be clarified.
-        return contentType.getModuleRpcs(modelContext, currentModuleKey).stream()
-            .findFirst()
-            .map(e -> Map.entry(e.getKey(), e.getValue().stream().filter(operName::equals).toList()))
-            .map(e -> contentType.createBody(List.of(e)))
-            .orElse(contentType.emptyBody);
+        // Now pick the latest revision for each namespace
+        final var rpcs = ImmutableSetMultimap.<QNameModule, QName>builder();
+        for (var entry : table.rowMap().entrySet()) {
+            entry.getValue().entrySet().stream()
+                .sorted(Comparator.comparing(Entry::getKey, (first, second) -> Revision.compare(second, first)))
+                .findFirst()
+                .ifPresent(row -> rpcs.putAll(QNameModule.create(entry.getKey(), row.getKey()), row.getValue()));
+        }
+        return new OperationsContent(modelContext, rpcs.build());
     }
 
     @Override
