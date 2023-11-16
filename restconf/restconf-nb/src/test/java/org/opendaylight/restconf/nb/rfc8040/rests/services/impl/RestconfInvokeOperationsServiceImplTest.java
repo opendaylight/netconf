@@ -102,7 +102,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         prepNNC(result);
         final var ar = mock(AsyncResponse.class);
         final var captor = ArgumentCaptor.forClass(Response.class);
-        invokeOperationsService.invokeRpcXML("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
+        invokeOperationsService.operationsPostXML("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
             <input xmlns="invoke:rpc:module"/>
             """.getBytes(StandardCharsets.UTF_8)), mock(UriInfo.class), ar);
         verify(ar).resume(captor.capture());
@@ -121,7 +121,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         prepNNC(result);
         final var ar = mock(AsyncResponse.class);
         final var response = ArgumentCaptor.forClass(Response.class);
-        invokeOperationsService.invokeRpcJSON("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
+        invokeOperationsService.operationsPostJSON("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
             {
               "invoke-rpc-module:input" : {
               }
