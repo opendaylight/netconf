@@ -42,7 +42,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.io.FileUtils;
@@ -193,8 +192,6 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     @Mock
     private Timer mockTimer;
     @Mock
-    private ScheduledExecutorService mockKeepaliveExecutor;
-    @Mock
     private DeviceActionFactory deviceActionFactory;
     @Mock
     private CredentialProvider credentialProvider;
@@ -317,8 +314,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 YangTextSchemaSource.class, 1));
 
         masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
-                masterClusterSingletonServiceProvider, mockTimer, mockKeepaliveExecutor, MoreExecutors.directExecutor(),
-                masterSystem, mockClientFactory, masterMountPointService, mockEncryptionService, mockRpcProviderService,
+                masterClusterSingletonServiceProvider, mockTimer, MoreExecutors.directExecutor(), masterSystem,
+                mockClientFactory, masterMountPointService, mockEncryptionService, mockRpcProviderService,
                 deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
@@ -353,10 +350,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 .registerClusterSingletonService(any());
 
         slaveNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, slaveDataBroker,
-                mockSlaveClusterSingletonServiceProvider, mockTimer, mockKeepaliveExecutor,
-                MoreExecutors.directExecutor(), slaveSystem, mockClientFactory, slaveMountPointService,
-                mockEncryptionService, mockRpcProviderService, deviceActionFactory, resourceManager, builderFactory,
-                TOPOLOGY_ID, Uint16.ZERO) {
+                mockSlaveClusterSingletonServiceProvider, mockTimer, MoreExecutors.directExecutor(), slaveSystem,
+                mockClientFactory, slaveMountPointService, mockEncryptionService, mockRpcProviderService,
+                deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,

@@ -21,13 +21,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -99,7 +97,6 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     private final DataBroker dataBroker;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
     private final Timer timer;
-    private final ScheduledExecutorService keepaliveExecutor;
     private final Executor processingExecutor;
     private final ActorSystem actorSystem;
     private final NetconfClientFactory clientFactory;
@@ -118,8 +115,6 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             @Reference final DataBroker dataBroker,
             @Reference final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
             @Reference(target = "(type=global-timer)") final Timer timer,
-            @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
-                final ScheduledThreadPool keepaliveExecutor,
             @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingExecutor,
             @Reference final ActorSystemProvider actorSystemProvider,
             @Reference(target = "(type=netconf-client-factory)") final NetconfClientFactory clientFactory,
@@ -130,33 +125,31 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             @Reference final SchemaResourceManager resourceManager,
             @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
             final Configuration configuration) {
-        this(baseSchemas, dataBroker, clusterSingletonServiceProvider, timer, keepaliveExecutor.getExecutor(),
-            processingExecutor.getExecutor(), actorSystemProvider.getActorSystem(), clientFactory, mountPointService,
-            encryptionService, rpcProviderService, deviceActionFactory, resourceManager, builderFactory,
-            configuration.topology$_$id(), Uint16.valueOf(configuration.write$_$transaction$_$idle$_$timeout()));
+        this(baseSchemas, dataBroker, clusterSingletonServiceProvider, timer, processingExecutor.getExecutor(),
+            actorSystemProvider.getActorSystem(), clientFactory, mountPointService, encryptionService,
+            rpcProviderService, deviceActionFactory, resourceManager, builderFactory, configuration.topology$_$id(),
+            Uint16.valueOf(configuration.write$_$transaction$_$idle$_$timeout()));
     }
 
     @Inject
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
             final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final Timer timer,
-            final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-            final ActorSystemProvider actorSystemProvider, final NetconfClientFactory clientFactory,
-            final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
-            final RpcProviderService rpcProviderService, final DeviceActionFactory deviceActionFactory,
-            final SchemaResourceManager resourceManager,
+            final ThreadPool processingExecutor, final ActorSystemProvider actorSystemProvider,
+            final NetconfClientFactory clientFactory, final DOMMountPointService mountPointService,
+            final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
+            final DeviceActionFactory deviceActionFactory, final SchemaResourceManager resourceManager,
             final NetconfClientConfigurationBuilderFactory builderFactory) {
-        this(baseSchemas, dataBroker, clusterSingletonServiceProvider, timer, keepaliveExecutor.getExecutor(),
-            processingExecutor.getExecutor(), actorSystemProvider.getActorSystem(), clientFactory,
-            mountPointService, encryptionService, rpcProviderService, deviceActionFactory, resourceManager,
-            builderFactory, NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, Uint16.ZERO);
+        this(baseSchemas, dataBroker, clusterSingletonServiceProvider, timer, processingExecutor.getExecutor(),
+            actorSystemProvider.getActorSystem(), clientFactory, mountPointService, encryptionService,
+            rpcProviderService, deviceActionFactory, resourceManager, builderFactory,
+            NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, Uint16.ZERO);
     }
 
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
         justification = "Non-final for mocking, but we register for DTCL and that leaks 'this'")
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
             final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final Timer timer,
-            final ScheduledExecutorService keepaliveExecutor, final Executor processingExecutor,
-            final ActorSystem actorSystem, final NetconfClientFactory clientFactory,
+            final Executor processingExecutor, final ActorSystem actorSystem, final NetconfClientFactory clientFactory,
             final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
             final RpcProviderService rpcProviderService, final DeviceActionFactory deviceActionFactory,
             final SchemaResourceManager resourceManager, final NetconfClientConfigurationBuilderFactory builderFactory,
@@ -165,7 +158,6 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         this.dataBroker = requireNonNull(dataBroker);
         this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
         this.timer = requireNonNull(timer);
-        this.keepaliveExecutor = requireNonNull(keepaliveExecutor);
         this.processingExecutor = requireNonNull(processingExecutor);
         this.actorSystem = requireNonNull(actorSystem);
         this.clientFactory = requireNonNull(clientFactory);
@@ -335,7 +327,6 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             .setNode(node)
             .setActorSystem(actorSystem)
             .setTimer(timer)
-            .setKeepaliveExecutor(keepaliveExecutor)
             .setProcessingExecutor(processingExecutor)
             .setTopologyId(topologyId)
             .setNetconfClientFactory(clientFactory)

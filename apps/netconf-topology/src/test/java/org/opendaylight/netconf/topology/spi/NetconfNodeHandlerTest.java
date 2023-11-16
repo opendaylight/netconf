@@ -23,12 +23,12 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
+import io.netty.util.Timeout;
 import io.netty.util.Timer;
+import io.netty.util.TimerTask;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -82,8 +82,6 @@ public class NetconfNodeHandlerTest {
     @Mock
     private Timer timer;
     @Mock
-    private ScheduledExecutorService scheduledExecutor;
-    @Mock
     private SchemaResourceManager schemaManager;
     @Mock
     private Executor processingExecutor;
@@ -112,11 +110,11 @@ public class NetconfNodeHandlerTest {
     @Captor
     private ArgumentCaptor<RemoteDeviceServices> servicesCaptor;
 
-    // Mock eventExecutor-related things
+    // Mock Timer-related things
     @Mock
-    private ScheduledFuture<?> scheduleFuture;
+    private Timeout timeout;
     @Captor
-    private ArgumentCaptor<Runnable> scheduleCaptor;
+    private ArgumentCaptor<TimerTask> timerCaptor;
     @Mock
     private EffectiveModelContext schemaContext;
 
@@ -135,8 +133,7 @@ public class NetconfNodeHandlerTest {
     @Before
     public void before() {
         // Instantiate the handler
-        handler = new NetconfNodeHandler(clientFactory, timer, scheduledExecutor, BASE_SCHEMAS,
-            schemaManager, processingExecutor,
+        handler = new NetconfNodeHandler(clientFactory, timer, BASE_SCHEMAS, schemaManager, processingExecutor,
             new DefaultNetconfClientConfigurationBuilderFactory(encryptionService, credentialProvider,
                 sslHandlerFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
@@ -189,15 +186,14 @@ public class NetconfNodeHandlerTest {
         assertEquals(1, handler.attempts());
 
         // Note: this will count as a second attempt
-        doReturn(scheduleFuture).when(scheduledExecutor)
-            .schedule(scheduleCaptor.capture(), anyLong(), any(TimeUnit.class));
+        doReturn(timeout).when(timer).newTimeout(timerCaptor.capture(), anyLong(), any());
 
         handler.onDeviceFailed(new AssertionError("schema failure"));
 
         assertEquals(2, handler.attempts());
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
-        scheduleCaptor.getValue().run();
+        timerCaptor.getValue().run(timeout);
         verify(clientFactory, times(2)).createClient(any());
         assertEquals(2, handler.attempts());
     }
@@ -209,14 +205,13 @@ public class NetconfNodeHandlerTest {
 
         // when the device is connected, we propagate the information and initiate reconnect
         doNothing().when(delegate).onDeviceDisconnected();
-        doReturn(scheduleFuture).when(scheduledExecutor).schedule(scheduleCaptor.capture(), eq(100L),
-            eq(TimeUnit.MILLISECONDS));
+        doReturn(timeout).when(timer).newTimeout(timerCaptor.capture(), eq(100L), eq(TimeUnit.MILLISECONDS));
         handler.onDeviceDisconnected();
 
         assertEquals(1, handler.attempts());
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
-        scheduleCaptor.getValue().run();
+        timerCaptor.getValue().run(timeout);
         verify(clientFactory, times(2)).createClient(any());
         assertEquals(1, handler.attempts());
     }
@@ -229,14 +224,13 @@ public class NetconfNodeHandlerTest {
         handler.connect();
         assertEquals(1, handler.attempts());
 
-        doReturn(scheduleFuture).when(scheduledExecutor).schedule(scheduleCaptor.capture(), eq(150L),
-            eq(TimeUnit.MILLISECONDS));
+        doReturn(timeout).when(timer).newTimeout(timerCaptor.capture(), eq(150L), eq(TimeUnit.MILLISECONDS));
         firstFuture.setException(new AssertionError("first"));
 
         assertEquals(2, handler.attempts());
 
         // and when we run the task, we get a clientDispatcher invocation, but attempts are still the same
-        scheduleCaptor.getValue().run();
+        timerCaptor.getValue().run(timeout);
         verify(clientFactory, times(2)).createClient(any());
         assertEquals(2, handler.attempts());
 

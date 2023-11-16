@@ -21,7 +21,6 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ScheduledExecutorService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,8 +44,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 public class CallHomeMountFactoryTest {
     @Mock
     private Timer mockTimer;
-    @Mock
-    private ScheduledExecutorService mockScheduledExecutor;
     @Mock
     private Executor mockProcessingExecutor;
     @Mock
@@ -73,8 +70,8 @@ public class CallHomeMountFactoryTest {
     public void setup() {
         topologyId = "";
 
-        instance = new CallHomeMountFactory(topologyId, mockTimer, mockScheduledExecutor, mockProcessingExecutor,
-                mockSchemaRepoProvider, mockBaseSchemas, mockDataBroker, mockMount, mockBuilderFactory) {
+        instance = new CallHomeMountFactory(topologyId, mockTimer, mockProcessingExecutor, mockSchemaRepoProvider,
+                mockBaseSchemas, mockDataBroker, mockMount, mockBuilderFactory) {
             @Override
             CallHomeMountSessionManager sessionManager() {
                 return mockSessMgr;

@@ -14,14 +14,12 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import io.netty.util.Timeout;
 import io.netty.util.Timer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
@@ -63,20 +61,20 @@ import org.slf4j.LoggerFactory;
  */
 public final class NetconfNodeHandler extends AbstractRegistration implements RemoteDeviceHandler {
     private abstract static sealed class Task {
-        private final Future<?> future;
 
-        Task(final Future<?> future) {
-            this.future = requireNonNull(future);
-        }
-
-        final void cancel() {
-            future.cancel(false);
-        }
+        abstract void cancel();
     }
 
     private final class ConnectingTask extends Task implements FutureCallback<NetconfClientSession> {
+        private final ListenableFuture<NetconfClientSession> future;
+
         ConnectingTask(final ListenableFuture<NetconfClientSession> future) {
-            super(future);
+            this.future = requireNonNull(future);
+        }
+
+        @Override
+        void cancel() {
+            future.cancel(false);
         }
 
         @Override
@@ -95,8 +93,15 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     }
 
     private static final class SleepingTask extends Task {
-        SleepingTask(final ScheduledFuture<?> future) {
-            super(future);
+        private final Timeout timeout;
+
+        SleepingTask(final Timeout timeout) {
+            this.timeout = requireNonNull(timeout);
+        }
+
+        @Override
+        void cancel() {
+            timeout.cancel();
         }
     }
 
@@ -107,7 +112,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final @NonNull NetconfClientConfiguration clientConfig;
     private final @NonNull NetconfDeviceCommunicator communicator;
     private final @NonNull RemoteDeviceHandler delegate;
-    private final @NonNull ScheduledExecutorService scheduledExecutor;
+    private final @NonNull Timer timer;
     private final @NonNull RemoteDeviceId deviceId;
 
     private final long maxAttempts;
@@ -122,14 +127,13 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private Task currentTask;
 
     public NetconfNodeHandler(final NetconfClientFactory clientFactory, final Timer timer,
-            final ScheduledExecutorService scheduledExecutor, final BaseNetconfSchemas baseSchemas,
-            final SchemaResourceManager schemaManager, final Executor processingExecutor,
-            final NetconfClientConfigurationBuilderFactory builderFactory,
+            final BaseNetconfSchemas baseSchemas, final SchemaResourceManager schemaManager,
+            final Executor processingExecutor, final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
         this.clientFactory = requireNonNull(clientFactory);
-        this.scheduledExecutor = requireNonNull(scheduledExecutor);
+        this.timer = requireNonNull(timer);
         this.delegate = requireNonNull(delegate);
         this.deviceId = requireNonNull(deviceId);
 
@@ -318,11 +322,11 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         // immediate reconnect. While we could check and got to lockedConnect(), it makes for a rare special case.
         // That special case makes for more code paths to test and introduces additional uncertainty as to whether
         // the attempt was executed on this thread or not.
-        currentTask = new SleepingTask(scheduledExecutor.schedule(this::reconnect, delayMillis, TimeUnit.MILLISECONDS));
+        currentTask = new SleepingTask(timer.newTimeout(this::reconnect, delayMillis, TimeUnit.MILLISECONDS));
         return null;
     }
 
-    private synchronized void reconnect() {
+    private synchronized void reconnect(final Timeout timeout) {
         currentTask = null;
         if (notClosed()) {
             lockedConnect();
