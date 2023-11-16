@@ -13,8 +13,15 @@ import org.opendaylight.yangtools.plugin.generator.api.AbstractFileGeneratorFact
 import org.opendaylight.yangtools.plugin.generator.api.FileGenerator;
 import org.opendaylight.yangtools.plugin.generator.api.FileGeneratorFactory;
 
+/**
+ * A {@link FileGenerator} plugin generating a WADL definition bould a particular
+ * YANG model.
+ */
 @MetaInfServices(value = FileGeneratorFactory.class)
 public final class WadlGeneratorFactory extends AbstractFileGeneratorFactory {
+    /**
+     * Default constructor.
+     */
     public WadlGeneratorFactory() {
         super(WadlGenerator.class.getName());
     }

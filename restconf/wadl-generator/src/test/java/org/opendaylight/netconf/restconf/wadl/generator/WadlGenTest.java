@@ -7,24 +7,19 @@
  */
 package org.opendaylight.netconf.restconf.wadl.generator;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.google.common.collect.Table;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Test;
-import org.opendaylight.yangtools.plugin.generator.api.GeneratedFile;
-import org.opendaylight.yangtools.plugin.generator.api.GeneratedFilePath;
-import org.opendaylight.yangtools.plugin.generator.api.GeneratedFileType;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public class WadlGenTest {
+class WadlGenTest {
     @Test
-    public void testListGeneration() {
-        final WadlGenerator generator = new WadlGenerator();
-        final EffectiveModelContext context = YangParserTestUtils.parseYangResourceDirectory("/wadl-gen");
-        Table<GeneratedFileType, GeneratedFilePath, GeneratedFile> generatedWadlFiles = generator.generateFiles(context,
+    void testListGeneration() {
+        final var generator = new WadlGenerator();
+        final var context = YangParserTestUtils.parseYangResourceDirectory("/wadl-gen");
+        final var generatedWadlFiles = generator.generateFiles(context,
             Set.copyOf(context.getModules()), (module, representation) -> Optional.empty());
         assertEquals(3, generatedWadlFiles.size());
         // TODO: more asserts
