@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb58268c_39245426",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountService.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c6dc0a1_f5585f88",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e3403ba9_ca1d790b",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-11-15T16:35:33Z",
       "side": 1,
       "message": "incorrect Copyright?",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d8064f1_d785c37e",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountStatusReporter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3403ba9_ca1d790b",
       "revId": "27b322b39a07475546329f22bc38b23815f4d308",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "13473b2d_eb16f88d",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountStatusReporter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "226ae9ef_849f0624",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "419fbbfa_ca1019ca",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-11-15T16:35:33Z",
       "side": 1,
       "message": "final",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb129182_c0404183",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountStatusReporter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "419fbbfa_ca1019ca",
       "revId": "27b322b39a07475546329f22bc38b23815f4d308",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -86,6 +158,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19035a8c_01180e69",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountStatusReporter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ba202e8_e9e961cc",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c43e86ef_fc51e3e2",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-11-15T16:35:33Z",
       "side": 1,
       "message": "incorrect copyright?",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7bf144e_252cbb1a",
+        "filename": "netconf/callhome-server/src/main/java/org/opendaylight/netconf/callhome/server/ssh/CallHomeSshAuthProvider.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c43e86ef_fc51e3e2",
       "revId": "27b322b39a07475546329f22bc38b23815f4d308",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -120,6 +228,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8e6c09d_dc29e17d",
+        "filename": "netconf/callhome-server/src/main/java/org/opendaylight/netconf/callhome/server/ssh/CallHomeSshAuthSettings.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c409943c_96037672",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbf2a9db_46e0507c",
@@ -133,6 +259,24 @@
       "writtenOn": "2023-11-15T16:35:33Z",
       "side": 1,
       "message": "incorrect Copyright?",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d05ac27_5279bba5",
+        "filename": "netconf/callhome-server/src/main/java/org/opendaylight/netconf/callhome/server/ssh/CallHomeSshServer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fbf2a9db_46e0507c",
       "revId": "27b322b39a07475546329f22bc38b23815f4d308",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -154,6 +298,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1baf17e9_bf644b4c",
+        "filename": "netconf/callhome-server/src/main/java/org/opendaylight/netconf/callhome/server/ssh/CallHomeSshServer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "67e30895_e0502de3",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fda95741_8e63b1d0",
@@ -167,6 +329,24 @@
       "writtenOn": "2023-11-15T16:35:33Z",
       "side": 1,
       "message": "final params",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed8e6625_e2a2fe1a",
+        "filename": "netconf/callhome-server/src/main/java/org/opendaylight/netconf/callhome/server/ssh/CallHomeSshServer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fda95741_8e63b1d0",
       "revId": "27b322b39a07475546329f22bc38b23815f4d308",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -188,6 +368,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5132d83_79ee8c1f",
+        "filename": "netconf/callhome-server/src/main/java/org/opendaylight/netconf/callhome/server/tls/CallHomeTlsServer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f656e53_64e989cf",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df08c74c_ebf584bc",
@@ -205,6 +403,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fab00a77_88534212",
+        "filename": "netconf/callhome-server/src/main/java/org/opendaylight/netconf/callhome/server/tls/CallHomeTlsServer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df08c74c_ebf584bc",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e45a8025_4414a921",
@@ -218,6 +434,24 @@
       "writtenOn": "2023-11-15T16:35:33Z",
       "side": 1,
       "message": "final params",
+      "revId": "27b322b39a07475546329f22bc38b23815f4d308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebf56cda_9720b3b2",
+        "filename": "netconf/callhome-server/src/main/java/org/opendaylight/netconf/callhome/server/tls/CallHomeTlsServer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-11-16T08:39:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e45a8025_4414a921",
       "revId": "27b322b39a07475546329f22bc38b23815f4d308",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
