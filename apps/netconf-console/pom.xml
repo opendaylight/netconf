@@ -20,11 +20,47 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
   <packaging>bundle</packaging>
 
   <dependencies>
-      <!-- Apache Karaf console dependency -->
+      <dependency>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>com.guicedee.services</groupId>
+          <artifactId>javax.inject</artifactId>
+          <optional>true</optional>
+      </dependency>
       <dependency>
           <groupId>org.apache.karaf.shell</groupId>
-          <artifactId>org.apache.karaf.shell.console</artifactId>
+          <artifactId>org.apache.karaf.shell.core</artifactId>
           <scope>provided</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.eclipse.jdt</groupId>
+          <artifactId>org.eclipse.jdt.annotation</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.opendaylight.yangtools</groupId>
+          <artifactId>yang-common</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.opendaylight.mdsal</groupId>
+          <artifactId>mdsal-binding-api</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.opendaylight.mdsal</groupId>
+          <artifactId>mdsal-common-api</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.opendaylight.mdsal</groupId>
+          <artifactId>yang-binding</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+          <artifactId>rfc6991-ietf-inet-types</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.opendaylight.mdsal.model</groupId>
+          <artifactId>ietf-topology</artifactId>
       </dependency>
       <dependency>
           <groupId>org.opendaylight.netconf</groupId>
@@ -35,11 +71,6 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
           <artifactId>netconf-client-mdsal</artifactId>
       </dependency>
       <dependency>
-          <groupId>com.guicedee.services</groupId>
-          <artifactId>javax.inject</artifactId>
-          <optional>true</optional>
-      </dependency>
-      <dependency>
           <groupId>org.osgi</groupId>
           <artifactId>org.osgi.service.component.annotations</artifactId>
       </dependency>
@@ -47,6 +78,21 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
       <dependency>
           <groupId>org.opendaylight.yangtools</groupId>
           <artifactId>yang-test-util</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.opendaylight.mdsal</groupId>
+          <artifactId>mdsal-binding-dom-adapter</artifactId>
+          <type>test-jar</type>
+      </dependency>
+      <dependency>
+          <groupId>org.opendaylight.mdsal</groupId>
+          <artifactId>mdsal-binding-runtime-api</artifactId>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.opendaylight.mdsal</groupId>
+          <artifactId>mdsal-binding-runtime-spi</artifactId>
+          <scope>test</scope>
       </dependency>
       <dependency>
           <groupId>org.opendaylight.mdsal</groupId>
