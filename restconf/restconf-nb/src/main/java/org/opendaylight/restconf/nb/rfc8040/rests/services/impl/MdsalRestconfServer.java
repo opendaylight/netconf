@@ -19,6 +19,7 @@ import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -37,6 +38,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.server.api.OperationsContent;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.OperationOutput;
@@ -47,10 +49,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
@@ -146,11 +150,12 @@ public final class MdsalRestconfServer implements RestconfServer {
         final var modelContext = inference.getEffectiveModelContext();
         if (modelContext.getModuleStatements().isEmpty()) {
             // No modules, or defensive return empty content
-            return contentType.emptyBody;
+            return emptyOperationsGET(contentType);
         }
         if (inference.isEmpty()) {
             // empty stack == get all RPCs/actions
-            return contentType.createBody(contentType.getModuleRpcs(modelContext, modelContext.getModuleStatements()));
+            return operationsGetBody(contentType,
+                getModuleRpcs(contentType, modelContext, modelContext.getModuleStatements()));
         }
 
         // get current module RPCs/actions by RPC/action name
@@ -173,11 +178,103 @@ public final class MdsalRestconfServer implements RestconfServer {
         //        There is a reason this sort of method should handle both RPCs and actions, which is the invocation
         //        remapping -- e.g. RFC8528 specifies how 'action' invocation is mappend to 'rpc' invocation.
         //        There is something fishy going on here and we either have a bug, or the spec needs to be clarified.
-        return contentType.getModuleRpcs(modelContext, currentModuleKey).stream()
+        return getModuleRpcs(contentType, modelContext, currentModuleKey).stream()
             .findFirst()
             .map(e -> Map.entry(e.getKey(), e.getValue().stream().filter(operName::equals).toList()))
-            .map(e -> contentType.createBody(List.of(e)))
-            .orElse(contentType.emptyBody);
+            .map(e -> operationsGetBody(contentType, List.of(e)))
+            .orElseGet(() -> emptyOperationsGET(contentType));
+    }
+
+    private static @NonNull String operationsGetBody(final OperationsContent contentType,
+            final List<Entry<String, List<String>>> rpcsByPrefix) {
+        final var ret = switch (contentType) {
+            case JSON -> {
+                final var sb = new StringBuilder("{\n"
+                    + "  \"ietf-restconf:operations\" : {\n");
+                var entryIt = rpcsByPrefix.iterator();
+                var entry = entryIt.next();
+                var nameIt = entry.getValue().iterator();
+                while (true) {
+                    sb.append("    \"").append(entry.getKey()).append(':').append(nameIt.next()).append("\": [null]");
+                    if (nameIt.hasNext()) {
+                        sb.append(",\n");
+                        continue;
+                    }
+
+                    if (entryIt.hasNext()) {
+                        sb.append(",\n");
+                        entry = entryIt.next();
+                        nameIt = entry.getValue().iterator();
+                        continue;
+                    }
+
+                    break;
+                }
+
+                yield sb.append("\n  }\n}");
+            }
+            case XML -> {
+                // Header with namespace declarations for each module
+                final var sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                    + "<operations xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"");
+                for (int i = 0; i < rpcsByPrefix.size(); ++i) {
+                    final var prefix = "ns" + i;
+                    sb.append("\n            xmlns:").append(prefix).append("=\"").append(rpcsByPrefix.get(i).getKey())
+                        .append("\"");
+                }
+                sb.append(" >");
+
+                // Second pass: emit all leaves
+                for (int i = 0; i < rpcsByPrefix.size(); ++i) {
+                    final var prefix = "ns" + i;
+                    for (var localName : rpcsByPrefix.get(i).getValue()) {
+                        sb.append("\n  <").append(prefix).append(':').append(localName).append("/>");
+                    }
+                }
+
+                yield sb.append("\n</operations>");
+            }
+        };
+        return ret.toString();
+    }
+
+    /**
+     * Returns a list of entries, where each entry contains a module prefix and a list of RPC names.
+     *
+     * @param context the effective model context
+     * @param modules the map of QNameModule to ModuleEffectiveStatement
+     * @return a list of entries, where each entry contains a module prefix and a list of RPC names
+     */
+    private static List<Entry<@NonNull String, List<String>>> getModuleRpcs(final OperationsContent contentType,
+            final EffectiveModelContext context, final Map<QNameModule, ModuleEffectiveStatement> modules) {
+        return modules.values().stream()
+            // Extract XMLNamespaces
+            .map(module -> module.localQNameModule().getNamespace())
+            // Make sure each is XMLNamespace unique
+            .distinct()
+            // Find the most recent module with that namespace. This needed so we expose the right set of RPCs,
+            // as we always pick the latest revision to resolve prefix (or module name).
+            .map(namespace -> context.findModuleStatements(namespace).iterator().next())
+            // Convert to module prefix + List<String> with RPC names
+            .map(module -> Map.entry(
+                switch (contentType) {
+                    case JSON -> module.argument().getLocalName();
+                    case XML -> module.localQNameModule().getNamespace().toString();
+                }, module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
+                .map(rpc -> rpc.argument().getLocalName())
+                .toList()))
+            // Skip prefixes which do not have any RPCs
+            .filter(entry -> !entry.getValue().isEmpty())
+            // Ensure stability: sort by prefix
+            .sorted(Entry.comparingByKey())
+            .toList();
+    }
+
+    private static @NonNull String emptyOperationsGET(final OperationsContent contentType) {
+        return switch (contentType) {
+            case JSON -> "{ \"ietf-restconf:operations\" : { } }";
+            case XML -> "<operations xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"/>";
+        };
     }
 
     @Override
