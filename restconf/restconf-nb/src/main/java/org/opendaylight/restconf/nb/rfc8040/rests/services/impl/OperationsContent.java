@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,7 +21,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC8040</a>.
  */
 public enum OperationsContent {
-    JSON("{ \"ietf-restconf:operations\" : { } }") {
+    JSON {
         @Override
         String createBody(final List<Entry<String, List<String>>> rpcsByPrefix) {
             final var sb = new StringBuilder("{\n"
@@ -57,7 +55,7 @@ public enum OperationsContent {
         }
     },
 
-    XML("<operations xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"/>") {
+    XML {
         @Override
         String createBody(final List<Entry<String, List<String>>> rpcsByPrefix) {
             // Header with namespace declarations for each module
@@ -86,12 +84,6 @@ public enum OperationsContent {
             return module.localQNameModule().getNamespace().toString();
         }
     };
-
-    public final @NonNull String emptyBody;
-
-    OperationsContent(final String emptyBody) {
-        this.emptyBody = requireNonNull(emptyBody);
-    }
 
     /**
      * Returns a list of entries, where each entry contains a module prefix and a list of RPC names.

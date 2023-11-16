@@ -146,7 +146,10 @@ public final class MdsalRestconfServer implements RestconfServer {
         final var modelContext = inference.getEffectiveModelContext();
         if (modelContext.getModuleStatements().isEmpty()) {
             // No modules, or defensive return empty content
-            return contentType.emptyBody;
+            return switch (contentType) {
+                case JSON -> "{ \"ietf-restconf:operations\" : { } }";
+                case XML -> "<operations xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"/>";
+            };
         }
         if (inference.isEmpty()) {
             // empty stack == get all RPCs/actions
