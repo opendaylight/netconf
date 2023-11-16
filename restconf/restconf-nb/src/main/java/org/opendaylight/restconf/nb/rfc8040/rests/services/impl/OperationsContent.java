@@ -13,13 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * RESTCONF {@code /operations} content for a {@code GET} operation as per
@@ -90,58 +87,10 @@ public enum OperationsContent {
         }
     };
 
-    private final @NonNull String emptyBody;
+    public final @NonNull String emptyBody;
 
     OperationsContent(final String emptyBody) {
         this.emptyBody = requireNonNull(emptyBody);
-    }
-
-    /**
-     * Return content with RPCs and actions for a particular {@link Inference}.
-     *
-     * @param inference Inference to use
-     * @return Content of HTTP GET operation as a String
-     */
-    public final @NonNull String bodyFor(final @NonNull Inference inference) {
-        final var context = inference.getEffectiveModelContext();
-        if (isEmptyContext(context)) {
-            // No modules, or defensive return empty content
-            return emptyBody;
-        }
-        if (inference.isEmpty()) {
-            // empty stack == get all RPCs/actions
-            return createBody(getModuleRpcs(context, context.getModuleStatements()));
-        }
-
-        // get current module RPCs/actions by RPC/action name
-        final var stack = inference.toSchemaInferenceStack();
-        final var currentModule = stack.currentModule();
-        final var currentModuleKey = Map.of(currentModule.localQNameModule(), currentModule);
-
-        final QName qname;
-        final var stmt = stack.currentStatement();
-        if (stmt instanceof RpcEffectiveStatement rpc) {
-            qname = rpc.argument();
-        } else if (stmt instanceof ActionEffectiveStatement action) {
-            qname = action.argument();
-        } else {
-            throw new IllegalArgumentException("Unhandled statement " + stmt);
-        }
-
-        final var operName = qname.getLocalName();
-        // FIXME: This is weird: it only handles rpc statements, not action statements. What is going on here?!
-        //        There is a reason this sort of method should handle both RPCs and actions, which is the invocation
-        //        remapping -- e.g. RFC8528 specifies how 'action' invocation is mappend to 'rpc' invocation.
-        //        There is something fishy going on here and we either have a bug, or the spec needs to be clarified.
-        return getModuleRpcs(context, currentModuleKey).stream()
-            .findFirst()
-            .map(e -> Map.entry(e.getKey(), e.getValue().stream().filter(operName::equals).toList()))
-            .map(e -> createBody(List.of(e)))
-            .orElse(emptyBody);
-    }
-
-    private static boolean isEmptyContext(final EffectiveModelContext context) {
-        return context.getModuleStatements().isEmpty();
     }
 
     /**
@@ -151,7 +100,7 @@ public enum OperationsContent {
      * @param modules the map of QNameModule to ModuleEffectiveStatement
      * @return a list of entries, where each entry contains a module prefix and a list of RPC names
      */
-    private List<Entry<@NonNull String, List<String>>> getModuleRpcs(final EffectiveModelContext context,
+    public List<Entry<@NonNull String, List<String>>> getModuleRpcs(final EffectiveModelContext context,
             final Map<QNameModule, ModuleEffectiveStatement> modules) {
         return modules.values().stream()
                 // Extract XMLNamespaces

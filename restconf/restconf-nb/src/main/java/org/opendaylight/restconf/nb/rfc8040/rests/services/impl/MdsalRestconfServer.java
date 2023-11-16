@@ -18,6 +18,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -49,6 +50,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.osgi.service.component.annotations.Activate;
@@ -140,7 +143,41 @@ public final class MdsalRestconfServer implements RestconfServer {
 
     @VisibleForTesting
     static @NonNull String operationsGET(final OperationsContent contentType, final @NonNull Inference inference) {
-        return contentType.bodyFor(inference);
+        final var modelContext = inference.getEffectiveModelContext();
+        if (modelContext.getModuleStatements().isEmpty()) {
+            // No modules, or defensive return empty content
+            return contentType.emptyBody;
+        }
+        if (inference.isEmpty()) {
+            // empty stack == get all RPCs/actions
+            return contentType.createBody(contentType.getModuleRpcs(modelContext, modelContext.getModuleStatements()));
+        }
+
+        // get current module RPCs/actions by RPC/action name
+        final var stack = inference.toSchemaInferenceStack();
+        final var currentModule = stack.currentModule();
+        final var currentModuleKey = Map.of(currentModule.localQNameModule(), currentModule);
+
+        final QName qname;
+        final var stmt = stack.currentStatement();
+        if (stmt instanceof RpcEffectiveStatement rpc) {
+            qname = rpc.argument();
+        } else if (stmt instanceof ActionEffectiveStatement action) {
+            qname = action.argument();
+        } else {
+            throw new IllegalArgumentException("Unhandled statement " + stmt);
+        }
+
+        final var operName = qname.getLocalName();
+        // FIXME: This is weird: it only handles rpc statements, not action statements. What is going on here?!
+        //        There is a reason this sort of method should handle both RPCs and actions, which is the invocation
+        //        remapping -- e.g. RFC8528 specifies how 'action' invocation is mappend to 'rpc' invocation.
+        //        There is something fishy going on here and we either have a bug, or the spec needs to be clarified.
+        return contentType.getModuleRpcs(modelContext, currentModuleKey).stream()
+            .findFirst()
+            .map(e -> Map.entry(e.getKey(), e.getValue().stream().filter(operName::equals).toList()))
+            .map(e -> contentType.createBody(List.of(e)))
+            .orElse(contentType.emptyBody);
     }
 
     @Override
