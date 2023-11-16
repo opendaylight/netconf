@@ -159,7 +159,7 @@ public final class RestconfOperationsServiceImpl {
 
     private void invokeRpc(final String identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
-        server.invokeRpc(uriInfo.getBaseUri(), identifier, body)
+        server.operationsPOST(uriInfo.getBaseUri(), identifier, body)
             .addCallback(new JaxRsRestconfCallback<OperationOutput>(ar) {
                 @Override
                 Response transform(final OperationOutput result) {

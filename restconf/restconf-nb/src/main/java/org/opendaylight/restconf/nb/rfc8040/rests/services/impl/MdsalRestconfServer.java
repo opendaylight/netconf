@@ -128,7 +128,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public RestconfFuture<OperationOutput> invokeRpc(final URI restconfURI, final String apiPath,
+    public RestconfFuture<OperationOutput> operationsPOST(final URI restconfURI, final String apiPath,
             final OperationInputBody body) {
         final var currentContext = databindProvider.currentContext();
         final var reqPath = bindRequestPath(currentContext, apiPath);
