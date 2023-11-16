@@ -7,11 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -23,7 +22,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC8040</a>.
  */
 public enum OperationsContent {
-    JSON("{ \"ietf-restconf:operations\" : { } }") {
+    JSON {
         @Override
         String createBody(final List<Entry<String, List<String>>> rpcsByPrefix) {
             final var sb = new StringBuilder("{\n"
@@ -50,14 +49,9 @@ public enum OperationsContent {
 
             return sb.append("\n  }\n}").toString();
         }
-
-        @Override
-        String prefix(final ModuleEffectiveStatement module) {
-            return module.argument().getLocalName();
-        }
     },
 
-    XML("<operations xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"/>") {
+    XML {
         @Override
         String createBody(final List<Entry<String, List<String>>> rpcsByPrefix) {
             // Header with namespace declarations for each module
@@ -80,18 +74,7 @@ public enum OperationsContent {
 
             return sb.append("\n</operations>").toString();
         }
-
-        @Override
-        String prefix(final ModuleEffectiveStatement module) {
-            return module.localQNameModule().getNamespace().toString();
-        }
     };
-
-    public final @NonNull String emptyBody;
-
-    OperationsContent(final String emptyBody) {
-        this.emptyBody = requireNonNull(emptyBody);
-    }
 
     /**
      * Returns a list of entries, where each entry contains a module prefix and a list of RPC names.
@@ -100,8 +83,9 @@ public enum OperationsContent {
      * @param modules the map of QNameModule to ModuleEffectiveStatement
      * @return a list of entries, where each entry contains a module prefix and a list of RPC names
      */
-    public List<Entry<@NonNull String, List<String>>> getModuleRpcs(final EffectiveModelContext context,
-            final Map<QNameModule, ModuleEffectiveStatement> modules) {
+    public static List<Entry<@NonNull String, List<String>>> getModuleRpcs(final EffectiveModelContext context,
+            final Map<QNameModule, ModuleEffectiveStatement> modules,
+            final Function<ModuleEffectiveStatement, String> moduleToPrefix) {
         return modules.values().stream()
                 // Extract XMLNamespaces
                 .map(module -> module.localQNameModule().getNamespace())
@@ -111,7 +95,7 @@ public enum OperationsContent {
                 // as we always pick the latest revision to resolve prefix (or module name).
                 .map(namespace -> context.findModuleStatements(namespace).iterator().next())
                 // Convert to module prefix + List<String> with RPC names
-                .map(module -> Map.entry(prefix(module),
+                .map(module -> Map.entry(moduleToPrefix.apply(module),
                         module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
                         .map(rpc -> rpc.argument().getLocalName())
                         .toList()))
@@ -123,6 +107,4 @@ public enum OperationsContent {
     }
 
     abstract @NonNull String createBody(List<Entry<String, List<String>>> rpcsByPrefix);
-
-    abstract @NonNull String prefix(ModuleEffectiveStatement module);
 }
