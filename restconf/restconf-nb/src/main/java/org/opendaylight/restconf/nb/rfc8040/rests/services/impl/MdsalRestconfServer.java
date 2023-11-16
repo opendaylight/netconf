@@ -117,7 +117,8 @@ public final class MdsalRestconfServer implements RestconfServer {
             mountPointService));
     }
 
-    public @NonNull NormalizedNodePayload yangLibraryVersionGET() {
+    @Override
+    public NormalizedNodePayload yangLibraryVersionGET() {
         final var stack = SchemaInferenceStack.of(databindProvider.currentContext().modelContext());
         stack.enterYangData(YangApi.NAME);
         stack.enterDataTree(Restconf.QNAME);
