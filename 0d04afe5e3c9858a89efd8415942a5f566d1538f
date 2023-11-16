@@ -16,6 +16,24 @@
       "message": "we can still use isConfiguration.\n```\nfinal var isConfig \u003d isParentConfig \u0026\u0026 node.isConfiguration()\n```",
       "revId": "0d04afe5e3c9858a89efd8415942a5f566d1538f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ee87880_3d5424fd",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-16T16:12:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a99b0cb5_598b6a31",
+      "revId": "0d04afe5e3c9858a89efd8415942a5f566d1538f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
