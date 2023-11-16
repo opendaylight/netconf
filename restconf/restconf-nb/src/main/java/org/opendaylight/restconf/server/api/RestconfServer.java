@@ -9,11 +9,11 @@ package org.opendaylight.restconf.server.api;
 
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.OperationsContent;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 
 /**
@@ -36,24 +36,22 @@ public interface RestconfServer {
     /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, String, OperationInputBody)}.
      *
-     * @param contentType Formatting type
-     * @return A formatted string
+     * @return An {@link OperationsContent}
      */
-    String operationsGET(OperationsContent contentType);
+    OperationsContent operationsGET();
 
     /*
      * Return the details about a particular operation supported by
      * {@link #operationsPOST(URI, String, OperationInputBody)}, as expressed in the
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#page-84>RFC8040<a> {@code container operations} statement.
      *
-     * @param contentType Formatting type
      * @param operation An operation
-     * @return A formatted string
+     * @return An {@link OperationsContent}, or {@code null} if {@code operation} does not point to an {@code rpc}
      */
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support ang-ext:mount,
     //        and hence it is a path right now
     // FIXME: use ApiPath instead of String
-    String operationsGET(OperationsContent contentType, String operation);
+    @Nullable OperationsContent operationsGET(String operation);
 
     /**
      * Invoke an RPC operation, as defined in

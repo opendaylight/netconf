@@ -13,6 +13,7 @@ import java.io.InputStream;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -23,12 +24,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.server.api.OperationsContent;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -57,20 +60,20 @@ public final class RestconfOperationsServiceImpl {
     @Path("/operations")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
     public String getOperationsJSON() {
-        return server.operationsGET(OperationsContent.JSON);
+        return server.operationsGET().toJSON();
     }
 
     /**
      * Retrieve list of operations and actions supported by the server or device in JSON format.
      *
-     * @param identifier path parameter to identify device and/or operation
+     * @param operation path parameter to identify device and/or operation
      * @return A string containing a JSON document conforming to both RFC8040 and RFC7951.
      */
     @GET
-    @Path("/operations/{identifier:.+}")
+    @Path("/operations/{operation:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-    public String getOperationJSON(@PathParam("identifier") final String identifier) {
-        return server.operationsGET(OperationsContent.JSON, identifier);
+    public String getOperationJSON(@PathParam("operation") final String operation) {
+        return operationsGET(operation).toJSON();
     }
 
     /**
@@ -82,20 +85,28 @@ public final class RestconfOperationsServiceImpl {
     @Path("/operations")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public String operationsGetXML() {
-        return server.operationsGET(OperationsContent.XML);
+        return server.operationsGET().toXML();
     }
 
     /**
      * Retrieve list of operations and actions supported by the server or device in XML format.
      *
-     * @param identifier path parameter to identify device and/or operation
+     * @param operation path parameter to identify device and/or operation
      * @return A string containing an XML document conforming to both RFC8040 section 11.3.1 and page 84.
      */
     @GET
-    @Path("/operations/{identifier:.+}")
+    @Path("/operations/{operation:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public String operationsGetXML(@PathParam("identifier") final String identifier) {
-        return server.operationsGET(OperationsContent.XML, identifier);
+    public String operationsGetXML(@PathParam("operation") final String operation) {
+        return operationsGET(operation).toXML();
+    }
+
+    private @NonNull OperationsContent operationsGET(final String operation) {
+        final var content = server.operationsGET(operation);
+        if (content == null) {
+            throw new NotFoundException();
+        }
+        return content;
     }
 
     /**
