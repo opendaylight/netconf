@@ -7,11 +7,12 @@
  */
 package org.opendaylight.netconf.console.commands;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -25,100 +26,89 @@ import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 @Service
 @Command(name = "show-device", scope = "netconf", description = "Shows netconf device attributes.")
 public class NetconfShowDeviceCommand implements Action {
-
     @Reference
     private NetconfCommands service;
-
-    public NetconfShowDeviceCommand() {
-
-    }
-
-    @VisibleForTesting
-    NetconfShowDeviceCommand(final NetconfCommands service) {
-        this.service = service;
-    }
-
-    @VisibleForTesting
-    NetconfShowDeviceCommand(final NetconfCommands service, final String deviceId, final String deviceIp,
-                             final String devicePort) {
-        this.service = service;
-        this.deviceId = deviceId;
-        this.deviceIp = deviceIp;
-        this.devicePort = devicePort;
-    }
 
     @Option(name = "-id",
             aliases = { "--identifier" },
             description = "Node Identifier of the netconf device",
             required = false,
             multiValued = false)
-    private String deviceId;
+    String deviceId;
 
     @Option(name = "-i",
             aliases = { "--ipaddress" },
             description = "IP address of the netconf device",
             required = false,
             multiValued = false)
-    private String deviceIp;
+    String deviceIp;
 
     @Option(name = "-p",
             aliases = { "--port" },
             description = "Port of the netconf device",
             required = false,
             multiValued = false)
-    private String devicePort;
+    String devicePort;
+
+    public NetconfShowDeviceCommand() {
+        // Nothing here, uses injection
+    }
+
+    @VisibleForTesting
+    NetconfShowDeviceCommand(final NetconfCommands service) {
+        this.service = requireNonNull(service);
+    }
+
+    @VisibleForTesting
+    NetconfShowDeviceCommand(final NetconfCommands service, final String deviceId, final String deviceIp,
+            final String devicePort) {
+        this.service = requireNonNull(service);
+        this.deviceId = deviceId;
+        this.deviceIp = deviceIp;
+        this.devicePort = devicePort;
+    }
 
     @Override
-    public Object execute() {
-
+    public String execute() {
         if ((Strings.isNullOrEmpty(deviceIp) || Strings.isNullOrEmpty(devicePort)) && Strings.isNullOrEmpty(deviceId)) {
             return "You must provide either the device Ip and the device Port or the device Id";
         }
-
-        Map<String, Map<String, List<String>>> devices = null;
-
         if (!Strings.isNullOrEmpty(deviceId)) {
-            devices = service.showDevice(deviceId);
-            printDeviceData(devices);
-            return null;
+            return printDeviceData(service.showDevice(deviceId));
         }
-
         if (!NetconfCommandUtils.isIpValid(deviceIp)
                 || devicePort != null && !NetconfCommandUtils.isPortValid(devicePort)) {
             return "Invalid IP:" + deviceIp + " or Port:" + devicePort + "Please enter a valid entry to proceed.";
         }
-
-        devices = service.showDevice(deviceIp, devicePort);
-        printDeviceData(devices);
-        return null;
+        return printDeviceData(service.showDevice(deviceIp, devicePort));
     }
 
     @SuppressWarnings("checkstyle:RegexpSinglelineJava")
-    private static void printDeviceData(final @NonNull Map<String, Map<String, List<String>>> devices) {
-        final ShellTable table = new ShellTable();
+    private static String printDeviceData(final @NonNull Map<String, Map<String, List<String>>> devices) {
+        final var table = new ShellTable();
         table.column(NetconfConsoleConstants.NETCONF_ID).alignLeft();
         table.column(NetconfConsoleConstants.NETCONF_IP).alignLeft();
         table.column(NetconfConsoleConstants.NETCONF_PORT).alignLeft();
         table.column(NetconfConsoleConstants.STATUS).alignLeft();
         table.column(NetconfConsoleConstants.AVAILABLE_CAPABILITIES).alignLeft();
 
-        for (final Entry<String, Map<String, List<String>>> entry : devices.entrySet()) {
-            final String nodeId = entry.getKey();
-            final Map<String, List<String>> device = entry.getValue();
+        for (var entry : devices.entrySet()) {
+            final var nodeId = entry.getKey();
+            final var device = entry.getValue();
             table.addRow().addContent(nodeId,
-                    device.get(NetconfConsoleConstants.NETCONF_IP).get(NetconfConsoleConstants.DEFAULT_INDEX),
-                    device.get(NetconfConsoleConstants.NETCONF_PORT).get(NetconfConsoleConstants.DEFAULT_INDEX),
-                    device.get(NetconfConsoleConstants.STATUS).get(NetconfConsoleConstants.DEFAULT_INDEX),
-                    device.get(NetconfConsoleConstants.AVAILABLE_CAPABILITIES)
-                            .get(NetconfConsoleConstants.DEFAULT_INDEX));
+                device.get(NetconfConsoleConstants.NETCONF_IP).get(NetconfConsoleConstants.DEFAULT_INDEX),
+                device.get(NetconfConsoleConstants.NETCONF_PORT).get(NetconfConsoleConstants.DEFAULT_INDEX),
+                device.get(NetconfConsoleConstants.STATUS).get(NetconfConsoleConstants.DEFAULT_INDEX),
+                device.get(NetconfConsoleConstants.AVAILABLE_CAPABILITIES) .get(NetconfConsoleConstants.DEFAULT_INDEX));
             formatCapabilities(device, table, NetconfConsoleConstants.AVAILABLE_CAPABILITIES);
         }
         table.print(System.out);
+        return null;
     }
 
     private static void formatCapabilities(final Map<String, List<String>> device, final ShellTable table,
             final String capabilityName) {
-        for (final String availableCapability : device.get(capabilityName)) {
+        for (var availableCapability : device.get(capabilityName)) {
             // First row is already added to table with the first available capability
             // Process rows other than the first to only have remaining available capabilities
             if (!Strings.isNullOrEmpty(availableCapability)

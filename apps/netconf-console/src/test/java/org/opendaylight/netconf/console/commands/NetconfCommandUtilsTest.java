@@ -5,46 +5,29 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.console.commands;
 
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class NetconfCommandUtilsTest {
-
+class NetconfCommandUtilsTest {
     @Test
-    public void testIsPortValid() {
-        final boolean portTrue = NetconfCommandUtils.isPortValid("65535");
-        final boolean portTrue2 = NetconfCommandUtils.isPortValid("0");
-
-        final boolean portFalse = NetconfCommandUtils.isPortValid("123x");
-        final boolean portFalse2 = NetconfCommandUtils.isPortValid("65536");
-        final boolean portFalse3 = NetconfCommandUtils.isPortValid("");
-
-        assertTrue(portTrue);
-        assertTrue(portTrue2);
-        assertFalse(portFalse);
-        assertFalse(portFalse2);
-        assertFalse(portFalse3);
-
+    void testIsPortValid() {
+        assertTrue(NetconfCommandUtils.isPortValid("65535"));
+        assertTrue(NetconfCommandUtils.isPortValid("0"));
+        assertFalse(NetconfCommandUtils.isPortValid("123x"));
+        assertFalse(NetconfCommandUtils.isPortValid("65536"));
+        assertFalse(NetconfCommandUtils.isPortValid(""));
     }
 
     @Test
-    public void testIsIpValid() {
-        final boolean ipTrue = NetconfCommandUtils.isIpValid("0.0.0.0");
-        final boolean ipTrue2 = NetconfCommandUtils.isIpValid("255.255.255.255");
-
-        final boolean ipFalse = NetconfCommandUtils.isIpValid("256.1.1.1");
-        final boolean ipFalse2 = NetconfCommandUtils.isIpValid("123.145.12.x");
-        final boolean ipFalse3 = NetconfCommandUtils.isIpValid("");
-
-        assertTrue(ipTrue);
-        assertTrue(ipTrue2);
-        assertFalse(ipFalse);
-        assertFalse(ipFalse2);
-        assertFalse(ipFalse3);
+    void testIsIpValid() {
+        assertTrue(NetconfCommandUtils.isIpValid("0.0.0.0"));
+        assertTrue(NetconfCommandUtils.isIpValid("255.255.255.255"));
+        assertFalse(NetconfCommandUtils.isIpValid("256.1.1.1"));
+        assertFalse(NetconfCommandUtils.isIpValid("123.145.12.x"));
+        assertFalse(NetconfCommandUtils.isIpValid(""));
     }
 }

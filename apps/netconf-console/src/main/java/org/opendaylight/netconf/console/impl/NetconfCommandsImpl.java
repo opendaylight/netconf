@@ -40,7 +40,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
@@ -68,15 +67,15 @@ public class NetconfCommandsImpl implements NetconfCommands {
 
     @Override
     public Map<String, Map<String, String>> listDevices() {
-        final Topology topology = NetconfConsoleUtils.read(LogicalDatastoreType.OPERATIONAL,
-                NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
+        final var topology = NetconfConsoleUtils.read(LogicalDatastoreType.OPERATIONAL,
+            NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
         if (topology == null) {
             return new HashMap<>();
         }
-        final Map<String, Map<String, String>> netconfNodes = new HashMap<>();
-        for (final Node node : topology.nonnullNode().values()) {
-            final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
-            final Map<String, String> attributes = new HashMap<>();
+        final var netconfNodes = new HashMap<String, Map<String, String>>();
+        for (var node : topology.nonnullNode().values()) {
+            final var netconfNode = node.augmentation(NetconfNode.class);
+            final var attributes = new HashMap<String, String>();
             attributes.put(NetconfConsoleConstants.NETCONF_ID, node.getNodeId().getValue());
             attributes.put(NetconfConsoleConstants.NETCONF_IP,
                     netconfNode.getHost().getIpAddress().getIpv4Address().getValue());

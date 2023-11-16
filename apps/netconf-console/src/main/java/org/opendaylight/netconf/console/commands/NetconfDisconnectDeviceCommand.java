@@ -5,8 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.console.commands;
+
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -20,52 +21,51 @@ import org.opendaylight.netconf.console.api.NetconfCommands;
 @Service
 @Command(name = "disconnect-device", scope = "netconf", description = "Disconnect netconf device.")
 public class NetconfDisconnectDeviceCommand implements Action {
-
     @Reference
     private NetconfCommands service;
-
-    public NetconfDisconnectDeviceCommand() {
-
-    }
-
-    @VisibleForTesting
-    NetconfDisconnectDeviceCommand(final NetconfCommands service) {
-        this.service = service;
-    }
-
-    @VisibleForTesting
-    NetconfDisconnectDeviceCommand(final NetconfCommands service, final String deviceId, final String deviceIp,
-                                   final String devicePort) {
-        this.service = service;
-        this.deviceId = deviceId;
-        this.deviceIp = deviceIp;
-        this.devicePort = devicePort;
-    }
 
     @Option(name = "-i",
             aliases = { "--ipaddress" },
             description = "IP address of the netconf device",
             required = false,
             multiValued = false)
-    private String deviceIp;
+    String deviceIp;
 
     @Option(name = "-p",
             aliases = { "--port" },
             description = "Port of the netconf device",
             required = false,
             multiValued = false)
-    private String devicePort;
+    String devicePort;
 
     @Option(name = "-id",
             aliases = { "--identifier" },
             description = "Node Identifier of the netconf device",
             required = false,
             multiValued = false)
-    private String deviceId;
+    String deviceId;
+
+    public NetconfDisconnectDeviceCommand() {
+        // Nothing here, uses injection
+    }
+
+    @VisibleForTesting
+    NetconfDisconnectDeviceCommand(final NetconfCommands service) {
+        this.service = requireNonNull(service);
+    }
+
+    @VisibleForTesting
+    NetconfDisconnectDeviceCommand(final NetconfCommands service, final String deviceId, final String deviceIp,
+            final String devicePort) {
+        this.service = requireNonNull(service);
+        this.deviceId = deviceId;
+        this.deviceIp = deviceIp;
+        this.devicePort = devicePort;
+    }
 
     @Override
-    public Object execute() {
-        boolean status = false;
+    public String execute() {
+        final boolean status;
         if (!Strings.isNullOrEmpty(deviceId)) {
             status = service.disconnectDevice(deviceId);
         } else {
@@ -74,8 +74,7 @@ public class NetconfDisconnectDeviceCommand implements Action {
             }
             status = service.disconnectDevice(deviceIp, devicePort);
         }
-        final String message = status ? "Netconf connector disconnected succesfully"
+        return status ? "Netconf connector disconnected succesfully"
                 : "Failed to disconnect netconf connector. Refer to karaf.log for details.";
-        return message;
     }
 }

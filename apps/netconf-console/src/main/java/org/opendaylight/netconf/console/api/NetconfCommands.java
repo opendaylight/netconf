@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.console.api;
 
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.Map;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 
 public interface NetconfCommands {
-
     /**
      * Returns a Hashmap with NETCONF ID as outer key and
      * inner keys representing attributes of a NETCONF device.
