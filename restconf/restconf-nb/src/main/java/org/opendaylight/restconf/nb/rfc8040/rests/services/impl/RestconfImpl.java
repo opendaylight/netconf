@@ -10,6 +10,9 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import java.io.InputStream;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
@@ -23,25 +26,97 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.OperationsContent;
 import org.opendaylight.restconf.server.spi.OperationOutput;
+import org.opendaylight.yangtools.yang.common.Revision;
 
 /**
  * Baseline RESTCONF implementation with JAX-RS.
  */
 @Path("/")
 public final class RestconfImpl {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
+
     private final MdsalRestconfServer server;
 
     public RestconfImpl(final MdsalRestconfServer server) {
         this.server = requireNonNull(server);
+    }
+
+
+    /**
+     * Get target data resource from data root.
+     *
+     * @param uriInfo URI info
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @GET
+    @Path("/data")
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void dataGET(@Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+        final var readParams = QueryParams.newReadDataParams(uriInfo);
+        completeDataGET(server.dataGET(readParams), readParams, ar);
+    }
+
+    /**
+     * Get target data resource.
+     *
+     * @param identifier path to target
+     * @param uriInfo URI info
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @GET
+    @Path("/data/{identifier:.+}")
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_JSON,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void dataGET(@Encoded @PathParam("identifier") final String identifier,
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+        final var readParams = QueryParams.newReadDataParams(uriInfo);
+        completeDataGET(server.dataGET(identifier, readParams), readParams, ar);
+    }
+
+    private static void completeDataGET(final RestconfFuture<NormalizedNodePayload> future,
+            final ReadDataParams readParams, final AsyncResponse ar) {
+        future.addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final NormalizedNodePayload result) {
+                return switch (readParams.content()) {
+                    case ALL, CONFIG -> {
+                        final var type = result.data().name().getNodeType();
+                        yield Response.status(Status.OK)
+                            .entity(result)
+                            // FIXME: is this ETag okay?
+                            .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
+                                + "-" + type.getLocalName() + '"')
+                            .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
+                            .build();
+                    }
+                    case NONCONFIG -> Response.status(Status.OK).entity(result).build();
+                };
+            }
+        });
     }
 
     /**

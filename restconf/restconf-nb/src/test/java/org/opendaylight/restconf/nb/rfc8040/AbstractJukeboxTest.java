@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -66,15 +64,6 @@ public abstract class AbstractJukeboxTest {
         .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
         .build();
 
-    protected static EffectiveModelContext JUKEBOX_SCHEMA;
-
-    @BeforeClass
-    public static final void beforeClass() {
-        JUKEBOX_SCHEMA = YangParserTestUtils.parseYangResourceDirectory("/jukebox");
-    }
-
-    @AfterClass
-    public static final void afterClass() {
-        JUKEBOX_SCHEMA = null;
-    }
+    protected static final EffectiveModelContext JUKEBOX_SCHEMA =
+        YangParserTestUtils.parseYangResourceDirectory("/jukebox");
 }

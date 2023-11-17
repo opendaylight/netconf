@@ -13,14 +13,10 @@ import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
-import javax.ws.rs.GET;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -39,12 +35,10 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
@@ -67,7 +61,6 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -86,7 +79,6 @@ import org.slf4j.LoggerFactory;
 @Path("/")
 public final class RestconfDataServiceImpl {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
     private final DatabindProvider databindProvider;
     private final MdsalRestconfServer server;
@@ -94,70 +86,6 @@ public final class RestconfDataServiceImpl {
     public RestconfDataServiceImpl(final DatabindProvider databindProvider, final MdsalRestconfServer server) {
         this.databindProvider = requireNonNull(databindProvider);
         this.server = requireNonNull(server);
-    }
-
-    /**
-     * Get target data resource from data root.
-     *
-     * @param uriInfo URI info
-     * @param ar {@link AsyncResponse} which needs to be completed
-     */
-    @GET
-    @Path("/data")
-    @Produces({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML,
-        MediaType.APPLICATION_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.TEXT_XML
-    })
-    public void dataGET(@Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        final var readParams = QueryParams.newReadDataParams(uriInfo);
-        completeDataGET(server.dataGET(readParams), readParams, ar);
-    }
-
-    /**
-     * Get target data resource.
-     *
-     * @param identifier path to target
-     * @param uriInfo URI info
-     * @param ar {@link AsyncResponse} which needs to be completed
-     */
-    @GET
-    @Path("/data/{identifier:.+}")
-    @Produces({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML,
-        MediaType.APPLICATION_JSON,
-        MediaType.APPLICATION_XML,
-        MediaType.TEXT_XML
-    })
-    public void dataGET(@Encoded @PathParam("identifier") final String identifier,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        final var readParams = QueryParams.newReadDataParams(uriInfo);
-        completeDataGET(server.dataGET(identifier, readParams), readParams, ar);
-    }
-
-    private static void completeDataGET(final RestconfFuture<NormalizedNodePayload> future,
-            final ReadDataParams readParams, final AsyncResponse ar) {
-        future.addCallback(new JaxRsRestconfCallback<>(ar) {
-            @Override
-            Response transform(final NormalizedNodePayload result) {
-                return switch (readParams.content()) {
-                    case ALL, CONFIG -> {
-                        final var type = result.data().name().getNodeType();
-                        yield Response.status(Status.OK)
-                            .entity(result)
-                            // FIXME: is this ETag okay?
-                            .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
-                                + "-" + type.getLocalName() + '"')
-                            .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
-                            .build();
-                    }
-                    case NONCONFIG -> Response.status(Status.OK).entity(result).build();
-                };
-            }
-        });
     }
 
     /**
