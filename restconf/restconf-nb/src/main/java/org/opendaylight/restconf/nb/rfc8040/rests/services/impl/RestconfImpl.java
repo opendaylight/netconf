@@ -21,6 +21,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -47,6 +48,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.OperationsContent;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationOutput;
@@ -352,6 +354,101 @@ public final class RestconfImpl {
 
             private static Status statusOfFirst(final List<RestconfError> error) {
                 return ErrorTags.statusOf(error.get(0).getErrorTag());
+            }
+        });
+    }
+
+    /**
+     * Replace the data store.
+     *
+     * @param uriInfo request URI information
+     * @param body data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @PUT
+    @Path("/data")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaType.APPLICATION_JSON,
+    })
+    public void dataJsonPUT(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
+        try (var jsonBody = new JsonResourceBody(body)) {
+            completeDataPUT(server.dataPUT(jsonBody, QueryParams.normalize(uriInfo)), ar);
+        }
+    }
+
+    /**
+     * Create or replace the target data resource.
+     *
+     * @param identifier path to target
+     * @param uriInfo request URI information
+     * @param body data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @PUT
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaType.APPLICATION_JSON,
+    })
+    public void dataJsonPUT(@Encoded @PathParam("identifier") final String identifier,
+            @Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
+        try (var jsonBody = new JsonResourceBody(body)) {
+            completeDataPUT(server.dataPUT(identifier, jsonBody, QueryParams.normalize(uriInfo)), ar);
+        }
+    }
+
+    /**
+     * Replace the data store.
+     *
+     * @param uriInfo request URI information
+     * @param body data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @PUT
+    @Path("/data")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void dataXmlPUT(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
+        try (var xmlBody = new XmlResourceBody(body)) {
+            completeDataPUT(server.dataPUT(xmlBody, QueryParams.normalize(uriInfo)), ar);
+        }
+    }
+
+    /**
+     * Create or replace the target data resource.
+     *
+     * @param identifier path to target
+     * @param uriInfo request URI information
+     * @param body data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @PUT
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void dataXmlPUT(@Encoded @PathParam("identifier") final String identifier,
+            @Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
+        try (var xmlBody = new XmlResourceBody(body)) {
+            completeDataPUT(server.dataPUT(identifier, xmlBody, QueryParams.normalize(uriInfo)), ar);
+        }
+    }
+
+    private static void completeDataPUT(final RestconfFuture<DataPutResult> future, final AsyncResponse ar) {
+        future.addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final DataPutResult result) {
+                return switch (result) {
+                    // Note: no Location header, as it matches the request path
+                    case CREATED -> Response.status(Status.CREATED).build();
+                    case REPLACED -> Response.noContent().build();
+                };
             }
         });
     }

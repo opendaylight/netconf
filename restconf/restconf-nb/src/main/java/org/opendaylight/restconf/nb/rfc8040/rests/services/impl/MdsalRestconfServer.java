@@ -25,6 +25,7 @@ import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CancellationException;
 import javax.inject.Inject;
@@ -46,6 +47,7 @@ import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
@@ -58,6 +60,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.OperationsContent;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -292,11 +295,35 @@ public final class MdsalRestconfServer implements RestconfServer {
      * @param schemaPath schema path of data
      * @return {@link DOMActionResult}
      */
-    private static RestconfFuture<DOMActionResult> dataInvokePOST(final ContainerNode data,
-            final Absolute schemaPath, final YangInstanceIdentifier yangIId, final DOMMountPoint mountPoint) {
+    private static RestconfFuture<DOMActionResult> dataInvokePOST(final ContainerNode data, final Absolute schemaPath,
+            final YangInstanceIdentifier yangIId, final DOMMountPoint mountPoint) {
         final var actionService = mountPoint.getService(DOMActionService.class);
         return actionService.isPresent() ? dataInvokePOST(data, schemaPath, yangIId, actionService.orElseThrow())
             : RestconfFuture.failed(new RestconfDocumentedException("DOMActionService is missing."));
+    }
+
+    @Override
+    public RestconfFuture<DataPutResult> dataPUT(final ResourceBody body, final Map<String, String> query) {
+        return dataPUT(bindRequestRoot(), body, query);
+    }
+
+    @Override
+    public RestconfFuture<DataPutResult> dataPUT(final String identifier, final ResourceBody body,
+             final Map<String, String> queryParameters) {
+        return dataPUT(bindRequestPath(identifier), body, queryParameters);
+    }
+
+    private @NonNull RestconfFuture<DataPutResult> dataPUT(final InstanceIdentifierContext reqPath,
+            final ResourceBody body, final Map<String, String> queryParameters) {
+        final Insert insert;
+        try {
+            insert = Insert.ofQueryParameters(reqPath.getSchemaContext(), queryParameters);
+        } catch (IllegalArgumentException e) {
+            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+        }
+        final var req = bindResourceRequest(reqPath, body);
+        return req.strategy().putData(req.path(), req.data(), insert);
     }
 
     @Override

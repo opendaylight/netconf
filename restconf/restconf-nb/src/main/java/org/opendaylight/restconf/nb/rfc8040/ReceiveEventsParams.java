@@ -54,8 +54,11 @@ public record ReceiveEventsParams(
 
     /**
      * Return {@link ReceiveEventsParams} for specified query parameters.
+     *
      * @param queryParameters Parameters and their values
      * @return A {@link ReceiveEventsParams}
+     * @throws NullPointerException if {@code queryParameters} is {@code null}
+     * @throws IllegalArgumentException if the parameters are invalid
      */
     public static @NonNull ReceiveEventsParams ofQueryParameters(final Map<String, String> queryParameters) {
         StartTimeParam startTime = null;
@@ -130,7 +133,7 @@ public record ReceiveEventsParams(
         return helper.toString();
     }
 
-    private static <T> @Nullable T optionalParam(final Function<String, @NonNull T> factory, final String name,
+    static <T> @Nullable T optionalParam(final Function<String, @NonNull T> factory, final String name,
             final String value) {
         try {
             return factory.apply(requireNonNull(value));

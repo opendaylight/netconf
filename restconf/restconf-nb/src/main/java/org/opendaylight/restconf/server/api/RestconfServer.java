@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.api;
 
 import java.net.URI;
+import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
@@ -90,6 +91,25 @@ public interface RestconfServer {
      * @return A {@link RestconfFuture} of the {@link PatchStatusContext} content
      */
     RestconfFuture<PatchStatusContext> dataPATCH(String identifier, PatchBody body);
+
+    /**
+     * Replace the data store.
+     *
+     * @param body data node for put to config DS
+     * @param queryParameters Query parameters
+     * @return A {@link RestconfFuture} completing with {@link DataPutResult}
+     */
+    RestconfFuture<DataPutResult> dataPUT(ResourceBody body, Map<String, String> queryParameters);
+
+    /**
+     * Create or replace a data store resource.
+     *
+     * @param identifier resource identifier
+     * @param body data node for put to config DS
+     * @param queryParameters Query parameters
+     * @return A {@link RestconfFuture} completing with {@link DataPutResult}
+     */
+    RestconfFuture<DataPutResult> dataPUT(String identifier, ResourceBody body, Map<String, String> queryParameters);
 
     /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, String, OperationInputBody)}.
