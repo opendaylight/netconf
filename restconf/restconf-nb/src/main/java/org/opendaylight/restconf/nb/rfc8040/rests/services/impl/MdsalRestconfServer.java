@@ -48,6 +48,7 @@ import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -344,6 +345,15 @@ public final class MdsalRestconfServer implements RestconfServer {
 
     @NonNull InstanceIdentifierContext bindRequestRoot() {
         return InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext().modelContext());
+    }
+
+    @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath, final ResourceBody body) {
+        final var inference = reqPath.inference();
+        final var path = reqPath.getInstanceIdentifier();
+        final var data = body.toNormalizedNode(path, inference, reqPath.getSchemaNode());
+
+        return new ResourceRequest(
+            getRestconfStrategy(inference.getEffectiveModelContext(), reqPath.getMountPoint()), path, data);
     }
 
     @VisibleForTesting
