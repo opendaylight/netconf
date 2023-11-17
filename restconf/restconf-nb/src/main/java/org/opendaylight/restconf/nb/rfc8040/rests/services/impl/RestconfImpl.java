@@ -14,6 +14,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -38,7 +39,9 @@ import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.OperationsContent;
+import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationOutput;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Revision;
 
 /**
@@ -48,10 +51,29 @@ import org.opendaylight.yangtools.yang.common.Revision;
 public final class RestconfImpl {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
-    private final MdsalRestconfServer server;
+    private final RestconfServer server;
 
-    public RestconfImpl(final MdsalRestconfServer server) {
+    public RestconfImpl(final RestconfServer server) {
         this.server = requireNonNull(server);
+    }
+
+    /**
+     * Delete the target data resource.
+     *
+     * @param identifier path to target
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @DELETE
+    @Path("/data/{identifier:.+}")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public void dataDELETE(@Encoded @PathParam("identifier") final String identifier,
+            @Suspended final AsyncResponse ar) {
+        server.dataDELETE(identifier).addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final Empty result) {
+                return Response.noContent().build();
+            }
+        });
     }
 
     /**

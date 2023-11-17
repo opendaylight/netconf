@@ -27,16 +27,12 @@ import java.util.concurrent.ExecutionException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -54,12 +50,13 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class RestconfOperationsPostTest {
+class RestconfOperationsPostTest extends AbstractRestconfTest {
     private static final URI RESTCONF_URI = URI.create("/restconf");
     private static final QName RPC = QName.create("invoke:rpc:module", "2013-12-03", "rpc-test");
     private static final ContainerNode INPUT = Builders.containerBuilder()
@@ -70,31 +67,17 @@ class RestconfOperationsPostTest {
         .withNodeIdentifier(new NodeIdentifier(QName.create(RPC, "output")))
         .withChild(ImmutableNodes.leafNode(QName.create(RPC, "content"), "operation result"))
         .build();
-    private static final DatabindContext CONTEXT =
-        DatabindContext.ofModel(YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc"));
-    private static final OperationInput OPER_INPUT = new OperationInput(CONTEXT,
-            SchemaInferenceStack.of(CONTEXT.modelContext(), Absolute.of(RPC)).toInference(), INPUT);
+    private static final EffectiveModelContext MODEL_CONTEXT =
+        YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc");
+    private static final OperationInput OPER_INPUT = new OperationInput(DatabindContext.ofModel(MODEL_CONTEXT),
+            SchemaInferenceStack.of(MODEL_CONTEXT, Absolute.of(RPC)).toInference(), INPUT);
 
-    @Mock
-    private DOMDataBroker dataBroker;
-    @Mock
-    private DOMRpcService rpcService;
-    @Mock
-    private DOMActionService actionService;
-    @Mock
-    private DOMMountPoint mountPoint;
-    @Mock
-    private DOMMountPointService mountPointService;
     @Mock
     private DOMNotificationService notificationService;
 
-    private RestconfImpl restconf;
-    private MdsalRestconfServer server;
-
-    @BeforeEach
-    void beforeEach() {
-        server = new MdsalRestconfServer(() -> CONTEXT, dataBroker, rpcService, actionService, mountPointService);
-        restconf = new RestconfImpl(server);
+    @Override
+    EffectiveModelContext modelContext() {
+        return MODEL_CONTEXT;
     }
 
     @Test
@@ -140,8 +123,7 @@ class RestconfOperationsPostTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of()))).when(rpcService)
             .invokeRpc(RPC, INPUT);
         assertEquals(OUTPUT,
-            Futures.getDone(
-                server.getRestconfStrategy(CONTEXT.modelContext(), null).invokeRpc(RESTCONF_URI, RPC, OPER_INPUT))
+            Futures.getDone(server.getRestconfStrategy(MODEL_CONTEXT, null).invokeRpc(RESTCONF_URI, RPC, OPER_INPUT))
             .output());
     }
 
@@ -153,7 +135,7 @@ class RestconfOperationsPostTest {
         doReturn(Futures.immediateFailedFuture(exception)).when(rpcService).invokeRpc(errorRpc, INPUT);
         final var ex = assertInstanceOf(RestconfDocumentedException.class,
             assertThrows(ExecutionException.class,
-                () -> Futures.getDone(server.getRestconfStrategy(CONTEXT.modelContext(), null)
+                () -> Futures.getDone(server.getRestconfStrategy(MODEL_CONTEXT, null)
                     .invokeRpc(RESTCONF_URI, errorRpc, OPER_INPUT))).getCause());
         final var errorList = ex.getErrors();
         assertEquals(1, errorList.size());
@@ -172,7 +154,7 @@ class RestconfOperationsPostTest {
             .invokeRpc(RPC, INPUT);
         assertEquals(OUTPUT,
             Futures.getDone(
-                server.getRestconfStrategy(CONTEXT.modelContext(), mountPoint).invokeRpc(RESTCONF_URI, RPC, OPER_INPUT))
+                server.getRestconfStrategy(MODEL_CONTEXT, mountPoint).invokeRpc(RESTCONF_URI, RPC, OPER_INPUT))
             .output());
     }
 
@@ -181,7 +163,7 @@ class RestconfOperationsPostTest {
         doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
-        final var strategy = server.getRestconfStrategy(CONTEXT.modelContext(), mountPoint);
+        final var strategy = server.getRestconfStrategy(MODEL_CONTEXT, mountPoint);
         final var ex = assertInstanceOf(RestconfDocumentedException.class,
             assertThrows(ExecutionException.class,
                 () -> Futures.getDone(strategy.invokeRpc(RESTCONF_URI, RPC, OPER_INPUT))).getCause());
@@ -198,8 +180,7 @@ class RestconfOperationsPostTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of())))
             .when(rpcService).invokeRpc(RPC, INPUT);
         assertEquals(OUTPUT,
-            Futures.getDone(server.getRestconfStrategy(CONTEXT.modelContext(), null)
-                .invokeRpc(RESTCONF_URI, RPC, OPER_INPUT))
+            Futures.getDone(server.getRestconfStrategy(MODEL_CONTEXT, null).invokeRpc(RESTCONF_URI, RPC, OPER_INPUT))
             .output());
     }
 

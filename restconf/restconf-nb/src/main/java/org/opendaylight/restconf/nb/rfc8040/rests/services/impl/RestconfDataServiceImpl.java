@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
@@ -336,27 +335,6 @@ public final class RestconfDataServiceImpl {
         }
 
         return uriInfo.getBaseUriBuilder().path("data").path(IdentifierCodec.serialize(path, schemaContext)).build();
-    }
-
-    /**
-     * Delete the target data resource.
-     *
-     * @param identifier path to target
-     * @param ar {@link AsyncResponse} which needs to be completed
-     */
-    @DELETE
-    @Path("/data/{identifier:.+}")
-    public void deleteData(@Encoded @PathParam("identifier") final String identifier,
-            @Suspended final AsyncResponse ar) {
-        final var reqPath = server.bindRequestPath(identifier);
-        final var strategy = server.getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
-
-        strategy.delete(reqPath.getInstanceIdentifier()).addCallback(new JaxRsRestconfCallback<>(ar) {
-            @Override
-            Response transform(final Empty result) {
-                return Response.noContent().build();
-            }
-        });
     }
 
     /**

@@ -11,37 +11,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class Netconf822Test {
-    private static final @NonNull DatabindContext DATABIND =
-        DatabindContext.ofModel(YangParserTestUtils.parseYangResourceDirectory("/nc822"));
+class Netconf822Test extends AbstractRestconfTest {
+    private static final @NonNull EffectiveModelContext MODEL_CONTEXT =
+        YangParserTestUtils.parseYangResourceDirectory("/nc822");
 
-    @Mock
-    private DOMDataBroker dataBroker;
-    @Mock
-    private DOMRpcService rpcService;
-    @Mock
-    private DOMActionService actionService;
-    @Mock
-    private DOMMountPointService mountPointService;
-
-    private MdsalRestconfServer server;
-
-    @BeforeEach
-    void beforeEach() {
-        server = new MdsalRestconfServer(() -> DATABIND, dataBroker, rpcService, actionService, mountPointService);
+    @Override
+    @NonNull EffectiveModelContext modelContext() {
+        return MODEL_CONTEXT;
     }
 
     @Test

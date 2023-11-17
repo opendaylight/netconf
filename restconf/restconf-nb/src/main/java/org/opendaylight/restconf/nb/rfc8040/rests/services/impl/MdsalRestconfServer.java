@@ -63,6 +63,7 @@ import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.Restconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -134,6 +135,13 @@ public final class MdsalRestconfServer implements RestconfServer {
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMMountPointService mountPointService, final RpcImplementation... localRpcs) {
         this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
+    }
+
+    @Override
+    public RestconfFuture<Empty> dataDELETE(final String identifier) {
+        final var reqPath = bindRequestPath(identifier);
+        final var strategy = getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
+        return strategy.delete(reqPath.getInstanceIdentifier());
     }
 
     @Override
