@@ -44,9 +44,11 @@ import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
+import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
@@ -69,6 +71,7 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
@@ -132,6 +135,39 @@ public final class MdsalRestconfServer implements RestconfServer {
         this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
     }
 
+    @Override
+    public RestconfFuture<NormalizedNodePayload> dataGET(final ReadDataParams readParams) {
+        return readData(bindRequestRoot(), readParams);
+    }
+
+    @Override
+    public RestconfFuture<NormalizedNodePayload> dataGET(final String identifier, final ReadDataParams readParams) {
+        return readData(bindRequestPath(identifier), readParams);
+    }
+
+    private @NonNull RestconfFuture<NormalizedNodePayload> readData(final InstanceIdentifierContext reqPath,
+            final ReadDataParams readParams) {
+        final var queryParams = QueryParams.newQueryParameters(readParams, reqPath);
+        final var fieldPaths = queryParams.fieldPaths();
+        final var strategy = getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
+        final NormalizedNode node;
+        if (fieldPaths != null && !fieldPaths.isEmpty()) {
+            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
+                readParams.withDefaults(), fieldPaths);
+        } else {
+            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
+                readParams.withDefaults());
+        }
+        if (node == null) {
+            return RestconfFuture.failed(new RestconfDocumentedException(
+                "Request could not be completed because the relevant data model content does not exist",
+                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
+        }
+
+        return RestconfFuture.of(new NormalizedNodePayload(reqPath.inference(), node, queryParams));
+    }
+
+    // FIXME: should follow the same pattern as operationsPOST() does
     RestconfFuture<DOMActionResult> dataInvokePOST(final InstanceIdentifierContext reqPath,
             final OperationInputBody body) {
         final var yangIIdContext = reqPath.getInstanceIdentifier();

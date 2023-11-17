@@ -614,6 +614,7 @@ public abstract class RestconfStrategy {
      * @param defaultsMode value of with-defaults parameter
      * @return {@link NormalizedNode}
      */
+    // FIXME: NETCONF-1155: this method should asynchronous
     public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) {
         return switch (content) {
@@ -645,6 +646,7 @@ public abstract class RestconfStrategy {
      * @param fields   paths to selected subtrees which should be read, relative to to the parent path
      * @return {@link NormalizedNode}
      */
+    // FIXME: NETCONF-1155: this method should asynchronous
     public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
             final @NonNull List<YangInstanceIdentifier> fields) {
