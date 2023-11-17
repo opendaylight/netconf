@@ -47,16 +47,14 @@ class Netconf822Test {
         assertEquals("""
             {
               "ietf-restconf:operations" : {
-                "foo:new": [null],
-                "foo:new1": [null]
+                "foo:new" : [null],
+                "foo:new1" : [null]
               }
             }""", content.toJSON());
         assertEquals("""
-            <?xml version="1.0" encoding="UTF-8"?>
-            <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"
-                        xmlns:ns0="foo">
-              <ns0:new/>
-              <ns0:new1/>
+            <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+              <new xmlns="foo"/>
+              <new1 xmlns="foo"/>
             </operations>""", content.toXML());
     }
 
@@ -65,16 +63,8 @@ class Netconf822Test {
         final var content = server.operationsGET("foo:new1");
         assertNotNull(content);
         assertEquals("""
-            {
-              "ietf-restconf:operations" : {
-                "foo:new1": [null]
-              }
-            }""", content.toJSON());
+            { "foo:new1" : [null] }""", content.toJSON());
         assertEquals("""
-            <?xml version="1.0" encoding="UTF-8"?>
-            <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"
-                        xmlns:ns0="foo">
-              <ns0:new1/>
-            </operations>""", content.toXML());
+            <new1 xmlns="foo"/>""", content.toXML());
     }
 }

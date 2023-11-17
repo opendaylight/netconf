@@ -39,21 +39,18 @@ public class RestconfOperationsServiceImplTest {
     private static final String EXPECTED_JSON = """
         {
           "ietf-restconf:operations" : {
-            "module1:dummy-rpc1-module1": [null],
-            "module1:dummy-rpc2-module1": [null],
-            "module2:dummy-rpc1-module2": [null],
-            "module2:dummy-rpc2-module2": [null]
+            "module1:dummy-rpc1-module1" : [null],
+            "module1:dummy-rpc2-module1" : [null],
+            "module2:dummy-rpc1-module2" : [null],
+            "module2:dummy-rpc2-module2" : [null]
           }
         }""";
     private static final String EXPECTED_XML = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"
-                    xmlns:ns0="module:1"
-                    xmlns:ns1="module:2">
-          <ns0:dummy-rpc1-module1/>
-          <ns0:dummy-rpc2-module1/>
-          <ns1:dummy-rpc1-module2/>
-          <ns1:dummy-rpc2-module2/>
+        <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
+          <dummy-rpc1-module1 xmlns="module:1"/>
+          <dummy-rpc2-module1 xmlns="module:1"/>
+          <dummy-rpc1-module2 xmlns="module:2"/>
+          <dummy-rpc2-module2 xmlns="module:2"/>
         </operations>""";
 
     private static EffectiveModelContext SCHEMA;
@@ -116,21 +113,13 @@ public class RestconfOperationsServiceImplTest {
     public void testMountPointSpecificOperationsJson() {
         final var operationJSON = opService.getOperationJSON(DEVICE_RPC1_MODULE1_ID);
         assertEquals("""
-            {
-              "ietf-restconf:operations" : {
-                "module1:dummy-rpc1-module1": [null]
-              }
-            }""", operationJSON);
+            { "module1:dummy-rpc1-module1" : [null] }""", operationJSON);
     }
 
     @Test
     public void testMountPointSpecificOperationsXml() {
         final var operationXML = opService.operationsGetXML(DEVICE_RPC1_MODULE1_ID);
         assertEquals("""
-            <?xml version="1.0" encoding="UTF-8"?>
-            <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"
-                        xmlns:ns0="module:1">
-              <ns0:dummy-rpc1-module1/>
-            </operations>""", operationXML);
+            <dummy-rpc1-module1 xmlns="module:1"/>""", operationXML);
     }
 }
