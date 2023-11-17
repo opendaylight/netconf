@@ -152,9 +152,7 @@ public final class MdsalRestconfServer implements RestconfServer {
 
         final var stmt = inference.toSchemaInferenceStack().currentStatement();
         if (stmt instanceof RpcEffectiveStatement rpc) {
-            final var qname = rpc.argument();
-            return new OperationsContent(inference.getEffectiveModelContext(),
-                ImmutableSetMultimap.of(qname.getModule(), qname));
+            return OperationsContent.of(inference.getEffectiveModelContext(), rpc.argument());
         }
         LOG.debug("Operation '{}' resulted in non-RPC {}", operation, stmt);
         return null;
@@ -164,7 +162,7 @@ public final class MdsalRestconfServer implements RestconfServer {
         final var modules = modelContext.getModuleStatements();
         if (modules.isEmpty()) {
             // No modules, or defensive return empty content
-            return new OperationsContent(modelContext, ImmutableSetMultimap.of());
+            return OperationsContent.of(modelContext, ImmutableSetMultimap.of());
         }
 
         // RPCs by their XMLNamespace/Revision
@@ -188,7 +186,7 @@ public final class MdsalRestconfServer implements RestconfServer {
                 .findFirst()
                 .ifPresent(row -> rpcs.putAll(QNameModule.create(entry.getKey(), row.getKey()), row.getValue()));
         }
-        return new OperationsContent(modelContext, rpcs.build());
+        return OperationsContent.of(modelContext, rpcs.build());
     }
 
     @Override
