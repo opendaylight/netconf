@@ -8,12 +8,16 @@
 package org.opendaylight.restconf.server.api;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.api.OperationsContentHelper.appendJSON;
+import static org.opendaylight.restconf.server.api.OperationsContentHelper.appendXML;
+import static org.opendaylight.restconf.server.api.OperationsContentHelper.jsonPrefix;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSetMultimap;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -22,81 +26,101 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * RESTCONF {@code /operations} content for a {@code GET} operation as per
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC8040</a>.
  */
-@NonNullByDefault
-public record OperationsContent(
-        EffectiveModelContext modelContext,
-        ImmutableSetMultimap<QNameModule, QName> operations) {
-    public OperationsContent {
-        requireNonNull(modelContext);
-        requireNonNull(operations);
+public sealed interface OperationsContent {
+    record Leaf(EffectiveModelContext modelContext, QName rpc) implements OperationsContent {
+        public Leaf {
+            requireNonNull(modelContext);
+            requireNonNull(rpc);
+        }
+
+        @Override
+        public String toJSON() {
+            // https://www.rfc-editor.org/rfc/rfc8040#page-84:
+            //
+            //            In JSON, the YANG module name identifies the module:
+            //
+            //              { 'ietf-system:system-restart' : [null] }
+            return appendJSON(new StringBuilder("{ "), jsonPrefix(modelContext, rpc.getModule()), rpc).append(" }")
+                .toString();
+        }
+
+        @Override
+        public String toXML() {
+            // https://www.rfc-editor.org/rfc/rfc8040#page-84:
+            //
+            //            In XML, the YANG module namespace identifies the module:
+            //
+            //              <system-restart
+            //                 xmlns='urn:ietf:params:xml:ns:yang:ietf-system'/>
+            return appendXML(new StringBuilder(), rpc).toString();
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this).add("rpc", rpc).toString();
+        }
     }
 
-    public String toJSON() {
-        final var sb = new StringBuilder("""
-            {
-              "ietf-restconf:operations" : {\
-            """);
+    record Container(EffectiveModelContext modelContext, ImmutableSetMultimap<QNameModule, QName> rpcs)
+            implements OperationsContent {
+        public Container {
+            requireNonNull(modelContext);
+            requireNonNull(rpcs);
+        }
 
-        if (!operations.isEmpty()) {
-            final var entryIt = operations.asMap().entrySet().stream()
-                .map(entry -> Map.entry(
-                    modelContext.findModuleStatement(entry.getKey()).orElseThrow().argument().getLocalName(),
-                    entry.getValue()))
+        @Override
+        public String toJSON() {
+            final var sb = new StringBuilder("""
+                {
+                  "ietf-restconf:operations" : {\
+                """);
+
+            if (!rpcs.isEmpty()) {
+                final var entryIt = rpcs.asMap().entrySet().stream()
+                    .map(entry -> Map.entry(jsonPrefix(modelContext, entry.getKey()), entry.getValue()))
+                    .sorted(Comparator.comparing(Entry::getKey))
+                    .iterator();
+                var entry = entryIt.next();
+                var nameIt = entry.getValue().iterator();
+                while (true) {
+                    appendJSON(sb.append("\n    "), entry.getKey(), nameIt.next());
+                    if (nameIt.hasNext()) {
+                        sb.append(',');
+                        continue;
+                    }
+
+                    if (entryIt.hasNext()) {
+                        sb.append(',');
+                        entry = entryIt.next();
+                        nameIt = entry.getValue().iterator();
+                        continue;
+                    }
+
+                    break;
+                }
+            }
+
+            return sb.append("\n  }\n}").toString();
+        }
+
+        @Override
+        public String toXML() {
+            // Header with namespace declarations for each module
+            final var sb = new StringBuilder("<operations xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"");
+            if (rpcs.isEmpty()) {
+                return sb.append("/>").toString();
+            }
+
+            sb.append('>');
+            rpcs.asMap().entrySet().stream()
                 .sorted(Comparator.comparing(Entry::getKey))
-                .iterator();
-            var entry = entryIt.next();
-            var nameIt = entry.getValue().iterator();
-            while (true) {
-                final var rpcName = nameIt.next().getLocalName();
-                sb.append("\n    \"").append(entry.getKey()).append(':').append(rpcName).append("\": [null]");
-                if (nameIt.hasNext()) {
-                    sb.append(',');
-                    continue;
-                }
-
-                if (entryIt.hasNext()) {
-                    sb.append(',');
-                    entry = entryIt.next();
-                    nameIt = entry.getValue().iterator();
-                    continue;
-                }
-
-                break;
-            }
+                .flatMap(entry -> entry.getValue().stream())
+                .forEach(rpc -> appendXML(sb.append("\n  "), rpc));
+            return sb.append("\n</operations>").toString();
         }
-
-        return sb.append("\n  }\n}").toString();
     }
 
-    public String toXML() {
-        // Header with namespace declarations for each module
-        final var sb = new StringBuilder("""
-            <?xml version="1.0" encoding="UTF-8"?>
-            <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"\
-            """);
-        if (operations.isEmpty()) {
-            return sb.append("/>").toString();
-        }
+    @NonNull String toJSON();
 
-        // We perform two passes:
-        // - first we emit namespace declarations
-        // - then we emit individual leaves
-        final var entries = operations.asMap().entrySet().stream()
-            .sorted(Comparator.comparing(Entry::getKey))
-            .toList();
-
-        for (int i = 0; i < entries.size(); ++i) {
-            sb.append("\n            xmlns:ns").append(i).append("=\"").append(entries.get(i).getKey().getNamespace())
-                .append('"');
-        }
-        sb.append('>');
-
-        for (int i = 0; i < entries.size(); ++i) {
-            for (var rpc : entries.get(i).getValue()) {
-                sb.append("\n  <ns").append(i).append(':').append(rpc.getLocalName()).append("/>");
-            }
-        }
-
-        return sb.append("\n</operations>").toString();
-    }
+    @NonNull String toXML();
 }
