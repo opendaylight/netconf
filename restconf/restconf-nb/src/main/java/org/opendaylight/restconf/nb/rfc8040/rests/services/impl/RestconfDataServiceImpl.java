@@ -39,6 +39,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
@@ -66,7 +67,6 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -100,7 +100,7 @@ public final class RestconfDataServiceImpl {
      * Get target data resource from data root.
      *
      * @param uriInfo URI info
-     * @return {@link NormalizedNodePayload}
+     * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Path("/data")
@@ -111,9 +111,9 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response readData(@Context final UriInfo uriInfo) {
+    public void dataGET(@Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
-        return readData(server.bindRequestRoot(), readParams);
+        completeDataGET(server.dataGET(readParams), readParams, ar);
     }
 
     /**
@@ -121,7 +121,7 @@ public final class RestconfDataServiceImpl {
      *
      * @param identifier path to target
      * @param uriInfo URI info
-     * @return {@link NormalizedNodePayload}
+     * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Path("/data/{identifier:.+}")
@@ -132,44 +132,32 @@ public final class RestconfDataServiceImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public Response readData(@Encoded @PathParam("identifier") final String identifier,
-            @Context final UriInfo uriInfo) {
+    public void dataGET(@Encoded @PathParam("identifier") final String identifier,
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
-        return readData(server.bindRequestPath(identifier), readParams);
+        completeDataGET(server.dataGET(identifier, readParams), readParams, ar);
     }
 
-    private Response readData(final InstanceIdentifierContext reqPath, final ReadDataParams readParams) {
-        final var queryParams = QueryParams.newQueryParameters(readParams, reqPath);
-        final var fieldPaths = queryParams.fieldPaths();
-        final var strategy = server.getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
-        final NormalizedNode node;
-        if (fieldPaths != null && !fieldPaths.isEmpty()) {
-            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
-                readParams.withDefaults(), fieldPaths);
-        } else {
-            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
-                readParams.withDefaults());
-        }
-        if (node == null) {
-            throw new RestconfDocumentedException(
-                "Request could not be completed because the relevant data model content does not exist",
-                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
-        }
-
-        return switch (readParams.content()) {
-            case ALL, CONFIG -> {
-                final QName type = node.name().getNodeType();
-                yield Response.status(Status.OK)
-                    .entity(new NormalizedNodePayload(reqPath.inference(), node, queryParams))
-                    .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null) + "-"
-                        + type.getLocalName() + '"')
-                    .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
-                    .build();
+    private static void completeDataGET(final RestconfFuture<NormalizedNodePayload> future,
+            final ReadDataParams readParams, final AsyncResponse ar) {
+        future.addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final NormalizedNodePayload result) {
+                return switch (readParams.content()) {
+                    case ALL, CONFIG -> {
+                        final var type = result.data().name().getNodeType();
+                        yield Response.status(Status.OK)
+                            .entity(result)
+                            // FIXME: is this ETag okay?
+                            .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
+                                + "-" + type.getLocalName() + '"')
+                            .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
+                            .build();
+                    }
+                    case NONCONFIG -> Response.status(Status.OK).entity(result).build();
+                };
             }
-            case NONCONFIG -> Response.status(Status.OK)
-                .entity(new NormalizedNodePayload(reqPath.inference(), node, queryParams))
-                .build();
-        };
+        });
     }
 
     /**

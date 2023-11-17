@@ -12,6 +12,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.spi.OperationOutput;
@@ -22,6 +23,11 @@ import org.opendaylight.restconf.server.spi.OperationOutput;
  */
 @NonNullByDefault
 public interface RestconfServer {
+
+    RestconfFuture<NormalizedNodePayload> dataGET(ReadDataParams readParams);
+
+    RestconfFuture<NormalizedNodePayload> dataGET(String identifier, ReadDataParams readParams);
+
     /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, String, OperationInputBody)}.
      *
