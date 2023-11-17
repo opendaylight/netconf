@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
@@ -31,15 +32,20 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
+import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.OperationsContent;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -230,6 +236,122 @@ public final class RestconfImpl {
             @Override
             Response transform(final Empty result) {
                 return Response.ok().build();
+            }
+        });
+    }
+
+    /**
+     * Ordered list of edits that are applied to the datastore by the server, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
+     *
+     * @param body YANG Patch body
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
+     */
+    @PATCH
+    @Path("/data")
+    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_JSON)
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
+    })
+    public void dataYangJsonPATCH(final InputStream body, @Suspended final AsyncResponse ar) {
+        try (var jsonBody = new JsonPatchBody(body)) {
+            completeDataYangPATCH(server.dataPATCH(jsonBody), ar);
+        }
+    }
+
+    /**
+     * Ordered list of edits that are applied to the target datastore by the server, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
+     *
+     * @param identifier path to target
+     * @param body YANG Patch body
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
+     */
+    @PATCH
+    @Path("/data/{identifier:.+}")
+    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_JSON)
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
+    })
+    public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final String identifier,
+            final InputStream body, @Suspended final AsyncResponse ar) {
+        try (var jsonBody = new JsonPatchBody(body)) {
+            completeDataYangPATCH(server.dataPATCH(identifier, jsonBody), ar);
+        }
+    }
+
+    /**
+     * Ordered list of edits that are applied to the datastore by the server, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
+     *
+     * @param body YANG Patch body
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
+     */
+    @PATCH
+    @Path("/data")
+    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_XML)
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
+    })
+    public void dataYangXmlPATCH(final InputStream body, @Suspended final AsyncResponse ar) {
+        try (var xmlBody = new XmlPatchBody(body)) {
+            completeDataYangPATCH(server.dataPATCH(xmlBody), ar);
+        }
+    }
+
+    /**
+     * Ordered list of edits that are applied to the target datastore by the server, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
+     *
+     * @param identifier path to target
+     * @param body YANG Patch body
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
+     */
+    @PATCH
+    @Path("/data/{identifier:.+}")
+    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_XML)
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaTypes.APPLICATION_YANG_DATA_XML
+    })
+    public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Suspended final AsyncResponse ar) {
+        try (var xmlBody = new XmlPatchBody(body)) {
+            completeDataYangPATCH(server.dataPATCH(identifier, xmlBody), ar);
+        }
+    }
+
+    private static void completeDataYangPATCH(final RestconfFuture<PatchStatusContext> future, final AsyncResponse ar) {
+        future.addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final PatchStatusContext result) {
+                return Response.status(statusOf(result)).entity(result).build();
+            }
+
+            private static Status statusOf(final PatchStatusContext result) {
+                if (result.ok()) {
+                    return Status.OK;
+                }
+                final var globalErrors = result.globalErrors();
+                if (globalErrors != null && !globalErrors.isEmpty()) {
+                    return statusOfFirst(globalErrors);
+                }
+                for (var edit : result.editCollection()) {
+                    if (!edit.isOk()) {
+                        final var editErrors = edit.getEditErrors();
+                        if (editErrors != null && !editErrors.isEmpty()) {
+                            return statusOfFirst(editErrors);
+                        }
+                    }
+                }
+                return Status.INTERNAL_SERVER_ERROR;
+            }
+
+            private static Status statusOfFirst(final List<RestconfError> error) {
+                return ErrorTags.statusOf(error.get(0).getErrorTag());
             }
         });
     }
