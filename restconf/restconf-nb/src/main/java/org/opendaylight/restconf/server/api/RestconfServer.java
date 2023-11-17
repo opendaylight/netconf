@@ -23,17 +23,6 @@ import org.opendaylight.restconf.server.spi.OperationOutput;
 @NonNullByDefault
 public interface RestconfServer {
     /**
-     * Return the revision of {@code ietf-yang-library} module implemented by this server, as defined in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">RFC8040 {+restconf}/yang-library-version</a>.
-     *
-     * @return A {@code yang-library-version} element
-     */
-    // FIXME: this is a simple coning-variadic return, similar to how OperationsContent is handled use a common
-    //        construct for both cases
-    // FIXME: RestconfFuture if we transition to being used by restconf-client implementation
-    NormalizedNodePayload yangLibraryVersionGET();
-
-    /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, String, OperationInputBody)}.
      *
      * @return An {@link OperationsContent}
@@ -66,4 +55,15 @@ public interface RestconfServer {
     //        and hence it is a path right now
     // FIXME: use ApiPath instead of String
     RestconfFuture<OperationOutput> operationsPOST(URI restconfURI, String operation, OperationInputBody body);
+
+    /**
+     * Return the revision of {@code ietf-yang-library} module implemented by this server, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">RFC8040 {+restconf}/yang-library-version</a>.
+     *
+     * @return A {@code yang-library-version} element
+     */
+    // FIXME: this is a simple coning-variadic return, similar to how OperationsContent is handled use a common
+    //        construct for both cases
+    // FIXME: RestconfFuture if we transition to being used by restconf-client implementation
+    NormalizedNodePayload yangLibraryVersionGET();
 }

@@ -60,7 +60,7 @@ public class Netconf799Test extends AbstractInstanceIdentifierTest {
 
         final DatabindProvider databindProvider = () -> DatabindContext.ofModel(IID_SCHEMA);
         final var dataService = new RestconfDataServiceImpl(databindProvider,
-            new MdsalRestconfServer(databindProvider, dataBroker, rpcService, mountPointService), actionService);
+            new MdsalRestconfServer(databindProvider, dataBroker, rpcService, actionService, mountPointService));
 
         doReturn(true).when(asyncResponse).resume(captor.capture());
         dataService.postDataJSON("instance-identifier-module:cont/cont1/reset",
