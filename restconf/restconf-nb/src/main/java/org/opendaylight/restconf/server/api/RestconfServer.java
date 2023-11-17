@@ -114,9 +114,9 @@ public interface RestconfServer {
     /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, String, OperationInputBody)}.
      *
-     * @return An {@link OperationsContent}
+     * @return An {@link OperationsGetResult}
      */
-    OperationsContent operationsGET();
+    OperationsGetResult operationsGET();
 
     /*
      * Return the details about a particular operation supported by
@@ -129,7 +129,7 @@ public interface RestconfServer {
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support ang-ext:mount,
     //        and hence it is a path right now
     // FIXME: use ApiPath instead of String
-    @Nullable OperationsContent operationsGET(String operation);
+    @Nullable OperationsGetResult operationsGET(String operation);
 
     /**
      * Invoke an RPC operation, as defined in

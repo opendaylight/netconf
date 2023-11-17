@@ -8,9 +8,9 @@
 package org.opendaylight.restconf.server.api;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.server.api.OperationsContentHelper.appendJSON;
-import static org.opendaylight.restconf.server.api.OperationsContentHelper.appendXML;
-import static org.opendaylight.restconf.server.api.OperationsContentHelper.jsonPrefix;
+import static org.opendaylight.restconf.server.api.OperationsGetResultHelper.appendJSON;
+import static org.opendaylight.restconf.server.api.OperationsGetResultHelper.appendXML;
+import static org.opendaylight.restconf.server.api.OperationsGetResultHelper.jsonPrefix;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -26,8 +26,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * RESTCONF {@code /operations} content for a {@code GET} operation as per
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC8040</a>.
  */
-public sealed interface OperationsContent {
-    record Leaf(EffectiveModelContext modelContext, QName rpc) implements OperationsContent {
+public sealed interface OperationsGetResult {
+    record Leaf(EffectiveModelContext modelContext, QName rpc) implements OperationsGetResult {
         public Leaf {
             requireNonNull(modelContext);
             requireNonNull(rpc);
@@ -62,7 +62,7 @@ public sealed interface OperationsContent {
     }
 
     record Container(EffectiveModelContext modelContext, ImmutableSetMultimap<QNameModule, QName> rpcs)
-            implements OperationsContent {
+            implements OperationsGetResult {
         public Container {
             requireNonNull(modelContext);
             requireNonNull(rpcs);

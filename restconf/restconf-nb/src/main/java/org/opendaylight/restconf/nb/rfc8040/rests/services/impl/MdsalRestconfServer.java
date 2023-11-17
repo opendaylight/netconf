@@ -61,7 +61,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.restconf.server.api.DataPutResult;
-import org.opendaylight.restconf.server.api.OperationsContent;
+import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.OperationOutput;
@@ -327,12 +327,12 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public OperationsContent operationsGET() {
+    public OperationsGetResult operationsGET() {
         return operationsGET(databindProvider.currentContext().modelContext());
     }
 
     @Override
-    public OperationsContent operationsGET(final String operation) {
+    public OperationsGetResult operationsGET(final String operation) {
         // get current module RPCs/actions by RPC/action name
         final var inference = bindRequestPath(operation).inference();
         if (inference.isEmpty()) {
@@ -341,17 +341,17 @@ public final class MdsalRestconfServer implements RestconfServer {
 
         final var stmt = inference.toSchemaInferenceStack().currentStatement();
         if (stmt instanceof RpcEffectiveStatement rpc) {
-            return new OperationsContent.Leaf(inference.getEffectiveModelContext(), rpc.argument());
+            return new OperationsGetResult.Leaf(inference.getEffectiveModelContext(), rpc.argument());
         }
         LOG.debug("Operation '{}' resulted in non-RPC {}", operation, stmt);
         return null;
     }
 
-    private static @NonNull OperationsContent operationsGET(final EffectiveModelContext modelContext) {
+    private static @NonNull OperationsGetResult operationsGET(final EffectiveModelContext modelContext) {
         final var modules = modelContext.getModuleStatements();
         if (modules.isEmpty()) {
             // No modules, or defensive return empty content
-            return new OperationsContent.Container(modelContext, ImmutableSetMultimap.of());
+            return new OperationsGetResult.Container(modelContext, ImmutableSetMultimap.of());
         }
 
         // RPCs by their XMLNamespace/Revision
@@ -375,7 +375,7 @@ public final class MdsalRestconfServer implements RestconfServer {
                 .findFirst()
                 .ifPresent(row -> rpcs.putAll(QNameModule.create(entry.getKey(), row.getKey()), row.getValue()));
         }
-        return new OperationsContent.Container(modelContext, rpcs.build());
+        return new OperationsGetResult.Container(modelContext, rpcs.build());
     }
 
     @Override

@@ -49,7 +49,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.DataPutResult;
-import org.opendaylight.restconf.server.api.OperationsContent;
+import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -503,7 +503,7 @@ public final class RestconfImpl {
         return operationsGET(operation).toXML();
     }
 
-    private @NonNull OperationsContent operationsGET(final String operation) {
+    private @NonNull OperationsGetResult operationsGET(final String operation) {
         final var content = server.operationsGET(operation);
         if (content == null) {
             throw new NotFoundException();
