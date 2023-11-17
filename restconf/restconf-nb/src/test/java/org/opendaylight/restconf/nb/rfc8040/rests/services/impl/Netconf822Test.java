@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -32,13 +33,15 @@ class Netconf822Test {
     @Mock
     private DOMRpcService rpcService;
     @Mock
+    private DOMActionService actionService;
+    @Mock
     private DOMMountPointService mountPointService;
 
     private MdsalRestconfServer server;
 
     @BeforeEach
     void beforeEach() {
-        server = new MdsalRestconfServer(() -> DATABIND, dataBroker, rpcService, mountPointService);
+        server = new MdsalRestconfServer(() -> DATABIND, dataBroker, rpcService, actionService, mountPointService);
     }
 
     @Test

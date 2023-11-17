@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -48,6 +49,8 @@ public class MdsalRestconfServerTest extends AbstractJukeboxTest {
     private NetconfDataTreeService netconfService;
     @Mock
     private DOMRpcService rpcService;
+    @Mock
+    private DOMActionService actionService;
 
     private MdsalRestconfServer server;
 
@@ -58,7 +61,7 @@ public class MdsalRestconfServerTest extends AbstractJukeboxTest {
 
     @Before
     public void before() {
-        server = new MdsalRestconfServer(DATABIND_PROVIDER, dataBroker, rpcService, mountPointService);
+        server = new MdsalRestconfServer(DATABIND_PROVIDER, dataBroker, rpcService, actionService, mountPointService);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
     }
 

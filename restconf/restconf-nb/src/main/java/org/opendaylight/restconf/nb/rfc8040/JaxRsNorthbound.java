@@ -17,11 +17,7 @@ import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
@@ -45,12 +41,9 @@ public final class JaxRsNorthbound implements AutoCloseable {
     public JaxRsNorthbound(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
             @Reference final ServletSupport servletSupport,
             @Reference final CustomFilterAdapterConfiguration filterAdapterConfiguration,
-            @Reference final DOMActionService actionService, @Reference final DOMDataBroker dataBroker,
-            @Reference final DOMMountPointService mountPointService,
-            @Reference final DOMNotificationService notificationService, @Reference final DOMRpcService rpcService,
-            @Reference final DOMSchemaService schemaService, @Reference final DatabindProvider databindProvider,
-            @Reference final MdsalRestconfServer server, @Reference final RestconfStreamServletFactory servletFactory)
-                throws ServletException {
+            @Reference final DOMMountPointService mountPointService, @Reference final DOMSchemaService schemaService,
+            @Reference final DatabindProvider databindProvider, @Reference final MdsalRestconfServer server,
+            @Reference final RestconfStreamServletFactory servletFactory) throws ServletException {
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
             .contextPath("/" + URLConstants.BASE_PATH)
@@ -58,8 +51,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
                 .servlet(servletSupport.createHttpServletBuilder(
-                    new RestconfApplication(databindProvider, server, mountPointService, dataBroker, actionService,
-                        notificationService, schemaService))
+                    new RestconfApplication(databindProvider, server, mountPointService, schemaService))
                     .build())
                 .asyncSupported(true)
                 .build())

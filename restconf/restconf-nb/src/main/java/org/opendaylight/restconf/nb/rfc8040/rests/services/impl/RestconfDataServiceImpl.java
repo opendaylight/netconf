@@ -10,9 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -20,7 +17,6 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.CancellationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
@@ -40,16 +36,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
@@ -79,16 +68,13 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,14 +89,11 @@ public final class RestconfDataServiceImpl {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
     private final DatabindProvider databindProvider;
-    private final DOMActionService actionService;
     private final MdsalRestconfServer server;
 
-    public RestconfDataServiceImpl(final DatabindProvider databindProvider, final MdsalRestconfServer server,
-            final DOMActionService actionService) {
+    public RestconfDataServiceImpl(final DatabindProvider databindProvider, final MdsalRestconfServer server) {
         this.databindProvider = requireNonNull(databindProvider);
         this.server = requireNonNull(server);
-        this.actionService = requireNonNull(actionService);
     }
 
     /**
@@ -740,90 +723,13 @@ public final class RestconfDataServiceImpl {
      */
     private void invokeAction(final InstanceIdentifierContext reqPath, final OperationInputBody body,
             final AsyncResponse ar) {
-        final var yangIIdContext = reqPath.getInstanceIdentifier();
-        final ContainerNode input;
-        try {
-            input = body.toContainerNode(reqPath.inference());
-        } catch (IOException e) {
-            LOG.debug("Error reading input", e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
-        }
-
-        final var mountPoint = reqPath.getMountPoint();
-        final var inference = reqPath.inference();
-        final var schemaPath = inference.toSchemaInferenceStack().toSchemaNodeIdentifier();
-        final var response = mountPoint != null ? invokeAction(input, schemaPath, yangIIdContext, mountPoint)
-            : invokeAction(input, schemaPath, yangIIdContext, actionService);
-
-        response.addCallback(new JaxRsRestconfCallback<>(ar) {
+        server.dataInvokePOST(reqPath, body).addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             Response transform(final DOMActionResult result) {
                 final var output = result.getOutput().orElse(null);
                 return output == null || output.isEmpty() ? Response.status(Status.NO_CONTENT).build()
-                    : Response.status(Status.OK).entity(new NormalizedNodePayload(inference, output)).build();
+                    : Response.status(Status.OK).entity(new NormalizedNodePayload(reqPath.inference(), output)).build();
             }
         });
-    }
-
-    /**
-     * Invoking Action via mount point.
-     *
-     * @param mountPoint mount point
-     * @param data input data
-     * @param schemaPath schema path of data
-     * @return {@link DOMActionResult}
-     */
-    private static RestconfFuture<DOMActionResult> invokeAction(final ContainerNode data,
-            final Absolute schemaPath, final YangInstanceIdentifier yangIId, final DOMMountPoint mountPoint) {
-        final var actionService = mountPoint.getService(DOMActionService.class);
-        return actionService.isPresent() ? invokeAction(data, schemaPath, yangIId, actionService.orElseThrow())
-            : RestconfFuture.failed(new RestconfDocumentedException("DOMActionService is missing."));
-    }
-
-    /**
-     * Invoke Action via ActionServiceHandler.
-     *
-     * @param data input data
-     * @param yangIId invocation context
-     * @param schemaPath schema path of data
-     * @param actionService action service to invoke action
-     * @return {@link DOMActionResult}
-     */
-    private static RestconfFuture<DOMActionResult> invokeAction(final ContainerNode data, final Absolute schemaPath,
-            final YangInstanceIdentifier yangIId, final DOMActionService actionService) {
-        final var ret = new SettableRestconfFuture<DOMActionResult>();
-
-        Futures.addCallback(actionService.invokeAction(schemaPath,
-            new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, yangIId.getParent()), data),
-            new FutureCallback<DOMActionResult>() {
-                @Override
-                public void onSuccess(final DOMActionResult result) {
-                    final var errors = result.getErrors();
-                    LOG.debug("InvokeAction Error Message {}", errors);
-                    if (errors.isEmpty()) {
-                        ret.set(result);
-                    } else {
-                        ret.setFailure(new RestconfDocumentedException("InvokeAction Error Message ", null, errors));
-                    }
-                }
-
-                @Override
-                public void onFailure(final Throwable cause) {
-                    if (cause instanceof DOMActionException) {
-                        ret.set(new SimpleDOMActionResult(List.of(RpcResultBuilder.newError(
-                            ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage()))));
-                    } else if (cause instanceof RestconfDocumentedException e) {
-                        ret.setFailure(e);
-                    } else if (cause instanceof CancellationException) {
-                        ret.setFailure(new RestconfDocumentedException("Action cancelled while executing",
-                            ErrorType.RPC, ErrorTag.PARTIAL_OPERATION, cause));
-                    } else {
-                        ret.setFailure(new RestconfDocumentedException("Invocation failed", cause));
-                    }
-                }
-            }, MoreExecutors.directExecutor());
-
-        return ret;
     }
 }

@@ -16,6 +16,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
@@ -23,16 +26,24 @@ import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.CancellationException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionException;
+import org.opendaylight.mdsal.dom.api.DOMActionResult;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
@@ -54,11 +65,14 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -92,6 +106,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     private final @NonNull DatabindProvider databindProvider;
     private final @NonNull DOMDataBroker dataBroker;
     private final @Nullable DOMRpcService rpcService;
+    private final @Nullable DOMActionService actionService;
 
     @SuppressWarnings("unused")
     private volatile RestconfStrategy localStrategy;
@@ -100,19 +115,101 @@ public final class MdsalRestconfServer implements RestconfServer {
     @Activate
     public MdsalRestconfServer(@Reference final DatabindProvider databindProvider,
             @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
+            @Reference final DOMActionService actionService,
             @Reference final DOMMountPointService mountPointService,
             @Reference final List<RpcImplementation> localRpcs) {
         this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcService = requireNonNull(rpcService);
+        this.actionService = requireNonNull(actionService);
         this.mountPointService = requireNonNull(mountPointService);
         this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
     }
 
     public MdsalRestconfServer(final DatabindProvider databindProvider, final DOMDataBroker dataBroker,
-            final DOMRpcService rpcService, final DOMMountPointService mountPointService,
-            final RpcImplementation... localRpcs) {
-        this(databindProvider, dataBroker, rpcService, mountPointService, List.of(localRpcs));
+            final DOMRpcService rpcService, final DOMActionService actionService,
+            final DOMMountPointService mountPointService, final RpcImplementation... localRpcs) {
+        this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
+    }
+
+    RestconfFuture<DOMActionResult> dataInvokePOST(final InstanceIdentifierContext reqPath,
+            final OperationInputBody body) {
+        final var yangIIdContext = reqPath.getInstanceIdentifier();
+        final var inference = reqPath.inference();
+        final ContainerNode input;
+        try {
+            input = body.toContainerNode(inference);
+        } catch (IOException e) {
+            LOG.debug("Error reading input", e);
+            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+        }
+
+        final var mountPoint = reqPath.getMountPoint();
+        final var schemaPath = inference.toSchemaInferenceStack().toSchemaNodeIdentifier();
+        return mountPoint != null ? dataInvokePOST(input, schemaPath, yangIIdContext, mountPoint)
+            : dataInvokePOST(input, schemaPath, yangIIdContext, actionService);
+    }
+
+    /**
+     * Invoke Action via ActionServiceHandler.
+     *
+     * @param data input data
+     * @param yangIId invocation context
+     * @param schemaPath schema path of data
+     * @param actionService action service to invoke action
+     * @return {@link DOMActionResult}
+     */
+    private static RestconfFuture<DOMActionResult> dataInvokePOST(final ContainerNode data, final Absolute schemaPath,
+            final YangInstanceIdentifier yangIId, final DOMActionService actionService) {
+        final var ret = new SettableRestconfFuture<DOMActionResult>();
+
+        Futures.addCallback(actionService.invokeAction(schemaPath,
+            new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, yangIId.getParent()), data),
+            new FutureCallback<DOMActionResult>() {
+                @Override
+                public void onSuccess(final DOMActionResult result) {
+                    final var errors = result.getErrors();
+                    LOG.debug("InvokeAction Error Message {}", errors);
+                    if (errors.isEmpty()) {
+                        ret.set(result);
+                    } else {
+                        ret.setFailure(new RestconfDocumentedException("InvokeAction Error Message ", null, errors));
+                    }
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    if (cause instanceof DOMActionException) {
+                        ret.set(new SimpleDOMActionResult(List.of(RpcResultBuilder.newError(
+                            ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage()))));
+                    } else if (cause instanceof RestconfDocumentedException e) {
+                        ret.setFailure(e);
+                    } else if (cause instanceof CancellationException) {
+                        ret.setFailure(new RestconfDocumentedException("Action cancelled while executing",
+                            ErrorType.RPC, ErrorTag.PARTIAL_OPERATION, cause));
+                    } else {
+                        ret.setFailure(new RestconfDocumentedException("Invocation failed", cause));
+                    }
+                }
+            }, MoreExecutors.directExecutor());
+
+        return ret;
+    }
+
+    /**
+     * Invoking Action via mount point.
+     *
+     * @param mountPoint mount point
+     * @param data input data
+     * @param schemaPath schema path of data
+     * @return {@link DOMActionResult}
+     */
+    private static RestconfFuture<DOMActionResult> dataInvokePOST(final ContainerNode data,
+            final Absolute schemaPath, final YangInstanceIdentifier yangIId, final DOMMountPoint mountPoint) {
+        final var actionService = mountPoint.getService(DOMActionService.class);
+        return actionService.isPresent() ? dataInvokePOST(data, schemaPath, yangIId, actionService.orElseThrow())
+            : RestconfFuture.failed(new RestconfDocumentedException("DOMActionService is missing."));
     }
 
     @Override

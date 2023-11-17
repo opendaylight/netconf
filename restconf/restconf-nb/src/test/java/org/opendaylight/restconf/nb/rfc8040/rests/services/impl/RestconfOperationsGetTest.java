@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -27,7 +28,6 @@ import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.module._1.rev140101.Module1Data;
 import org.opendaylight.yang.gen.v1.module._2.rev140102.Module2Data;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @ExtendWith(MockitoExtension.class)
 class RestconfOperationsGetTest {
@@ -51,8 +51,8 @@ class RestconfOperationsGetTest {
           <dummy-rpc2-module2 xmlns="module:2"/>
         </operations>""";
 
-    private static final EffectiveModelContext SCHEMA = BindingRuntimeHelpers.createRuntimeContext(
-        Module1Data.class, Module2Data.class, NetworkTopology.class).getEffectiveModelContext();
+    private static final DatabindContext DATABIND = DatabindContext.ofModel(BindingRuntimeHelpers.createRuntimeContext(
+        Module1Data.class, Module2Data.class, NetworkTopology.class).getEffectiveModelContext());
 
     @Mock
     private DOMMountPointService mountPointService;
@@ -64,13 +64,15 @@ class RestconfOperationsGetTest {
     private DOMDataBroker dataBroker;
     @Mock
     private DOMRpcService rpcService;
+    @Mock
+    private DOMActionService actionService;
 
     private RestconfImpl restconf;
 
     @BeforeEach
     void beforeEach() {
         restconf = new RestconfImpl(
-            new MdsalRestconfServer(() -> DatabindContext.ofModel(SCHEMA), dataBroker, rpcService, mountPointService));
+            new MdsalRestconfServer(() -> DATABIND, dataBroker, rpcService, actionService, mountPointService));
     }
 
     @Test
@@ -86,7 +88,7 @@ class RestconfOperationsGetTest {
     }
 
     private void mockMountPoint() {
-        doReturn(SCHEMA).when(schemaService).getGlobalContext();
+        doReturn(DATABIND.modelContext()).when(schemaService).getGlobalContext();
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
     }

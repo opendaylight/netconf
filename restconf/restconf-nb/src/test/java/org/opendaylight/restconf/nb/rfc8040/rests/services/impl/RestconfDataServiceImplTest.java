@@ -132,7 +132,7 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
 
         final DatabindProvider databindProvider = () -> DatabindContext.ofModel(JUKEBOX_SCHEMA);
         dataService = new RestconfDataServiceImpl(databindProvider,
-            new MdsalRestconfServer(databindProvider, dataBroker, rpcService, mountPointService), actionService);
+            new MdsalRestconfServer(databindProvider, dataBroker, rpcService, actionService, mountPointService));
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
