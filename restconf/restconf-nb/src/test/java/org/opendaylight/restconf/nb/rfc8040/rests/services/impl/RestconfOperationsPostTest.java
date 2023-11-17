@@ -27,12 +27,12 @@ import java.util.concurrent.ExecutionException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -57,8 +57,8 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class RestconfInvokeOperationsServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class RestconfOperationsPostTest {
     private static final URI RESTCONF_URI = URI.create("/restconf");
     private static final QName RPC = QName.create("invoke:rpc:module", "2013-12-03", "rpc-test");
     private static final ContainerNode INPUT = Builders.containerBuilder()
@@ -85,24 +85,24 @@ public class RestconfInvokeOperationsServiceImplTest {
     @Mock
     private DOMNotificationService notificationService;
 
-    private RestconfOperationsServiceImpl invokeOperationsService;
+    private RestconfImpl restconf;
     private MdsalRestconfServer server;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void beforeEach() {
         server = new MdsalRestconfServer(() -> CONTEXT, dataBroker, rpcService, mountPointService);
-        invokeOperationsService = new RestconfOperationsServiceImpl(server);
+        restconf = new RestconfImpl(server);
     }
 
     @Test
-    public void testInvokeRpcWithNonEmptyOutput() {
+    void testInvokeRpcWithNonEmptyOutput() {
         final var result = mock(ContainerNode.class);
         doReturn(false).when(result).isEmpty();
 
         prepNNC(result);
         final var ar = mock(AsyncResponse.class);
         final var captor = ArgumentCaptor.forClass(Response.class);
-        invokeOperationsService.operationsPostXML("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
+        restconf.operationsXmlPOST("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
             <input xmlns="invoke:rpc:module"/>
             """.getBytes(StandardCharsets.UTF_8)), mock(UriInfo.class), ar);
         verify(ar).resume(captor.capture());
@@ -114,14 +114,14 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void testInvokeRpcWithEmptyOutput() {
+    void testInvokeRpcWithEmptyOutput() {
         final var result = mock(ContainerNode.class);
         doReturn(true).when(result).isEmpty();
 
         prepNNC(result);
         final var ar = mock(AsyncResponse.class);
         final var response = ArgumentCaptor.forClass(Response.class);
-        invokeOperationsService.operationsPostJSON("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
+        restconf.operationsJsonPOST("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
             {
               "invoke-rpc-module:input" : {
               }
@@ -133,7 +133,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void invokeRpcTest() throws Exception {
+    void invokeRpcTest() throws Exception {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of()))).when(rpcService)
             .invokeRpc(RPC, INPUT);
         assertEquals(OUTPUT,
@@ -143,7 +143,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void invokeRpcErrorsAndCheckTestTest() throws Exception {
+    void invokeRpcErrorsAndCheckTestTest() throws Exception {
         final var errorRpc = QName.create(RPC, "error-rpc");
         final var exception = new DOMRpcImplementationNotAvailableException(
                 "No implementation of RPC " + errorRpc + " available.");
@@ -161,7 +161,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void invokeRpcViaMountPointTest() throws Exception {
+    void invokeRpcViaMountPointTest() throws Exception {
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
@@ -174,7 +174,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void invokeRpcMissingMountPointServiceTest() {
+    void invokeRpcMissingMountPointServiceTest() {
         doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
@@ -191,7 +191,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void checkResponseTest() throws Exception {
+    void checkResponseTest() throws Exception {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of())))
             .when(rpcService).invokeRpc(RPC, INPUT);
         assertEquals(OUTPUT,
