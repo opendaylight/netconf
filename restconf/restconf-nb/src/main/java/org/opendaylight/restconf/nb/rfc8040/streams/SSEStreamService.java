@@ -24,6 +24,7 @@ import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.slf4j.Logger;
@@ -66,25 +67,16 @@ final class SSEStreamService {
             throw new NotFoundException("No such stream: " + streamName);
         }
 
-        final var queryParameters = ImmutableMap.<String, String>builder();
-        for (var entry : uriInfo.getQueryParameters().entrySet()) {
-            final var values = entry.getValue();
-            switch (values.size()) {
-                case 0:
-                    // No-op
-                    break;
-                case 1:
-                    queryParameters.put(entry.getKey(), values.get(0));
-                    break;
-                default:
-                    throw new BadRequestException(
-                        "Parameter " + entry.getKey() + " can appear at most once in request URI");
-            }
+        final ImmutableMap<String, String> queryParameters;
+        try {
+            queryParameters = QueryParams.normalize(uriInfo);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
         }
 
         final ReceiveEventsParams params;
         try {
-            params = ReceiveEventsParams.ofQueryParameters(queryParameters.build());
+            params = ReceiveEventsParams.ofQueryParameters(queryParameters);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }

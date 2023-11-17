@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -60,6 +61,33 @@ public final class QueryParams {
 
     private QueryParams() {
         // Utility class
+    }
+
+    /**
+     * Normalize query parameters from an {@link UriInfo}.
+     *
+     * @param uriInfo An {@link UriInfo}
+     * @return Normalized query parameters
+     * @throws NullPointerException if {@code uriInfo} is {@code null}
+     * @throws IllegalArgumentException if there are multiple values for a parameter
+     */
+    public static @NonNull ImmutableMap<String, String> normalize(final UriInfo uriInfo) {
+        final var builder = ImmutableMap.<String, String>builder();
+        for (var entry : uriInfo.getQueryParameters().entrySet()) {
+            final var values = entry.getValue();
+            switch (values.size()) {
+                case 0:
+                    // No-op
+                    break;
+                case 1:
+                    builder.put(entry.getKey(), values.get(0));
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                        "Parameter " + entry.getKey() + " can appear at most once in request URI");
+            }
+        }
+        return builder.build();
     }
 
     public static QueryParameters newQueryParameters(final ReadDataParams params,

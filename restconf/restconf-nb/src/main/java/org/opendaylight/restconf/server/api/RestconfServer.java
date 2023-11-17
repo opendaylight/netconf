@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.server.api;
 
 import java.net.URI;
+import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
@@ -18,6 +19,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.CreateOrReplaceResult;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.yangtools.yang.common.Empty;
 
@@ -90,6 +92,26 @@ public interface RestconfServer {
      * @return A {@link RestconfFuture} of the {@link PatchStatusContext} content
      */
     RestconfFuture<PatchStatusContext> dataPATCH(String identifier, PatchBody body);
+
+    /**
+     * Replace the data store.
+     *
+     * @param body data node for put to config DS
+     * @param queryParameters Query parameters
+     * @return A {@link RestconfFuture} of the {@link CreateOrReplaceResult} content
+     */
+    RestconfFuture<CreateOrReplaceResult> dataPUT(ResourceBody body, Map<String, String> queryParameters);
+
+    /**
+     * Create or replace a data store resource.
+     *
+     * @param identifier resource identifier
+     * @param body data node for put to config DS
+     * @param queryParameters Query parameters
+     * @return A {@link RestconfFuture} of the {@link CreateOrReplaceResult} content
+     */
+    RestconfFuture<CreateOrReplaceResult> dataPUT(String identifier, ResourceBody body,
+        Map<String, String> queryParameters);
 
     /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, String, OperationInputBody)}.

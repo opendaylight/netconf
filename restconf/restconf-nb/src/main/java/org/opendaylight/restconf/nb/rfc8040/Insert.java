@@ -8,16 +8,20 @@
 package org.opendaylight.restconf.nb.rfc8040;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams.optionalParam;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
+import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Parser and holder of query parameters from uriInfo for data and datastore modification operations.
@@ -42,6 +46,43 @@ public final class Insert implements Immutable {
     private Insert(final InsertParam insert, final PathArgument pointArg) {
         this.insert = requireNonNull(insert);
         this.pointArg = pointArg;
+    }
+
+    /**
+     * Return an {@link Insert} parameter for specified query parameters.
+     *
+     * @param queryParameters Parameters and their values
+     * @return An {@link Insert}, or {@code null} if no insert information is present
+     * @throws NullPointerException if any argument is {@code null}
+     * @throws IllegalArgumentException if the parameters are invalid
+     */
+    public static @Nullable Insert ofQueryParameters(final EffectiveModelContext modelContext,
+            final Map<String, String> queryParameters) {
+        InsertParam insert = null;
+        PointParam point = null;
+
+        for (var entry : queryParameters.entrySet()) {
+            final var paramName = entry.getKey();
+            final var paramValue = entry.getValue();
+
+            switch (paramName) {
+                case InsertParam.uriName:
+                    insert = optionalParam(InsertParam::forUriValue, paramName, paramValue);
+                    break;
+                case PointParam.uriName:
+                    point = optionalParam(PointParam::forUriValue, paramName, paramValue);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid parameter: " + paramName);
+            }
+        }
+
+        return Insert.forParams(insert, point,
+            // TODO: instead of a EffectiveModelContext, we should have received
+            //       YangInstanceIdentifierDeserializer.Result, from which we can use to seed the parser. This
+            //       call-site should not support 'yang-ext:mount' and should just reuse DataSchemaContextTree,
+            //       saving a lookup
+            value -> YangInstanceIdentifierDeserializer.create(modelContext, value).path.getLastPathArgument());
     }
 
     public static @Nullable Insert forParams(final @Nullable InsertParam insert, final @Nullable PointParam point,

@@ -15,7 +15,6 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.container.AsyncResponse;
@@ -33,16 +32,12 @@ import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
-import org.opendaylight.restconf.nb.rfc8040.databind.JsonResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
-import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
-import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.CreateOrReplaceResult;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -66,106 +61,6 @@ public final class RestconfDataServiceImpl {
     public RestconfDataServiceImpl(final DatabindProvider databindProvider, final MdsalRestconfServer server) {
         this.databindProvider = requireNonNull(databindProvider);
         this.server = requireNonNull(server);
-    }
-
-    /**
-     * Replace the data store.
-     *
-     * @param uriInfo request URI information
-     * @param body data node for put to config DS
-     * @param ar {@link AsyncResponse} which needs to be completed
-     */
-    @PUT
-    @Path("/data")
-    @Consumes({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaType.APPLICATION_JSON,
-    })
-    public void putDataJSON(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
-        try (var jsonBody = new JsonResourceBody(body)) {
-            putData(null, uriInfo, jsonBody, ar);
-        }
-    }
-
-    /**
-     * Create or replace the target data resource.
-     *
-     * @param identifier path to target
-     * @param uriInfo request URI information
-     * @param body data node for put to config DS
-     * @param ar {@link AsyncResponse} which needs to be completed
-     */
-    @PUT
-    @Path("/data/{identifier:.+}")
-    @Consumes({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaType.APPLICATION_JSON,
-    })
-    public void putDataJSON(@Encoded @PathParam("identifier") final String identifier,
-            @Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
-        try (var jsonBody = new JsonResourceBody(body)) {
-            putData(identifier, uriInfo, jsonBody, ar);
-        }
-    }
-
-    /**
-     * Replace the data store.
-     *
-     * @param uriInfo request URI information
-     * @param body data node for put to config DS
-     * @param ar {@link AsyncResponse} which needs to be completed
-     */
-    @PUT
-    @Path("/data")
-    @Consumes({
-        MediaTypes.APPLICATION_YANG_DATA_XML,
-        MediaType.APPLICATION_XML,
-        MediaType.TEXT_XML
-    })
-    public void putDataXML(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
-        try (var xmlBody = new XmlResourceBody(body)) {
-            putData(null, uriInfo, xmlBody, ar);
-        }
-    }
-
-    /**
-     * Create or replace the target data resource.
-     *
-     * @param identifier path to target
-     * @param uriInfo request URI information
-     * @param body data node for put to config DS
-     * @param ar {@link AsyncResponse} which needs to be completed
-     */
-    @PUT
-    @Path("/data/{identifier:.+}")
-    @Consumes({
-        MediaTypes.APPLICATION_YANG_DATA_XML,
-        MediaType.APPLICATION_XML,
-        MediaType.TEXT_XML
-    })
-    public void putDataXML(@Encoded @PathParam("identifier") final String identifier,
-            @Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
-        try (var xmlBody = new XmlResourceBody(body)) {
-            putData(identifier, uriInfo, xmlBody, ar);
-        }
-    }
-
-    private void putData(final @Nullable String identifier, final UriInfo uriInfo, final ResourceBody body,
-            final AsyncResponse ar) {
-        final var reqPath = server.bindRequestPath(identifier);
-        final var insert = QueryParams.parseInsert(reqPath.getSchemaContext(), uriInfo);
-        final var req = server.bindResourceRequest(reqPath, body);
-
-        req.strategy().putData(req.path(), req.data(), insert).addCallback(new JaxRsRestconfCallback<>(ar) {
-            @Override
-            Response transform(final CreateOrReplaceResult result) {
-                return switch (result) {
-                    // Note: no Location header, as it matches the request path
-                    case CREATED -> Response.status(Status.CREATED).build();
-                    case REPLACED -> Response.noContent().build();
-                };
-            }
-        });
     }
 
     /**
