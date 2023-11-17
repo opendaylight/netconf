@@ -33,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -79,6 +80,8 @@ class RestconfOperationsPostTest {
     @Mock
     private DOMRpcService rpcService;
     @Mock
+    private DOMActionService actionService;
+    @Mock
     private DOMMountPoint mountPoint;
     @Mock
     private DOMMountPointService mountPointService;
@@ -90,7 +93,7 @@ class RestconfOperationsPostTest {
 
     @BeforeEach
     void beforeEach() {
-        server = new MdsalRestconfServer(() -> CONTEXT, dataBroker, rpcService, mountPointService);
+        server = new MdsalRestconfServer(() -> CONTEXT, dataBroker, rpcService, actionService, mountPointService);
         restconf = new RestconfImpl(server);
     }
 

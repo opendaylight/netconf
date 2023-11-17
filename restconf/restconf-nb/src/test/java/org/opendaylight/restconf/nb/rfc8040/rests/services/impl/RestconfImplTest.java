@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -28,13 +29,15 @@ class RestconfImplTest {
     @Mock
     private DOMRpcService rpcService;
     @Mock
+    private DOMActionService actionService;
+    @Mock
     private DOMMountPointService mountPointService;
 
     @Test
     void testLibraryVersion() {
         final var context = DatabindContext.ofModel(YangParserTestUtils.parseYangResourceDirectory("/restconf/impl"));
         final var restconfImpl = new RestconfImpl(new MdsalRestconfServer(() -> context, dataBroker, rpcService,
-            mountPointService));
+           actionService, mountPointService));
         final var libraryVersion = assertInstanceOf(LeafNode.class, restconfImpl.yangLibraryVersionGET().data());
         assertEquals("2019-01-04", libraryVersion.body());
     }
