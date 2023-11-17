@@ -17,30 +17,19 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 
 import java.util.List;
 import java.util.Optional;
-import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -52,7 +41,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 @ExtendWith(MockitoExtension.class)
-class RestconfDataGetTest extends AbstractJukeboxTest {
+class RestconfDataGetTest extends AbstractRestconfTest {
     private static final NodeIdentifier PLAYLIST_NID = new NodeIdentifier(PLAYLIST_QNAME);
     private static final NodeIdentifier LIBRARY_NID = new NodeIdentifier(LIBRARY_QNAME);
 
@@ -70,32 +59,10 @@ class RestconfDataGetTest extends AbstractJukeboxTest {
             .build();
 
     @Mock
-    private UriInfo uriInfo;
-    @Mock
-    private AsyncResponse asyncResponse;
-    @Mock
-    private DOMDataBroker dataBroker;
-    @Mock
-    private DOMActionService actionService;
-    @Mock
-    private DOMRpcService rpcService;
-    @Mock
-    private DOMMountPointService mountPointService;
-    @Mock
     private DOMDataTreeReadTransaction tx;
-    @Mock
-    private DOMMountPoint mountPoint;
-    @Captor
-    private ArgumentCaptor<Response> responseCaptor;
-    @Captor
-    private ArgumentCaptor<RestconfDocumentedException> exceptionCaptor;
-
-    private RestconfImpl restconf;
 
     @BeforeEach
     void beforeEach() {
-        restconf = new RestconfImpl(new MdsalRestconfServer(() -> DatabindContext.ofModel(JUKEBOX_SCHEMA), dataBroker,
-            rpcService, actionService, mountPointService));
         doReturn(tx).when(dataBroker).newReadOnlyTransaction();
     }
 

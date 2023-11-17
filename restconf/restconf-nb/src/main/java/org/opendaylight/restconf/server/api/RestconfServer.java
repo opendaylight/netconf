@@ -16,6 +16,7 @@ import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.spi.OperationOutput;
+import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
  * An implementation of a RESTCONF server, implementing the
@@ -23,6 +24,15 @@ import org.opendaylight.restconf.server.spi.OperationOutput;
  */
 @NonNullByDefault
 public interface RestconfServer {
+    /**
+     * Delete a data resource.
+     *
+     * @param identifier resource identifier
+     * @return A {@link RestconfFuture} of the operation
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    RestconfFuture<Empty> dataDELETE(String identifier);
+
     /**
      * Return the content of the datastore.
      *
@@ -32,7 +42,7 @@ public interface RestconfServer {
     RestconfFuture<NormalizedNodePayload> dataGET(ReadDataParams readParams);
 
     /**
-     * Return the content of a resource.
+     * Return the content of a data resource.
      *
      * @param identifier resource identifier
      * @param readParams {@link ReadDataParams} for this request

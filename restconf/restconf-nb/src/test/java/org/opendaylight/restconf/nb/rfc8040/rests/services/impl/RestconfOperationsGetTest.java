@@ -12,25 +12,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yang.gen.v1.module._1.rev140101.Module1Data;
 import org.opendaylight.yang.gen.v1.module._2.rev140102.Module2Data;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @ExtendWith(MockitoExtension.class)
-class RestconfOperationsGetTest {
+class RestconfOperationsGetTest extends AbstractRestconfTest {
     private static final String DEVICE_ID = "network-topology:network-topology/topology=topology-netconf/"
         + "node=device/yang-ext:mount";
     private static final String DEVICE_RPC1_MODULE1_ID = DEVICE_ID + "module1:dummy-rpc1-module1";
@@ -51,28 +45,15 @@ class RestconfOperationsGetTest {
           <dummy-rpc2-module2 xmlns="module:2"/>
         </operations>""";
 
-    private static final DatabindContext DATABIND = DatabindContext.ofModel(BindingRuntimeHelpers.createRuntimeContext(
-        Module1Data.class, Module2Data.class, NetworkTopology.class).getEffectiveModelContext());
+    private static final EffectiveModelContext MODEL_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(
+        Module1Data.class, Module2Data.class, NetworkTopology.class).getEffectiveModelContext();
 
-    @Mock
-    private DOMMountPointService mountPointService;
-    @Mock
-    private DOMMountPoint mountPoint;
     @Mock
     private DOMSchemaService schemaService;
-    @Mock
-    private DOMDataBroker dataBroker;
-    @Mock
-    private DOMRpcService rpcService;
-    @Mock
-    private DOMActionService actionService;
 
-    private RestconfImpl restconf;
-
-    @BeforeEach
-    void beforeEach() {
-        restconf = new RestconfImpl(
-            new MdsalRestconfServer(() -> DATABIND, dataBroker, rpcService, actionService, mountPointService));
+    @Override
+    EffectiveModelContext modelContext() {
+        return MODEL_CONTEXT;
     }
 
     @Test
@@ -88,7 +69,7 @@ class RestconfOperationsGetTest {
     }
 
     private void mockMountPoint() {
-        doReturn(DATABIND.modelContext()).when(schemaService).getGlobalContext();
+        doReturn(MODEL_CONTEXT).when(schemaService).getGlobalContext();
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
     }

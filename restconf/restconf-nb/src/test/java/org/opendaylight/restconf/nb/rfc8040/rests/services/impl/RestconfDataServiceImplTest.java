@@ -51,7 +51,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
@@ -59,8 +58,6 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -201,48 +198,6 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
         assertEquals(201, response.getStatus());
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
             response.getLocation());
-    }
-
-    @Test
-    public void testDeleteData() {
-        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        doReturn(immediateTrueFluentFuture())
-                .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        final var captor = ArgumentCaptor.forClass(Response.class);
-        doReturn(true).when(asyncResponse).resume(captor.capture());
-        dataService.deleteData("example-jukebox:jukebox", asyncResponse);
-
-        assertEquals(204, captor.getValue().getStatus());
-    }
-
-    @Test
-    public void testDeleteDataNotExisting() {
-        doReturn(immediateFalseFluentFuture())
-                .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        final var captor = ArgumentCaptor.forClass(RestconfDocumentedException.class);
-        doReturn(true).when(asyncResponse).resume(captor.capture());
-        dataService.deleteData("example-jukebox:jukebox", asyncResponse);
-
-        final var errors = captor.getValue().getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
-    }
-
-    /**
-     * Test of deleting data on mount point.
-     */
-    @Test
-    public void testDeleteDataMountPoint() {
-        doNothing().when(readWrite).delete(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        doReturn(immediateTrueFluentFuture())
-                .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        final var captor = ArgumentCaptor.forClass(Response.class);
-        doReturn(true).when(asyncResponse).resume(captor.capture());
-        dataService.deleteData("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", asyncResponse);
-
-        assertEquals(204, captor.getValue().getStatus());
     }
 
     @Test
