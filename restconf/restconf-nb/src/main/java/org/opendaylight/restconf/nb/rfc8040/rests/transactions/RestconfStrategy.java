@@ -44,6 +44,8 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.server.api.DataCreatePostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.OperationOutput;
@@ -364,8 +366,8 @@ public abstract class RestconfStrategy {
      * @param insert  {@link Insert}
      * @return A {@link RestconfFuture}
      */
-    public final RestconfFuture<Empty> postData(final YangInstanceIdentifier path, final NormalizedNode data,
-            final @Nullable Insert insert) {
+    public final RestconfFuture<DataCreatePostResult> postData(final YangInstanceIdentifier path,
+            final NormalizedNode data, final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
             final var parentPath = path.coerceParent();
@@ -374,20 +376,23 @@ public abstract class RestconfStrategy {
         } else {
             future = createAndCommit(prepareWriteExecution(), path, data);
         }
-        final var ret = new SettableRestconfFuture<Empty>();
 
+        final var ret = new SettableRestconfFuture<DataCreatePostResult>();
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(Empty.value());
+                ret.set(new DataCreatePostResult(IdentifierCodec.serialize(
+                    data instanceof MapNode mapData && !mapData.isEmpty()
+                        ? path.node(mapData.body().iterator().next().name()) : path,
+                    modelContext)));
             }
 
             @Override
             public void onFailure(final Throwable cause) {
                 ret.setFailure(TransactionUtil.decodeException(cause, "POST", path, modelContext));
             }
-        }, MoreExecutors.directExecutor());
 
+        }, MoreExecutors.directExecutor());
         return ret;
     }
 
