@@ -7,17 +7,16 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -25,14 +24,13 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yang.gen.v1.module._1.rev140101.Module1Data;
 import org.opendaylight.yang.gen.v1.module._2.rev140102.Module2Data;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class RestconfOperationsServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class RestconfOperationsGetTest {
     private static final String DEVICE_ID = "network-topology:network-topology/topology=topology-netconf/"
         + "node=device/yang-ext:mount";
     private static final String DEVICE_RPC1_MODULE1_ID = DEVICE_ID + "module1:dummy-rpc1-module1";
@@ -53,7 +51,8 @@ public class RestconfOperationsServiceImplTest {
           <dummy-rpc2-module2 xmlns="module:2"/>
         </operations>""";
 
-    private static EffectiveModelContext SCHEMA;
+    private static final EffectiveModelContext SCHEMA = BindingRuntimeHelpers.createRuntimeContext(
+        Module1Data.class, Module2Data.class, NetworkTopology.class).getEffectiveModelContext();
 
     @Mock
     private DOMMountPointService mountPointService;
@@ -66,59 +65,58 @@ public class RestconfOperationsServiceImplTest {
     @Mock
     private DOMRpcService rpcService;
 
-    private RestconfOperationsServiceImpl opService;
+    private RestconfImpl restconf;
 
-    @BeforeClass
-    public static void beforeClass() {
-        SCHEMA = BindingRuntimeHelpers.createRuntimeContext(Module1Data.class, Module2Data.class, NetworkTopology.class)
-            .getEffectiveModelContext();
-    }
-
-    @Before
-    public void before() {
-        doReturn(SCHEMA).when(schemaService).getGlobalContext();
-        doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
-        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
-
-        final DatabindProvider databindProvider = () -> DatabindContext.ofModel(SCHEMA);
-        opService = new RestconfOperationsServiceImpl(
-            new MdsalRestconfServer(databindProvider, dataBroker, rpcService, mountPointService));
+    @BeforeEach
+    void beforeEach() {
+        restconf = new RestconfImpl(
+            new MdsalRestconfServer(() -> DatabindContext.ofModel(SCHEMA), dataBroker, rpcService, mountPointService));
     }
 
     @Test
-    public void testOperationsJson() {
-        final var operationsJSON = opService.getOperationsJSON();
+    void testOperationsJson() {
+        final var operationsJSON = restconf.operationsJsonGET();
         assertEquals(EXPECTED_JSON, operationsJSON);
     }
 
     @Test
-    public void testOperationsXml() {
-        final var operationsXML = opService.operationsGetXML();
+    void testOperationsXml() {
+        final var operationsXML = restconf.operationsXmlGET();
         assertEquals(EXPECTED_XML, operationsXML);
     }
 
+    private void mockMountPoint() {
+        doReturn(SCHEMA).when(schemaService).getGlobalContext();
+        doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
+        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
+    }
+
     @Test
-    public void testMountPointOperationsJson() {
-        final var operationJSON = opService.getOperationJSON(DEVICE_ID);
+    void testMountPointOperationsJson() {
+        mockMountPoint();
+        final var operationJSON = restconf.operationsJsonGET(DEVICE_ID);
         assertEquals(EXPECTED_JSON, operationJSON);
     }
 
     @Test
-    public void testMountPointOperationsXml() {
-        final var operationXML = opService.operationsGetXML(DEVICE_ID);
+    void testMountPointOperationsXml() {
+        mockMountPoint();
+        final var operationXML = restconf.operationsXmlGET(DEVICE_ID);
         assertEquals(EXPECTED_XML, operationXML);
     }
 
     @Test
-    public void testMountPointSpecificOperationsJson() {
-        final var operationJSON = opService.getOperationJSON(DEVICE_RPC1_MODULE1_ID);
+    void testMountPointSpecificOperationsJson() {
+        mockMountPoint();
+        final var operationJSON = restconf.operationsJsonGET(DEVICE_RPC1_MODULE1_ID);
         assertEquals("""
             { "module1:dummy-rpc1-module1" : [null] }""", operationJSON);
     }
 
     @Test
-    public void testMountPointSpecificOperationsXml() {
-        final var operationXML = opService.operationsGetXML(DEVICE_RPC1_MODULE1_ID);
+    void testMountPointSpecificOperationsXml() {
+        mockMountPoint();
+        final var operationXML = restconf.operationsXmlGET(DEVICE_RPC1_MODULE1_ID);
         assertEquals("""
             <dummy-rpc1-module1 xmlns="module:1"/>""", operationXML);
     }

@@ -128,16 +128,6 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public NormalizedNodePayload yangLibraryVersionGET() {
-        final var stack = SchemaInferenceStack.of(databindProvider.currentContext().modelContext());
-        stack.enterYangData(YangApi.NAME);
-        stack.enterDataTree(Restconf.QNAME);
-        stack.enterDataTree(YANG_LIBRARY_VERSION);
-        return new NormalizedNodePayload(stack.toInference(),
-            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION));
-    }
-
-    @Override
     public OperationsContent operationsGET() {
         return operationsGET(databindProvider.currentContext().modelContext());
     }
@@ -207,6 +197,16 @@ public final class MdsalRestconfServer implements RestconfServer {
         return getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint())
             .invokeRpc(restconfURI, reqPath.getSchemaNode().getQName(),
                 new OperationInput(currentContext, inference, input));
+    }
+
+    @Override
+    public NormalizedNodePayload yangLibraryVersionGET() {
+        final var stack = SchemaInferenceStack.of(databindProvider.currentContext().modelContext());
+        stack.enterYangData(YangApi.NAME);
+        stack.enterDataTree(Restconf.QNAME);
+        stack.enterDataTree(YANG_LIBRARY_VERSION);
+        return new NormalizedNodePayload(stack.toInference(),
+            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION));
     }
 
     @NonNull InstanceIdentifierContext bindRequestRoot() {
