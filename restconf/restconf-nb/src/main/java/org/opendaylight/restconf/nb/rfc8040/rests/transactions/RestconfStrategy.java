@@ -44,6 +44,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
+import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
@@ -97,22 +98,6 @@ import org.slf4j.LoggerFactory;
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
 public abstract class RestconfStrategy {
-    /**
-     * Result of a {@code PUT} request as defined in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>. The definition makes it
-     * clear that the logical operation is {@code create-or-replace}.
-     */
-    public enum CreateOrReplaceResult {
-        /**
-         * A new resource has been created.
-         */
-        CREATED,
-        /*
-         * An existing resources has been replaced.
-         */
-        REPLACED;
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
 
     private final @NonNull EffectiveModelContext modelContext;
@@ -247,9 +232,9 @@ public abstract class RestconfStrategy {
      * @param path    path of data
      * @param data    data
      * @param insert  {@link Insert}
-     * @return A {@link CreateOrReplaceResult}
+     * @return A {@link DataPutResult}
      */
-    public final RestconfFuture<CreateOrReplaceResult> putData(final YangInstanceIdentifier path,
+    public final RestconfFuture<DataPutResult> putData(final YangInstanceIdentifier path,
             final NormalizedNode data, final @Nullable Insert insert) {
         final var exists = TransactionUtil.syncAccess(exists(path), path);
 
@@ -262,12 +247,12 @@ public abstract class RestconfStrategy {
             commitFuture = replaceAndCommit(prepareWriteExecution(), path, data);
         }
 
-        final var ret = new SettableRestconfFuture<CreateOrReplaceResult>();
+        final var ret = new SettableRestconfFuture<DataPutResult>();
 
         Futures.addCallback(commitFuture, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(exists ? CreateOrReplaceResult.REPLACED : CreateOrReplaceResult.CREATED);
+                ret.set(exists ? DataPutResult.REPLACED : DataPutResult.CREATED);
             }
 
             @Override
