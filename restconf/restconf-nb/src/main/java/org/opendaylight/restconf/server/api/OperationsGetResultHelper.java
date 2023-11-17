@@ -18,8 +18,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  *   <li>SpotBugs ends up reporting UPM_UNCALLED_PRIVATE_METHOD</li>
  * </ul>
  */
-final class OperationsContentHelper {
-    private OperationsContentHelper() {
+final class OperationsGetResultHelper {
+    private OperationsGetResultHelper() {
         // Hidden on purpose
     }
 
