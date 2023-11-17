@@ -174,7 +174,7 @@ public final class RestconfDataServiceImpl {
             final AsyncResponse ar) {
         final var reqPath = server.bindRequestPath(identifier);
         final var insert = QueryParams.parseInsert(reqPath.getSchemaContext(), uriInfo);
-        final var req = bindResourceRequest(reqPath, body);
+        final var req = server.bindResourceRequest(reqPath, body);
 
         req.strategy().putData(req.path(), req.data(), insert).addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
@@ -474,24 +474,13 @@ public final class RestconfDataServiceImpl {
      */
     private void plainPatchData(final InstanceIdentifierContext reqPath, final ResourceBody body,
             final AsyncResponse ar) {
-        final var req = bindResourceRequest(reqPath, body);
+        final var req = server.bindResourceRequest(reqPath, body);
         req.strategy().merge(req.path(), req.data()).addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             Response transform(final Empty result) {
                 return Response.ok().build();
             }
         });
-    }
-
-    private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
-            final ResourceBody body) {
-        final var inference = reqPath.inference();
-        final var path = reqPath.getInstanceIdentifier();
-        final var data = body.toNormalizedNode(path, inference, reqPath.getSchemaNode());
-
-        return new ResourceRequest(
-            server.getRestconfStrategy(inference.getEffectiveModelContext(), reqPath.getMountPoint()),
-            path, data);
     }
 
     /**

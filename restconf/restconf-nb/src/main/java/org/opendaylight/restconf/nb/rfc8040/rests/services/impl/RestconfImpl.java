@@ -54,7 +54,6 @@ public final class RestconfImpl {
         this.server = requireNonNull(server);
     }
 
-
     /**
      * Get target data resource from data root.
      *
