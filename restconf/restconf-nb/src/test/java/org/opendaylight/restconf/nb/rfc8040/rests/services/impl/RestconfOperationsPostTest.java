@@ -18,9 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.Futures;
-import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -88,9 +86,9 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         prepNNC(result);
         final var ar = mock(AsyncResponse.class);
         final var captor = ArgumentCaptor.forClass(Response.class);
-        restconf.operationsXmlPOST("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
+        restconf.operationsXmlPOST("invoke-rpc-module:rpc-test", stringInputStream("""
             <input xmlns="invoke:rpc:module"/>
-            """.getBytes(StandardCharsets.UTF_8)), mock(UriInfo.class), ar);
+            """), mock(UriInfo.class), ar);
         verify(ar).resume(captor.capture());
 
         final var response = captor.getValue();
@@ -107,12 +105,12 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         prepNNC(result);
         final var ar = mock(AsyncResponse.class);
         final var response = ArgumentCaptor.forClass(Response.class);
-        restconf.operationsJsonPOST("invoke-rpc-module:rpc-test", new ByteArrayInputStream("""
+        restconf.operationsJsonPOST("invoke-rpc-module:rpc-test", stringInputStream("""
             {
               "invoke-rpc-module:input" : {
               }
             }
-            """.getBytes(StandardCharsets.UTF_8)), mock(UriInfo.class), ar);
+            """), mock(UriInfo.class), ar);
         verify(ar).resume(response.capture());
 
         assertEquals(204, response.getValue().getStatus());

@@ -9,19 +9,15 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
-import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -29,37 +25,26 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
-import org.opendaylight.restconf.nb.rfc8040.databind.JsonPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
-import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
-import org.opendaylight.restconf.nb.rfc8040.databind.XmlPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
-import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.CreateOrReplaceResult;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yangtools.yang.common.Empty;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -68,8 +53,6 @@ import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The "{+restconf}/data" subtree represents the datastore resource type, which is a collection of configuration data
@@ -77,8 +60,6 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 public final class RestconfDataServiceImpl {
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
-
     private final DatabindProvider databindProvider;
     private final MdsalRestconfServer server;
 
@@ -335,149 +316,6 @@ public final class RestconfDataServiceImpl {
         }
 
         return uriInfo.getBaseUriBuilder().path("data").path(IdentifierCodec.serialize(path, schemaContext)).build();
-    }
-
-    /**
-     * Ordered list of edits that are applied to the target datastore by the server, as defined in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
-     *
-     * @param identifier path to target
-     * @param body YANG Patch body
-     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
-     */
-    @PATCH
-    @Path("/data/{identifier:.+}")
-    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_XML)
-    @Produces({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML
-    })
-    public void yangPatchDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
-            @Suspended final AsyncResponse ar) {
-        try (var xmlBody = new XmlPatchBody(body)) {
-            yangPatchData(identifier, xmlBody, ar);
-        }
-    }
-
-    /**
-     * Ordered list of edits that are applied to the datastore by the server, as defined in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
-     *
-     * @param body YANG Patch body
-     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
-     */
-    @PATCH
-    @Path("/data")
-    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_XML)
-    @Produces({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML
-    })
-    public void yangPatchDataXML(final InputStream body, @Suspended final AsyncResponse ar) {
-        try (var xmlBody = new XmlPatchBody(body)) {
-            yangPatchData(xmlBody, ar);
-        }
-    }
-
-    /**
-     * Ordered list of edits that are applied to the target datastore by the server, as defined in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
-     *
-     * @param identifier path to target
-     * @param body YANG Patch body
-     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
-     */
-    @PATCH
-    @Path("/data/{identifier:.+}")
-    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_JSON)
-    @Produces({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML
-    })
-    public void yangPatchDataJSON(@Encoded @PathParam("identifier") final String identifier,
-            final InputStream body, @Suspended final AsyncResponse ar) {
-        try (var jsonBody = new JsonPatchBody(body)) {
-            yangPatchData(identifier, jsonBody, ar);
-        }
-    }
-
-    /**
-     * Ordered list of edits that are applied to the datastore by the server, as defined in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
-     *
-     * @param body YANG Patch body
-     * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
-     */
-    @PATCH
-    @Path("/data")
-    @Consumes(MediaTypes.APPLICATION_YANG_PATCH_JSON)
-    @Produces({
-        MediaTypes.APPLICATION_YANG_DATA_JSON,
-        MediaTypes.APPLICATION_YANG_DATA_XML
-    })
-    public void yangPatchDataJSON(final InputStream body, @Suspended final AsyncResponse ar) {
-        try (var jsonBody = new JsonPatchBody(body)) {
-            yangPatchData(jsonBody, ar);
-        }
-    }
-
-    private void yangPatchData(final @NonNull PatchBody body, final AsyncResponse ar) {
-        final var context = server.bindRequestRoot().getSchemaContext();
-        yangPatchData(context, parsePatchBody(context, YangInstanceIdentifier.of(), body), null, ar);
-    }
-
-    private void yangPatchData(final String identifier, final @NonNull PatchBody body,
-            final AsyncResponse ar) {
-        final var reqPath = server.bindRequestPath(identifier);
-        final var modelContext = reqPath.getSchemaContext();
-        yangPatchData(modelContext, parsePatchBody(modelContext, reqPath.getInstanceIdentifier(), body),
-            reqPath.getMountPoint(), ar);
-    }
-
-    @VisibleForTesting
-    void yangPatchData(final @NonNull EffectiveModelContext modelContext,
-            final @NonNull PatchContext patch, final @Nullable DOMMountPoint mountPoint, final AsyncResponse ar) {
-        server.getRestconfStrategy(modelContext, mountPoint).patchData(patch)
-            .addCallback(new JaxRsRestconfCallback<>(ar) {
-                @Override
-                Response transform(final PatchStatusContext result) {
-                    return Response.status(statusOf(result)).entity(result).build();
-                }
-
-                private static Status statusOf(final PatchStatusContext result) {
-                    if (result.ok()) {
-                        return Status.OK;
-                    }
-                    final var globalErrors = result.globalErrors();
-                    if (globalErrors != null && !globalErrors.isEmpty()) {
-                        return statusOfFirst(globalErrors);
-                    }
-                    for (var edit : result.editCollection()) {
-                        if (!edit.isOk()) {
-                            final var editErrors = edit.getEditErrors();
-                            if (editErrors != null && !editErrors.isEmpty()) {
-                                return statusOfFirst(editErrors);
-                            }
-                        }
-                    }
-                    return Status.INTERNAL_SERVER_ERROR;
-                }
-
-                private static Status statusOfFirst(final List<RestconfError> error) {
-                    return ErrorTags.statusOf(error.get(0).getErrorTag());
-                }
-            });
-    }
-
-    private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,
-            final @NonNull YangInstanceIdentifier urlPath, final @NonNull PatchBody body) {
-        try {
-            return body.toPatchContext(context, urlPath);
-        } catch (IOException e) {
-            LOG.debug("Error parsing YANG Patch input", e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
-        }
     }
 
     /**

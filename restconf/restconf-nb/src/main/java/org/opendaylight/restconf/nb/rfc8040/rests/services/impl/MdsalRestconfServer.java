@@ -44,10 +44,13 @@ import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
@@ -189,6 +192,30 @@ public final class MdsalRestconfServer implements RestconfServer {
     private @NonNull RestconfFuture<Empty> dataPATCH(final InstanceIdentifierContext reqPath, final ResourceBody body) {
         final var req = bindResourceRequest(reqPath, body);
         return req.strategy().merge(req.path(), req.data());
+    }
+
+    @Override
+    public RestconfFuture<PatchStatusContext> dataPATCH(final PatchBody body) {
+        return dataPATCH(bindRequestRoot(), body);
+    }
+
+    @Override
+    public RestconfFuture<PatchStatusContext> dataPATCH(final String identifier, final PatchBody body) {
+        return dataPATCH(bindRequestPath(identifier), body);
+    }
+
+    private @NonNull RestconfFuture<PatchStatusContext> dataPATCH(final InstanceIdentifierContext reqPath,
+            final PatchBody body) {
+        final var modelContext = reqPath.getSchemaContext();
+        final PatchContext patch;
+        try {
+            patch = body.toPatchContext(modelContext, reqPath.getInstanceIdentifier());
+        } catch (IOException e) {
+            LOG.debug("Error parsing YANG Patch input", e);
+            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+        }
+        return getRestconfStrategy(modelContext, reqPath.getMountPoint()).patchData(patch);
     }
 
     // FIXME: should follow the same pattern as operationsPOST() does
