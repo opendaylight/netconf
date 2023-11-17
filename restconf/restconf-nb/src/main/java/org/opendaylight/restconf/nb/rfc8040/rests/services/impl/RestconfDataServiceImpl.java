@@ -449,18 +449,18 @@ public final class RestconfDataServiceImpl {
     private static Status getStatusCode(final PatchStatusContext result) {
         if (result.ok()) {
             return Status.OK;
-        } else if (result.globalErrors() == null || result.globalErrors().isEmpty()) {
-            return result.editCollection().stream()
-                .filter(patchStatus -> !patchStatus.isOk() && !patchStatus.getEditErrors().isEmpty())
-                .findFirst()
-                .map(PatchStatusEntity::getEditErrors)
-                .flatMap(errors -> errors.stream().findFirst())
-                .map(error -> ErrorTags.statusOf(error.getErrorTag()))
-                .orElse(Status.INTERNAL_SERVER_ERROR);
-        } else {
-            final var error = result.globalErrors().iterator().next();
-            return ErrorTags.statusOf(error.getErrorTag());
         }
+        final var globalErrors = result.globalErrors();
+        if (globalErrors != null && !globalErrors.isEmpty()) {
+            return ErrorTags.statusOf(globalErrors.get(0).getErrorTag());
+        }
+        return result.editCollection().stream()
+            .filter(patchStatus -> !patchStatus.isOk() && !patchStatus.getEditErrors().isEmpty())
+            .findFirst()
+            .map(PatchStatusEntity::getEditErrors)
+            .flatMap(errors -> errors.stream().findFirst())
+            .map(error -> ErrorTags.statusOf(error.getErrorTag()))
+            .orElse(Status.INTERNAL_SERVER_ERROR);
     }
 
     private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,
