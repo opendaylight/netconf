@@ -14,6 +14,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -49,6 +50,25 @@ public interface RestconfServer {
      * @return A {@link RestconfFuture} of the {@link NormalizedNodePayload} content
      */
     RestconfFuture<NormalizedNodePayload> dataGET(String identifier, ReadDataParams readParams);
+
+    /**
+     * Partially modify the target data resource, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
+     *
+     * @param body data node for put to config DS
+     * @return A {@link RestconfFuture} of the operation
+     */
+    RestconfFuture<Empty> dataPATCH(ResourceBody body);
+
+    /**
+     * Partially modify the target data resource, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
+     *
+     * @param identifier resource identifier
+     * @param body data node for put to config DS
+     * @return A {@link RestconfFuture} of the operation
+     */
+    RestconfFuture<Empty> dataPATCH(String identifier, ResourceBody body);
 
     /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, String, OperationInputBody)}.

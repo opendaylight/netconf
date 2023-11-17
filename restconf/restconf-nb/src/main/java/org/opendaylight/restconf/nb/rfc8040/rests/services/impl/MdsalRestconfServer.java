@@ -176,6 +176,21 @@ public final class MdsalRestconfServer implements RestconfServer {
         return RestconfFuture.of(new NormalizedNodePayload(reqPath.inference(), node, queryParams));
     }
 
+    @Override
+    public RestconfFuture<Empty> dataPATCH(final ResourceBody body) {
+        return dataPATCH(bindRequestRoot(), body);
+    }
+
+    @Override
+    public RestconfFuture<Empty> dataPATCH(final String identifier, final ResourceBody body) {
+        return dataPATCH(bindRequestPath(identifier), body);
+    }
+
+    private @NonNull RestconfFuture<Empty> dataPATCH(final InstanceIdentifierContext reqPath, final ResourceBody body) {
+        final var req = bindResourceRequest(reqPath, body);
+        return req.strategy().merge(req.path(), req.data());
+    }
+
     // FIXME: should follow the same pattern as operationsPOST() does
     RestconfFuture<DOMActionResult> dataInvokePOST(final InstanceIdentifierContext reqPath,
             final OperationInputBody body) {

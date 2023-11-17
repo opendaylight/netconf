@@ -18,6 +18,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -34,8 +35,10 @@ import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.OperationsContent;
@@ -136,6 +139,97 @@ public final class RestconfImpl {
                     }
                     case NONCONFIG -> Response.status(Status.OK).entity(result).build();
                 };
+            }
+        });
+    }
+
+    /**
+     * Partially modify the target data store, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
+     *
+     * @param body data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @PATCH
+    @Path("/data")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void dataXmlPATCH(final InputStream body, @Suspended final AsyncResponse ar) {
+        try (var xmlBody = new XmlResourceBody(body)) {
+            completeDataPATCH(server.dataPATCH(xmlBody), ar);
+        }
+    }
+
+    /**
+     * Partially modify the target data resource, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
+     *
+     * @param identifier path to target
+     * @param body data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @PATCH
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void dataXmlPATCH(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Suspended final AsyncResponse ar) {
+        try (var xmlBody = new XmlResourceBody(body)) {
+            completeDataPATCH(server.dataPATCH(identifier, xmlBody), ar);
+        }
+    }
+
+    /**
+     * Partially modify the target data store, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
+     *
+     * @param body data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @PATCH
+    @Path("/data")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaType.APPLICATION_JSON,
+    })
+    public void dataJsonPATCH(final InputStream body, @Suspended final AsyncResponse ar) {
+        try (var jsonBody = new JsonResourceBody(body)) {
+            completeDataPATCH(server.dataPATCH(jsonBody), ar);
+        }
+    }
+
+    /**
+     * Partially modify the target data resource, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
+     *
+     * @param identifier path to target
+     * @param body data node for put to config DS
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @PATCH
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaType.APPLICATION_JSON,
+    })
+    public void dataJsonPATCH(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Suspended final AsyncResponse ar) {
+        try (var jsonBody = new JsonResourceBody(body)) {
+            completeDataPATCH(server.dataPATCH(identifier, jsonBody), ar);
+        }
+    }
+
+    private static void completeDataPATCH(final RestconfFuture<Empty> future, final AsyncResponse ar) {
+        future.addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final Empty result) {
+                return Response.ok().build();
             }
         });
     }
