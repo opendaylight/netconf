@@ -35,7 +35,7 @@ class RestconfImplTest {
         final var context = DatabindContext.ofModel(YangParserTestUtils.parseYangResourceDirectory("/restconf/impl"));
         final var restconfImpl = new RestconfImpl(new MdsalRestconfServer(() -> context, dataBroker, rpcService,
             mountPointService));
-        final var libraryVersion = assertInstanceOf(LeafNode.class, restconfImpl.getLibraryVersion().data());
+        final var libraryVersion = assertInstanceOf(LeafNode.class, restconfImpl.yangLibraryVersionGET().data());
         assertEquals("2019-01-04", libraryVersion.body());
     }
 }
