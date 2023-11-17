@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 
 import java.io.InputStream;
-import java.net.URI;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Encoded;
@@ -38,15 +37,10 @@ import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.yangtools.yang.common.Empty;
+import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
@@ -178,8 +172,9 @@ public final class RestconfDataServiceImpl {
 
         strategy.postData(path, data, insert).addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final Empty result) {
-                return Response.created(resolveLocation(uriInfo, path, modelContext, data)).build();
+            Response transform(final CreateResource result) {
+                return Response.created(uriInfo.getBaseUriBuilder().path("data").path(result.createdPath()).build())
+                    .build();
             }
         });
     }
@@ -190,27 +185,6 @@ public final class RestconfDataServiceImpl {
             ret = ret.node(arg);
         }
         return ret;
-    }
-
-    /**
-     * Get location from {@link YangInstanceIdentifier} and {@link UriInfo}.
-     *
-     * @param uriInfo       uri info
-     * @param initialPath   data path
-     * @param schemaContext reference to {@link SchemaContext}
-     * @return {@link URI}
-     */
-    private static URI resolveLocation(final UriInfo uriInfo, final YangInstanceIdentifier initialPath,
-                                       final EffectiveModelContext schemaContext, final NormalizedNode data) {
-        YangInstanceIdentifier path = initialPath;
-        if (data instanceof MapNode mapData) {
-            final var children = mapData.body();
-            if (!children.isEmpty()) {
-                path = path.node(children.iterator().next().name());
-            }
-        }
-
-        return uriInfo.getBaseUriBuilder().path("data").path(IdentifierCodec.serialize(path, schemaContext)).build();
     }
 
     /**
