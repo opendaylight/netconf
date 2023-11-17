@@ -34,9 +34,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
@@ -441,26 +441,32 @@ public final class RestconfDataServiceImpl {
             .addCallback(new JaxRsRestconfCallback<>(ar) {
                 @Override
                 Response transform(final PatchStatusContext result) {
-                    return Response.status(getStatusCode(result)).entity(result).build();
+                    return Response.status(statusOf(result)).entity(result).build();
+                }
+
+                private static Status statusOf(final PatchStatusContext result) {
+                    if (result.ok()) {
+                        return Status.OK;
+                    }
+                    final var globalErrors = result.globalErrors();
+                    if (globalErrors != null && !globalErrors.isEmpty()) {
+                        return statusOf(globalErrors.get(0));
+                    }
+                    for (var edit : result.editCollection()) {
+                        if (!edit.isOk()) {
+                            final var editErrors = edit.getEditErrors();
+                            if (editErrors != null && !editErrors.isEmpty()) {
+                                return statusOf(editErrors.get(0));
+                            }
+                        }
+                    }
+                    return Status.INTERNAL_SERVER_ERROR;
+                }
+
+                private static Status statusOf(final RestconfError error) {
+                    return ErrorTags.statusOf(error.getErrorTag());
                 }
             });
-    }
-
-    private static Status getStatusCode(final PatchStatusContext result) {
-        if (result.ok()) {
-            return Status.OK;
-        } else if (result.globalErrors() == null || result.globalErrors().isEmpty()) {
-            return result.editCollection().stream()
-                .filter(patchStatus -> !patchStatus.isOk() && !patchStatus.getEditErrors().isEmpty())
-                .findFirst()
-                .map(PatchStatusEntity::getEditErrors)
-                .flatMap(errors -> errors.stream().findFirst())
-                .map(error -> ErrorTags.statusOf(error.getErrorTag()))
-                .orElse(Status.INTERNAL_SERVER_ERROR);
-        } else {
-            final var error = result.globalErrors().iterator().next();
-            return ErrorTags.statusOf(error.getErrorTag());
-        }
     }
 
     private static @NonNull PatchContext parsePatchBody(final @NonNull EffectiveModelContext context,
