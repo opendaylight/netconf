@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonPatchStatusBodyWriter;
@@ -19,7 +20,6 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlPatchStatusBodyW
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YangSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YinSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.server.api.RestconfServer;
 
@@ -30,7 +30,7 @@ final class RestconfApplication extends Application {
             final DOMMountPointService mountPointService, final DOMSchemaService domSchemaService) {
         singletons = Set.of(
             new RestconfDocumentedExceptionMapper(databindProvider),
-            new RestconfImpl(server),
+            new JaxRsRestconf(server),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService));
     }
 

@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
+package org.opendaylight.restconf.nb.jaxrs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -18,12 +18,12 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -37,8 +37,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class Netconf799Test extends AbstractInstanceIdentifierTest {
+@ExtendWith(MockitoExtension.class)
+class Netconf799Test extends AbstractInstanceIdentifierTest {
     private static final QName OUTPUT_QNAME = QName.create(CONT_QNAME, "output");
 
     @Mock
@@ -57,12 +57,12 @@ public class Netconf799Test extends AbstractInstanceIdentifierTest {
     private ArgumentCaptor<Response> captor;
 
     @Test
-    public void testInvokeAction() {
+    void testInvokeAction() {
         doReturn(Futures.immediateFuture(new SimpleDOMActionResult(
             Builders.containerBuilder().withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME)).build())))
             .when(actionService).invokeAction(eq(Absolute.of(CONT_QNAME, CONT1_QNAME, RESET_QNAME)), any(), any());
 
-        final var restconf = new RestconfImpl(new MdsalRestconfServer(
+        final var restconf = new JaxRsRestconf(new MdsalRestconfServer(
             () -> DatabindContext.ofModel(IID_SCHEMA), dataBroker, rpcService, actionService, mountPointService));
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
