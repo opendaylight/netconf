@@ -25,6 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,14 +49,12 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     @Captor
     ArgumentCaptor<RestconfDocumentedException> exceptionCaptor;
 
-    MdsalRestconfServer server;
     RestconfImpl restconf;
 
     @BeforeEach
     final void setupRestconf() {
-        server = new MdsalRestconfServer(() -> DatabindContext.ofModel(modelContext()), dataBroker, rpcService,
-            actionService, mountPointService);
-        restconf = new RestconfImpl(server);
+        restconf = new RestconfImpl(new MdsalRestconfServer(() -> DatabindContext.ofModel(modelContext()), dataBroker,
+            rpcService, actionService, mountPointService));
     }
 
     @NonNull EffectiveModelContext modelContext() {

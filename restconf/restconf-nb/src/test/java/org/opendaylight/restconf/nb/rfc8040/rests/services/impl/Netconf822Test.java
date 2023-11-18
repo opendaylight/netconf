@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.Test;
@@ -29,28 +28,25 @@ class Netconf822Test extends AbstractRestconfTest {
 
     @Test
     void testOperationsContent() {
-        final var content = server.operationsGET();
         assertEquals("""
             {
               "ietf-restconf:operations" : {
                 "foo:new" : [null],
                 "foo:new1" : [null]
               }
-            }""", content.toJSON());
+            }""", restconf.operationsJsonGET());
         assertEquals("""
             <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
               <new xmlns="foo"/>
               <new1 xmlns="foo"/>
-            </operations>""", content.toXML());
+            </operations>""", restconf.operationsXmlGET());
     }
 
     @Test
     void testOperationsContentByIdentifier() {
-        final var content = server.operationsGET("foo:new1");
-        assertNotNull(content);
         assertEquals("""
-            { "foo:new1" : [null] }""", content.toJSON());
+            { "foo:new1" : [null] }""", restconf.operationsJsonGET("foo:new1"));
         assertEquals("""
-            <new1 xmlns="foo"/>""", content.toXML());
+            <new1 xmlns="foo"/>""", restconf.operationsXmlGET("foo:new1"));
     }
 }
