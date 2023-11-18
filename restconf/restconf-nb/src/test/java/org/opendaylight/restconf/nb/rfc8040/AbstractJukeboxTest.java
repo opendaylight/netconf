@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -67,7 +68,7 @@ public abstract class AbstractJukeboxTest {
         .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
         .build();
 
-    protected static final EffectiveModelContext JUKEBOX_SCHEMA =
+    protected static final @NonNull EffectiveModelContext JUKEBOX_SCHEMA =
         YangParserTestUtils.parseYangResourceDirectory("/jukebox");
 
     protected static final InputStream stringInputStream(final String str) {
