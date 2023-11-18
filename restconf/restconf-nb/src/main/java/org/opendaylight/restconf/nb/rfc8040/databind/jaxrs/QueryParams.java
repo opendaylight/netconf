@@ -34,16 +34,13 @@ import org.opendaylight.restconf.api.query.StopTimeParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @Beta
 public final class QueryParams {
@@ -153,43 +150,6 @@ public final class QueryParams {
         }
 
         return new ReadDataParams(content, depth, fields, withDefaults, prettyPrint);
-    }
-
-    public static @Nullable Insert parseInsert(final EffectiveModelContext modelContext, final UriInfo uriInfo) {
-        InsertParam insert = null;
-        PointParam point = null;
-
-        for (var entry : uriInfo.getQueryParameters().entrySet()) {
-            final var paramName = entry.getKey();
-            final var paramValues = entry.getValue();
-
-            try {
-                switch (paramName) {
-                    case InsertParam.uriName:
-                        insert = optionalParam(InsertParam::forUriValue, paramName, paramValues);
-                        break;
-                    case PointParam.uriName:
-                        point = optionalParam(PointParam::forUriValue, paramName, paramValues);
-                        break;
-                    default:
-                        throw unhandledParam("write", paramName);
-                }
-            } catch (IllegalArgumentException e) {
-                throw new RestconfDocumentedException("Invalid " + paramName + " value: " + e.getMessage(),
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
-            }
-        }
-
-        try {
-            return Insert.forParams(insert, point,
-                // TODO: instead of a EffectiveModelContext, we should have received
-                //       YangInstanceIdentifierDeserializer.Result, from which we can use to seed the parser. This
-                //       call-site should not support 'yang-ext:mount' and should just reuse DataSchemaContextTree,
-                //       saving a lookup
-                value -> YangInstanceIdentifierDeserializer.create(modelContext, value).path.getLastPathArgument());
-        } catch (IllegalArgumentException e) {
-            throw new RestconfDocumentedException("Invalid query parameters: " + e.getMessage(), e);
-        }
     }
 
     private static RestconfDocumentedException unhandledParam(final String operation, final String name) {

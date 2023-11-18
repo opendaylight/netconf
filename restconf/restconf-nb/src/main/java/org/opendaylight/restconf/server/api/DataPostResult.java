@@ -10,6 +10,8 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
 /**
  * Result of a {@code POST} request as defined in
@@ -18,15 +20,25 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public sealed interface DataPostResult {
     /**
-     * Result of a {@code POST} request as defined in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1">RFC8040 Create ResourceMode</a>.
+     * Result of a {@code POST} request in as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1">RFC8040 Create Resource Mode</a>.
      *
      * @param createdPath API path of the newly-created resource
      */
     // FIXME: use ApiPath instead of String
-    public record CreateResource(String createdPath) implements DataPostResult {
+    record CreateResource(String createdPath) implements DataPostResult {
         public CreateResource {
             requireNonNull(createdPath);
         }
+    }
+
+    /**
+     * Result of a {@code POST} request as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2">RFC8040 Invoke Operation Mode</a>.
+     *
+     * @param output Non-empty operation output, or {@code null}
+     */
+    record InvokeOperation(@Nullable NormalizedNodePayload output) implements DataPostResult {
+        public static final InvokeOperation EMPTY = new InvokeOperation(null);
     }
 }

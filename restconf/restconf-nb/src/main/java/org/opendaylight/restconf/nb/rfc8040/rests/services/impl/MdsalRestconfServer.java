@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -49,6 +50,8 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.DataPostBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
@@ -60,6 +63,9 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.server.api.DataPostResult;
+import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
+import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -78,9 +84,11 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -96,7 +104,7 @@ import org.slf4j.LoggerFactory;
  */
 // FIXME: this should live in 'org.opendaylight.restconf.server.mdsal' package
 @Singleton
-@Component(service = { MdsalRestconfServer.class, RestconfServer.class })
+@Component
 public final class MdsalRestconfServer implements RestconfServer {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfServer.class);
     private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
@@ -221,8 +229,54 @@ public final class MdsalRestconfServer implements RestconfServer {
         return getRestconfStrategy(modelContext, reqPath.getMountPoint()).patchData(patch);
     }
 
-    // FIXME: should follow the same pattern as operationsPOST() does
-    RestconfFuture<DOMActionResult> dataInvokePOST(final InstanceIdentifierContext reqPath,
+    @Override
+    public RestconfFuture<CreateResource> dataPOST(final ChildBody body, final Map<String, String> queryParameters) {
+        return dataCreatePOST(bindRequestRoot(), body, queryParameters);
+    }
+
+    @Override
+    public RestconfFuture<? extends DataPostResult> dataPOST(final String identifier, final DataPostBody body,
+            final Map<String, String> queryParameters) {
+        final var reqPath = bindRequestPath(identifier);
+        if (reqPath.getSchemaNode() instanceof ActionDefinition) {
+            try (var inputBody = body.toOperationInput()) {
+                return dataInvokePOST(reqPath, inputBody);
+            }
+        }
+
+        try (var childBody = body.toResource()) {
+            return dataCreatePOST(reqPath, childBody, queryParameters);
+        }
+    }
+
+    private @NonNull RestconfFuture<CreateResource> dataCreatePOST(final InstanceIdentifierContext reqPath,
+            final ChildBody body, final Map<String, String> queryParameters) {
+        final var inference = reqPath.inference();
+        final var modelContext = inference.getEffectiveModelContext();
+
+        final Insert insert;
+        try {
+            insert = Insert.ofQueryParameters(modelContext, queryParameters);
+        } catch (IllegalArgumentException e) {
+            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+        }
+
+        final var parentPath = reqPath.getInstanceIdentifier();
+        final var payload = body.toPayload(parentPath, inference);
+        return getRestconfStrategy(modelContext, reqPath.getMountPoint())
+            .postData(concat(parentPath, payload.prefix()), payload.body(), insert);
+    }
+
+    private static YangInstanceIdentifier concat(final YangInstanceIdentifier parent, final List<PathArgument> args) {
+        var ret = parent;
+        for (var arg : args) {
+            ret = ret.node(arg);
+        }
+        return ret;
+    }
+
+    RestconfFuture<InvokeOperation> dataInvokePOST(final InstanceIdentifierContext reqPath,
             final OperationInputBody body) {
         final var yangIIdContext = reqPath.getInstanceIdentifier();
         final var inference = reqPath.inference();
@@ -237,8 +291,13 @@ public final class MdsalRestconfServer implements RestconfServer {
 
         final var mountPoint = reqPath.getMountPoint();
         final var schemaPath = inference.toSchemaInferenceStack().toSchemaNodeIdentifier();
-        return mountPoint != null ? dataInvokePOST(input, schemaPath, yangIIdContext, mountPoint)
+        final var future = mountPoint != null ? dataInvokePOST(input, schemaPath, yangIIdContext, mountPoint)
             : dataInvokePOST(input, schemaPath, yangIIdContext, actionService);
+
+        return future.transform(result -> result.getOutput()
+            .flatMap(output -> output.isEmpty() ? Optional.empty()
+                : Optional.of(new InvokeOperation(new NormalizedNodePayload(reqPath.inference(), output))))
+            .orElse(InvokeOperation.EMPTY));
     }
 
     /**

@@ -15,10 +15,13 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.DataPostBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.yangtools.yang.common.Empty;
 
@@ -91,6 +94,11 @@ public interface RestconfServer {
      * @return A {@link RestconfFuture} of the {@link PatchStatusContext} content
      */
     RestconfFuture<PatchStatusContext> dataPATCH(String identifier, PatchBody body);
+
+    RestconfFuture<CreateResource> dataPOST(ChildBody body, Map<String, String> queryParameters);
+
+    RestconfFuture<? extends DataPostResult> dataPOST(String identifier, DataPostBody body,
+        Map<String, String> queryParameters);
 
     /**
      * Replace the data store.
