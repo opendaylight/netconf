@@ -15,7 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.api.MediaTypes;
 
 /**
  * Controller for determining the {@code Root Resource} of the RESTCONF API. This interface serves up a

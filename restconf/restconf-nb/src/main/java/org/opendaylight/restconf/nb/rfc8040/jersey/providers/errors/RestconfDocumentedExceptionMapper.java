@@ -31,7 +31,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.jaxrs.JaxRsMediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
@@ -94,7 +94,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         final ContainerNode errorsContainer = buildErrorsContainer(exception);
         final String serializedResponseBody;
         final MediaType responseMediaType = transformToResponseMediaType(getSupportedMediaType());
-        if (MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE.equals(responseMediaType)) {
+        if (JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON.equals(responseMediaType)) {
             serializedResponseBody = serializeErrorsContainerToJson(errorsContainer);
         } else {
             serializedResponseBody = serializeErrorsContainerToXml(errorsContainer);
@@ -319,9 +319,9 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      */
     private static MediaType transformToResponseMediaType(final MediaType mediaTypeBase) {
         if (isJsonCompatibleMediaType(mediaTypeBase)) {
-            return MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE;
+            return JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON;
         } else if (isXmlCompatibleMediaType(mediaTypeBase)) {
-            return MediaTypes.APPLICATION_YANG_DATA_XML_TYPE;
+            return JaxRsMediaTypes.APPLICATION_YANG_DATA_XML;
         } else {
             throw new IllegalStateException(String.format("Unexpected input media-type %s "
                     + "- it should be JSON/XML compatible type.", mediaTypeBase));
@@ -334,14 +334,14 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
 
     private static boolean isJsonCompatibleMediaType(final MediaType mediaType) {
         return mediaType.isCompatible(MediaType.APPLICATION_JSON_TYPE)
-                || mediaType.isCompatible(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
-                || mediaType.isCompatible(MediaTypes.APPLICATION_YANG_PATCH_JSON_TYPE);
+                || mediaType.isCompatible(JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON)
+                || mediaType.isCompatible(JaxRsMediaTypes.APPLICATION_YANG_PATCH_JSON);
     }
 
     private static boolean isXmlCompatibleMediaType(final MediaType mediaType) {
         return mediaType.isCompatible(MediaType.APPLICATION_XML_TYPE)
-                || mediaType.isCompatible(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
-                || mediaType.isCompatible(MediaTypes.APPLICATION_YANG_PATCH_XML_TYPE);
+                || mediaType.isCompatible(JaxRsMediaTypes.APPLICATION_YANG_DATA_XML)
+                || mediaType.isCompatible(JaxRsMediaTypes.APPLICATION_YANG_PATCH_XML);
     }
 
     /**
