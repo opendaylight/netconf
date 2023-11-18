@@ -38,28 +38,38 @@ import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.JsonDataPostBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlChildBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.XmlDataPostBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlOperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlPatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.server.api.DataPostResult;
+import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
+import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Baseline RESTCONF implementation with JAX-RS.
  */
 @Path("/")
 public final class RestconfImpl {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfImpl.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
     private final RestconfServer server;
@@ -354,6 +364,110 @@ public final class RestconfImpl {
 
             private static Status statusOfFirst(final List<RestconfError> error) {
                 return ErrorTags.statusOf(error.get(0).getErrorTag());
+            }
+        });
+    }
+
+    /**
+     * Create a top-level data resource.
+     *
+     * @param body data node for put to config DS
+     * @param uriInfo URI info
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @POST
+    @Path("/data")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaType.APPLICATION_JSON,
+    })
+    public void postDataJSON(final InputStream body, @Context final UriInfo uriInfo,
+            @Suspended final AsyncResponse ar) {
+        try (var jsonBody = new JsonChildBody(body)) {
+            completeDataPOST(server.dataPOST(jsonBody, QueryParams.normalize(uriInfo)), uriInfo, ar);
+        }
+    }
+
+    /**
+     * Create a data resource in target.
+     *
+     * @param identifier path to target
+     * @param body data node for put to config DS
+     * @param uriInfo URI info
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @POST
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_JSON,
+        MediaType.APPLICATION_JSON,
+    })
+    public void postDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+        completeDataPOST(server.dataPOST(identifier, new JsonDataPostBody(body), QueryParams.normalize(uriInfo)),
+            uriInfo, ar);
+    }
+
+    /**
+     * Create a top-level data resource.
+     *
+     * @param body data node for put to config DS
+     * @param uriInfo URI info
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @POST
+    @Path("/data")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void postDataXML(final InputStream body, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+        try (var xmlBody = new XmlChildBody(body)) {
+            completeDataPOST(server.dataPOST(xmlBody, QueryParams.normalize(uriInfo)), uriInfo, ar);
+        }
+    }
+
+    /**
+     * Create a data resource in target.
+     *
+     * @param identifier path to target
+     * @param body data node for put to config DS
+     * @param uriInfo URI info
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @POST
+    @Path("/data/{identifier:.+}")
+    @Consumes({
+        MediaTypes.APPLICATION_YANG_DATA_XML,
+        MediaType.APPLICATION_XML,
+        MediaType.TEXT_XML
+    })
+    public void postDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+        completeDataPOST(server.dataPOST(identifier, new XmlDataPostBody(body), QueryParams.normalize(uriInfo)),
+            uriInfo, ar);
+    }
+
+    private static void completeDataPOST(final RestconfFuture<? extends DataPostResult> future, final UriInfo uriInfo,
+            final AsyncResponse ar) {
+        future.addCallback(new JaxRsRestconfCallback<DataPostResult>(ar) {
+            @Override
+            Response transform(final DataPostResult result) {
+                if (result instanceof CreateResource createResource) {
+                    return Response.created(uriInfo.getBaseUriBuilder()
+                            .path("data")
+                            .path(createResource.createdPath())
+                            .build())
+                        .build();
+                }
+                if (result instanceof InvokeOperation invokeOperation) {
+                    final var output = invokeOperation.output();
+                    return output == null ? Response.status(Status.NO_CONTENT).build()
+                        : Response.status(Status.OK).entity(output).build();
+                }
+                LOG.error("Unhandled result {}", result);
+                return Response.serverError().build();
             }
         });
     }

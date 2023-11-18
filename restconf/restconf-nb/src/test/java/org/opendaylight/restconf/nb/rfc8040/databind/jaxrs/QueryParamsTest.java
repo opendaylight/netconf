@@ -32,6 +32,7 @@ import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
@@ -77,12 +78,11 @@ public class QueryParamsTest {
     public void checkParametersTypesNegativeTest() {
         assertInvalidIAE(ReceiveEventsParams::ofQueryParameters);
         assertUnknownParam(QueryParams::newReadDataParams);
-        assertUnknownParam(uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo));
+        assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mock(EffectiveModelContext.class), queryParams));
 
         assertInvalidIAE(ReceiveEventsParams::ofQueryParameters, ContentParam.ALL);
         assertInvalidParam(QueryParams::newReadDataParams, InsertParam.LAST);
-        assertInvalidParam(
-            uriInfo -> QueryParams.parseInsert(mock(EffectiveModelContext.class), uriInfo),
+        assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mock(EffectiveModelContext.class), queryParams),
             ContentParam.ALL);
     }
 
