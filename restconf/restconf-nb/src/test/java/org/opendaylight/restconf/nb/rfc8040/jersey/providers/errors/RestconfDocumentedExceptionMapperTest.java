@@ -29,7 +29,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.MediaTypes;
+import org.opendaylight.restconf.nb.jaxrs.JaxRsMediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -84,9 +84,9 @@ public class RestconfDocumentedExceptionMapperTest {
                 "Mapping of the exception with one error entry but null status code. This status code should"
                         + "be derived from single error entry; JSON output",
                 new RestconfDocumentedException("Sample error message"),
-                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(MediaTypes.APPLICATION_YANG_PATCH_JSON_TYPE)),
+                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(JaxRsMediaTypes.APPLICATION_YANG_PATCH_JSON)),
                 Response.status(Status.INTERNAL_SERVER_ERROR)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
+                        .type(JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON)
                         .entity("""
                             {
                               "errors": {
@@ -107,9 +107,9 @@ public class RestconfDocumentedExceptionMapperTest {
                 new RestconfDocumentedException("general message", new IllegalStateException("cause"), List.of(
                                 new RestconfError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, "message 1"),
                                 new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "message 2"))),
-                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(MediaTypes.APPLICATION_YANG_PATCH_XML_TYPE)),
+                mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(JaxRsMediaTypes.APPLICATION_YANG_PATCH_XML)),
                 Response.status(Status.BAD_REQUEST)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
+                        .type(JaxRsMediaTypes.APPLICATION_YANG_DATA_XML)
                         .entity("""
                             <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
                               <error>
@@ -131,7 +131,7 @@ public class RestconfDocumentedExceptionMapperTest {
                 sampleComplexError, mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(
                         MediaType.APPLICATION_JSON_TYPE)),
                 Response.status(Status.BAD_REQUEST)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE)
+                        .type(JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON)
                         .entity("""
                             {
                               "errors": {
@@ -166,10 +166,10 @@ public class RestconfDocumentedExceptionMapperTest {
             {
                 "Mapping of the exception with three entries and optional entries set: error app tag (the first error),"
                         + " error info (the second error), and error path (the last error); XML output",
-                sampleComplexError, mockHttpHeaders(MediaTypes.APPLICATION_YANG_PATCH_JSON_TYPE,
-                        List.of(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)),
+                sampleComplexError, mockHttpHeaders(JaxRsMediaTypes.APPLICATION_YANG_PATCH_JSON,
+                        List.of(JaxRsMediaTypes.APPLICATION_YANG_DATA_XML)),
                 Response.status(Status.BAD_REQUEST)
-                        .type(MediaTypes.APPLICATION_YANG_DATA_XML_TYPE)
+                        .type(JaxRsMediaTypes.APPLICATION_YANG_DATA_XML)
                         .entity("""
                             <errors xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
                               <error>
@@ -217,7 +217,7 @@ public class RestconfDocumentedExceptionMapperTest {
 
     @Test
     public void testFormatingJson() throws JSONException {
-        assumeTrue(expectedResponse.getMediaType().equals(MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE));
+        assumeTrue(expectedResponse.getMediaType().equals(JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON));
 
         exceptionMapper.setHttpHeaders(httpHeaders);
         final Response response = exceptionMapper.toResponse(thrownException);
@@ -237,7 +237,7 @@ public class RestconfDocumentedExceptionMapperTest {
                 actualResponse, expectedResponse);
         assertEquals(errorMessage, expectedResponse.getStatus(), actualResponse.getStatus());
         assertEquals(errorMessage, expectedResponse.getMediaType(), actualResponse.getMediaType());
-        if (MediaTypes.APPLICATION_YANG_DATA_JSON_TYPE.equals(expectedResponse.getMediaType())) {
+        if (JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON.equals(expectedResponse.getMediaType())) {
             JSONAssert.assertEquals(expectedResponse.getEntity().toString(),
                     actualResponse.getEntity().toString(), true);
         } else {
