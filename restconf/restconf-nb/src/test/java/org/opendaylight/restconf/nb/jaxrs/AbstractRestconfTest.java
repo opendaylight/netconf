@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
+package org.opendaylight.restconf.nb.jaxrs;
 
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
@@ -49,11 +49,11 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     @Captor
     ArgumentCaptor<RestconfDocumentedException> exceptionCaptor;
 
-    RestconfImpl restconf;
+    JaxRsRestconf restconf;
 
     @BeforeEach
     final void setupRestconf() {
-        restconf = new RestconfImpl(new MdsalRestconfServer(() -> DatabindContext.ofModel(modelContext()), dataBroker,
+        restconf = new JaxRsRestconf(new MdsalRestconfServer(() -> DatabindContext.ofModel(modelContext()), dataBroker,
             rpcService, actionService, mountPointService));
     }
 

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
+package org.opendaylight.restconf.nb.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
@@ -65,16 +65,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Baseline RESTCONF implementation with JAX-RS.
+ * Baseline RESTCONF implementation with JAX-RS. Interfaces to a {@link RestconfServer}.
  */
 @Path("/")
-public final class RestconfImpl {
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfImpl.class);
+public final class JaxRsRestconf {
+    private static final Logger LOG = LoggerFactory.getLogger(JaxRsRestconf.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
     private final RestconfServer server;
 
-    public RestconfImpl(final RestconfServer server) {
+    public JaxRsRestconf(final RestconfServer server) {
         this.server = requireNonNull(server);
     }
 
