@@ -6,6 +6,6 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * Package holding data binding components implemented on top of MD-SAL APIs.
+ * RESTCONF server implementation on top of MD-SAL APIs.
  */
-package org.opendaylight.restconf.nb.rfc8040.databind.mdsal;
+package org.opendaylight.restconf.server.mdsal;
