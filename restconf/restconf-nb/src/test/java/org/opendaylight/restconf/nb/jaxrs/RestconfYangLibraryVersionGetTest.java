@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
+package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -24,7 +24,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class RestconfImplTest {
+class RestconfYangLibraryVersionGetTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
@@ -37,7 +37,7 @@ class RestconfImplTest {
     @Test
     void testLibraryVersion() {
         final var context = DatabindContext.ofModel(YangParserTestUtils.parseYangResourceDirectory("/restconf/impl"));
-        final var restconfImpl = new RestconfImpl(new MdsalRestconfServer(() -> context, dataBroker, rpcService,
+        final var restconfImpl = new JaxRsRestconf(new MdsalRestconfServer(() -> context, dataBroker, rpcService,
             actionService, mountPointService));
         final var libraryVersion = assertInstanceOf(LeafNode.class, restconfImpl.yangLibraryVersionGET().data());
         assertEquals("2019-01-04", libraryVersion.body());

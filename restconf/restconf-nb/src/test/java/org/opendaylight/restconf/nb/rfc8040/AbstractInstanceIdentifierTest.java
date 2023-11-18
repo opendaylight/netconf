@@ -10,8 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -51,17 +49,8 @@ public abstract class AbstractInstanceIdentifierTest {
     protected static final QName MY_LEAF11_QNAME = QName.create(PATCH_CONT_QNAME, "my-leaf11");
     protected static final QName MY_LEAF12_QNAME = QName.create(PATCH_CONT_QNAME, "my-leaf12");
 
-    protected static EffectiveModelContext IID_SCHEMA;
-
-    @BeforeClass
-    public static final void beforeClass() {
-        IID_SCHEMA = YangParserTestUtils.parseYangResourceDirectory("/instanceidentifier/yang");
-    }
-
-    @AfterClass
-    public static final void afterClass() {
-        IID_SCHEMA = null;
-    }
+    protected static final EffectiveModelContext IID_SCHEMA =
+        YangParserTestUtils.parseYangResourceDirectory("/instanceidentifier/yang");
 
     protected static final InputStream stringInputStream(final String str) {
         return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
