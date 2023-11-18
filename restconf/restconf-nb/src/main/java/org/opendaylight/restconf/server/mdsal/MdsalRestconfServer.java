@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
+package org.opendaylight.restconf.server.mdsal;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
@@ -102,7 +102,6 @@ import org.slf4j.LoggerFactory;
 /**
  * A RESTCONF server implemented on top of MD-SAL.
  */
-// FIXME: this should live in 'org.opendaylight.restconf.server.mdsal' package
 @Singleton
 @Component
 public final class MdsalRestconfServer implements RestconfServer {
@@ -175,11 +174,10 @@ public final class MdsalRestconfServer implements RestconfServer {
         final var strategy = getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
         final NormalizedNode node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
-            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
-                readParams.withDefaults(), fieldPaths);
+            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(), readParams.withDefaults(),
+                fieldPaths);
         } else {
-            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(),
-                readParams.withDefaults());
+            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(), readParams.withDefaults());
         }
         if (node == null) {
             return RestconfFuture.failed(new RestconfDocumentedException(
@@ -276,7 +274,7 @@ public final class MdsalRestconfServer implements RestconfServer {
         return ret;
     }
 
-    RestconfFuture<InvokeOperation> dataInvokePOST(final InstanceIdentifierContext reqPath,
+    private RestconfFuture<InvokeOperation> dataInvokePOST(final InstanceIdentifierContext reqPath,
             final OperationInputBody body) {
         final var yangIIdContext = reqPath.getInstanceIdentifier();
         final var inference = reqPath.inference();
@@ -467,23 +465,24 @@ public final class MdsalRestconfServer implements RestconfServer {
             ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION));
     }
 
-    @NonNull InstanceIdentifierContext bindRequestPath(final String identifier) {
+    private @NonNull InstanceIdentifierContext bindRequestPath(final String identifier) {
         return bindRequestPath(databindProvider.currentContext(), identifier);
     }
 
-    @Deprecated
-    @NonNull InstanceIdentifierContext bindRequestPath(final DatabindContext databind, final String identifier) {
+    private @NonNull InstanceIdentifierContext bindRequestPath(final DatabindContext databind,
+            final String identifier) {
         // FIXME: go through ApiPath first. That part should eventually live in callers
         // FIXME: DatabindContext looks like it should be internal
         return verifyNotNull(ParserIdentifier.toInstanceIdentifier(requireNonNull(identifier), databind.modelContext(),
             mountPointService));
     }
 
-    @NonNull InstanceIdentifierContext bindRequestRoot() {
+    private @NonNull InstanceIdentifierContext bindRequestRoot() {
         return InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext().modelContext());
     }
 
-    @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath, final ResourceBody body) {
+    private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
+            final ResourceBody body) {
         final var inference = reqPath.inference();
         final var path = reqPath.getInstanceIdentifier();
         final var data = body.toNormalizedNode(path, inference, reqPath.getSchemaNode());
@@ -493,7 +492,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @VisibleForTesting
-    @NonNull RestconfStrategy getRestconfStrategy(final EffectiveModelContext modelContext,
+    public @NonNull RestconfStrategy getRestconfStrategy(final EffectiveModelContext modelContext,
             final @Nullable DOMMountPoint mountPoint) {
         if (mountPoint == null) {
             return localStrategy(modelContext);
@@ -503,8 +502,8 @@ public final class MdsalRestconfServer implements RestconfServer {
         if (ret == null) {
             final var mountId = mountPoint.getIdentifier();
             LOG.warn("Mount point {} does not expose a suitable access interface", mountId);
-            throw new RestconfDocumentedException("Could not find a supported access interface in mount point "
-                + mountId);
+            throw new RestconfDocumentedException("Could not find a supported access interface in mount point",
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, mountId);
         }
         return ret;
     }
