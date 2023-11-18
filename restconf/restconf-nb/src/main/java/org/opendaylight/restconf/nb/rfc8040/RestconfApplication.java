@@ -19,19 +19,17 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlPatchStatusBodyW
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YangSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YinSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
+import org.opendaylight.restconf.server.api.RestconfServer;
 
 final class RestconfApplication extends Application {
     private final Set<Object> singletons;
 
-    RestconfApplication(final DatabindProvider databindProvider, final MdsalRestconfServer server,
+    RestconfApplication(final DatabindProvider databindProvider, final RestconfServer server,
             final DOMMountPointService mountPointService, final DOMSchemaService domSchemaService) {
         singletons = Set.of(
             new RestconfDocumentedExceptionMapper(databindProvider),
-            new RestconfDataServiceImpl(databindProvider, server),
             new RestconfImpl(server),
             new RestconfSchemaServiceImpl(domSchemaService, mountPointService));
     }

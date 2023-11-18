@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * An abstract request body backed by an {@link InputStream}.
  */
 public abstract sealed class AbstractBody implements AutoCloseable
-        permits ChildBody, OperationInputBody, PatchBody, ResourceBody {
+        permits ChildBody, DataPostBody, OperationInputBody, PatchBody, ResourceBody {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractBody.class);
 
     private static final VarHandle INPUT_STREAM;

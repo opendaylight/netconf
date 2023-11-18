@@ -10,84 +10,48 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 
 import java.net.URI;
-import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
+@ExtendWith(MockitoExtension.class)
+class RestconfDataServiceImplTest extends AbstractRestconfTest {
     @Mock
-    private UriInfo uriInfo;
-    @Mock
-    private DOMDataTreeReadWriteTransaction readWrite;
-    @Mock
-    private DOMMountPointService mountPointService;
-    @Mock
-    private DOMDataBroker mountDataBroker;
-    @Mock
-    private DOMActionService actionService;
-    @Mock
-    private DOMRpcService rpcService;
-    @Mock
-    private AsyncResponse asyncResponse;
-    @Captor
-    private ArgumentCaptor<Response> responseCaptor;
+    private DOMDataTreeReadWriteTransaction tx;
 
-    private RestconfDataServiceImpl dataService;
-
-    @Before
-    public void setUp() throws Exception {
-        doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
-
-        final var dataBroker = mock(DOMDataBroker.class);
-        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
-
-        final DatabindProvider databindProvider = () -> DatabindContext.ofModel(JUKEBOX_SCHEMA);
-        dataService = new RestconfDataServiceImpl(databindProvider,
-            new MdsalRestconfServer(databindProvider, dataBroker, rpcService, actionService, mountPointService));
+    @BeforeEach
+    void beforeEach() {
+        doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
+        doReturn(tx).when(dataBroker).newReadWriteTransaction();
     }
 
     @Test
-    public void testPostData() {
+    void testPostData() {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
+        doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
+        doNothing().when(tx).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
             Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME)).build());
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
-        final var captor = ArgumentCaptor.forClass(Response.class);
-        doReturn(true).when(asyncResponse).resume(captor.capture());
-        dataService.postDataJSON(stringInputStream("""
+        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
+        restconf.postDataJSON(stringInputStream("""
             {
               "example-jukebox:jukebox" : {
               }
             }"""), uriInfo, asyncResponse);
-        final var response = captor.getValue();
+        final var response = responseCaptor.getValue();
         assertEquals(201, response.getStatus());
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox"), response.getLocation());
     }
@@ -96,23 +60,21 @@ public class RestconfDataServiceImplTest extends AbstractJukeboxTest {
     public void testPostMapEntryData() {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         final var node = PLAYLIST_IID.node(BAND_ENTRY.name());
-        doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
-        doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
+        doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doNothing().when(tx).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
-        final var captor = ArgumentCaptor.forClass(Response.class);
-        doReturn(true).when(asyncResponse).resume(captor.capture());
-        dataService.postDataJSON("example-jukebox:jukebox", stringInputStream("""
+        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
+        restconf.postDataJSON("example-jukebox:jukebox", stringInputStream("""
             {
               "example-jukebox:playlist" : {
                 "name" : "name of band",
                 "description" : "band description"
               }
             }"""), uriInfo, asyncResponse);
-        final var response = captor.getValue();
+        final var response = responseCaptor.getValue();
         assertEquals(201, response.getStatus());
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
             response.getLocation());
     }
-
 }

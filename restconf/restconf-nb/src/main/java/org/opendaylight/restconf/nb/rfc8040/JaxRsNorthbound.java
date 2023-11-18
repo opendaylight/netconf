@@ -20,8 +20,8 @@ import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.MdsalRestconfServer;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
+import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -42,7 +42,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             @Reference final ServletSupport servletSupport,
             @Reference final CustomFilterAdapterConfiguration filterAdapterConfiguration,
             @Reference final DOMMountPointService mountPointService, @Reference final DOMSchemaService schemaService,
-            @Reference final DatabindProvider databindProvider, @Reference final MdsalRestconfServer server,
+            @Reference final DatabindProvider databindProvider, @Reference final RestconfServer server,
             @Reference final RestconfStreamServletFactory servletFactory) throws ServletException {
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
