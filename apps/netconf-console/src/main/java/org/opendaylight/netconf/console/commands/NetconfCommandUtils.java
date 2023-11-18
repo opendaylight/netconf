@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.console.commands;
 
-import com.google.common.base.Strings;
 import java.util.regex.Pattern;
 
 final class NetconfCommandUtils {
@@ -21,9 +20,6 @@ final class NetconfCommandUtils {
     }
 
     static boolean isPortValid(final String devicePort) {
-//        if (Strings.isNullOrEmpty(devicePort)) {
-//            return false;
-//        }
         final int port;
         try {
             port = Integer.parseInt(devicePort);
@@ -34,9 +30,6 @@ final class NetconfCommandUtils {
     }
 
     static boolean isIpValid(final String deviceIp) {
-        if (Strings.isNullOrEmpty(deviceIp)) {
-            return false;
-        }
-        return IP_PATTERN.matcher(deviceIp).matches();
+        return deviceIp != null && IP_PATTERN.matcher(deviceIp).matches();
     }
 }
