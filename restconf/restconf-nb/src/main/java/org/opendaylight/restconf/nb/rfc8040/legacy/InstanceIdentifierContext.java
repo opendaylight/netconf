@@ -11,9 +11,18 @@ import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ApiPath.Step;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -100,6 +109,63 @@ public abstract class InstanceIdentifierContext {
     InstanceIdentifierContext(final SchemaNode schemaNode, final DOMMountPoint mountPoint) {
         this.schemaNode = requireNonNull(schemaNode);
         this.mountPoint = mountPoint;
+    }
+
+    // FIXME: NETCONF-773: this recursion should really live in MdsalRestconfServer
+    public static @NonNull InstanceIdentifierContext ofApiPath(final ApiPath path,
+            final EffectiveModelContext modelContext, final DOMMountPointService mountPointService) {
+        final var steps = path.steps();
+        final var limit = steps.size() - 1;
+
+        var prefix = 0;
+        DOMMountPoint currentMountPoint = null;
+        var currentModelContext = modelContext;
+        while (prefix <= limit) {
+            final var mount = indexOfMount(steps, prefix, limit);
+            if (mount == -1) {
+                break;
+            }
+            if (mount == 0) {
+                // Mount requires at least one parent item
+                throw new RestconfDocumentedException("");
+            }
+
+            final var userPath = path.subPath(0, mount);
+            final var mountService = currentMountPoint == null ? mountPointService
+                : currentMountPoint.getService(DOMMountPointService.class).orElse(null);
+            if (mountService == null) {
+                // FIXME: wrong path here
+                throw new RestconfDocumentedException("No mount points available in " + userPath,
+                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT);
+            }
+
+            final var mountPath = IdentifierCodec.deserialize(path.subPath(prefix, mount), modelContext);
+            final var nextMountPoint = mountService.getMountPoint(mountPath)
+                .orElseThrow(() -> new RestconfDocumentedException("Mount point " + userPath + " does not exist",
+                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+            final var nextModelContext = nextMountPoint.getService(DOMSchemaService.class)
+                .orElseThrow(() -> new RestconfDocumentedException(
+                    "Mount point " + userPath + " does not expose DOMSchemaService",
+                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT))
+                .getGlobalContext();
+
+            prefix = mount + 1;
+            currentModelContext = nextModelContext;
+            currentMountPoint = nextMountPoint;
+        }
+
+        final var result = YangInstanceIdentifierDeserializer.create(currentModelContext, path.subPath(prefix));
+        return InstanceIdentifierContext.ofPath(result.stack, result.node, result.path, currentMountPoint);
+    }
+
+    private static int indexOfMount(final ImmutableList<Step> steps, final int fromIndex, final int limit) {
+        for (int i = fromIndex; i <= limit; ++ i) {
+            final var step = steps.get(i);
+            if ("yang-ext".equals(step.module()) && "mount".equals(step.identifier().getLocalName())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public static @NonNull InstanceIdentifierContext ofLocalRoot(final EffectiveModelContext context) {
