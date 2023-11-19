@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,11 +17,11 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class Netconf822Test extends AbstractRestconfTest {
-    private static final @NonNull EffectiveModelContext MODEL_CONTEXT =
+    private static final EffectiveModelContext MODEL_CONTEXT =
         YangParserTestUtils.parseYangResourceDirectory("/nc822");
 
     @Override
-    @NonNull EffectiveModelContext modelContext() {
+    EffectiveModelContext modelContext() {
         return MODEL_CONTEXT;
     }
 
@@ -34,19 +33,19 @@ class Netconf822Test extends AbstractRestconfTest {
                 "foo:new" : [null],
                 "foo:new1" : [null]
               }
-            }""", restconf.operationsJsonGET());
+            }""", assertEntity(200, ar -> restconf.operationsJsonGET(ar)));
         assertEquals("""
             <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
               <new xmlns="foo"/>
               <new1 xmlns="foo"/>
-            </operations>""", restconf.operationsXmlGET());
+            </operations>""", assertEntity(200, ar -> restconf.operationsXmlGET(ar)));
     }
 
     @Test
     void testOperationsContentByIdentifier() {
         assertEquals("""
-            { "foo:new1" : [null] }""", restconf.operationsJsonGET("foo:new1"));
+            { "foo:new1" : [null] }""", assertEntity(200, ar -> restconf.operationsJsonGET("foo:new1", ar)));
         assertEquals("""
-            <new1 xmlns="foo"/>""", restconf.operationsXmlGET("foo:new1"));
+            <new1 xmlns="foo"/>""", assertEntity(200, ar -> restconf.operationsXmlGET("foo:new1", ar)));
     }
 }

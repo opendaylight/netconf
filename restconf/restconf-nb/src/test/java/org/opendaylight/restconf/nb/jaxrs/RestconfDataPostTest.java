@@ -45,15 +45,12 @@ class RestconfDataPostTest extends AbstractRestconfTest {
             Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME)).build());
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.postDataJSON(stringInputStream("""
-            {
-              "example-jukebox:jukebox" : {
-              }
-            }"""), uriInfo, asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(201, response.getStatus());
-        assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox"), response.getLocation());
+        assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox"),
+            assertResponse(201, ar -> restconf.postDataJSON(stringInputStream("""
+                {
+                  "example-jukebox:jukebox" : {
+                  }
+                }"""), uriInfo, ar)).getLocation());
     }
 
     @Test
@@ -64,17 +61,13 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         doNothing().when(tx).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.postDataJSON("example-jukebox:jukebox", stringInputStream("""
-            {
-              "example-jukebox:playlist" : {
-                "name" : "name of band",
-                "description" : "band description"
-              }
-            }"""), uriInfo, asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(201, response.getStatus());
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
-            response.getLocation());
+            assertResponse(201, ar -> restconf.postDataJSON("example-jukebox:jukebox", stringInputStream("""
+                {
+                  "example-jukebox:playlist" : {
+                    "name" : "name of band",
+                    "description" : "band description"
+                  }
+                }"""), uriInfo, ar)).getLocation());
     }
 }

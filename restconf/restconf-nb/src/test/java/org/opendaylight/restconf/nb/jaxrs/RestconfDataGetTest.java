@@ -15,7 +15,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
-import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.core.MultivaluedHashMap;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +29,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -74,11 +72,8 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataGET("example-jukebox:jukebox", uriInfo, asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(200, response.getStatus());
-        assertEquals(EMPTY_JUKEBOX, ((NormalizedNodePayload) response.getEntity()).data());
+        assertEquals(EMPTY_JUKEBOX,
+            assertNormalizedNode(200, ar -> restconf.dataGET("example-jukebox:jukebox", uriInfo, ar)));
     }
 
     @Test
@@ -91,12 +86,8 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .when(tx)
                 .read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataGET(uriInfo, asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(200, response.getStatus());
-
-        final var data = assertInstanceOf(ContainerNode.class, ((NormalizedNodePayload) response.getEntity()).data());
+        final var data = assertInstanceOf(ContainerNode.class,
+            assertNormalizedNode(200, ar -> restconf.dataGET(uriInfo, ar)));
         final var rootNodes = data.body();
         assertEquals(1, rootNodes.size());
         final var allDataChildren = assertInstanceOf(ContainerNode.class, rootNodes.iterator().next()).body();
@@ -130,13 +121,10 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataGET("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", uriInfo, asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(200, response.getStatus());
-
         // response must contain all child nodes from config and operational containers merged in one container
-        final var data = assertInstanceOf(ContainerNode.class, ((NormalizedNodePayload) response.getEntity()).data());
+        final var data = assertInstanceOf(ContainerNode.class,
+            assertNormalizedNode(200, ar ->
+                restconf.dataGET("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", uriInfo, ar)));
         assertEquals(3, data.size());
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
         assertNotNull(data.childByArg(LIBRARY_NID));
@@ -151,12 +139,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
-        doReturn(true).when(asyncResponse).resume(exceptionCaptor.capture());
-        restconf.dataGET("example-jukebox:jukebox", uriInfo, asyncResponse);
-
-        final var errors = exceptionCaptor.getValue().getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> restconf.dataGET("example-jukebox:jukebox", uriInfo, ar));
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
         assertEquals("Request could not be completed because the relevant data model content does not exist",
@@ -168,25 +151,19 @@ class RestconfDataGetTest extends AbstractRestconfTest {
      */
     @Test
     void testReadDataConfigTest() {
-        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
-        parameters.put("content", List.of("config"));
+        final var parameters = new MultivaluedHashMap<String, String>();
+        parameters.putSingle("content", "config");
 
         doReturn(parameters).when(uriInfo).getQueryParameters();
         doReturn(immediateFluentFuture(Optional.of(CONFIG_JUKEBOX))).when(tx)
                 .read(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataGET("example-jukebox:jukebox", uriInfo, asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(200, response.getStatus());
-
         // response must contain only config data
-        final var data = assertInstanceOf(ContainerNode.class, ((NormalizedNodePayload) response.getEntity()).data());
-
+        final var data = assertInstanceOf(ContainerNode.class,
+            assertNormalizedNode(200, ar -> restconf.dataGET("example-jukebox:jukebox", uriInfo, ar)));
         // config data present
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
         assertNotNull(data.childByArg(LIBRARY_NID));
-
         // state data absent
         assertNull(data.childByArg(PLAYLIST_NID));
     }
@@ -203,15 +180,9 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(immediateFluentFuture(Optional.of(OPER_JUKEBOX))).when(tx)
                 .read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataGET("example-jukebox:jukebox", uriInfo, asyncResponse);
-        final var response = responseCaptor.getValue();
-
-        assertEquals(200, response.getStatus());
-
         // response must contain only operational data
-        final var data = assertInstanceOf(ContainerNode.class, ((NormalizedNodePayload) response.getEntity()).data());
-
+        final var data = assertInstanceOf(ContainerNode.class,
+            assertNormalizedNode(200, ar -> restconf.dataGET("example-jukebox:jukebox", uriInfo, ar)));
         // state data present
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
         assertNotNull(data.childByArg(PLAYLIST_NID));

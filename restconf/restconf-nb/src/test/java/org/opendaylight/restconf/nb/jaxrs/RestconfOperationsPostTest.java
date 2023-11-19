@@ -7,8 +7,8 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -31,7 +31,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -74,14 +73,9 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(false).when(result).isEmpty();
 
         prepNNC(result);
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.operationsXmlPOST("invoke-rpc-module:rpc-test", stringInputStream("""
-            <input xmlns="invoke:rpc:module"/>
-            """), uriInfo, asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(200, response.getStatus());
-        final var entity = (NormalizedNodePayload) response.getEntity();
-        assertSame(result, entity.data());
+        assertSame(result, assertNormalizedNode(200, ar -> restconf.operationsXmlPOST("invoke-rpc-module:rpc-test",
+            stringInputStream("""
+                <input xmlns="invoke:rpc:module"/>"""), uriInfo, ar)));
     }
 
     @Test
@@ -90,31 +84,26 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(true).when(result).isEmpty();
 
         prepNNC(result);
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.operationsJsonPOST("invoke-rpc-module:rpc-test", stringInputStream("""
-            {
-              "invoke-rpc-module:input" : {
-              }
-            }"""), uriInfo, asyncResponse);
-        assertEquals(204, responseCaptor.getValue().getStatus());
+        assertNull(assertEntity(204, ar -> restconf.operationsJsonPOST("invoke-rpc-module:rpc-test",
+            stringInputStream("""
+                {
+                  "invoke-rpc-module:input" : {
+                  }
+                }"""), uriInfo, ar)));
     }
 
     @Test
-    void invokeRpcTest() throws Exception {
+    void invokeRpcTest() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of()))).when(rpcService)
             .invokeRpc(RPC, INPUT);
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.operationsXmlPOST("invoke-rpc-module:rpc-test", stringInputStream("""
-            <input xmlns="invoke:rpc:module">
-              <cont>
-                <lf>test</lf>
-              </cont>
-            </input>"""), uriInfo, asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(200, response.getStatus());
-        final var payload = assertInstanceOf(NormalizedNodePayload.class, response.getEntity());
-        assertEquals(OUTPUT, payload.data());
+        assertEquals(OUTPUT, assertNormalizedNode(200, ar -> restconf.operationsXmlPOST("invoke-rpc-module:rpc-test",
+            stringInputStream("""
+                <input xmlns="invoke:rpc:module">
+                  <cont>
+                    <lf>test</lf>
+                  </cont>
+                </input>"""), uriInfo, ar)));
     }
 
     @Test
@@ -123,18 +112,15 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                 "No implementation of RPC " + RPC + " available.");
         doReturn(Futures.immediateFailedFuture(exception)).when(rpcService).invokeRpc(RPC, INPUT);
 
-        doReturn(true).when(asyncResponse).resume(exceptionCaptor.capture());
-        restconf.operationsJsonPOST("invoke-rpc-module:rpc-test", stringInputStream("""
-            {
-              "invoke-rpc-module:input" : {
-                "cont" : {
-                  "lf" : "test"
-                }
-              }
-            }"""), uriInfo, asyncResponse);
-        final var errors = exceptionCaptor.getValue().getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> restconf.operationsJsonPOST("invoke-rpc-module:rpc-test",
+            stringInputStream("""
+                {
+                  "invoke-rpc-module:input" : {
+                    "cont" : {
+                      "lf" : "test"
+                    }
+                  }
+                }"""), uriInfo, ar));
         assertEquals("No implementation of RPC (invoke:rpc:module?revision=2013-12-03)rpc-test available.",
             error.getErrorMessage());
         assertEquals(ErrorType.RPC, error.getErrorType());
@@ -153,8 +139,9 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of()))).when(rpcService)
             .invokeRpc(RPC, INPUT);
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.operationsJsonPOST("ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test",
+        assertEquals(OUTPUT, assertNormalizedNode(200,
+            ar -> restconf.operationsJsonPOST(
+                "ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test",
             stringInputStream("""
                 {
                   "invoke-rpc-module:input" : {
@@ -162,11 +149,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                       "lf" : "test"
                     }
                   }
-                }"""), uriInfo, asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(200, response.getStatus());
-        final var payload = assertInstanceOf(NormalizedNodePayload.class, response.getEntity());
-        assertEquals(OUTPUT, payload.data());
+                }"""), uriInfo, ar)));
     }
 
     @Test
@@ -179,16 +162,14 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of(
             QName.create("urn:ietf:params:xml:ns:yang:ietf-yang-library", "2016-06-21", "modules-state")));
 
-        doReturn(true).when(asyncResponse).resume(exceptionCaptor.capture());
-        restconf.operationsJsonPOST("ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test",
-            stringInputStream("""
-                {
-                  "invoke-rpc-module:input" : {
-                  }
-                }"""), uriInfo, asyncResponse);
-        final var errors = exceptionCaptor.getValue().getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(
+            ar -> restconf.operationsJsonPOST(
+                "ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test",
+                stringInputStream("""
+                    {
+                      "invoke-rpc-module:input" : {
+                      }
+                    }"""), uriInfo, ar));
         assertEquals("RPC invocation is not available", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, error.getErrorTag());
@@ -199,17 +180,15 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of())))
             .when(rpcService).invokeRpc(RPC, INPUT);
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.operationsJsonPOST("invoke-rpc-module:rpc-test", stringInputStream("""
-            {
-              "invoke-rpc-module:input" : {
-                "cont" : {
-                  "lf" : "test"
-                }
-              }
-            }"""), uriInfo, asyncResponse);
-        final var payload = assertInstanceOf(NormalizedNodePayload.class, responseCaptor.getValue().getEntity());
-        assertEquals(OUTPUT, payload.data());
+        assertEquals(OUTPUT, assertNormalizedNode(200, ar -> restconf.operationsJsonPOST("invoke-rpc-module:rpc-test",
+            stringInputStream("""
+                {
+                  "invoke-rpc-module:input" : {
+                    "cont" : {
+                      "lf" : "test"
+                    }
+                  }
+                }"""), uriInfo, ar)));
     }
 
     private void prepNNC(final ContainerNode result) {

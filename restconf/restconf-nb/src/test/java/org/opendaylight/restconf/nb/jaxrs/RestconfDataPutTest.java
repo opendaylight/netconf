@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -16,7 +16,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import java.util.Optional;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,17 +53,15 @@ class RestconfDataPutTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture()).when(readTx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(rwTx).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataJsonPUT("example-jukebox:jukebox", uriInfo, stringInputStream("""
-            {
-              "example-jukebox:jukebox" : {
-                 "player": {
-                   "gap": "0.2"
-                 }
-              }
-            }"""), asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        assertNull(assertEntity(204, ar -> restconf.dataJsonPUT("example-jukebox:jukebox", uriInfo,
+            stringInputStream("""
+                {
+                  "example-jukebox:jukebox" : {
+                    "player": {
+                      "gap": "0.2"
+                    }
+                  }
+                }"""), ar)));
     }
 
     @Test
@@ -78,15 +75,12 @@ class RestconfDataPutTest extends AbstractRestconfTest {
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataXmlPUT("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox",
-            uriInfo, stringInputStream("""
-                <jukebox xmlns="http://example.com/ns/example-jukebox">
-                  <player>
-                    <gap>0.2</gap>
-                  </player>
-                </jukebox>"""), asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        assertNull(assertEntity(204, ar -> restconf.dataXmlPUT(
+            "example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", uriInfo, stringInputStream("""
+            <jukebox xmlns="http://example.com/ns/example-jukebox">
+              <player>
+                <gap>0.2</gap>
+              </player>
+            </jukebox>"""), ar)));
     }
 }
