@@ -13,9 +13,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -25,6 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -50,11 +49,14 @@ public class RestconfSchemaServiceTest {
     private static final String NOT_EXISTING_MODULE = "not-existing/2016-01-01";
 
     // schema context with modules
-    private static EffectiveModelContext SCHEMA_CONTEXT;
+    private static final EffectiveModelContext SCHEMA_CONTEXT =
+        YangParserTestUtils.parseYangResourceDirectory("/modules");
     // schema context with modules behind mount point
-    private static EffectiveModelContext SCHEMA_CONTEXT_BEHIND_MOUNT_POINT;
+    private static final EffectiveModelContext SCHEMA_CONTEXT_BEHIND_MOUNT_POINT =
+        YangParserTestUtils.parseYangResourceDirectory("/modules/modules-behind-mount-point");
     // schema context with mount points
-    private static EffectiveModelContext SCHEMA_CONTEXT_WITH_MOUNT_POINTS;
+    private static final EffectiveModelContext SCHEMA_CONTEXT_WITH_MOUNT_POINTS =
+        YangParserTestUtils.parseYangResourceDirectory("/modules/mount-points");
 
     // service under test
     private RestconfSchemaService schemaService;
@@ -64,21 +66,6 @@ public class RestconfSchemaServiceTest {
     private DOMSchemaService mockSchemaService;
     @Mock
     private DOMYangTextSourceProvider mockSourceProvider;
-
-    @BeforeClass
-    public static void beforeClass() {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/modules");
-        SCHEMA_CONTEXT_BEHIND_MOUNT_POINT =
-            YangParserTestUtils.parseYangResourceDirectory("/modules/modules-behind-mount-point");
-        SCHEMA_CONTEXT_WITH_MOUNT_POINTS = YangParserTestUtils.parseYangResourceDirectory("/modules/mount-points");
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        SCHEMA_CONTEXT = null;
-        SCHEMA_CONTEXT_BEHIND_MOUNT_POINT = null;
-        SCHEMA_CONTEXT_WITH_MOUNT_POINTS = null;
-    }
 
     @Before
     public void setup() throws Exception {
@@ -210,9 +197,15 @@ public class RestconfSchemaServiceTest {
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
         // make test - call service on mount point with null schema context
-        assertThrows(IllegalStateException.class,
+        final var errors = assertThrows(RestconfDocumentedException.class,
             // NULL_MOUNT_POINT contains null schema context
-            () -> schemaService.getSchema(NULL_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT));
+            () -> schemaService.getSchema(NULL_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT))
+            .getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals("Mount point mount-point-2:cont does not expose DOMSchemaService", error.getErrorMessage());
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.getErrorTag());
     }
 
     /**
