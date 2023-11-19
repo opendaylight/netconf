@@ -58,15 +58,14 @@ class RestconfDataPutTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture()).when(readTx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(rwTx).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
 
-        assertNull(assertEntity(204, ar -> restconf.dataJsonPUT("example-jukebox:jukebox", uriInfo,
-            stringInputStream("""
-                {
-                  "example-jukebox:jukebox" : {
-                    "player": {
-                      "gap": "0.2"
-                    }
-                  }
-                }"""), ar)));
+        assertNull(assertEntity(204, ar -> restconf.dataJsonPUT(JUKEBOX_API_PATH, uriInfo, stringInputStream("""
+            {
+              "example-jukebox:jukebox" : {
+                "player": {
+                  "gap": "0.2"
+                }
+              }
+            }"""), ar)));
     }
 
     @Test
@@ -82,12 +81,13 @@ class RestconfDataPutTest extends AbstractRestconfTest {
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
 
         assertNull(assertEntity(204, ar -> restconf.dataXmlPUT(
-            "example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", uriInfo, stringInputStream("""
-            <jukebox xmlns="http://example.com/ns/example-jukebox">
-              <player>
-                <gap>0.2</gap>
-              </player>
-            </jukebox>"""), ar)));
+            new JaxRsApiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), uriInfo,
+            stringInputStream("""
+                <jukebox xmlns="http://example.com/ns/example-jukebox">
+                  <player>
+                    <gap>0.2</gap>
+                  </player>
+                </jukebox>"""), ar)));
     }
 
     @Test
