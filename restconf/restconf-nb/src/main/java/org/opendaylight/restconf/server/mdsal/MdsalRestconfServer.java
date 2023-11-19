@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.server.mdsal;
 
-import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -43,6 +42,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
@@ -62,7 +62,6 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
@@ -151,7 +150,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public RestconfFuture<Empty> dataDELETE(final String identifier) {
+    public RestconfFuture<Empty> dataDELETE(final ApiPath identifier) {
         final var reqPath = bindRequestPath(identifier);
         final var strategy = getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
         return strategy.delete(reqPath.getInstanceIdentifier());
@@ -163,7 +162,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public RestconfFuture<NormalizedNodePayload> dataGET(final String identifier, final ReadDataParams readParams) {
+    public RestconfFuture<NormalizedNodePayload> dataGET(final ApiPath identifier, final ReadDataParams readParams) {
         return readData(bindRequestPath(identifier), readParams);
     }
 
@@ -194,7 +193,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public RestconfFuture<Empty> dataPATCH(final String identifier, final ResourceBody body) {
+    public RestconfFuture<Empty> dataPATCH(final ApiPath identifier, final ResourceBody body) {
         return dataPATCH(bindRequestPath(identifier), body);
     }
 
@@ -209,7 +208,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public RestconfFuture<PatchStatusContext> dataPATCH(final String identifier, final PatchBody body) {
+    public RestconfFuture<PatchStatusContext> dataPATCH(final ApiPath identifier, final PatchBody body) {
         return dataPATCH(bindRequestPath(identifier), body);
     }
 
@@ -233,7 +232,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public RestconfFuture<? extends DataPostResult> dataPOST(final String identifier, final DataPostBody body,
+    public RestconfFuture<? extends DataPostResult> dataPOST(final ApiPath identifier, final DataPostBody body,
             final Map<String, String> queryParameters) {
         final var reqPath = bindRequestPath(identifier);
         if (reqPath.getSchemaNode() instanceof ActionDefinition) {
@@ -365,7 +364,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public RestconfFuture<DataPutResult> dataPUT(final String identifier, final ResourceBody body,
+    public RestconfFuture<DataPutResult> dataPUT(final ApiPath identifier, final ResourceBody body,
              final Map<String, String> queryParameters) {
         return dataPUT(bindRequestPath(identifier), body, queryParameters);
     }
@@ -389,7 +388,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public RestconfFuture<OperationsGetResult> operationsGET(final String operation) {
+    public RestconfFuture<OperationsGetResult> operationsGET(final ApiPath operation) {
         // get current module RPCs/actions by RPC/action name
         final var inference = bindRequestPath(operation).inference();
         if (inference.isEmpty()) {
@@ -438,7 +437,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public RestconfFuture<OperationOutput> operationsPOST(final URI restconfURI, final String apiPath,
+    public RestconfFuture<OperationOutput> operationsPOST(final URI restconfURI, final ApiPath apiPath,
             final OperationInputBody body) {
         final var currentContext = databindProvider.currentContext();
         final var reqPath = bindRequestPath(currentContext, apiPath);
@@ -471,16 +470,14 @@ public final class MdsalRestconfServer implements RestconfServer {
             ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION)));
     }
 
-    private @NonNull InstanceIdentifierContext bindRequestPath(final String identifier) {
+    private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull ApiPath identifier) {
         return bindRequestPath(databindProvider.currentContext(), identifier);
     }
 
-    private @NonNull InstanceIdentifierContext bindRequestPath(final DatabindContext databind,
-            final String identifier) {
-        // FIXME: go through ApiPath first. That part should eventually live in callers
+    private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull DatabindContext databind,
+            final @NonNull ApiPath identifier) {
         // FIXME: DatabindContext looks like it should be internal
-        return verifyNotNull(ParserIdentifier.toInstanceIdentifier(requireNonNull(identifier), databind.modelContext(),
-            mountPointService));
+        return InstanceIdentifierContext.ofApiPath(identifier, databind.modelContext(), mountPointService);
     }
 
     private @NonNull InstanceIdentifierContext bindRequestRoot() {

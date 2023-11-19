@@ -72,8 +72,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
-        assertEquals(EMPTY_JUKEBOX,
-            assertNormalizedNode(200, ar -> restconf.dataGET("example-jukebox:jukebox", uriInfo, ar)));
+        assertEquals(EMPTY_JUKEBOX, assertNormalizedNode(200, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar)));
     }
 
     @Test
@@ -123,8 +122,8 @@ class RestconfDataGetTest extends AbstractRestconfTest {
 
         // response must contain all child nodes from config and operational containers merged in one container
         final var data = assertInstanceOf(ContainerNode.class,
-            assertNormalizedNode(200, ar ->
-                restconf.dataGET("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", uriInfo, ar)));
+            assertNormalizedNode(200, ar -> restconf.dataGET(
+                new JaxRsApiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), uriInfo, ar)));
         assertEquals(3, data.size());
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
         assertNotNull(data.childByArg(LIBRARY_NID));
@@ -139,7 +138,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
-        final var error = assertError(ar -> restconf.dataGET("example-jukebox:jukebox", uriInfo, ar));
+        final var error = assertError(ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar));
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
         assertEquals("Request could not be completed because the relevant data model content does not exist",
@@ -160,7 +159,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
 
         // response must contain only config data
         final var data = assertInstanceOf(ContainerNode.class,
-            assertNormalizedNode(200, ar -> restconf.dataGET("example-jukebox:jukebox", uriInfo, ar)));
+            assertNormalizedNode(200, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar)));
         // config data present
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
         assertNotNull(data.childByArg(LIBRARY_NID));
@@ -181,8 +180,8 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
         // response must contain only operational data
-        final var data = assertInstanceOf(ContainerNode.class,
-            assertNormalizedNode(200, ar -> restconf.dataGET("example-jukebox:jukebox", uriInfo, ar)));
+        final var data = assertInstanceOf(ContainerNode.class, assertNormalizedNode(200,
+            ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar)));
         // state data present
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
         assertNotNull(data.childByArg(PLAYLIST_NID));
