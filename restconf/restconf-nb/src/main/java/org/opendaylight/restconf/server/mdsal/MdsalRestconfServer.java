@@ -384,12 +384,12 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public OperationsGetResult operationsGET() {
+    public RestconfFuture<OperationsGetResult> operationsGET() {
         return operationsGET(databindProvider.currentContext().modelContext());
     }
 
     @Override
-    public OperationsGetResult operationsGET(final String operation) {
+    public RestconfFuture<OperationsGetResult> operationsGET(final String operation) {
         // get current module RPCs/actions by RPC/action name
         final var inference = bindRequestPath(operation).inference();
         if (inference.isEmpty()) {
@@ -398,17 +398,19 @@ public final class MdsalRestconfServer implements RestconfServer {
 
         final var stmt = inference.toSchemaInferenceStack().currentStatement();
         if (stmt instanceof RpcEffectiveStatement rpc) {
-            return new OperationsGetResult.Leaf(inference.getEffectiveModelContext(), rpc.argument());
+            return RestconfFuture.of(
+                new OperationsGetResult.Leaf(inference.getEffectiveModelContext(), rpc.argument()));
         }
-        LOG.debug("Operation '{}' resulted in non-RPC {}", operation, stmt);
-        return null;
+        return RestconfFuture.failed(new RestconfDocumentedException("RPC not found",
+            ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
     }
 
-    private static @NonNull OperationsGetResult operationsGET(final EffectiveModelContext modelContext) {
+    private static @NonNull RestconfFuture<OperationsGetResult> operationsGET(
+            final EffectiveModelContext modelContext) {
         final var modules = modelContext.getModuleStatements();
         if (modules.isEmpty()) {
             // No modules, or defensive return empty content
-            return new OperationsGetResult.Container(modelContext, ImmutableSetMultimap.of());
+            return RestconfFuture.of(new OperationsGetResult.Container(modelContext, ImmutableSetMultimap.of()));
         }
 
         // RPCs by their XMLNamespace/Revision
@@ -432,7 +434,7 @@ public final class MdsalRestconfServer implements RestconfServer {
                 .findFirst()
                 .ifPresent(row -> rpcs.putAll(QNameModule.create(entry.getKey(), row.getKey()), row.getValue()));
         }
-        return new OperationsGetResult.Container(modelContext, rpcs.build());
+        return RestconfFuture.of(new OperationsGetResult.Container(modelContext, rpcs.build()));
     }
 
     @Override
@@ -456,13 +458,17 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public NormalizedNodePayload yangLibraryVersionGET() {
+    public RestconfFuture<NormalizedNodePayload> yangLibraryVersionGET() {
         final var stack = SchemaInferenceStack.of(databindProvider.currentContext().modelContext());
-        stack.enterYangData(YangApi.NAME);
-        stack.enterDataTree(Restconf.QNAME);
-        stack.enterDataTree(YANG_LIBRARY_VERSION);
-        return new NormalizedNodePayload(stack.toInference(),
-            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION));
+        try {
+            stack.enterYangData(YangApi.NAME);
+            stack.enterDataTree(Restconf.QNAME);
+            stack.enterDataTree(YANG_LIBRARY_VERSION);
+        } catch (IllegalArgumentException e) {
+            return RestconfFuture.failed(new RestconfDocumentedException("RESTCONF is not available"));
+        }
+        return RestconfFuture.of(new NormalizedNodePayload(stack.toInference(),
+            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, YANG_LIBRARY_REVISION)));
     }
 
     private @NonNull InstanceIdentifierContext bindRequestPath(final String identifier) {
