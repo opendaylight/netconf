@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.api;
 import java.net.URI;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
@@ -112,11 +111,13 @@ public interface RestconfServer {
     RestconfFuture<DataPutResult> dataPUT(String identifier, ResourceBody body, Map<String, String> queryParameters);
 
     /**
-     * Return the set of supported RPCs supported by {@link #operationsPOST(URI, String, OperationInputBody)}.
+     * Return the set of supported RPCs supported by {@link #operationsPOST(URI, String, OperationInputBody)},
+     * as expressed in the <a href="https://www.rfc-editor.org/rfc/rfc8040#page-84>RFC8040<a>
+     * {@code container operations} statement.
      *
-     * @return An {@link OperationsGetResult}
+     * @return A {@link RestconfFuture} completing with an {@link OperationsGetResult}
      */
-    OperationsGetResult operationsGET();
+    RestconfFuture<OperationsGetResult> operationsGET();
 
     /*
      * Return the details about a particular operation supported by
@@ -124,12 +125,9 @@ public interface RestconfServer {
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#page-84>RFC8040<a> {@code container operations} statement.
      *
      * @param operation An operation
-     * @return An {@link OperationsContent}, or {@code null} if {@code operation} does not point to an {@code rpc}
+     * @return A {@link RestconfFuture} completing with an {@link OperationsGetResult}
      */
-    // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support ang-ext:mount,
-    //        and hence it is a path right now
-    // FIXME: use ApiPath instead of String
-    @Nullable OperationsGetResult operationsGET(String operation);
+    RestconfFuture<OperationsGetResult> operationsGET(String operation);
 
     /**
      * Invoke an RPC operation, as defined in
@@ -138,7 +136,7 @@ public interface RestconfServer {
      * @param restconfURI Base URI of the request
      * @param operation {@code <operation>} path, really an {@link ApiPath} to an {@code rpc}
      * @param body RPC operation
-     * @return A {@link RestconfFuture} of the {@link OperationOutput operation result}
+     * @return A {@link RestconfFuture} completing with {@link OperationOutput}
      */
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support ang-ext:mount,
     //        and hence it is a path right now
@@ -149,10 +147,10 @@ public interface RestconfServer {
      * Return the revision of {@code ietf-yang-library} module implemented by this server, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">RFC8040 {+restconf}/yang-library-version</a>.
      *
-     * @return A {@code yang-library-version} element
+     * @return A {@link RestconfFuture} completing with {@link NormalizedNodePayload} containing a single
+     *        {@code yang-library-version} leaf element.
      */
-    // FIXME: this is a simple coning-variadic return, similar to how OperationsContent is handled use a common
-    //        construct for both cases
-    // FIXME: RestconfFuture if we transition to being used by restconf-client implementation
-    NormalizedNodePayload yangLibraryVersionGET();
+    // FIXME: this is a simple encoding-variadic return, similar to how OperationsContent is handled use a common
+    //        construct for both cases -- in this case it carries a yang.common.Revision
+    RestconfFuture<NormalizedNodePayload> yangLibraryVersionGET();
 }

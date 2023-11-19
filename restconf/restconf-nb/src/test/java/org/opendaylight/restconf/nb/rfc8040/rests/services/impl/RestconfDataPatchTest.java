@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
@@ -45,46 +44,44 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
         doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataYangJsonPATCH(stringInputStream("""
-            {
-              "ietf-yang-patch:yang-patch" : {
-                "patch-id" : "test patch id",
-                "edit" : [
-                  {
-                    "edit-id" : "create data",
-                    "operation" : "create",
-                    "target" : "/example-jukebox:jukebox",
-                    "value" : {
-                      "jukebox" : {
-                        "player" : {
-                          "gap" : "0.2"
+        final var status = assertEntity(PatchStatusContext.class, 200,
+            ar -> restconf.dataYangJsonPATCH(stringInputStream("""
+                {
+                  "ietf-yang-patch:yang-patch" : {
+                    "patch-id" : "test patch id",
+                    "edit" : [
+                      {
+                        "edit-id" : "create data",
+                        "operation" : "create",
+                        "target" : "/example-jukebox:jukebox",
+                        "value" : {
+                          "jukebox" : {
+                            "player" : {
+                              "gap" : "0.2"
+                            }
+                          }
                         }
-                      }
-                    }
-                  },
-                  {
-                    "edit-id" : "replace data",
-                    "operation" : "replace",
-                    "target" : "/example-jukebox:jukebox",
-                    "value" : {
-                      "jukebox" : {
-                        "player" : {
-                          "gap" : "0.3"
+                      },
+                      {
+                        "edit-id" : "replace data",
+                        "operation" : "replace",
+                        "target" : "/example-jukebox:jukebox",
+                        "value" : {
+                          "jukebox" : {
+                            "player" : {
+                              "gap" : "0.3"
+                            }
+                          }
                         }
+                      },
+                      {
+                        "edit-id" : "delete data",
+                        "operation" : "delete",
+                        "target" : "/example-jukebox:jukebox/player/gap"
                       }
-                    }
-                  },
-                  {
-                    "edit-id" : "delete data",
-                    "operation" : "delete",
-                    "target" : "/example-jukebox:jukebox/player/gap"
+                    ]
                   }
-                ]
-              }"""), asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(200, response.getStatus());
-        final var status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
+                }"""), ar));
         assertTrue(status.ok());
         final var edits = status.editCollection();
         assertEquals(3, edits.size());
@@ -100,40 +97,37 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
         doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(tx).cancel();
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataYangJsonPATCH(stringInputStream("""
-            {
-              "ietf-yang-patch:yang-patch" : {
-                "patch-id" : "test patch id",
-                "edit" : [
-                  {
-                    "edit-id" : "create data",
-                    "operation" : "create",
-                    "target" : "/example-jukebox:jukebox",
-                    "value" : {
-                      "jukebox" : {
-                        "player" : {
-                          "gap" : "0.2"
+        final var status = assertEntity(PatchStatusContext.class, 409, ar -> restconf.dataYangJsonPATCH(
+            stringInputStream("""
+                {
+                  "ietf-yang-patch:yang-patch" : {
+                    "patch-id" : "test patch id",
+                    "edit" : [
+                      {
+                        "edit-id" : "create data",
+                        "operation" : "create",
+                        "target" : "/example-jukebox:jukebox",
+                        "value" : {
+                          "jukebox" : {
+                            "player" : {
+                              "gap" : "0.2"
+                            }
+                          }
                         }
+                      },
+                      {
+                        "edit-id" : "remove data",
+                        "operation" : "remove",
+                        "target" : "/example-jukebox:jukebox/player/gap"
+                      },
+                      {
+                        "edit-id" : "delete data",
+                        "operation" : "delete",
+                        "target" : "/example-jukebox:jukebox/player/gap"
                       }
-                    }
-                  },
-                  {
-                    "edit-id" : "remove data",
-                    "operation" : "remove",
-                    "target" : "/example-jukebox:jukebox/player/gap"
-                  },
-                  {
-                    "edit-id" : "delete data",
-                    "operation" : "delete",
-                    "target" : "/example-jukebox:jukebox/player/gap"
+                    ]
                   }
-                ]
-              }
-            }"""), asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(409, response.getStatus());
-        final var status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
+                }"""), ar));
         assertFalse(status.ok());
         final var edits = status.editCollection();
         assertEquals(3, edits.size());
@@ -157,43 +151,40 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataYangXmlPATCH(stringInputStream("""
-            <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
-              <patch-id>test patch id</patch-id>
-              <edit>
-                <edit-id>create data</edit-id>
-                <operation>create</operation>
-                <target>/example-jukebox:jukebox</target>
-                <value>
-                  <jukebox xmlns="http://example.com/ns/example-jukebox">
-                    <player>
-                      <gap>0.2</gap>
-                    </player>
-                  </jukebox>
-                </value>
-              </edit>
-              <edit>
-                <edit-id>replace data</edit-id>
-                <operation>replace</operation>
-                <target>/example-jukebox:jukebox</target>
-                <value>
-                  <jukebox xmlns="http://example.com/ns/example-jukebox">
-                    <player>
-                      <gap>0.3</gap>
-                    </player>
-                  </jukebox>
-                </value>
-              </edit>
-              <edit>
-                <edit-id>delete data</edit-id>
-                <operation>delete</operation>
-                <target>/example-jukebox:jukebox/player/gap</target>
-              </edit>
-            </yang-patch>"""), asyncResponse);
-        final var response = responseCaptor.getValue();
-        assertEquals(200, response.getStatus());
-        final var status = assertInstanceOf(PatchStatusContext.class, response.getEntity());
+        final var status = assertEntity(PatchStatusContext.class, 200,
+            ar -> restconf.dataYangXmlPATCH(stringInputStream("""
+                <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+                  <patch-id>test patch id</patch-id>
+                  <edit>
+                    <edit-id>create data</edit-id>
+                    <operation>create</operation>
+                    <target>/example-jukebox:jukebox</target>
+                    <value>
+                      <jukebox xmlns="http://example.com/ns/example-jukebox">
+                        <player>
+                          <gap>0.2</gap>
+                        </player>
+                      </jukebox>
+                    </value>
+                  </edit>
+                  <edit>
+                    <edit-id>replace data</edit-id>
+                    <operation>replace</operation>
+                    <target>/example-jukebox:jukebox</target>
+                    <value>
+                      <jukebox xmlns="http://example.com/ns/example-jukebox">
+                        <player>
+                          <gap>0.3</gap>
+                        </player>
+                      </jukebox>
+                    </value>
+                  </edit>
+                  <edit>
+                    <edit-id>delete data</edit-id>
+                    <operation>delete</operation>
+                    <target>/example-jukebox:jukebox/player/gap</target>
+                  </edit>
+                </yang-patch>"""), ar));
         assertTrue(status.ok());
         assertNull(status.globalErrors());
         final var edits = status.editCollection();

@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -48,10 +49,8 @@ class RestconfDataDeleteTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture())
                 .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataDELETE("example-jukebox:jukebox", asyncResponse);
 
-        assertEquals(204, responseCaptor.getValue().getStatus());
+        assertNull(assertResponse(204, ar -> restconf.dataDELETE("example-jukebox:jukebox", ar)));
     }
 
     @Test
@@ -60,12 +59,7 @@ class RestconfDataDeleteTest extends AbstractRestconfTest {
                 .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(true).when(tx).cancel();
 
-        doReturn(true).when(asyncResponse).resume(exceptionCaptor.capture());
-        restconf.dataDELETE("example-jukebox:jukebox", asyncResponse);
-
-        final var errors = exceptionCaptor.getValue().getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> restconf.dataDELETE("example-jukebox:jukebox", ar));
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
     }
@@ -86,9 +80,8 @@ class RestconfDataDeleteTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture())
                 .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
-        doReturn(true).when(asyncResponse).resume(responseCaptor.capture());
-        restconf.dataDELETE("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", asyncResponse);
 
-        assertEquals(204, responseCaptor.getValue().getStatus());
+        assertNull(assertResponse(204,
+            ar -> restconf.dataDELETE("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox", ar)));
     }
 }

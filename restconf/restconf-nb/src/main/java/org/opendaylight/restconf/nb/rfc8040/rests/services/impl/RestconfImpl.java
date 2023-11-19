@@ -14,11 +14,11 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Function;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -32,7 +32,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
@@ -456,26 +455,31 @@ public final class RestconfImpl {
     /**
      * List RPC and action operations in RFC7951 format.
      *
-     * @return A string containing a JSON document conforming to both RFC8040 and RFC7951.
+     * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Path("/operations")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-    public String operationsJsonGET() {
-        return server.operationsGET().toJSON();
+    public void operationsJsonGET(@Suspended final AsyncResponse ar) {
+        completeOperationsJsonGet(server.operationsGET(), ar);
     }
 
     /**
      * Retrieve list of operations and actions supported by the server or device in JSON format.
      *
      * @param operation path parameter to identify device and/or operation
-     * @return A string containing a JSON document conforming to both RFC8040 and RFC7951.
+     * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Path("/operations/{operation:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-    public String operationsJsonGET(@PathParam("operation") final String operation) {
-        return operationsGET(operation).toJSON();
+    public void operationsJsonGET(@PathParam("operation") final String operation, final AsyncResponse ar) {
+        completeOperationsGet(server.operationsGET(operation), ar, OperationsGetResult::toJSON);
+    }
+
+    private static void completeOperationsJsonGet(final RestconfFuture<OperationsGetResult> future,
+            final AsyncResponse ar) {
+        completeOperationsGet(future, ar, OperationsGetResult::toJSON);
     }
 
     /**
@@ -486,8 +490,8 @@ public final class RestconfImpl {
     @GET
     @Path("/operations")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public String operationsXmlGET() {
-        return server.operationsGET().toXML();
+    public void operationsXmlGET(@Suspended final AsyncResponse ar) {
+        completeOperationsXmlGet(server.operationsGET(), ar);
     }
 
     /**
@@ -499,16 +503,23 @@ public final class RestconfImpl {
     @GET
     @Path("/operations/{operation:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public String operationsXmlGET(@PathParam("operation") final String operation) {
-        return operationsGET(operation).toXML();
+    public void operationsXmlGET(@PathParam("operation") final String operation, final AsyncResponse ar) {
+        completeOperationsXmlGet(server.operationsGET(operation), ar);
     }
 
-    private @NonNull OperationsGetResult operationsGET(final String operation) {
-        final var content = server.operationsGET(operation);
-        if (content == null) {
-            throw new NotFoundException();
-        }
-        return content;
+    private static void completeOperationsXmlGet(final RestconfFuture<OperationsGetResult> future,
+            final AsyncResponse ar) {
+        completeOperationsGet(future, ar, OperationsGetResult::toXML);
+    }
+
+    private static void completeOperationsGet(final RestconfFuture<OperationsGetResult> future, final AsyncResponse ar,
+            final Function<OperationsGetResult, String> toString) {
+        future.addCallback(new JaxRsRestconfCallback<OperationsGetResult>(ar) {
+            @Override
+            Response transform(final OperationsGetResult result) {
+                return Response.ok().entity(toString.apply(result)).build();
+            }
+        });
     }
 
     /**
@@ -597,7 +608,12 @@ public final class RestconfImpl {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public NormalizedNodePayload yangLibraryVersionGET() {
-        return server.yangLibraryVersionGET();
+    public void yangLibraryVersionGET(@Suspended final AsyncResponse ar) {
+        server.yangLibraryVersionGET().addCallback(new JaxRsRestconfCallback<NormalizedNodePayload>(ar) {
+            @Override
+            Response transform(final NormalizedNodePayload result) {
+                return Response.ok().entity(result).build();
+            }
+        });
     }
 }

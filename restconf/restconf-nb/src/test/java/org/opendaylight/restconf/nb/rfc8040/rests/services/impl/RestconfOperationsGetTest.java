@@ -10,11 +10,11 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -48,9 +48,6 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
     private static final EffectiveModelContext MODEL_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(
         Module1Data.class, Module2Data.class, NetworkTopology.class).getEffectiveModelContext();
 
-    @Mock
-    private DOMSchemaService schemaService;
-
     @Override
     EffectiveModelContext modelContext() {
         return MODEL_CONTEXT;
@@ -58,17 +55,16 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
 
     @Test
     void testOperationsJson() {
-        final var operationsJSON = restconf.operationsJsonGET();
-        assertEquals(EXPECTED_JSON, operationsJSON);
+        assertEquals(EXPECTED_JSON, assertResponse(200, ar -> restconf.operationsJsonGET(ar)));
     }
 
     @Test
     void testOperationsXml() {
-        final var operationsXML = restconf.operationsXmlGET();
-        assertEquals(EXPECTED_XML, operationsXML);
+        assertEquals(EXPECTED_XML, assertResponse(200, ar -> restconf.operationsXmlGET(ar)));
     }
 
     private void mockMountPoint() {
+        final var schemaService = mock(DOMSchemaService.class);
         doReturn(MODEL_CONTEXT).when(schemaService).getGlobalContext();
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
@@ -77,30 +73,28 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
     @Test
     void testMountPointOperationsJson() {
         mockMountPoint();
-        final var operationJSON = restconf.operationsJsonGET(DEVICE_ID);
-        assertEquals(EXPECTED_JSON, operationJSON);
+        assertEquals(EXPECTED_JSON, assertResponse(200, ar -> restconf.operationsJsonGET(DEVICE_ID, ar)));
     }
 
     @Test
     void testMountPointOperationsXml() {
         mockMountPoint();
-        final var operationXML = restconf.operationsXmlGET(DEVICE_ID);
-        assertEquals(EXPECTED_XML, operationXML);
+        assertEquals(EXPECTED_XML, assertResponse(200, ar -> restconf.operationsXmlGET(DEVICE_ID, ar)));
     }
 
     @Test
     void testMountPointSpecificOperationsJson() {
         mockMountPoint();
-        final var operationJSON = restconf.operationsJsonGET(DEVICE_RPC1_MODULE1_ID);
         assertEquals("""
-            { "module1:dummy-rpc1-module1" : [null] }""", operationJSON);
+            { "module1:dummy-rpc1-module1" : [null] }""",
+            assertResponse(200, ar -> restconf.operationsJsonGET(DEVICE_RPC1_MODULE1_ID, ar)));
     }
 
     @Test
     void testMountPointSpecificOperationsXml() {
         mockMountPoint();
-        final var operationXML = restconf.operationsXmlGET(DEVICE_RPC1_MODULE1_ID);
         assertEquals("""
-            <dummy-rpc1-module1 xmlns="module:1"/>""", operationXML);
+            <dummy-rpc1-module1 xmlns="module:1"/>""",
+            assertResponse(200, ar -> restconf.operationsXmlGET(DEVICE_RPC1_MODULE1_ID, ar)));
     }
 }
