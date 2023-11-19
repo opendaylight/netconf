@@ -14,6 +14,13 @@ import com.google.common.annotations.VisibleForTesting;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -100,6 +107,41 @@ public abstract class InstanceIdentifierContext {
     InstanceIdentifierContext(final SchemaNode schemaNode, final DOMMountPoint mountPoint) {
         this.schemaNode = requireNonNull(schemaNode);
         this.mountPoint = mountPoint;
+    }
+
+    public static @NonNull InstanceIdentifierContext ofApiPath(final ApiPath path,
+            final EffectiveModelContext modelContext, final DOMMountPointService mountPointService) {
+        return ofApiPath(path, 0, null, modelContext, mountPointService);
+    }
+
+    // FIXME: NETCONF-773: this recursion should really live in MdsalRestconfServer
+    private static @NonNull InstanceIdentifierContext ofApiPath(final ApiPath path, final int prefix,
+            final DOMMountPoint mountPoint, final EffectiveModelContext modelContext,
+            final DOMMountPointService mountPointService) {
+        final var steps = path.steps();
+        for (int i = prefix, size = steps.size(); i < size; ++i) {
+            final var step = steps.get(i);
+            if ("yang-ext".equals(step.module()) && "mount".equals(step.identifier().getLocalName())) {
+                if (mountPointService == null) {
+                    throw new RestconfDocumentedException("No mount points available in " + path.subPath(0, i - 1),
+                        ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT);
+                }
+
+                final var mountPath = IdentifierCodec.deserialize(path.subPath(prefix, i), modelContext);
+                final var userPath = path.subPath(0, i);
+                final var mount = mountPointService.getMountPoint(mountPath)
+                    .orElseThrow(() -> new RestconfDocumentedException("Mount point " + userPath + " does not exist",
+                        ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+                final var schemaService = mount.getService(DOMSchemaService.class)
+                    .orElseThrow(() -> new RestconfDocumentedException(
+                        "Mount point " + userPath + " does not expose DOMSchemaService"));
+                return ofApiPath(path, i + 1, mountPoint, schemaService.getGlobalContext(),
+                    mount.getService(DOMMountPointService.class).orElse(null));
+            }
+        }
+
+        final var result = YangInstanceIdentifierDeserializer.create(modelContext, path.subPath(prefix));
+        return InstanceIdentifierContext.ofPath(result.stack, result.node, result.path, null);
     }
 
     public static @NonNull InstanceIdentifierContext ofLocalRoot(final EffectiveModelContext context) {
