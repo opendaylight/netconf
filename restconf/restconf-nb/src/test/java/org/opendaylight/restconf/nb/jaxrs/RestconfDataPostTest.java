@@ -62,7 +62,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
-            assertResponse(201, ar -> restconf.postDataJSON("example-jukebox:jukebox", stringInputStream("""
+            assertResponse(201, ar -> restconf.postDataJSON(JUKEBOX_API_PATH, stringInputStream("""
                 {
                   "example-jukebox:playlist" : {
                     "name" : "name of band",

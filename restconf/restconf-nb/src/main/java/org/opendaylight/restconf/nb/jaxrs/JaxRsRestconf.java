@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
@@ -86,9 +87,9 @@ public final class JaxRsRestconf {
     @DELETE
     @Path("/data/{identifier:.+}")
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
-    public void dataDELETE(@Encoded @PathParam("identifier") final String identifier,
+    public void dataDELETE(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
             @Suspended final AsyncResponse ar) {
-        server.dataDELETE(identifier).addCallback(new JaxRsRestconfCallback<>(ar) {
+        server.dataDELETE(identifier.apiPath).addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             Response transform(final Empty result) {
                 return Response.noContent().build();
@@ -132,10 +133,10 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void dataGET(@Encoded @PathParam("identifier") final String identifier,
+    public void dataGET(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
-        completeDataGET(server.dataGET(identifier, readParams), readParams, ar);
+        completeDataGET(server.dataGET(identifier.apiPath, readParams), readParams, ar);
     }
 
     private static void completeDataGET(final RestconfFuture<NormalizedNodePayload> future,
@@ -195,10 +196,10 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void dataXmlPATCH(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+    public void dataXmlPATCH(@Encoded @PathParam("identifier") final JaxRsApiPath identifier, final InputStream body,
             @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            completeDataPATCH(server.dataPATCH(identifier, xmlBody), ar);
+            completeDataPATCH(server.dataPATCH(identifier.apiPath, xmlBody), ar);
         }
     }
 
@@ -235,10 +236,10 @@ public final class JaxRsRestconf {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public void dataJsonPATCH(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+    public void dataJsonPATCH(@Encoded @PathParam("identifier") final JaxRsApiPath identifier, final InputStream body,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            completeDataPATCH(server.dataPATCH(identifier, jsonBody), ar);
+            completeDataPATCH(server.dataPATCH(identifier.apiPath, jsonBody), ar);
         }
     }
 
@@ -286,10 +287,10 @@ public final class JaxRsRestconf {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final String identifier,
+    public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
             final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(identifier, jsonBody), ar);
+            completeDataYangPATCH(server.dataPATCH(identifier.apiPath, jsonBody), ar);
         }
     }
 
@@ -328,10 +329,10 @@ public final class JaxRsRestconf {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
-            @Suspended final AsyncResponse ar) {
+    public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
+            final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(identifier, xmlBody), ar);
+            completeDataYangPATCH(server.dataPATCH(identifier.apiPath, xmlBody), ar);
         }
     }
 
@@ -401,10 +402,10 @@ public final class JaxRsRestconf {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public void postDataJSON(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+    public void postDataJSON(@Encoded @PathParam("identifier") final JaxRsApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        completeDataPOST(server.dataPOST(identifier, new JsonDataPostBody(body), QueryParams.normalize(uriInfo)),
-            uriInfo, ar);
+        completeDataPOST(server.dataPOST(identifier.apiPath, new JsonDataPostBody(body),
+            QueryParams.normalize(uriInfo)), uriInfo, ar);
     }
 
     /**
@@ -442,9 +443,9 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void postDataXML(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
+    public void postDataXML(@Encoded @PathParam("identifier") final JaxRsApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        completeDataPOST(server.dataPOST(identifier, new XmlDataPostBody(body), QueryParams.normalize(uriInfo)),
+        completeDataPOST(server.dataPOST(identifier.apiPath, new XmlDataPostBody(body), QueryParams.normalize(uriInfo)),
             uriInfo, ar);
     }
 
@@ -504,10 +505,10 @@ public final class JaxRsRestconf {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public void dataJsonPUT(@Encoded @PathParam("identifier") final String identifier,
+    public void dataJsonPUT(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
             @Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            completeDataPUT(server.dataPUT(identifier, jsonBody, QueryParams.normalize(uriInfo)), ar);
+            completeDataPUT(server.dataPUT(identifier.apiPath, jsonBody, QueryParams.normalize(uriInfo)), ar);
         }
     }
 
@@ -546,10 +547,10 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void dataXmlPUT(@Encoded @PathParam("identifier") final String identifier,
+    public void dataXmlPUT(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
             @Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            completeDataPUT(server.dataPUT(identifier, xmlBody, QueryParams.normalize(uriInfo)), ar);
+            completeDataPUT(server.dataPUT(identifier.apiPath, xmlBody, QueryParams.normalize(uriInfo)), ar);
         }
     }
 
@@ -587,8 +588,8 @@ public final class JaxRsRestconf {
     @GET
     @Path("/operations/{operation:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-    public void operationsJsonGET(@PathParam("operation") final String operation, final AsyncResponse ar) {
-        completeOperationsGet(server.operationsGET(operation), ar, OperationsGetResult::toJSON);
+    public void operationsJsonGET(@PathParam("operation") final JaxRsApiPath operation, final AsyncResponse ar) {
+        completeOperationsGet(server.operationsGET(operation.apiPath), ar, OperationsGetResult::toJSON);
     }
 
     private static void completeOperationsJsonGet(final RestconfFuture<OperationsGetResult> future,
@@ -617,8 +618,8 @@ public final class JaxRsRestconf {
     @GET
     @Path("/operations/{operation:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public void operationsXmlGET(@PathParam("operation") final String operation, final AsyncResponse ar) {
-        completeOperationsXmlGet(server.operationsGET(operation), ar);
+    public void operationsXmlGET(@PathParam("operation") final JaxRsApiPath operation, final AsyncResponse ar) {
+        completeOperationsXmlGet(server.operationsGET(operation.apiPath), ar);
     }
 
     private static void completeOperationsXmlGet(final RestconfFuture<OperationsGetResult> future,
@@ -659,10 +660,10 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void operationsXmlPOST(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+    public void operationsXmlPOST(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
+            final InputStream body, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlOperationInputBody(body)) {
-            operationsPOST(identifier, uriInfo, ar, xmlBody);
+            operationsPOST(identifier.apiPath, uriInfo, ar, xmlBody);
         }
     }
 
@@ -688,14 +689,14 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void operationsJsonPOST(@Encoded @PathParam("identifier") final String identifier, final InputStream body,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+    public void operationsJsonPOST(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
+            final InputStream body, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonOperationInputBody(body)) {
-            operationsPOST(identifier, uriInfo, ar, jsonBody);
+            operationsPOST(identifier.apiPath, uriInfo, ar, jsonBody);
         }
     }
 
-    private void operationsPOST(final String identifier, final UriInfo uriInfo, final AsyncResponse ar,
+    private void operationsPOST(final ApiPath identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
         server.operationsPOST(uriInfo.getBaseUri(), identifier, body)
             .addCallback(new JaxRsRestconfCallback<OperationOutput>(ar) {
