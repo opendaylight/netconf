@@ -43,9 +43,10 @@ class Netconf822Test extends AbstractRestconfTest {
 
     @Test
     void testOperationsContentByIdentifier() {
+        final var apiPath = new JaxRsApiPath("foo:new1");
         assertEquals("""
-            { "foo:new1" : [null] }""", assertEntity(200, ar -> restconf.operationsJsonGET("foo:new1", ar)));
+            { "foo:new1" : [null] }""", assertEntity(200, ar -> restconf.operationsJsonGET(apiPath, ar)));
         assertEquals("""
-            <new1 xmlns="foo"/>""", assertEntity(200, ar -> restconf.operationsXmlGET("foo:new1", ar)));
+            <new1 xmlns="foo"/>""", assertEntity(200, ar -> restconf.operationsXmlGET(apiPath, ar)));
     }
 }
