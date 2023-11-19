@@ -29,13 +29,13 @@ public sealed class RestconfFuture<V> extends AbstractFuture<@NonNull V> permits
         // Hidden on purpose
     }
 
-    public static <V> RestconfFuture<V> of(final V value) {
+    public static <V> @NonNull RestconfFuture<V> of(final V value) {
         final var future = new RestconfFuture<V>();
         future.set(requireNonNull(value));
         return future;
     }
 
-    public static <V> RestconfFuture<V> failed(final RestconfDocumentedException cause) {
+    public static <V> @NonNull RestconfFuture<V> failed(final RestconfDocumentedException cause) {
         final var future = new RestconfFuture<V>();
         future.setException(requireNonNull(cause));
         return future;
