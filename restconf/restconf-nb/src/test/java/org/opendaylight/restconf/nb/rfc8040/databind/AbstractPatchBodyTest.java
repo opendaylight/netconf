@@ -63,7 +63,17 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
         assertNotNull(patchContext.entities());
     }
 
-    final @NonNull PatchContext parse(final String uriPath, final String patchBody) throws IOException {
+    final @NonNull PatchContext parse(final String prefix, final String suffix, final String patchBody)
+            throws IOException {
+        final String uriPath;
+        if (prefix.isEmpty()) {
+            uriPath = suffix;
+        } else if (suffix.isEmpty()) {
+            uriPath = prefix;
+        } else {
+            uriPath = prefix + '/' + suffix;
+        }
+
         final var iid = ParserIdentifier.toInstanceIdentifier(uriPath, IID_SCHEMA, mountPointService);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
