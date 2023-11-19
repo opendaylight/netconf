@@ -37,7 +37,7 @@ public interface RestconfServer {
      * @return A {@link RestconfFuture} of the operation
      */
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
-    RestconfFuture<Empty> dataDELETE(String identifier);
+    RestconfFuture<Empty> dataDELETE(ApiPath identifier);
 
     /**
      * Return the content of the datastore.
@@ -54,7 +54,7 @@ public interface RestconfServer {
      * @param readParams {@link ReadDataParams} for this request
      * @return A {@link RestconfFuture} of the {@link NormalizedNodePayload} content
      */
-    RestconfFuture<NormalizedNodePayload> dataGET(String identifier, ReadDataParams readParams);
+    RestconfFuture<NormalizedNodePayload> dataGET(ApiPath identifier, ReadDataParams readParams);
 
     /**
      * Partially modify the target data resource, as defined in
@@ -73,7 +73,7 @@ public interface RestconfServer {
      * @param body data node for put to config DS
      * @return A {@link RestconfFuture} of the operation
      */
-    RestconfFuture<Empty> dataPATCH(String identifier, ResourceBody body);
+    RestconfFuture<Empty> dataPATCH(ApiPath identifier, ResourceBody body);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
@@ -92,11 +92,11 @@ public interface RestconfServer {
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link PatchStatusContext} content
      */
-    RestconfFuture<PatchStatusContext> dataPATCH(String identifier, PatchBody body);
+    RestconfFuture<PatchStatusContext> dataPATCH(ApiPath identifier, PatchBody body);
 
     RestconfFuture<CreateResource> dataPOST(ChildBody body, Map<String, String> queryParameters);
 
-    RestconfFuture<? extends DataPostResult> dataPOST(String identifier, DataPostBody body,
+    RestconfFuture<? extends DataPostResult> dataPOST(ApiPath identifier, DataPostBody body,
         Map<String, String> queryParameters);
 
     /**
@@ -116,7 +116,7 @@ public interface RestconfServer {
      * @param queryParameters Query parameters
      * @return A {@link RestconfFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(String identifier, ResourceBody body, Map<String, String> queryParameters);
+    RestconfFuture<DataPutResult> dataPUT(ApiPath identifier, ResourceBody body, Map<String, String> queryParameters);
 
     /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, String, OperationInputBody)},
@@ -136,7 +136,7 @@ public interface RestconfServer {
      * @param operation An operation
      * @return A {@link RestconfFuture} completing with an {@link OperationsGetResult}
      */
-    RestconfFuture<OperationsGetResult> operationsGET(String operation);
+    RestconfFuture<OperationsGetResult> operationsGET(ApiPath operation);
 
     /**
      * Invoke an RPC operation, as defined in
@@ -150,7 +150,7 @@ public interface RestconfServer {
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support ang-ext:mount,
     //        and hence it is a path right now
     // FIXME: use ApiPath instead of String
-    RestconfFuture<OperationOutput> operationsPOST(URI restconfURI, String operation, OperationInputBody body);
+    RestconfFuture<OperationOutput> operationsPOST(URI restconfURI, ApiPath operation, OperationInputBody body);
 
     /**
      * Return the revision of {@code ietf-yang-library} module implemented by this server, as defined in

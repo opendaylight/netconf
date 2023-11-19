@@ -17,9 +17,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -30,6 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
@@ -58,19 +57,19 @@ public class ParserIdentifierTest {
     private static final String TEST_IDENT =
             "parser-identifier:cont1/cont2/listTest/list-in-grouping=name/leaf-A.B";
 
-    private static final String TEST_IDENT_RESULT =
-            "/(parser:identifier?revision=2016-06-02)cont1/cont2/listTest/listTest/list-in-grouping/"
-            + "list-in-grouping[{(parser:identifier?revision=2016-06-02)name=name}]/leaf-A.B";
+    private static final String TEST_IDENT_RESULT = """
+            /(parser:identifier?revision=2016-06-02)cont1/cont2/listTest/listTest/list-in-grouping/\
+            list-in-grouping[{(parser:identifier?revision=2016-06-02)name=name}]/leaf-A.B""";
 
     // test identifier with nodes defined in other modules using augmentation + expected result
     private static final String TEST_IDENT_OTHERS =
             "parser-identifier-included:list-1=name,2016-06-02/parser-identifier:augment-leaf";
 
-    private static final String TEST_IDENT_OTHERS_RESULT =
-            "/(parser:identifier:included?revision=2016-06-02)list-1/list-1"
-            + "[{(parser:identifier:included?revision=2016-06-02)name=name, "
-            + "(parser:identifier:included?revision=2016-06-02)revision=2016-06-02}]"
-            + "/(parser:identifier?revision=2016-06-02)augment-leaf";
+    private static final String TEST_IDENT_OTHERS_RESULT = """
+        /(parser:identifier:included?revision=2016-06-02)list-1/list-1\
+        [{(parser:identifier:included?revision=2016-06-02)name=name, \
+        (parser:identifier:included?revision=2016-06-02)revision=2016-06-02}]\
+        /(parser:identifier?revision=2016-06-02)augment-leaf""";
 
     // invalid test identifier
     private static final String INVALID_TEST_IDENT =
@@ -84,9 +83,11 @@ public class ParserIdentifierTest {
     private static final String INVOKE_ACTION = "example-actions:interfaces/interface=eth0/reset";
 
     // schema context with test modules
-    private static EffectiveModelContext SCHEMA_CONTEXT;
+    private static final EffectiveModelContext SCHEMA_CONTEXT =
+        YangParserTestUtils.parseYangResourceDirectory("/parser-identifier");
     // contains the same modules but it is different object (it can be compared with equals)
-    private static EffectiveModelContext SCHEMA_CONTEXT_ON_MOUNT_POINT;
+    // FIXME: we really should use a different context of mount point
+    private static final EffectiveModelContext SCHEMA_CONTEXT_ON_MOUNT_POINT = SCHEMA_CONTEXT;
 
     // mount point and mount point service
     private DOMMountPoint mountPoint;
@@ -101,18 +102,6 @@ public class ParserIdentifierTest {
     private DOMSchemaService domSchemaService;
     @Mock
     private DOMYangTextSourceProvider sourceProvider;
-
-    @BeforeClass
-    public static void beforeClass() {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/parser-identifier");
-        SCHEMA_CONTEXT_ON_MOUNT_POINT = YangParserTestUtils.parseYangResourceDirectory("/parser-identifier");
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        SCHEMA_CONTEXT = null;
-        SCHEMA_CONTEXT_ON_MOUNT_POINT = null;
-    }
 
     @Before
     public void setup() throws Exception {
@@ -536,13 +525,10 @@ public class ParserIdentifierTest {
     }
 
     /**
-     * Test invoke RPC.
-     *
-     * <p>
-     * Verify if RPC schema node was found.
+     * Test invoke RPC. Verify if RPC schema node was found.
      */
     @Test
-    public void invokeRpcTest() {
+    public void invokeRpcTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(INVOKE_RPC, SCHEMA_CONTEXT, null);
 
         // RPC schema node
@@ -551,19 +537,17 @@ public class ParserIdentifierTest {
         assertEquals("rpc-test", rpcQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(INVOKE_RPC, SCHEMA_CONTEXT), result.getInstanceIdentifier());
+        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_RPC), SCHEMA_CONTEXT),
+            result.getInstanceIdentifier());
         assertEquals(null, result.getMountPoint());
         assertEquals(SCHEMA_CONTEXT, result.getSchemaContext());
     }
 
     /**
-     * Test invoke RPC on mount point.
-     *
-     * <p>
-     * Verify if RPC schema node was found.
+     * Test invoke RPC on mount point. Verify if RPC schema node was found.
      */
     @Test
-    public void invokeRpcOnMountPointTest() {
+    public void invokeRpcOnMountPointTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + INVOKE_RPC, SCHEMA_CONTEXT,
             mountPointService);
 
@@ -573,17 +557,17 @@ public class ParserIdentifierTest {
         assertEquals("rpc-test", rpcQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(INVOKE_RPC, SCHEMA_CONTEXT), result.getInstanceIdentifier());
+        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_RPC), SCHEMA_CONTEXT),
+            result.getInstanceIdentifier());
         assertEquals(mountPoint, result.getMountPoint());
         assertEquals(SCHEMA_CONTEXT_ON_MOUNT_POINT, result.getSchemaContext());
     }
 
     /**
-     * Test Action.
-     * Verify if Action schema node was found.
+     * Test Action. Verify if Action schema node was found.
      */
     @Test
-    public void invokeActionTest() {
+    public void invokeActionTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(INVOKE_ACTION, SCHEMA_CONTEXT, null);
 
         // Action schema node
@@ -592,17 +576,17 @@ public class ParserIdentifierTest {
         assertEquals("reset", actionQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(INVOKE_ACTION, SCHEMA_CONTEXT), result.getInstanceIdentifier());
+        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_ACTION), SCHEMA_CONTEXT),
+            result.getInstanceIdentifier());
         assertNull(result.getMountPoint());
         assertSame(SCHEMA_CONTEXT, result.getSchemaContext());
     }
 
     /**
-     * Test invoke Action on mount point.
-     * Verify if Action schema node was found.
+     * Test invoke Action on mount point. Verify if Action schema node was found.
      */
     @Test
-    public void invokeActionOnMountPointTest() {
+    public void invokeActionOnMountPointTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + INVOKE_ACTION,
             SCHEMA_CONTEXT, mountPointService);
 
@@ -612,7 +596,8 @@ public class ParserIdentifierTest {
         assertEquals("reset", actionQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(INVOKE_ACTION, SCHEMA_CONTEXT), result.getInstanceIdentifier());
+        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_ACTION), SCHEMA_CONTEXT),
+            result.getInstanceIdentifier());
         assertEquals(mountPoint, result.getMountPoint());
         assertEquals(SCHEMA_CONTEXT_ON_MOUNT_POINT, result.getSchemaContext());
     }
