@@ -12,7 +12,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 public class XmlPatchBodyMountPointTest extends XmlPatchBodyTest {
     @Override
     String mountPrefix() {
-        return "instance-identifier-module:cont/yang-ext:mount/";
+        return "instance-identifier-module:cont/yang-ext:mount";
     }
 
     @Override
