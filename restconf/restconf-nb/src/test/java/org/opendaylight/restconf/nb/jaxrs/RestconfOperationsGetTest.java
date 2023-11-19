@@ -25,9 +25,10 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @ExtendWith(MockitoExtension.class)
 class RestconfOperationsGetTest extends AbstractRestconfTest {
-    private static final String DEVICE_ID = "network-topology:network-topology/topology=topology-netconf/"
-        + "node=device/yang-ext:mount";
-    private static final String DEVICE_RPC1_MODULE1_ID = DEVICE_ID + "module1:dummy-rpc1-module1";
+    private static final JaxRsApiPath DEVICE_ID =
+        new JaxRsApiPath("network-topology:network-topology/topology=topology-netconf/node=device/yang-ext:mount");
+    private static final JaxRsApiPath DEVICE_RPC1_MODULE1_ID = new JaxRsApiPath("network-topology:network-topology/"
+        + "topology=topology-netconf/node=device/yang-ext:mount/module1:dummy-rpc1-module1");
     private static final String EXPECTED_JSON = """
         {
           "ietf-restconf:operations" : {

@@ -95,7 +95,7 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
     /**
      * Valid top level node name.
      *
-     * @param path path of node
+     * @param apiPath path of node
      * @param data data
      */
     @VisibleForTesting
