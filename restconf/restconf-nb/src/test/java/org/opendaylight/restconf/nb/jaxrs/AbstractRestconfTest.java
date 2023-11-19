@@ -41,6 +41,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @ExtendWith(MockitoExtension.class)
 abstract class AbstractRestconfTest extends AbstractJukeboxTest {
+    static final JaxRsApiPath JUKEBOX_API_PATH = new JaxRsApiPath("example-jukebox:jukebox");
+
     @Mock
     UriInfo uriInfo;
     @Mock

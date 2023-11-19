@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -27,9 +28,9 @@ class IdentifierCodecTest {
      * URI contains list identifier and leaf identifier.
      */
     @Test
-    void codecListAndLeafTest() {
-        final var dataYangII = IdentifierCodec.deserialize(
-            "list-test:top/list1=%2C%27\"%3A\"%20%2F,,foo/list2=a,b/result", SCHEMA_CONTEXT);
+    void codecListAndLeafTest() throws Exception{
+        final var dataYangII = IdentifierCodec.deserialize(ApiPath.parse(
+            "list-test:top/list1=%2C%27\"%3A\"%20%2F,,foo/list2=a,b/result"), SCHEMA_CONTEXT);
         assertEquals("list-test:top/list1=%2C%27\"%3A\" %2F,,foo/list2=a,b/result",
             IdentifierCodec.serialize(dataYangII, SCHEMA_CONTEXT));
     }
@@ -40,9 +41,9 @@ class IdentifierCodecTest {
      * URI contains leaf list identifier.
      */
     @Test
-    void codecLeafListTest() {
+    void codecLeafListTest() throws Exception {
         final var str = "list-test:top/Y=4";
-        final var dataYangII = IdentifierCodec.deserialize(str, SCHEMA_CONTEXT);
+        final var dataYangII = IdentifierCodec.deserialize(ApiPath.parse(str), SCHEMA_CONTEXT);
         assertEquals(str, IdentifierCodec.serialize(dataYangII, SCHEMA_CONTEXT));
     }
 
@@ -67,12 +68,12 @@ class IdentifierCodecTest {
     }
 
     /**
-     * Positive test of serialization <code>YangInstanceIdentifier.EMPTY</code> and deserialization of result back to
-     * <code>YangInstanceIdentifier.EMPTY</code>.
+     * Positive test of serialization {@link YangInstanceIdentifier#EMPTY} and deserialization of result back to
+     * {@link YangInstanceIdentifier#EMPTY}.
      */
     @Test
-    void codecDeserializeAndSerializeEmptyTest() {
+    void codecDeserializeAndSerializeEmptyTest() throws Exception {
         final var serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), SCHEMA_CONTEXT);
-        assertEquals(YangInstanceIdentifier.of(), IdentifierCodec.deserialize(serialized, SCHEMA_CONTEXT));
+        assertEquals(YangInstanceIdentifier.of(), IdentifierCodec.deserialize(ApiPath.parse(serialized), SCHEMA_CONTEXT));
     }
 }
