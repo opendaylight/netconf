@@ -66,7 +66,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
             () -> DatabindContext.ofModel(IID_SCHEMA), dataBroker, rpcService, actionService, mountPointService));
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
-        restconf.postDataJSON("instance-identifier-module:cont/cont1/reset",
+        restconf.postDataJSON(new JaxRsApiPath("instance-identifier-module:cont/cont1/reset"),
             stringInputStream("""
             {
               "instance-identifier-module:input": {

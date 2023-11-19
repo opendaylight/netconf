@@ -23,6 +23,7 @@ import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -201,9 +202,15 @@ public class RestconfSchemaServiceTest {
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
         // make test - call service on mount point with null schema context
-        assertThrows(IllegalStateException.class,
+        final var errors = assertThrows(RestconfDocumentedException.class,
             // NULL_MOUNT_POINT contains null schema context
-            () -> schemaService.getSchema(NULL_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT));
+            () -> schemaService.getSchema(NULL_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT))
+            .getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals("Mount point mount-point-2:cont does not expose DOMSchemaService", error.getErrorMessage());
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.getErrorTag());
     }
 
     /**

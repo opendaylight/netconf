@@ -26,7 +26,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
 
     @Test
     public final void moduleDataTest() throws Exception {
-        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+        checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
                 <comment>this is test patch</comment>
@@ -63,7 +63,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
     @Test
     public final void moduleDataValueMissingNegativeTest() throws Exception {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+            () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                     <patch-id>test-patch</patch-id>
                     <comment>Test patch with missing value node for create operation</comment>
@@ -83,7 +83,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
     @Test
     public final void moduleDataNotValueNotSupportedNegativeTest() throws Exception {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+            () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                     <patch-id>test-patch</patch-id>
                     <comment>Test patch with not allowed value node for delete operation</comment>
@@ -108,7 +108,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataAbsoluteTargetPathTest() throws Exception {
-        checkPatchContext(parse(mountPrefix(), """
+        checkPatchContext(parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
                 <comment>Test patch with absolute target path</comment>
@@ -144,7 +144,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchCompleteTargetInURITest() throws Exception {
-        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont", """
+        checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
                 <comment>Test to create and replace data in container directly using / sign as a target</comment>
@@ -189,7 +189,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataMergeOperationOnListTest() throws Exception {
-        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+        checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>Test merge operation</patch-id>
                 <comment>This is test patch for merge operation on list</comment>
@@ -225,7 +225,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleDataMergeOperationOnContainerTest() throws Exception {
-        checkPatchContext(parse(mountPrefix() + "instance-identifier-patch-module:patch-cont", """
+        checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>Test merge operation</patch-id>
                 <comment>This is test patch for merge operation on container</comment>
@@ -270,7 +270,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
-        checkPatchContext(parse(mountPrefix(), """
+        checkPatchContext(parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
                 <comment>Test patch applied to the top-level container with empty URI</comment>
@@ -294,7 +294,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchTargetTopLevelContainerWithFullPathURITest() throws Exception {
-        final var returnValue = parse(mountPrefix() + "instance-identifier-patch-module:patch-cont", """
+        final var returnValue = parse(mountPrefix(), "instance-identifier-patch-module:patch-cont", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
                 <comment>Test patch applied to the top-level container with '/' in target</comment>
@@ -333,8 +333,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchTargetSecondLevelListWithFullPathURITest() throws Exception {
-        final var returnValue = parse(
-            mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=my-leaf-set",
+        final var returnValue = parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=my-leaf-set",
             """
                 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                     <patch-id>test-patch</patch-id>
@@ -369,7 +368,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleTargetTopLevelAugmentedContainerTest() throws Exception {
-        final var returnValue = parse(mountPrefix(), """
+        final var returnValue = parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
                 <comment>This test patch for augmented element</comment>
@@ -396,7 +395,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleTargetMapNodeTest() throws Exception {
-        final var returnValue = parse(mountPrefix(), """
+        final var returnValue = parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>map-patch</patch-id>
                 <comment>YANG patch comment</comment>
@@ -428,7 +427,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchTargetLeafSetNodeTest() throws Exception {
-        final var returnValue = parse(mountPrefix(), """
+        final var returnValue = parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>set-patch</patch-id>
                 <comment>YANG patch comment</comment>
@@ -456,7 +455,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleTargetUnkeyedListNodeTest() throws Exception {
-        final var returnValue = parse(mountPrefix(), """
+        final var returnValue = parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>list-patch</patch-id>
                 <comment>YANG patch comment</comment>
@@ -488,7 +487,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void moduleTargetCaseNodeTest() throws Exception {
-        final var returnValue = parse(mountPrefix(), """
+        final var returnValue = parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>choice-patch</patch-id>
                 <comment>YANG patch comment</comment>
@@ -515,7 +514,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      */
     @Test
     public final void modulePatchSimpleLeafValueTest() throws Exception {
-        final var returnValue = parse(mountPrefix() + "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
+        final var returnValue = parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
                 <comment>this is test patch</comment>
