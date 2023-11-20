@@ -7,12 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
-import java.util.HexFormat;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -33,25 +30,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * Serializer for {@link YangInstanceIdentifier} to {@link String} for restconf.
  */
 public final class YangInstanceIdentifierSerializer {
-    // Escaper based on RFC8040-requirement to percent-encode reserved characters, as defined in
-    // https://tools.ietf.org/html/rfc3986#section-2.2
-    @VisibleForTesting
-    static final Escaper PERCENT_ESCAPER;
-
-    static {
-        final var hexFormat = HexFormat.of().withUpperCase();
-        final var builder = Escapers.builder();
-        for (char ch : new char[] {
-            // Reserved characters as per https://tools.ietf.org/html/rfc3986#section-2.2
-            ':', '/', '?', '#', '[', ']', '@',
-            '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=',
-            // FIXME: this space should not be here, but that was a day-0 bug and we have asserts on this
-            ' '
-        }) {
-            builder.addEscape(ch, "%" + hexFormat.toHighHexDigit(ch) + hexFormat.toLowHexDigit(ch));
-        }
-        PERCENT_ESCAPER = builder.build();
-    }
 
     private YangInstanceIdentifierSerializer() {
         // Hidden on purpose
@@ -123,7 +101,7 @@ public final class YangInstanceIdentifierSerializer {
 
         // FIXME: this is quite fishy
         final var str = String.valueOf(value);
-        path.append(PERCENT_ESCAPER.escape(str));
+        path.append(ApiPath.PERCENT_ESCAPER.escape(str));
     }
 
     private static void prepareNodeWithPredicates(final StringBuilder path, final Set<Entry<QName, Object>> entries) {
@@ -135,7 +113,7 @@ public final class YangInstanceIdentifierSerializer {
         while (iterator.hasNext()) {
             // FIXME: this is quite fishy
             final var str = String.valueOf(iterator.next().getValue());
-            path.append(PERCENT_ESCAPER.escape(str));
+            path.append(ApiPath.PERCENT_ESCAPER.escape(str));
             if (iterator.hasNext()) {
                 path.append(',');
             }

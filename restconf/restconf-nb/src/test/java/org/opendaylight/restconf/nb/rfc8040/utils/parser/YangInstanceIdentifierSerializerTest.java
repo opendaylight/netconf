@@ -243,30 +243,6 @@ public class YangInstanceIdentifierSerializerTest {
     }
 
     /**
-     * Test to verify if all reserved characters according to rfc3986 are considered by serializer implementation to
-     * be percent encoded.
-     */
-    @Test
-    public void verifyReservedCharactersTest() {
-        final char[] genDelims = { ':', '/', '?', '#', '[', ']', '@' };
-        final char[] subDelims = { '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=' };
-
-        for (final char ch : genDelims) {
-            assertPercentEncoded(ch);
-        }
-
-        for (final char ch : subDelims) {
-            assertPercentEncoded(ch);
-        }
-    }
-
-    private static void assertPercentEncoded(final char ch) {
-        final var str = YangInstanceIdentifierSerializer.PERCENT_ESCAPER.escape(String.valueOf(ch));
-        assertEquals(3, str.length());
-        assertEquals('%', str.charAt(0));
-    }
-
-    /**
      * Test if URIs with percent encoded characters are all correctly serialized.
      */
     @Test

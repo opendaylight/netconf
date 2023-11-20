@@ -13,7 +13,10 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableList;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import java.text.ParseException;
+import java.util.HexFormat;
 import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -67,6 +70,13 @@ public final class ApiPath implements Immutable {
         ToStringHelper addToStringAttributes(final ToStringHelper helper) {
             return helper.add("module", module).add("identifier", identifier);
         }
+
+        void appendTo(final StringBuilder sb) {
+            if (module != null) {
+                sb.append(module).append(':');
+            }
+            sb.append(identifier.getLocalName());
+        }
     }
 
     /**
@@ -118,6 +128,40 @@ public final class ApiPath implements Immutable {
         ToStringHelper addToStringAttributes(final ToStringHelper helper) {
             return super.addToStringAttributes(helper).add("keyValues", keyValues);
         }
+
+        @Override
+        void appendTo(final StringBuilder sb) {
+            super.appendTo(sb);
+            sb.append('=');
+            final var it = keyValues.iterator();
+            while (true) {
+                sb.append(PERCENT_ESCAPER.escape(it.next()));
+                if (it.hasNext()) {
+                    sb.append(',');
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    // Escaper based on RFC8040-requirement to percent-encode reserved characters, as defined in
+    // https://tools.ietf.org/html/rfc3986#section-2.2
+    public static final Escaper PERCENT_ESCAPER;
+
+    static {
+        final var hexFormat = HexFormat.of().withUpperCase();
+        final var builder = Escapers.builder();
+        for (char ch : new char[] {
+            // Reserved characters as per https://tools.ietf.org/html/rfc3986#section-2.2
+            ':', '/', '?', '#', '[', ']', '@',
+            '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=',
+            // FIXME: this space should not be here, but that was a day-0 bug and we have asserts on this
+            ' '
+        }) {
+            builder.addEscape(ch, "%" + hexFormat.toHighHexDigit(ch) + hexFormat.toLowHexDigit(ch));
+        }
+        PERCENT_ESCAPER = builder.build();
     }
 
     private static final ApiPath EMPTY = new ApiPath(ImmutableList.of());
@@ -204,6 +248,24 @@ public final class ApiPath implements Immutable {
     @Override
     public boolean equals(final @Nullable Object obj) {
         return obj == this || obj instanceof ApiPath other && steps.equals(other.steps());
+    }
+
+    @Override
+    public String toString() {
+        if (steps.isEmpty()) {
+            return "";
+        }
+        final var sb = new StringBuilder();
+        final var it = steps.iterator();
+        while (true) {
+            it.next().appendTo(sb);
+            if (it.hasNext()) {
+                sb.append('/');
+            } else {
+                break;
+            }
+        }
+        return sb.toString();
     }
 
     private static ApiPath parseString(final ApiPathParser parser, final String str) throws ParseException {

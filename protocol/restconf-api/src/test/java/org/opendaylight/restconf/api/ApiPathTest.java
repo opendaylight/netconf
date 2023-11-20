@@ -27,7 +27,7 @@ class ApiPathTest {
 
     @Test
     void testEmpty() {
-        assertEquals(List.of(), parse("/"));
+        assertEquals(List.of(), parse("").steps());
     }
 
     @Test
@@ -46,35 +46,50 @@ class ApiPathTest {
 
     @Test
     void testExample1() {
-        final var path = parse("/example-top:top/list1=key1,key2,key3/list2=key4,key5/X");
-        assertEquals(4, path.size());
-        assertApiIdentifier(path.get(0), "example-top", "top");
-        assertListInstance(path.get(1), null, "list1", "key1", "key2", "key3");
-        assertListInstance(path.get(2), null, "list2", "key4", "key5");
-        assertApiIdentifier(path.get(3), null, "X");
+        final var str = "example-top:top/list1=key1,key2,key3/list2=key4,key5/X";
+        final var path = parse(str);
+        assertEquals(str, path.toString());
+
+        final var steps = path.steps();
+        assertEquals(4, steps.size());
+        assertApiIdentifier(steps.get(0), "example-top", "top");
+        assertListInstance(steps.get(1), null, "list1", "key1", "key2", "key3");
+        assertListInstance(steps.get(2), null, "list2", "key4", "key5");
+        assertApiIdentifier(steps.get(3), null, "X");
     }
 
     @Test
     void testExample2() {
-        final var path = parse("/example-top:top/Y=instance-value");
-        assertEquals(2, path.size());
-        assertApiIdentifier(path.get(0), "example-top", "top");
-        assertListInstance(path.get(1), null, "Y", "instance-value");
+        final var str = "example-top:top/Y=instance-value";
+        final var path = parse(str);
+        assertEquals(str, path.toString());
+
+        final var steps = path.steps();
+        assertEquals(2, steps.size());
+        assertApiIdentifier(steps.get(0), "example-top", "top");
+        assertListInstance(steps.get(1), null, "Y", "instance-value");
     }
 
     @Test
     void testExample3() {
-        final var path = parse("/example-top:top/list1=%2C%27\"%3A\"%20%2F,,foo");
-        assertEquals(2, path.size());
-        assertApiIdentifier(path.get(0), "example-top", "top");
-        assertListInstance(path.get(1), null, "list1", ",'\":\" /", "", "foo");
+        final var str = "example-top:top/list1=%2C%27\"%3A\"%20%2F,,foo";
+        final var path = parse(str);
+        assertEquals(str, path.toString());
+
+        final var steps = path.steps();
+        assertEquals(2, steps.size());
+        assertApiIdentifier(steps.get(0), "example-top", "top");
+        assertListInstance(steps.get(1), null, "list1", ",'\":\" /", "", "foo");
     }
 
     @Test
     void testEscapedColon() {
-        final var path = parse("/foo%3Afoo");
-        assertEquals(1, path.size());
-        assertApiIdentifier(path.get(0), "foo", "foo");
+        final var path = parse("foo%3Afoo");
+        assertEquals("foo:foo", path.toString());
+
+        final var steps = path.steps();
+        assertEquals(1, steps.size());
+        assertApiIdentifier(steps.get(0), "foo", "foo");
     }
 
     @Test
@@ -98,6 +113,35 @@ class ApiPathTest {
         assertEquals(8, ex.getErrorOffset());
     }
 
+    /**
+     * Test to verify if all reserved characters according to rfc3986 are considered by serializer implementation to
+     * be percent encoded.
+     */
+    @Test
+    void verifyReservedCharactersTest() {
+        final char[] genDelims = { ':', '/', '?', '#', '[', ']', '@' };
+        final char[] subDelims = { '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=' };
+
+        for (final char ch : genDelims) {
+            assertPercentEncoded(ch);
+        }
+
+        for (final char ch : subDelims) {
+            assertPercentEncoded(ch);
+        }
+    }
+
+    @Test
+    void testEmptyToString() {
+        assertEquals("", ApiPath.empty().toString());
+    }
+
+    private static void assertPercentEncoded(final char ch) {
+        final var str = ApiPath.PERCENT_ESCAPER.escape(String.valueOf(ch));
+        assertEquals(3, str.length());
+        assertEquals('%', str.charAt(0));
+    }
+
     private static void assertApiIdentifier(final Step step, final String module, final String identifier) {
         assertInstanceOf(ApiIdentifier.class, step);
         assertEquals(module, step.module());
@@ -112,12 +156,11 @@ class ApiPathTest {
         assertEquals(List.of(keyValues), listInstance.keyValues());
     }
 
-    private static List<Step> parse(final String str) {
-        final String toParse = str.substring(1);
+    private static ApiPath parse(final String str) {
         try {
-            return ApiPath.parse(toParse).steps();
+            return ApiPath.parse(str);
         } catch (ParseException e) {
-            throw new AssertionError("Failed to parse \"" + toParse + "\"", e);
+            throw new AssertionError("Failed to parse \"" + str + "\"", e);
         }
     }
 }
