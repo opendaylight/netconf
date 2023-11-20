@@ -20,7 +20,10 @@ import java.util.Deque;
 import java.util.Iterator;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.SchemaEntity;
+import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
@@ -97,9 +100,9 @@ public final class SchemasStream extends InputStream {
         final var result = new ArrayDeque<SchemaEntity>();
         final var definitionNames = new DefinitionNames();
         final var stack = SchemaInferenceStack.of(context);
+        final var moduleName = module.getName();
         for (final var rpc : module.getRpcs()) {
             stack.enterSchemaTree(rpc.getQName());
-            final var moduleName = module.getName();
             final var rpcName = rpc.getQName().getLocalName();
             final var rpcInput = rpc.getInput();
             if (!rpcInput.getChildNodes().isEmpty()) {
@@ -116,7 +119,29 @@ public final class SchemasStream extends InputStream {
             stack.exit();
         }
 
-        // actions
+        for (final var childNode : module.getChildNodes()) {
+            stack.enterSchemaTree(childNode.getQName());
+            if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
+                for (final var actionDef : ((ActionNodeContainer) childNode).getActions()) {
+                    stack.enterSchemaTree(actionDef.getQName());
+                    final var actionName = actionDef.getQName().getLocalName();
+                    final var actionInput = actionDef.getInput();
+                    if (!actionInput.getChildNodes().isEmpty()) {
+                        final var input = new SchemaEntity(actionInput, moduleName + "_" + actionName + "_input",
+                            "object", stack, moduleName, false, definitionNames);
+                        result.add(input);
+                    }
+                    final var actionOutput = actionDef.getInput();
+                    if (!actionOutput.getChildNodes().isEmpty()) {
+                        final var output = new SchemaEntity(actionOutput, moduleName + "_" + actionName + "_output",
+                            "object", stack, moduleName, false, definitionNames);
+                        result.add(output);
+                    }
+                    stack.exit();
+                }
+            }
+            stack.exit();
+        }
         // child nodes
         // etc.
         return result;
