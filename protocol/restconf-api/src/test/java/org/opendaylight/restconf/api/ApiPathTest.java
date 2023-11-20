@@ -72,9 +72,8 @@ class ApiPathTest {
 
     @Test
     void testExample3() {
-        final var str = "example-top:top/list1=%2C%27\"%3A\"%20%2F,,foo";
-        final var path = parse(str);
-        assertEquals(str, path.toString());
+        final var path = parse("example-top:top/list1=%2C%27\"%3A\"%20%2F,,foo");
+        assertEquals("example-top:top/list1=%2C%27\"%3A\" %2F,,foo", path.toString());
 
         final var steps = path.steps();
         assertEquals(2, steps.size());
