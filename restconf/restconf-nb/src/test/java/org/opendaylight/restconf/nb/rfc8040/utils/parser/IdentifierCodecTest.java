@@ -21,7 +21,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
  */
 public class IdentifierCodecTest {
     private static final String URI_WITH_LIST_AND_LEAF =
-            "list-test:top/list1=%2C%27" + '"' + "%3A" + '"' + "%20%2F,,foo/list2=a,b/result";
+        "list-test:top/list1=%2C%27\"%3A\"%20%2F,,foo/list2=a,b/result";
     private static final String URI_WITH_INT_VAL_LEAF_LIST = "list-test:top/Y=4";
 
     private static EffectiveModelContext SCHEMA_CONTEXT;
