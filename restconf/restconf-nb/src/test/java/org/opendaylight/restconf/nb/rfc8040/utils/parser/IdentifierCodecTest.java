@@ -7,11 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -19,17 +17,9 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 /**
  * Unit tests for {@link IdentifierCodec} mostly according to examples from draft-ietf-netconf-restconf-13.
  */
-public class IdentifierCodecTest {
-    private static final String URI_WITH_LIST_AND_LEAF =
-            "list-test:top/list1=%2C%27" + '"' + "%3A" + '"' + "%20%2F,,foo/list2=a,b/result";
-    private static final String URI_WITH_INT_VAL_LEAF_LIST = "list-test:top/Y=4";
-
-    private static EffectiveModelContext SCHEMA_CONTEXT;
-
-    @BeforeClass
-    public static void beforeClass() {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/restconf/parser");
-    }
+class IdentifierCodecTest {
+    private static final EffectiveModelContext SCHEMA_CONTEXT =
+        YangParserTestUtils.parseYangResourceDirectory("/restconf/parser");
 
     /**
      * Positive test of deserialization URI <code>String</code> to <code>YangInstanceIdentifier</code> and
@@ -37,13 +27,11 @@ public class IdentifierCodecTest {
      * URI contains list identifier and leaf identifier.
      */
     @Test
-    public void codecListAndLeafTest() {
-        final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(
-                IdentifierCodecTest.URI_WITH_LIST_AND_LEAF, SCHEMA_CONTEXT);
-        final String serializedDataYangII = IdentifierCodec.serialize(dataYangII, SCHEMA_CONTEXT);
-
-        assertEquals("Failed codec deserialization and serialization test",
-                IdentifierCodecTest.URI_WITH_LIST_AND_LEAF, serializedDataYangII);
+    void codecListAndLeafTest() {
+        final var dataYangII = IdentifierCodec.deserialize(
+            "list-test:top/list1=%2C%27\"%3A\"%20%2F,,foo/list2=a,b/result", SCHEMA_CONTEXT);
+        assertEquals("list-test:top/list1=%2C%27\"%3A\" %2F,,foo/list2=a,b/result",
+            IdentifierCodec.serialize(dataYangII, SCHEMA_CONTEXT));
     }
 
     /**
@@ -52,13 +40,10 @@ public class IdentifierCodecTest {
      * URI contains leaf list identifier.
      */
     @Test
-    public void codecLeafListTest() {
-        final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(
-                IdentifierCodecTest.URI_WITH_INT_VAL_LEAF_LIST, SCHEMA_CONTEXT);
-        final String serializedDataYangII = IdentifierCodec.serialize(dataYangII, SCHEMA_CONTEXT);
-
-        assertEquals("Failed codec deserialization and serialization test",
-                IdentifierCodecTest.URI_WITH_INT_VAL_LEAF_LIST, serializedDataYangII);
+    void codecLeafListTest() {
+        final var str = "list-test:top/Y=4";
+        final var dataYangII = IdentifierCodec.deserialize(str, SCHEMA_CONTEXT);
+        assertEquals(str, IdentifierCodec.serialize(dataYangII, SCHEMA_CONTEXT));
     }
 
     /**
@@ -67,9 +52,9 @@ public class IdentifierCodecTest {
      * expected to be returned.
      */
     @Test
-    public void codecDeserializeNullTest() {
-        final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(null, SCHEMA_CONTEXT);
-        assertEquals("Failed codec deserialization test", YangInstanceIdentifier.of(), dataYangII);
+    void codecDeserializeNullTest() {
+        final var dataYangII = IdentifierCodec.deserialize(null, SCHEMA_CONTEXT);
+        assertEquals(YangInstanceIdentifier.of(), dataYangII);
     }
 
     /**
@@ -77,9 +62,8 @@ public class IdentifierCodecTest {
      * expected to be returned.
      */
     @Test
-    public void codecSerializeEmptyTest() {
-        final String serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), SCHEMA_CONTEXT);
-        assertTrue("Failed codec serialization test", serialized.isEmpty());
+    void codecSerializeEmptyTest() {
+        assertEquals("", IdentifierCodec.serialize(YangInstanceIdentifier.of(), SCHEMA_CONTEXT));
     }
 
     /**
@@ -87,9 +71,8 @@ public class IdentifierCodecTest {
      * <code>YangInstanceIdentifier.EMPTY</code>.
      */
     @Test
-    public void codecDeserializeAndSerializeEmptyTest() {
-        final String serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), SCHEMA_CONTEXT);
-        assertEquals("Failed codec serialization and deserialization test",
-                YangInstanceIdentifier.of(), IdentifierCodec.deserialize(serialized, SCHEMA_CONTEXT));
+    void codecDeserializeAndSerializeEmptyTest() {
+        final var serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), SCHEMA_CONTEXT);
+        assertEquals(YangInstanceIdentifier.of(), IdentifierCodec.deserialize(serialized, SCHEMA_CONTEXT));
     }
 }
