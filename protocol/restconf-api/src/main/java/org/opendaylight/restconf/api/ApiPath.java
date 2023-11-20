@@ -156,8 +156,6 @@ public final class ApiPath implements Immutable {
             // Reserved characters as per https://tools.ietf.org/html/rfc3986#section-2.2
             ':', '/', '?', '#', '[', ']', '@',
             '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=',
-            // FIXME: this space should not be here, but that was a day-0 bug and we have asserts on this
-            ' '
         }) {
             builder.addEscape(ch, "%" + hexFormat.toHighHexDigit(ch) + hexFormat.toLowHexDigit(ch));
         }
