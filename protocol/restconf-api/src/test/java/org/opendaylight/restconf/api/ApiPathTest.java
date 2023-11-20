@@ -98,6 +98,31 @@ class ApiPathTest {
         assertEquals(8, ex.getErrorOffset());
     }
 
+
+    /**
+     * Test to verify if all reserved characters according to rfc3986 are considered by serializer implementation to
+     * be percent encoded.
+     */
+    @Test
+    void verifyReservedCharactersTest() {
+        final char[] genDelims = { ':', '/', '?', '#', '[', ']', '@' };
+        final char[] subDelims = { '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=' };
+
+        for (final char ch : genDelims) {
+            assertPercentEncoded(ch);
+        }
+
+        for (final char ch : subDelims) {
+            assertPercentEncoded(ch);
+        }
+    }
+
+    private static void assertPercentEncoded(final char ch) {
+        final var str = ApiPath.PERCENT_ESCAPER.escape(String.valueOf(ch));
+        assertEquals(3, str.length());
+        assertEquals('%', str.charAt(0));
+    }
+
     private static void assertApiIdentifier(final Step step, final String module, final String identifier) {
         assertInstanceOf(ApiIdentifier.class, step);
         assertEquals(module, step.module());
