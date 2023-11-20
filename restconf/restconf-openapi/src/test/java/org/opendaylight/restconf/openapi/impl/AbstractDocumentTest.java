@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import org.glassfish.jersey.internal.util.collection.ImmutableMultivaluedMap;
-import org.junit.AfterClass;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -38,10 +37,6 @@ public abstract class AbstractDocumentTest {
         .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
 
     private static OpenApiService openApiService;
-
-    @AfterClass
-    public static void afterClass() throws Exception {
-    }
 
     protected static void initializeClass(final String yangPath) {
         final var schemaService = mock(DOMSchemaService.class);
