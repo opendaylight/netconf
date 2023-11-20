@@ -15,11 +15,20 @@ import org.eclipse.jdt.annotation.Nullable;
 
 public final class PathEntity extends OpenApiEntity {
     private final @NonNull String path;
-    private final @Nullable OperationEntity post;
+    private final @Nullable PostEntity post;
+    private final @Nullable PatchEntity patch;
+    private final @Nullable GetEntity get;
+    private final @Nullable PutEntity put;
+    private final @Nullable DeleteEntity delete;
 
-    public PathEntity(final String path, final OperationEntity post) {
+    public PathEntity(final String path, final PostEntity post, final PatchEntity patch,
+            final PutEntity put, final GetEntity get, final DeleteEntity delete) {
         this.path = Objects.requireNonNull(path);
         this.post = post;
+        this.patch = patch;
+        this.put = put;
+        this.delete = delete;
+        this.get = get;
     }
 
     @Override
@@ -49,6 +58,14 @@ public final class PathEntity extends OpenApiEntity {
         if (patchOperation != null) {
             patchOperation.generate(generator);
         }
+        final var deleteOperation = delete();
+        if (deleteOperation != null) {
+            deleteOperation.generate(generator);
+        }
+        final var getOperation = get();
+        if (getOperation != null) {
+            getOperation.generate(generator);
+        }
         generator.writeEndObject();
     }
 
@@ -69,10 +86,18 @@ public final class PathEntity extends OpenApiEntity {
     }
 
     @Nullable OperationEntity put() {
-        return null;
+        return put;
     }
 
     @Nullable OperationEntity patch() {
-        return null;
+        return patch;
+    }
+
+    @Nullable OperationEntity get() {
+        return get;
+    }
+
+    @Nullable OperationEntity delete() {
+        return delete;
     }
 }
