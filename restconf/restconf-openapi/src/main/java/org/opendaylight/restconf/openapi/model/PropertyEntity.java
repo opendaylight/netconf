@@ -137,7 +137,7 @@ public class PropertyEntity {
                     stack.enterSchemaTree(childNode.getQName());
                     processChoiceNodeRecursively(isChildConfig, stack, childChoice);
                     stack.exit();
-                } else {
+                } else if (!isConfig || childNode.isConfiguration()) {
                     generator.writeObjectFieldStart(childNode.getQName().getLocalName());
                     processChildNode(childNode, stack, isConfig);
                     generator.writeEndObject();
@@ -369,7 +369,7 @@ public class PropertyEntity {
         generator.writeEndObject();
     }
 
-    private boolean isSchemaNodeMandatory(final DataSchemaNode schemaNode) {
+    protected static boolean isSchemaNodeMandatory(final DataSchemaNode schemaNode) {
         if (schemaNode instanceof ContainerSchemaNode containerNode) {
             if (containerNode.isPresenceContainer()) {
                 return false;
