@@ -22,7 +22,7 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
