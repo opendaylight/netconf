@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "306962ae_018a320a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-11-21T07:38:31Z",
+      "side": 1,
+      "message": "What is the impact on RPC usage?",
+      "revId": "c903d60c6beffe063a19e0d30e08cd91c76e3312",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
