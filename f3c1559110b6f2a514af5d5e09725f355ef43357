@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c12d9d16_2d76aa63",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-21T13:36:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72731bd9_580fe969",
+      "revId": "f3c1559110b6f2a514af5d5e09725f355ef43357",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6911a4d7_e9919b68",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf94ba8e_5a6c279c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-21T13:36:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6911a4d7_e9919b68",
+      "revId": "f3c1559110b6f2a514af5d5e09725f355ef43357",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f49de848_a2ac1660",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-11-21T07:57:17Z",
       "side": 1,
       "message": "why we call it two times?",
+      "revId": "f3c1559110b6f2a514af5d5e09725f355ef43357",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f9ac0af_f181862f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-21T13:36:13Z",
+      "side": 1,
+      "message": "Should not be needed at all as this is just a copy",
+      "parentUuid": "f49de848_a2ac1660",
       "revId": "f3c1559110b6f2a514af5d5e09725f355ef43357",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
