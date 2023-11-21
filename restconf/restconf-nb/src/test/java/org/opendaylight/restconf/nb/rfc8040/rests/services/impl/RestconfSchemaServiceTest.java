@@ -24,7 +24,6 @@ import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -57,7 +56,7 @@ public class RestconfSchemaServiceTest {
         YangParserTestUtils.parseYangResourceDirectory("/modules/mount-points");
 
     // service under test
-    private RestconfSchemaService schemaService;
+    private RestconfSchemaServiceImpl schemaService;
 
     // handlers
     @Mock
