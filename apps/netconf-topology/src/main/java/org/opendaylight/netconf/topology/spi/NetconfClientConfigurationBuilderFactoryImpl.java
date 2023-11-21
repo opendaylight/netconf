@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.security.KeyPair;
 import java.util.List;
 import javax.inject.Inject;
@@ -30,12 +31,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.cli
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.client.identity.PasswordBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.connection.parameters.Protocol.Name;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.KeyAuth;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPwUnencrypted;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.KeyAuth;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -106,7 +107,8 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         } else if (credentials instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
             sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
-                loginPassword.getUsername(), encryptionService.decrypt(loginPassword.getPassword())));
+                loginPassword.getUsername(), new String(encryptionService.decrypt(loginPassword.getPassword()),
+                    Charset.defaultCharset())));
 
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyBased = keyAuth.getKeyBased();

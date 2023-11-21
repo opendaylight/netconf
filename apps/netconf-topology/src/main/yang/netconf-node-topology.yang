@@ -5,7 +5,11 @@ module netconf-node-topology {
     import network-topology { prefix nt; revision-date 2013-10-21; }
     import yang-ext { prefix ext; revision-date "2013-07-09";}
     import netconf-node-optional { prefix nno; }
-    import odl-netconf-device { prefix ond; }
+    import odl-netconf-device { prefix ond; revision-date 2023-11-21;}
+
+    revision 2023-11-21 {
+        description "Separeted rpc input credentials from odl-netconf-device";
+    }
 
     revision 2022-12-25 {
         description "Refactored into odl-netconf-device";
@@ -15,6 +19,49 @@ module netconf-node-topology {
         description "Initial revision of Topology model";
     }
 
+    grouping username-password {
+        leaf username {
+            type string;
+        }
+
+        leaf password {
+            type string;
+        }
+    }
+
+    grouping credentials {
+        choice credentials-rpc {
+            config true;
+            case login-pw-rpc {
+                description "login-password credentials, encrypted.";
+
+                container login-password-rpc {
+                    uses username-password;
+                }
+            }
+            case login-pw-rpc-unencrypted {
+                description "login-password credentials, not encrypted.";
+
+                container login-password-rpc-unencrypted {
+                    uses username-password;
+                }
+            }
+            case key-auth-rpc {
+                description "key-based authentication, use the id for the pair thats stored in the keystore.";
+
+                container key-based {
+                    leaf key-id {
+                        type string;
+                    }
+
+                    leaf username {
+                        type string;
+                    }
+                }
+            }
+        }
+    }
+
     grouping netconf-node-fields {
       uses ond:credentials;
       uses ond:connection-parameters;
@@ -22,10 +69,17 @@ module netconf-node-topology {
       uses ond:datastore-access;
     }
 
+    grouping netconf-node-fields-rpc {
+        uses credentials;
+        uses ond:connection-parameters;
+        uses ond:netconf-schema-storage;
+        uses ond:datastore-access;
+    }
+
     rpc create-device {
         status deprecated;
         input {
-            uses netconf-node-fields;
+            uses netconf-node-fields-rpc;
             uses nno:netconf-node-augmented-optional-fields;
             leaf node-id {
                 type string;
