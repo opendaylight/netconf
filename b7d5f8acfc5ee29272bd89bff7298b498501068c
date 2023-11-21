@@ -16,6 +16,24 @@
       "message": "IMO this is not correct package. restconf nb is correct one.",
       "revId": "b7d5f8acfc5ee29272bd89bff7298b498501068c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2705bf1_37741a68",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfDataPutTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-21T12:27:26Z",
+      "side": 1,
+      "message": "This can be done in a separate patch.",
+      "parentUuid": "e1b2e62b_d66d9d75",
+      "revId": "b7d5f8acfc5ee29272bd89bff7298b498501068c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
