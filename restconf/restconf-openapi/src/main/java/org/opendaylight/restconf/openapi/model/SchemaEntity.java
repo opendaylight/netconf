@@ -17,6 +17,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
@@ -109,13 +110,23 @@ public final class SchemaEntity extends OpenApiEntity {
     }
 
     private void generateProperties(final @NonNull JsonGenerator generator) throws IOException {
-
         final List<String> required = new ArrayList<>();
-        final var childNodes = ((ContainerLike) value).getChildNodes();
-        stack.enterSchemaTree(value.getQName());
+
         generator.writeObjectFieldStart("properties");
-        for (final var node : childNodes) {
-            new PropertyEntity(node, generator, stack, required, parentName, isParentConfig, definitionNames);
+        if (value instanceof ContainerLike) {
+            final var childNodes = ((ContainerLike) value).getChildNodes();
+            stack.enterSchemaTree(value.getQName());
+            for (final var node : childNodes) {
+                new PropertyEntity(node, generator, stack, required, parentName + "_"
+                    + value.getQName().getLocalName(), isParentConfig, definitionNames);
+            }
+        } else {
+            stack.enterSchemaTree(value.getQName());
+            for (final var childNode : ((DataNodeContainer) value).getChildNodes()) {
+                new PropertyEntity(childNode, generator, stack, required, parentName + "_"
+                    + value.getQName().getLocalName(), isParentConfig, definitionNames);
+            }
+            stack.exit();
         }
         generator.writeEndObject();
         generateRequired(generator, required);
