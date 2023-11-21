@@ -9,6 +9,10 @@ module odl-netconf-device {
   import ietf-inet-types { prefix inet; }
   import ietf-netconf { prefix nc; }
 
+  revision 2023-11-21 {
+    description "Store encrypted login-pw cased password as binary";
+  }
+
   revision 2023-10-25 {
     description "Remove deprecated login-password case";
   }
@@ -24,6 +28,16 @@ module odl-netconf-device {
   revision 2022-12-25;
 
   grouping username-password {
+    leaf username {
+      type string;
+    }
+
+    leaf password {
+      type binary;
+    }
+  }
+
+  grouping username-password-unencrypted {
     leaf username {
       type string;
     }
@@ -47,7 +61,7 @@ module odl-netconf-device {
         description "login-password credentials, not encrypted.";
 
         container login-password-unencrypted {
-          uses username-password;
+          uses username-password-unencrypted;
         }
       }
       case key-auth {

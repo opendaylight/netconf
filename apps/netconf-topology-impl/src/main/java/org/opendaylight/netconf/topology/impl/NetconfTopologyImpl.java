@@ -14,7 +14,6 @@ import java.util.concurrent.Executor;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
@@ -63,22 +62,21 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             @Reference(target = "(type=global-netconf-processing-executor)") final ThreadPool processingThreadPool,
             @Reference final SchemaResourceManager schemaRepositoryProvider, @Reference final DataBroker dataBroker,
             @Reference final DOMMountPointService mountPointService,
-            @Reference final AAAEncryptionService encryptionService,
             @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
             @Reference final RpcProviderService rpcProviderService, @Reference final BaseNetconfSchemas baseSchemas,
             @Reference final DeviceActionFactory deviceActionFactory) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, clientFactory, timer, processingThreadPool.getExecutor(),
-            schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, builderFactory,
+            schemaRepositoryProvider, dataBroker, mountPointService, builderFactory,
             rpcProviderService, baseSchemas, deviceActionFactory);
     }
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientclientFactory,
             final Timer timer, final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final NetconfClientConfigurationBuilderFactory builderFactory,
+            final NetconfClientConfigurationBuilderFactory builderFactory,
             final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas) {
         this(topologyId, clientclientFactory, timer, processingExecutor, schemaRepositoryProvider, dataBroker,
-            mountPointService, encryptionService, builderFactory, rpcProviderService, baseSchemas, null);
+            mountPointService, builderFactory, rpcProviderService, baseSchemas, null);
     }
 
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
@@ -86,7 +84,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     public NetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
             final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final NetconfClientConfigurationBuilderFactory builderFactory,
+            final NetconfClientConfigurationBuilderFactory builderFactory,
             final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas,
             final DeviceActionFactory deviceActionFactory) {
         super(topologyId, clientFactory, timer, processingExecutor, schemaRepositoryProvider, dataBroker,
@@ -98,7 +96,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
                 .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
                 .child(Node.class)
                 .build()), this);
-        rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, topologyId);
+        rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, topologyId);
     }
 
     @PreDestroy
