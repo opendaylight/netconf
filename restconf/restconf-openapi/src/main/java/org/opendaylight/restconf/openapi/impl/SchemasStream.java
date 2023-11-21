@@ -22,12 +22,17 @@ import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.SchemaEntity;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public final class SchemasStream extends InputStream {
+    private static final String OBJECT_TYPE = "object";
+    private static final String INPUT_SUFFIX = "_input";
+    private static final String OUTPUT_SUFFIX = "_output";
+
     private final Iterator<? extends Module> iterator;
     private final OpenApiBodyWriter writer;
     private final EffectiveModelContext context;
@@ -106,13 +111,13 @@ public final class SchemasStream extends InputStream {
             final var rpcName = rpc.getQName().getLocalName();
             final var rpcInput = rpc.getInput();
             if (!rpcInput.getChildNodes().isEmpty()) {
-                final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + "_input", "object",
+                final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, OBJECT_TYPE,
                     stack, moduleName, false, definitionNames);
                 result.add(input);
             }
             final var rpcOutput = rpc.getOutput();
             if (!rpcOutput.getChildNodes().isEmpty()) {
-                final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + "_output", "object",
+                final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, OBJECT_TYPE,
                     stack, moduleName, false, definitionNames);
                 result.add(output);
             }
@@ -122,19 +127,23 @@ public final class SchemasStream extends InputStream {
         for (final var childNode : module.getChildNodes()) {
             stack.enterSchemaTree(childNode.getQName());
             if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
+                final var child = new SchemaEntity((DataSchemaNode) childNode,
+                    moduleName + "_" + childNode.getQName().getLocalName(),
+                    OBJECT_TYPE, stack, moduleName, true, definitionNames);
+                result.add(child);
                 for (final var actionDef : ((ActionNodeContainer) childNode).getActions()) {
                     stack.enterSchemaTree(actionDef.getQName());
                     final var actionName = actionDef.getQName().getLocalName();
                     final var actionInput = actionDef.getInput();
                     if (!actionInput.getChildNodes().isEmpty()) {
-                        final var input = new SchemaEntity(actionInput, moduleName + "_" + actionName + "_input",
-                            "object", stack, moduleName, false, definitionNames);
+                        final var input = new SchemaEntity(actionInput, moduleName + "_" + actionName + INPUT_SUFFIX,
+                            OBJECT_TYPE, stack, moduleName, false, definitionNames);
                         result.add(input);
                     }
                     final var actionOutput = actionDef.getInput();
                     if (!actionOutput.getChildNodes().isEmpty()) {
-                        final var output = new SchemaEntity(actionOutput, moduleName + "_" + actionName + "_output",
-                            "object", stack, moduleName, false, definitionNames);
+                        final var output = new SchemaEntity(actionOutput, moduleName + "_" + actionName + OUTPUT_SUFFIX,
+                            OBJECT_TYPE, stack, moduleName, false, definitionNames);
                         result.add(output);
                     }
                     stack.exit();
