@@ -9,6 +9,7 @@ module odl-netconf-device {
   import ietf-inet-types { prefix inet; }
   import ietf-netconf { prefix nc; }
 
+<<<<<<< HEAD   (2c4199 Make RESTCONF base path configurable)
   revision 2024-01-18 {
     description "Mark between-attempts-timeout-millis, max-timeout-between-attempts-millis and sleep-factor
     as deprecated. They will be renamed to min-backoff-millis, max-backoff-millis and backoff-multiplier
@@ -21,6 +22,14 @@ module odl-netconf-device {
 
   revision 2024-01-04 {
     description "Add possibility to set max timeout between connection attempts";
+=======
+  revision 2023-11-21 {
+    description "Store encrypted login-pw case password as binary";
+  }
+
+  revision 2023-10-25 {
+    description "Remove deprecated login-password case";
+>>>>>>> CHANGE (3a7861 Use base64 encoding for netconf device passwords)
   }
 
   revision 2023-10-24 {
@@ -34,6 +43,16 @@ module odl-netconf-device {
   revision 2022-12-25;
 
   grouping username-password {
+    leaf username {
+      type string;
+    }
+
+    leaf password {
+      type binary;
+    }
+  }
+
+  grouping username-password-unencrypted {
     leaf username {
       type string;
     }
@@ -63,7 +82,7 @@ module odl-netconf-device {
         description "login-password credentials, not encrypted.";
 
         container login-password-unencrypted {
-          uses username-password;
+          uses username-password-unencrypted;
         }
       }
       case key-auth {

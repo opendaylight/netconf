@@ -12,9 +12,16 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
+<<<<<<< HEAD   (2c4199 Make RESTCONF base path configurable)
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeFields;
+=======
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeFields;
+>>>>>>> CHANGE (3a7861 Use base64 encoding for netconf device passwords)
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;

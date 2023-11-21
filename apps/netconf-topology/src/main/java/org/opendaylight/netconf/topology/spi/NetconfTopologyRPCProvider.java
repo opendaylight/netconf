@@ -14,17 +14,29 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import java.util.Base64;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+<<<<<<< HEAD   (2c4199 Make RESTCONF base path configurable)
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.LoginPwBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.login.pw.LoginPasswordBuilder;
+=======
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.KeyAuthBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.LoginPwBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.key.auth.KeyBasedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.login.pw.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
+>>>>>>> CHANGE (3a7861 Use base64 encoding for netconf device passwords)
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptionalBuilder;
+<<<<<<< HEAD   (2c4199 Make RESTCONF base path configurable)
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceOutputBuilder;
@@ -34,6 +46,22 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev22
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeTopologyService;
+=======
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDevice;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDeviceInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDeviceOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDeviceOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.DeleteDevice;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.DeleteDeviceInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.DeleteDeviceOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.DeleteDeviceOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.RpcCredentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.KeyAuth;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.LoginPwUnencrypted;
+>>>>>>> CHANGE (3a7861 Use base64 encoding for netconf device passwords)
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -118,25 +146,38 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     NetconfNode encryptPassword(final CreateDeviceInput input) {
         final NetconfNodeBuilder builder = new NetconfNodeBuilder();
         builder.fieldsFrom(input);
-
-        return builder.setCredentials(handleEncryption(input.getCredentials()))
+        return builder.setCredentials(translate(input.getRpcCredentials()))
             .build();
     }
 
-    private Credentials handleEncryption(final Credentials credentials) {
-        if (credentials instanceof LoginPw loginPw) {
+    private Credentials translate(final RpcCredentials credentialsRpc) {
+        if (credentialsRpc instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
-
             return new LoginPwBuilder()
                 .setLoginPassword(new LoginPasswordBuilder()
                     .setUsername(loginPassword.getUsername())
-                    .setPassword(encryptionService.encrypt(loginPassword.getPassword()))
+                    .setPassword(Base64.getDecoder().decode(encryptionService.encrypt(loginPassword.getPassword())))
                     .build())
                 .build();
+        } else if (credentialsRpc instanceof LoginPwUnencrypted loginPwUnencrypted) {
+            final var loginPassword = loginPwUnencrypted.getLoginPasswordUnencrypted();
+            return new LoginPwUnencryptedBuilder()
+                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                    .setUsername(loginPassword.getUsername())
+                    .setPassword(loginPassword.getPassword())
+                    .build())
+                .build();
+        } else if (credentialsRpc instanceof KeyAuth keyAuth) {
+            final var loginPassword = keyAuth.getKeyBased();
+            return new KeyAuthBuilder()
+                .setKeyBased(new KeyBasedBuilder()
+                    .setUsername(loginPassword.getUsername())
+                    .setKeyId(loginPassword.getKeyId())
+                    .build())
+                .build();
+        } else {
+            throw new IllegalArgumentException("Unsupported credential type: " + credentialsRpc.getClass());
         }
-
-        // nothing else needs to be encrypted
-        return credentials;
     }
 
     private void writeToConfigDS(final Node node, final NodeId nodeId,

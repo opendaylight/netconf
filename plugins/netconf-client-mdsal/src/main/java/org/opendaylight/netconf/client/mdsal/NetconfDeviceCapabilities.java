@@ -12,8 +12,13 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.jdt.annotation.NonNull;
+<<<<<<< HEAD   (2c4199 Make RESTCONF base path configurable)
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.oper.unavailable.capabilities.UnavailableCapability.FailureReason;
+=======
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.connection.oper.available.capabilities.AvailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.connection.oper.unavailable.capabilities.UnavailableCapability.FailureReason;
+>>>>>>> CHANGE (3a7861 Use base64 encoding for netconf device passwords)
 import org.opendaylight.yangtools.yang.common.QName;
 
 public record NetconfDeviceCapabilities(

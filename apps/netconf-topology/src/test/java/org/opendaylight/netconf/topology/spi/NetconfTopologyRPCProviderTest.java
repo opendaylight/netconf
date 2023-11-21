@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 
+import java.util.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +23,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+<<<<<<< HEAD   (2c4199 Make RESTCONF base path configurable)
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.LoginPwBuilder;
@@ -32,6 +34,19 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+=======
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDeviceInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDeviceInputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.RpcCredentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.LoginPwBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.login.pw.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
+>>>>>>> CHANGE (3a7861 Use base64 encoding for netconf device passwords)
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
@@ -65,7 +80,7 @@ public class NetconfTopologyRPCProviderTest {
         assertTrue(credentials instanceof LoginPw);
         final LoginPw loginPw = (LoginPw) credentials;
 
-        assertEquals(ENC_PWD, loginPw.getLoginPassword().getPassword());
+        assertEquals(ENC_PWD, Base64.getEncoder().encodeToString(loginPw.getLoginPassword().getPassword()));
     }
 
     @Test
@@ -80,7 +95,7 @@ public class NetconfTopologyRPCProviderTest {
     }
 
     private static CreateDeviceInput getInput(final boolean encrypt) {
-        final Credentials credentials;
+        final RpcCredentials credentials;
         if (encrypt) {
             credentials = new LoginPwBuilder()
                 .setLoginPassword(new LoginPasswordBuilder().setUsername("test").setPassword(TEST_PWD).build())
@@ -95,7 +110,7 @@ public class NetconfTopologyRPCProviderTest {
         }
 
         return new CreateDeviceInputBuilder()
-            .setCredentials(credentials)
+            .setRpcCredentials(credentials)
             .setHost(new Host(new IpAddress(new Ipv4Address("10.18.16.188"))))
             .setPort(new PortNumber(Uint16.valueOf(830)))
             .setTcpOnly(Boolean.FALSE)

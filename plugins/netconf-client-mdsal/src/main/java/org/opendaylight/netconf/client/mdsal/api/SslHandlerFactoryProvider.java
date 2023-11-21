@@ -10,7 +10,11 @@ package org.opendaylight.netconf.client.mdsal.api;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.SslHandlerFactory;
+<<<<<<< HEAD   (2c4199 Make RESTCONF base path configurable)
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.protocol.Specification;
+=======
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.connection.parameters.protocol.Specification;
+>>>>>>> CHANGE (3a7861 Use base64 encoding for netconf device passwords)
 
 /**
  * A provider for {@link SslHandlerFactory} implementations. This allows the factory to be tailored with a
