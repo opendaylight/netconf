@@ -10,19 +10,22 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
+import org.opendaylight.restconf.nb.rfc8040.legacy.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 
 /**
- * Implementation of {@link RestconfSchemaService}.
+ * Retrieval of the YANG modules which server supports.
  */
 @Path("/")
-public class RestconfSchemaServiceImpl implements RestconfSchemaService {
+public class RestconfSchemaServiceImpl {
     private final DOMSchemaService schemaService;
     private final DOMMountPointService mountPointService;
     private final DOMYangTextSourceProvider sourceProvider;
@@ -41,8 +44,16 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
         checkArgument(sourceProvider != null, "No DOMYangTextSourceProvider available in %s", schemaService);
     }
 
-    @Override
-    public SchemaExportContext getSchema(final String identifier) {
+    /**
+     * Get schema of specific module.
+     *
+     * @param identifier path parameter
+     * @return {@link SchemaExportContext}
+     */
+    @GET
+    @Produces({ YangConstants.RFC6020_YIN_MEDIA_TYPE, YangConstants.RFC6020_YANG_MEDIA_TYPE })
+    @Path("modules/{identifier:.+}")
+    public SchemaExportContext getSchema(@PathParam("identifier") final String identifier) {
         return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaService.getGlobalContext(), identifier,
             mountPointService, sourceProvider);
     }

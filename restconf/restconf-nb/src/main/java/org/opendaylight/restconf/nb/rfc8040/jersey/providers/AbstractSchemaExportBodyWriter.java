@@ -11,7 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
+import org.opendaylight.restconf.nb.rfc8040.legacy.SchemaExportContext;
 
 abstract class AbstractSchemaExportBodyWriter implements MessageBodyWriter<SchemaExportContext> {
     @Override
