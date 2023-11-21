@@ -5,6 +5,10 @@ module netconf-node-optional {
     import network-topology { prefix nt; revision-date 2013-10-21; }
     import yang-ext { prefix ext; revision-date "2013-07-09";}
 
+    revision 2023-11-21 {
+        description "Separeted rpc input credentials from odl-netconf-device";
+    }
+
     revision 2022-12-25 {
         description "Datastore locking moved to odl-netconf-device.";
     }
