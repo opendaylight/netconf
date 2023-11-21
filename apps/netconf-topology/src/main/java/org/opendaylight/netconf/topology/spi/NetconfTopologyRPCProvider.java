@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import java.nio.charset.Charset;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -22,20 +23,27 @@ import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPwBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.login.pw.LoginPasswordBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDevice;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.DeleteDevice;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.DeleteDeviceInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.DeleteDeviceOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.DeleteDeviceOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.KeyAuthBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.LoginPwBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.key.auth.KeyBasedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.login.pw.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDevice;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDeviceInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDeviceOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDeviceOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.DeleteDevice;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.DeleteDeviceInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.DeleteDeviceOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.DeleteDeviceOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.credentials.CredentialsRpc;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.credentials.credentials.rpc.KeyAuthRpc;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.credentials.credentials.rpc.LoginPwRpc;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.credentials.credentials.rpc.LoginPwRpcUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -124,24 +132,39 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
         final NetconfNodeBuilder builder = new NetconfNodeBuilder();
         builder.fieldsFrom(input);
 
-        return builder.setCredentials(handleEncryption(input.getCredentials()))
+        return builder.setCredentials(translate(input.getCredentialsRpc()))
             .build();
     }
 
-    private Credentials handleEncryption(final Credentials credentials) {
-        if (credentials instanceof LoginPw loginPw) {
-            final var loginPassword = loginPw.getLoginPassword();
+    private Credentials translate(final CredentialsRpc credentialsRpc) {
+        if (credentialsRpc instanceof LoginPwRpc loginPw) {
+            final var loginPassword = loginPw.getLoginPasswordRpc();
 
             return new LoginPwBuilder()
                 .setLoginPassword(new LoginPasswordBuilder()
                     .setUsername(loginPassword.getUsername())
-                    .setPassword(encryptionService.encrypt(loginPassword.getPassword()))
+                    .setPassword(encryptionService.encrypt(loginPassword.getPassword())
+                        .getBytes(Charset.defaultCharset()))
+                    .build())
+                .build();
+        } else if (credentialsRpc instanceof LoginPwRpcUnencrypted loginPwUnencrypted) {
+            final var loginPassword = loginPwUnencrypted.getLoginPasswordRpcUnencrypted();
+
+            return new LoginPwUnencryptedBuilder()
+                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                    .setUsername(loginPassword.getUsername())
+                    .setPassword(loginPassword.getPassword())
+                    .build())
+                .build();
+        } else {
+            final var loginPassword = ((KeyAuthRpc) credentialsRpc).getKeyBased();
+            return new KeyAuthBuilder()
+                .setKeyBased(new KeyBasedBuilder()
+                    .setUsername(loginPassword.getUsername())
+                    .setKeyId(loginPassword.getKeyId())
                     .build())
                 .build();
         }
-
-        // nothing else needs to be encrypted
-        return credentials;
     }
 
     private void writeToConfigDS(final NetconfNode node, final NodeId nodeId,
