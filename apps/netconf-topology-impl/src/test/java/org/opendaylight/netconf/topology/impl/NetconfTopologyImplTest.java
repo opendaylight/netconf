@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
@@ -39,9 +38,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPwUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231121.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -74,8 +73,6 @@ class NetconfTopologyImplTest {
     @Mock
     private DOMMountPointService mountPointService;
     @Mock
-    private AAAEncryptionService encryptionService;
-    @Mock
     private RpcProviderService rpcProviderService;
     @Mock
     private NetconfClientConfigurationBuilderFactory builderFactory;
@@ -96,7 +93,7 @@ class NetconfTopologyImplTest {
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(), mockedClientFactory,
             mockedTimer, MoreExecutors.directExecutor(), mockedResourceManager, dataBroker, mountPointService,
-            encryptionService, builderFactory, rpcProviderService,
+            builderFactory, rpcProviderService,
             new DefaultBaseNetconfSchemas(new DefaultYangParserFactory()));
         //verify initialization of topology
         verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, TOPOLOGY_PATH,
@@ -151,11 +148,10 @@ class NetconfTopologyImplTest {
         TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
                 final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
                 final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                final AAAEncryptionService encryptionService,
                 final NetconfClientConfigurationBuilderFactory builderFactory,
                 final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas) {
             super(topologyId, clientFactory, timer, processingExecutor, schemaRepositoryProvider,
-                dataBroker, mountPointService, encryptionService, builderFactory, rpcProviderService, baseSchemas);
+                dataBroker, mountPointService, builderFactory, rpcProviderService, baseSchemas);
         }
 
         @Override
