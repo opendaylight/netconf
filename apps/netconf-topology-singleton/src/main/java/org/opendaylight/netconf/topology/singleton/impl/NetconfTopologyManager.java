@@ -24,7 +24,6 @@ import java.util.concurrent.Executor;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
@@ -50,7 +49,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUti
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.netconf.topology.spi.NetconfTopologyRPCProvider;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -119,14 +118,13 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             @Reference final ActorSystemProvider actorSystemProvider,
             @Reference(target = "(type=netconf-client-factory)") final NetconfClientFactory clientFactory,
             @Reference final DOMMountPointService mountPointService,
-            @Reference final AAAEncryptionService encryptionService,
             @Reference final RpcProviderService rpcProviderService,
             @Reference final DeviceActionFactory deviceActionFactory,
             @Reference final SchemaResourceManager resourceManager,
             @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
             final Configuration configuration) {
         this(baseSchemas, dataBroker, clusterSingletonServiceProvider, timer, processingExecutor.getExecutor(),
-            actorSystemProvider.getActorSystem(), clientFactory, mountPointService, encryptionService,
+            actorSystemProvider.getActorSystem(), clientFactory, mountPointService,
             rpcProviderService, deviceActionFactory, resourceManager, builderFactory, configuration.topology$_$id(),
             Uint16.valueOf(configuration.write$_$transaction$_$idle$_$timeout()));
     }
@@ -136,11 +134,11 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final Timer timer,
             final ThreadPool processingExecutor, final ActorSystemProvider actorSystemProvider,
             final NetconfClientFactory clientFactory, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
+            final RpcProviderService rpcProviderService,
             final DeviceActionFactory deviceActionFactory, final SchemaResourceManager resourceManager,
             final NetconfClientConfigurationBuilderFactory builderFactory) {
         this(baseSchemas, dataBroker, clusterSingletonServiceProvider, timer, processingExecutor.getExecutor(),
-            actorSystemProvider.getActorSystem(), clientFactory, mountPointService, encryptionService,
+            actorSystemProvider.getActorSystem(), clientFactory, mountPointService,
             rpcProviderService, deviceActionFactory, resourceManager, builderFactory,
             NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, Uint16.ZERO);
     }
@@ -150,7 +148,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
             final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final Timer timer,
             final Executor processingExecutor, final ActorSystem actorSystem, final NetconfClientFactory clientFactory,
-            final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
+            final DOMMountPointService mountPointService,
             final RpcProviderService rpcProviderService, final DeviceActionFactory deviceActionFactory,
             final SchemaResourceManager resourceManager, final NetconfClientConfigurationBuilderFactory builderFactory,
             final String topologyId, final Uint16 writeTransactionIdleTimeout) {
@@ -169,7 +167,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         this.builderFactory = requireNonNull(builderFactory);
 
         dataChangeListenerRegistration = registerDataTreeChangeListener();
-        rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, topologyId);
+        rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, topologyId);
     }
 
     @Override
