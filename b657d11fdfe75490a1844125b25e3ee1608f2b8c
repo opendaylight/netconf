@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f2559f5_8356f22f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-11-21T07:49:16Z",
+      "side": 1,
+      "message": "I would prefer to create new model without revision instead of changing existing ones.",
+      "revId": "b657d11fdfe75490a1844125b25e3ee1608f2b8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
