@@ -21,13 +21,20 @@ import java.util.Iterator;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.SchemaEntity;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 public final class SchemasStream extends InputStream {
+    private static final String OBJECT_TYPE = "object";
+    private static final String INPUT_SUFFIX = "_input";
+    private static final String OUTPUT_SUFFIX = "_output";
+
     private final Iterator<? extends Module> iterator;
     private final OpenApiBodyWriter writer;
     private final EffectiveModelContext context;
@@ -106,44 +113,79 @@ public final class SchemasStream extends InputStream {
             final var rpcName = rpc.getQName().getLocalName();
             final var rpcInput = rpc.getInput();
             if (!rpcInput.getChildNodes().isEmpty()) {
-                final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + "_input", "object",
-                    stack, moduleName, false, definitionNames);
+                final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, OBJECT_TYPE,
+                    stack, moduleName, false, definitionNames, EntityType.RPC);
                 result.add(input);
             }
             final var rpcOutput = rpc.getOutput();
             if (!rpcOutput.getChildNodes().isEmpty()) {
-                final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + "_output", "object",
-                    stack, moduleName, false, definitionNames);
+                final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, OBJECT_TYPE,
+                    stack, moduleName, false, definitionNames, EntityType.RPC);
                 result.add(output);
             }
             stack.exit();
         }
 
         for (final var childNode : module.getChildNodes()) {
-            stack.enterSchemaTree(childNode.getQName());
-            if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
-                for (final var actionDef : ((ActionNodeContainer) childNode).getActions()) {
-                    stack.enterSchemaTree(actionDef.getQName());
-                    final var actionName = actionDef.getQName().getLocalName();
-                    final var actionInput = actionDef.getInput();
-                    if (!actionInput.getChildNodes().isEmpty()) {
-                        final var input = new SchemaEntity(actionInput, moduleName + "_" + actionName + "_input",
-                            "object", stack, moduleName, false, definitionNames);
-                        result.add(input);
-                    }
-                    final var actionOutput = actionDef.getInput();
-                    if (!actionOutput.getChildNodes().isEmpty()) {
-                        final var output = new SchemaEntity(actionOutput, moduleName + "_" + actionName + "_output",
-                            "object", stack, moduleName, false, definitionNames);
-                        result.add(output);
-                    }
-                    stack.exit();
-                }
+            processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
+                true);
+        }
+        return result;
+    }
+
+    private static void processDataAndActionNodes(final DataSchemaNode node, final String title,
+            final SchemaInferenceStack stack, final DefinitionNames definitionNames,
+            final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
+        if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
+            final var newTitle = title + "_" + node.getQName().getLocalName();
+            final var child = new SchemaEntity(node, newTitle, OBJECT_TYPE, stack, parentName, isParentConfig,
+                definitionNames, EntityType.NODE);
+            final var isConfig = node.isConfiguration() && isParentConfig;
+            result.add(child);
+            stack.enterSchemaTree(node.getQName());
+            processActions(node, title, stack, definitionNames, result, parentName);
+            for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
+                processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
+            }
+            stack.exit();
+        } else if (node instanceof ChoiceSchemaNode choiceNode) {
+            // Process default case or first case
+            final var caseNode = choiceNode.getDefaultCase()
+                .orElseGet(() -> choiceNode.getCases().stream().findFirst()
+                    .orElseThrow(() -> new IllegalStateException("No cases found in ChoiceSchemaNode")));
+            stack.enterSchemaTree(choiceNode.getQName());
+            stack.enterSchemaTree(caseNode.getQName());
+            for (final var childNode : caseNode.getChildNodes()) {
+                processDataAndActionNodes(childNode, title, stack, definitionNames, result, parentName, isParentConfig);
+            }
+            stack.exit(); // Exit the CaseSchemaNode context
+            stack.exit(); // Exit the ChoiceSchemaNode context
+        }
+    }
+
+    private static void processActions(final DataSchemaNode node, final String title, final SchemaInferenceStack stack,
+            final DefinitionNames definitionNames, final ArrayDeque<SchemaEntity> result, final String parentName) {
+        for (final var actionDef : ((ActionNodeContainer) node).getActions()) {
+            stack.enterSchemaTree(actionDef.getQName());
+            final var actionName = actionDef.getQName().getLocalName();
+            final var actionInput = actionDef.getInput();
+            if (!actionInput.getChildNodes().isEmpty()) {
+                final var input = new SchemaEntity(actionInput, title + "_" + actionName + INPUT_SUFFIX,
+                    OBJECT_TYPE, stack, parentName, false, definitionNames, EntityType.RPC);
+                result.add(input);
+            }
+            final var actionOutput = actionDef.getOutput();
+            if (!actionOutput.getChildNodes().isEmpty()) {
+                final var output = new SchemaEntity(actionOutput, title + "_" + actionName + OUTPUT_SUFFIX,
+                    OBJECT_TYPE, stack, parentName, false, definitionNames, EntityType.RPC);
+                result.add(output);
             }
             stack.exit();
         }
-        // child nodes
-        // etc.
-        return result;
+    }
+
+    public enum EntityType {
+        NODE,
+        RPC
     }
 }
