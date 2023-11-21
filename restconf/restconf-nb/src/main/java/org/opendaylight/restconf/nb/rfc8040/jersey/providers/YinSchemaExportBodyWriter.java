@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
+import org.opendaylight.restconf.nb.rfc8040.legacy.SchemaExportContext;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.model.export.YinExportUtils;
 
