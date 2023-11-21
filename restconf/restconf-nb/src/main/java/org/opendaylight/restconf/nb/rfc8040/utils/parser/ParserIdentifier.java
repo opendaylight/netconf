@@ -15,12 +15,9 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import java.text.ParseException;
 import java.time.format.DateTimeParseException;
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map.Entry;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -32,21 +29,16 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.SchemaExportContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Util class for parsing identifier.
  */
 public final class ParserIdentifier {
-    private static final Logger LOG = LoggerFactory.getLogger(ParserIdentifier.class);
-
     // FIXME: Remove this constant. All logic relying on this constant should instead rely on YangInstanceIdentifier
     //        equivalent coming out of argument parsing. This may require keeping List<YangInstanceIdentifier> as the
     //        nested path split on yang-ext:mount. This splitting needs to be based on consulting the
@@ -84,51 +76,6 @@ public final class ParserIdentifier {
         }
 
         return InstanceIdentifierContext.ofApiPath(apiPath, schemaContext, mountPointService);
-    }
-
-    /**
-     * Make a moduleName/Revision pair from identifier.
-     *
-     * @param identifier
-     *             path parameter
-     * @return {@link QName}
-     */
-    @VisibleForTesting
-    static Entry<String, Revision> makeQNameFromIdentifier(final String identifier) {
-        // check if more than one slash is not used as path separator
-        if (identifier.contains("//")) {
-            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' {}", identifier);
-            throw new RestconfDocumentedException(
-                    "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
-                    ErrorTag.INVALID_VALUE);
-        }
-
-        final int mountIndex = identifier.indexOf(MOUNT);
-        final String moduleNameAndRevision;
-        if (mountIndex >= 0) {
-            moduleNameAndRevision = identifier.substring(mountIndex + MOUNT.length()).replaceFirst("/", "");
-        } else {
-            moduleNameAndRevision = identifier;
-        }
-
-        final List<String> pathArgs = SLASH_SPLITTER.splitToList(moduleNameAndRevision);
-        if (pathArgs.size() != 2) {
-            LOG.debug("URI has bad format '{}'. It should be 'moduleName/yyyy-MM-dd'", identifier);
-            throw new RestconfDocumentedException(
-                    "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
-                    ErrorTag.INVALID_VALUE);
-        }
-
-        final Revision moduleRevision;
-        try {
-            moduleRevision = Revision.of(pathArgs.get(1));
-        } catch (final DateTimeParseException e) {
-            LOG.debug("URI has bad format: '{}'. It should be 'moduleName/yyyy-MM-dd'", identifier);
-            throw new RestconfDocumentedException("URI has bad format. It should be \'moduleName/yyyy-MM-dd\'",
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
-        }
-
-        return new SimpleImmutableEntry<>(pathArgs.get(0), moduleRevision);
     }
 
     /**
