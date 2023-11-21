@@ -16,7 +16,9 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.openapi.impl.DefinitionNames;
-import org.opendaylight.yangtools.yang.model.api.ContainerLike;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
@@ -75,7 +77,9 @@ public final class SchemaEntity extends OpenApiEntity {
     }
 
     private @Nullable String description() {
-        return value.getDescription().orElse(null);
+        // FIXME: Ensure the method returns null if the description is not available.
+        return value.getDescription()
+            .orElse(value instanceof InputSchemaNode || value instanceof OutputSchemaNode ? null : "");
     }
 
     private @Nullable String reference() {
@@ -110,13 +114,12 @@ public final class SchemaEntity extends OpenApiEntity {
     }
 
     private void generateProperties(final @NonNull JsonGenerator generator) throws IOException {
-
         final var required = new ArrayList<String>();
-        final var childNodes = ((ContainerLike) value).getChildNodes();
-        stack.enterSchemaTree(value.getQName());
         generator.writeObjectFieldStart("properties");
-        for (final var node : childNodes) {
-            new PropertyEntity(node, generator, stack, required, parentName, isParentConfig, definitionNames);
+        stack.enterSchemaTree(value.getQName());
+        for (final var childNode : ((DataNodeContainer) value).getChildNodes()) {
+            new PropertyEntity(childNode, generator, stack, required, parentName + "_"
+                + value.getQName().getLocalName(), isParentConfig, definitionNames);
         }
         generator.writeEndObject();
         generateRequired(generator, required);
