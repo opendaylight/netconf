@@ -1,0 +1,327 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3a33586_2c9d33ec",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea50ae2b_ed7547aa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6134929e_8366cf07",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c14a18c_e2880ef0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4ef7e61_c3319aa9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fdddb26_e4ca8ebd",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48634c3c_561f83b9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdf6dff2_b5015157",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56b3ff6d_00a91afc",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 479,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "269bba93_a07839c2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "242d45b9_839910c4",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36420e81_1bb81864",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 585,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4374a88a_695c8736",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 591,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "470db99e_ed17a4d7",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 593,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c02a824_24c0d291",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef89a663_8e254c95",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "final",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f875d419_d346c677",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "final",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55518b99_8fff1a0e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "final var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fd22b65_7d665c51",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T15:44:00Z",
+      "side": 1,
+      "message": "var",
+      "revId": "bf6c2c8cc3cc207030220b8e04a570bbf13ab4c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
