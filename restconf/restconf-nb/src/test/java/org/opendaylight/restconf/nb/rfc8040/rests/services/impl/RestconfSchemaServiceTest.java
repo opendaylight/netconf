@@ -96,10 +96,10 @@ public class RestconfSchemaServiceTest {
         assertNotNull(exportContext);
 
         final var module = exportContext.module();
-        assertNotNull(module);
-        assertEquals("module1", module.getName());
-        assertEquals(Revision.ofNullable("2014-01-01"), module.getRevision());
-        assertEquals("module:1", module.getNamespace().toString());
+        assertEquals("module1", module.argument().getLocalName());
+        final var namespace = module.localQNameModule();
+        assertEquals(Revision.ofNullable("2014-01-01"), namespace.getRevision());
+        assertEquals("module:1", namespace.getNamespace().toString());
     }
 
     /**
@@ -137,11 +137,10 @@ public class RestconfSchemaServiceTest {
         assertNotNull(exportContext);
 
         final var module = exportContext.module();
-        assertNotNull(module);
-
-        assertEquals("module1-behind-mount-point", module.getName());
-        assertEquals(Revision.ofNullable("2014-02-03"), module.getRevision());
-        assertEquals("module:1:behind:mount:point", module.getNamespace().toString());
+        assertEquals("module1-behind-mount-point", module.argument().getLocalName());
+        final var namespace = module.localQNameModule();
+        assertEquals(Revision.ofNullable("2014-02-03"), namespace.getRevision());
+        assertEquals("module:1:behind:mount:point", namespace.getNamespace().toString());
     }
 
     /**
