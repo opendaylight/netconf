@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -22,11 +21,16 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Response;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconfCallback;
 import org.opendaylight.restconf.nb.rfc8040.legacy.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -36,7 +40,6 @@ import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 
 /**
  * Retrieval of the YANG modules which server supports.
@@ -77,9 +80,14 @@ public class RestconfSchemaServiceImpl {
     @GET
     @Produces({ YangConstants.RFC6020_YIN_MEDIA_TYPE, YangConstants.RFC6020_YANG_MEDIA_TYPE })
     @Path("modules/{identifier:.+}")
-    public SchemaExportContext getSchema(@PathParam("identifier") final String identifier) {
-        return toSchemaExportContextFromIdentifier(schemaService.getGlobalContext(), identifier, mountPointService,
-            sourceProvider);
+    public void getSchema(@PathParam("identifier") final String identifier, @Suspended final AsyncResponse ar) {
+        toSchemaExportContextFromIdentifier(schemaService.getGlobalContext(), identifier, mountPointService,
+            sourceProvider).addCallback(new JaxRsRestconfCallback<>(ar) {
+                @Override
+                protected Response transform(final SchemaExportContext result) {
+                    return Response.ok(result).build();
+                }
+            });
     }
 
     /**
@@ -96,38 +104,58 @@ public class RestconfSchemaServiceImpl {
      * @return {@link SchemaExportContext}
      */
     @VisibleForTesting
-    static SchemaExportContext toSchemaExportContextFromIdentifier(final EffectiveModelContext schemaContext,
-            final String identifier, final DOMMountPointService domMountPointService,
-            final DOMYangTextSourceProvider sourceProvider) {
+    static @NonNull RestconfFuture<SchemaExportContext> toSchemaExportContextFromIdentifier(
+            final EffectiveModelContext schemaContext, final String identifier,
+            final DOMMountPointService domMountPointService, final DOMYangTextSourceProvider sourceProvider) {
         final var pathComponents = SLASH_SPLITTER.split(identifier);
-        final var componentIter = pathComponents.iterator();
-        if (!Iterables.contains(pathComponents, MOUNT)) {
-            final var module = coerceModule(schemaContext, validateAndGetModulName(componentIter),
-                validateAndGetRevision(componentIter), null);
-            return new SchemaExportContext(schemaContext, module, sourceProvider);
-        }
 
-        final var pathBuilder = new StringBuilder();
-        while (componentIter.hasNext()) {
-            final var current = componentIter.next();
-            if (MOUNT.equals(current)) {
-                pathBuilder.append('/').append(MOUNT);
-                break;
+        final var it = pathComponents.iterator();
+        final EffectiveModelContext context;
+        final Object debugName;
+        if (Iterables.contains(pathComponents, MOUNT)) {
+            final var pathBuilder = new StringBuilder();
+            while (it.hasNext()) {
+                final var current = it.next();
+                if (MOUNT.equals(current)) {
+                    pathBuilder.append('/').append(MOUNT);
+                    break;
+                }
+
+                if (!pathBuilder.isEmpty()) {
+                    pathBuilder.append('/');
+                }
+                pathBuilder.append(current);
             }
 
-            if (!pathBuilder.isEmpty()) {
-                pathBuilder.append('/');
-            }
-            pathBuilder.append(current);
-        }
-        final var point = ParserIdentifier.toInstanceIdentifier(pathBuilder.toString(), schemaContext,
+            final var point = ParserIdentifier.toInstanceIdentifier(pathBuilder.toString(), schemaContext,
                 requireNonNull(domMountPointService));
-        final var context = coerceModelContext(point.getMountPoint());
-        final var module = coerceModule(context, validateAndGetModulName(componentIter),
-            validateAndGetRevision(componentIter), point.getMountPoint());
-        return new SchemaExportContext(context, module, sourceProvider);
-    }
+            final var mountPoint = point.getMountPoint();
+            debugName = mountPoint.getIdentifier();
+            context = mountPoint.getService(DOMSchemaService.class)
+                .map(DOMSchemaService::getGlobalContext)
+                .orElse(null);
+            if (context == null) {
+                return RestconfFuture.failed(new RestconfDocumentedException(
+                    "Mount point '" + debugName + "' does not have a model context"));
+            }
+        } else {
+            context = requireNonNull(schemaContext);
+            debugName = "controller";
+        }
 
+        final var moduleName = validateAndGetModulName(it);
+        final var revision = validateAndGetRevision(it);
+        final var optModule = context.findModule(moduleName, revision);
+        if (optModule.isEmpty()) {
+            return RestconfFuture.failed(new RestconfDocumentedException(
+                "Module %s %s cannot be found on %s.".formatted(moduleName, revision, debugName),
+                ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
+        }
+
+        return RestconfFuture.of(new SchemaExportContext(context, optModule.orElseThrow().asEffectiveStatement(),
+            // FIXME: this does not seem right -- mounts should have their own thing
+            sourceProvider));
+    }
 
     /**
      * Validation and parsing of revision.
@@ -175,28 +203,5 @@ public class RestconfSchemaServiceImpl {
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
         return name;
-    }
-
-    private static ModuleEffectiveStatement coerceModule(final EffectiveModelContext context, final String moduleName,
-            final Revision revision, final DOMMountPoint mountPoint) {
-        return context.findModule(moduleName, revision)
-            .map(Module::asEffectiveStatement)
-            .orElseThrow(() -> {
-                final var msg = "Module %s %s cannot be found on %s.".formatted(moduleName, revision,
-                    mountPoint == null ? "controller" : mountPoint.getIdentifier());
-                return new RestconfDocumentedException(msg, ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
-            });
-    }
-
-    private static EffectiveModelContext coerceModelContext(final DOMMountPoint mountPoint) {
-        final EffectiveModelContext context = modelContext(mountPoint);
-        checkState(context != null, "Mount point %s does not have a model context", mountPoint);
-        return context;
-    }
-
-    private static EffectiveModelContext modelContext(final DOMMountPoint mountPoint) {
-        return mountPoint.getService(DOMSchemaService.class)
-            .map(DOMSchemaService::getGlobalContext)
-            .orElse(null);
     }
 }
