@@ -59,10 +59,8 @@ class RestconfModulesGetTest {
      */
     @Test
     void toSchemaExportContextFromIdentifierTest() {
-        final var exportContext = RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(
-                MODEL_CONTEXT, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null, sourceProvider);
-        assertNotNull(exportContext);
-
+        final var exportContext = RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
+            TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null, sourceProvider).getOrThrow();
         final var module = exportContext.module();
         assertNotNull(module);
         assertEquals(TEST_MODULE_NAME, module.argument().getLocalName());
@@ -79,7 +77,8 @@ class RestconfModulesGetTest {
     void toSchemaExportContextFromIdentifierNotFoundTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(
-                MODEL_CONTEXT, "not-existing-module" + "/" + "2016-01-01", null, sourceProvider));
+                MODEL_CONTEXT, "not-existing-module" + "/" + "2016-01-01", null, sourceProvider)
+            .getOrThrow());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -116,7 +115,7 @@ class RestconfModulesGetTest {
 
         final var exportContext = RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
             MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
-            mountPointService, sourceProvider);
+            mountPointService, sourceProvider).getOrThrow();
 
         final var module = exportContext.module();
         assertEquals(TEST_MODULE_NAME, module.argument().getLocalName());
@@ -137,7 +136,8 @@ class RestconfModulesGetTest {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
                 MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
-                mountPointService, sourceProvider));
+                mountPointService, sourceProvider)
+            .getOrThrow());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);

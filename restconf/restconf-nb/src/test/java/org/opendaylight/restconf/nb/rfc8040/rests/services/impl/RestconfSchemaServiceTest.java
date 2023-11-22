@@ -9,8 +9,9 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
+import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertEntity;
+import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertError;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import org.junit.Before;
@@ -22,8 +23,8 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
+import org.opendaylight.restconf.nb.rfc8040.legacy.SchemaExportContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -76,8 +77,8 @@ public class RestconfSchemaServiceTest {
                 .createMountPoint(YangInstanceIdentifier.of(QName.create("mount:point:2", "2016-01-01", "cont")))
                 .register();
 
-        when(mockSchemaService.getExtensions())
-            .thenReturn(ImmutableClassToInstanceMap.of(DOMYangTextSourceProvider.class, mockSourceProvider));
+        doReturn(ImmutableClassToInstanceMap.of(DOMYangTextSourceProvider.class, mockSourceProvider))
+            .when(mockSchemaService).getExtensions();
         schemaService = new RestconfSchemaServiceImpl(mockSchemaService, mountPointService);
     }
 
@@ -87,10 +88,11 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaTest() {
         // prepare conditions - return not-mount point schema context
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
+        doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
         // make test
-        final var exportContext = schemaService.getSchema(TEST_MODULE);
+        final var exportContext = assertEntity(SchemaExportContext.class, 200,
+            ar -> schemaService.getSchema(TEST_MODULE, ar));
 
         // verify
         assertNotNull(exportContext);
@@ -109,14 +111,9 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaForNotExistingModuleTest() {
         // prepare conditions - return not-mount point schema context
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
+        doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
-        // make test & verify
-        final var ex = assertThrows(RestconfDocumentedException.class, () ->
-            schemaService.getSchema(NOT_EXISTING_MODULE));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> schemaService.getSchema(NOT_EXISTING_MODULE, ar));
         assertEquals("Module not-existing 2016-01-01 cannot be found on controller.", error.getErrorMessage());
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
@@ -128,10 +125,11 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaMountPointTest() {
         // prepare conditions - return schema context with mount points
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
+        doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test
-        final var exportContext = schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT);
+        final var exportContext = assertEntity(SchemaExportContext.class, 200,
+            ar -> schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT, ar));
 
         // verify
         assertNotNull(exportContext);
@@ -150,44 +148,13 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaForNotExistingModuleMountPointTest() {
         // prepare conditions - return schema context with mount points
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
+        doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
-        // make test & verify
-        final var ex = assertThrows(RestconfDocumentedException.class, () ->
-            schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE, ar));
         assertEquals("Module not-existing 2016-01-01 cannot be found on /(mount:point:1?revision=2016-01-01)cont.",
             error.getErrorMessage());
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
-    }
-
-    /**
-     * Try to get schema with <code>null</code> <code>SchemaContext</code> expecting <code>NullPointerException</code>.
-     */
-    @Test
-    public void getSchemaWithNullSchemaContextTest() {
-        // prepare conditions - returned schema context is null
-        when(mockSchemaService.getGlobalContext()).thenReturn(null);
-
-        // make test
-        assertThrows(NullPointerException.class, () -> schemaService.getSchema(TEST_MODULE));
-    }
-
-    /**
-     * Try to get schema with <code>null</code> <code>SchemaContext</code> for mount points.
-     * <code>NullPointerException</code> is expected.
-     */
-    @Test
-    public void getSchemaWithNullSchemaContextMountPointTest() {
-        // prepare conditions - returned schema context for mount points is null
-        when(mockSchemaService.getGlobalContext()).thenReturn(null);
-
-        // make test
-        assertThrows(NullPointerException.class,
-            () -> schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT));
     }
 
     /**
@@ -197,31 +164,15 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaNullSchemaContextBehindMountPointTest() {
         // prepare conditions - return correct schema context for mount points (this is not null)
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
+        doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test - call service on mount point with null schema context
-        final var errors = assertThrows(RestconfDocumentedException.class,
-            // NULL_MOUNT_POINT contains null schema context
-            () -> schemaService.getSchema(NULL_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT))
-            .getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        // NULL_MOUNT_POINT contains null schema context
+        final var error = assertError(
+            ar -> schemaService.getSchema(NULL_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT, ar));
         assertEquals("Mount point mount-point-2:cont does not expose DOMSchemaService", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.getErrorTag());
-    }
-
-    /**
-     * Try to get schema with null identifier expecting <code>NullPointerException</code>. The same processing is for
-     * server and also for mount point.
-     */
-    @Test
-    public void getSchemaWithNullIdentifierTest() {
-        // prepare conditions - return correct schema context
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
-
-        // make test
-        assertThrows(NullPointerException.class, () -> schemaService.getSchema(null));
     }
 
     /**
@@ -231,13 +182,9 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithEmptyIdentifierTest() {
         // prepare conditions - return correct schema context
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
+        doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
-        // make test and verify
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> schemaService.getSchema(""));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> schemaService.getSchema("", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -251,13 +198,10 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithEmptyIdentifierMountPointTest() {
         // prepare conditions - return correct schema context with mount points
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
+        doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> schemaService.getSchema(MOUNT_POINT + ""));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> schemaService.getSchema(MOUNT_POINT + "", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -270,14 +214,10 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithNotParsableIdentifierTest() {
         // prepare conditions - return correct schema context without mount points
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
+        doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> schemaService.getSchema("01_module/2016-01-01"));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> schemaService.getSchema("01_module/2016-01-01", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -291,14 +231,10 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithNotParsableIdentifierMountPointTest() {
         // prepare conditions - return correct schema context with mount points
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
+        doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> schemaService.getSchema(MOUNT_POINT + "01_module/2016-01-01"));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> schemaService.getSchema(MOUNT_POINT + "01_module/2016-01-01", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -314,13 +250,10 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWrongIdentifierTest() {
         // prepare conditions - return correct schema context without mount points
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
+        doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> schemaService.getSchema("2014-01-01"));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> schemaService.getSchema("2014-01-01", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -337,14 +270,10 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWrongIdentifierMountPointTest() {
         // prepare conditions - return correct schema context with mount points
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
+        doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> schemaService.getSchema(MOUNT_POINT + "2014-01-01"));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> schemaService.getSchema(MOUNT_POINT + "2014-01-01", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -358,13 +287,10 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithoutRevisionTest() {
         // prepare conditions - return correct schema context without mount points
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
+        doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> schemaService.getSchema("module"));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> schemaService.getSchema("module", ar));
         assertEquals("Revision date must be supplied.", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -378,14 +304,10 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithoutRevisionMountPointTest() {
         // prepare conditions - return correct schema context with mount points
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
+        doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> schemaService.getSchema(MOUNT_POINT + "module"));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(ar -> schemaService.getSchema(MOUNT_POINT + "module", ar));
         assertEquals("Revision date must be supplied.", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -398,14 +320,10 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaContextWithNotExistingMountPointTest() {
         // prepare conditions - return schema context with mount points
-        when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
+        doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
-        // make test
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> schemaService.getSchema(NOT_EXISTING_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(
+            ar -> schemaService.getSchema(NOT_EXISTING_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT, ar));
         assertEquals("Failed to lookup for module with name 'mount-point-3'.", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.UNKNOWN_ELEMENT, error.getErrorTag());
