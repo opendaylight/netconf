@@ -27,6 +27,7 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -240,7 +241,7 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierTest() {
-        final var exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
+        final var exportContext = RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(
                 MODEL_CONTEXT, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null, sourceProvider);
 
         assertNotNull("Export context should be parsed", exportContext);
@@ -260,7 +261,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierNotFoundTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(
                 MODEL_CONTEXT, "not-existing-module" + "/" + "2016-01-01", null, sourceProvider));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
@@ -278,7 +279,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierInvalidIdentifierNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
                 TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, null, sourceProvider));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
@@ -294,7 +295,7 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierMountPointTest() {
-        final var exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
+        final var exportContext = RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
             MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
             mountPointService, sourceProvider);
 
@@ -312,7 +313,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierMountPointNotFoundTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
                 MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
                 mountPointService, sourceProvider));
         final var errors = ex.getErrors();
@@ -332,7 +333,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierMountPointInvalidIdentifierNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
                 MOUNT_POINT_IDENT + "/" + TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, mountPointService,
                 sourceProvider));
         final var errors = ex.getErrors();
@@ -350,7 +351,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierNullIdentifierNegativeTest() {
         assertThrows(NullPointerException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT, null, null, sourceProvider));
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT, null, null, sourceProvider));
     }
 
     /**
@@ -359,7 +360,7 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierNullSchemaContextNegativeTest() {
-        assertThrows(NullPointerException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(null,
+        assertThrows(NullPointerException.class, () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(null,
             TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null, sourceProvider));
     }
 
@@ -370,7 +371,7 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierMountPointNullSchemaContextNegativeTest() {
-        assertThrows(NullPointerException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(null,
+        assertThrows(NullPointerException.class, () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(null,
             MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, mountPointService,
             sourceProvider));
     }
@@ -382,7 +383,7 @@ public class ParserIdentifierTest {
      */
     @Test
     public void toSchemaExportContextFromIdentifierNullMountPointServiceNegativeTest() {
-        assertThrows(NullPointerException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
+        assertThrows(NullPointerException.class, () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(
             MODEL_CONTEXT, MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null,
             sourceProvider));
     }
@@ -390,7 +391,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierNullSchemaContextBehindMountPointNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
                 "/yang-ext:mount/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, mockMountPointService,
                 sourceProvider));
         final var errors = ex.getErrors();
