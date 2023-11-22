@@ -15,11 +15,17 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
 import java.text.ParseException;
 import java.util.HexFormat;
 import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.concepts.HierarchicalIdentifier;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName;
 import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
@@ -30,7 +36,10 @@ import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
  * as a series of {@link Step}s.
  */
 @NonNullByDefault
-public final class ApiPath implements Immutable {
+public final class ApiPath implements HierarchicalIdentifier<ApiPath> {
+    @java.io.Serial
+    private static final long serialVersionUID = 1L;
+
     /**
      * A single step in an {@link ApiPath}.
      */
@@ -207,16 +216,57 @@ public final class ApiPath implements Immutable {
         return str.isEmpty() ? EMPTY : parseString(ApiPathParser.newUrl(), str);
     }
 
+    /**
+     * Return the {@link Step}s of this path.
+     *
+     * @return Path steps
+     */
     public ImmutableList<Step> steps() {
         return steps;
     }
 
+    @Override
+    public boolean contains(final ApiPath other) {
+        if (this == other) {
+            return true;
+        }
+        final var oit = other.steps.iterator();
+        for (var step : steps) {
+            if (!oit.hasNext() || !step.equals(oit.next())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns the index of a Step in this path matching specified module and identifier. This method is equivalent to
+     * {@code indexOf(module, identifier, 0)}.
+     *
+     * @param module Requested {@link Step#module()}
+     * @param identifier Requested {@link Step#identifier()}
+     * @return Index of the step in {@link #steps}, or {@code -1} if a matching step is not found
+     * @throws NullPointerException if {@code identifier} is {@code null}
+     */
     public int indexOf(final String module, final String identifier) {
-        final var m = requireNonNull(module);
+        return indexOf(module, identifier, 0);
+    }
+
+    /**
+     * Returns the index of a Step in this path matching specified module and identifier, starting search at specified
+     * index.
+     *
+     * @param module Requested {@link Step#module()}
+     * @param identifier Requested {@link Step#identifier()}
+     * @param fromIndex index from which to search
+     * @return Index of the step in {@link #steps}, or {@code -1} if a matching step is not found
+     * @throws NullPointerException if {@code identifier} is {@code null}
+     */
+    public int indexOf(final String module, final String identifier, final int fromIndex) {
         final var id = requireNonNull(identifier);
-        for (int i = 0, size = steps.size(); i < size; ++i) {
+        for (int i = fromIndex, size = steps.size(); i < size; ++i) {
             final var step = steps.get(i);
-            if (m.equals(step.module) && id.equals(step.identifier.getLocalName())) {
+            if (id.equals(step.identifier.getLocalName()) && Objects.equals(module, step.module)) {
                 return i;
             }
         }
@@ -264,6 +314,30 @@ public final class ApiPath implements Immutable {
             }
         }
         return sb.toString();
+    }
+
+    @java.io.Serial
+    Object writeReplace() throws ObjectStreamException {
+        return new APv1(toString());
+    }
+
+    @java.io.Serial
+    private void writeObject(final ObjectOutputStream stream) throws IOException {
+        throw nse();
+    }
+
+    @java.io.Serial
+    private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        throw nse();
+    }
+
+    @java.io.Serial
+    private void readObjectNoData() throws ObjectStreamException {
+        throw nse();
+    }
+
+    private NotSerializableException nse() {
+        return new NotSerializableException(getClass().getName());
     }
 
     private static ApiPath parseString(final ApiPathParser parser, final String str) throws ParseException {
