@@ -34,6 +34,7 @@ import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 
 /**
  * Util class for parsing identifier.
@@ -94,37 +95,33 @@ public final class ParserIdentifier {
     public static SchemaExportContext toSchemaExportContextFromIdentifier(final EffectiveModelContext schemaContext,
             final String identifier, final DOMMountPointService domMountPointService,
             final DOMYangTextSourceProvider sourceProvider) {
-        final Iterable<String> pathComponents = SLASH_SPLITTER.split(identifier);
-        final Iterator<String> componentIter = pathComponents.iterator();
+        final var pathComponents = SLASH_SPLITTER.split(identifier);
+        final var componentIter = pathComponents.iterator();
         if (!Iterables.contains(pathComponents, MOUNT)) {
-            final String moduleName = validateAndGetModulName(componentIter);
-            final Revision revision = validateAndGetRevision(componentIter);
-            final Module module = coerceModule(schemaContext, moduleName, revision, null);
+            final var module = coerceModule(schemaContext, validateAndGetModulName(componentIter),
+                validateAndGetRevision(componentIter), null);
             return new SchemaExportContext(schemaContext, module, sourceProvider);
-        } else {
-            final StringBuilder pathBuilder = new StringBuilder();
-            while (componentIter.hasNext()) {
-                final String current = componentIter.next();
-
-                if (MOUNT.equals(current)) {
-                    pathBuilder.append('/').append(MOUNT);
-                    break;
-                }
-
-                if (pathBuilder.length() != 0) {
-                    pathBuilder.append('/');
-                }
-
-                pathBuilder.append(current);
-            }
-            final InstanceIdentifierContext point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
-                requireNonNull(domMountPointService));
-            final String moduleName = validateAndGetModulName(componentIter);
-            final Revision revision = validateAndGetRevision(componentIter);
-            final EffectiveModelContext context = coerceModelContext(point.getMountPoint());
-            final Module module = coerceModule(context, moduleName, revision, point.getMountPoint());
-            return new SchemaExportContext(context, module, sourceProvider);
         }
+
+        final var pathBuilder = new StringBuilder();
+        while (componentIter.hasNext()) {
+            final var current = componentIter.next();
+            if (MOUNT.equals(current)) {
+                pathBuilder.append('/').append(MOUNT);
+                break;
+            }
+
+            if (!pathBuilder.isEmpty()) {
+                pathBuilder.append('/');
+            }
+            pathBuilder.append(current);
+        }
+        final var point = toInstanceIdentifier(pathBuilder.toString(), schemaContext,
+                requireNonNull(domMountPointService));
+        final var context = coerceModelContext(point.getMountPoint());
+        final var module = coerceModule(context, validateAndGetModulName(componentIter),
+            validateAndGetRevision(componentIter), point.getMountPoint());
+        return new SchemaExportContext(context, module, sourceProvider);
     }
 
     /**
@@ -175,15 +172,15 @@ public final class ParserIdentifier {
         return name;
     }
 
-    private static Module coerceModule(final EffectiveModelContext context, final String moduleName,
+    private static ModuleEffectiveStatement coerceModule(final EffectiveModelContext context, final String moduleName,
             final Revision revision, final DOMMountPoint mountPoint) {
-        final var module = context.findModule(moduleName, revision);
-        if (module.isEmpty()) {
-            final var msg = "Module %s %s cannot be found on %s.".formatted(moduleName, revision,
-                mountPoint == null ? "controller" : mountPoint.getIdentifier());
-            throw new RestconfDocumentedException(msg, ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
-        }
-        return module.orElseThrow();
+        return context.findModule(moduleName, revision)
+            .map(Module::asEffectiveStatement)
+            .orElseThrow(() -> {
+                final var msg = "Module %s %s cannot be found on %s.".formatted(moduleName, revision,
+                    mountPoint == null ? "controller" : mountPoint.getIdentifier());
+                return new RestconfDocumentedException(msg, ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+            });
     }
 
     private static EffectiveModelContext coerceModelContext(final DOMMountPoint mountPoint) {

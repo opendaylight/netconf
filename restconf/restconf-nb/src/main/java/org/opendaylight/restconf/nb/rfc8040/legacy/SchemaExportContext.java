@@ -9,18 +9,20 @@ package org.opendaylight.restconf.nb.rfc8040.legacy;
 
 import static java.util.Objects.requireNonNull;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
 /**
  * Holder of schema export context.
  */
+@NonNullByDefault
 public record SchemaExportContext(
-    @NonNull EffectiveModelContext schemaContext,
-    @NonNull Module module,
-    @NonNull DOMYangTextSourceProvider sourceProvider) {
+    EffectiveModelContext schemaContext,
+    ModuleEffectiveStatement module,
+    SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
 
     public SchemaExportContext {
         requireNonNull(schemaContext);
