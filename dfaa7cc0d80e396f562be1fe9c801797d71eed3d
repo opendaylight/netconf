@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c468e6a_268fb92b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsSteam.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T14:43:02Z",
+      "side": 1,
+      "message": "urlPrefix from MountPointOpenApi should be used to create paths for connected devices.",
+      "revId": "dfaa7cc0d80e396f562be1fe9c801797d71eed3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c0fabf1_f843d617",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/OperationEntity.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T14:43:02Z",
+      "side": 1,
+      "message": "return schema.getDescription().orElse(\"\") \n\ndescription is never null in old implementation, there were used empty string in every operation.",
+      "revId": "dfaa7cc0d80e396f562be1fe9c801797d71eed3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f3ba8e7_f95e20cd",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PostEntity.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-22T14:43:02Z",
+      "side": 1,
+      "message": "JSON content is not generated correctly\n\ngenerator.writeObjectFieldStart(MediaType.APPLICATION_JSON);\ngenerator.writeObjectFieldStart(SCHEMA);\ngenerator.writeObjectFieldStart(\"properties\");\ngenerator.writeObjectFieldStart(INPUT_KEY);\ngenerator.writeStringField(\"$ref\", ref);\ngenerator.writeStringField(TYPE, OBJECT);\ngenerator.writeEndObject();\ngenerator.writeEndObject();\ngenerator.writeEndObject();\ngenerator.writeEndObject();\n\nyou should use something like this.",
+      "revId": "dfaa7cc0d80e396f562be1fe9c801797d71eed3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
