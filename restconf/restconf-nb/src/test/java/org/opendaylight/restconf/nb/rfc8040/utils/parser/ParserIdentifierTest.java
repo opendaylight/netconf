@@ -247,9 +247,10 @@ public class ParserIdentifierTest {
 
         final var module = exportContext.module();
         assertNotNull(module);
-        assertEquals(TEST_MODULE_NAME, module.getName());
-        assertEquals(Revision.ofNullable(TEST_MODULE_REVISION), module.getRevision());
-        assertEquals(TEST_MODULE_NAMESPACE, module.getNamespace().toString());
+        assertEquals(TEST_MODULE_NAME, module.argument().getLocalName());
+        final var namespace = module.localQNameModule();
+        assertEquals(Revision.ofNullable(TEST_MODULE_REVISION), namespace.getRevision());
+        assertEquals(TEST_MODULE_NAMESPACE, namespace.getNamespace().toString());
     }
 
     /**
@@ -298,11 +299,10 @@ public class ParserIdentifierTest {
             mountPointService, sourceProvider);
 
         final var module = exportContext.module();
-        assertNotNull(module);
-
-        assertEquals(TEST_MODULE_NAME, module.getName());
-        assertEquals(Revision.ofNullable(TEST_MODULE_REVISION), module.getRevision());
-        assertEquals(TEST_MODULE_NAMESPACE, module.getNamespace().toString());
+        assertEquals(TEST_MODULE_NAME, module.argument().getLocalName());
+        final var namespace = module.localQNameModule();
+        assertEquals(Revision.ofNullable(TEST_MODULE_REVISION), namespace.getRevision());
+        assertEquals(TEST_MODULE_NAMESPACE, namespace.getNamespace().toString());
     }
 
     /**

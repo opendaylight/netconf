@@ -28,7 +28,7 @@ public class YinSchemaExportBodyWriter extends AbstractSchemaExportBodyWriter {
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException {
         try {
-            YinExportUtils.writeModuleAsYinText(context.module().asEffectiveStatement(), entityStream);
+            YinExportUtils.writeModuleAsYinText(context.module(), entityStream);
         } catch (final XMLStreamException e) {
             throw new IOException("Failed to export module", e);
         }
