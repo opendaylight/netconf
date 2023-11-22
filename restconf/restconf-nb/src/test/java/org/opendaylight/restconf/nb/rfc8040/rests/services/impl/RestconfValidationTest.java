@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.utils.parser;
+package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -33,7 +34,7 @@ class RestconfValidationTest {
      */
     @Test
     void validateAndGetRevisionTest() {
-        assertEquals(Revision.of("2014-01-01"), ParserIdentifier.validateAndGetRevision(REVISIONS.iterator()));
+        assertEquals(Revision.of("2014-01-01"), RestconfSchemaServiceImpl.validateAndGetRevision(REVISIONS.iterator()));
     }
 
     /**
@@ -43,7 +44,7 @@ class RestconfValidationTest {
     @Test
     void validateAndGetRevisionNotSuppliedTest() {
         final var error = assertInvalidValue(
-            () -> ParserIdentifier.validateAndGetRevision(Collections.emptyIterator()));
+            () -> RestconfSchemaServiceImpl.validateAndGetRevision(Collections.emptyIterator()));
         assertEquals("Revision date must be supplied.", error.getErrorMessage());
     }
 
@@ -54,7 +55,8 @@ class RestconfValidationTest {
     @Test
     void validateAndGetRevisionNotParsableTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.validateAndGetRevision(Iterators.singletonIterator("not-parsable-as-date")));
+            () -> RestconfSchemaServiceImpl.validateAndGetRevision(Iterators.singletonIterator(
+                "not-parsable-as-date")));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -68,7 +70,7 @@ class RestconfValidationTest {
      */
     @Test
     void validateAndGetModulNameTest() {
-        assertEquals("_module-1", ParserIdentifier.validateAndGetModulName(NAMES.iterator()));
+        assertEquals("_module-1", RestconfSchemaServiceImpl.validateAndGetModulName(NAMES.iterator()));
     }
 
     /**
@@ -78,7 +80,7 @@ class RestconfValidationTest {
     @Test
     void validateAndGetModulNameNotSuppliedTest() {
         final var error = assertInvalidValue(
-            () -> ParserIdentifier.validateAndGetModulName(Collections.emptyIterator()));
+            () -> RestconfSchemaServiceImpl.validateAndGetModulName(Collections.emptyIterator()));
         assertEquals("Module name must be supplied.", error.getErrorMessage());
     }
 
@@ -90,7 +92,7 @@ class RestconfValidationTest {
     @Test
     void validateAndGetModuleNameNotParsableFirstTest() {
         final var error = assertInvalidValue(
-            () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator(
+            () -> RestconfSchemaServiceImpl.validateAndGetModulName(Iterators.singletonIterator(
                 "01-not-parsable-as-name-on-firts-char")));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
     }
@@ -102,8 +104,9 @@ class RestconfValidationTest {
      */
     @Test
     public void validateAndGetModuleNameNotParsableNextTest() {
-        final var error = assertInvalidValue(() -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator(
-            "not-parsable-as-name-after-first-char*")));
+        final var error = assertInvalidValue(
+            () -> RestconfSchemaServiceImpl.validateAndGetModulName(Iterators.singletonIterator(
+                "not-parsable-as-name-after-first-char*")));
         assertEquals("Supplied name has not expected identifier format.", error.getErrorMessage());
     }
 
@@ -114,7 +117,7 @@ class RestconfValidationTest {
     @Test
     void validateAndGetModuleNameNotParsableXmlTest() {
         final var error = assertInvalidValue(
-            () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator("xMl-module-name")));
+            () -> RestconfSchemaServiceImpl.validateAndGetModulName(Iterators.singletonIterator("xMl-module-name")));
         assertEquals("Identifier must NOT start with XML ignore case.", error.getErrorMessage());
     }
 
@@ -125,7 +128,7 @@ class RestconfValidationTest {
     @Test
     void validateAndGetModuleNameEmptyTest() {
         final var error = assertInvalidValue(
-            () -> ParserIdentifier.validateAndGetModulName(Iterators.singletonIterator("")));
+            () -> RestconfSchemaServiceImpl.validateAndGetModulName(Iterators.singletonIterator("")));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
     }
 

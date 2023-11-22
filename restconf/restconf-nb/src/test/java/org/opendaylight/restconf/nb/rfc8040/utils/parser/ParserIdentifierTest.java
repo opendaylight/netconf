@@ -7,21 +7,16 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
@@ -30,7 +25,6 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -38,13 +32,9 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 /**
  * Unit tests for {@link ParserIdentifier}.
  */
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ParserIdentifierTest {
     // mount point identifier
     private static final String MOUNT_POINT_IDENT = "mount-point:mount-container/point-number/yang-ext:mount";
-
-    // invalid mount point identifier
-    private static final String INVALID_MOUNT_POINT_IDENT = "mount-point:point-number/yang-ext:mount";
 
     // test identifier + expected result
     private static final String TEST_IDENT =
@@ -68,10 +58,6 @@ public class ParserIdentifierTest {
     private static final String INVALID_TEST_IDENT =
             "parser-identifier:cont2/listTest/list-in-grouping=name/leaf-A.B";
 
-    private static final String TEST_MODULE_NAME = "test-module";
-    private static final String TEST_MODULE_REVISION = "2016-06-02";
-    private static final String TEST_MODULE_NAMESPACE = "test:module";
-
     private static final String INVOKE_RPC = "invoke-rpc-module:rpc-test";
     private static final String INVOKE_ACTION = "example-actions:interfaces/interface=eth0/reset";
 
@@ -87,28 +73,17 @@ public class ParserIdentifierTest {
     private final DOMMountPointService mountPointService = new DOMMountPointServiceImpl();
     private DOMMountPoint mountPoint;
 
-    // mock mount point and mount point service
-    @Mock
-    private DOMMountPoint mockMountPoint;
-    @Mock
-    private DOMMountPointService mockMountPointService;
-    @Mock
-    private DOMSchemaService domSchemaService;
-    @Mock
-    private DOMYangTextSourceProvider sourceProvider;
-
-    @Before
-    public void setup() throws Exception {
+    @BeforeEach
+    void beforeEach() {
         // create and register mount point
-        final var mountPointId = YangInstanceIdentifier.builder()
-                .node(QName.create("mount:point", "2016-06-02", "mount-container"))
-                .node(QName.create("mount:point", "2016-06-02", "point-number"))
-                .build();
+        final var mountPointId = YangInstanceIdentifier.of(
+            QName.create("mount:point", "2016-06-02", "mount-container"),
+            QName.create("mount:point", "2016-06-02", "point-number"));
 
         mountPoint = mountPointService.createMountPoint(mountPointId)
-                .addService(DOMSchemaService.class, FixedDOMSchemaService.of(MODEL_CONTEXT_ON_MOUNT_POINT))
-                .register()
-                .getInstance();
+            .addService(DOMSchemaService.class, FixedDOMSchemaService.of(MODEL_CONTEXT_ON_MOUNT_POINT))
+            .register()
+            .getInstance();
     }
 
     /**
@@ -120,7 +95,7 @@ public class ParserIdentifierTest {
      * in one module.
      */
     @Test
-    public void toInstanceIdentifierTest() {
+    void toInstanceIdentifierTest() {
         final var context = ParserIdentifier.toInstanceIdentifier(TEST_IDENT, MODEL_CONTEXT, null);
         assertEquals(TEST_IDENT_RESULT, context.getInstanceIdentifier().toString());
     }
@@ -130,7 +105,7 @@ public class ParserIdentifierTest {
      * multiple modules.
      */
     @Test
-    public void toInstanceIdentifierOtherModulesTest() {
+    void toInstanceIdentifierOtherModulesTest() {
         final var context = ParserIdentifier.toInstanceIdentifier(TEST_IDENT_OTHERS, MODEL_CONTEXT, null);
         assertEquals(TEST_IDENT_OTHERS_RESULT, context.getInstanceIdentifier().toString());
     }
@@ -139,7 +114,7 @@ public class ParserIdentifierTest {
      * Positive test of creating {@code InstanceIdentifierContext} from identifier containing {@code yang-ext:mount}.
      */
     @Test
-    public void toInstanceIdentifierMountPointTest() {
+    void toInstanceIdentifierMountPointTest() {
         final var context = ParserIdentifier.toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + TEST_IDENT, MODEL_CONTEXT,
             mountPointService);
         assertEquals(TEST_IDENT_RESULT.toString(), context.getInstanceIdentifier().toString());
@@ -152,7 +127,7 @@ public class ParserIdentifierTest {
      * <code>null</code>. Test fails expecting <code>NullPointerException</code>.
      */
     @Test
-    public void toInstanceIdentifierNullSchemaContextNegativeTest() {
+    void toInstanceIdentifierNullSchemaContextNegativeTest() {
         assertThrows(NullPointerException.class, () -> ParserIdentifier.toInstanceIdentifier(TEST_IDENT, null, null));
     }
 
@@ -160,7 +135,7 @@ public class ParserIdentifierTest {
      * Api path can be empty. <code>YangInstanceIdentifier.EMPTY</code> is expected to be returned.
      */
     @Test
-    public void toInstanceIdentifierEmptyIdentifierTest() {
+    void toInstanceIdentifierEmptyIdentifierTest() {
         final var context = ParserIdentifier.toInstanceIdentifier("", MODEL_CONTEXT, null);
         assertEquals(YangInstanceIdentifier.of(), context.getInstanceIdentifier());
     }
@@ -169,7 +144,7 @@ public class ParserIdentifierTest {
      * Negative test with invalid test identifier. Test should fail with <code>RestconfDocumentedException</code>.
      */
     @Test
-    public void toInstanceIdentifierInvalidIdentifierNegativeTest() {
+    void toInstanceIdentifierInvalidIdentifierNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.toInstanceIdentifier(INVALID_TEST_IDENT, MODEL_CONTEXT, null));
         final var errors = ex.getErrors();
@@ -185,9 +160,10 @@ public class ParserIdentifierTest {
      * should fail with {@link RestconfDocumentedException}.
      */
     @Test
-    public void toInstanceIdentifierMountPointInvalidIdentifierNegativeTest() {
+    void toInstanceIdentifierMountPointInvalidIdentifierNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toInstanceIdentifier(INVALID_MOUNT_POINT_IDENT, MODEL_CONTEXT, mountPointService));
+            () -> ParserIdentifier.toInstanceIdentifier("mount-point:point-number/yang-ext:mount", MODEL_CONTEXT,
+                mountPointService));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -202,7 +178,7 @@ public class ParserIdentifierTest {
      * compared to expected values.
      */
     @Test
-    public void toInstanceIdentifierMissingMountPointNegativeTest() {
+    void toInstanceIdentifierMissingMountPointNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.toInstanceIdentifier("yang-ext:mount", MODEL_CONTEXT, mountPointService));
         final var errors = ex.getErrors();
@@ -219,7 +195,7 @@ public class ParserIdentifierTest {
      * compared to expected values.
      */
     @Test
-    public void toInstanceIdentifierMissingMountPointServiceNegativeTest() {
+    void toInstanceIdentifierMissingMountPointServiceNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> ParserIdentifier.toInstanceIdentifier("yang-ext:mount", MODEL_CONTEXT, null));
         final var errors = ex.getErrors();
@@ -231,182 +207,10 @@ public class ParserIdentifierTest {
     }
 
     /**
-     * {@link ParserIdentifier#toSchemaExportContextFromIdentifier(SchemaContext, String, DOMMountPointService)} tests.
-     */
-
-    /**
-     * Positive test of getting <code>SchemaExportContext</code>. Expected module name, revision and namespace are
-     * verified.
-     */
-    @Test
-    public void toSchemaExportContextFromIdentifierTest() {
-        final var exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
-                MODEL_CONTEXT, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null, sourceProvider);
-
-        assertNotNull("Export context should be parsed", exportContext);
-
-        final var module = exportContext.module();
-        assertNotNull(module);
-        assertEquals(TEST_MODULE_NAME, module.argument().getLocalName());
-        final var namespace = module.localQNameModule();
-        assertEquals(Revision.ofNullable(TEST_MODULE_REVISION), namespace.getRevision());
-        assertEquals(TEST_MODULE_NAMESPACE, namespace.getNamespace().toString());
-    }
-
-    /**
-     * Test of getting <code>SchemaExportContext</code> when desired module is not found.
-     * <code>SchemaExportContext</code> should not be created and exception is thrown.
-     */
-    @Test
-    public void toSchemaExportContextFromIdentifierNotFoundTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
-                MODEL_CONTEXT, "not-existing-module" + "/" + "2016-01-01", null, sourceProvider));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
-        assertEquals("Module not-existing-module 2016-01-01 cannot be found on controller.", error.getErrorMessage());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-    }
-
-    /**
-     * Negative test trying to get <code>SchemaExportContext</code> with invalid identifier. Test is expected to fail
-     * with <code>RestconfDocumentedException</code> error type, error tag and error status code are compared to
-     * expected values.
-     */
-    @Test
-    public void toSchemaExportContextFromIdentifierInvalidIdentifierNegativeTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
-                TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, null, sourceProvider));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
-        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
-    }
-
-    /**
-     * Positive test of getting <code>SchemaExportContext</code> for module behind mount point.
-     * Expected module name, revision and namespace are verified.
-     */
-    @Test
-    public void toSchemaExportContextFromIdentifierMountPointTest() {
-        final var exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
-            MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
-            mountPointService, sourceProvider);
-
-        final var module = exportContext.module();
-        assertEquals(TEST_MODULE_NAME, module.argument().getLocalName());
-        final var namespace = module.localQNameModule();
-        assertEquals(Revision.ofNullable(TEST_MODULE_REVISION), namespace.getRevision());
-        assertEquals(TEST_MODULE_NAMESPACE, namespace.getNamespace().toString());
-    }
-
-    /**
-     * Negative test of getting <code>SchemaExportContext</code> when desired module is not found behind mount point.
-     * <code>SchemaExportContext</code> should not be created and exception is thrown.
-     */
-    @Test
-    public void toSchemaExportContextFromIdentifierMountPointNotFoundTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
-                MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
-                mountPointService, sourceProvider));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
-        assertEquals("Module not-existing-module 2016-01-01 cannot be found on "
-            + "/(mount:point?revision=2016-06-02)mount-container/point-number.", error.getErrorMessage());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-    }
-
-    /**
-     * Negative test trying to get <code>SchemaExportContext</code> behind mount point with invalid identifier. Test is
-     * expected to fail with <code>RestconfDocumentedException</code> error type, error tag and error status code are
-     * compared to expected values.
-     */
-    @Test
-    public void toSchemaExportContextFromIdentifierMountPointInvalidIdentifierNegativeTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
-                MOUNT_POINT_IDENT + "/" + TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, mountPointService,
-                sourceProvider));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
-        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
-    }
-
-    /**
-     * Negative test of getting <code>SchemaExportContext</code> when supplied identifier is null.
-     * <code>NullPointerException</code> is expected. <code>DOMMountPointService</code> is not used.
-     */
-    @Test
-    public void toSchemaExportContextFromIdentifierNullIdentifierNegativeTest() {
-        assertThrows(NullPointerException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT, null, null, sourceProvider));
-    }
-
-    /**
-     * Negative test of of getting <code>SchemaExportContext</code> when supplied <code>SchemaContext</code> is
-     * <code>null</code>. Test is expected to fail with <code>NullPointerException</code>.
-     */
-    @Test
-    public void toSchemaExportContextFromIdentifierNullSchemaContextNegativeTest() {
-        assertThrows(NullPointerException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(null,
-            TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null, sourceProvider));
-    }
-
-    /**
-     * Negative test of of getting <code>SchemaExportContext</code> when supplied <code>SchemaContext</code> is
-     * <code>null</code> and identifier specifies module behind mount point. Test is expected to fail with
-     * <code>NullPointerException</code>.
-     */
-    @Test
-    public void toSchemaExportContextFromIdentifierMountPointNullSchemaContextNegativeTest() {
-        assertThrows(NullPointerException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(null,
-            MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, mountPointService,
-            sourceProvider));
-    }
-
-    /**
-     * Negative test of of getting <code>SchemaExportContext</code> when supplied <code>DOMMountPointService</code>
-     * is <code>null</code> and identifier defines module behind mount point. Test is expected to fail with
-     * <code>NullPointerException</code>.
-     */
-    @Test
-    public void toSchemaExportContextFromIdentifierNullMountPointServiceNegativeTest() {
-        assertThrows(NullPointerException.class, () -> ParserIdentifier.toSchemaExportContextFromIdentifier(
-            MODEL_CONTEXT, MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null,
-            sourceProvider));
-    }
-
-    @Test
-    public void toSchemaExportContextFromIdentifierNullSchemaContextBehindMountPointNegativeTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> ParserIdentifier.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
-                "/yang-ext:mount/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, mockMountPointService,
-                sourceProvider));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
-        // FIXME: this should be something different
-        assertEquals("Identifier may not be empty", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
-    }
-
-    /**
      * Test invoke RPC. Verify if RPC schema node was found.
      */
     @Test
-    public void invokeRpcTest() throws Exception {
+    void invokeRpcTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(INVOKE_RPC, MODEL_CONTEXT, null);
 
         // RPC schema node
@@ -425,7 +229,7 @@ public class ParserIdentifierTest {
      * Test invoke RPC on mount point. Verify if RPC schema node was found.
      */
     @Test
-    public void invokeRpcOnMountPointTest() throws Exception {
+    void invokeRpcOnMountPointTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + INVOKE_RPC, MODEL_CONTEXT,
             mountPointService);
 
@@ -445,7 +249,7 @@ public class ParserIdentifierTest {
      * Test Action. Verify if Action schema node was found.
      */
     @Test
-    public void invokeActionTest() throws Exception {
+    void invokeActionTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(INVOKE_ACTION, MODEL_CONTEXT, null);
 
         // Action schema node
@@ -464,7 +268,7 @@ public class ParserIdentifierTest {
      * Test invoke Action on mount point. Verify if Action schema node was found.
      */
     @Test
-    public void invokeActionOnMountPointTest() throws Exception {
+    void invokeActionOnMountPointTest() throws Exception {
         final var result = ParserIdentifier.toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + INVOKE_ACTION,
             MODEL_CONTEXT, mountPointService);
 
