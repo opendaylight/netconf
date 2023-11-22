@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.transport.ssh;
 
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
 import java.net.SocketAddress;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.netty.NettyIoSession;
@@ -20,5 +21,13 @@ final class TransportIoSession extends NettyIoSession {
 
     ChannelHandler getHandler() {
         return adapter;
+    }
+
+    @Override
+    protected void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+        // adapter is not propagating fireChannelInactive() down the the pipeline, but instead loops here. Once we have
+        // cleaned up, propagate fireChannelInactive() outselves.
+        super.channelInactive(ctx);
+        ctx.fireChannelInactive();
     }
 }
