@@ -19,10 +19,12 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
  *
  * @param <V> value type
  */
-abstract class JaxRsRestconfCallback<V> extends RestconfCallback<V> {
+// FIXME: hide this class
+public abstract class JaxRsRestconfCallback<V> extends RestconfCallback<V> {
     private final AsyncResponse ar;
 
-    JaxRsRestconfCallback(final AsyncResponse ar) {
+    // FIXME: hide this constructor
+    protected JaxRsRestconfCallback(final AsyncResponse ar) {
         this.ar = requireNonNull(ar);
     }
 
@@ -36,5 +38,6 @@ abstract class JaxRsRestconfCallback<V> extends RestconfCallback<V> {
         ar.resume(failure);
     }
 
-    abstract Response transform(V result);
+    // FIXME: hide this method and its implementations
+    protected abstract Response transform(V result);
 }
