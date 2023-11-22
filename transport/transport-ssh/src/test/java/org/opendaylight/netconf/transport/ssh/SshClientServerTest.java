@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,7 +28,10 @@ import static org.opendaylight.netconf.transport.ssh.TestUtils.buildServerIdenti
 import static org.opendaylight.netconf.transport.ssh.TestUtils.generateKeyPairWithCertificate;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -339,6 +343,63 @@ public class SshClientServerTest {
             factoryManager.setUserAuthFactories(List.of(
                 new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
         };
+    }
+
+    @Test
+    @DisplayName("Handle channel inactive event")
+    void handleChannelInactive() throws Exception {
+        final var username = getUsernameAndUpdate();
+        when(sshClientConfig.getClientIdentity()).thenReturn(usernameOnlyIdentity(username));
+        when(sshClientConfig.getServerAuthentication()).thenReturn(null);
+
+        // place channelInactive handlers on a server side channel when connection is established
+        final var firstHandlerFuture = SettableFuture.<Boolean>create();
+        final var lastHandlerFuture = SettableFuture.<Boolean>create();
+        final var serverTransportListener = new TransportChannelListener() {
+            @Override
+            public void onTransportChannelEstablished(final TransportChannel channel) {
+                channel.channel().pipeline().addFirst("FIRST", new ChannelInboundHandlerAdapter() {
+                    @Override
+                    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+                        firstHandlerFuture.set(Boolean.TRUE);
+                        ctx.fireChannelInactive();
+                    }
+                });
+                channel.channel().pipeline().addLast("LAST", new ChannelInboundHandlerAdapter() {
+                    @Override
+                    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+                        lastHandlerFuture.set(Boolean.TRUE);
+                        ctx.fireChannelInactive();
+                    }
+                });
+            }
+
+            @Override
+            public void onTransportChannelFailed(final Throwable cause) {
+                // not used
+            }
+        };
+
+        final var server = FACTORY.listenServer(SUBSYSTEM, serverTransportListener, tcpServerConfig, null,
+                serverConfigurator(username)).get(2, TimeUnit.SECONDS);
+        try {
+            // connect with client
+            final var client = FACTORY.connectClient(SUBSYSTEM, clientListener, tcpClientConfig, sshClientConfig,
+                clientConfigurator(username)).get(2, TimeUnit.SECONDS);
+            try {
+                verify(clientListener, timeout(10_000)).onTransportChannelEstablished(any(TransportChannel.class));
+            } finally {
+                // disconnect client
+                client.shutdown().get(2, TimeUnit.SECONDS);
+                // validate channel closure on server side it handled properly:
+                // both first and last handlers expected to be triggered
+                // indicating there is no obstacles for the event in a channel pipeline
+                assertEquals(Boolean.TRUE, firstHandlerFuture.get(1, TimeUnit.SECONDS));
+                assertEquals(Boolean.TRUE, lastHandlerFuture.get(1, TimeUnit.SECONDS));
+            }
+        } finally {
+            server.shutdown().get(2, TimeUnit.SECONDS);
+        }
     }
 
     @FunctionalInterface

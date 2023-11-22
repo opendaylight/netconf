@@ -14,7 +14,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -294,19 +293,14 @@ final class TransportUtils {
         // from the logical perspective we are the head handlers.
         final var pipeline = underlay.channel().pipeline();
 
-        // - install outbound packet handler, i.e. moving bytes from the channel into SSHD's pipeline
+        // outbound packet handler, i.e. moving bytes from the channel into SSHD's pipeline
         pipeline.addLast(new OutboundChannelHandler(out));
-        // - remember the context of this handler, we will be using it to issue writes into the channel
-        final var head = pipeline.lastContext();
 
-        // - install inner channel termination handler
-        pipeline.addLast(new ChannelInboundHandlerAdapter() {
-            @Override
-            public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
-                inactive.onChannelInactive();
-            }
-        });
+        // invoke requested action on channel termination
+        underlay.channel().closeFuture().addListener(future -> inactive.onChannelInactive());
 
-        return head;
+        // return last context for subsequent channelActive to be applied on,
+        // it's necessary to avoid extra activation of existing SSH adapter
+        return pipeline.lastContext();
     }
 }
