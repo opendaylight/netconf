@@ -16,6 +16,7 @@ import static org.mockito.Mockito.doReturn;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -24,6 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -59,10 +61,8 @@ class RestconfModulesGetTest {
      */
     @Test
     void toSchemaExportContextFromIdentifierTest() {
-        final var exportContext = RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(
-                MODEL_CONTEXT, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null, sourceProvider);
-        assertNotNull(exportContext);
-
+        final var exportContext = RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
+            TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null, sourceProvider).getOrThrow();
         final var module = exportContext.module();
         assertNotNull(module);
         assertEquals(TEST_MODULE_NAME, module.argument().getLocalName());
@@ -79,7 +79,8 @@ class RestconfModulesGetTest {
     void toSchemaExportContextFromIdentifierNotFoundTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(
-                MODEL_CONTEXT, "not-existing-module" + "/" + "2016-01-01", null, sourceProvider));
+                MODEL_CONTEXT, "not-existing-module" + "/" + "2016-01-01", null, sourceProvider)
+            .getOrThrow());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -97,7 +98,7 @@ class RestconfModulesGetTest {
     void toSchemaExportContextFromIdentifierInvalidIdentifierNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
-                TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, null, sourceProvider));
+                TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, null, sourceProvider).getOrThrow());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -116,7 +117,7 @@ class RestconfModulesGetTest {
 
         final var exportContext = RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
             MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
-            mountPointService, sourceProvider);
+            mountPointService, sourceProvider).getOrThrow();
 
         final var module = exportContext.module();
         assertEquals(TEST_MODULE_NAME, module.argument().getLocalName());
@@ -137,7 +138,8 @@ class RestconfModulesGetTest {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
                 MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
-                mountPointService, sourceProvider));
+                mountPointService, sourceProvider)
+            .getOrThrow());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -159,7 +161,7 @@ class RestconfModulesGetTest {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
                 MOUNT_POINT_IDENT + "/" + TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, mountPointService,
-                sourceProvider));
+                sourceProvider).getOrThrow());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -221,7 +223,7 @@ class RestconfModulesGetTest {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
                 "/yang-ext:mount/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, mountPointService,
-                sourceProvider));
+                sourceProvider).getOrThrow());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -235,5 +237,96 @@ class RestconfModulesGetTest {
         doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT_ON_MOUNT_POINT))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(MOUNT_IID);
+    }
+
+    /**
+     * Negative test of module revision validation when there is no revision. Test fails catching
+     * <code>RestconfDocumentedException</code> and checking for correct error type, error tag and error status code.
+     */
+    @Test
+    void validateAndGetRevisionNotSuppliedTest() {
+        final var error = assertInvalidValue(
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT, "module", null, null)
+            .getOrThrow());
+        assertEquals("Revision date must be supplied.", error.getErrorMessage());
+    }
+
+    /**
+     * Negative test of module revision validation when supplied revision is not parsable as revision. Test fails
+     * catching <code>RestconfDocumentedException</code>.
+     */
+    @Test
+    void validateAndGetRevisionNotParsableTest() {
+        final var ex = assertThrows(RestconfDocumentedException.class,
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
+                "module/not-parsable-as-date", null, null).getOrThrow());
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals("Supplied revision is not in expected date format YYYY-mm-dd", error.getErrorMessage());
+        assertEquals(ErrorType.APPLICATION, error.getErrorType());
+        assertEquals(ErrorTag.OPERATION_FAILED, error.getErrorTag());
+    }
+
+    /**
+     * Negative test of module name validation when there is no module name. Test fails catching
+     * <code>RestconfDocumentedException</code> and checking for correct error type, error tag and error status code.
+     */
+    @Test
+    void validateAndGetModulNameNotSuppliedTest() {
+        mockMountPoint();
+
+        final var error = assertInvalidValue(
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT, MOUNT_POINT_IDENT,
+                mountPointService, null).getOrThrow());
+        assertEquals("Module name must be supplied", error.getErrorMessage());
+    }
+
+    /**
+     * Negative test of module name validation when supplied name is not parsable as module name on the first
+     * character. Test fails catching <code>RestconfDocumentedException</code> and checking for correct error type,
+     * error tag and error status code.
+     */
+    @Test
+    void validateAndGetModuleNameNotParsableFirstTest() {
+        final var error = assertInvalidValue(
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
+                "01-not-parsable-as-name-on-first-char", null, null).getOrThrow());
+        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
+    }
+
+    /**
+     * Negative test of module name validation when supplied name is not parsable as module name on any of the
+     * characters after the first character. Test fails catching <code>RestconfDocumentedException</code> and checking
+     * for correct error type, error tag and error status code.
+     */
+    @Test
+    public void validateAndGetModuleNameNotParsableNextTest() {
+        final var error = assertInvalidValue(
+            () ->  RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT,
+                "not-parsable-as-name-after-first-char*", null, null).getOrThrow());
+        assertEquals("Supplied name has not expected identifier format", error.getErrorMessage());
+    }
+
+    /**
+     * Negative test of module name validation when supplied name is empty. Test fails catching
+     * <code>RestconfDocumentedException</code> and checking for correct error type, error tag and error status code.
+     */
+    @Test
+    void validateAndGetModuleNameEmptyTest() {
+        final var error = assertInvalidValue(
+            () -> RestconfSchemaServiceImpl.toSchemaExportContextFromIdentifier(MODEL_CONTEXT, "", null, null)
+            .getOrThrow());
+        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
+    }
+
+    private static RestconfError assertInvalidValue(final Executable runnable) {
+        final var ex = assertThrows(RestconfDocumentedException.class, runnable);
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+        return error;
     }
 }
