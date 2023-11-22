@@ -39,8 +39,9 @@ import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
+// FIXME: hide this class
 @ExtendWith(MockitoExtension.class)
-abstract class AbstractRestconfTest extends AbstractJukeboxTest {
+public abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     static final JaxRsApiPath JUKEBOX_API_PATH = new JaxRsApiPath("example-jukebox:jukebox");
 
     @Mock
@@ -72,7 +73,8 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return assertEntity(NormalizedNodePayload.class, status, invocation).data();
     }
 
-    static final <T> T assertEntity(final Class<T> expectedType, final int expectedStatus,
+    // FIXME: hide this method
+    public static final <T> T assertEntity(final Class<T> expectedType, final int expectedStatus,
             final Consumer<AsyncResponse> invocation) {
         return assertInstanceOf(expectedType, assertEntity(expectedStatus, invocation));
     }
@@ -81,7 +83,8 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return assertResponse(expectedStatus, invocation).getEntity();
     }
 
-    static final RestconfError assertError(final Consumer<AsyncResponse> invocation) {
+    // FIXME: hide this method
+    public static final RestconfError assertError(final Consumer<AsyncResponse> invocation) {
         final var errors = assertErrors(invocation);
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -89,7 +92,8 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return error;
     }
 
-    static final List<RestconfError> assertErrors(final Consumer<AsyncResponse> invocation) {
+    // FIXME: hide this method
+    public static final List<RestconfError> assertErrors(final Consumer<AsyncResponse> invocation) {
         final var ar = mock(AsyncResponse.class);
         final var captor = ArgumentCaptor.forClass(RestconfDocumentedException.class);
         doReturn(true).when(ar).resume(captor.capture());

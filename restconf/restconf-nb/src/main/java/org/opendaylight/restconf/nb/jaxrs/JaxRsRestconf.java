@@ -91,7 +91,7 @@ public final class JaxRsRestconf {
             @Suspended final AsyncResponse ar) {
         server.dataDELETE(identifier.apiPath).addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final Empty result) {
+            protected Response transform(final Empty result) {
                 return Response.noContent().build();
             }
         });
@@ -143,7 +143,7 @@ public final class JaxRsRestconf {
             final ReadDataParams readParams, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final NormalizedNodePayload result) {
+            protected Response transform(final NormalizedNodePayload result) {
                 return switch (readParams.content()) {
                     case ALL, CONFIG -> {
                         final var type = result.data().name().getNodeType();
@@ -246,7 +246,7 @@ public final class JaxRsRestconf {
     private static void completeDataPATCH(final RestconfFuture<Empty> future, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final Empty result) {
+            protected Response transform(final Empty result) {
                 return Response.ok().build();
             }
         });
@@ -339,7 +339,7 @@ public final class JaxRsRestconf {
     private static void completeDataYangPATCH(final RestconfFuture<PatchStatusContext> future, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final PatchStatusContext result) {
+            protected Response transform(final PatchStatusContext result) {
                 return Response.status(statusOf(result)).entity(result).build();
             }
 
@@ -453,7 +453,7 @@ public final class JaxRsRestconf {
             final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<DataPostResult>(ar) {
             @Override
-            Response transform(final DataPostResult result) {
+            protected Response transform(final DataPostResult result) {
                 if (result instanceof CreateResource createResource) {
                     return Response.created(uriInfo.getBaseUriBuilder()
                             .path("data")
@@ -557,7 +557,7 @@ public final class JaxRsRestconf {
     private static void completeDataPUT(final RestconfFuture<DataPutResult> future, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final DataPutResult result) {
+            protected Response transform(final DataPutResult result) {
                 return switch (result) {
                     // Note: no Location header, as it matches the request path
                     case CREATED -> Response.status(Status.CREATED).build();
@@ -631,7 +631,7 @@ public final class JaxRsRestconf {
             final Function<OperationsGetResult, String> toString) {
         future.addCallback(new JaxRsRestconfCallback<OperationsGetResult>(ar) {
             @Override
-            Response transform(final OperationsGetResult result) {
+            protected Response transform(final OperationsGetResult result) {
                 return Response.ok().entity(toString.apply(result)).build();
             }
         });
@@ -701,7 +701,7 @@ public final class JaxRsRestconf {
         server.operationsPOST(uriInfo.getBaseUri(), identifier, body)
             .addCallback(new JaxRsRestconfCallback<OperationOutput>(ar) {
                 @Override
-                Response transform(final OperationOutput result) {
+                protected Response transform(final OperationOutput result) {
                     final var body = result.output();
                     return body == null ? Response.noContent().build()
                         : Response.ok().entity(new NormalizedNodePayload(result.operation(), body)).build();
@@ -726,7 +726,7 @@ public final class JaxRsRestconf {
     public void yangLibraryVersionGET(@Suspended final AsyncResponse ar) {
         server.yangLibraryVersionGET().addCallback(new JaxRsRestconfCallback<NormalizedNodePayload>(ar) {
             @Override
-            Response transform(final NormalizedNodePayload result) {
+            protected Response transform(final NormalizedNodePayload result) {
                 return Response.ok().entity(result).build();
             }
         });
