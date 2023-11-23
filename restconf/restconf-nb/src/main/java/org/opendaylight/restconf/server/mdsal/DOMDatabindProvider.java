@@ -13,6 +13,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -29,6 +30,7 @@ import org.osgi.service.component.annotations.Reference;
 @Singleton
 @Component(service = DatabindProvider.class)
 public final class DOMDatabindProvider implements DatabindProvider, EffectiveModelContextListener, AutoCloseable {
+    private final DOMSourceResolver sourceProvider;
     private final Registration reg;
 
     private volatile DatabindContext currentContext;
@@ -36,6 +38,8 @@ public final class DOMDatabindProvider implements DatabindProvider, EffectiveMod
     @Inject
     @Activate
     public DOMDatabindProvider(@Reference final DOMSchemaService schemaService) {
+        final var ext = schemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
+        sourceProvider = ext != null ? new DOMSourceResolver(ext) : null;
         currentContext = DatabindContext.ofModel(schemaService.getGlobalContext());
         reg = schemaService.registerSchemaContextListener(this);
     }
@@ -49,7 +53,7 @@ public final class DOMDatabindProvider implements DatabindProvider, EffectiveMod
     public void onModelContextUpdated(final EffectiveModelContext newModelContext) {
         final var local = currentContext;
         if (local != null && local.modelContext() != newModelContext) {
-            currentContext = DatabindContext.ofModel(newModelContext);
+            currentContext = DatabindContext.ofModel(newModelContext, sourceProvider);
         }
     }
 
