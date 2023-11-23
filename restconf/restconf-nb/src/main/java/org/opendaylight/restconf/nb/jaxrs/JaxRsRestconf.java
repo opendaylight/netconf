@@ -9,7 +9,9 @@ package org.opendaylight.restconf.nb.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.text.ParseException;
@@ -42,6 +44,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
@@ -64,11 +67,13 @@ import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
+import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -606,6 +611,45 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                     case CREATED -> Response.status(Status.CREATED).build();
                     case REPLACED -> Response.noContent().build();
                 };
+            }
+        });
+    }
+
+    /**
+     * Get schema of specific module.
+     *
+     * @param identifier path parameter
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
+    @Path("/modules/{identifier:.+}")
+    public void modulesYangGET(@PathParam("identifier") final String identifier, @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYangGET(identifier), ar);
+    }
+
+    /**
+     * Get schema of specific module.
+     *
+     * @param identifier path parameter
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
+    @Path("/modules/{identifier:.+}")
+    public void modulesYinGET(@PathParam("identifier") final String identifier, @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYinGET(identifier), ar);
+    }
+
+    private static void completeModulesGET(final RestconfFuture<ModulesGetResult> future, final AsyncResponse ar) {
+        future.addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final ModulesGetResult result) {
+                final Reader reader;
+                try {
+                    reader = result.source().openStream();
+                } catch (IOException e) {
+                    throw new RestconfDocumentedException("Cannot open source", e);
+                }
+                return Response.ok(reader).build();
             }
         });
     }

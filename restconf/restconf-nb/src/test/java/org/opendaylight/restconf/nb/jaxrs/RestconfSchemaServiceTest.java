@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
+package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -14,6 +14,7 @@ import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertEnti
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertError;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
+import java.io.Reader;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +25,6 @@ import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
-import org.opendaylight.restconf.nb.rfc8040.legacy.SchemaExportContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -57,7 +57,7 @@ public class RestconfSchemaServiceTest {
         YangParserTestUtils.parseYangResourceDirectory("/modules/mount-points");
 
     // service under test
-    private RestconfSchemaServiceImpl schemaService;
+    private JaxRsRestconf restconf;
 
     // handlers
     @Mock
@@ -79,7 +79,7 @@ public class RestconfSchemaServiceTest {
 
         doReturn(ImmutableClassToInstanceMap.of(DOMYangTextSourceProvider.class, mockSourceProvider))
             .when(mockSchemaService).getExtensions();
-        schemaService = new RestconfSchemaServiceImpl(mockSchemaService, mountPointService);
+        restconf = new JaxRsRestconf(mockSchemaService, mountPointService);
     }
 
     /**
@@ -91,8 +91,7 @@ public class RestconfSchemaServiceTest {
         doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
         // make test
-        final var exportContext = assertEntity(SchemaExportContext.class, 200,
-            ar -> schemaService.getSchema(TEST_MODULE, ar));
+        final var exportContext = assertEntity(Reader.class, 200, ar -> restconf.modulesYangGET(TEST_MODULE, ar));
 
         // verify
         assertNotNull(exportContext);
@@ -113,7 +112,7 @@ public class RestconfSchemaServiceTest {
         // prepare conditions - return not-mount point schema context
         doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
-        final var error = assertError(ar -> schemaService.getSchema(NOT_EXISTING_MODULE, ar));
+        final var error = assertError(ar -> restconf.modulesYangGET(NOT_EXISTING_MODULE, ar));
         assertEquals("Module not-existing 2016-01-01 cannot be found on controller.", error.getErrorMessage());
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
@@ -128,8 +127,8 @@ public class RestconfSchemaServiceTest {
         doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test
-        final var exportContext = assertEntity(SchemaExportContext.class, 200,
-            ar -> schemaService.getSchema(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT, ar));
+        final var exportContext = assertEntity(Reader.class, 200,
+            ar -> restconf.modulesYangGET(MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT, ar));
 
         // verify
         assertNotNull(exportContext);
@@ -150,7 +149,7 @@ public class RestconfSchemaServiceTest {
         // prepare conditions - return schema context with mount points
         doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
-        final var error = assertError(ar -> schemaService.getSchema(MOUNT_POINT + NOT_EXISTING_MODULE, ar));
+        final var error = assertError(ar -> restconf.modulesYangGET(MOUNT_POINT + NOT_EXISTING_MODULE, ar));
         assertEquals("Module not-existing 2016-01-01 cannot be found on /(mount:point:1?revision=2016-01-01)cont.",
             error.getErrorMessage());
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
@@ -169,7 +168,7 @@ public class RestconfSchemaServiceTest {
         // make test - call service on mount point with null schema context
         // NULL_MOUNT_POINT contains null schema context
         final var error = assertError(
-            ar -> schemaService.getSchema(NULL_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT, ar));
+            ar -> restconf.modulesYangGET(NULL_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT, ar));
         assertEquals("Mount point mount-point-2:cont does not expose DOMSchemaService", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.getErrorTag());
@@ -184,7 +183,7 @@ public class RestconfSchemaServiceTest {
         // prepare conditions - return correct schema context
         doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
-        final var error = assertError(ar -> schemaService.getSchema("", ar));
+        final var error = assertError(ar -> restconf.modulesYangGET("", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -201,7 +200,7 @@ public class RestconfSchemaServiceTest {
         doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var error = assertError(ar -> schemaService.getSchema(MOUNT_POINT + "", ar));
+        final var error = assertError(ar -> restconf.modulesYangGET(MOUNT_POINT + "", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -217,7 +216,7 @@ public class RestconfSchemaServiceTest {
         doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var error = assertError(ar -> schemaService.getSchema("01_module/2016-01-01", ar));
+        final var error = assertError(ar -> restconf.modulesYangGET("01_module/2016-01-01", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -234,7 +233,7 @@ public class RestconfSchemaServiceTest {
         doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var error = assertError(ar -> schemaService.getSchema(MOUNT_POINT + "01_module/2016-01-01", ar));
+        final var error = assertError(ar -> restconf.modulesYangGET(MOUNT_POINT + "01_module/2016-01-01", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -253,7 +252,7 @@ public class RestconfSchemaServiceTest {
         doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var error = assertError(ar -> schemaService.getSchema("2014-01-01", ar));
+        final var error = assertError(ar -> restconf.modulesYangGET("2014-01-01", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -273,7 +272,7 @@ public class RestconfSchemaServiceTest {
         doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var error = assertError(ar -> schemaService.getSchema(MOUNT_POINT + "2014-01-01", ar));
+        final var error = assertError(ar -> restconf.modulesYangGET(MOUNT_POINT + "2014-01-01", ar));
         assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -290,7 +289,7 @@ public class RestconfSchemaServiceTest {
         doReturn(SCHEMA_CONTEXT).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var error = assertError(ar -> schemaService.getSchema("module", ar));
+        final var error = assertError(ar -> restconf.modulesYangGET("module", ar));
         assertEquals("Revision date must be supplied.", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -307,7 +306,7 @@ public class RestconfSchemaServiceTest {
         doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         // make test and verify
-        final var error = assertError(ar -> schemaService.getSchema(MOUNT_POINT + "module", ar));
+        final var error = assertError(ar -> restconf.modulesYangGET(MOUNT_POINT + "module", ar));
         assertEquals("Revision date must be supplied.", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
@@ -323,7 +322,7 @@ public class RestconfSchemaServiceTest {
         doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(mockSchemaService).getGlobalContext();
 
         final var error = assertError(
-            ar -> schemaService.getSchema(NOT_EXISTING_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT, ar));
+            ar -> restconf.modulesYangGET(NOT_EXISTING_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT, ar));
         assertEquals("Failed to lookup for module with name 'mount-point-3'.", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.UNKNOWN_ELEMENT, error.getErrorTag());
