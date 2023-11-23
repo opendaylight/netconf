@@ -10,9 +10,11 @@ package org.opendaylight.restconf.server.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -21,9 +23,11 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
+import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -41,6 +45,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -62,10 +68,12 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
+import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -81,6 +89,7 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -90,6 +99,10 @@ import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.api.YinTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -115,6 +128,15 @@ public final class MdsalRestconfServer implements RestconfServer {
             throw new ExceptionInInitializerError(e);
         }
     }
+
+    // FIXME: Remove this constant. All logic relying on this constant should instead rely on YangInstanceIdentifier
+    //        equivalent coming out of argument parsing. This may require keeping List<YangInstanceIdentifier> as the
+    //        nested path split on yang-ext:mount. This splitting needs to be based on consulting the
+    //        EffectiveModelContext and allowing it only where yang-ext:mount is actually used in models.
+    @Deprecated(forRemoval = true)
+    private static final String MOUNT = "yang-ext:mount";
+    @Deprecated(forRemoval = true)
+    private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
     private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
     private final @NonNull DOMMountPointService mountPointService;
@@ -378,6 +400,100 @@ public final class MdsalRestconfServer implements RestconfServer {
         }
         final var req = bindResourceRequest(reqPath, body);
         return req.strategy().putData(req.path(), req.data(), insert);
+    }
+
+    @Override
+    public RestconfFuture<ModulesGetResult> modulesYangGET(final String identifier) {
+        return modulesGET(identifier, YangTextSchemaSource.class);
+    }
+
+    @Override
+    public RestconfFuture<ModulesGetResult> modulesYinGET(final String identifier) {
+        return modulesGET(identifier, YinTextSchemaSource.class);
+    }
+
+    private @NonNull RestconfFuture<ModulesGetResult> modulesGET(final String identifier,
+            final Class<? extends SchemaSourceRepresentation> representation) {
+        final var currentContext = databindProvider.currentContext();
+        final var pathComponents = SLASH_SPLITTER.split(identifier);
+        final var it =  pathComponents.iterator();
+        final DatabindContext databind;
+        final Object debugName;
+        if (Iterables.contains(pathComponents, MOUNT)) {
+            final var sb = new StringBuilder();
+            while (true) {
+                final var current = it.next();
+                sb.append(current);
+                if (MOUNT.equals(current) || !it.hasNext()) {
+                    break;
+                }
+
+                sb.append('/');
+            }
+
+            final InstanceIdentifierContext point;
+            try {
+                point = ParserIdentifier.toInstanceIdentifier(sb.toString(), currentContext.modelContext(),
+                    mountPointService);
+            } catch (RestconfDocumentedException e) {
+                return RestconfFuture.failed(e);
+            }
+
+            final var mountPoint = point.getMountPoint();
+            debugName = mountPoint.getIdentifier();
+            final var optSchemaService = mountPoint.getService(DOMSchemaService.class);
+            if (optSchemaService.isEmpty()) {
+                return RestconfFuture.failed(new RestconfDocumentedException(
+                    "Mount point '" + debugName + "' does not expose models"));
+            }
+            final var schemaService = optSchemaService.orElseThrow();
+            final var modelContext = schemaService.getGlobalContext();
+            if (modelContext == null) {
+                return RestconfFuture.failed(new RestconfDocumentedException(
+                    "Mount point '" + debugName + "' does not have a model context"));
+            }
+            final var domProvider = schemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
+            databind = DatabindContext.ofModel(modelContext,
+                domProvider == null ? null : new DOMSourceResolver(domProvider));
+        } else {
+            databind = currentContext;
+            debugName = "controller";
+        }
+
+        // module name has to be an identifier
+        if (!it.hasNext()) {
+            return RestconfFuture.failed(new RestconfDocumentedException("Module name must be supplied",
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
+        }
+        final var moduleName = it.next();
+        if (moduleName.isEmpty() || !YangNames.IDENTIFIER_START.matches(moduleName.charAt(0))) {
+            return RestconfFuture.failed(new RestconfDocumentedException(
+                "Identifier must start with character from set 'a-zA-Z_", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
+        }
+        if (moduleName.toUpperCase(Locale.ROOT).startsWith("XML")) {
+            return RestconfFuture.failed(new RestconfDocumentedException(
+                "Identifier must NOT start with XML ignore case", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
+        }
+        if (YangNames.NOT_IDENTIFIER_PART.matchesAnyOf(moduleName.substring(1))) {
+            return RestconfFuture.failed(new RestconfDocumentedException(
+                "Supplied name has not expected identifier format", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
+        }
+
+        // YANG Revision-compliant string is required
+        if (!it.hasNext()) {
+            return RestconfFuture.failed(new RestconfDocumentedException("Revision date must be supplied.",
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
+        }
+        final Revision revision;
+        try {
+            revision = Revision.of(it.next());
+        } catch (final DateTimeParseException e) {
+            return RestconfFuture.failed(new RestconfDocumentedException(
+                "Supplied revision is not in expected date format YYYY-mm-dd", e));
+        }
+
+        return databind.resolveSource(new SourceIdentifier(moduleName, revision), representation)
+            .transform(ModulesGetResult::new);
     }
 
     @Override
