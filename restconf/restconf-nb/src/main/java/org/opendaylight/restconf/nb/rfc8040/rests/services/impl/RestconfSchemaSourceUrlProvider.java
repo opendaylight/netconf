@@ -12,18 +12,19 @@ import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.yanglib.writer.YangLibrarySchemaSourceUrlProvider;
+import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.osgi.service.component.annotations.Component;
 
 /**
- * Component composing schema source URL value on per yang resource basis.
+ * Component composing schema source URL value on per YANG resource basis.
  *
  * <p>The URL is expected to be requested by {@link org.opendaylight.netconf.yanglib.writer.YangLibraryWriter
  * YangLibraryWriter} when yang-library data is being constructed, only default module-set name ("ODL_modules")
  * is supported. The composed URL for resource download expected to be served by
- * {@link RestconfSchemaServiceImpl}.
+ * {@link JaxRsRestconf#modulesYangGET(String, javax.ws.rs.container.AsyncResponse)} et al.
  */
 @Singleton
 @Component(immediate = true, service = YangLibrarySchemaSourceUrlProvider.class)

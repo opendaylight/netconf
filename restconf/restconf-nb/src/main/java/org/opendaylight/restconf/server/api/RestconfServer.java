@@ -165,4 +165,8 @@ public interface RestconfServer {
     // FIXME: this is a simple encoding-variadic return, similar to how OperationsContent is handled use a common
     //        construct for both cases -- in this case it carries a yang.common.Revision
     RestconfFuture<NormalizedNodePayload> yangLibraryVersionGET();
+
+    RestconfFuture<ModulesGetResult> modulesYangGET(String identifier);
+
+    RestconfFuture<ModulesGetResult> modulesYinGET(String identifier);
 }
