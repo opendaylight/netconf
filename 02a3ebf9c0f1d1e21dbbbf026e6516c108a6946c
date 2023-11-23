@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2232d75a_06b1c183",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-23T08:44:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce303140_b3a7c98a",
+      "revId": "02a3ebf9c0f1d1e21dbbbf026e6516c108a6946c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ea757e0_1d592b05",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-11-23T08:08:53Z",
       "side": 1,
       "message": "final var ?",
+      "revId": "02a3ebf9c0f1d1e21dbbbf026e6516c108a6946c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "428bffe7_6dceba63",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-23T08:44:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ea757e0_1d592b05",
       "revId": "02a3ebf9c0f1d1e21dbbbf026e6516c108a6946c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
