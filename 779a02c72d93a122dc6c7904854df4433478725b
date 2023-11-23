@@ -16,6 +16,24 @@
       "message": "this should be out of schemas body, i think if you put generator.writeEndObject() before this InputStreamReader, it sholud be good",
       "revId": "779a02c72d93a122dc6c7904854df4433478725b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e7becc0_a3b55506",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-23T16:38:47Z",
+      "side": 1,
+      "message": "and deleted line 82",
+      "parentUuid": "754194d6_b1d02413",
+      "revId": "779a02c72d93a122dc6c7904854df4433478725b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
