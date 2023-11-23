@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1597e94f_c6891283",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsSteam.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-11-23T13:54:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c468e6a_268fb92b",
+      "revId": "dfaa7cc0d80e396f562be1fe9c801797d71eed3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c0fabf1_f843d617",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81e0cfde_07355534",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/OperationEntity.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-11-23T13:54:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c0fabf1_f843d617",
+      "revId": "dfaa7cc0d80e396f562be1fe9c801797d71eed3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f3ba8e7_f95e20cd",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-11-22T14:43:02Z",
       "side": 1,
       "message": "JSON content is not generated correctly\n\ngenerator.writeObjectFieldStart(MediaType.APPLICATION_JSON);\ngenerator.writeObjectFieldStart(SCHEMA);\ngenerator.writeObjectFieldStart(\"properties\");\ngenerator.writeObjectFieldStart(INPUT_KEY);\ngenerator.writeStringField(\"$ref\", ref);\ngenerator.writeStringField(TYPE, OBJECT);\ngenerator.writeEndObject();\ngenerator.writeEndObject();\ngenerator.writeEndObject();\ngenerator.writeEndObject();\n\nyou should use something like this.",
+      "revId": "dfaa7cc0d80e396f562be1fe9c801797d71eed3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a0bada0_c3b6f345",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PostEntity.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-11-23T13:54:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f3ba8e7_f95e20cd",
       "revId": "dfaa7cc0d80e396f562be1fe9c801797d71eed3d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
