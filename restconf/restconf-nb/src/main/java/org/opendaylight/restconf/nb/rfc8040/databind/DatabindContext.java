@@ -9,19 +9,47 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.export.YinExportUtils;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.api.YinTextSchemaSource;
 
 /**
  * An immutable context holding a consistent view of things related to data bind operations.
  */
 public final class DatabindContext {
+    /**
+     * Interface for acquiring model source.
+     */
+    @NonNullByDefault
+    @FunctionalInterface
+    public interface SourceResolver {
+        /**
+         * Resolve a specified source into a byte stream in specified representation.
+         *
+         * @param source Source identifier
+         * @param representation Requested representation
+         * @return A {@link RestconfFuture} completing with an {@link InputStream}, or {@code null} if the requested
+         *        representation is not supported.
+         */
+        @Nullable RestconfFuture<InputStream> resolveSource(SourceIdentifier source,
+            Class<? extends SchemaSourceRepresentation> representation);
+    }
+
     private static final VarHandle JSON_CODECS;
     private static final VarHandle XML_CODECS;
 
@@ -36,22 +64,35 @@ public final class DatabindContext {
     }
 
     private final @NonNull MountPointContext mountContext;
+    private final SourceResolver sourceResolver;
 
     @SuppressWarnings("unused")
     private volatile JSONCodecFactory jsonCodecs;
     @SuppressWarnings("unused")
     private volatile XmlCodecFactory xmlCodecs;
 
-    private DatabindContext(final @NonNull MountPointContext mountContext) {
+    private DatabindContext(final @NonNull MountPointContext mountContext,
+            final @Nullable SourceResolver sourceResolver) {
         this.mountContext = requireNonNull(mountContext);
+        this.sourceResolver = sourceResolver;
     }
 
     public static @NonNull DatabindContext ofModel(final EffectiveModelContext modelContext) {
-        return ofMountPoint(MountPointContext.of(modelContext));
+        return ofModel(modelContext, null);
+    }
+
+    public static @NonNull DatabindContext ofModel(final EffectiveModelContext modelContext,
+            final @Nullable SourceResolver sourceResolver) {
+        return ofMountPoint(MountPointContext.of(modelContext), sourceResolver);
     }
 
     public static @NonNull DatabindContext ofMountPoint(final MountPointContext mountContext) {
-        return new DatabindContext(mountContext);
+        return ofMountPoint(mountContext, null);
+    }
+
+    public static @NonNull DatabindContext ofMountPoint(final MountPointContext mountContext,
+            final @Nullable SourceResolver sourceResolver) {
+        return new DatabindContext(mountContext, sourceResolver);
     }
 
     public @NonNull EffectiveModelContext modelContext() {
@@ -78,5 +119,33 @@ public final class DatabindContext {
         final var created = XmlCodecFactory.create(mountContext);
         final var witness = (XmlCodecFactory) XML_CODECS.compareAndExchangeRelease(this, null, created);
         return witness != null ? witness : created;
+    }
+
+    public @NonNull RestconfFuture<InputStream> resolveSource(final SourceIdentifier source,
+            final Class<? extends SchemaSourceRepresentation> representation) {
+        final var src = requireNonNull(source);
+        if (sourceResolver != null) {
+            final var delegate = sourceResolver.resolveSource(src, representation);
+            if (delegate != null) {
+                return delegate;
+            }
+        }
+        if (YangTextSchemaSource.class.isAssignableFrom(representation)) {
+            return declaredYangSource(source);
+        }
+        if (YinTextSchemaSource.class.isAssignableFrom(representation)) {
+            return declaredYinSource(source);
+        }
+        return RestconfFuture.failed(new RestconfDocumentedException(
+            "Unsupported source representation " + representation.getName()));
+    }
+
+    private @NonNull RestconfFuture<InputStream> declaredYangSource(final SourceIdentifier source) {
+
+    }
+
+    private @NonNull RestconfFuture<InputStream> declaredYinSource(final SourceIdentifier source) {
+        YinExportUtils.writeModuleAsYinText(context.module(), entityStream);
+
     }
 }

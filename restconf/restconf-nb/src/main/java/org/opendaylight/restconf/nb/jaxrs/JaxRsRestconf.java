@@ -56,11 +56,13 @@ import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
+import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -563,6 +565,40 @@ public final class JaxRsRestconf {
                     case CREATED -> Response.status(Status.CREATED).build();
                     case REPLACED -> Response.noContent().build();
                 };
+            }
+        });
+    }
+
+    /**
+     * Get schema of specific module.
+     *
+     * @param identifier path parameter
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
+    @Path("/modules/{identifier:.+}")
+    public void modulesYangGET(@PathParam("identifier") final String identifier, @Suspended final AsyncResponse ar) {
+        server.modulesYangGET(identifier).addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            protected Response transform(final ModulesGetResult result) {
+                return Response.ok(result.stream()).build();
+            }
+        });
+    }
+
+    /**
+     * Get schema of specific module.
+     *
+     * @param identifier path parameter
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
+    @Path("/modules/{identifier:.+}")
+    public void modulesYinGET(@PathParam("identifier") final String identifier, @Suspended final AsyncResponse ar) {
+        server.modulesYinGET(identifier).addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            protected Response transform(final ModulesGetResult result) {
+                return Response.ok(result.stream()).build();
             }
         });
     }

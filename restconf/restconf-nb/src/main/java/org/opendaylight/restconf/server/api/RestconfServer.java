@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server.api;
 
+import com.google.common.annotations.Beta;
 import java.net.URI;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -117,6 +118,16 @@ public interface RestconfServer {
      * @return A {@link RestconfFuture} completing with {@link DataPutResult}
      */
     RestconfFuture<DataPutResult> dataPUT(ApiPath identifier, ResourceBody body, Map<String, String> queryParameters);
+
+    // FIXME: this is an OpenDaylight extension. Its presence should be announced through a capability
+    // TODO: while fixing the above, think about whether we want to define an extension interface for such capabilities
+    @Beta
+    RestconfFuture<ModulesGetResult> modulesYangGET(String identifier);
+
+    // FIXME: this is an OpenDaylight extension. Its presence should be announced through a capability
+    // TODO: while fixing the above, think about whether we want to define an extension interface for such capabilities
+    @Beta
+    RestconfFuture<ModulesGetResult> modulesYinGET(String identifier);
 
     /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, ApiPath, OperationInputBody)},

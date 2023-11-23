@@ -17,10 +17,7 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeB
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonPatchStatusBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlPatchStatusBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YangSchemaExportBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.YinSchemaExportBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
-import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.server.api.RestconfServer;
 
 final class RestconfApplication extends Application {
@@ -30,15 +27,13 @@ final class RestconfApplication extends Application {
             final DOMMountPointService mountPointService, final DOMSchemaService domSchemaService) {
         singletons = Set.of(
             new RestconfDocumentedExceptionMapper(databindProvider),
-            new JaxRsRestconf(server),
-            new RestconfSchemaServiceImpl(domSchemaService, mountPointService));
+            new JaxRsRestconf(server));
     }
 
     @Override
     public Set<Class<?>> getClasses() {
         return Set.of(
             JsonNormalizedNodeBodyWriter.class, XmlNormalizedNodeBodyWriter.class,
-            YinSchemaExportBodyWriter.class, YangSchemaExportBodyWriter.class,
             JsonPatchStatusBodyWriter.class, XmlPatchStatusBodyWriter.class);
     }
 
