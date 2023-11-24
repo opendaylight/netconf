@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -23,6 +22,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -410,8 +410,8 @@ public final class MdsalRestconfServer implements RestconfServer {
             return RestconfFuture.of(new OperationsGetResult.Container(modelContext, ImmutableSetMultimap.of()));
         }
 
-        // RPCs by their XMLNamespace/Revision
-        final var table = HashBasedTable.<XMLNamespace, Revision, ImmutableSet<QName>>create();
+        // RPC QNames by their XMLNamespace/Revision. This should be a Table, but Revision can be null, which wrecks us.
+        final var table = new HashMap<XMLNamespace, Map<Revision, ImmutableSet<QName>>>();
         for (var entry : modules.entrySet()) {
             final var module = entry.getValue();
             final var rpcNames = module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
@@ -419,13 +419,14 @@ public final class MdsalRestconfServer implements RestconfServer {
                 .collect(ImmutableSet.toImmutableSet());
             if (!rpcNames.isEmpty()) {
                 final var namespace = entry.getKey();
-                table.put(namespace.getNamespace(), namespace.getRevision().orElse(null), rpcNames);
+                table.computeIfAbsent(namespace.getNamespace(), ignored -> new HashMap<>())
+                    .put(namespace.getRevision().orElse(null), rpcNames);
             }
         }
 
         // Now pick the latest revision for each namespace
         final var rpcs = ImmutableSetMultimap.<QNameModule, QName>builder();
-        for (var entry : table.rowMap().entrySet()) {
+        for (var entry : table.entrySet()) {
             entry.getValue().entrySet().stream()
                 .sorted(Comparator.comparing(Entry::getKey, (first, second) -> Revision.compare(second, first)))
                 .findFirst()
