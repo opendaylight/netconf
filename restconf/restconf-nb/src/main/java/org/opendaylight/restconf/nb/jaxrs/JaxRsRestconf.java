@@ -588,7 +588,8 @@ public final class JaxRsRestconf {
     @GET
     @Path("/operations/{operation:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-    public void operationsJsonGET(@PathParam("operation") final JaxRsApiPath operation, final AsyncResponse ar) {
+    public void operationsJsonGET(@PathParam("operation") final JaxRsApiPath operation,
+            @Suspended final AsyncResponse ar) {
         completeOperationsGet(server.operationsGET(operation.apiPath), ar, OperationsGetResult::toJSON);
     }
 
@@ -618,7 +619,8 @@ public final class JaxRsRestconf {
     @GET
     @Path("/operations/{operation:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public void operationsXmlGET(@PathParam("operation") final JaxRsApiPath operation, final AsyncResponse ar) {
+    public void operationsXmlGET(@PathParam("operation") final JaxRsApiPath operation,
+            @Suspended final AsyncResponse ar) {
         completeOperationsXmlGet(server.operationsGET(operation.apiPath), ar);
     }
 
