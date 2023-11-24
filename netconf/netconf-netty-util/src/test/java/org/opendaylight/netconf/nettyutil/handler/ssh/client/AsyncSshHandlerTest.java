@@ -15,7 +15,9 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -32,10 +34,13 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelPromise;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timer;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -87,6 +92,8 @@ public class AsyncSshHandlerTest {
     private SshFutureListener<OpenFuture> sshChannelOpenListener;
     private ChannelPromise promise;
 
+    private final Timer timer = new HashedWheelTimer(100, TimeUnit.MILLISECONDS);
+
     @Before
     public void setUp() throws Exception {
         stubAuth();
@@ -95,12 +102,12 @@ public class AsyncSshHandlerTest {
         stubCtx();
 
         promise = getMockedPromise();
-
-        asyncSshHandler = new AsyncSshHandler(authHandler, sshClient);
+        asyncSshHandler = new AsyncSshHandler(authHandler, sshClient, timer);
     }
 
     @After
     public void tearDown() throws Exception {
+        timer.stop();
         sshConnectListener = null;
         sshAuthListener = null;
         sshChannelOpenListener = null;
@@ -160,8 +167,46 @@ public class AsyncSshHandlerTest {
         }, MoreExecutors.directExecutor());
         doReturn(connectFuture).when(sshClient).connect("usr", remoteAddress);
         doReturn(channelConfig).when(channel).config();
-        doReturn(1).when(channelConfig).getConnectTimeoutMillis();
-        doReturn(connectFuture).when(connectFuture).verify(1,TimeUnit.MILLISECONDS);
+        doReturn(1000).when(channelConfig).getConnectTimeoutMillis();
+    }
+
+    @Test
+    public void testNoDelayAfterPendingConnection() throws Exception {
+        // Prepare pending connection.
+        final var mockStuckConnectFuture = mock(ConnectFuture.class);
+        doReturn(false).when(mockStuckConnectFuture).isDone();
+        doReturn(mockStuckConnectFuture).when(mockStuckConnectFuture).addListener(any(SshFutureListener.class));
+        doNothing().when(mockStuckConnectFuture).setException(any(TimeoutException.class));
+        doReturn(null).when(mockStuckConnectFuture).cancel();
+        doReturn("StuckConnection").when(mockStuckConnectFuture).getId();
+        final var mockStuckAddress = mock(SocketAddress.class);
+        doReturn(mockStuckConnectFuture).when(sshClient).connect("usr", mockStuckAddress);
+
+        // Start pending connection.
+        asyncSshHandler.connect(ctx, mockStuckAddress, localAddress, promise);
+        // Start normal connection.
+        asyncSshHandler.connect(ctx, remoteAddress, localAddress, promise);
+
+        // Handle normal connection.
+        final var asyncOut = getMockedIoInputStream();
+        final var asyncIn = getMockedIoOutputStream();
+        final var subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final var sshSession = getMockedSshSession(subsystemChannel);
+        final var connectFuture = getSuccessConnectFuture(sshSession);
+        sshConnectListener.operationComplete(connectFuture);
+        sshAuthListener.operationComplete(getSuccessAuthFuture());
+        sshChannelOpenListener.operationComplete(getSuccessOpenFuture());
+        verify(subsystemChannel).setStreaming(ClientChannel.Streaming.Async);
+
+        // Verify that pending connection is still waiting.
+        verify(mockStuckConnectFuture, never()).setException(any(TimeoutException.class));
+        // Verify that normal connection successfully finished.
+        verify(promise).setSuccess();
+        verify(ctx).fireChannelActive();
+        // Verify that pending connection set TimeoutException.
+        verify(mockStuckConnectFuture, timeout(2000)).setException(any(TimeoutException.class));
+        asyncSshHandler.close(ctx, getMockedPromise());
+        verify(ctx).fireChannelInactive();
     }
 
     @Test
