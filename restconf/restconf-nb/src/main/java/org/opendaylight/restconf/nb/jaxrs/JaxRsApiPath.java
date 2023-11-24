@@ -17,7 +17,7 @@ import org.opendaylight.restconf.api.ApiPath;
  * A JAX-RS parsing bridge to {@link ApiPath}.
  */
 @NonNullByDefault
-final class JaxRsApiPath {
+public final class JaxRsApiPath {
     final ApiPath apiPath;
 
     /**
@@ -27,7 +27,7 @@ final class JaxRsApiPath {
      * @throws NullPointerException if {@code str} is {@code null}
      * @throws BadRequestException if {@code str} cannmot be interpreted as an {@link ApiPath}
      */
-    JaxRsApiPath(final String str) {
+    public JaxRsApiPath(final String str) {
         try {
             apiPath = ApiPath.parseUrl(str);
         } catch (ParseException e) {
