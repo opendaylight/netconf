@@ -16,6 +16,24 @@
       "message": "What is the impact on RPC usage?",
       "revId": "c903d60c6beffe063a19e0d30e08cd91c76e3312",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "975c4ed6_06a392ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-11-24T16:40:49Z",
+      "side": 1,
+      "message": "As far as I tested it - you can use all RPCs as you used them before. There are just few of them actually - only 3 for create and 3 for delete - all inside netconf-keystore.yang file.",
+      "parentUuid": "306962ae_018a320a",
+      "revId": "c903d60c6beffe063a19e0d30e08cd91c76e3312",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
