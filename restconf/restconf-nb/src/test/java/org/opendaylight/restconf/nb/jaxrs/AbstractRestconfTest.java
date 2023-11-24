@@ -15,11 +15,13 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -30,6 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
@@ -42,7 +45,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 // FIXME: hide this class
 @ExtendWith(MockitoExtension.class)
 public abstract class AbstractRestconfTest extends AbstractJukeboxTest {
-    static final JaxRsApiPath JUKEBOX_API_PATH = new JaxRsApiPath("example-jukebox:jukebox");
+    static final ApiPath JUKEBOX_API_PATH = apiPath("example-jukebox:jukebox");
 
     @Mock
     UriInfo uriInfo;
@@ -111,5 +114,13 @@ public abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         final var response = captor.getValue();
         assertEquals(expectedStatus, response.getStatus());
         return response;
+    }
+
+    static final @NonNull ApiPath apiPath(final String str) {
+        try {
+            return ApiPath.parse(str);
+        } catch (ParseException e) {
+            throw new AssertionError(e);
+        }
     }
 }

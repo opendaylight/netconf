@@ -81,7 +81,7 @@ class RestconfDataPutTest extends AbstractRestconfTest {
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
 
         assertNull(assertEntity(204, ar -> restconf.dataXmlPUT(
-            new JaxRsApiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), uriInfo,
+            apiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), uriInfo,
             stringInputStream("""
                 <jukebox xmlns="http://example.com/ns/example-jukebox">
                   <player>
@@ -101,7 +101,7 @@ class RestconfDataPutTest extends AbstractRestconfTest {
             .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         assertNull(assertEntity(201, ar -> restconf.dataJsonPUT(
-            new JaxRsApiPath("example-jukebox:jukebox/playlist=0/song=3"), uriInfo, stringInputStream("""
+            apiPath("example-jukebox:jukebox/playlist=0/song=3"), uriInfo, stringInputStream("""
             {
               "example-jukebox:song" : [
                 {
@@ -125,7 +125,7 @@ class RestconfDataPutTest extends AbstractRestconfTest {
             .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         assertNull(assertEntity(201, ar -> restconf.dataJsonPUT(
-            new JaxRsApiPath("example-jukebox:jukebox/playlist=0/song=3"), uriInfo, stringInputStream("""
+            apiPath("example-jukebox:jukebox/playlist=0/song=3"), uriInfo, stringInputStream("""
             {
               "example-jukebox:song" : [
                 {
@@ -150,7 +150,7 @@ class RestconfDataPutTest extends AbstractRestconfTest {
             .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         assertNull(assertEntity(201, ar -> restconf.dataJsonPUT(
-            new JaxRsApiPath("example-jukebox:jukebox/playlist=0/song=3"), uriInfo, stringInputStream("""
+            apiPath("example-jukebox:jukebox/playlist=0/song=3"), uriInfo, stringInputStream("""
             {
               "example-jukebox:song" : [
                 {
@@ -175,7 +175,7 @@ class RestconfDataPutTest extends AbstractRestconfTest {
             .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         assertNull(assertEntity(201, ar -> restconf.dataJsonPUT(
-            new JaxRsApiPath("example-jukebox:jukebox/playlist=0/song=3"), uriInfo, stringInputStream("""
+            apiPath("example-jukebox:jukebox/playlist=0/song=3"), uriInfo, stringInputStream("""
             {
               "example-jukebox:song" : [
                 {
