@@ -74,7 +74,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
 
         prepNNC(result);
         assertSame(result, assertNormalizedNode(200, ar -> restconf.operationsXmlPOST(
-            new JaxRsApiPath("invoke-rpc-module:rpc-test"), stringInputStream("""
+            apiPath("invoke-rpc-module:rpc-test"), stringInputStream("""
                 <input xmlns="invoke:rpc:module"/>"""), uriInfo, ar)));
     }
 
@@ -84,7 +84,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(true).when(result).isEmpty();
 
         prepNNC(result);
-        assertNull(assertEntity(204, ar -> restconf.operationsJsonPOST(new JaxRsApiPath("invoke-rpc-module:rpc-test"),
+        assertNull(assertEntity(204, ar -> restconf.operationsJsonPOST(apiPath("invoke-rpc-module:rpc-test"),
             stringInputStream("""
                 {
                   "invoke-rpc-module:input" : {
@@ -98,7 +98,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
             .invokeRpc(RPC, INPUT);
 
         assertEquals(OUTPUT, assertNormalizedNode(200, ar -> restconf.operationsXmlPOST(
-            new JaxRsApiPath("invoke-rpc-module:rpc-test"), stringInputStream("""
+            apiPath("invoke-rpc-module:rpc-test"), stringInputStream("""
                 <input xmlns="invoke:rpc:module">
                   <cont>
                     <lf>test</lf>
@@ -112,7 +112,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                 "No implementation of RPC " + RPC + " available.");
         doReturn(Futures.immediateFailedFuture(exception)).when(rpcService).invokeRpc(RPC, INPUT);
 
-        final var error = assertError(ar -> restconf.operationsJsonPOST(new JaxRsApiPath("invoke-rpc-module:rpc-test"),
+        final var error = assertError(ar -> restconf.operationsJsonPOST(apiPath("invoke-rpc-module:rpc-test"),
             stringInputStream("""
                 {
                   "invoke-rpc-module:input" : {
@@ -141,15 +141,15 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
 
         assertEquals(OUTPUT, assertNormalizedNode(200,
             ar -> restconf.operationsJsonPOST(
-                new JaxRsApiPath("ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test"),
-            stringInputStream("""
-                {
-                  "invoke-rpc-module:input" : {
-                    "cont" : {
-                      "lf" : "test"
-                    }
-                  }
-                }"""), uriInfo, ar)));
+                apiPath("ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test"),
+                stringInputStream("""
+                    {
+                      "invoke-rpc-module:input" : {
+                        "cont" : {
+                          "lf" : "test"
+                        }
+                      }
+                    }"""), uriInfo, ar)));
     }
 
     @Test
@@ -164,7 +164,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
 
         final var error = assertError(
             ar -> restconf.operationsJsonPOST(
-                new JaxRsApiPath("ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test"),
+                apiPath("ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test"),
                 stringInputStream("""
                     {
                       "invoke-rpc-module:input" : {
@@ -181,7 +181,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
             .when(rpcService).invokeRpc(RPC, INPUT);
 
         assertEquals(OUTPUT, assertNormalizedNode(200, ar -> restconf.operationsJsonPOST(
-            new JaxRsApiPath("invoke-rpc-module:rpc-test"),
+            apiPath("invoke-rpc-module:rpc-test"),
             stringInputStream("""
                 {
                   "invoke-rpc-module:input" : {

@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -42,8 +43,8 @@ class Netconf822Test extends AbstractRestconfTest {
     }
 
     @Test
-    void testOperationsContentByIdentifier() {
-        final var apiPath = new JaxRsApiPath("foo:new1");
+    void testOperationsContentByIdentifier() throws Exception {
+        final var apiPath = ApiPath.parse("foo:new1");
         assertEquals("""
             { "foo:new1" : [null] }""", assertEntity(200, ar -> restconf.operationsJsonGET(apiPath, ar)));
         assertEquals("""

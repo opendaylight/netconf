@@ -82,6 +82,6 @@ class RestconfDataDeleteTest extends AbstractRestconfTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
         assertNull(assertEntity(204, ar -> restconf.dataDELETE(
-            new JaxRsApiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), ar)));
+            apiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), ar)));
     }
 }

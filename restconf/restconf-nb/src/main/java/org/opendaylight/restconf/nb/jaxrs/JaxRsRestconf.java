@@ -10,11 +10,15 @@ package org.opendaylight.restconf.nb.jaxrs;
 import static java.util.Objects.requireNonNull;
 
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.text.ParseException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Function;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
@@ -32,6 +36,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -65,17 +73,50 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Baseline RESTCONF implementation with JAX-RS. Interfaces to a {@link RestconfServer}.
+ * Baseline RESTCONF implementation with JAX-RS. Interfaces to a {@link RestconfServer}. Since we need {@link ApiPath}
+ * arguments, we also implement {@link ParamConverterProvider} and provide the appropriate converter. This has the nice
+ * side-effect of suppressing <a href="https://github.com/eclipse-ee4j/jersey/issues/3700">Jersey warnings</a>.
  */
 @Path("/")
-public final class JaxRsRestconf {
+@Singleton
+public final class JaxRsRestconf implements ParamConverterProvider {
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsRestconf.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
+    private static final ParamConverter<ApiPath> API_PATH_CONVERTER = new ParamConverter<>() {
+        @Override
+        public ApiPath fromString(final String value) {
+            final var str = nonnull(value);
+            try {
+                return ApiPath.parseUrl(str);
+            } catch (ParseException e) {
+                throw new IllegalArgumentException(e.getMessage(), e);
+            }
+        }
+
+        @Override
+        public String toString(final ApiPath value) {
+            return nonnull(value).toString();
+        }
+
+        private static <T> @NonNull T nonnull(final @Nullable T value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value must not be null");
+            }
+            return value;
+        }
+    };
 
     private final RestconfServer server;
 
     public JaxRsRestconf(final RestconfServer server) {
         this.server = requireNonNull(server);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> ParamConverter<T> getConverter(final Class<T> rawType, final Type genericType,
+            final Annotation[] annotations) {
+        return ApiPath.class.equals(rawType) ? (ParamConverter<T>) API_PATH_CONVERTER : null;
     }
 
     /**
@@ -87,9 +128,9 @@ public final class JaxRsRestconf {
     @DELETE
     @Path("/data/{identifier:.+}")
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
-    public void dataDELETE(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
+    public void dataDELETE(@Encoded @PathParam("identifier") final ApiPath identifier,
             @Suspended final AsyncResponse ar) {
-        server.dataDELETE(identifier.apiPath).addCallback(new JaxRsRestconfCallback<>(ar) {
+        server.dataDELETE(identifier).addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             protected Response transform(final Empty result) {
                 return Response.noContent().build();
@@ -133,10 +174,10 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void dataGET(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
-            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+    public void dataGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
+            @Suspended final AsyncResponse ar) {
         final var readParams = QueryParams.newReadDataParams(uriInfo);
-        completeDataGET(server.dataGET(identifier.apiPath, readParams), readParams, ar);
+        completeDataGET(server.dataGET(identifier, readParams), readParams, ar);
     }
 
     private static void completeDataGET(final RestconfFuture<NormalizedNodePayload> future,
@@ -196,10 +237,10 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void dataXmlPATCH(@Encoded @PathParam("identifier") final JaxRsApiPath identifier, final InputStream body,
+    public void dataXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            completeDataPATCH(server.dataPATCH(identifier.apiPath, xmlBody), ar);
+            completeDataPATCH(server.dataPATCH(identifier, xmlBody), ar);
         }
     }
 
@@ -236,10 +277,10 @@ public final class JaxRsRestconf {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public void dataJsonPATCH(@Encoded @PathParam("identifier") final JaxRsApiPath identifier, final InputStream body,
+    public void dataJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            completeDataPATCH(server.dataPATCH(identifier.apiPath, jsonBody), ar);
+            completeDataPATCH(server.dataPATCH(identifier, jsonBody), ar);
         }
     }
 
@@ -287,10 +328,10 @@ public final class JaxRsRestconf {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
-            final InputStream body, @Suspended final AsyncResponse ar) {
+    public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
+            @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(identifier.apiPath, jsonBody), ar);
+            completeDataYangPATCH(server.dataPATCH(identifier, jsonBody), ar);
         }
     }
 
@@ -329,10 +370,10 @@ public final class JaxRsRestconf {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
-            final InputStream body, @Suspended final AsyncResponse ar) {
+    public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
+            @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(identifier.apiPath, xmlBody), ar);
+            completeDataYangPATCH(server.dataPATCH(identifier, xmlBody), ar);
         }
     }
 
@@ -402,10 +443,10 @@ public final class JaxRsRestconf {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public void postDataJSON(@Encoded @PathParam("identifier") final JaxRsApiPath identifier, final InputStream body,
+    public void postDataJSON(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        completeDataPOST(server.dataPOST(identifier.apiPath, new JsonDataPostBody(body),
-            QueryParams.normalize(uriInfo)), uriInfo, ar);
+        completeDataPOST(server.dataPOST(identifier, new JsonDataPostBody(body), QueryParams.normalize(uriInfo)),
+            uriInfo, ar);
     }
 
     /**
@@ -443,9 +484,9 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void postDataXML(@Encoded @PathParam("identifier") final JaxRsApiPath identifier, final InputStream body,
+    public void postDataXML(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        completeDataPOST(server.dataPOST(identifier.apiPath, new XmlDataPostBody(body), QueryParams.normalize(uriInfo)),
+        completeDataPOST(server.dataPOST(identifier, new XmlDataPostBody(body), QueryParams.normalize(uriInfo)),
             uriInfo, ar);
     }
 
@@ -505,10 +546,10 @@ public final class JaxRsRestconf {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaType.APPLICATION_JSON,
     })
-    public void dataJsonPUT(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
-            @Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
+    public void dataJsonPUT(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
+            final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            completeDataPUT(server.dataPUT(identifier.apiPath, jsonBody, QueryParams.normalize(uriInfo)), ar);
+            completeDataPUT(server.dataPUT(identifier, jsonBody, QueryParams.normalize(uriInfo)), ar);
         }
     }
 
@@ -547,10 +588,10 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void dataXmlPUT(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
-            @Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
+    public void dataXmlPUT(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
+            final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            completeDataPUT(server.dataPUT(identifier.apiPath, xmlBody, QueryParams.normalize(uriInfo)), ar);
+            completeDataPUT(server.dataPUT(identifier, xmlBody, QueryParams.normalize(uriInfo)), ar);
         }
     }
 
@@ -588,9 +629,8 @@ public final class JaxRsRestconf {
     @GET
     @Path("/operations/{operation:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-    public void operationsJsonGET(@PathParam("operation") final JaxRsApiPath operation,
-            @Suspended final AsyncResponse ar) {
-        completeOperationsGet(server.operationsGET(operation.apiPath), ar, OperationsGetResult::toJSON);
+    public void operationsJsonGET(@PathParam("operation") final ApiPath operation, @Suspended final AsyncResponse ar) {
+        completeOperationsGet(server.operationsGET(operation), ar, OperationsGetResult::toJSON);
     }
 
     private static void completeOperationsJsonGet(final RestconfFuture<OperationsGetResult> future,
@@ -619,9 +659,8 @@ public final class JaxRsRestconf {
     @GET
     @Path("/operations/{operation:.+}")
     @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public void operationsXmlGET(@PathParam("operation") final JaxRsApiPath operation,
-            @Suspended final AsyncResponse ar) {
-        completeOperationsXmlGet(server.operationsGET(operation.apiPath), ar);
+    public void operationsXmlGET(@PathParam("operation") final ApiPath operation, @Suspended final AsyncResponse ar) {
+        completeOperationsXmlGet(server.operationsGET(operation), ar);
     }
 
     private static void completeOperationsXmlGet(final RestconfFuture<OperationsGetResult> future,
@@ -662,10 +701,10 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void operationsXmlPOST(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
-            final InputStream body, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+    public void operationsXmlPOST(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlOperationInputBody(body)) {
-            operationsPOST(identifier.apiPath, uriInfo, ar, xmlBody);
+            operationsPOST(identifier, uriInfo, ar, xmlBody);
         }
     }
 
@@ -691,10 +730,10 @@ public final class JaxRsRestconf {
         MediaType.APPLICATION_XML,
         MediaType.TEXT_XML
     })
-    public void operationsJsonPOST(@Encoded @PathParam("identifier") final JaxRsApiPath identifier,
-            final InputStream body, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
+    public void operationsJsonPOST(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonOperationInputBody(body)) {
-            operationsPOST(identifier.apiPath, uriInfo, ar, jsonBody);
+            operationsPOST(identifier, uriInfo, ar, jsonBody);
         }
     }
 
