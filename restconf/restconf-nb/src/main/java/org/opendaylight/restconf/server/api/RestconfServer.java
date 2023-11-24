@@ -28,6 +28,9 @@ import org.opendaylight.yangtools.yang.common.Empty;
  * An implementation of a RESTCONF server, implementing the
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3">RESTCONF API Resource</a>.
  */
+// FIXME: configuration datastore should maintain ETag and Last-Modified headers, so that these can be returned when
+//        GET/PATCH/POST/PUT modify the data.
+// FIXME: NETCONF-773: as a first step in doing that we should carry those fields in our responses
 @NonNullByDefault
 public interface RestconfServer {
     /**
