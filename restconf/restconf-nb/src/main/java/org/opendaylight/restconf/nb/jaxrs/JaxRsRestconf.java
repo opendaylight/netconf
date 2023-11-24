@@ -191,8 +191,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                         yield Response.status(Status.OK)
                             .entity(result)
                             // FIXME: is this ETag okay?
+                            // FIXME: use tag() method instead
                             .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
                                 + "-" + type.getLocalName() + '"')
+                            // FIXME: use lastModified() method instead
                             .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                             .build();
                     }
