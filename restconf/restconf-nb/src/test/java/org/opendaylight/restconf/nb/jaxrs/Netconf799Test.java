@@ -29,6 +29,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
@@ -57,7 +58,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
     private ArgumentCaptor<Response> captor;
 
     @Test
-    void testInvokeAction() {
+    void testInvokeAction() throws Exception {
         doReturn(Futures.immediateFuture(new SimpleDOMActionResult(
             Builders.containerBuilder().withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME)).build())))
             .when(actionService).invokeAction(eq(Absolute.of(CONT_QNAME, CONT1_QNAME, RESET_QNAME)), any(), any());
@@ -66,7 +67,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
             () -> DatabindContext.ofModel(IID_SCHEMA), dataBroker, rpcService, actionService, mountPointService));
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
-        restconf.postDataJSON(new JaxRsApiPath("instance-identifier-module:cont/cont1/reset"),
+        restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
             stringInputStream("""
             {
               "instance-identifier-module:input": {

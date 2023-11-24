@@ -123,7 +123,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         // response must contain all child nodes from config and operational containers merged in one container
         final var data = assertInstanceOf(ContainerNode.class,
             assertNormalizedNode(200, ar -> restconf.dataGET(
-                new JaxRsApiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), uriInfo, ar)));
+               apiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), uriInfo, ar)));
         assertEquals(3, data.size());
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
         assertNotNull(data.childByArg(LIBRARY_NID));
