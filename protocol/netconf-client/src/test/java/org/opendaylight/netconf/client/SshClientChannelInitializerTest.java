@@ -18,6 +18,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
+import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
@@ -51,7 +52,7 @@ public class SshClientChannelInitializerTest {
         doReturn("").when(promise).toString();
 
         SshClientChannelInitializer initializer = new SshClientChannelInitializer(authenticationHandler,
-                negotiatorFactory, sessionListener);
+                negotiatorFactory, sessionListener, mock(Timer.class));
         initializer.initialize(channel, promise);
         verify(pipeline, times(1)).addFirst(any(ChannelHandler.class));
     }
