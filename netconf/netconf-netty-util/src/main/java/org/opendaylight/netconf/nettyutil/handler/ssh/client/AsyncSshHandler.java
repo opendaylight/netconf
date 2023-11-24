@@ -13,6 +13,8 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import io.netty.util.Timeout;
+import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import java.io.IOException;
@@ -21,6 +23,7 @@ import java.lang.invoke.VarHandle;
 import java.net.SocketAddress;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.Nullable;
@@ -30,6 +33,7 @@ import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.common.PropertyResolverUtils;
 import org.opendaylight.netconf.shaded.sshd.core.CoreModuleProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +78,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private final Future<?> negotiationFuture;
     private final NetconfSshClient sshClient;
     private final String name;
+    private final Timer timer;
 
     // Initialized by connect()
     @GuardedBy("this")
@@ -87,16 +92,17 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private volatile boolean disconnected;
 
     private AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
-            final @Nullable Future<?> negotiationFuture, final @Nullable String name) {
+            final Timer timer, final @Nullable Future<?> negotiationFuture, final @Nullable String name) {
         this.authenticationHandler = requireNonNull(authenticationHandler);
         this.sshClient = requireNonNull(sshClient);
+        this.timer = requireNonNull(timer);
         this.negotiationFuture = negotiationFuture;
         this.name = name != null && !name.isBlank() ? name : "UNNAMED";
     }
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
-            final @Nullable Future<?> negotiationFuture) {
-        this(authenticationHandler, sshClient, negotiationFuture, null);
+            final Timer timer, final @Nullable Future<?> negotiationFuture) {
+        this(authenticationHandler, sshClient, timer, negotiationFuture, null);
     }
 
     /**
@@ -105,12 +111,14 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @param authenticationHandler authentication handler
      * @param sshClient             started SshClient
      */
-    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient) {
-        this(authenticationHandler, sshClient, null);
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
+            final Timer timer) {
+        this(authenticationHandler, sshClient, timer, null);
     }
 
-    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) {
-        return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT);
+    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
+            final Timer timer) {
+        return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT, timer);
     }
 
     /**
@@ -122,9 +130,9 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @return                      {@code AsyncSshHandler}
      */
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
-            final Future<?> negotiationFuture, final @Nullable NetconfSshClient sshClient,
+            final Future<?> negotiationFuture, final Timer timer, final @Nullable NetconfSshClient sshClient,
             final @Nullable String name) {
-        return new AsyncSshHandler(authenticationHandler, sshClient != null ? sshClient : DEFAULT_CLIENT,
+        return new AsyncSshHandler(authenticationHandler, sshClient != null ? sshClient : DEFAULT_CLIENT, timer,
                 negotiationFuture, name);
     }
 
@@ -148,13 +156,31 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             //complete connection promise with netconf negotiation future
             negotiationFuture.addListener(negotiationFutureListener);
         }
+        // Sync the connection timeout in the SshClient with the timeout configured in the device
+        final var connectTimeoutMillis = ctx.channel().config().getConnectTimeoutMillis();
+        PropertyResolverUtils.updateProperty(sshClient.getProperties(),
+            CoreModuleProperties.IO_CONNECT_TIMEOUT.getName(), Duration.ofMillis(connectTimeoutMillis).getSeconds());
 
         LOG.debug("{}: Starting SSH to {} on channel: {}", name, remoteAddress, ctx.channel());
-        sshClient.connect(authenticationHandler.getUsername(), remoteAddress)
-            // FIXME: this is a blocking call, we should handle this with a concurrently-scheduled timeout. We do not
-            //        have a Timer ready, so perhaps we should be using the event loop?
-            .verify(ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS)
-            .addListener(future -> onConnectComplete(future, ctx));
+        final var sshConnectFuture = sshClient.connect(authenticationHandler.getUsername(), remoteAddress);
+        final var timeout = setTimeoutToConnectFuture(connectTimeoutMillis, sshConnectFuture);
+        sshConnectFuture.addListener(future -> {
+            if (timeout != null && !timeout.isExpired()) {
+                timeout.cancel();
+            }
+            onConnectComplete(future, ctx);
+        });
+    }
+
+    private Timeout setTimeoutToConnectFuture(final int connectTimeoutMillis, final ConnectFuture sshConnectFuture) {
+        return timer.newTimeout(unused -> {
+            if (!sshConnectFuture.isDone()) {
+                // Connection timed out
+                sshConnectFuture.setException(new TimeoutException("Connection timed out for session: "
+                    + sshConnectFuture.getId()));
+                sshConnectFuture.cancel();
+            }
+        }, connectTimeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     private synchronized void onConnectComplete(final ConnectFuture connectFuture, final ChannelHandlerContext ctx) {
