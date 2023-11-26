@@ -35,7 +35,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 abstract class AbstractResourceBodyTest extends AbstractBodyTest {
@@ -52,7 +51,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
     static final QName LF11 = QName.create("augment:module:leaf:list", "2014-01-27", "lf11");
     static final QName LFLST11 = QName.create(LF11, "lflst11");
 
-    static EffectiveModelContext MODEL_CONTEXT;
+    static DatabindContext DATABIND;
 
     private final Function<InputStream, ResourceBody> bodyConstructor;
     private final DOMMountPointService mountPointService;
@@ -74,7 +73,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         final var testFiles = loadFiles("/instanceidentifier/yang");
         testFiles.addAll(loadFiles("/modules"));
         testFiles.addAll(loadFiles("/foo-xml-test/yang"));
-        MODEL_CONTEXT = YangParserTestUtils.parseYangFiles(testFiles);
+        DATABIND = DatabindContext.ofModel(YangParserTestUtils.parseYangFiles(testFiles));
     }
 
     // FIXME: migrate callers to use string literals
@@ -96,7 +95,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         }
 
         try (var body = bodyConstructor.apply(patchBody)) {
-            final var context = InstanceIdentifierContext.ofApiPath(apiPath, MODEL_CONTEXT, mountPointService);
+            final var context = InstanceIdentifierContext.ofApiPath(DATABIND, apiPath, mountPointService);
             return body.toNormalizedNode(context.getInstanceIdentifier(), context.inference(), context.getSchemaNode());
         }
     }

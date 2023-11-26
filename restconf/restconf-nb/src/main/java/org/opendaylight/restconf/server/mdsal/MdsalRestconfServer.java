@@ -455,7 +455,7 @@ public final class MdsalRestconfServer implements RestconfServer {
         final var currentContext = databindProvider.currentContext();
         final InstanceIdentifierContext point;
         try {
-            point = InstanceIdentifierContext.ofApiPath(mountPath, currentContext.modelContext(), mountPointService);
+            point = InstanceIdentifierContext.ofApiPath(currentContext, mountPath, mountPointService);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
@@ -563,7 +563,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     public RestconfFuture<OperationOutput> operationsPOST(final URI restconfURI, final ApiPath apiPath,
             final OperationInputBody body) {
         final var currentContext = databindProvider.currentContext();
-        final var reqPath = bindRequestPath(currentContext, apiPath);
+        final var reqPath = InstanceIdentifierContext.ofApiPath(currentContext, apiPath, mountPointService);
         final var inference = reqPath.inference();
         final ContainerNode input;
         try {
@@ -596,13 +596,12 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull ApiPath identifier) {
-        return bindRequestPath(databindProvider.currentContext(), identifier);
+        return InstanceIdentifierContext.ofApiPath(databindProvider.currentContext(), identifier, mountPointService);
     }
 
     private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull DatabindContext databind,
             final @NonNull ApiPath identifier) {
-        // FIXME: DatabindContext looks like it should be internal
-        return InstanceIdentifierContext.ofApiPath(identifier, databind.modelContext(), mountPointService);
+        return InstanceIdentifierContext.ofApiPath(databind, identifier, mountPointService);
     }
 
     private @NonNull InstanceIdentifierContext bindRequestRoot() {

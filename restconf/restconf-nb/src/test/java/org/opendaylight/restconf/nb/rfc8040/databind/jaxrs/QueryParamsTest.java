@@ -34,6 +34,7 @@ import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
@@ -78,13 +79,14 @@ public class QueryParamsTest {
      */
     @Test
     public void checkParametersTypesNegativeTest() {
+        final var databind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
         assertInvalidIAE(ReceiveEventsParams::ofQueryParameters);
         assertUnknownParam(QueryParams::newReadDataParams);
-        assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mock(EffectiveModelContext.class), queryParams));
+        assertInvalidIAE(queryParams -> Insert.ofQueryParameters(databind, queryParams));
 
         assertInvalidIAE(ReceiveEventsParams::ofQueryParameters, ContentParam.ALL);
         assertInvalidParam(QueryParams::newReadDataParams, InsertParam.LAST);
-        assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mock(EffectiveModelContext.class), queryParams),
+        assertInvalidIAE(queryParams -> Insert.ofQueryParameters(databind, queryParams),
             ContentParam.ALL);
     }
 

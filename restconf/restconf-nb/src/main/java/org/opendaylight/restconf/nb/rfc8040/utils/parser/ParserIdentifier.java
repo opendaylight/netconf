@@ -13,6 +13,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -53,6 +54,6 @@ final class ParserIdentifier {
             throw new RestconfDocumentedException(e.getMessage(), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
         }
 
-        return InstanceIdentifierContext.ofApiPath(apiPath, schemaContext, mountPointService);
+        return InstanceIdentifierContext.ofApiPath(DatabindContext.ofModel(schemaContext), apiPath, mountPointService);
     }
 }

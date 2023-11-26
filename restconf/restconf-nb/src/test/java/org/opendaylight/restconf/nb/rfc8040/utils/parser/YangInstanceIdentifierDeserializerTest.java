@@ -19,10 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -34,7 +33,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -45,17 +43,8 @@ public class YangInstanceIdentifierDeserializerTest {
         QName.create("https://example.com/ns/example-actions", "2016-07-07", "interfaces");
 
     // schema context
-    private static EffectiveModelContext SCHEMA_CONTEXT;
-
-    @BeforeClass
-    public static void beforeClass() {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResourceDirectory("/restconf/parser/deserializer");
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        SCHEMA_CONTEXT = null;
-    }
+    private static final DatabindContext DATABIND =
+        DatabindContext.ofModel(YangParserTestUtils.parseYangResourceDirectory("/restconf/parser/deserializer"));
 
     /**
      * Test of deserialization <code>String</code> URI with container to
@@ -63,7 +52,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA")
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:contA")
             .path.getPathArguments();
         assertEquals(1, result.size());
         assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
@@ -75,7 +64,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerWithLeafTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA/leaf-A")
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:contA/leaf-A")
             .path.getPathArguments();
         assertEquals(2, result.size());
         assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
@@ -88,7 +77,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerWithListWithLeafListTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "deserializer-test:contA/list-A=100/leaf-list-AA=instance").path.getPathArguments();
         assertEquals(5, result.size());
 
@@ -111,7 +100,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerWithListWithActionTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "example-actions:interfaces/interface=eth0/reset").path.getPathArguments();
         assertEquals(4, result.size());
         // container
@@ -130,7 +119,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerWithChoiceSchemaNodeWithActionTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "example-actions:interfaces/typeA-gigabyte/interface=eth0/reboot").path.getPathArguments();
         assertEquals(6, result.size());
 
@@ -156,7 +145,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeContainerWithChoiceCaseSchemaNodeWithActionTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "example-actions:interfaces/udp/reboot").path.getPathArguments();
         assertEquals(4, result.size());
         // container
@@ -175,7 +164,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeListWithNoKeysTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:list-no-key")
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:list-no-key")
             .path.getPathArguments();
         assertEquals(2, result.size());
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-no-key");
@@ -189,7 +178,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeListWithOneKeyTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "deserializer-test:list-one-key=value").path.getPathArguments();
         assertEquals(2, result.size());
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-one-key");
@@ -209,7 +198,7 @@ public class YangInstanceIdentifierDeserializerTest {
             QName.create(list, "number"), Uint8.valueOf(100),
             QName.create(list, "enabled"), false);
 
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "deserializer-test:list-multiple-keys=value,100,false").path.getPathArguments();
         assertEquals(2, result.size());
         assertEquals(NodeIdentifier.create(list), result.get(0));
@@ -222,7 +211,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeLeafListTest() {
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "deserializer-test:leaf-list-0=true").path.getPathArguments();
         assertEquals(2, result.size());
 
@@ -236,7 +225,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializeEmptyDataTest() {
-        assertEquals(List.of(), YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "").path.getPathArguments());
+        assertEquals(List.of(), YangInstanceIdentifierDeserializer.create(DATABIND, "").path.getPathArguments());
     }
 
     /**
@@ -256,7 +245,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void nullDataNegativeNegativeTest() {
         assertThrows(NullPointerException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, (String) null));
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, (String) null));
     }
 
     /**
@@ -266,10 +255,11 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeBadCharMissingSlashOrEqualNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:cont*leaf-A"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
-            + "error-message: Invalid path 'deserializer-test:cont*leaf-A' at offset 22, "
-            + "error-info: Expecting [a-zA-Z_.-], not '*']]", ex.getMessage());
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:cont*leaf-A"));
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: malformed-message,\s\
+        	error-message: Invalid path 'deserializer-test:cont*leaf-A' at offset 22,\s\
+        	error-info: Expecting [a-zA-Z_.-], not '*']]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -284,10 +274,11 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void validArgIdentifierContainerEndsWithSlashNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA/"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
-            + "error-message: Invalid path 'deserializer-test:contA/' at offset 24, "
-            + "error-info: Identifier may not be empty]]", ex.getMessage());
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:contA/"));
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: malformed-message,\s\
+        	error-message: Invalid path 'deserializer-test:contA/' at offset 24,\s\
+        	error-info: Identifier may not be empty]]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -302,10 +293,11 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void validArgIdentifierContainerEndsWithMultipleSlashesNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA///"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
-            + "error-message: Invalid path 'deserializer-test:contA///' at offset 24, "
-            + "error-info: Identifier may not be empty]]", ex.getMessage());
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:contA///"));
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: malformed-message,\s\
+        	error-message: Invalid path 'deserializer-test:contA///' at offset 24,\s\
+        	error-info: Identifier may not be empty]]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -320,10 +312,11 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void validArgIdentifierListEndsWithSlashLNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:list-one-key=value/"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
-            + "error-message: Invalid path 'deserializer-test:list-one-key=value/' at offset 37, "
-            + "error-info: Identifier may not be empty]]", ex.getMessage());
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:list-one-key=value/"));
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: malformed-message,\s\
+        	error-message: Invalid path 'deserializer-test:list-one-key=value/' at offset 37,\s\
+        	error-info: Identifier may not be empty]]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -338,10 +331,11 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void validArgIdentifierListEndsWithSlashesNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:list-one-key=value//"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
-            + "error-message: Invalid path 'deserializer-test:list-one-key=value//' at offset 37, "
-            + "error-info: Identifier may not be empty]]", ex.getMessage());
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:list-one-key=value//"));
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: malformed-message,\s\
+        	error-message: Invalid path 'deserializer-test:list-one-key=value//' at offset 37,\s\
+        	error-info: Identifier may not be empty]]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -356,10 +350,11 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void prepareQnameEmptyIdentifierNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "/"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
-            + "error-message: Invalid path '/' at offset 0, "
-            + "error-info: Identifier may not be empty]]", ex.getMessage());
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "/"));
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: malformed-message,\s\
+        	error-message: Invalid path '/' at offset 0,\s\
+        	error-info: Identifier may not be empty]]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -374,10 +369,11 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void prepareQnameBuildPathNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test*contA"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
-            + "error-message: Invalid path 'deserializer-test*contA' at offset 17, "
-            + "error-info: Expecting [a-zA-Z_.-], not '*']]", ex.getMessage());
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test*contA"));
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: malformed-message,\s\
+        	error-message: Invalid path 'deserializer-test*contA' at offset 17,\s\
+        	error-info: Expecting [a-zA-Z_.-], not '*']]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -392,7 +388,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void prepareQnameNotExistingPrefixNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "not-existing:contA"));
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "not-existing:contA"));
         assertEquals("errors: [RestconfError [error-type: protocol, error-tag: unknown-element, "
             + "error-message: Failed to lookup for module with name 'not-existing'.]]", ex.getMessage());
         final var errors = ex.getErrors();
@@ -408,10 +404,11 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void prepareQnameNotValidPrefixAndLocalNameNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class, () ->
-            YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:*not-parsable-identifier"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
-            + "error-message: Invalid path 'deserializer-test:*not-parsable-identifier' at offset 18, "
-            + "error-info: Expecting [a-zA-Z_], not '*']]", ex.getMessage());
+            YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:*not-parsable-identifier"));
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: malformed-message,\s\
+        	error-message: Invalid path 'deserializer-test:*not-parsable-identifier' at offset 18,\s\
+        	error-info: Expecting [a-zA-Z_], not '*']]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -426,10 +423,11 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void prepareQnameErrorParsingNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: malformed-message, "
-            + "error-message: Invalid path 'deserializer-test:' at offset 18, "
-            + "error-info: Identifier may not be empty]]", ex.getMessage());
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:"));
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: malformed-message,\s\
+        	error-message: Invalid path 'deserializer-test:' at offset 18,\s\
+        	error-info: Identifier may not be empty]]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -445,7 +443,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void prepareQnameNotValidContainerNameNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:contA/leafB"));
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:contA/leafB"));
         assertEquals("errors: [RestconfError [error-type: protocol, error-tag: data-missing, "
             + "error-message: Schema for '(deserializer:test?revision=2016-06-06)leafB' not found]]", ex.getMessage());
         final var errors = ex.getErrors();
@@ -462,7 +460,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void prepareQnameNotValidListNameNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND,
                 "deserializer-test:list-no-key/disabled=false"));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, ex.getErrors().get(0).getErrorTag());
@@ -475,10 +473,11 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void prepareIdentifierNotKeyedEntryNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:list-one-key"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: missing-attribute, "
-            + "error-message: Entry '(deserializer:test?revision=2016-06-06)list-one-key' requires key or value "
-            + "predicate to be present.]]", ex.getMessage());
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:list-one-key"));
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: missing-attribute,\s\
+        	error-message: Entry '(deserializer:test?revision=2016-06-06)list-one-key' requires key or value\s\
+        	predicate to be present.]]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -492,11 +491,12 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeKeysEndsWithCommaTooManyNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND,
             "deserializer-test:list-multiple-keys=value,100,false,"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: unknown-attribute, "
-            + "error-message: Schema for (deserializer:test?revision=2016-06-06)list-multiple-keys "
-            + "requires 3 key values, 4 supplied]]", ex.getMessage());
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: unknown-attribute,\s\
+        	error-message: Schema for (deserializer:test?revision=2016-06-06)list-multiple-keys\s\
+        	requires 3 key values, 4 supplied]]""", ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         assertEquals(ErrorType.PROTOCOL, errors.get(0).getErrorType());
@@ -510,11 +510,12 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void deserializeKeysEndsWithCommaIllegalNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND,
             "deserializer-test:list-multiple-keys=value,100,"));
-        assertEquals("errors: [RestconfError [error-type: protocol, error-tag: invalid-value, "
-            + "error-message: Invalid value '' for (deserializer:test?revision=2016-06-06)enabled, "
-            + "error-info: Invalid value '' for boolean type. Allowed values are 'true' and 'false']]",
+        assertEquals("""
+        	errors: [RestconfError [error-type: protocol, error-tag: invalid-value,\s\
+        	error-message: Invalid value '' for (deserializer:test?revision=2016-06-06)enabled,\s\
+        	error-info: Invalid value '' for boolean type. Allowed values are 'true' and 'false']]""",
             ex.getMessage());
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
@@ -536,7 +537,7 @@ public class YangInstanceIdentifierDeserializerTest {
             QName.create(list, "number"), Uint8.ONE,
             QName.create(list, "enabled"), false);
 
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "deserializer-test:list-multiple-keys=%3Afoo,1,false/string-value").path.getPathArguments();
         assertEquals(3, result.size());
         // list
@@ -555,7 +556,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void notAllListKeysEncodedNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND,
                     "deserializer-test:list-multiple-keys=%3Afoo/string-value"));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals(ErrorTag.MISSING_ATTRIBUTE, ex.getErrors().get(0).getErrorTag());
@@ -568,7 +569,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void percentEncodedKeyEndsWithNoPercentEncodedChars() {
         final String URI = "deserializer-test:list-multiple-keys=%3Afoo,1,true";
-        final YangInstanceIdentifier result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, URI).path;
+        final YangInstanceIdentifier result = YangInstanceIdentifierDeserializer.create(DATABIND, URI).path;
 
         final Iterator<Entry<QName, Object>> resultListKeys =
                 ((NodeIdentifierWithPredicates)result.getLastPathArgument()).entrySet().iterator();
@@ -589,7 +590,7 @@ public class YangInstanceIdentifierDeserializerTest {
             QName.create(list, "number"), Uint8.ZERO,
             QName.create(list, "enabled"), true);
 
-        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final var result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "deserializer-test:list-multiple-keys=,0,true").path.getPathArguments();
         assertEquals(2, result.size());
         assertEquals(NodeIdentifier.create(list), result.get(0));
@@ -604,7 +605,7 @@ public class YangInstanceIdentifierDeserializerTest {
     @Test
     public void leafListMissingKeyNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, "deserializer-test:leaf-list-0="));
+            () -> YangInstanceIdentifierDeserializer.create(DATABIND, "deserializer-test:leaf-list-0="));
         assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
     }
@@ -614,7 +615,7 @@ public class YangInstanceIdentifierDeserializerTest {
      */
     @Test
     public void deserializePartInOtherModuleTest() {
-        final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "deserializer-test-included:augmented-list=100/deserializer-test:augmented-leaf")
             .path.getPathArguments();
         assertEquals(3, result.size());
@@ -632,7 +633,7 @@ public class YangInstanceIdentifierDeserializerTest {
 
     @Test
     public void deserializeListInOtherModuleTest() {
-        final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+        final List<PathArgument> result = YangInstanceIdentifierDeserializer.create(DATABIND,
             "deserializer-test-included:augmented-list=100/deserializer-test:augmenting-list=0")
             .path.getPathArguments();
         assertEquals(4, result.size());
@@ -668,7 +669,7 @@ public class YangInstanceIdentifierDeserializerTest {
     }
 
     private static void assertIdentityrefKeyValue(final String path) {
-        final var pathArgs = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT, path).path.getPathArguments();
+        final var pathArgs = YangInstanceIdentifierDeserializer.create(DATABIND, path).path.getPathArguments();
         assertEquals(4, pathArgs.size());
 
         assertEquals("refs", pathArgs.get(0).getNodeType().getLocalName());

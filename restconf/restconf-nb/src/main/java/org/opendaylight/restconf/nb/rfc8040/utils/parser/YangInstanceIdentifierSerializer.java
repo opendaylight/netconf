@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -21,8 +22,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -45,8 +44,8 @@ public final class YangInstanceIdentifierSerializer {
      *             path to data
      * @return {@link String}
      */
-    public static String create(final EffectiveModelContext schemaContext, final YangInstanceIdentifier data) {
-        final var current = DataSchemaContextTree.from(schemaContext).getRoot();
+    public static String create(final DatabindContext databind, final YangInstanceIdentifier data) {
+        final var current = databind.schemaTree().getRoot();
         final var variables = new MainVarsWrapper(current);
         final var path = new StringBuilder();
 
@@ -80,7 +79,7 @@ public final class YangInstanceIdentifierSerializer {
                     path.append('/');
                 }
 
-                path.append(prefixForNamespace(arg.getNodeType(), schemaContext)).append(':');
+                path.append(prefixForNamespace(arg.getNodeType(), databind.modelContext())).append(':');
             } else {
                 path.append('/');
             }

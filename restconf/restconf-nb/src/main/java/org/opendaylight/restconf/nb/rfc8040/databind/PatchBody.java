@@ -42,7 +42,7 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
     abstract @NonNull PatchContext toPatchContext(@NonNull EffectiveModelContext context,
         @NonNull YangInstanceIdentifier urlPath, @NonNull InputStream inputStream) throws IOException;
 
-    static final YangInstanceIdentifier parsePatchTarget(final EffectiveModelContext context,
+    static final YangInstanceIdentifier parsePatchTarget(final DatabindContext databind,
             final YangInstanceIdentifier urlPath, final String target) {
         if (target.equals("/")) {
             verify(!urlPath.isEmpty(),
@@ -54,11 +54,12 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         if (urlPath.isEmpty()) {
             targetUrl = target.startsWith("/") ? target.substring(1) : target;
         } else {
-            targetUrl = IdentifierCodec.serialize(urlPath, context) + target;
+            targetUrl = IdentifierCodec.serialize(urlPath, databind) + target;
         }
 
         try {
-            return InstanceIdentifierContext.ofApiPath(ApiPath.parse(targetUrl), context, null).getInstanceIdentifier();
+            return InstanceIdentifierContext.ofApiPath(databind, ApiPath.parse(targetUrl), null)
+                .getInstanceIdentifier();
         } catch (ParseException | RestconfDocumentedException e) {
             throw new RestconfDocumentedException("Failed to parse target " + target,
                 ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE, e);

@@ -20,12 +20,12 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -67,9 +67,9 @@ public abstract class InstanceIdentifierContext {
             this.path = requireNonNull(path);
         }
 
-        static @NonNull DataPath of(final EffectiveModelContext context, final YangInstanceIdentifier path,
+        static @NonNull DataPath of(final DatabindContext databind, final YangInstanceIdentifier path,
                 final DOMMountPoint mountPoint) {
-            final var nodeAndStack = DataSchemaContextTree.from(context).enterPath(path).orElseThrow();
+            final var nodeAndStack = databind.schemaTree().enterPath(path).orElseThrow();
             return new DataPath(nodeAndStack.node().dataSchemaNode(), mountPoint, nodeAndStack.stack(), path);
         }
 
@@ -113,14 +113,14 @@ public abstract class InstanceIdentifierContext {
     }
 
     // FIXME: NETCONF-773: this recursion should really live in MdsalRestconfServer
-    public static @NonNull InstanceIdentifierContext ofApiPath(final ApiPath path,
-            final EffectiveModelContext modelContext, final DOMMountPointService mountPointService) {
+    public static @NonNull InstanceIdentifierContext ofApiPath(final DatabindContext databind, final ApiPath path,
+            final DOMMountPointService mountPointService) {
         final var steps = path.steps();
         final var limit = steps.size() - 1;
 
         var prefix = 0;
         DOMMountPoint currentMountPoint = null;
-        var currentModelContext = modelContext;
+        var currentDatabind = databind;
         while (prefix <= limit) {
             final var mount = indexOfMount(steps, prefix, limit);
             if (mount == -1) {
@@ -134,7 +134,7 @@ public abstract class InstanceIdentifierContext {
                     ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
             }
 
-            final var mountPath = IdentifierCodec.deserialize(path.subPath(prefix, mount), modelContext);
+            final var mountPath = IdentifierCodec.deserialize(path.subPath(prefix, mount), databind);
             final var userPath = path.subPath(0, mount);
             final var nextMountPoint = mountService.getMountPoint(mountPath)
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point '" + userPath + "' does not exist",
@@ -150,11 +150,11 @@ public abstract class InstanceIdentifierContext {
             }
 
             prefix = mount + 1;
-            currentModelContext = nextModelContext;
+            currentDatabind = DatabindContext.ofModel(nextModelContext);
             currentMountPoint = nextMountPoint;
         }
 
-        final var result = YangInstanceIdentifierDeserializer.create(currentModelContext, path.subPath(prefix));
+        final var result = YangInstanceIdentifierDeserializer.create(currentDatabind, path.subPath(prefix));
         return InstanceIdentifierContext.ofPath(result.stack, result.node, result.path, currentMountPoint);
     }
 

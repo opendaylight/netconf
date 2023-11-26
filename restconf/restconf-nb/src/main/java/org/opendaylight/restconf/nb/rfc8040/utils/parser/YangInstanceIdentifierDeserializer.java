@@ -19,6 +19,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -31,10 +32,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -58,16 +57,16 @@ public final class YangInstanceIdentifierDeserializer {
         public final @NonNull SchemaInferenceStack stack;
         public final @NonNull SchemaNode node;
 
-        Result(final EffectiveModelContext context) {
+        Result(final DatabindContext databind) {
             path = YangInstanceIdentifier.of();
-            node = requireNonNull(context);
-            stack = SchemaInferenceStack.of(context);
+            node = databind.modelContext();
+            stack = SchemaInferenceStack.of(databind.modelContext());
         }
 
-        Result(final EffectiveModelContext context, final QName qname) {
+        Result(final DatabindContext databind, final QName qname) {
             // Legacy behavior: RPCs do not really have a YangInstanceIdentifier, but the rest of the code expects it
             path = YangInstanceIdentifier.of(qname);
-            stack = SchemaInferenceStack.of(context);
+            stack = SchemaInferenceStack.of(databind.modelContext());
 
             final var stmt = stack.enterSchemaTree(qname);
             verify(stmt instanceof RpcDefinition, "Unexpected statement %s", stmt);
@@ -81,11 +80,11 @@ public final class YangInstanceIdentifierDeserializer {
         }
     }
 
-    private final @NonNull EffectiveModelContext schemaContext;
+    private final @NonNull DatabindContext databind;
     private final @NonNull ApiPath apiPath;
 
-    private YangInstanceIdentifierDeserializer(final EffectiveModelContext schemaContext, final ApiPath apiPath) {
-        this.schemaContext = requireNonNull(schemaContext);
+    private YangInstanceIdentifierDeserializer(final DatabindContext databind, final ApiPath apiPath) {
+        this.databind = requireNonNull(databind);
         this.apiPath = requireNonNull(apiPath);
     }
 
@@ -97,7 +96,7 @@ public final class YangInstanceIdentifierDeserializer {
      * @return {@link Iterable} of {@link PathArgument}
      * @throws RestconfDocumentedException the path is not valid
      */
-    public static Result create(final EffectiveModelContext schemaContext, final String data) {
+    public static Result create(final DatabindContext databind, final String data) {
         final ApiPath path;
         try {
             path = ApiPath.parse(requireNonNull(data));
@@ -105,11 +104,11 @@ public final class YangInstanceIdentifierDeserializer {
             throw new RestconfDocumentedException("Invalid path '" + data + "' at offset " + e.getErrorOffset(),
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e);
         }
-        return create(schemaContext, path);
+        return create(databind, path);
     }
 
-    public static Result create(final EffectiveModelContext schemaContext, final ApiPath path) {
-        return new YangInstanceIdentifierDeserializer(schemaContext, path).parse();
+    public static Result create(final DatabindContext databind, final ApiPath path) {
+        return new YangInstanceIdentifierDeserializer(databind, path).parse();
     }
 
     // FIXME: NETCONF-818: this method really needs to report an Inference and optionally a YangInstanceIdentifier
@@ -123,7 +122,7 @@ public final class YangInstanceIdentifierDeserializer {
     private Result parse() {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
-            return new Result(schemaContext);
+            return new Result(databind);
         }
 
         // First step is somewhat special:
@@ -143,7 +142,7 @@ public final class YangInstanceIdentifierDeserializer {
         var qname = step.identifier().bindTo(namespace);
 
         // We go through more modern APIs here to get this special out of the way quickly
-        final var optRpc = schemaContext.findModuleStatement(namespace).orElseThrow()
+        final var optRpc = databind.modelContext().findModuleStatement(namespace).orElseThrow()
             .findSchemaTreeNode(RpcEffectiveStatement.class, qname);
         if (optRpc.isPresent()) {
             // We have found an RPC match,
@@ -156,14 +155,14 @@ public final class YangInstanceIdentifierDeserializer {
                     + "therefore it must not contain key values", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
             }
 
-            return new Result(schemaContext, optRpc.orElseThrow().argument());
+            return new Result(databind, optRpc.orElseThrow().argument());
         }
 
-        final var stack = SchemaInferenceStack.of(schemaContext);
+        final var stack = SchemaInferenceStack.of(databind.modelContext());
         final var path = new ArrayList<PathArgument>();
         final SchemaNode node;
 
-        DataSchemaContext parentNode = DataSchemaContextTree.from(schemaContext).getRoot();
+        DataSchemaContext parentNode = databind.schemaTree().getRoot();
         while (true) {
             final var parentSchema = parentNode.dataSchemaNode();
             if (parentSchema instanceof ActionNodeContainer actionParent) {
@@ -265,7 +264,6 @@ public final class YangInstanceIdentifierDeserializer {
 
     private Object prepareValueByType(final SchemaInferenceStack stack, final DataSchemaNode schemaNode,
             final @NonNull String value) {
-
         TypeDefinition<? extends TypeDefinition<?>> typedef;
         if (schemaNode instanceof LeafListSchemaNode) {
             typedef = ((LeafListSchemaNode) schemaNode).getType();
@@ -282,7 +280,7 @@ public final class YangInstanceIdentifierDeserializer {
 
         try {
             if (typedef instanceof InstanceIdentifierTypeDefinition) {
-                return new StringModuleInstanceIdentifierCodec(schemaContext).deserialize(value);
+                return new StringModuleInstanceIdentifierCodec(databind.modelContext()).deserialize(value);
             }
 
             return verifyNotNull(TypeDefinitionAwareCodec.from(typedef),
@@ -313,7 +311,7 @@ public final class YangInstanceIdentifierDeserializer {
             localName = value;
         }
 
-        return schemaContext.getModuleStatement(namespace)
+        return databind.modelContext().getModuleStatement(namespace)
             .streamEffectiveSubstatements(IdentityEffectiveStatement.class)
             .map(IdentityEffectiveStatement::argument)
             .filter(qname -> localName.equals(qname.getLocalName()))
@@ -324,7 +322,7 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private @NonNull QNameModule resolveNamespace(final String moduleName) {
-        final var it = schemaContext.findModuleStatements(moduleName).iterator();
+        final var it = databind.modelContext().findModuleStatements(moduleName).iterator();
         if (it.hasNext()) {
             return it.next().localQNameModule();
         }

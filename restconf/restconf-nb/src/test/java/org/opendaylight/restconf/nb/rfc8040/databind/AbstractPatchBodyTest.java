@@ -82,7 +82,8 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
             throw new AssertionError(e);
         }
 
-        final var iid = InstanceIdentifierContext.ofApiPath(apiPath, IID_SCHEMA, mountPointService);
+        final var iid = InstanceIdentifierContext.ofApiPath(DatabindContext.ofModel(IID_SCHEMA), apiPath,
+            mountPointService);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
             return body.toPatchContext(iid.getSchemaContext(), iid.getInstanceIdentifier());

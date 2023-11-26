@@ -26,11 +26,9 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,13 +56,12 @@ public final class XmlPatchBody extends PatchBody {
         }
     }
 
-    private static @NonNull PatchContext parse(final EffectiveModelContext context,
-            final YangInstanceIdentifier urlPath, final Document doc)
-                throws XMLStreamException, IOException, SAXException, URISyntaxException {
+    private static @NonNull PatchContext parse(final DatabindContext databind, final YangInstanceIdentifier urlPath,
+            final Document doc) throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final var entities = ImmutableList.<PatchEntity>builder();
         final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final var editNodes = doc.getElementsByTagName("edit");
-        final var schemaTree = DataSchemaContextTree.from(context);
+        final var schemaTree = databind.schemaTree();
 
         for (int i = 0; i < editNodes.getLength(); i++) {
             final Element element = (Element) editNodes.item(i);
@@ -76,7 +73,7 @@ public final class XmlPatchBody extends PatchBody {
             final Element firstValueElement = values != null ? values.get(0) : null;
 
             // find complete path to target, it can be also empty (only slash)
-            final var targetII = parsePatchTarget(context, urlPath, target);
+            final var targetII = parsePatchTarget(databind, urlPath, target);
             // move schema node
             final var lookup = schemaTree.enterPath(targetII).orElseThrow();
 
@@ -87,9 +84,9 @@ public final class XmlPatchBody extends PatchBody {
             }
 
             if (requiresValue(oper)) {
-                final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
-                final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                final XmlParserStream xmlParser = XmlParserStream.create(writer, inference);
+                final var resultHolder = new NormalizationResultHolder();
+                final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+                final var xmlParser = XmlParserStream.create(writer, inference);
                 xmlParser.traverse(new DOMSource(firstValueElement));
 
                 final var result = resultHolder.getResult().data();
