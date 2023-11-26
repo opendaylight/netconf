@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * state to operational data store.
  */
 @Singleton
-@Component(immediate = true, configurationPid = "org.opendaylight.netconf.yanglib")
+@Component(service = { }, configurationPid = "org.opendaylight.netconf.yanglib")
 @Designate(ocd = YangLibraryWriter.Configuration.class)
 public final class YangLibraryWriter implements EffectiveModelContextListener, AutoCloseable {
 
@@ -59,23 +59,33 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
     private static final InstanceIdentifier<ModulesState> MODULES_STATE_INSTANCE_IDENTIFIER =
         InstanceIdentifier.create(ModulesState.class);
 
-    private final AtomicLong idCounter = new AtomicLong(0L);
+    private final AtomicLong contentIdCounter = new AtomicLong();
+    private final YangLibrarySchemaSourceUrlProvider urlProvider;
     private final DataBroker dataBroker;
     private final boolean writeLegacy;
-
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
-    volatile YangLibrarySchemaSourceUrlProvider schemaSourceUrlProvider;
 
     @GuardedBy("this")
     private Registration reg;
 
-    @Inject
-    @Activate
-    public YangLibraryWriter(final @Reference DOMSchemaService schemaService,
-        final @Reference DataBroker dataBroker, final Configuration configuration) {
+    public YangLibraryWriter(final DOMSchemaService schemaService, final DataBroker dataBroker,
+            final YangLibrarySchemaSourceUrlProvider urlProvider, final boolean writeLegacy) {
         this.dataBroker = requireNonNull(dataBroker);
-        this.writeLegacy = configuration.write$_$legacy();
+        this.urlProvider = urlProvider;
+        this.writeLegacy = writeLegacy;
         reg = schemaService.registerSchemaContextListener(this);
+    }
+
+    @Inject
+    public YangLibraryWriter(final DOMSchemaService schemaService, final DataBroker dataBroker,
+            final YangLibrarySchemaSourceUrlProvider urlProvider) {
+        this(schemaService, dataBroker, urlProvider, false);
+    }
+
+    @Activate
+    public YangLibraryWriter(final @Reference DOMSchemaService schemaService, final @Reference DataBroker dataBroker,
+            @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+                final YangLibrarySchemaSourceUrlProvider urlProvider, final Configuration configuration) {
+        this(schemaService, dataBroker, urlProvider, configuration.write$_$legacy());
     }
 
     @Deactivate
@@ -128,13 +138,13 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
             // Already shut down, do not do anything
             return;
         }
-        final var nextId = String.valueOf(idCounter.incrementAndGet());
+        final var nextId = String.valueOf(contentIdCounter.incrementAndGet());
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, YANG_LIBRARY_INSTANCE_IDENTIFIER,
-            YangLibraryContentBuilderUtil.buildYangLibrary(context, nextId, schemaSourceUrlProvider));
+            YangLibraryContentBuilderUtil.buildYangLibrary(context, nextId, urlProvider));
         if (writeLegacy) {
             tx.put(LogicalDatastoreType.OPERATIONAL, MODULES_STATE_INSTANCE_IDENTIFIER,
-                YangLibraryContentBuilderUtil.buildModuleState(context, nextId, schemaSourceUrlProvider));
+                YangLibraryContentBuilderUtil.buildModuleState(context, nextId, urlProvider));
         }
 
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {

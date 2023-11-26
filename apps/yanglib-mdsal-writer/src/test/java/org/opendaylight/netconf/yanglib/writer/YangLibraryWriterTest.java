@@ -20,7 +20,6 @@ import static org.opendaylight.netconf.yanglib.writer.YangLibraryContentBuilderU
 import static org.opendaylight.netconf.yanglib.writer.YangLibraryContentBuilderUtil.DEFAULT_SCHEMA_NAME;
 import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module.ConformanceType.Implement;
 import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module.ConformanceType.Import;
-import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYangResources;
 
 import java.util.Optional;
 import java.util.Set;
@@ -61,6 +60,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
+import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class YangLibraryWriterTest {
@@ -96,16 +96,11 @@ class YangLibraryWriterTest {
         doReturn(registration).when(schemaService).registerSchemaContextListener(any());
     }
 
-    private YangLibraryWriter.Configuration setupConfig(final boolean writeLegacy) {
-        doReturn(writeLegacy).when(config).write$_$legacy();
-        return config;
-    }
-
     @Test
     @DisplayName("No update bc context has no ietf-yang-library")
     void noUpdate() {
-        writer = new YangLibraryWriter(schemaService, dataBroker, setupConfig(NO_LEGACY));
-        writer.onModelContextUpdated(parseYangResources(YangLibraryWriterTest.class,
+        writer = new YangLibraryWriter(schemaService, dataBroker, null);
+        writer.onModelContextUpdated(YangParserTestUtils.parseYangResources(YangLibraryWriterTest.class,
             "/test-module.yang", "/test-submodule.yang"));
         verifyNoInteractions(dataBroker);
     }
@@ -117,11 +112,8 @@ class YangLibraryWriterTest {
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();
 
-        writer = new YangLibraryWriter(schemaService, dataBroker, setupConfig(writeLegacy));
-        if (withUrls) {
-            writer.schemaSourceUrlProvider = URL_PROVIDER;
-        }
-        writer.onModelContextUpdated(parseYangResources(YangLibraryWriterTest.class,
+        writer = new YangLibraryWriter(schemaService, dataBroker, withUrls ? URL_PROVIDER : null, writeLegacy);
+        writer.onModelContextUpdated(YangParserTestUtils.parseYangResources(YangLibraryWriterTest.class,
             "/test-module.yang", "/test-submodule.yang", "/test-more.yang", "/ietf-yang-library@2019-01-04.yang",
             "/ietf-datastores@2018-02-14.yang", "/ietf-yang-types.yang", "/ietf-inet-types.yang"));
 
@@ -149,8 +141,11 @@ class YangLibraryWriterTest {
     void clearOnClose(final boolean writeLegacy) throws Exception {
         doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();
+        doReturn(writeLegacy).when(config).write$_$legacy();
 
-        new YangLibraryWriter(schemaService, dataBroker, setupConfig(writeLegacy)).close();
+        try (var writer = new YangLibraryWriter(schemaService, dataBroker, null, config)) {
+            // nothing else
+        }
         verify(writeTransaction).delete(OPERATIONAL, YANG_LIBRARY_PATH);
         if (writeLegacy) {
             verify(writeTransaction).delete(OPERATIONAL, MODULES_STATE_PATH);
