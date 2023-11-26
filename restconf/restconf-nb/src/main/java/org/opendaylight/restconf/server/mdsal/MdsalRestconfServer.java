@@ -61,11 +61,13 @@ import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
-import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
@@ -94,6 +96,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -186,7 +189,22 @@ public final class MdsalRestconfServer implements RestconfServer {
 
     private @NonNull RestconfFuture<NormalizedNodePayload> readData(final InstanceIdentifierContext reqPath,
             final ReadDataParams readParams) {
-        final var queryParams = QueryParams.newQueryParameters(readParams, reqPath);
+        final var fields = readParams.fields();
+        final QueryParameters queryParams;
+        if (fields != null) {
+            final var modelContext = reqPath.getSchemaContext();
+            final var schemaNode = (DataSchemaNode) reqPath.getSchemaNode();
+            if (reqPath.getMountPoint() != null) {
+                queryParams = QueryParameters.ofFieldPaths(readParams, NetconfFieldsTranslator.translate(modelContext,
+                    schemaNode, fields));
+            } else {
+                queryParams = QueryParameters.ofFields(readParams, WriterFieldsTranslator.translate(modelContext,
+                    schemaNode, fields));
+            }
+        } else {
+            queryParams = QueryParameters.of(readParams);
+        }
+
         final var fieldPaths = queryParams.fieldPaths();
         final var strategy = getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
         final NormalizedNode node;

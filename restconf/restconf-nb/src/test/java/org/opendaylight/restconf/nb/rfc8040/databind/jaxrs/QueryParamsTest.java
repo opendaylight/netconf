@@ -36,10 +36,12 @@ import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
@@ -155,12 +157,13 @@ public class QueryParamsTest {
         assertEquals(ContentParam.CONFIG, params.content());
 
         // depth
-        final DepthParam depth = params.depth();
+        final var depth = params.depth();
         assertNotNull(depth);
         assertEquals(10, depth.value());
 
         // fields
-        assertNotNull(params.fields());
+        final var paramsFields = params.fields();
+        assertNotNull(paramsFields);
 
         // fields for write filtering
         final var containerSchema = mock(ContainerSchemaNode.class,
@@ -178,10 +181,11 @@ public class QueryParamsTest {
 
         final var stack = SchemaInferenceStack.of(context);
         stack.enterSchemaTree(containerQName);
+        final var iid = InstanceIdentifierContext.ofStack(stack);
 
-        final QueryParameters queryParameters = QueryParams.newQueryParameters(params,
-            InstanceIdentifierContext.ofStack(stack));
-        final List<Set<QName>> fields = queryParameters.fields();
+        final var queryParameters = QueryParameters.ofFields(params, WriterFieldsTranslator.translate(
+            iid.getSchemaContext(), (DataSchemaNode) iid.getSchemaNode(), paramsFields));
+        final var fields = queryParameters.fields();
         assertNotNull(fields);
         assertEquals(1, fields.size());
         assertEquals(Set.of(containerChild), fields.get(0));
