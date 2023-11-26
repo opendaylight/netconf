@@ -16,7 +16,7 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.restconf.server.spi.RestconfStream;

@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 

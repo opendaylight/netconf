@@ -15,7 +15,7 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
+import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
