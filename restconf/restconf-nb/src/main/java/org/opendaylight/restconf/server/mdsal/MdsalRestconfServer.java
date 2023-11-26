@@ -14,7 +14,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -68,7 +67,6 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
@@ -403,69 +401,72 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @Override
-    public RestconfFuture<ModulesGetResult> modulesYangGET(final String identifier) {
-        return modulesGET(identifier, YangTextSchemaSource.class);
+    public RestconfFuture<ModulesGetResult> modulesYangGET(final String fileName, final String revision) {
+        return modulesGET(fileName, revision, YangTextSchemaSource.class);
     }
 
     @Override
-    public RestconfFuture<ModulesGetResult> modulesYinGET(final String identifier) {
-        return modulesGET(identifier, YinTextSchemaSource.class);
+    public RestconfFuture<ModulesGetResult> modulesYangGET(final ApiPath mountPath, final String fileName,
+            final String revision) {
+        return modulesGET(mountPath, fileName, revision, YangTextSchemaSource.class);
     }
 
-    private @NonNull RestconfFuture<ModulesGetResult> modulesGET(final String identifier,
+    @Override
+    public RestconfFuture<ModulesGetResult> modulesYinGET(final String fileName, final String revision) {
+        return modulesGET(fileName, revision, YinTextSchemaSource.class);
+    }
+
+    @Override
+    public RestconfFuture<ModulesGetResult> modulesYinGET(final ApiPath mountPath, final String fileName,
+            final String revision) {
+        return modulesGET(mountPath, fileName, revision, YinTextSchemaSource.class);
+    }
+
+    private @NonNull RestconfFuture<ModulesGetResult> modulesGET(final String fileName, final String revision,
             final Class<? extends SchemaSourceRepresentation> representation) {
-        final var currentContext = databindProvider.currentContext();
-        final var pathComponents = SLASH_SPLITTER.split(identifier);
-        final var it =  pathComponents.iterator();
-        final DatabindContext databind;
-        final Object debugName;
-        if (Iterables.contains(pathComponents, MOUNT)) {
-            final var sb = new StringBuilder();
-            while (true) {
-                final var current = it.next();
-                sb.append(current);
-                if (MOUNT.equals(current) || !it.hasNext()) {
-                    break;
-                }
+        return modulesGET(databindProvider.currentContext(), fileName, revision, representation);
+    }
 
-                sb.append('/');
-            }
-
-            final InstanceIdentifierContext point;
-            try {
-                point = ParserIdentifier.toInstanceIdentifier(sb.toString(), currentContext.modelContext(),
-                    mountPointService);
-            } catch (RestconfDocumentedException e) {
-                return RestconfFuture.failed(e);
-            }
-
-            final var mountPoint = point.getMountPoint();
-            debugName = mountPoint.getIdentifier();
-            final var optSchemaService = mountPoint.getService(DOMSchemaService.class);
-            if (optSchemaService.isEmpty()) {
-                return RestconfFuture.failed(new RestconfDocumentedException(
-                    "Mount point '" + debugName + "' does not expose models"));
-            }
-            final var schemaService = optSchemaService.orElseThrow();
-            final var modelContext = schemaService.getGlobalContext();
-            if (modelContext == null) {
-                return RestconfFuture.failed(new RestconfDocumentedException(
-                    "Mount point '" + debugName + "' does not have a model context"));
-            }
-            final var domProvider = schemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
-            databind = DatabindContext.ofModel(modelContext,
-                domProvider == null ? null : new DOMSourceResolver(domProvider));
-        } else {
-            databind = currentContext;
-            debugName = "controller";
+    private @NonNull RestconfFuture<ModulesGetResult> modulesGET(final ApiPath mountPath, final String fileName,
+            final String revision, final Class<? extends SchemaSourceRepresentation> representation) {
+        final var mountOffset = mountPath.indexOf("yang-ext", "mount");
+        if (mountOffset != mountPath.steps().size() - 1) {
+            return RestconfFuture.failed(new RestconfDocumentedException("Mount path has to end with yang-ext:mount"));
         }
 
-        // module name has to be an identifier
-        if (!it.hasNext()) {
+        final var currentContext = databindProvider.currentContext();
+        final InstanceIdentifierContext point;
+        try {
+            point = InstanceIdentifierContext.ofApiPath(mountPath, currentContext.modelContext(), mountPointService);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+
+        final var mountPoint = point.getMountPoint();
+        final var optSchemaService = mountPoint.getService(DOMSchemaService.class);
+        if (optSchemaService.isEmpty()) {
+            return RestconfFuture.failed(new RestconfDocumentedException(
+                "Mount point '" + mountPoint.getIdentifier() + "' does not expose models"));
+        }
+        final var schemaService = optSchemaService.orElseThrow();
+        final var modelContext = schemaService.getGlobalContext();
+        if (modelContext == null) {
+            return RestconfFuture.failed(new RestconfDocumentedException(
+                "Mount point '" + mountPoint.getIdentifier() + "' does not have a model context"));
+        }
+        final var domProvider = schemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
+
+        return modulesGET(DatabindContext.ofModel(modelContext,
+            domProvider == null ? null : new DOMSourceResolver(domProvider)), fileName, revision, representation);
+    }
+
+    private static @NonNull RestconfFuture<ModulesGetResult> modulesGET(final DatabindContext databind,
+            final String moduleName, final String revisionStr,
+            final Class<? extends SchemaSourceRepresentation> representation) {
+        if (moduleName == null) {
             return RestconfFuture.failed(new RestconfDocumentedException("Module name must be supplied",
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
         }
-        final var moduleName = it.next();
         if (moduleName.isEmpty() || !YangNames.IDENTIFIER_START.matches(moduleName.charAt(0))) {
             return RestconfFuture.failed(new RestconfDocumentedException(
                 "Identifier must start with character from set 'a-zA-Z_", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
@@ -480,16 +481,13 @@ public final class MdsalRestconfServer implements RestconfServer {
         }
 
         // YANG Revision-compliant string is required
-        if (!it.hasNext()) {
-            return RestconfFuture.failed(new RestconfDocumentedException("Revision date must be supplied.",
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
-        }
         final Revision revision;
         try {
-            revision = Revision.of(it.next());
+            revision = Revision.ofNullable(revisionStr).orElse(null);
         } catch (final DateTimeParseException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(
-                "Supplied revision is not in expected date format YYYY-mm-dd", e));
+                "Supplied revision is not in expected date format YYYY-mm-dd",
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
         }
 
         return databind.resolveSource(new SourceIdentifier(moduleName, revision), representation)

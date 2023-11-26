@@ -795,6 +795,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     //          yang-library locations. We most likely want to do that to ensure users are not tempted to connect to
     //          wild destinations
 
+    private static final String FILENAME_REVISION_PARAMS =
+        "{fileName : [^/]+}(/{revision : ([0-9]{4}(-[0-9]{2}){2})})?";
+
     /**
      * Get schema of specific module.
      *
@@ -803,9 +806,25 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
-    @Path("/modules/{identifier:.+}")
-    public void modulesYangGET(@PathParam("identifier") final String identifier, @Suspended final AsyncResponse ar) {
-        completeModulesGET(server.modulesYangGET(identifier), ar);
+    @Path("/modules/" + FILENAME_REVISION_PARAMS)
+    public void modulesYangGET(@PathParam("fileName") final String fileName,
+            @PathParam("revision") final String revision, @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYangGET(fileName, revision), ar);
+    }
+
+    /**
+     * Get schema of specific module.
+     *
+     * @param identifier path parameter
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
+    @Path("/modules/{mountPath:.+}/" + FILENAME_REVISION_PARAMS)
+    public void modulesYangGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
+            @PathParam("fileName") final String fileName, @PathParam("revision") final String revision,
+            @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYangGET(mountPath, fileName, revision), ar);
     }
 
     /**
@@ -816,9 +835,25 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
-    @Path("/modules/{identifier:.+}")
-    public void modulesYinGET(@PathParam("identifier") final String identifier, @Suspended final AsyncResponse ar) {
-        completeModulesGET(server.modulesYinGET(identifier), ar);
+    @Path("/modules/" + FILENAME_REVISION_PARAMS)
+    public void modulesYinGET(@PathParam("fileName") final String fileName,
+            @PathParam("revision") final String revision, @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYinGET(fileName, revision), ar);
+    }
+
+    /**
+     * Get schema of specific module.
+     *
+     * @param identifier path parameter
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
+    @Path("/modules/{mountPath:.+}/" + FILENAME_REVISION_PARAMS)
+    public void modulesYinGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
+            @PathParam("fileName") final String fileName, @PathParam("revision") final String revision,
+            @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYinGET(mountPath, fileName, revision), ar);
     }
 
     private static void completeModulesGET(final RestconfFuture<ModulesGetResult> future, final AsyncResponse ar) {
