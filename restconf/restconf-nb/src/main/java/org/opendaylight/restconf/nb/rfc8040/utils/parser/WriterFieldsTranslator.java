@@ -18,7 +18,6 @@ import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.ParameterAwareNormalizedNodeWriter;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -52,17 +51,15 @@ public final class WriterFieldsTranslator {
      * @param input input value of fields parameter
      * @return {@link List} of levels; each level contains set of {@link QName}
      */
-    public static @NonNull List<Set<QName>> translate(final @NonNull InstanceIdentifierContext identifier,
-            final @NonNull FieldsParam input) {
-        final DataSchemaContext startNode = DataSchemaContext.of((DataSchemaNode) identifier.getSchemaNode());
-        if (startNode == null) {
+    public static @NonNull List<Set<QName>> translate(final @NonNull EffectiveModelContext modelContext,
+            final DataSchemaNode schemaNode, final @NonNull FieldsParam input) {
+        if (schemaNode == null) {
             throw new RestconfDocumentedException(
                     "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
-
         final var parsed = new ArrayList<Set<QName>>();
-        processSelectors(parsed, identifier.getSchemaContext(), identifier.getSchemaNode().getQName().getModule(),
-            startNode, input.nodeSelectors(), 0);
+        processSelectors(parsed, modelContext, schemaNode.getQName().getModule(), DataSchemaContext.of(schemaNode),
+            input.nodeSelectors(), 0);
         return parsed;
     }
 
