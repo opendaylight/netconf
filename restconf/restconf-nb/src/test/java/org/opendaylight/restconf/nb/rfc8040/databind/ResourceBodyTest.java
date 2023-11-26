@@ -35,7 +35,7 @@ public class ResourceBodyTest extends AbstractJukeboxTest {
             .node(PLAYLIST_QNAME)
             .nodeWithKey(PLAYLIST_QNAME, NAME_QNAME, "name of band")
             .build();
-        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_SCHEMA, path);
+        final var iidContext = InstanceIdentifierContext.ofLocalPath(JUKEBOX_DATABIND, path);
         ResourceBody.validateListKeysEqualityInPayloadAndUri(iidContext.getSchemaNode(), path, BAND_ENTRY);
     }
 }

@@ -26,7 +26,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
@@ -35,7 +34,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 
 @ExtendWith(MockitoExtension.class)
 class MdsalRestconfServerTest extends AbstractJukeboxTest {
-    private static final DatabindProvider DATABIND_PROVIDER = () -> DatabindContext.ofModel(JUKEBOX_SCHEMA);
+    private static final DatabindProvider DATABIND_PROVIDER = () -> JUKEBOX_DATABIND;
 
     @Mock
     private DOMMountPointService mountPointService;
