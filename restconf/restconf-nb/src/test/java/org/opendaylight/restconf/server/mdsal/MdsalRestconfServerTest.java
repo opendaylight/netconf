@@ -26,7 +26,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
@@ -35,7 +34,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 
 @ExtendWith(MockitoExtension.class)
 class MdsalRestconfServerTest extends AbstractJukeboxTest {
-    private static final DatabindProvider DATABIND_PROVIDER = () -> DatabindContext.ofModel(JUKEBOX_SCHEMA);
+    private static final DatabindProvider DATABIND_PROVIDER = () -> JUKEBOX_DATABIND;
 
     @Mock
     private DOMMountPointService mountPointService;
@@ -59,7 +58,7 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
 
     @Test
     void testGetRestconfStrategyLocal() {
-        assertInstanceOf(MdsalRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_SCHEMA, null));
+        assertInstanceOf(MdsalRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_DATABIND, null));
     }
 
     @Test
@@ -67,14 +66,14 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
-        assertInstanceOf(MdsalRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint));
+        assertInstanceOf(MdsalRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_DATABIND, mountPoint));
     }
 
     @Test
     void testGetRestconfStrategyMountNetconfService() {
         doReturn(Optional.of(netconfService)).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
-        assertInstanceOf(NetconfRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint));
+        assertInstanceOf(NetconfRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_DATABIND, mountPoint));
     }
 
     @Test
@@ -84,7 +83,7 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
         doReturn(Optional.empty()).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> server.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint));
+            () -> server.getRestconfStrategy(JUKEBOX_DATABIND, mountPoint));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);

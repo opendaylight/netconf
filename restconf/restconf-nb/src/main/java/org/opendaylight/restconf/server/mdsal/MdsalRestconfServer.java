@@ -172,18 +172,21 @@ public final class MdsalRestconfServer implements RestconfServer {
 
     @Override
     public RestconfFuture<Empty> dataDELETE(final ApiPath identifier) {
-        final var reqPath = bindRequestPath(identifier);
-        final var strategy = getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
-        return strategy.delete(reqPath.getInstanceIdentifier());
+        final var strategyAndPath = localStrategy().resolvePath(identifier);
+        return strategyAndPath.strategy().delete(strategyAndPath.path());
     }
 
     @Override
     public RestconfFuture<NormalizedNodePayload> dataGET(final ReadDataParams readParams) {
+        final var strategy = localStrategy();
+
         return readData(bindRequestRoot(), readParams);
     }
 
     @Override
     public RestconfFuture<NormalizedNodePayload> dataGET(final ApiPath identifier, final ReadDataParams readParams) {
+        final var strategyAndPath = localStrategy().resolvePath(identifier);
+
         return readData(bindRequestPath(identifier), readParams);
     }
 
@@ -225,11 +228,15 @@ public final class MdsalRestconfServer implements RestconfServer {
 
     @Override
     public RestconfFuture<Empty> dataPATCH(final ResourceBody body) {
+        final var strategy = localStrategy();
+
         return dataPATCH(bindRequestRoot(), body);
     }
 
     @Override
     public RestconfFuture<Empty> dataPATCH(final ApiPath identifier, final ResourceBody body) {
+        final var strategyAndPath = localStrategy().resolvePath(identifier);
+
         return dataPATCH(bindRequestPath(identifier), body);
     }
 
@@ -562,6 +569,9 @@ public final class MdsalRestconfServer implements RestconfServer {
     @Override
     public RestconfFuture<OperationOutput> operationsPOST(final URI restconfURI, final ApiPath apiPath,
             final OperationInputBody body) {
+        final var strategyAndPath = localStrategy().resolvePath(apiPath);
+        // FIXME: assert that resolved path has a single element and that is an RPC
+
         final var currentContext = databindProvider.currentContext();
         final var reqPath = bindRequestPath(currentContext, apiPath);
         final var inference = reqPath.inference();
@@ -574,8 +584,7 @@ public final class MdsalRestconfServer implements RestconfServer {
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
         }
 
-        return getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint())
-            .invokeRpc(restconfURI, reqPath.getSchemaNode().getQName(),
+        return strategyAndPath.strategy().invokeRpc(restconfURI, reqPath.getSchemaNode().getQName(),
                 new OperationInput(currentContext, inference, input));
     }
 
@@ -606,7 +615,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     private @NonNull InstanceIdentifierContext bindRequestRoot() {
-        return InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext().modelContext());
+        return InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext());
     }
 
     private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
@@ -620,13 +629,13 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     @VisibleForTesting
-    @NonNull RestconfStrategy getRestconfStrategy(final EffectiveModelContext modelContext,
+    @NonNull RestconfStrategy getRestconfStrategy(final DatabindContext databind,
             final @Nullable DOMMountPoint mountPoint) {
         if (mountPoint == null) {
-            return localStrategy(modelContext);
+            return localStrategy(databind);
         }
 
-        final var ret = RestconfStrategy.forMountPoint(modelContext, mountPoint);
+        final var ret = RestconfStrategy.forMountPoint(databind, mountPoint);
         if (ret == null) {
             final var mountId = mountPoint.getIdentifier();
             LOG.warn("Mount point {} does not expose a suitable access interface", mountId);
@@ -636,13 +645,17 @@ public final class MdsalRestconfServer implements RestconfServer {
         return ret;
     }
 
-    private @NonNull RestconfStrategy localStrategy(final EffectiveModelContext modelContext) {
+    private @NonNull RestconfStrategy localStrategy() {
+        return localStrategy(databindProvider.currentContext());
+    }
+
+    private @NonNull RestconfStrategy localStrategy(final DatabindContext databind) {
         final var local = (RestconfStrategy) LOCAL_STRATEGY.getAcquire(this);
-        if (local != null && modelContext.equals(local.modelContext())) {
+        if (local != null && databind.equals(local.databind())) {
             return local;
         }
 
-        final var created = new MdsalRestconfStrategy(modelContext, dataBroker, rpcService, localRpcs);
+        final var created = new MdsalRestconfStrategy(databind, dataBroker, rpcService, mountPointService, localRpcs);
         LOCAL_STRATEGY.setRelease(this, created);
         return created;
     }
