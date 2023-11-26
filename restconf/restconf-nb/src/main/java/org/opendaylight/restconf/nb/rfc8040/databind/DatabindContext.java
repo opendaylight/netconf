@@ -26,6 +26,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SubmoduleEffectiveStatement;
@@ -58,12 +59,14 @@ public final class DatabindContext {
 
     private static final VarHandle JSON_CODECS;
     private static final VarHandle XML_CODECS;
+    private static final VarHandle SCHEMA_TREE;
 
     static {
         final var lookup = MethodHandles.lookup();
         try {
             JSON_CODECS = lookup.findVarHandle(DatabindContext.class, "jsonCodecs", JSONCodecFactory.class);
             XML_CODECS = lookup.findVarHandle(DatabindContext.class, "xmlCodecs", XmlCodecFactory.class);
+            SCHEMA_TREE = lookup.findVarHandle(DatabindContext.class, "schemaTree", DataSchemaContextTree.class);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -72,6 +75,8 @@ public final class DatabindContext {
     private final @NonNull MountPointContext mountContext;
     private final SourceResolver sourceResolver;
 
+    @SuppressWarnings("unused")
+    private volatile DataSchemaContextTree schemaTree;
     @SuppressWarnings("unused")
     private volatile JSONCodecFactory jsonCodecs;
     @SuppressWarnings("unused")
@@ -103,6 +108,17 @@ public final class DatabindContext {
 
     public @NonNull EffectiveModelContext modelContext() {
         return mountContext.getEffectiveModelContext();
+    }
+
+    public @NonNull DataSchemaContextTree schemaTree() {
+        final var existing = (DataSchemaContextTree) SCHEMA_TREE.getAcquire(this);
+        return existing != null ? existing : createSchemaTree();
+    }
+
+    private @NonNull DataSchemaContextTree createSchemaTree() {
+        final var created = DataSchemaContextTree.from(modelContext());
+        final var witness = (DataSchemaContextTree) SCHEMA_TREE.compareAndExchangeRelease(this, null, created);
+        return witness != null ? witness : created;
     }
 
     public @NonNull JSONCodecFactory jsonCodecs() {
