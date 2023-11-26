@@ -17,6 +17,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -32,6 +33,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
@@ -43,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * state to operational data store.
  */
 @Singleton
-@Component(immediate = true, configurationPid = "org.opendaylight.netconf.yanglib")
+@Component(service = { }, configurationPid = "org.opendaylight.netconf.yanglib")
 @Designate(ocd = YangLibraryWriter.Configuration.class)
 public final class YangLibraryWriter implements EffectiveModelContextListener, AutoCloseable {
 
@@ -59,23 +61,46 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
     private static final InstanceIdentifier<ModulesState> MODULES_STATE_INSTANCE_IDENTIFIER =
         InstanceIdentifier.create(ModulesState.class);
 
-    private final AtomicLong idCounter = new AtomicLong(0L);
+    private final AtomicLong contentIdCounter = new AtomicLong();
     private final DataBroker dataBroker;
     private final boolean writeLegacy;
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
-    volatile YangLibrarySchemaSourceUrlProvider schemaSourceUrlProvider;
-
+    @GuardedBy("this")
+    private YangLibrarySchemaSourceUrlProvider urlProvider;
+    @GuardedBy("this")
+    private EffectiveModelContext currentContext;
     @GuardedBy("this")
     private Registration reg;
 
-    @Inject
-    @Activate
-    public YangLibraryWriter(final @Reference DOMSchemaService schemaService,
-        final @Reference DataBroker dataBroker, final Configuration configuration) {
+    public YangLibraryWriter(final DOMSchemaService schemaService, final DataBroker dataBroker,
+            final YangLibrarySchemaSourceUrlProvider urlProvider, final boolean writeLegacy) {
         this.dataBroker = requireNonNull(dataBroker);
-        this.writeLegacy = configuration.write$_$legacy();
+        this.urlProvider = urlProvider;
+        this.writeLegacy = writeLegacy;
         reg = schemaService.registerSchemaContextListener(this);
+    }
+
+    @Inject
+    public YangLibraryWriter(final DOMSchemaService schemaService, final DataBroker dataBroker,
+            final YangLibrarySchemaSourceUrlProvider urlProvider) {
+        this(schemaService, dataBroker, urlProvider, false);
+    }
+
+    @Activate
+    public YangLibraryWriter(final @Reference DOMSchemaService schemaService, final @Reference DataBroker dataBroker,
+                final Configuration configuration) {
+        this(schemaService, dataBroker, null, configuration.write$_$legacy());
+    }
+
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY,
+        unbind = "unsetUrlProvider", updated = "setUrlProvider")
+    synchronized void setUrlProvider(final YangLibrarySchemaSourceUrlProvider urlProvider) {
+        this.urlProvider = urlProvider;
+        updateYangLibrary();
+    }
+
+    synchronized void unsetUrlProvider() {
+        setUrlProvider(null);
     }
 
     @Deactivate
@@ -115,26 +140,33 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
     }
 
     @Override
-    public void onModelContextUpdated(final EffectiveModelContext context) {
-        if (context.findModule(YangLibrary.QNAME.getModule()).isPresent()) {
-            updateYangLibrary(context);
-        } else {
-            LOG.warn("ietf-yang-library not present in context, skipping update");
+    public synchronized void onModelContextUpdated(final EffectiveModelContext context) {
+        if (reg != null) {
+            if (context.findModuleStatement(YangLibrary.QNAME.getModule()).isPresent()) {
+                currentContext = context;
+                updateYangLibrary();
+            } else {
+                LOG.warn("ietf-yang-library not present in context, skipping update");
+                currentContext = null;
+            }
         }
     }
 
-    private synchronized void updateYangLibrary(final EffectiveModelContext context) {
-        if (reg == null) {
-            // Already shut down, do not do anything
+    @Holding("this")
+    private void updateYangLibrary() {
+        final var context = currentContext;
+        if (context == null) {
+            // Nothing to do
             return;
         }
-        final var nextId = String.valueOf(idCounter.incrementAndGet());
+
+        final var nextId = String.valueOf(contentIdCounter.incrementAndGet());
         final var tx = dataBroker.newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, YANG_LIBRARY_INSTANCE_IDENTIFIER,
-            YangLibraryContentBuilderUtil.buildYangLibrary(context, nextId, schemaSourceUrlProvider));
+            YangLibraryContentBuilderUtil.buildYangLibrary(context, nextId, urlProvider));
         if (writeLegacy) {
             tx.put(LogicalDatastoreType.OPERATIONAL, MODULES_STATE_INSTANCE_IDENTIFIER,
-                YangLibraryContentBuilderUtil.buildModuleState(context, nextId, schemaSourceUrlProvider));
+                YangLibraryContentBuilderUtil.buildModuleState(context, nextId, urlProvider));
         }
 
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {

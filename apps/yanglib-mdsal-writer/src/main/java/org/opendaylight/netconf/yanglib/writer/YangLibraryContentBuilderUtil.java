@@ -71,6 +71,7 @@ final class YangLibraryContentBuilderUtil {
             final @NonNull String contentId, final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider) {
         final var deviationsMap = getDeviationsMap(context);
         return new YangLibraryBuilder()
+            .setContentId(contentId)
             .setModuleSet(BindingMap.of(new ModuleSetBuilder()
                 .setName(DEFAULT_MODULE_SET_NAME)
                 .setModule(context.getModules().stream()
@@ -86,7 +87,6 @@ final class YangLibraryContentBuilderUtil {
                 .setName(Operational.VALUE)
                 .setSchema(DEFAULT_SCHEMA_NAME)
                 .build()))
-            .setContentId(contentId)
             .build();
     }
 
