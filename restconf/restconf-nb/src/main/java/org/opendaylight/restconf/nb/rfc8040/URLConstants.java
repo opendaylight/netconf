@@ -19,9 +19,18 @@ public final class URLConstants {
      */
     public static final String BASE_PATH = "rests";
     /**
-     * The second URL path element for streams supper, i.e. {@code https://localhost/BASE_PATH/STREAMS}.
+     * The second URL path element for streams support, i.e. {@code https://localhost/BASE_PATH/STREAMS}.
      */
     public static final String STREAMS_SUBPATH = "streams";
+    /**
+     * The second URL path element for YANG library module support, i.e. {@code https://localhost/BASE_PATH/MODULES}.
+     */
+    public static final String MODULES_SUBPATH = "modules";
+    /**
+     * The query parameter carrying the optional revision in YANG library module support, i.e.
+     * {@code https://localhost/BASE_PATH/MODULES?REVISION=2023-11-26}.
+     */
+    public static final String MODULES_REVISION_QUERY = "revision";
 
     private URLConstants() {
         // Hidden on purpose

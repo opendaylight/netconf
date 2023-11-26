@@ -31,6 +31,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -49,6 +50,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
+import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonDataPostBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonOperationInputBody;
@@ -798,27 +800,65 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     /**
      * Get schema of specific module.
      *
-     * @param identifier path parameter
+     * @param fileName source file name
+     * @param revision source revision
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
-    @Path("/modules/{identifier:.+}")
-    public void modulesYangGET(@PathParam("identifier") final String identifier, @Suspended final AsyncResponse ar) {
-        completeModulesGET(server.modulesYangGET(identifier), ar);
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
+    public void modulesYangGET(@PathParam("fileName") final String fileName,
+            @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYangGET(fileName, revision), ar);
     }
 
     /**
      * Get schema of specific module.
      *
-     * @param identifier path parameter
+     * @param mountPath mount point path
+     * @param fileName source file name
+     * @param revision source revision
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
+    public void modulesYangGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
+            @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
+            @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYangGET(mountPath, fileName, revision), ar);
+    }
+
+    /**
+     * Get schema of specific module.
+     *
+     * @param fileName source file name
+     * @param revision source revision
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
-    @Path("/modules/{identifier:.+}")
-    public void modulesYinGET(@PathParam("identifier") final String identifier, @Suspended final AsyncResponse ar) {
-        completeModulesGET(server.modulesYinGET(identifier), ar);
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
+    public void modulesYinGET(@PathParam("fileName") final String fileName,
+            @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYinGET(fileName, revision), ar);
+    }
+
+    /**
+     * Get schema of specific module.
+     *
+     * @param mountPath mount point path
+     * @param fileName source file name
+     * @param revision source revision
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
+    public void modulesYinGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
+            @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
+            @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYinGET(mountPath, fileName, revision), ar);
     }
 
     private static void completeModulesGET(final RestconfFuture<ModulesGetResult> future, final AsyncResponse ar) {

@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * <p>The URL is expected to be requested by {@link org.opendaylight.netconf.yanglib.writer.YangLibraryWriter
  * YangLibraryWriter} when yang-library data is being constructed, only default module-set name ("ODL_modules")
  * is supported. The composed URL for resource download expected to be served by
- * {@link JaxRsRestconf#modulesYangGET(String, javax.ws.rs.container.AsyncResponse)} et al.
+ * {@link JaxRsRestconf#modulesYangGET(String, String, javax.ws.rs.container.AsyncResponse)} et al.
  */
 @Singleton
 @Component(immediate = true, service = YangLibrarySchemaSourceUrlProvider.class)
@@ -34,10 +34,10 @@ public final class RestconfSchemaSourceUrlProvider implements YangLibrarySchemaS
     public Optional<Uri> getSchemaSourceUrl(final @NonNull String moduleSetName,
             final @NonNull String moduleName, final @Nullable Revision revision) {
         if ("ODL_modules".equals(moduleSetName)) {
-            // "/modules/.*" path is mapped to RestconfSchemaService#getSchema(String) using JaxRS annotation
-            final var sb = new StringBuilder("/" + URLConstants.BASE_PATH + "/modules/").append(moduleName);
+            final var sb = new StringBuilder("/" + URLConstants.BASE_PATH + "/" + URLConstants.MODULES_SUBPATH + "/")
+                .append(moduleName);
             if (revision != null) {
-                sb.append("/").append(revision);
+                sb.append("?" + URLConstants.MODULES_REVISION_QUERY + "=").append(revision);
             }
             return Optional.of(new Uri(sb.toString()));
         }
