@@ -21,7 +21,6 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -87,29 +86,32 @@ public final class NetconfFieldsTranslator {
      * Translate a {@link FieldsParam} to a list of child node paths saved in lists, suitable for use with
      * {@link NetconfDataTreeService}.
      *
-     * @param identifier identifier context created from request URI
+     * @param modelContext EffectiveModelContext
+     * @param schemaNode Root DataSchemaNode
      * @param input input value of fields parameter
      * @return {@link List} of {@link YangInstanceIdentifier} that are relative to the last {@link PathArgument}
-     *     of provided {@code identifier}
+     *         of provided {@code identifier}
      */
     public static @NonNull List<YangInstanceIdentifier> translate(
-            final @NonNull InstanceIdentifierContext identifier, final @NonNull FieldsParam input) {
-        final var parsed = parseFields(identifier, input);
-        return parsed.stream().map(NetconfFieldsTranslator::buildPath).toList();
+            final @NonNull EffectiveModelContext modelContext, final @NonNull DataSchemaNode schemaNode,
+            final @NonNull FieldsParam input) {
+        return parseFields(modelContext, schemaNode, input).stream()
+            .map(NetconfFieldsTranslator::buildPath)
+            .toList();
     }
 
-    private static @NonNull Set<LinkedPathElement> parseFields(final @NonNull InstanceIdentifierContext identifier,
-            final @NonNull FieldsParam input) {
+    private static @NonNull Set<LinkedPathElement> parseFields(final @NonNull EffectiveModelContext modelContext,
+            final @NonNull DataSchemaNode schemaNode, final @NonNull FieldsParam input) {
         final DataSchemaContext startNode;
         try {
-            startNode = DataSchemaContext.of((DataSchemaNode) identifier.getSchemaNode());
+            startNode = DataSchemaContext.of(schemaNode);
         } catch (IllegalStateException e) {
             throw new RestconfDocumentedException(
                 "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
         }
 
         final var parsed = new HashSet<LinkedPathElement>();
-        processSelectors(parsed, identifier.getSchemaContext(), identifier.getSchemaNode().getQName().getModule(),
+        processSelectors(parsed, modelContext, schemaNode.getQName().getModule(),
             new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
 
         return parsed;

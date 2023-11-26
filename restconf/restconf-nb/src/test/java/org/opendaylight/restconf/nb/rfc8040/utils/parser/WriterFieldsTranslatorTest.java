@@ -15,8 +15,9 @@ import java.util.Set;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.api.query.FieldsParam;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Unit test for {@link WriterFieldsTranslator}.
@@ -24,8 +25,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 @RunWith(MockitoJUnitRunner.class)
 public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set<QName>> {
     @Override
-    protected List<Set<QName>> translateFields(final InstanceIdentifierContext context, final FieldsParam fields) {
-        return WriterFieldsTranslator.translate(context, fields);
+    protected List<Set<QName>> translateFields(final EffectiveModelContext modelContext,
+            final DataSchemaNode schemaNode, final FieldsParam fields) {
+        return WriterFieldsTranslator.translate(modelContext, schemaNode, fields);
     }
 
     @Override

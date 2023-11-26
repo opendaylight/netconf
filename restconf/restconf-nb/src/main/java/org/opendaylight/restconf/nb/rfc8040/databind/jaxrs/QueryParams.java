@@ -35,10 +35,6 @@ import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -85,18 +81,6 @@ public final class QueryParams {
             }
         }
         return builder.build();
-    }
-
-    public static QueryParameters newQueryParameters(final ReadDataParams params,
-            final InstanceIdentifierContext identifier) {
-        final var fields = params.fields();
-        if (fields == null) {
-            return QueryParameters.of(params);
-        }
-
-        return identifier.getMountPoint() != null
-            ? QueryParameters.ofFieldPaths(params, NetconfFieldsTranslator.translate(identifier, fields))
-                : QueryParameters.ofFields(params, WriterFieldsTranslator.translate(identifier, fields));
     }
 
     /**
