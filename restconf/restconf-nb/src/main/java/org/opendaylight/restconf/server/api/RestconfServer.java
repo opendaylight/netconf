@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.api;
 import java.net.URI;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
@@ -166,7 +167,11 @@ public interface RestconfServer {
     //        construct for both cases -- in this case it carries a yang.common.Revision
     RestconfFuture<NormalizedNodePayload> yangLibraryVersionGET();
 
-    RestconfFuture<ModulesGetResult> modulesYangGET(String identifier);
+    RestconfFuture<ModulesGetResult> modulesYangGET(String fileName, @Nullable String revision);
 
-    RestconfFuture<ModulesGetResult> modulesYinGET(String identifier);
+    RestconfFuture<ModulesGetResult> modulesYangGET(ApiPath mountPath, String fileName, @Nullable String revision);
+
+    RestconfFuture<ModulesGetResult> modulesYinGET(String fileName, @Nullable String revision);
+
+    RestconfFuture<ModulesGetResult> modulesYinGET(ApiPath mountPath, String fileName, @Nullable String revision);
 }

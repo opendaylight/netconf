@@ -141,9 +141,13 @@ public abstract class InstanceIdentifierContext {
                     ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
             final var nextModelContext = nextMountPoint.getService(DOMSchemaService.class)
                 .orElseThrow(() -> new RestconfDocumentedException(
-                    "Mount point " + userPath + " does not expose DOMSchemaService",
+                    "Mount point '" + userPath + "' does not expose DOMSchemaService",
                     ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT))
                 .getGlobalContext();
+            if (nextModelContext == null) {
+                throw new RestconfDocumentedException("Mount point '" + userPath + "' does not have any models",
+                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT);
+            }
 
             prefix = mount + 1;
             currentModelContext = nextModelContext;
