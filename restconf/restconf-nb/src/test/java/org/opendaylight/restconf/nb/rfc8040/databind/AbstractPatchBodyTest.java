@@ -14,6 +14,7 @@ import static org.mockito.Mockito.doReturn;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.Optional;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
@@ -26,9 +27,10 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -73,8 +75,14 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
         } else {
             uriPath = prefix + '/' + suffix;
         }
+        final ApiPath apiPath;
+        try {
+            apiPath = ApiPath.parse(uriPath);
+        } catch (ParseException e) {
+            throw new AssertionError(e);
+        }
 
-        final var iid = ParserIdentifier.toInstanceIdentifier(uriPath, IID_SCHEMA, mountPointService);
+        final var iid = InstanceIdentifierContext.ofApiPath(apiPath, IID_SCHEMA, mountPointService);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
             return body.toPatchContext(iid.getSchemaContext(), iid.getInstanceIdentifier());

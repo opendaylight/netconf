@@ -22,7 +22,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 /**
  * Util class for parsing identifier.
  */
-public final class ParserIdentifier {
+@Deprecated(forRemoval = true)
+final class ParserIdentifier {
     private ParserIdentifier() {
         // Hidden on purpose
     }
@@ -43,7 +44,7 @@ public final class ParserIdentifier {
      * @param mountPointService mount point service
      * @return {@link InstanceIdentifierContext}
      */
-    public static InstanceIdentifierContext toInstanceIdentifier(final String identifier,
+    static InstanceIdentifierContext toInstanceIdentifier(final String identifier,
             final EffectiveModelContext schemaContext, final @Nullable DOMMountPointService mountPointService) {
         final ApiPath apiPath;
         try {

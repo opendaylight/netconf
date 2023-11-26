@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.Optional;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
@@ -25,8 +26,9 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -86,8 +88,15 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
     }
 
     private @NonNull NormalizedNode parse(final String uriPath, final InputStream patchBody) throws IOException {
+        final ApiPath apiPath;
+        try {
+            apiPath = ApiPath.parse(uriPath);
+        } catch (ParseException e) {
+            throw new AssertionError(e);
+        }
+
         try (var body = bodyConstructor.apply(patchBody)) {
-            final var context = ParserIdentifier.toInstanceIdentifier(uriPath, MODEL_CONTEXT, mountPointService);
+            final var context = InstanceIdentifierContext.ofApiPath(apiPath, MODEL_CONTEXT, mountPointService);
             return body.toNormalizedNode(context.getInstanceIdentifier(), context.inference(), context.getSchemaNode());
         }
     }

@@ -11,11 +11,13 @@ import static com.google.common.base.Verify.verify;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -56,8 +58,8 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         }
 
         try {
-            return ParserIdentifier.toInstanceIdentifier(targetUrl, context, null).getInstanceIdentifier();
-        } catch (RestconfDocumentedException e) {
+            return InstanceIdentifierContext.ofApiPath(ApiPath.parse(targetUrl), context, null).getInstanceIdentifier();
+        } catch (ParseException | RestconfDocumentedException e) {
             throw new RestconfDocumentedException("Failed to parse target " + target,
                 ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE, e);
         }
