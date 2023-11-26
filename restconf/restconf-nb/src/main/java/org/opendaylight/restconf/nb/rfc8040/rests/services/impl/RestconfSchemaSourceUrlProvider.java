@@ -8,14 +8,14 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.util.Optional;
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.yanglib.writer.YangLibrarySchemaSourceUrlProvider;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -27,12 +27,17 @@ import org.osgi.service.component.annotations.Component;
  * {@link JaxRsRestconf#modulesYangGET(String, String, javax.ws.rs.container.AsyncResponse)} et al.
  */
 @Singleton
-@Component(immediate = true, service = YangLibrarySchemaSourceUrlProvider.class)
+@Component
 public final class RestconfSchemaSourceUrlProvider implements YangLibrarySchemaSourceUrlProvider {
+    @Inject
+    @Activate
+    public RestconfSchemaSourceUrlProvider() {
+        // Visible for injection
+    }
 
     @Override
-    public Optional<Uri> getSchemaSourceUrl(final @NonNull String moduleSetName,
-            final @NonNull String moduleName, final @Nullable Revision revision) {
+    public Optional<Uri> getSchemaSourceUrl(final String moduleSetName, final String moduleName,
+            final Revision revision) {
         if ("ODL_modules".equals(moduleSetName)) {
             final var sb = new StringBuilder("/" + URLConstants.BASE_PATH + "/" + URLConstants.MODULES_SUBPATH + "/")
                 .append(moduleName);
