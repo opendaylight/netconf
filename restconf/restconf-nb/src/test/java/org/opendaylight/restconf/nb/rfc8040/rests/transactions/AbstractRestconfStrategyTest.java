@@ -26,6 +26,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
@@ -217,7 +218,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      */
     @Test
     public final void testDeleteData() throws Exception {
-        final var future = testDeleteDataStrategy().delete(YangInstanceIdentifier.of());
+        final var future = testDeleteDataStrategy().delete(ApiPath.empty());
         assertNotNull(Futures.getDone(future));
     }
 
@@ -228,7 +229,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      */
     @Test
     public final void testNegativeDeleteData() {
-        final var future = testNegativeDeleteDataStrategy().delete(YangInstanceIdentifier.of());
+        final var future = testNegativeDeleteDataStrategy().delete(ApiPath.empty());
         final var ex = assertThrows(ExecutionException.class, () -> Futures.getDone(future)).getCause();
         assertThat(ex, instanceOf(RestconfDocumentedException.class));
         final var errors = ((RestconfDocumentedException) ex).getErrors();

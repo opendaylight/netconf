@@ -20,12 +20,12 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -67,9 +67,9 @@ public abstract class InstanceIdentifierContext {
             this.path = requireNonNull(path);
         }
 
-        static @NonNull DataPath of(final EffectiveModelContext context, final YangInstanceIdentifier path,
+        static @NonNull DataPath of(final DatabindContext databind, final YangInstanceIdentifier path,
                 final DOMMountPoint mountPoint) {
-            final var nodeAndStack = DataSchemaContextTree.from(context).enterPath(path).orElseThrow();
+            final var nodeAndStack = databind.schemaTree().enterPath(path).orElseThrow();
             return new DataPath(nodeAndStack.node().dataSchemaNode(), mountPoint, nodeAndStack.stack(), path);
         }
 
@@ -213,6 +213,10 @@ public abstract class InstanceIdentifierContext {
     public static @NonNull InstanceIdentifierContext ofMountPointPath(final DOMMountPoint mountPoint,
             final EffectiveModelContext context, final YangInstanceIdentifier path) {
         return DataPath.of(context, path, requireNonNull(mountPoint));
+    }
+
+    public final @NonNull DatabindContext databind() {
+        return databind;
     }
 
     public final @NonNull SchemaNode getSchemaNode() {
