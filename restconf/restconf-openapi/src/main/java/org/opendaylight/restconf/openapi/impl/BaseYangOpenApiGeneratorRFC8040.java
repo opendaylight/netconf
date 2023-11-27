@@ -30,7 +30,6 @@ public abstract class BaseYangOpenApiGeneratorRFC8040 extends BaseYangOpenApiGen
         this.basePath = requireNonNull(basePath);
     }
 
-    @Override
     public String getResourcePath(final String resourceType, final String context) {
         if ("data".equals(resourceType)) {
             return "/" + basePath + "/data" + context;
