@@ -128,7 +128,7 @@ public abstract class InstanceIdentifierContext {
                     ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
             }
 
-            final var mountPath = IdentifierCodec.deserialize(path.subPath(prefix, mount), databind.modelContext());
+            final var mountPath = IdentifierCodec.deserialize(path.subPath(prefix, mount), databind);
             final var userPath = path.subPath(0, mount);
             final var nextMountPoint = mountService.getMountPoint(mountPath)
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point '" + userPath + "' does not exist",
@@ -148,8 +148,7 @@ public abstract class InstanceIdentifierContext {
             currentMountPoint = nextMountPoint;
         }
 
-        final var result = YangInstanceIdentifierDeserializer.create(currentDatabind.modelContext(),
-            path.subPath(prefix));
+        final var result = YangInstanceIdentifierDeserializer.create(currentDatabind, path.subPath(prefix));
         return InstanceIdentifierContext.ofPath(currentDatabind, result.stack, result.node, result.path,
             currentMountPoint);
     }

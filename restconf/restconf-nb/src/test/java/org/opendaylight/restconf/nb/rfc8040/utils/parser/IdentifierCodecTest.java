@@ -11,16 +11,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
  * Unit tests for {@link IdentifierCodec} mostly according to examples from draft-ietf-netconf-restconf-13.
  */
 class IdentifierCodecTest {
-    private static final EffectiveModelContext SCHEMA_CONTEXT =
-        YangParserTestUtils.parseYangResourceDirectory("/restconf/parser");
+    private static final DatabindContext DATABIND = DatabindContext.ofModel(
+        YangParserTestUtils.parseYangResourceDirectory("/restconf/parser"));
 
     /**
      * Positive test of deserialization URI <code>String</code> to <code>YangInstanceIdentifier</code> and
@@ -30,9 +30,9 @@ class IdentifierCodecTest {
     @Test
     void codecListAndLeafTest() throws Exception {
         final var dataYangII = IdentifierCodec.deserialize(ApiPath.parse(
-            "list-test:top/list1=%2C%27\"%3A\"%20%2F,,foo/list2=a,b/result"), SCHEMA_CONTEXT);
+            "list-test:top/list1=%2C%27\"%3A\"%20%2F,,foo/list2=a,b/result"), DATABIND);
         assertEquals("list-test:top/list1=%2C%27\"%3A\" %2F,,foo/list2=a,b/result",
-            IdentifierCodec.serialize(dataYangII, SCHEMA_CONTEXT));
+            IdentifierCodec.serialize(dataYangII, DATABIND.modelContext()));
     }
 
     /**
@@ -43,8 +43,8 @@ class IdentifierCodecTest {
     @Test
     void codecLeafListTest() throws Exception {
         final var str = "list-test:top/Y=4";
-        final var dataYangII = IdentifierCodec.deserialize(ApiPath.parse(str), SCHEMA_CONTEXT);
-        assertEquals(str, IdentifierCodec.serialize(dataYangII, SCHEMA_CONTEXT));
+        final var dataYangII = IdentifierCodec.deserialize(ApiPath.parse(str), DATABIND);
+        assertEquals(str, IdentifierCodec.serialize(dataYangII, DATABIND.modelContext()));
     }
 
     /**
@@ -54,7 +54,7 @@ class IdentifierCodecTest {
      */
     @Test
     void codecDeserializeNullTest() {
-        final var dataYangII = IdentifierCodec.deserialize(null, SCHEMA_CONTEXT);
+        final var dataYangII = IdentifierCodec.deserialize(null, DATABIND);
         assertEquals(YangInstanceIdentifier.of(), dataYangII);
     }
 
@@ -64,7 +64,7 @@ class IdentifierCodecTest {
      */
     @Test
     void codecSerializeEmptyTest() {
-        assertEquals("", IdentifierCodec.serialize(YangInstanceIdentifier.of(), SCHEMA_CONTEXT));
+        assertEquals("", IdentifierCodec.serialize(YangInstanceIdentifier.of(), DATABIND.modelContext()));
     }
 
     /**
@@ -73,8 +73,8 @@ class IdentifierCodecTest {
      */
     @Test
     void codecDeserializeAndSerializeEmptyTest() throws Exception {
-        final var serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), SCHEMA_CONTEXT);
+        final var serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), DATABIND.modelContext());
         assertEquals(YangInstanceIdentifier.of(), IdentifierCodec.deserialize(ApiPath.parse(serialized),
-            SCHEMA_CONTEXT));
+            DATABIND));
     }
 }

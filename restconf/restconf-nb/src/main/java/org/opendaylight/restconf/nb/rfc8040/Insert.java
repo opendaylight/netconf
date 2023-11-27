@@ -18,10 +18,10 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Parser and holder of query parameters from uriInfo for data and datastore modification operations.
@@ -56,7 +56,7 @@ public final class Insert implements Immutable {
      * @throws NullPointerException if any argument is {@code null}
      * @throws IllegalArgumentException if the parameters are invalid
      */
-    public static @Nullable Insert ofQueryParameters(final EffectiveModelContext modelContext,
+    public static @Nullable Insert ofQueryParameters(final DatabindContext databind,
             final Map<String, String> queryParameters) {
         InsertParam insert = null;
         PointParam point = null;
@@ -78,11 +78,7 @@ public final class Insert implements Immutable {
         }
 
         return Insert.forParams(insert, point,
-            // TODO: instead of a EffectiveModelContext, we should have received
-            //       YangInstanceIdentifierDeserializer.Result, from which we can use to seed the parser. This
-            //       call-site should not support 'yang-ext:mount' and should just reuse DataSchemaContextTree,
-            //       saving a lookup
-            value -> YangInstanceIdentifierDeserializer.create(modelContext, value).path.getLastPathArgument());
+            value -> YangInstanceIdentifierDeserializer.create(databind, value).path.getLastPathArgument());
     }
 
     public static @Nullable Insert forParams(final @Nullable InsertParam insert, final @Nullable PointParam point,
