@@ -26,7 +26,6 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierD
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
@@ -44,7 +43,7 @@ public abstract class InstanceIdentifierContext {
 
         @Override
         public Inference inference() {
-            return SchemaInferenceStack.of(getSchemaContext()).toInference();
+            return SchemaInferenceStack.of(databind().modelContext()).toInference();
         }
     }
 
@@ -223,11 +222,6 @@ public abstract class InstanceIdentifierContext {
 
     public final @Nullable DOMMountPoint getMountPoint() {
         return mountPoint;
-    }
-
-    @Deprecated(forRemoval = true)
-    public final @NonNull EffectiveModelContext getSchemaContext() {
-        return databind.modelContext();
     }
 
     public abstract @NonNull Inference inference();

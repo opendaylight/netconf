@@ -185,7 +185,7 @@ public class QueryParamsTest {
         final var iid = InstanceIdentifierContext.ofStack(DatabindContext.ofModel(context), stack);
 
         final var queryParameters = QueryParameters.ofFields(params, WriterFieldsTranslator.translate(
-            iid.getSchemaContext(), (DataSchemaNode) iid.getSchemaNode(), paramsFields));
+            iid.databind().modelContext(), (DataSchemaNode) iid.getSchemaNode(), paramsFields));
         final var fields = queryParameters.fields();
         assertNotNull(fields);
         assertEquals(1, fields.size());

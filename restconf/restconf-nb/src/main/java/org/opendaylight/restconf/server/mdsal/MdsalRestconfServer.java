@@ -233,7 +233,7 @@ public final class MdsalRestconfServer implements RestconfServer, EffectiveModel
         final var fields = readParams.fields();
         final QueryParameters queryParams;
         if (fields != null) {
-            final var modelContext = reqPath.getSchemaContext();
+            final var modelContext = reqPath.databind().modelContext();
             final var schemaNode = (DataSchemaNode) reqPath.getSchemaNode();
             if (reqPath.getMountPoint() != null) {
                 queryParams = QueryParameters.ofFieldPaths(readParams, NetconfFieldsTranslator.translate(modelContext,
@@ -448,7 +448,7 @@ public final class MdsalRestconfServer implements RestconfServer, EffectiveModel
             final ResourceBody body, final Map<String, String> queryParameters) {
         final Insert insert;
         try {
-            insert = Insert.ofQueryParameters(reqPath.getSchemaContext(), queryParameters);
+            insert = Insert.ofQueryParameters(reqPath.databind().modelContext(), queryParameters);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
