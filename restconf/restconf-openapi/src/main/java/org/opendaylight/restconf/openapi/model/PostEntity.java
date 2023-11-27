@@ -10,7 +10,6 @@ package org.opendaylight.restconf.openapi.model;
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
-import static org.opendaylight.restconf.openapi.impl.DefinitionGenerator.OUTPUT_SUFFIX;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
@@ -69,7 +68,7 @@ public final class PostEntity extends OperationEntity {
             final var operationName = rpc.getQName().getLocalName();
             if (!output.getChildNodes().isEmpty()) {
                 // TODO: add proper discriminator from DefinitionNames when schemas re-implementation is done
-                final var ref = COMPONENTS_PREFIX + moduleName() + "_" + operationName + OUTPUT_SUFFIX;
+                final var ref = COMPONENTS_PREFIX + moduleName() + "_" + operationName + "_output";
                 generator.writeObjectFieldStart(String.valueOf(OK.getStatusCode()));
                 generator.writeStringField(DESCRIPTION, String.format("RPC %s success", operationName));
 
