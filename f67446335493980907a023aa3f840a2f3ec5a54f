@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "048ce3f5_d95668b0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-11-27T12:38:42Z",
+      "side": 1,
+      "message": "why?",
+      "revId": "f67446335493980907a023aa3f840a2f3ec5a54f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9aa5295_cd61b4a8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-11-27T12:38:42Z",
+      "side": 1,
+      "message": "Isn\u0027t this issue present on master, too?",
+      "revId": "f67446335493980907a023aa3f840a2f3ec5a54f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
