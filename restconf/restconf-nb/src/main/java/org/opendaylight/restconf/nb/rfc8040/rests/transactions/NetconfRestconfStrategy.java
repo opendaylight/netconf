@@ -22,6 +22,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -38,8 +39,9 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     private final NetconfDataTreeService netconfService;
 
     public NetconfRestconfStrategy(final EffectiveModelContext modelContext,
-            final NetconfDataTreeService netconfService, final @Nullable DOMRpcService rpcService) {
-        super(modelContext, ImmutableMap.of(), rpcService);
+            final NetconfDataTreeService netconfService, final @Nullable DOMRpcService rpcService,
+            final @Nullable DOMYangTextSourceProvider sourceProvider) {
+        super(modelContext, ImmutableMap.of(), rpcService, sourceProvider);
         this.netconfService = requireNonNull(netconfService);
     }
 
