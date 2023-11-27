@@ -32,7 +32,7 @@ class IdentifierCodecTest {
         final var dataYangII = IdentifierCodec.deserialize(ApiPath.parse(
             "list-test:top/list1=%2C%27\"%3A\"%20%2F,,foo/list2=a,b/result"), DATABIND);
         assertEquals("list-test:top/list1=%2C%27\"%3A\" %2F,,foo/list2=a,b/result",
-            IdentifierCodec.serialize(dataYangII, DATABIND.modelContext()));
+            IdentifierCodec.serialize(dataYangII, DATABIND));
     }
 
     /**
@@ -44,7 +44,7 @@ class IdentifierCodecTest {
     void codecLeafListTest() throws Exception {
         final var str = "list-test:top/Y=4";
         final var dataYangII = IdentifierCodec.deserialize(ApiPath.parse(str), DATABIND);
-        assertEquals(str, IdentifierCodec.serialize(dataYangII, DATABIND.modelContext()));
+        assertEquals(str, IdentifierCodec.serialize(dataYangII, DATABIND));
     }
 
     /**
@@ -54,8 +54,7 @@ class IdentifierCodecTest {
      */
     @Test
     void codecDeserializeNullTest() {
-        final var dataYangII = IdentifierCodec.deserialize(null, DATABIND);
-        assertEquals(YangInstanceIdentifier.of(), dataYangII);
+        assertEquals(YangInstanceIdentifier.of(), IdentifierCodec.deserialize(null, DATABIND));
     }
 
     /**
@@ -64,7 +63,7 @@ class IdentifierCodecTest {
      */
     @Test
     void codecSerializeEmptyTest() {
-        assertEquals("", IdentifierCodec.serialize(YangInstanceIdentifier.of(), DATABIND.modelContext()));
+        assertEquals("", IdentifierCodec.serialize(YangInstanceIdentifier.of(), DATABIND));
     }
 
     /**
@@ -73,7 +72,7 @@ class IdentifierCodecTest {
      */
     @Test
     void codecDeserializeAndSerializeEmptyTest() throws Exception {
-        final var serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), DATABIND.modelContext());
+        final var serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), DATABIND);
         assertEquals(YangInstanceIdentifier.of(), IdentifierCodec.deserialize(ApiPath.parse(serialized),
             DATABIND));
     }

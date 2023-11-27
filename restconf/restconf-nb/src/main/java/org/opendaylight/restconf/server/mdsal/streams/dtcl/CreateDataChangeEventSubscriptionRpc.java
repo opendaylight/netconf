@@ -112,7 +112,7 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
         return streamRegistry.createStream(restconfURI,
             new DataTreeChangeSource(databindProvider, changeService, datastore, path),
             "Events occuring in " + datastore + " datastore under /"
-                + IdentifierCodec.serialize(path, input.currentContext().modelContext()))
+                + IdentifierCodec.serialize(path, input.currentContext()))
             .transform(stream -> input.newOperationOutput(Builders.containerBuilder()
                 .withNodeIdentifier(OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))

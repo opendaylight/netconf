@@ -53,7 +53,7 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         if (urlPath.isEmpty()) {
             targetUrl = target.startsWith("/") ? target.substring(1) : target;
         } else {
-            targetUrl = IdentifierCodec.serialize(urlPath, databind.modelContext()) + target;
+            targetUrl = IdentifierCodec.serialize(urlPath, databind) + target;
         }
 
         try {
