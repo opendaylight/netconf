@@ -36,10 +36,8 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 public final class JsonPatchBody extends PatchBody {
@@ -48,19 +46,18 @@ public final class JsonPatchBody extends PatchBody {
     }
 
     @Override
-    PatchContext toPatchContext(final EffectiveModelContext context, final YangInstanceIdentifier urlPath,
+    PatchContext toPatchContext(final DatabindContext databind, final YangInstanceIdentifier urlPath,
             final InputStream inputStream) throws IOException {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
-            final var resultList = read(jsonReader, context, urlPath, patchId);
+            final var resultList = read(jsonReader, databind, urlPath, patchId);
             // Note: patchId side-effect of above
             return new PatchContext(patchId.get(), resultList);
         }
     }
 
-    private static ImmutableList<PatchEntity> read(final JsonReader in, final EffectiveModelContext context,
+    private static ImmutableList<PatchEntity> read(final JsonReader in, final DatabindContext databind,
             final YangInstanceIdentifier urlPath, final AtomicReference<String> patchId) throws IOException {
-        final var schemaTree = DataSchemaContextTree.from(context);
         final var edits = ImmutableList.<PatchEntity>builder();
         final var edit = new PatchEdit();
 
@@ -85,7 +82,7 @@ public final class JsonPatchBody extends PatchBody {
                 case END_DOCUMENT:
                     break;
                 case NAME:
-                    parseByName(in.nextName(), edit, in, urlPath, schemaTree, edits, patchId);
+                    parseByName(in.nextName(), edit, in, urlPath, databind, edits, patchId);
                     break;
                 case END_OBJECT:
                     in.endObject();
@@ -105,7 +102,7 @@ public final class JsonPatchBody extends PatchBody {
     // Switch value of parsed JsonToken.NAME and read edit definition or patch id
     private static void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
             final @NonNull JsonReader in, final @NonNull YangInstanceIdentifier urlPath,
-            final @NonNull DataSchemaContextTree schemaTree, final @NonNull Builder<PatchEntity> resultCollection,
+            final @NonNull DatabindContext databind, final @NonNull Builder<PatchEntity> resultCollection,
             final @NonNull AtomicReference<String> patchId) throws IOException {
         switch (name) {
             case "edit":
@@ -113,14 +110,14 @@ public final class JsonPatchBody extends PatchBody {
                     in.beginArray();
 
                     while (in.hasNext()) {
-                        readEditDefinition(edit, in, urlPath, schemaTree);
+                        readEditDefinition(edit, in, urlPath, databind);
                         resultCollection.add(prepareEditOperation(edit));
                         edit.clear();
                     }
 
                     in.endArray();
                 } else {
-                    readEditDefinition(edit, in, urlPath, schemaTree);
+                    readEditDefinition(edit, in, urlPath, databind);
                     resultCollection.add(prepareEditOperation(edit));
                     edit.clear();
                 }
@@ -136,7 +133,7 @@ public final class JsonPatchBody extends PatchBody {
 
     // Read one patch edit object from JSON input
     private static void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
-            final @NonNull YangInstanceIdentifier urlPath, final @NonNull DataSchemaContextTree schemaTree)
+            final @NonNull YangInstanceIdentifier urlPath, final @NonNull DatabindContext databind)
                 throws IOException {
         String deferredValue = null;
         in.beginObject();
@@ -152,14 +149,14 @@ public final class JsonPatchBody extends PatchBody {
                     break;
                 case "target":
                     // target can be specified completely in request URI
-                    edit.setTarget(parsePatchTarget(schemaTree.getEffectiveModelContext(), urlPath, in.nextString()));
-                    final var stack = schemaTree.enterPath(edit.getTarget()).orElseThrow().stack();
+                    edit.setTarget(parsePatchTarget(databind, urlPath, in.nextString()));
+                    final var stack = databind.schemaTree().enterPath(edit.getTarget()).orElseThrow().stack();
                     if (!stack.isEmpty()) {
                         stack.exit();
                     }
 
                     if (!stack.isEmpty()) {
-                        final EffectiveStatement<?, ?> parentStmt = stack.currentStatement();
+                        final var parentStmt = stack.currentStatement();
                         verify(parentStmt instanceof SchemaNode, "Unexpected parent %s", parentStmt);
                     }
                     edit.setTargetSchemaNode(stack.toInference());
@@ -174,8 +171,7 @@ public final class JsonPatchBody extends PatchBody {
                         deferredValue = readValueNode(in);
                     } else {
                         // We have a target schema node, reuse this reader without buffering the value.
-                        edit.setData(readEditData(in, edit.getTargetSchemaNode(),
-                            schemaTree.getEffectiveModelContext()));
+                        edit.setData(readEditData(in, edit.getTargetSchemaNode(), databind.modelContext()));
                     }
                     break;
                 default:
@@ -189,7 +185,7 @@ public final class JsonPatchBody extends PatchBody {
         if (deferredValue != null) {
             // read saved data to normalized node when target schema is already known
             edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit.getTargetSchemaNode(),
-                schemaTree.getEffectiveModelContext()));
+                databind.modelContext()));
         }
     }
 

@@ -27,6 +27,7 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -34,7 +35,6 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Implementation of RESTCONF operations using {@link DOMTransactionChain} and related concepts.
@@ -45,16 +45,16 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final DOMDataBroker dataBroker;
 
-    public MdsalRestconfStrategy(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker,
+    public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMYangTextSourceProvider sourceProvider,
             final ImmutableMap<QName, RpcImplementation> localRpcs) {
-        super(modelContext, localRpcs, rpcService, sourceProvider);
+        super(databind, localRpcs, rpcService, sourceProvider);
         this.dataBroker = requireNonNull(dataBroker);
     }
 
-    public MdsalRestconfStrategy(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker,
+    public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
             final @Nullable DOMRpcService rpcService, final @Nullable  DOMYangTextSourceProvider sourceProvider) {
-        this(modelContext, dataBroker, rpcService, sourceProvider, ImmutableMap.of());
+        this(databind, dataBroker, rpcService, sourceProvider, ImmutableMap.of());
     }
 
     @Override

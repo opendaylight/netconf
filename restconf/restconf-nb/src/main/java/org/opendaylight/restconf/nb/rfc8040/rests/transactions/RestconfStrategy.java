@@ -117,10 +117,9 @@ public abstract class RestconfStrategy {
     private final DOMYangTextSourceProvider sourceProvider;
     private final DOMRpcService rpcService;
 
-    RestconfStrategy(final EffectiveModelContext modelContext, final ImmutableMap<QName, RpcImplementation> localRpcs,
+    RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
             final @Nullable DOMRpcService rpcService, final DOMYangTextSourceProvider sourceProvider) {
-        // FIXME: pass this down
-        databind = DatabindContext.ofModel(modelContext);
+        this.databind = requireNonNull(databind);
         this.localRpcs = requireNonNull(localRpcs);
         this.rpcService = rpcService;
         this.sourceProvider = sourceProvider;
@@ -129,12 +128,12 @@ public abstract class RestconfStrategy {
     /**
      * Look up the appropriate strategy for a particular mount point.
      *
-     * @param modelContext {@link EffectiveModelContext} of target mount point
+     * @param databind {@link DatabindContext} of target mount point
      * @param mountPoint Target mount point
      * @return A strategy, or null if the mount point does not expose a supported interface
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static @Nullable RestconfStrategy forMountPoint(final EffectiveModelContext modelContext,
+    public static @Nullable RestconfStrategy forMountPoint(final DatabindContext databind,
             final DOMMountPoint mountPoint) {
         final var rpcService = mountPoint.getService(DOMRpcService.class).orElse(null);
         final var sourceProvider = mountPoint.getService(DOMSchemaService.class)
@@ -143,11 +142,11 @@ public abstract class RestconfStrategy {
 
         final var netconfService = mountPoint.getService(NetconfDataTreeService.class);
         if (netconfService.isPresent()) {
-            return new NetconfRestconfStrategy(modelContext, netconfService.orElseThrow(), rpcService, sourceProvider);
+            return new NetconfRestconfStrategy(databind, netconfService.orElseThrow(), rpcService, sourceProvider);
         }
         final var dataBroker = mountPoint.getService(DOMDataBroker.class);
         if (dataBroker.isPresent()) {
-            return new MdsalRestconfStrategy(modelContext, dataBroker.orElseThrow(), rpcService, sourceProvider);
+            return new MdsalRestconfStrategy(databind, dataBroker.orElseThrow(), rpcService, sourceProvider);
         }
         return null;
     }
