@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -42,8 +43,10 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
 
     private static final EffectiveModelContext TEST_SERVICES_SCHEMA =
         YangParserTestUtils.parseYangResourceDirectory("/test-services");
+    private static final DatabindContext TEST_SERVICES_DATABIND = DatabindContext.ofModel(TEST_SERVICES_SCHEMA);
     private static final EffectiveModelContext FOO_SCHEMA =
         YangParserTestUtils.parseYangResourceDirectory("/same-qname-nodes");
+    private static final DatabindContext FOO_DATABIND = DatabindContext.ofModel(FOO_SCHEMA);
 
     private DataSchemaNode jukeboxSchemaNode;
     private DataSchemaNode testServices;
@@ -109,11 +112,11 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
 
     @Before
     public void setUp() {
-        jukeboxSchemaNode = assertInstanceOf(DataSchemaNode.class, InstanceIdentifierContext.ofStack(
+        jukeboxSchemaNode = assertInstanceOf(DataSchemaNode.class, InstanceIdentifierContext.ofStack(JUKEBOX_DATABIND,
             SchemaInferenceStack.ofDataTreePath(JUKEBOX_SCHEMA, JUKEBOX_QNAME)).getSchemaNode());
-        testServices = assertInstanceOf(DataSchemaNode.class, InstanceIdentifierContext.ofStack(
+        testServices = assertInstanceOf(DataSchemaNode.class, InstanceIdentifierContext.ofStack(TEST_SERVICES_DATABIND,
             SchemaInferenceStack.ofDataTreePath(TEST_SERVICES_SCHEMA, TEST_DATA_Q_NAME)).getSchemaNode());
-        foo = assertInstanceOf(DataSchemaNode.class, InstanceIdentifierContext.ofStack(
+        foo = assertInstanceOf(DataSchemaNode.class, InstanceIdentifierContext.ofStack(FOO_DATABIND,
             SchemaInferenceStack.ofDataTreePath(FOO_SCHEMA, FOO_Q_NAME)).getSchemaNode());
     }
 

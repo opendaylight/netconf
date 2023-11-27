@@ -289,16 +289,15 @@ public final class MdsalRestconfServer implements RestconfServer, EffectiveModel
 
     private @NonNull RestconfFuture<PatchStatusContext> dataPATCH(final InstanceIdentifierContext reqPath,
             final PatchBody body) {
-        final var modelContext = reqPath.getSchemaContext();
         final PatchContext patch;
         try {
-            patch = body.toPatchContext(modelContext, reqPath.getInstanceIdentifier());
+            patch = body.toPatchContext(reqPath.databind(), reqPath.getInstanceIdentifier());
         } catch (IOException e) {
             LOG.debug("Error parsing YANG Patch input", e);
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
         }
-        return getRestconfStrategy(modelContext, reqPath.getMountPoint()).patchData(patch);
+        return getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint()).patchData(patch);
     }
 
     @Override
@@ -493,7 +492,7 @@ public final class MdsalRestconfServer implements RestconfServer, EffectiveModel
 
         final InstanceIdentifierContext point;
         try {
-            point = InstanceIdentifierContext.ofApiPath(mountPath, localStrategy().modelContext(), mountPointService);
+            point = InstanceIdentifierContext.ofApiPath(mountPath, localStrategy().databind(), mountPointService);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
@@ -640,11 +639,11 @@ public final class MdsalRestconfServer implements RestconfServer, EffectiveModel
     private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull MdsalRestconfStrategy strategy,
             final @NonNull ApiPath identifier) {
         // FIXME: DatabindContext looks like it should be internal
-        return InstanceIdentifierContext.ofApiPath(identifier, strategy.modelContext(), mountPointService);
+        return InstanceIdentifierContext.ofApiPath(identifier, strategy.databind(), mountPointService);
     }
 
     private @NonNull InstanceIdentifierContext bindRequestRoot() {
-        return InstanceIdentifierContext.ofLocalRoot(localStrategy().modelContext());
+        return InstanceIdentifierContext.ofLocalRoot(localStrategy().databind());
     }
 
     private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
