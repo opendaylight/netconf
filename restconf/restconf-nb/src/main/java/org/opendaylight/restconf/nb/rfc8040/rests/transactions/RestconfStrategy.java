@@ -402,7 +402,7 @@ public abstract class RestconfStrategy {
                 ret.set(new CreateResource(IdentifierCodec.serialize(
                     data instanceof MapNode mapData && !mapData.isEmpty()
                         ? path.node(mapData.body().iterator().next().name()) : path,
-                    modelContext())));
+                    databind)));
             }
 
             @Override
