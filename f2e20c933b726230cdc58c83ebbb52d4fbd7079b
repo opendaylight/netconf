@@ -16,6 +16,24 @@
       "message": "Can copy test to master branch to see that master is ok without fix?",
       "revId": "f2e20c933b726230cdc58c83ebbb52d4fbd7079b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3c4b830_ad503715",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-11-27T14:44:22Z",
+      "side": 1,
+      "message": "In the master branch, AsyncSshHandler is marked as deprecated and marked for removal in 7.0.0, and is already unused in connection process.\n\nMoving only tests will not help since AsyncSshHandlerTest mocks ConnectFuture and problematic verify method.\ndoReturn(connectFuture).when(connectFuture).verify(1,TimeUnit.MILLISECONDS);",
+      "parentUuid": "febdaa63_8ef88aa0",
+      "revId": "f2e20c933b726230cdc58c83ebbb52d4fbd7079b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
