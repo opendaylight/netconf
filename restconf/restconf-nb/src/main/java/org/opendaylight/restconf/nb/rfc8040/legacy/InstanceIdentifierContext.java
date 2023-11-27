@@ -20,12 +20,12 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -33,16 +33,8 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 
 public abstract class InstanceIdentifierContext {
     private static final class Root extends InstanceIdentifierContext {
-        private final @NonNull EffectiveModelContext context;
-
-        Root(final EffectiveModelContext context, final DOMMountPoint mountPoint) {
-            super(context, mountPoint);
-            this.context = requireNonNull(context);
-        }
-
-        @Override
-        public EffectiveModelContext getSchemaContext() {
-            return context;
+        Root(final DatabindContext databind, final DOMMountPoint mountPoint) {
+            super(databind, databind.modelContext(), mountPoint);
         }
 
         @Override
@@ -52,7 +44,7 @@ public abstract class InstanceIdentifierContext {
 
         @Override
         public Inference inference() {
-            return SchemaInferenceStack.of(context).toInference();
+            return SchemaInferenceStack.of(getSchemaContext()).toInference();
         }
     }
 
@@ -60,17 +52,17 @@ public abstract class InstanceIdentifierContext {
         private final @NonNull YangInstanceIdentifier path;
         private final @NonNull SchemaInferenceStack stack;
 
-        private DataPath(final SchemaNode schemaNode, final DOMMountPoint mountPoint,
+        private DataPath(final DatabindContext databind, final SchemaNode schemaNode, final DOMMountPoint mountPoint,
                 final SchemaInferenceStack stack, final YangInstanceIdentifier path) {
-            super(schemaNode, mountPoint);
+            super(databind, schemaNode, mountPoint);
             this.stack = requireNonNull(stack);
             this.path = requireNonNull(path);
         }
 
-        static @NonNull DataPath of(final EffectiveModelContext context, final YangInstanceIdentifier path,
+        static @NonNull DataPath of(final DatabindContext databind, final YangInstanceIdentifier path,
                 final DOMMountPoint mountPoint) {
-            final var nodeAndStack = DataSchemaContextTree.from(context).enterPath(path).orElseThrow();
-            return new DataPath(nodeAndStack.node().dataSchemaNode(), mountPoint, nodeAndStack.stack(), path);
+            final var nodeAndStack = databind.schemaTree().enterPath(path).orElseThrow();
+            return new DataPath(databind, nodeAndStack.node().dataSchemaNode(), mountPoint, nodeAndStack.stack(), path);
         }
 
         @Override
@@ -87,9 +79,9 @@ public abstract class InstanceIdentifierContext {
     private static final class WithoutDataPath extends InstanceIdentifierContext {
         private final @NonNull SchemaInferenceStack stack;
 
-        private WithoutDataPath(final SchemaNode schemaNode, final DOMMountPoint mountPoint,
-                final SchemaInferenceStack stack) {
-            super(schemaNode, mountPoint);
+        private WithoutDataPath(final DatabindContext databind, final SchemaNode schemaNode,
+                final DOMMountPoint mountPoint, final SchemaInferenceStack stack) {
+            super(databind, schemaNode, mountPoint);
             this.stack = requireNonNull(stack);
         }
 
@@ -104,10 +96,13 @@ public abstract class InstanceIdentifierContext {
         }
     }
 
+    private final @NonNull DatabindContext databind;
     private final @NonNull SchemaNode schemaNode;
     private final @Nullable DOMMountPoint mountPoint;
 
-    InstanceIdentifierContext(final SchemaNode schemaNode, final DOMMountPoint mountPoint) {
+    InstanceIdentifierContext(final DatabindContext databind, final SchemaNode schemaNode,
+            final DOMMountPoint mountPoint) {
+        this.databind = requireNonNull(databind);
         this.schemaNode = requireNonNull(schemaNode);
         this.mountPoint = mountPoint;
     }
@@ -168,14 +163,14 @@ public abstract class InstanceIdentifierContext {
         return -1;
     }
 
-    public static @NonNull InstanceIdentifierContext ofLocalRoot(final EffectiveModelContext context) {
-        return new Root(context, null);
+    public static @NonNull InstanceIdentifierContext ofLocalRoot(final DatabindContext databind) {
+        return new Root(databind, null);
     }
 
     @VisibleForTesting
-    public static @NonNull InstanceIdentifierContext ofLocalPath(final EffectiveModelContext context,
+    public static @NonNull InstanceIdentifierContext ofLocalPath(final DatabindContext databind,
             final YangInstanceIdentifier path) {
-        return DataPath.of(context, path, null);
+        return DataPath.of(databind, path, null);
     }
 
     // Invocations of various identifier-less details
@@ -204,15 +199,19 @@ public abstract class InstanceIdentifierContext {
         return new DataPath(schemaNode, mountPoint, stack, path);
     }
 
-    public static @NonNull InstanceIdentifierContext ofMountPointRoot(final DOMMountPoint mountPoint,
-            final EffectiveModelContext mountContext) {
-        return new Root(mountContext, requireNonNull(mountPoint));
+    public static @NonNull InstanceIdentifierContext ofMountPointRoot(final DatabindContext databind,
+            final DOMMountPoint mountPoint) {
+        return new Root(databind, requireNonNull(mountPoint));
     }
 
     @VisibleForTesting
-    public static @NonNull InstanceIdentifierContext ofMountPointPath(final DOMMountPoint mountPoint,
-            final EffectiveModelContext context, final YangInstanceIdentifier path) {
-        return DataPath.of(context, path, requireNonNull(mountPoint));
+    public static @NonNull InstanceIdentifierContext ofMountPointPath(final DatabindContext databind,
+            final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
+        return DataPath.of(databind, path, requireNonNull(mountPoint));
+    }
+
+    public final @NonNull DatabindContext databind() {
+        return databind;
     }
 
     public final @NonNull SchemaNode getSchemaNode() {
@@ -223,8 +222,9 @@ public abstract class InstanceIdentifierContext {
         return mountPoint;
     }
 
-    public @NonNull EffectiveModelContext getSchemaContext() {
-        return inference().getEffectiveModelContext();
+    @Deprecated(forRemoval = true)
+    public final @NonNull EffectiveModelContext getSchemaContext() {
+        return databind.modelContext();
     }
 
     public abstract @NonNull Inference inference();

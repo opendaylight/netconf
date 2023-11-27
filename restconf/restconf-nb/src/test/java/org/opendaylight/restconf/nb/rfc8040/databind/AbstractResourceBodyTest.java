@@ -52,7 +52,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
     static final QName LF11 = QName.create("augment:module:leaf:list", "2014-01-27", "lf11");
     static final QName LFLST11 = QName.create(LF11, "lflst11");
 
-    static EffectiveModelContext MODEL_CONTEXT;
+    private static EffectiveModelContext MODEL_CONTEXT;
 
     private final Function<InputStream, ResourceBody> bodyConstructor;
     private final DOMMountPointService mountPointService;

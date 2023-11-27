@@ -644,7 +644,7 @@ public final class MdsalRestconfServer implements RestconfServer, EffectiveModel
     }
 
     private @NonNull InstanceIdentifierContext bindRequestRoot() {
-        return InstanceIdentifierContext.ofLocalRoot(localStrategy().modelContext());
+        return InstanceIdentifierContext.ofLocalRoot(localStrategy().databind());
     }
 
     private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
