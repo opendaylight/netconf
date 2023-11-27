@@ -324,18 +324,16 @@ public final class MdsalRestconfServer implements RestconfServer, EffectiveModel
 
     private @NonNull RestconfFuture<CreateResource> dataCreatePOST(final InstanceIdentifierContext reqPath,
             final ChildBody body, final Map<String, String> queryParameters) {
-        final var inference = reqPath.inference();
-
         final Insert insert;
         try {
-            insert = Insert.ofQueryParameters(inference.getEffectiveModelContext(), queryParameters);
+            insert = Insert.ofQueryParameters(reqPath.databind(), queryParameters);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
         }
 
         final var parentPath = reqPath.getInstanceIdentifier();
-        final var payload = body.toPayload(parentPath, inference);
+        final var payload = body.toPayload(parentPath, reqPath.inference());
         return getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint())
             .postData(concat(parentPath, payload.prefix()), payload.body(), insert);
     }
@@ -448,7 +446,7 @@ public final class MdsalRestconfServer implements RestconfServer, EffectiveModel
             final ResourceBody body, final Map<String, String> queryParameters) {
         final Insert insert;
         try {
-            insert = Insert.ofQueryParameters(reqPath.databind().modelContext(), queryParameters);
+            insert = Insert.ofQueryParameters(reqPath.databind(), queryParameters);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));

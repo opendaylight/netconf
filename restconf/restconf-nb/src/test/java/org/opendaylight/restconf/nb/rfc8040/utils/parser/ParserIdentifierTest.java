@@ -21,6 +21,7 @@ import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -219,7 +220,7 @@ public class ParserIdentifierTest {
         assertEquals("rpc-test", rpcQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_RPC), MODEL_CONTEXT),
+        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_RPC), DatabindContext.ofModel(MODEL_CONTEXT)),
             result.getInstanceIdentifier());
         assertEquals(null, result.getMountPoint());
         assertSame(MODEL_CONTEXT, result.databind().modelContext());
@@ -239,7 +240,7 @@ public class ParserIdentifierTest {
         assertEquals("rpc-test", rpcQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_RPC), MODEL_CONTEXT),
+        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_RPC), DatabindContext.ofModel(MODEL_CONTEXT)),
             result.getInstanceIdentifier());
         assertEquals(mountPoint, result.getMountPoint());
         assertSame(MODEL_CONTEXT_ON_MOUNT_POINT, result.databind().modelContext());
@@ -258,7 +259,7 @@ public class ParserIdentifierTest {
         assertEquals("reset", actionQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_ACTION), MODEL_CONTEXT),
+        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_ACTION), DatabindContext.ofModel(MODEL_CONTEXT)),
             result.getInstanceIdentifier());
         assertNull(result.getMountPoint());
         assertSame(MODEL_CONTEXT, result.databind().modelContext());
@@ -278,7 +279,7 @@ public class ParserIdentifierTest {
         assertEquals("reset", actionQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_ACTION), MODEL_CONTEXT),
+        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_ACTION), DatabindContext.ofModel(MODEL_CONTEXT)),
             result.getInstanceIdentifier());
         assertEquals(mountPoint, result.getMountPoint());
         assertSame(MODEL_CONTEXT_ON_MOUNT_POINT, result.databind().modelContext());

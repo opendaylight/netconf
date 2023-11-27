@@ -79,14 +79,14 @@ public class QueryParamsTest {
      */
     @Test
     public void checkParametersTypesNegativeTest() {
+        final var mockDatabind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
         assertInvalidIAE(ReceiveEventsParams::ofQueryParameters);
         assertUnknownParam(QueryParams::newReadDataParams);
-        assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mock(EffectiveModelContext.class), queryParams));
+        assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mockDatabind, queryParams));
 
         assertInvalidIAE(ReceiveEventsParams::ofQueryParameters, ContentParam.ALL);
         assertInvalidParam(QueryParams::newReadDataParams, InsertParam.LAST);
-        assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mock(EffectiveModelContext.class), queryParams),
-            ContentParam.ALL);
+        assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mockDatabind, queryParams), ContentParam.ALL);
     }
 
     /**
