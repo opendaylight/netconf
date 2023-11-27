@@ -61,7 +61,7 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
 
     @Test
     void testGetRestconfStrategyLocal() {
-        assertInstanceOf(MdsalRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_SCHEMA, null));
+        assertInstanceOf(MdsalRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_DATABIND, null));
     }
 
     @Test
@@ -71,7 +71,7 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(ImmutableClassToInstanceMap.of()).when(schemaService).getExtensions();
-        assertInstanceOf(MdsalRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint));
+        assertInstanceOf(MdsalRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_DATABIND, mountPoint));
     }
 
     @Test
@@ -80,7 +80,7 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(ImmutableClassToInstanceMap.of()).when(schemaService).getExtensions();
-        assertInstanceOf(NetconfRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint));
+        assertInstanceOf(NetconfRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_DATABIND, mountPoint));
     }
 
     @Test
@@ -92,7 +92,7 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
         doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
         doReturn(ImmutableClassToInstanceMap.of()).when(schemaService).getExtensions();
         final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> server.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint));
+            () -> server.getRestconfStrategy(JUKEBOX_DATABIND, mountPoint));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);

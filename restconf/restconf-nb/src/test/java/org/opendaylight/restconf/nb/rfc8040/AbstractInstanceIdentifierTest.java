@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -51,6 +52,7 @@ public abstract class AbstractInstanceIdentifierTest {
 
     protected static final EffectiveModelContext IID_SCHEMA =
         YangParserTestUtils.parseYangResourceDirectory("/instanceidentifier/yang");
+    protected static final DatabindContext IID_DATABIND = DatabindContext.ofModel(IID_SCHEMA);
 
     protected static final InputStream stringInputStream(final String str) {
         return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));

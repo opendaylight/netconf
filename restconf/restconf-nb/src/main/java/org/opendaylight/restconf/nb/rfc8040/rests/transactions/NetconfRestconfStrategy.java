@@ -25,10 +25,10 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Implementation of RESTCONF operations on top of a raw NETCONF backend.
@@ -38,10 +38,9 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 public final class NetconfRestconfStrategy extends RestconfStrategy {
     private final NetconfDataTreeService netconfService;
 
-    public NetconfRestconfStrategy(final EffectiveModelContext modelContext,
-            final NetconfDataTreeService netconfService, final @Nullable DOMRpcService rpcService,
-            final @Nullable DOMYangTextSourceProvider sourceProvider) {
-        super(modelContext, ImmutableMap.of(), rpcService, sourceProvider);
+    public NetconfRestconfStrategy(final DatabindContext databind, final NetconfDataTreeService netconfService,
+            final @Nullable DOMRpcService rpcService, final @Nullable DOMYangTextSourceProvider sourceProvider) {
+        super(databind, ImmutableMap.of(), rpcService, sourceProvider);
         this.netconfService = requireNonNull(netconfService);
     }
 

@@ -34,6 +34,7 @@ import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
@@ -181,7 +182,7 @@ public class QueryParamsTest {
 
         final var stack = SchemaInferenceStack.of(context);
         stack.enterSchemaTree(containerQName);
-        final var iid = InstanceIdentifierContext.ofStack(stack);
+        final var iid = InstanceIdentifierContext.ofStack(DatabindContext.ofModel(context), stack);
 
         final var queryParameters = QueryParameters.ofFields(params, WriterFieldsTranslator.translate(
             iid.getSchemaContext(), (DataSchemaNode) iid.getSchemaNode(), paramsFields));
