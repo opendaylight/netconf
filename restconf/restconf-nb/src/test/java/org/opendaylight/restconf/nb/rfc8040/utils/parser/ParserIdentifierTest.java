@@ -119,7 +119,7 @@ public class ParserIdentifierTest {
             mountPointService);
         assertEquals(TEST_IDENT_RESULT.toString(), context.getInstanceIdentifier().toString());
         assertEquals(mountPoint, context.getMountPoint());
-        assertEquals(MODEL_CONTEXT_ON_MOUNT_POINT, context.getSchemaContext());
+        assertSame(MODEL_CONTEXT_ON_MOUNT_POINT, context.databind().modelContext());
     }
 
     /**
@@ -222,7 +222,7 @@ public class ParserIdentifierTest {
         assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_RPC), MODEL_CONTEXT),
             result.getInstanceIdentifier());
         assertEquals(null, result.getMountPoint());
-        assertEquals(MODEL_CONTEXT, result.getSchemaContext());
+        assertSame(MODEL_CONTEXT, result.databind().modelContext());
     }
 
     /**
@@ -242,7 +242,7 @@ public class ParserIdentifierTest {
         assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_RPC), MODEL_CONTEXT),
             result.getInstanceIdentifier());
         assertEquals(mountPoint, result.getMountPoint());
-        assertEquals(MODEL_CONTEXT_ON_MOUNT_POINT, result.getSchemaContext());
+        assertSame(MODEL_CONTEXT_ON_MOUNT_POINT, result.databind().modelContext());
     }
 
     /**
@@ -261,7 +261,7 @@ public class ParserIdentifierTest {
         assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_ACTION), MODEL_CONTEXT),
             result.getInstanceIdentifier());
         assertNull(result.getMountPoint());
-        assertSame(MODEL_CONTEXT, result.getSchemaContext());
+        assertSame(MODEL_CONTEXT, result.databind().modelContext());
     }
 
     /**
@@ -281,6 +281,6 @@ public class ParserIdentifierTest {
         assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_ACTION), MODEL_CONTEXT),
             result.getInstanceIdentifier());
         assertEquals(mountPoint, result.getMountPoint());
-        assertEquals(MODEL_CONTEXT_ON_MOUNT_POINT, result.getSchemaContext());
+        assertSame(MODEL_CONTEXT_ON_MOUNT_POINT, result.databind().modelContext());
     }
 }
