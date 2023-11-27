@@ -11,6 +11,7 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
@@ -32,7 +34,9 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -44,6 +48,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
+import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPutResult;
@@ -81,13 +86,18 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeCon
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.SubmoduleEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
+import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.repo.api.YinTextSchemaSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,15 +112,18 @@ import org.slf4j.LoggerFactory;
 public abstract class RestconfStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
 
-    private final @NonNull EffectiveModelContext modelContext;
+    private final @NonNull DatabindContext databind;
     private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
+    private final DOMYangTextSourceProvider sourceProvider;
     private final DOMRpcService rpcService;
 
     RestconfStrategy(final EffectiveModelContext modelContext, final ImmutableMap<QName, RpcImplementation> localRpcs,
-            final @Nullable DOMRpcService rpcService) {
-        this.modelContext = requireNonNull(modelContext);
+            final @Nullable DOMRpcService rpcService, final DOMYangTextSourceProvider sourceProvider) {
+        // FIXME: pass this down
+        databind = DatabindContext.ofModel(modelContext);
         this.localRpcs = requireNonNull(localRpcs);
         this.rpcService = rpcService;
+        this.sourceProvider = sourceProvider;
     }
 
     /**
@@ -124,20 +137,27 @@ public abstract class RestconfStrategy {
     public static @Nullable RestconfStrategy forMountPoint(final EffectiveModelContext modelContext,
             final DOMMountPoint mountPoint) {
         final var rpcService = mountPoint.getService(DOMRpcService.class).orElse(null);
+        final var sourceProvider = mountPoint.getService(DOMSchemaService.class)
+            .flatMap(schema -> Optional.ofNullable(schema.getExtensions().getInstance(DOMYangTextSourceProvider.class)))
+            .orElse(null);
 
         final var netconfService = mountPoint.getService(NetconfDataTreeService.class);
         if (netconfService.isPresent()) {
-            return new NetconfRestconfStrategy(modelContext, netconfService.orElseThrow(), rpcService);
+            return new NetconfRestconfStrategy(modelContext, netconfService.orElseThrow(), rpcService, sourceProvider);
         }
         final var dataBroker = mountPoint.getService(DOMDataBroker.class);
         if (dataBroker.isPresent()) {
-            return new MdsalRestconfStrategy(modelContext, dataBroker.orElseThrow(), rpcService);
+            return new MdsalRestconfStrategy(modelContext, dataBroker.orElseThrow(), rpcService, sourceProvider);
         }
         return null;
     }
 
+    public final @NonNull DatabindContext databind() {
+        return databind;
+    }
+
     public final @NonNull EffectiveModelContext modelContext() {
-        return modelContext;
+        return databind.modelContext();
     }
 
     /**
@@ -223,7 +243,7 @@ public abstract class RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path, modelContext));
+                future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path, modelContext()));
             }
         }, MoreExecutors.directExecutor());
     }
@@ -259,7 +279,7 @@ public abstract class RestconfStrategy {
 
             @Override
             public void onFailure(final Throwable cause) {
-                ret.setFailure(TransactionUtil.decodeException(cause, "PUT", path, modelContext));
+                ret.setFailure(TransactionUtil.decodeException(cause, "PUT", path, modelContext()));
             }
         }, MoreExecutors.directExecutor());
 
@@ -318,7 +338,7 @@ public abstract class RestconfStrategy {
         }
 
         int lastInsertedPosition = 0;
-        final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext, path.getParent());
+        final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext(), path.getParent());
         tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
@@ -338,8 +358,7 @@ public abstract class RestconfStrategy {
 
     private DataSchemaNode checkListAndOrderedType(final YangInstanceIdentifier path) {
         // FIXME: we have this available in InstanceIdentifierContext
-        final var dataSchemaNode = DataSchemaContextTree.from(modelContext).findChild(path).orElseThrow()
-            .dataSchemaNode();
+        final var dataSchemaNode = databind.schemaTree().findChild(path).orElseThrow().dataSchemaNode();
 
         final String message;
         if (dataSchemaNode instanceof ListSchemaNode listSchema) {
@@ -384,12 +403,12 @@ public abstract class RestconfStrategy {
                 ret.set(new CreateResource(IdentifierCodec.serialize(
                     data instanceof MapNode mapData && !mapData.isEmpty()
                         ? path.node(mapData.body().iterator().next().name()) : path,
-                    modelContext)));
+                    modelContext())));
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                ret.setFailure(TransactionUtil.decodeException(cause, "POST", path, modelContext));
+                ret.setFailure(TransactionUtil.decodeException(cause, "POST", path, modelContext()));
             }
 
         }, MoreExecutors.directExecutor());
@@ -517,21 +536,22 @@ public abstract class RestconfStrategy {
         // We have errors
         if (!noError) {
             tx.cancel();
-            ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false, null));
+            ret.set(new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), false, null));
             return ret;
         }
 
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), true, null));
+                ret.set(new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), true,
+                    null));
             }
 
             @Override
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                ret.set(new PatchStatusContext(modelContext, patch.patchId(), List.copyOf(editCollection), false,
-                    TransactionUtil.decodeException(cause, "PATCH", null, modelContext).getErrors()));
+                ret.set(new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), false,
+                    TransactionUtil.decodeException(cause, "PATCH", null, modelContext()).getErrors()));
             }
         }, MoreExecutors.directExecutor());
 
@@ -555,7 +575,7 @@ public abstract class RestconfStrategy {
         }
 
         int lastInsertedPosition = 0;
-        final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext, grandParentPath);
+        final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext(), grandParentPath);
         tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
@@ -689,7 +709,7 @@ public abstract class RestconfStrategy {
         };
 
         // FIXME: we have this readily available in InstanceIdentifierContext
-        final var ctxNode = DataSchemaContextTree.from(modelContext).findChild(path).orElseThrow();
+        final var ctxNode = databind.schemaTree().findChild(path).orElseThrow();
         if (readData instanceof ContainerNode container) {
             final var builder = Builders.containerBuilder().withNodeIdentifier(container.name());
             buildCont(builder, container.body(), ctxNode, trim);
@@ -1079,4 +1099,63 @@ public abstract class RestconfStrategy {
             }, MoreExecutors.directExecutor());
         return ret;
     }
+
+    public @NonNull RestconfFuture<CharSource> resolveSource(final SourceIdentifier source,
+            final Class<? extends SchemaSourceRepresentation> representation) {
+        final var src = requireNonNull(source);
+        if (YangTextSchemaSource.class.isAssignableFrom(representation)) {
+            if (sourceProvider != null) {
+                final var ret = new SettableRestconfFuture<CharSource>();
+                Futures.addCallback(sourceProvider.getSource(src), new FutureCallback<YangTextSchemaSource>() {
+                    @Override
+                    public void onSuccess(final YangTextSchemaSource result) {
+                        ret.set(result);
+                    }
+
+                    @Override
+                    public void onFailure(final Throwable cause) {
+                        ret.setFailure(cause instanceof RestconfDocumentedException e ? e
+                            : new RestconfDocumentedException(cause.getMessage(), ErrorType.RPC,
+                                ErrorTag.OPERATION_FAILED, cause));
+                    }
+                }, MoreExecutors.directExecutor());
+                return ret;
+            }
+            return exportSource(modelContext(), src, YangCharSource::new, YangCharSource::new);
+        }
+        if (YinTextSchemaSource.class.isAssignableFrom(representation)) {
+            return exportSource(modelContext(), src, YinCharSource.OfModule::new, YinCharSource.OfSubmodule::new);
+        }
+        return RestconfFuture.failed(new RestconfDocumentedException(
+            "Unsupported source representation " + representation.getName()));
+    }
+
+    private static @NonNull RestconfFuture<CharSource> exportSource(final EffectiveModelContext modelContext,
+            final SourceIdentifier source, final Function<ModuleEffectiveStatement, CharSource> moduleCtor,
+            final BiFunction<ModuleEffectiveStatement, SubmoduleEffectiveStatement, CharSource> submoduleCtor) {
+        // If the source identifies a module, things are easy
+        final var name = source.name().getLocalName();
+        final var optRevision = Optional.ofNullable(source.revision());
+        final var optModule = modelContext.findModule(name, optRevision);
+        if (optModule.isPresent()) {
+            return RestconfFuture.of(moduleCtor.apply(optModule.orElseThrow().asEffectiveStatement()));
+        }
+
+        // The source could be a submodule, which we need to hunt down
+        for (var module : modelContext.getModules()) {
+            for (var submodule : module.getSubmodules()) {
+                if (name.equals(submodule.getName()) && optRevision.equals(submodule.getRevision())) {
+                    return RestconfFuture.of(submoduleCtor.apply(module.asEffectiveStatement(),
+                        submodule.asEffectiveStatement()));
+                }
+            }
+        }
+
+        final var sb = new StringBuilder().append("Source ").append(source.name().getLocalName());
+        optRevision.ifPresent(rev -> sb.append('@').append(rev));
+        sb.append(" not found");
+        return RestconfFuture.failed(new RestconfDocumentedException(sb.toString(),
+            ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
+    }
+
 }

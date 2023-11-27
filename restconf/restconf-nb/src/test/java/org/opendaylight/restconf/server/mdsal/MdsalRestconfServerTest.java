@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,20 +24,18 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
-import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
 @ExtendWith(MockitoExtension.class)
 class MdsalRestconfServerTest extends AbstractJukeboxTest {
-    private static final DatabindProvider DATABIND_PROVIDER = () -> DatabindContext.ofModel(JUKEBOX_SCHEMA);
-
     @Mock
     private DOMMountPointService mountPointService;
     @Mock
@@ -49,12 +48,15 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
     private DOMRpcService rpcService;
     @Mock
     private DOMActionService actionService;
+    @Mock
+    private DOMSchemaService schemaService;
 
     private MdsalRestconfServer server;
 
     @BeforeEach
     void before() {
-        server = new MdsalRestconfServer(DATABIND_PROVIDER, dataBroker, rpcService, actionService, mountPointService);
+        server = new MdsalRestconfServer(FixedDOMSchemaService.of(JUKEBOX_SCHEMA), dataBroker, rpcService,
+            actionService, mountPointService);
     }
 
     @Test
@@ -67,6 +69,8 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
+        doReturn(ImmutableClassToInstanceMap.of()).when(schemaService).getExtensions();
         assertInstanceOf(MdsalRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint));
     }
 
@@ -74,6 +78,8 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
     void testGetRestconfStrategyMountNetconfService() {
         doReturn(Optional.of(netconfService)).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
+        doReturn(ImmutableClassToInstanceMap.of()).when(schemaService).getExtensions();
         assertInstanceOf(NetconfRestconfStrategy.class, server.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint));
     }
 
@@ -83,6 +89,8 @@ class MdsalRestconfServerTest extends AbstractJukeboxTest {
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
+        doReturn(ImmutableClassToInstanceMap.of()).when(schemaService).getExtensions();
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> server.getRestconfStrategy(JUKEBOX_SCHEMA, mountPoint));
         final var errors = ex.getErrors();

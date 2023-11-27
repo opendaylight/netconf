@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.jaxrs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -18,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.yang.gen.v1.module._1.rev140101.Module1Data;
 import org.opendaylight.yang.gen.v1.module._2.rev140102.Module2Data;
@@ -66,9 +66,8 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
     }
 
     private void mockMountPoint() {
-        final var schemaService = mock(DOMSchemaService.class);
-        doReturn(MODEL_CONTEXT).when(schemaService).getGlobalContext();
-        doReturn(Optional.of(schemaService)).when(mountPoint).getService(DOMSchemaService.class);
+        doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT))).when(mountPoint)
+            .getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
     }
 

@@ -32,19 +32,18 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-// FIXME: hide this class
 @ExtendWith(MockitoExtension.class)
-public abstract class AbstractRestconfTest extends AbstractJukeboxTest {
+abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     static final ApiPath JUKEBOX_API_PATH = apiPath("example-jukebox:jukebox");
 
     @Mock
@@ -64,7 +63,7 @@ public abstract class AbstractRestconfTest extends AbstractJukeboxTest {
 
     @BeforeEach
     final void setupRestconf() {
-        restconf = new JaxRsRestconf(new MdsalRestconfServer(() -> DatabindContext.ofModel(modelContext()), dataBroker,
+        restconf = new JaxRsRestconf(new MdsalRestconfServer(FixedDOMSchemaService.of(modelContext()), dataBroker,
             rpcService, actionService, mountPointService));
     }
 
@@ -76,8 +75,7 @@ public abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return assertEntity(NormalizedNodePayload.class, status, invocation).data();
     }
 
-    // FIXME: hide this method
-    public static final <T> T assertEntity(final Class<T> expectedType, final int expectedStatus,
+    static final <T> T assertEntity(final Class<T> expectedType, final int expectedStatus,
             final Consumer<AsyncResponse> invocation) {
         return assertInstanceOf(expectedType, assertEntity(expectedStatus, invocation));
     }
@@ -86,8 +84,7 @@ public abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return assertResponse(expectedStatus, invocation).getEntity();
     }
 
-    // FIXME: hide this method
-    public static final RestconfError assertError(final Consumer<AsyncResponse> invocation) {
+    static final RestconfError assertError(final Consumer<AsyncResponse> invocation) {
         final var errors = assertErrors(invocation);
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -95,8 +92,7 @@ public abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return error;
     }
 
-    // FIXME: hide this method
-    public static final List<RestconfError> assertErrors(final Consumer<AsyncResponse> invocation) {
+    static final List<RestconfError> assertErrors(final Consumer<AsyncResponse> invocation) {
         final var ar = mock(AsyncResponse.class);
         final var captor = ArgumentCaptor.forClass(RestconfDocumentedException.class);
         doReturn(true).when(ar).resume(captor.capture());

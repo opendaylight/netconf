@@ -24,6 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
@@ -45,14 +46,15 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final DOMDataBroker dataBroker;
 
     public MdsalRestconfStrategy(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker,
-            final @Nullable DOMRpcService rpcService, final ImmutableMap<QName, RpcImplementation> localRpcs) {
-        super(modelContext, localRpcs, rpcService);
+            final @Nullable DOMRpcService rpcService, final @Nullable DOMYangTextSourceProvider sourceProvider,
+            final ImmutableMap<QName, RpcImplementation> localRpcs) {
+        super(modelContext, localRpcs, rpcService, sourceProvider);
         this.dataBroker = requireNonNull(dataBroker);
     }
 
     public MdsalRestconfStrategy(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker,
-            final @Nullable DOMRpcService rpcService) {
-        this(modelContext, dataBroker, rpcService, ImmutableMap.of());
+            final @Nullable DOMRpcService rpcService, final @Nullable  DOMYangTextSourceProvider sourceProvider) {
+        this(modelContext, dataBroker, rpcService, sourceProvider, ImmutableMap.of());
     }
 
     @Override

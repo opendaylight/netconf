@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.server.mdsal;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -31,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -81,6 +83,7 @@ import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.Restconf;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -98,6 +101,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
@@ -107,6 +111,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.YinTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,8 +120,9 @@ import org.slf4j.LoggerFactory;
  * A RESTCONF server implemented on top of MD-SAL.
  */
 @Singleton
-@Component
-public final class MdsalRestconfServer implements RestconfServer {
+@Component(service = { RestconfServer.class, DatabindProvider.class })
+public final class MdsalRestconfServer
+        implements RestconfServer, DatabindProvider, EffectiveModelContextListener, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfServer.class);
     private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
     private static final VarHandle LOCAL_STRATEGY;
@@ -124,7 +130,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     static {
         try {
             LOCAL_STRATEGY = MethodHandles.lookup()
-                .findVarHandle(MdsalRestconfServer.class, "localStrategy", RestconfStrategy.class);
+                .findVarHandle(MdsalRestconfServer.class, "localStrategy", MdsalRestconfStrategy.class);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -141,33 +147,74 @@ public final class MdsalRestconfServer implements RestconfServer {
 
     private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
     private final @NonNull DOMMountPointService mountPointService;
-    private final @NonNull DatabindProvider databindProvider;
     private final @NonNull DOMDataBroker dataBroker;
     private final @Nullable DOMRpcService rpcService;
     private final @Nullable DOMActionService actionService;
+    private final @Nullable DOMYangTextSourceProvider sourceProvider;
+
+    private final Registration reg;
 
     @SuppressWarnings("unused")
-    private volatile RestconfStrategy localStrategy;
+    private volatile MdsalRestconfStrategy localStrategy;
 
     @Inject
     @Activate
-    public MdsalRestconfServer(@Reference final DatabindProvider databindProvider,
+    public MdsalRestconfServer(@Reference final DOMSchemaService schemaService,
             @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
             @Reference final DOMActionService actionService,
             @Reference final DOMMountPointService mountPointService,
             @Reference final List<RpcImplementation> localRpcs) {
-        this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcService = requireNonNull(rpcService);
         this.actionService = requireNonNull(actionService);
         this.mountPointService = requireNonNull(mountPointService);
         this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
+        sourceProvider = schemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
+
+        localStrategy = new MdsalRestconfStrategy(schemaService.getGlobalContext(), dataBroker, rpcService,
+            sourceProvider, this.localRpcs);
+        reg = schemaService.registerSchemaContextListener(this);
     }
 
-    public MdsalRestconfServer(final DatabindProvider databindProvider, final DOMDataBroker dataBroker,
+    public MdsalRestconfServer(final DOMSchemaService schemaService, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMMountPointService mountPointService, final RpcImplementation... localRpcs) {
-        this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
+        this(schemaService, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
+    }
+
+    @Override
+    public DatabindContext currentContext() {
+        return localStrategy().databind();
+    }
+
+    @Override
+    public void onModelContextUpdated(final EffectiveModelContext newModelContext) {
+        final var local = localStrategy();
+        if (!newModelContext.equals(local.modelContext())) {
+            LOCAL_STRATEGY.setRelease(this,
+                new MdsalRestconfStrategy(newModelContext, dataBroker, rpcService, sourceProvider, localRpcs));
+        }
+    }
+
+    private @NonNull MdsalRestconfStrategy localStrategy() {
+        return verifyNotNull((MdsalRestconfStrategy) LOCAL_STRATEGY.getAcquire(this));
+    }
+
+    @Deprecated(forRemoval = true)
+    private @NonNull MdsalRestconfStrategy localStrategy(final EffectiveModelContext modelContext) {
+        final var local = localStrategy();
+        if (local.modelContext().equals(modelContext)) {
+            return local;
+        }
+        return new MdsalRestconfStrategy(modelContext, dataBroker, rpcService, sourceProvider, localRpcs);
+    }
+
+    @PreDestroy
+    @Deactivate
+    @Override
+    public void close() {
+        reg.close();
+        localStrategy = null;
     }
 
     @Override
@@ -442,7 +489,7 @@ public final class MdsalRestconfServer implements RestconfServer {
 
     private @NonNull RestconfFuture<ModulesGetResult> modulesGET(final String fileName, final String revision,
             final Class<? extends SchemaSourceRepresentation> representation) {
-        return modulesGET(databindProvider.currentContext(), fileName, revision, representation);
+        return modulesGET(localStrategy(), fileName, revision, representation);
     }
 
     private @NonNull RestconfFuture<ModulesGetResult> modulesGET(final ApiPath mountPath, final String fileName,
@@ -452,25 +499,25 @@ public final class MdsalRestconfServer implements RestconfServer {
             return RestconfFuture.failed(new RestconfDocumentedException("Mount path has to end with yang-ext:mount"));
         }
 
-        final var currentContext = databindProvider.currentContext();
         final InstanceIdentifierContext point;
         try {
-            point = InstanceIdentifierContext.ofApiPath(mountPath, currentContext.modelContext(), mountPointService);
+            point = InstanceIdentifierContext.ofApiPath(mountPath, localStrategy().modelContext(), mountPointService);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
 
         final var mountPoint = point.getMountPoint();
         final var modelContext = point.getSchemaContext();
-        final var domProvider = mountPoint.getService(DOMSchemaService.class)
-            .flatMap(svc -> Optional.ofNullable(svc.getExtensions().getInstance(DOMYangTextSourceProvider.class)));
-
-        return modulesGET(DatabindContext.ofModel(modelContext,
-            domProvider.isEmpty() ? null : new DOMSourceResolver(domProvider.orElseThrow())), fileName, revision,
-            representation);
+        final RestconfStrategy strategy;
+        try {
+            strategy = forMountPoint(modelContext, mountPoint);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+        return modulesGET(strategy, fileName, revision, representation);
     }
 
-    private static @NonNull RestconfFuture<ModulesGetResult> modulesGET(final DatabindContext databind,
+    private static @NonNull RestconfFuture<ModulesGetResult> modulesGET(final RestconfStrategy strategy,
             final String moduleName, final String revisionStr,
             final Class<? extends SchemaSourceRepresentation> representation) {
         if (moduleName == null) {
@@ -500,13 +547,13 @@ public final class MdsalRestconfServer implements RestconfServer {
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
         }
 
-        return databind.resolveSource(new SourceIdentifier(moduleName, revision), representation)
+        return strategy.resolveSource(new SourceIdentifier(moduleName, revision), representation)
             .transform(ModulesGetResult::new);
     }
 
     @Override
     public RestconfFuture<OperationsGetResult> operationsGET() {
-        return operationsGET(databindProvider.currentContext().modelContext());
+        return operationsGET(localStrategy().modelContext());
     }
 
     @Override
@@ -562,8 +609,7 @@ public final class MdsalRestconfServer implements RestconfServer {
     @Override
     public RestconfFuture<OperationOutput> operationsPOST(final URI restconfURI, final ApiPath apiPath,
             final OperationInputBody body) {
-        final var currentContext = databindProvider.currentContext();
-        final var reqPath = bindRequestPath(currentContext, apiPath);
+        final var reqPath = bindRequestPath(localStrategy(), apiPath);
         final var inference = reqPath.inference();
         final ContainerNode input;
         try {
@@ -574,14 +620,14 @@ public final class MdsalRestconfServer implements RestconfServer {
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
         }
 
-        return getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint())
-            .invokeRpc(restconfURI, reqPath.getSchemaNode().getQName(),
-                new OperationInput(currentContext, inference, input));
+        final var strategy = getRestconfStrategy(reqPath.getSchemaContext(), reqPath.getMountPoint());
+        return strategy.invokeRpc(restconfURI, reqPath.getSchemaNode().getQName(),
+                new OperationInput(strategy.databind(), inference, input));
     }
 
     @Override
     public RestconfFuture<NormalizedNodePayload> yangLibraryVersionGET() {
-        final var stack = SchemaInferenceStack.of(databindProvider.currentContext().modelContext());
+        final var stack = SchemaInferenceStack.of(localStrategy().modelContext());
         try {
             stack.enterYangData(YangApi.NAME);
             stack.enterDataTree(Restconf.QNAME);
@@ -596,17 +642,17 @@ public final class MdsalRestconfServer implements RestconfServer {
     }
 
     private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull ApiPath identifier) {
-        return bindRequestPath(databindProvider.currentContext(), identifier);
+        return bindRequestPath(localStrategy(), identifier);
     }
 
-    private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull DatabindContext databind,
+    private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull MdsalRestconfStrategy strategy,
             final @NonNull ApiPath identifier) {
         // FIXME: DatabindContext looks like it should be internal
-        return InstanceIdentifierContext.ofApiPath(identifier, databind.modelContext(), mountPointService);
+        return InstanceIdentifierContext.ofApiPath(identifier, strategy.modelContext(), mountPointService);
     }
 
     private @NonNull InstanceIdentifierContext bindRequestRoot() {
-        return InstanceIdentifierContext.ofLocalRoot(databindProvider.currentContext().modelContext());
+        return InstanceIdentifierContext.ofLocalRoot(localStrategy().modelContext());
     }
 
     private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
@@ -625,7 +671,11 @@ public final class MdsalRestconfServer implements RestconfServer {
         if (mountPoint == null) {
             return localStrategy(modelContext);
         }
+        return forMountPoint(modelContext, mountPoint);
+    }
 
+    private static @NonNull RestconfStrategy forMountPoint(final EffectiveModelContext modelContext,
+            final DOMMountPoint mountPoint) {
         final var ret = RestconfStrategy.forMountPoint(modelContext, mountPoint);
         if (ret == null) {
             final var mountId = mountPoint.getIdentifier();
@@ -634,16 +684,5 @@ public final class MdsalRestconfServer implements RestconfServer {
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, mountId);
         }
         return ret;
-    }
-
-    private @NonNull RestconfStrategy localStrategy(final EffectiveModelContext modelContext) {
-        final var local = (RestconfStrategy) LOCAL_STRATEGY.getAcquire(this);
-        if (local != null && modelContext.equals(local.modelContext())) {
-            return local;
-        }
-
-        final var created = new MdsalRestconfStrategy(modelContext, dataBroker, rpcService, localRpcs);
-        LOCAL_STRATEGY.setRelease(this, created);
-        return created;
     }
 }
