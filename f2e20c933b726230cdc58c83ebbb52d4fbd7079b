@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "febdaa63_8ef88aa0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-11-27T14:05:59Z",
+      "side": 1,
+      "message": "Can copy test to master branch to see that master is ok without fix?",
+      "revId": "f2e20c933b726230cdc58c83ebbb52d4fbd7079b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
