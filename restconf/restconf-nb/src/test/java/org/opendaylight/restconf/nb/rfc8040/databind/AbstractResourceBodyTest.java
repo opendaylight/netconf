@@ -25,6 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -88,12 +89,15 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         }
     }
 
-    static final void assertRangeViolation(final Executable executable) {
+    static final RestconfError assertError(final Executable executable) {
         final var ex = assertThrows(RestconfDocumentedException.class, executable);
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
+        return errors.get(0);
+    }
 
-        final var error = errors.get(0);
+    static final void assertRangeViolation(final Executable executable) {
+        final var error = assertError(executable);
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
         assertEquals("bar error app tag", error.getErrorAppTag());

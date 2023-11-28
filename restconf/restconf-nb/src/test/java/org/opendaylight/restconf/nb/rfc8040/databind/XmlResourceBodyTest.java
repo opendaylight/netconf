@@ -183,4 +183,16 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
                 xmlns="augment:module:leaf:list">/a:cont/a:cont1/b:lflst11[.="lflst11_1"]</lf11>
                 </cont1>"""));
     }
+
+    @Test
+    void testMismatchedInput() throws Exception {
+        final var error = assertError(() -> parse("base:cont", """
+            <restconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"/>"""));
+        assertEquals("""
+            Incorrect message root element (urn:ietf:params:xml:ns:yang:ietf-restconf)restconf-state, should be \
+            (ns)cont""", error.getErrorMessage());
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+    }
+
 }

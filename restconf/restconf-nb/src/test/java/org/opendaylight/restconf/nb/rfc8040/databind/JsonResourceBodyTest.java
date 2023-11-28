@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -86,5 +88,19 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
                 "bar": 100
               }
             }"""));
+    }
+
+    @Test
+    void testMismatchedInput() throws Exception {
+        final var error = assertError(() -> parse("base:cont", """
+            {
+              "ietf-restconf:restconf-state" : {
+              }
+            }"""));
+        assertEquals("""
+            Payload name ((urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring?revision=2017-01-26)restconf-state) is \
+            different from identifier name ((ns?revision=2016-02-28)cont)""", error.getErrorMessage());
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
     }
 }

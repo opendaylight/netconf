@@ -58,10 +58,10 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
     public @NonNull NormalizedNode toNormalizedNode(final @NonNull DataPutPath path,
             final @NonNull SchemaNode schemaNode) {
         final var instance = path.instance();
-        final var expected = instance.isEmpty() ? DATA_NID : instance.getLastPathArgument();
+        final var expectedName = instance.isEmpty() ? DATA_NID : instance.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
         try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
-            streamTo(path, expected, acquireStream(), streamWriter);
+            streamTo(path, expectedName, acquireStream(), streamWriter);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
@@ -83,29 +83,19 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
             data = parsedData;
         }
 
-        validTopLevelNodeName(expected, data);
+        final var dataName = data.name();
+        if (!dataName.equals(expectedName)) {
+            throw new RestconfDocumentedException(
+                "Payload name (" + dataName + ") is different from identifier name (" + expectedName + ")",
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        }
+
         validateListKeysEqualityInPayloadAndUri(schemaNode, instance, data);
         return data;
     }
 
     abstract void streamTo(@NonNull DataPutPath path, @NonNull PathArgument name, @NonNull InputStream inputStream,
         @NonNull NormalizedNodeStreamWriter writer) throws IOException;
-
-    /**
-     * Valid top level node name.
-     *
-     * @param apiPath path of node
-     * @param data data
-     */
-    @VisibleForTesting
-    static final void validTopLevelNodeName(final PathArgument expected, final NormalizedNode data) {
-        final var payloadName = data.name();
-        if (!payloadName.equals(expected)) {
-            throw new RestconfDocumentedException(
-                "Payload name (" + payloadName + ") is different from identifier name (" + expected + ")",
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-        }
-    }
 
     /**
      * Validates whether keys in {@code payload} are equal to values of keys in
