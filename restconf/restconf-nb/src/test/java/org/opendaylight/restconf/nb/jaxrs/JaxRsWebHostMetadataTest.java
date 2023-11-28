@@ -5,17 +5,17 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
+package org.opendaylight.restconf.nb.jaxrs;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class RootResourceDiscoveryServiceImplTest {
-    private final RootResourceDiscoveryServiceImpl svc = new RootResourceDiscoveryServiceImpl("fooBarBaz");
+class JaxRsWebHostMetadataTest {
+    private final JaxRsWebHostMetadata svc = new JaxRsWebHostMetadata("fooBarBaz");
 
     @Test
-    public void testJsonData() {
+    void testJsonData() {
         final var response = svc.readJsonData();
         assertEquals(200, response.getStatus());
         assertEquals("""
@@ -28,7 +28,7 @@ public class RootResourceDiscoveryServiceImplTest {
     }
 
     @Test
-    public void testXrdData() {
+    void testXrdData() {
         final var response = svc.readXrdData();
         assertEquals(200, response.getStatus());
         assertEquals("""

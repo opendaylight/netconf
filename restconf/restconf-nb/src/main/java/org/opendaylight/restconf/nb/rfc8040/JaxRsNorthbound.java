@@ -8,7 +8,9 @@
 package org.opendaylight.restconf.nb.rfc8040;
 
 import com.google.common.annotations.Beta;
+import java.util.Set;
 import javax.servlet.ServletException;
+import javax.ws.rs.core.Application;
 import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration;
 import org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter;
 import org.opendaylight.aaa.web.FilterDetails;
@@ -19,6 +21,7 @@ import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.jaxrs.JaxRsWebHostMetadata;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
@@ -79,8 +82,13 @@ public final class JaxRsNorthbound implements AutoCloseable {
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
-                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(URLConstants.BASE_PATH))
-                    .build())
+                .servlet(servletSupport.createHttpServletBuilder(
+                    new Application() {
+                        @Override
+                        public Set<Object> getSingletons() {
+                            return Set.of(new JaxRsWebHostMetadata(URLConstants.BASE_PATH));
+                        }
+                    }).build())
                 .name("Rootfound")
                 .build());
 

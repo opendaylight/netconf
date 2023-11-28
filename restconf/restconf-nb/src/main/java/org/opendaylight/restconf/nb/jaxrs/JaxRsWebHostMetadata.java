@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
+package org.opendaylight.restconf.nb.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
@@ -20,15 +20,15 @@ import org.opendaylight.restconf.api.MediaTypes;
 /**
  * Controller for determining the {@code Root Resource} of the RESTCONF API. This interface serves up a
  * {@code host-meta} document as defined in
- * <a href="https://tools.ietf.org/html/rfc8040#section-3">RFC6415 section 3</a>.
+ * <a href="https://tools.ietf.org/html/rfc6415#section-3">RFC6415 The host-meta Document</a>.
  */
 // FIXME: this really should be the endpoint's job to aggregate these. Once JAX-RS (or any other wiring) can provide it,
 //        integrate with that framework, so we co-exist with others.
 @Path("/")
-public final class RootResourceDiscoveryServiceImpl {
+public final class JaxRsWebHostMetadata {
     private final String restconfRoot;
 
-    public RootResourceDiscoveryServiceImpl(final String restconfRoot) {
+    public JaxRsWebHostMetadata(final String restconfRoot) {
         this.restconfRoot = requireNonNull(restconfRoot);
     }
 
