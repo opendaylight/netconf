@@ -7,11 +7,16 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 import java.util.Map;
-import org.junit.Test;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -23,11 +28,17 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
-public class XmlResourceBodyTest extends AbstractResourceBodyTest {
+class XmlResourceBodyTest extends AbstractResourceBodyTest {
     private static final QName TOP_LEVEL_LIST = QName.create("foo", "2017-08-09", "top-level-list");
 
-    public XmlResourceBodyTest() {
+    XmlResourceBodyTest() {
         super(XmlResourceBody::new);
+    }
+
+    private void mockMount() {
+        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
+        doReturn(Optional.of(FixedDOMSchemaService.of(IID_SCHEMA))).when(mountPoint)
+            .getService(DOMSchemaService.class);
     }
 
     /**
@@ -36,7 +47,9 @@ public class XmlResourceBodyTest extends AbstractResourceBodyTest {
      * thrown.
      */
     @Test
-    public void wrongRootElementTest() {
+    void wrongRootElementTest() {
+        mockMount();
+
         assertThrowsException("",
             "Incorrect message root element (instance:identifier:module)cont1, should be "
                 + "(urn:ietf:params:xml:ns:yang:ietf-restconf)data");
@@ -62,13 +75,13 @@ public class XmlResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     @Test
-    public void testRangeViolation() throws Exception {
+    void testRangeViolation() throws Exception {
         assertRangeViolation(() -> parse("netconf786:foo", """
             <foo xmlns="netconf786"><bar>100</bar></foo>"""));
     }
 
     @Test
-    public void putXmlTest() throws Exception {
+    void putXmlTest() throws Exception {
         final var keyName = QName.create(TOP_LEVEL_LIST, "key-leaf");
         assertEquals(Builders.mapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(TOP_LEVEL_LIST, keyName, "key-value"))
@@ -78,12 +91,14 @@ public class XmlResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     @Test
-    public void moduleDataTest() throws Exception {
+    void moduleDataTest() throws Exception {
         testModuleData("instance-identifier-module:cont");
     }
 
     @Test
-    public void moduleDataMountPointTest() throws Exception {
+    void moduleDataMountPointTest() throws Exception {
+        mockMount();
+
         testModuleData("instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont");
     }
 
@@ -123,12 +138,14 @@ public class XmlResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     @Test
-    public void moduleSubContainerDataPutTest() throws Exception {
+    void moduleSubContainerDataPutTest() throws Exception {
         testModuleSubContainerDataPut("instance-identifier-module:cont/cont1");
     }
 
     @Test
-    public void moduleSubContainerDataPutMountPointTest() throws Exception {
+    void moduleSubContainerDataPutMountPointTest() throws Exception {
+        mockMount();
+
         testModuleSubContainerDataPut(
             "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont/cont1");
     }

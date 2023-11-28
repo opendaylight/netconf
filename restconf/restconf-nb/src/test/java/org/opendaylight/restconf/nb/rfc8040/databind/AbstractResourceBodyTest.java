@@ -7,25 +7,22 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import static java.util.Objects.requireNonNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.Optional;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
-import org.junit.BeforeClass;
-import org.junit.function.ThrowingRunnable;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
@@ -34,11 +31,11 @@ import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@ExtendWith(MockitoExtension.class)
 abstract class AbstractResourceBodyTest extends AbstractBodyTest {
     static final NodeIdentifier CONT_NID = new NodeIdentifier(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
     static final NodeIdentifier CONT1_NID = new NodeIdentifier(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont1"));
@@ -55,23 +52,20 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
 
     private static DatabindContext DATABIND;
 
+    @Mock
+    DOMMountPointService mountPointService;
+    @Mock
+    DOMMountPoint mountPoint;
+
     private final Function<InputStream, ResourceBody> bodyConstructor;
-    private final DOMMountPointService mountPointService;
-    private final DOMMountPoint mountPoint;
 
     AbstractResourceBodyTest(final Function<InputStream, ResourceBody> bodyConstructor) {
-        this.bodyConstructor = requireNonNull(bodyConstructor);
-
-        mountPointService = mock(DOMMountPointService.class);
-        mountPoint = mock(DOMMountPoint.class);
-        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
-        doReturn(Optional.of(FixedDOMSchemaService.of(IID_SCHEMA))).when(mountPoint)
-            .getService(DOMSchemaService.class);
-
+        assertNotNull(bodyConstructor);
+        this.bodyConstructor = bodyConstructor;
     }
 
-    @BeforeClass
-    public static final void initModelContext() throws Exception {
+    @BeforeAll
+    static final void initModelContext() throws Exception {
         final var testFiles = loadFiles("/instanceidentifier/yang");
         testFiles.addAll(loadFiles("/modules"));
         testFiles.addAll(loadFiles("/foo-xml-test/yang"));
@@ -104,8 +98,8 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         }
     }
 
-    static final void assertRangeViolation(final ThrowingRunnable runnable) {
-        final var ex = assertThrows(RestconfDocumentedException.class, runnable);
+    static final void assertRangeViolation(final Executable executable) {
+        final var ex = assertThrows(RestconfDocumentedException.class, executable);
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
 

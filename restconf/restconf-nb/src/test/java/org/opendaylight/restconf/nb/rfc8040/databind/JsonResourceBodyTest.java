@@ -7,10 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -18,13 +18,13 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
-public class JsonResourceBodyTest extends AbstractResourceBodyTest {
-    public JsonResourceBodyTest() {
+class JsonResourceBodyTest extends AbstractResourceBodyTest {
+    JsonResourceBodyTest() {
         super(JsonResourceBody::new);
     }
 
     @Test
-    public void moduleDataTest() throws Exception {
+    void moduleDataTest() throws Exception {
         final var entryId = NodeIdentifierWithPredicates.of(LST11,
             Map.of(KEYVALUE111, "value1", KEYVALUE112, "value2"));
 
@@ -64,7 +64,7 @@ public class JsonResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     @Test
-    public void moduleSubContainerDataPutTest() throws Exception {
+    void moduleSubContainerDataPutTest() throws Exception {
         assertEquals(Builders.containerBuilder()
             .withNodeIdentifier(CONT1_NID)
             .withChild(ImmutableNodes.leafNode(LF11, YangInstanceIdentifier.of(CONT_NID, CONT1_NID,
@@ -74,7 +74,7 @@ public class JsonResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     @Test
-    public void testRangeViolation() throws Exception {
+    void testRangeViolation() throws Exception {
         assertRangeViolation(() -> parse("netconf786:foo", """
             {
               "netconf786:foo": {
