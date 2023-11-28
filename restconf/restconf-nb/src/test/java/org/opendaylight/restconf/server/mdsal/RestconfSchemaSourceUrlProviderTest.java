@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
+package org.opendaylight.restconf.server.mdsal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,14 +30,14 @@ class RestconfSchemaSourceUrlProviderTest {
     }
 
     @ParameterizedTest(name = "Supported module-set name. URL: {2}")
-    @MethodSource("getSchemaSourceUrlArgs")
+    @MethodSource
     void getSchemaSourceUrl(final String moduleName, final Revision revision, final Uri expected) {
         final var urlProvider = new RestconfSchemaSourceUrlProvider();
         final var result = urlProvider.getSchemaSourceUrl("ODL_modules", moduleName, revision);
         assertEquals(Optional.of(expected), result);
     }
 
-    private static List<Arguments> getSchemaSourceUrlArgs() {
+    private static List<Arguments> getSchemaSourceUrl() {
         return List.of(
             Arguments.of("odl-module", Revision.of("2023-02-23"),
                 new Uri("/rests/modules/odl-module?revision=2023-02-23")),
