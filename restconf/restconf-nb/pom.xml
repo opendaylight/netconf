@@ -102,8 +102,17 @@
     </dependency>
 
     <dependency>
+      <groupId>org.opendaylight.odlparent</groupId>
+      <artifactId>logging-markers</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>concepts</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.yangtools</groupId>
+      <artifactId>rfc8040-model-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
@@ -143,14 +152,6 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-model-ri</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-model-spi</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-model-util</artifactId>
     </dependency>
     <dependency>
@@ -160,10 +161,6 @@
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-repo-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-xpath-api</artifactId>
     </dependency>
 
     <dependency>
@@ -193,10 +190,6 @@
     <dependency>
       <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
       <artifactId>rfc8072</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
-      <artifactId>rfc8525</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf.model</groupId>
