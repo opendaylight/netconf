@@ -43,14 +43,13 @@ public final class QueryParams {
     private static final Set<String> KNOWN_PARAMS = Set.of(
         // Read data
         ContentParam.uriName, DepthParam.uriName, FieldsParam.uriName, WithDefaultsParam.uriName,
-        PrettyPrintParam.uriName,
         // Modify data
         InsertParam.uriName, PointParam.uriName,
         // Notifications
         FilterParam.uriName, StartTimeParam.uriName, StopTimeParam.uriName,
         // ODL extensions
-        LeafNodesOnlyParam.uriName, SkipNotificationDataParam.uriName, ChangedLeafNodesOnlyParam.uriName,
-        ChildNodesOnlyParam.uriName);
+        ChangedLeafNodesOnlyParam.uriName, ChildNodesOnlyParam.uriName, PrettyPrintParam.uriName,
+        LeafNodesOnlyParam.uriName, SkipNotificationDataParam.uriName);
 
     private QueryParams() {
         // Utility class
