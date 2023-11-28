@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.utils.parser;
+package org.opendaylight.restconf.nb.rfc8040.legacy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -23,8 +23,7 @@ import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -34,10 +33,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-/**
- * Unit tests for {@link ParserIdentifier}.
- */
-class ParserIdentifierTest {
+class InstanceIdentifierContextTest {
     // mount point identifier
     private static final String MOUNT_POINT_IDENT = "mount-point:mount-container/point-number/yang-ext:mount";
 
@@ -101,7 +97,7 @@ class ParserIdentifierTest {
      */
     @Test
     void toInstanceIdentifierTest() {
-        final var context = toInstanceIdentifier(TEST_IDENT, MODEL_CONTEXT, null);
+        final var context = assertContext(TEST_IDENT, MODEL_CONTEXT, null);
         assertEquals(TEST_IDENT_RESULT, context.getInstanceIdentifier().toString());
     }
 
@@ -111,7 +107,7 @@ class ParserIdentifierTest {
      */
     @Test
     void toInstanceIdentifierOtherModulesTest() {
-        final var context = toInstanceIdentifier(TEST_IDENT_OTHERS, MODEL_CONTEXT, null);
+        final var context = assertContext(TEST_IDENT_OTHERS, MODEL_CONTEXT, null);
         assertEquals(TEST_IDENT_OTHERS_RESULT, context.getInstanceIdentifier().toString());
     }
 
@@ -120,7 +116,7 @@ class ParserIdentifierTest {
      */
     @Test
     void toInstanceIdentifierMountPointTest() {
-        final var context = toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + TEST_IDENT, MODEL_CONTEXT,
+        final var context = assertContext(MOUNT_POINT_IDENT + "/" + TEST_IDENT, MODEL_CONTEXT,
             mountPointService);
         assertEquals(TEST_IDENT_RESULT.toString(), context.getInstanceIdentifier().toString());
         assertEquals(mountPoint, context.getMountPoint());
@@ -133,7 +129,7 @@ class ParserIdentifierTest {
      */
     @Test
     void toInstanceIdentifierNullSchemaContextNegativeTest() {
-        assertThrows(NullPointerException.class, () -> toInstanceIdentifier(TEST_IDENT, null, null));
+        assertThrows(NullPointerException.class, () -> assertContext(TEST_IDENT, null, null));
     }
 
     /**
@@ -141,7 +137,7 @@ class ParserIdentifierTest {
      */
     @Test
     void toInstanceIdentifierEmptyIdentifierTest() {
-        final var context = toInstanceIdentifier("", MODEL_CONTEXT, null);
+        final var context = assertContext("", MODEL_CONTEXT, null);
         assertEquals(YangInstanceIdentifier.of(), context.getInstanceIdentifier());
     }
 
@@ -150,11 +146,7 @@ class ParserIdentifierTest {
      */
     @Test
     void toInstanceIdentifierInvalidIdentifierNegativeTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> toInstanceIdentifier(INVALID_TEST_IDENT, MODEL_CONTEXT, null));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError(INVALID_TEST_IDENT, MODEL_CONTEXT, null);
         assertEquals("Schema for '(parser:identifier?revision=2016-06-02)cont2' not found", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
@@ -166,11 +158,7 @@ class ParserIdentifierTest {
      */
     @Test
     void toInstanceIdentifierMountPointInvalidIdentifierNegativeTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> toInstanceIdentifier("mount-point:point-number/yang-ext:mount", MODEL_CONTEXT, mountPointService));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError("mount-point:point-number/yang-ext:mount", MODEL_CONTEXT, mountPointService);
         assertEquals("Schema for '(mount:point?revision=2016-06-02)point-number' not found", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
@@ -183,11 +171,7 @@ class ParserIdentifierTest {
      */
     @Test
     void toInstanceIdentifierMissingMountPointNegativeTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> toInstanceIdentifier("yang-ext:mount", MODEL_CONTEXT, mountPointService));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError("yang-ext:mount", MODEL_CONTEXT, mountPointService);
         assertEquals("Mount point '' does not exist", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.getErrorTag());
@@ -200,11 +184,7 @@ class ParserIdentifierTest {
      */
     @Test
     void toInstanceIdentifierMissingMountPointServiceNegativeTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> toInstanceIdentifier("yang-ext:mount", MODEL_CONTEXT, null));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
+        final var error = assertError("yang-ext:mount", MODEL_CONTEXT, null);
         assertEquals("Mount point service is not available", error.getErrorMessage());
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
         assertEquals(ErrorTag.OPERATION_FAILED, error.getErrorTag());
@@ -215,7 +195,7 @@ class ParserIdentifierTest {
      */
     @Test
     void invokeRpcTest() throws Exception {
-        final var result = toInstanceIdentifier(INVOKE_RPC, MODEL_CONTEXT, null);
+        final var result = assertContext(INVOKE_RPC, MODEL_CONTEXT, null);
 
         // RPC schema node
         final QName rpcQName = result.getSchemaNode().getQName();
@@ -233,7 +213,7 @@ class ParserIdentifierTest {
      */
     @Test
     void invokeRpcOnMountPointTest() throws Exception {
-        final var result = toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + INVOKE_RPC, MODEL_CONTEXT, mountPointService);
+        final var result = assertContext(MOUNT_POINT_IDENT + "/" + INVOKE_RPC, MODEL_CONTEXT, mountPointService);
 
         // RPC schema node
         final var rpcQName = result.getSchemaNode().getQName();
@@ -251,7 +231,7 @@ class ParserIdentifierTest {
      */
     @Test
     void invokeActionTest() throws Exception {
-        final var result = toInstanceIdentifier(INVOKE_ACTION, MODEL_CONTEXT, null);
+        final var result = assertContext(INVOKE_ACTION, MODEL_CONTEXT, null);
 
         // Action schema node
         final var actionQName = result.getSchemaNode().getQName();
@@ -269,11 +249,11 @@ class ParserIdentifierTest {
      */
     @Test
     void invokeActionOnMountPointTest() throws Exception {
-        final var result = toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + INVOKE_ACTION, MODEL_CONTEXT,
+        final var result = assertContext(MOUNT_POINT_IDENT + "/" + INVOKE_ACTION, MODEL_CONTEXT,
             mountPointService);
 
         // Action schema node
-        final QName actionQName = result.getSchemaNode().getQName();
+        final var actionQName = result.getSchemaNode().getQName();
         assertEquals("https://example.com/ns/example-actions", actionQName.getModule().getNamespace().toString());
         assertEquals("reset", actionQName.getLocalName());
 
@@ -283,24 +263,32 @@ class ParserIdentifierTest {
         assertSame(MODEL_CONTEXT_ON_MOUNT_POINT, result.databind().modelContext());
     }
 
-    private static YangInstanceIdentifier assertPath(final String path) {
-        try {
-            return new ApiPathNormalizer(DatabindContext.ofModel(MODEL_CONTEXT)).normalizePath(ApiPath.parse(path))
-                .path;
-        } catch (ParseException e) {
-            throw new AssertionError(e);
-        }
+    private static InstanceIdentifierContext assertContext(final String identifier,
+            final EffectiveModelContext schemaContext, final @Nullable DOMMountPointService mountPointService) {
+        return InstanceIdentifierContext.ofApiPath(assertApiPath(identifier), DatabindContext.ofModel(schemaContext),
+            mountPointService);
     }
 
-    private static InstanceIdentifierContext toInstanceIdentifier(final String identifier,
-            final EffectiveModelContext schemaContext, final @Nullable DOMMountPointService mountPointService) {
-        final ApiPath apiPath;
+    private static RestconfError assertError(final String identifier, final EffectiveModelContext schemaContext,
+            final @Nullable DOMMountPointService mountPointService) {
+        final var apiPath = assertApiPath(identifier);
+        final var databind = DatabindContext.ofModel(schemaContext);
+        final var ex = assertThrows(RestconfDocumentedException.class,
+            () -> InstanceIdentifierContext.ofApiPath(apiPath, databind, mountPointService));
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        return errors.get(0);
+    }
+
+    private static YangInstanceIdentifier assertPath(final String path) {
+        return new ApiPathNormalizer(DatabindContext.ofModel(MODEL_CONTEXT)).normalizePath(assertApiPath(path)).path;
+    }
+
+    private static ApiPath assertApiPath(final String str) {
         try {
-            apiPath = ApiPath.parseUrl(identifier);
+            return ApiPath.parseUrl(str);
         } catch (ParseException e) {
             throw new AssertionError(e);
         }
-
-        return InstanceIdentifierContext.ofApiPath(apiPath, DatabindContext.ofModel(schemaContext), mountPointService);
     }
 }
