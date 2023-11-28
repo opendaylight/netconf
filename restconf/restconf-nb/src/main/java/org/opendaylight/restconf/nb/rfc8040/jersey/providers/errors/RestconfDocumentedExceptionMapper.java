@@ -48,9 +48,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  Mapper that is responsible for transformation of thrown {@link RestconfDocumentedException} to errors structure
- *  that is modelled by RESTCONF module (see section 8 of RFC-8040).
+ * An {@link ExceptionMapper} that is responsible for transformation of thrown {@link RestconfDocumentedException} to
+ * {@code errors} structure that is modelled by RESTCONF module (see section 8 of RFC-8040).
+ *
+ * @see Errors
  */
+// FIXME: NETCONF-1188: eliminate the need for this class by having a separate exception which a has a HTTP status and
+//                      optionally holds an ErrorsBody -- i.e. the equivalent of Errors, perhaps as NormalizedNode,
+//                      with sufficient context to send it to JSON or XML -- very similar to a NormalizedNodePayload
+@Deprecated
 @Provider
 public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<RestconfDocumentedException> {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
