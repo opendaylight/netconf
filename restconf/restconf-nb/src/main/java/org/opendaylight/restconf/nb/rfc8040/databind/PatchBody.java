@@ -18,7 +18,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -32,24 +32,24 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         super(inputStream);
     }
 
-    public final @NonNull PatchContext toPatchContext(final @NonNull DatabindContext databind,
-            final @NonNull YangInstanceIdentifier urlPath) throws IOException {
+    public final @NonNull PatchContext toPatchContext(final @NonNull DataPatchPath path) throws IOException {
         try (var is = acquireStream()) {
-            return toPatchContext(databind, urlPath, is);
+            return toPatchContext(path, is);
         }
     }
 
-    abstract @NonNull PatchContext toPatchContext(@NonNull DatabindContext databind,
-        @NonNull YangInstanceIdentifier urlPath, @NonNull InputStream inputStream) throws IOException;
+    abstract @NonNull PatchContext toPatchContext(@NonNull DataPatchPath path, @NonNull InputStream inputStream)
+        throws IOException;
 
-    static final YangInstanceIdentifier parsePatchTarget(final DatabindContext databind,
-            final YangInstanceIdentifier urlPath, final String target) {
+    static final YangInstanceIdentifier parsePatchTarget(final DataPatchPath path, final String target) {
+        final var urlPath = path.instance();
         if (target.equals("/")) {
             verify(!urlPath.isEmpty(),
                 "target resource of URI must not be a datastore resource when target is '/'");
             return urlPath;
         }
 
+        final var databind = path.databind();
         final String targetUrl;
         if (urlPath.isEmpty()) {
             targetUrl = target.startsWith("/") ? target.substring(1) : target;

@@ -69,6 +69,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
+import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
@@ -301,9 +302,10 @@ public final class MdsalRestconfServer
 
     private @NonNull RestconfFuture<PatchStatusContext> dataPATCH(final InstanceIdentifierContext reqPath,
             final PatchBody body) {
+        final var patchPath = new DataPatchPath(reqPath.databind(), reqPath.getInstanceIdentifier());
         final PatchContext patch;
         try {
-            patch = body.toPatchContext(reqPath.databind(), reqPath.getInstanceIdentifier());
+            patch = body.toPatchContext(patchPath);
         } catch (IOException e) {
             LOG.debug("Error parsing YANG Patch input", e);
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),

@@ -20,12 +20,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
-import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
@@ -45,10 +44,9 @@ public final class XmlPatchBody extends PatchBody {
     }
 
     @Override
-    PatchContext toPatchContext(final DatabindContext databind, final YangInstanceIdentifier urlPath,
-            final InputStream inputStream) throws IOException {
+    PatchContext toPatchContext(final DataPatchPath path, final InputStream inputStream) throws IOException {
         try {
-            return parse(databind, urlPath, UntrustedXML.newDocumentBuilder().parse(inputStream));
+            return parse(path, UntrustedXML.newDocumentBuilder().parse(inputStream));
         } catch (XMLStreamException | SAXException | URISyntaxException e) {
             LOG.debug("Failed to parse YANG Patch XML", e);
             throw new RestconfDocumentedException("Error parsing YANG Patch XML: " + e.getMessage(), ErrorType.PROTOCOL,
@@ -56,11 +54,12 @@ public final class XmlPatchBody extends PatchBody {
         }
     }
 
-    private static @NonNull PatchContext parse(final DatabindContext databind, final YangInstanceIdentifier urlPath,
-            final Document doc) throws XMLStreamException, IOException, SAXException, URISyntaxException {
+    private static @NonNull PatchContext parse(final DataPatchPath path, final Document doc)
+            throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final var entities = ImmutableList.<PatchEntity>builder();
         final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final var editNodes = doc.getElementsByTagName("edit");
+        final var databind = path.databind();
 
         for (int i = 0; i < editNodes.getLength(); i++) {
             final Element element = (Element) editNodes.item(i);
@@ -72,7 +71,7 @@ public final class XmlPatchBody extends PatchBody {
             final Element firstValueElement = values != null ? values.get(0) : null;
 
             // find complete path to target, it can be also empty (only slash)
-            final var targetII = parsePatchTarget(databind, urlPath, target);
+            final var targetII = parsePatchTarget(path, target);
             // move schema node
             final var lookup = databind.schemaTree().enterPath(targetII).orElseThrow();
 
@@ -85,7 +84,7 @@ public final class XmlPatchBody extends PatchBody {
             if (requiresValue(oper)) {
                 final var resultHolder = new NormalizationResultHolder();
                 final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                final var xmlParser = XmlParserStream.create(writer, inference);
+                final var xmlParser = XmlParserStream.create(writer, databind.xmlCodecs(), inference);
                 xmlParser.traverse(new DOMSource(firstValueElement));
 
                 final var result = resultHolder.getResult().data();

@@ -31,6 +31,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
+import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -85,7 +86,7 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
         final var iid = InstanceIdentifierContext.ofApiPath(apiPath, IID_DATABIND, mountPointService);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
-            return body.toPatchContext(iid.databind(), iid.getInstanceIdentifier());
+            return body.toPatchContext(new DataPatchPath(iid.databind(), iid.getInstanceIdentifier()));
         }
     }
 }
