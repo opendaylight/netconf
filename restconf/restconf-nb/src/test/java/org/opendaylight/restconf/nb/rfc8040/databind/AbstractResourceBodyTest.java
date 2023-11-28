@@ -72,17 +72,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         DATABIND = DatabindContext.ofModel(YangParserTestUtils.parseYangFiles(testFiles));
     }
 
-    // FIXME: migrate callers to use string literals
-    @Deprecated
-    final @NonNull NormalizedNode parseResource(final String uriPath, final String resourceName) throws IOException {
-        return parse(uriPath, AbstractResourceBodyTest.class.getResourceAsStream(resourceName));
-    }
-
     final @NonNull NormalizedNode parse(final String uriPath, final String patchBody) throws IOException {
-        return parse(uriPath, stringInputStream(patchBody));
-    }
-
-    private @NonNull NormalizedNode parse(final String uriPath, final InputStream patchBody) throws IOException {
         final ApiPath apiPath;
         try {
             apiPath = ApiPath.parse(uriPath);
@@ -90,7 +80,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
             throw new AssertionError(e);
         }
 
-        try (var body = bodyConstructor.apply(patchBody)) {
+        try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
             final var context = InstanceIdentifierContext.ofApiPath(apiPath, DATABIND, mountPointService);
             return body.toNormalizedNode(
                 new DataPutPath(context.databind(), context.inference(), context.getInstanceIdentifier()),

@@ -38,8 +38,13 @@ class JsonChildBodyTest extends AbstractBodyTest {
 
     @Test
     void moduleSubContainerDataPostTest() {
-        final var body = new JsonChildBody(
-            JsonChildBodyTest.class.getResourceAsStream("/instanceidentifier/json/json_sub_container.json"));
+        final var body = new JsonChildBody(stringInputStream("""
+            {
+              "instance-identifier-module:cont1": {
+                "augment-module-leaf-list:lf11" : "/instance-identifier-module:cont\
+            /instance-identifier-module:cont1/augment-module-leaf-list:lflst11[.=\\"lflst11_1\\"]"
+              }
+            }"""));
         final var payload = body.toPayload(CONT_PATH);
 
         final var lflst11 = QName.create("augment:module:leaf:list", "2014-01-27", "lflst11");

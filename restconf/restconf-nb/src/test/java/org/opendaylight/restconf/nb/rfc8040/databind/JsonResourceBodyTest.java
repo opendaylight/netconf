@@ -69,8 +69,13 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
             .withNodeIdentifier(CONT1_NID)
             .withChild(ImmutableNodes.leafNode(LF11, YangInstanceIdentifier.of(CONT_NID, CONT1_NID,
                 new NodeIdentifier(LFLST11), new NodeWithValue<>(LFLST11, "lflst11_1"))))
-            .build(), parseResource("instance-identifier-module:cont/cont1",
-                "/instanceidentifier/json/json_sub_container.json"));
+            .build(), parse("instance-identifier-module:cont/cont1", """
+                {
+                  "instance-identifier-module:cont1": {
+                    "augment-module-leaf-list:lf11" : "/instance-identifier-module:cont\
+                /instance-identifier-module:cont1/augment-module-leaf-list:lflst11[.=\\"lflst11_1\\"]"
+                  }
+                }"""));
     }
 
     @Test
