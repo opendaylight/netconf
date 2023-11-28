@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
@@ -20,6 +21,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.DataPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -334,7 +336,8 @@ class YangInstanceIdentifierSerializerTest {
 
     private static YangInstanceIdentifier assertNormalized(final String str) {
         try {
-            return new ApiPathNormalizer(DATABIND).normalizePath(ApiPath.parse(str)).path;
+            return assertInstanceOf(DataPath.class, new ApiPathNormalizer(DATABIND).normalizePath(ApiPath.parse(str)))
+                .instance();
         } catch (ParseException e) {
             throw new AssertionError(e);
         }

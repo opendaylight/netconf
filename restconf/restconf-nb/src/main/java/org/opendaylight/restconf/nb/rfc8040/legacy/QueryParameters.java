@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.legacy;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.annotations.Beta;
 import java.util.List;
 import java.util.Set;
@@ -18,7 +16,6 @@ import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
  * This holds various options acquired from a requests's query part. This class needs to be further split up to make
@@ -27,50 +24,19 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  */
 @Beta
 // FIXME: this probably needs to be renamed back to WriterParams, or somesuch
-public final class QueryParameters {
-    private static final @NonNull QueryParameters EMPTY = of(DataGetParams.EMPTY);
-
-    private final @NonNull DataGetParams params;
-    private final List<YangInstanceIdentifier> fieldPaths;
-    private final List<Set<QName>> fields;
-
-    private QueryParameters(final DataGetParams params, final List<Set<QName>> fields,
-            final List<YangInstanceIdentifier> fieldPaths) {
-        this.params = requireNonNull(params);
-        this.fields = fields;
-        this.fieldPaths = fieldPaths;
-    }
-
-    public static @NonNull QueryParameters empty() {
-        return EMPTY;
-    }
+public record QueryParameters(
+        @Nullable DepthParam depth,
+        @Nullable PrettyPrintParam prettyPrint,
+        @Nullable List<Set<QName>> fields) {
+    public static final @NonNull QueryParameters EMPTY = new QueryParameters(null, null, null);
 
     public static @NonNull QueryParameters of(final DataGetParams params) {
-        return new QueryParameters(params, null, null);
+        final var depth = params.depth();
+        final var prettyPrint = params.prettyPrint();
+        return depth == null && prettyPrint == null ? EMPTY : new QueryParameters(depth, prettyPrint, null);
     }
 
-    public static @NonNull QueryParameters ofFields(final DataGetParams params, final List<Set<QName>> fields) {
-        return new QueryParameters(params, fields, null);
-    }
-
-    public static @NonNull QueryParameters ofFieldPaths(final DataGetParams params,
-            final List<YangInstanceIdentifier> fieldPaths) {
-        return new QueryParameters(params, null, fieldPaths);
-    }
-
-    public @Nullable DepthParam depth() {
-        return params.depth();
-    }
-
-    public @Nullable PrettyPrintParam prettyPrint() {
-        return params.prettyPrint();
-    }
-
-    public @Nullable List<Set<QName>> fields() {
-        return fields;
-    }
-
-    public @Nullable List<YangInstanceIdentifier> fieldPaths() {
-        return fieldPaths;
+    public static @NonNull QueryParameters of(final DataGetParams params, final List<Set<QName>> fields) {
+        return fields == null ? of(params) : new QueryParameters(params.depth(), params.prettyPrint(), fields);
     }
 }

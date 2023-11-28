@@ -16,8 +16,13 @@ import static org.mockito.Mockito.doReturn;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -40,6 +45,11 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(IID_SCHEMA))).when(mountPoint)
             .getService(DOMSchemaService.class);
+        doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
     }
 
     /**

@@ -15,17 +15,18 @@ import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert.PointNormalizer;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.OperationPath.Rpc;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -38,45 +39,73 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.IdentityEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.InputEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.SchemaTreeEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * Deserializer for {@link String} to {@link YangInstanceIdentifier} for restconf.
  */
 public final class ApiPathNormalizer implements PointNormalizer {
-    public static final class Result {
-        public final @NonNull YangInstanceIdentifier path;
-        public final @NonNull SchemaInferenceStack stack;
-        public final @NonNull SchemaNode node;
+    @NonNullByDefault
+    public sealed interface Path {
 
-        Result(final EffectiveModelContext modelContext) {
-            path = YangInstanceIdentifier.of();
-            stack = SchemaInferenceStack.of(modelContext);
-            node = requireNonNull(modelContext);
+        Inference inference();
+    }
+
+    @NonNullByDefault
+    public sealed interface InstanceReference extends Path {
+
+        YangInstanceIdentifier instance();
+    }
+
+    @NonNullByDefault
+    public record DataPath(Inference inference, YangInstanceIdentifier instance, DataSchemaContext schema)
+            implements InstanceReference {
+        public DataPath {
+            requireNonNull(inference);
+            requireNonNull(instance);
+            requireNonNull(schema);
+        }
+    }
+
+    @NonNullByDefault
+    public sealed interface OperationPath extends Path {
+
+        InputEffectiveStatement inputStatement();
+
+        public record Action(Inference inference, YangInstanceIdentifier instance, ActionEffectiveStatement action)
+                implements OperationPath, InstanceReference {
+            public Action {
+                requireNonNull(inference);
+                requireNonNull(action);
+                requireNonNull(instance);
+            }
+
+            @Override
+            public InputEffectiveStatement inputStatement() {
+                return action.input();
+            }
         }
 
-        Result(final EffectiveModelContext modelContext, final QName qname) {
-            // Legacy behavior: RPCs do not really have a YangInstanceIdentifier, but the rest of the code expects it
-            path = YangInstanceIdentifier.of(qname);
-            stack = SchemaInferenceStack.of(modelContext);
+        public record Rpc(Inference inference, RpcEffectiveStatement rpc) implements OperationPath {
+            public Rpc {
+                requireNonNull(inference);
+                requireNonNull(rpc);
+            }
 
-            final var stmt = stack.enterSchemaTree(qname);
-            verify(stmt instanceof RpcDefinition, "Unexpected statement %s", stmt);
-            node = (RpcDefinition) stmt;
-        }
-
-        Result(final List<PathArgument> steps, final SchemaInferenceStack stack, final SchemaNode node) {
-            path = YangInstanceIdentifier.of(steps);
-            this.stack = requireNonNull(stack);
-            this.node = requireNonNull(node);
+            @Override
+            public InputEffectiveStatement inputStatement() {
+                return rpc.input();
+            }
         }
     }
 
@@ -90,23 +119,11 @@ public final class ApiPathNormalizer implements PointNormalizer {
         instanceIdentifierCodec = new ApiPathInstanceIdentifierCodec(databind);
     }
 
-    @Override
-    public PathArgument normalizePoint(final ApiPath value) {
-        return normalizePath(value).path.getLastPathArgument();
-    }
-
-    // FIXME: NETCONF-818: this method really needs to report an Inference and optionally a YangInstanceIdentifier
-    // - we need the inference for discerning the correct context
-    // - RPCs do not have a YangInstanceIdentifier
-    // - Actions always have a YangInstanceIdentifier, but it points to their parent
-    // - we need to discern the cases RPC invocation, Action invocation and data tree access quickly
-    //
-    // All of this really is an utter mess because we end up calling into this code from various places which,
-    // for example, should not allow RPCs to be valid targets
-    public @NonNull Result normalizePath(final ApiPath apiPath) {
+    public @NonNull Path normalizePath(final ApiPath apiPath) {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
-            return new Result(modelContext);
+            return new DataPath(Inference.ofDataTreePath(modelContext), YangInstanceIdentifier.of(),
+                databind.schemaTree().getRoot());
         }
 
         // First step is somewhat special:
@@ -129,6 +146,8 @@ public final class ApiPathNormalizer implements PointNormalizer {
         final var optRpc = modelContext.findModuleStatement(namespace).orElseThrow()
             .findSchemaTreeNode(RpcEffectiveStatement.class, qname);
         if (optRpc.isPresent()) {
+            final var rpc = optRpc.orElseThrow();
+
             // We have found an RPC match,
             if (it.hasNext()) {
                 throw new RestconfDocumentedException("First step in the path resolves to RPC '" + qname + "' and "
@@ -139,19 +158,22 @@ public final class ApiPathNormalizer implements PointNormalizer {
                     + "therefore it must not contain key values", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
             }
 
-            return new Result(modelContext, optRpc.orElseThrow().argument());
+            final var stack = SchemaInferenceStack.of(modelContext);
+            final var stmt = stack.enterSchemaTree(rpc.argument());
+            verify(rpc.equals(stmt), "Expecting %s, inferred %s", rpc, stmt);
+            return new OperationPath.Rpc(stack.toInference(), rpc);
         }
 
         final var stack = SchemaInferenceStack.of(modelContext);
         final var path = new ArrayList<PathArgument>();
-        final SchemaNode node;
-
         DataSchemaContext parentNode = databind.schemaTree().getRoot();
         while (true) {
             final var parentSchema = parentNode.dataSchemaNode();
             if (parentSchema instanceof ActionNodeContainer actionParent) {
                 final var optAction = actionParent.findAction(qname);
                 if (optAction.isPresent()) {
+                    final var action = optAction.orElseThrow();
+
                     if (it.hasNext()) {
                         throw new RestconfDocumentedException("Request path resolves to action '" + qname + "' and "
                             + "therefore it must not continue past it", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
@@ -162,11 +184,11 @@ public final class ApiPathNormalizer implements PointNormalizer {
                             ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
                     }
 
-                    // Legacy behavior: Action's path should not include its path, but the rest of the code expects it
-                    path.add(new NodeIdentifier(qname));
-                    stack.enterSchemaTree(qname);
-                    node = optAction.orElseThrow();
-                    break;
+                    final var stmt = stack.enterSchemaTree(qname);
+                    final var actionStmt = action.asEffectiveStatement();
+                    verify(actionStmt.equals(stmt), "Expecting %s, inferred %s", actionStmt, stmt);
+
+                    return new OperationPath.Action(stack.toInference(), YangInstanceIdentifier.of(path), actionStmt);
                 }
             }
 
@@ -205,8 +227,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
             path.add(pathArg);
 
             if (!it.hasNext()) {
-                node = childNode.dataSchemaNode();
-                break;
+                return new DataPath(stack.toInference(), YangInstanceIdentifier.of(path), childNode);
             }
 
             parentNode = childNode;
@@ -218,8 +239,78 @@ public final class ApiPathNormalizer implements PointNormalizer {
 
             qname = step.identifier().bindTo(namespace);
         }
+    }
 
-        return new Result(path, stack, node);
+    public @NonNull DataPath normalizeDataPath(final ApiPath apiPath) {
+        final var path = normalizePath(apiPath);
+        if (path instanceof DataPath dataPath) {
+            return dataPath;
+        }
+        throw new RestconfDocumentedException("Point '" + apiPath + "' resolves to non-data " + path,
+            ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+    }
+
+    @Override
+    public PathArgument normalizePoint(final ApiPath value) {
+        final var path = normalizePath(value);
+        if (path instanceof DataPath dataPath) {
+            final var lastArg = normalizeDataPath(value).instance().getLastPathArgument();
+            if (lastArg != null) {
+                return lastArg;
+            }
+            throw new IllegalArgumentException("Point '" + value + "' resolves to empty path");
+        }
+        throw new IllegalArgumentException("Point '" + value + "' resolves to non-data " + path);
+    }
+
+    public @NonNull Rpc normalizeRpcPath(final ApiPath apiPath) {
+        final var steps = apiPath.steps();
+        return switch (steps.size()) {
+            case 0 -> throw new RestconfDocumentedException("RPC name must be present", ErrorType.PROTOCOL,
+                ErrorTag.DATA_MISSING);
+            case 1 -> normalizeRpcPath(steps.get(0));
+            default -> throw new RestconfDocumentedException(apiPath + " does not refer to an RPC", ErrorType.PROTOCOL,
+                ErrorTag.DATA_MISSING);
+        };
+    }
+
+    public @NonNull Rpc normalizeRpcPath(final ApiPath.Step step) {
+        final var firstModule = step.module();
+        if (firstModule == null) {
+            throw new RestconfDocumentedException(
+                "First member must use namespace-qualified form, '" + step.identifier() + "' does not",
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+        }
+
+        final var namespace = resolveNamespace(firstModule);
+        final var qname = step.identifier().bindTo(namespace);
+        final var stack = SchemaInferenceStack.of(modelContext);
+        final SchemaTreeEffectiveStatement<?> stmt;
+        try {
+            stmt = stack.enterSchemaTree(qname);
+        } catch (IllegalArgumentException e) {
+            throw new RestconfDocumentedException(qname + " does not refer to an RPC", ErrorType.PROTOCOL,
+                ErrorTag.DATA_MISSING, e);
+        }
+        if (stmt instanceof RpcEffectiveStatement rpc) {
+            return new Rpc(stack.toInference(), rpc);
+        }
+        throw new RestconfDocumentedException(qname + " does not refer to an RPC", ErrorType.PROTOCOL,
+            ErrorTag.DATA_MISSING);
+    }
+
+    public @NonNull InstanceReference normalizeDataOrActionPath(final ApiPath apiPath) {
+
+
+        // FIXME: optimize this
+        final var path = normalizePath(apiPath);
+        if (path instanceof DataPath dataPath) {
+            return dataPath;
+        }
+        if (path instanceof OperationPath.Action actionPath) {
+            return actionPath;
+        }
+        throw new RestconfDocumentedException("Unexpected path " + path, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
     private NodeIdentifierWithPredicates prepareNodeWithPredicates(final SchemaInferenceStack stack, final QName qname,

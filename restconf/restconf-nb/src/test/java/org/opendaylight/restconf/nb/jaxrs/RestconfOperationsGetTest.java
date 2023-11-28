@@ -16,8 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.yang.gen.v1.module._1.rev140101.Module1Data;
 import org.opendaylight.yang.gen.v1.module._2.rev140102.Module2Data;
@@ -68,6 +73,11 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
     private void mockMountPoint() {
         doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT))).when(mountPoint)
             .getService(DOMSchemaService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
+        doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
     }
 

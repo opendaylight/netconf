@@ -32,7 +32,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -87,34 +86,18 @@ public final class NetconfFieldsTranslator {
      * {@link NetconfDataTreeService}.
      *
      * @param modelContext EffectiveModelContext
-     * @param schemaNode Root DataSchemaNode
+     * @param startNode Root DataSchemaNode
      * @param input input value of fields parameter
      * @return {@link List} of {@link YangInstanceIdentifier} that are relative to the last {@link PathArgument}
      *         of provided {@code identifier}
      */
     public static @NonNull List<YangInstanceIdentifier> translate(
-            final @NonNull EffectiveModelContext modelContext, final @NonNull DataSchemaNode schemaNode,
+            final @NonNull EffectiveModelContext modelContext, final @NonNull DataSchemaContext startNode,
             final @NonNull FieldsParam input) {
-        return parseFields(modelContext, schemaNode, input).stream()
-            .map(NetconfFieldsTranslator::buildPath)
-            .toList();
-    }
-
-    private static @NonNull Set<LinkedPathElement> parseFields(final @NonNull EffectiveModelContext modelContext,
-            final @NonNull DataSchemaNode schemaNode, final @NonNull FieldsParam input) {
-        final DataSchemaContext startNode;
-        try {
-            startNode = DataSchemaContext.of(schemaNode);
-        } catch (IllegalStateException e) {
-            throw new RestconfDocumentedException(
-                "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
-        }
-
         final var parsed = new HashSet<LinkedPathElement>();
-        processSelectors(parsed, modelContext, schemaNode.getQName().getModule(),
+        processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(),
             new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
-
-        return parsed;
+        return parsed.stream().map(NetconfFieldsTranslator::buildPath).toList();
     }
 
     private static void processSelectors(final Set<LinkedPathElement> parsed, final EffectiveModelContext context,
