@@ -34,7 +34,7 @@ import org.opendaylight.restconf.api.query.StopTimeParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
+import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -85,10 +85,10 @@ public final class QueryParams {
     /**
      * Parse parameters from URI request and check their types and values.
      *
-     * @param uriInfo    URI info
-     * @return {@link ReadDataParams}
+     * @param uriInfo URI info
+     * @return {@link DataGetParams}
      */
-    public static @NonNull ReadDataParams newReadDataParams(final UriInfo uriInfo) {
+    public static @NonNull DataGetParams newDataGetParams(final UriInfo uriInfo) {
         ContentParam content = ContentParam.ALL;
         DepthParam depth = null;
         FieldsParam fields = null;
@@ -132,7 +132,7 @@ public final class QueryParams {
             }
         }
 
-        return new ReadDataParams(content, depth, fields, withDefaults, prettyPrint);
+        return new DataGetParams(content, depth, fields, withDefaults, prettyPrint);
     }
 
     private static RestconfDocumentedException unhandledParam(final String operation, final String name) {

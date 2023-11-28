@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.server.api;
 
 import static java.util.Objects.requireNonNull;
 
@@ -19,22 +19,23 @@ import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
- * Parser and holder of query parameters from uriInfo for data and datastore read operations.
+ * Supported query parameters of {@code /data} {@code GET} HTTP operation, as defined in
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.3">RFC8040 section 4.3</a>.
  */
-public record ReadDataParams(
+public record DataGetParams(
         @NonNull ContentParam content,
         @Nullable DepthParam depth,
         @Nullable FieldsParam fields,
         @Nullable WithDefaultsParam withDefaults,
         @Nullable PrettyPrintParam prettyPrint) implements Immutable {
-    private static final @NonNull ReadDataParams EMPTY =
-        new ReadDataParams(ContentParam.ALL, null, null, null, null);
+    private static final @NonNull DataGetParams EMPTY =
+        new DataGetParams(ContentParam.ALL, null, null, null, null);
 
-    public ReadDataParams {
+    public DataGetParams {
         requireNonNull(content);
     }
 
-    public static @NonNull ReadDataParams empty() {
+    public static @NonNull DataGetParams empty() {
         return EMPTY;
     }
 }

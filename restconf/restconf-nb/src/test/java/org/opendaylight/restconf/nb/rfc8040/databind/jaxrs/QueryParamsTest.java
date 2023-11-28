@@ -81,11 +81,11 @@ public class QueryParamsTest {
     public void checkParametersTypesNegativeTest() {
         final var mockDatabind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
         assertInvalidIAE(ReceiveEventsParams::ofQueryParameters);
-        assertUnknownParam(QueryParams::newReadDataParams);
+        assertUnknownParam(QueryParams::newDataGetParams);
         assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mockDatabind, queryParams));
 
         assertInvalidIAE(ReceiveEventsParams::ofQueryParameters, ContentParam.ALL);
-        assertInvalidParam(QueryParams::newReadDataParams, InsertParam.LAST);
+        assertInvalidParam(QueryParams::newDataGetParams, InsertParam.LAST);
         assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mockDatabind, queryParams), ContentParam.ALL);
     }
 
@@ -95,7 +95,7 @@ public class QueryParamsTest {
     @Test
     public void parseUriParametersDefaultTest() {
         // no parameters, default values should be used
-        final var params = assertParams(QueryParams::newReadDataParams, new MultivaluedHashMap<>());
+        final var params = assertParams(QueryParams::newDataGetParams, new MultivaluedHashMap<>());
         assertEquals(ContentParam.ALL, params.content());
         assertNull(params.depth());
         assertNull(params.fields());
@@ -103,14 +103,14 @@ public class QueryParamsTest {
 
     @Test
     public void testInvalidValueReadDataParams() {
-        assertInvalidValue(QueryParams::newReadDataParams, ContentParam.uriName);
-        assertInvalidValue(QueryParams::newReadDataParams, DepthParam.uriName);
-        assertInvalidValue(QueryParams::newReadDataParams, WithDefaultsParam.uriName);
+        assertInvalidValue(QueryParams::newDataGetParams, ContentParam.uriName);
+        assertInvalidValue(QueryParams::newDataGetParams, DepthParam.uriName);
+        assertInvalidValue(QueryParams::newDataGetParams, WithDefaultsParam.uriName);
 
         // inserted value is too high
-        assertInvalidValue(QueryParams::newReadDataParams, DepthParam.uriName, "65536");
+        assertInvalidValue(QueryParams::newDataGetParams, DepthParam.uriName, "65536");
         // inserted value is too low
-        assertInvalidValue(QueryParams::newReadDataParams, DepthParam.uriName, "0");
+        assertInvalidValue(QueryParams::newDataGetParams, DepthParam.uriName, "0");
     }
 
     /**
@@ -118,7 +118,7 @@ public class QueryParamsTest {
      */
     @Test
     public void parseUriParametersWithDefaultAndTaggedTest() {
-        final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "report-all-tagged");
+        final var params = assertParams(QueryParams::newDataGetParams, WithDefaultsParam.uriName, "report-all-tagged");
         assertEquals(WithDefaultsParam.REPORT_ALL_TAGGED, params.withDefaults());
     }
 
@@ -127,7 +127,7 @@ public class QueryParamsTest {
      */
     @Test
     public void parseUriParametersWithDefaultAndReportAllTest() {
-        final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "report-all");
+        final var params = assertParams(QueryParams::newDataGetParams, WithDefaultsParam.uriName, "report-all");
         assertEquals(WithDefaultsParam.REPORT_ALL, params.withDefaults());
     }
 
@@ -137,7 +137,7 @@ public class QueryParamsTest {
      */
     @Test
     public void parseUriParametersWithDefaultAndNonTaggedTest() {
-        final var params = assertParams(QueryParams::newReadDataParams, WithDefaultsParam.uriName, "explicit");
+        final var params = assertParams(QueryParams::newDataGetParams, WithDefaultsParam.uriName, "explicit");
         assertEquals(WithDefaultsParam.EXPLICIT, params.withDefaults());
     }
 
@@ -153,7 +153,7 @@ public class QueryParamsTest {
         parameters.putSingle("depth", "10");
         parameters.putSingle("fields", "container-child");
 
-        final var params = assertParams(QueryParams::newReadDataParams, parameters);
+        final var params = assertParams(QueryParams::newDataGetParams, parameters);
         // content
         assertEquals(ContentParam.CONFIG, params.content());
 
