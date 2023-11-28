@@ -23,8 +23,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
@@ -118,6 +120,8 @@ class RestconfDataGetTest extends AbstractRestconfTest {
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
 
         // response must contain all child nodes from config and operational containers merged in one container

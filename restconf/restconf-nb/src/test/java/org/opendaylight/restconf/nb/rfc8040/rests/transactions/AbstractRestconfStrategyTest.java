@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.restconf.api.query.ContentParam;
@@ -32,6 +33,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -208,9 +210,26 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         new NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
 
     @Mock
-    EffectiveModelContext mockSchemaContext;
+    private EffectiveModelContext mockSchemaContext;
     @Mock
     private UriInfo uriInfo;
+
+    private DatabindContext mockDatabind;
+
+    @Before
+    public void initMockDatabind() {
+        mockDatabind = DatabindContext.ofModel(mockSchemaContext);
+    }
+
+    abstract @NonNull RestconfStrategy newStrategy(DatabindContext databind);
+
+    final @NonNull RestconfStrategy jukeboxStrategy() {
+        return newStrategy(JUKEBOX_DATABIND);
+    }
+
+    final @NonNull RestconfStrategy mockStrategy() {
+        return newStrategy(mockDatabind);
+    }
 
     /**
      * Test of successful DELETE operation.

@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
@@ -20,7 +19,8 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Result;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.DataPath;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.OperationPath.Action;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -49,7 +49,7 @@ class ApiPathNormalizerTest {
      */
     @Test
     void deserializeContainerTest() {
-        final var result = assertNormalizedPath("deserializer-test:contA").path.getPathArguments();
+        final var result = assertNormalizedPath("deserializer-test:contA").getPathArguments();
         assertEquals(1, result.size());
         assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
     }
@@ -60,7 +60,7 @@ class ApiPathNormalizerTest {
      */
     @Test
     void deserializeContainerWithLeafTest() {
-        final var result = assertNormalizedPath("deserializer-test:contA/leaf-A").path.getPathArguments();
+        final var result = assertNormalizedPath("deserializer-test:contA/leaf-A").getPathArguments();
         assertEquals(2, result.size());
         assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")), result.get(0));
         assertEquals(NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "leaf-A")), result.get(1));
@@ -72,7 +72,7 @@ class ApiPathNormalizerTest {
      */
     @Test
     void deserializeContainerWithListWithLeafListTest() {
-        final var result = assertNormalizedPath("deserializer-test:contA/list-A=100/leaf-list-AA=instance").path
+        final var result = assertNormalizedPath("deserializer-test:contA/list-A=100/leaf-list-AA=instance")
             .getPathArguments();
         assertEquals(5, result.size());
 
@@ -95,17 +95,16 @@ class ApiPathNormalizerTest {
      */
     @Test
     void deserializeContainerWithListWithActionTest() {
-        final var result = assertNormalizedPath("example-actions:interfaces/interface=eth0/reset").path
-            .getPathArguments();
-        assertEquals(4, result.size());
-        // container
-        assertEquals(NodeIdentifier.create(ACTIONS_INTERFACES), result.get(0));
-        // list
+        final var result = assertNormalizedAction("example-actions:interfaces/interface=eth0/reset");
         final var list = QName.create(ACTIONS_INTERFACES, "interface");
-        assertEquals(NodeIdentifier.create(list), result.get(1));
-        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "name"), "eth0"), result.get(2));
-        // action
-        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "reset")), result.get(3));
+        assertEquals(YangInstanceIdentifier.builder()
+            // container
+            .node(ACTIONS_INTERFACES)
+            // list
+            .node(list)
+            .nodeWithKey(list, QName.create(list, "name"), "eth0")
+            .build(), result.instance());
+        assertEquals(QName.create(ACTIONS_INTERFACES, "reset"), result.action().argument());
     }
 
     /**
@@ -114,24 +113,20 @@ class ApiPathNormalizerTest {
      */
     @Test
     void deserializeContainerWithChoiceSchemaNodeWithActionTest() {
-        final var result = assertNormalizedPath("example-actions:interfaces/typeA-gigabyte/interface=eth0/reboot").path
-            .getPathArguments();
-        assertEquals(6, result.size());
-
-        // container
-        assertEquals(NodeIdentifier.create(ACTIONS_INTERFACES), result.get(0));
-        // choice
-        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "interface-type")), result.get(1));
-        // container
-        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "typeA-gigabyte")), result.get(2));
-
-        // list
+        final var result = assertNormalizedAction("example-actions:interfaces/typeA-gigabyte/interface=eth0/reboot");
         final var list = QName.create(ACTIONS_INTERFACES, "interface");
-        assertEquals(NodeIdentifier.create(list), result.get(3));
-        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "name"), "eth0"), result.get(4));
-
-        // action QName
-        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "reboot")), result.get(5));
+        assertEquals(YangInstanceIdentifier.builder()
+            // container
+            .node(ACTIONS_INTERFACES)
+            // choice
+            .node(QName.create(ACTIONS_INTERFACES, "interface-type"))
+            // container
+            .node(QName.create(ACTIONS_INTERFACES, "typeA-gigabyte"))
+            // list
+            .node(list)
+            .nodeWithKey(list, QName.create(list, "name"), "eth0")
+            .build(), result.instance());
+        assertEquals(QName.create(ACTIONS_INTERFACES, "reboot"), result.action().argument());
     }
 
     /**
@@ -140,16 +135,15 @@ class ApiPathNormalizerTest {
      */
     @Test
     void deserializeContainerWithChoiceCaseSchemaNodeWithActionTest() {
-        final var result = assertNormalizedPath("example-actions:interfaces/udp/reboot").path.getPathArguments();
-        assertEquals(4, result.size());
-        // container
-        assertEquals(NodeIdentifier.create(ACTIONS_INTERFACES), result.get(0));
-        // choice
-        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "protocol")), result.get(1));
-        // choice container
-        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "udp")), result.get(2));
-        // action QName
-        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "reboot")), result.get(3));
+        final var result = assertNormalizedAction("example-actions:interfaces/udp/reboot");
+        assertEquals(YangInstanceIdentifier.of(
+            // container
+            ACTIONS_INTERFACES,
+            // choice
+            QName.create(ACTIONS_INTERFACES, "protocol"),
+            // choice container
+            QName.create(ACTIONS_INTERFACES, "udp")),
+            result.instance());
     }
 
     /**
@@ -158,7 +152,7 @@ class ApiPathNormalizerTest {
      */
     @Test
     void deserializeListWithNoKeysTest() {
-        final var result = assertNormalizedPath("deserializer-test:list-no-key").path.getPathArguments();
+        final var result = assertNormalizedPath("deserializer-test:list-no-key").getPathArguments();
         assertEquals(2, result.size());
         final var list = QName.create("deserializer:test", "2016-06-06", "list-no-key");
         assertEquals(NodeIdentifier.create(list), result.get(0));
@@ -171,7 +165,7 @@ class ApiPathNormalizerTest {
      */
     @Test
     void deserializeListWithOneKeyTest() {
-        final var result = assertNormalizedPath("deserializer-test:list-one-key=value").path.getPathArguments();
+        final var result = assertNormalizedPath("deserializer-test:list-one-key=value").getPathArguments();
         assertEquals(2, result.size());
         final QName list = QName.create("deserializer:test", "2016-06-06", "list-one-key");
         assertEquals(NodeIdentifier.create(list), result.get(0));
@@ -190,7 +184,7 @@ class ApiPathNormalizerTest {
             QName.create(list, "number"), Uint8.valueOf(100),
             QName.create(list, "enabled"), false);
 
-        final var result = assertNormalizedPath("deserializer-test:list-multiple-keys=value,100,false").path
+        final var result = assertNormalizedPath("deserializer-test:list-multiple-keys=value,100,false")
             .getPathArguments();
         assertEquals(2, result.size());
         assertEquals(NodeIdentifier.create(list), result.get(0));
@@ -203,7 +197,7 @@ class ApiPathNormalizerTest {
      */
     @Test
     void deserializeLeafListTest() {
-        final var result = assertNormalizedPath("deserializer-test:leaf-list-0=true").path.getPathArguments();
+        final var result = assertNormalizedPath("deserializer-test:leaf-list-0=true").getPathArguments();
         assertEquals(2, result.size());
 
         final QName leafList = QName.create("deserializer:test", "2016-06-06", "leaf-list-0");
@@ -216,7 +210,7 @@ class ApiPathNormalizerTest {
      */
     @Test
     void deserializeEmptyDataTest() {
-        assertEquals(YangInstanceIdentifier.of(), assertNormalizedPath("").path);
+        assertEquals(YangInstanceIdentifier.of(), assertNormalizedPath(""));
     }
 
     /**
@@ -319,7 +313,7 @@ class ApiPathNormalizerTest {
             QName.create(list, "enabled"), false);
 
         final var result = assertNormalizedPath("deserializer-test:list-multiple-keys=%3Afoo,1,false/string-value")
-            .path.getPathArguments();
+            .getPathArguments();
         assertEquals(3, result.size());
         // list
         assertEquals(NodeIdentifier.create(list), result.get(0));
@@ -351,7 +345,7 @@ class ApiPathNormalizerTest {
     @Test
     void percentEncodedKeyEndsWithNoPercentEncodedChars() {
         final var URI = "deserializer-test:list-multiple-keys=%3Afoo,1,true";
-        final var result = assertNormalizedPath(URI).path;
+        final var result = assertNormalizedPath(URI);
 
         final var resultListKeys = assertInstanceOf(NodeIdentifierWithPredicates.class, result.getLastPathArgument())
             .entrySet().iterator();
@@ -371,7 +365,7 @@ class ApiPathNormalizerTest {
             QName.create(list, "number"), Uint8.ZERO,
             QName.create(list, "enabled"), true);
 
-        final var result = assertNormalizedPath("deserializer-test:list-multiple-keys=,0,true").path.getPathArguments();
+        final var result = assertNormalizedPath("deserializer-test:list-multiple-keys=,0,true").getPathArguments();
         assertEquals(2, result.size());
         assertEquals(NodeIdentifier.create(list), result.get(0));
         assertEquals(NodeIdentifierWithPredicates.of(list, values), result.get(1));
@@ -397,7 +391,7 @@ class ApiPathNormalizerTest {
     @Test
     void deserializePartInOtherModuleTest() {
         final var result = assertNormalizedPath(
-            "deserializer-test-included:augmented-list=100/deserializer-test:augmented-leaf").path.getPathArguments();
+            "deserializer-test-included:augmented-list=100/deserializer-test:augmented-leaf").getPathArguments();
         assertEquals(3, result.size());
 
         // list
@@ -414,8 +408,7 @@ class ApiPathNormalizerTest {
     @Test
     void deserializeListInOtherModuleTest() {
         final var result = assertNormalizedPath(
-            "deserializer-test-included:augmented-list=100/deserializer-test:augmenting-list=0")
-            .path.getPathArguments();
+            "deserializer-test-included:augmented-list=100/deserializer-test:augmenting-list=0").getPathArguments();
         assertEquals(4, result.size());
 
         // list
@@ -456,10 +449,12 @@ class ApiPathNormalizerTest {
         return errors.get(0);
     }
 
-    private static Result assertNormalizedPath(final String path) {
-        final var result = NORMALIZER.normalizePath(assertApiPath(path));
-        assertNotNull(result);
-        return result;
+    private static Action assertNormalizedAction(final String path) {
+        return assertInstanceOf(Action.class, NORMALIZER.normalizePath(assertApiPath(path)));
+    }
+
+    private static YangInstanceIdentifier assertNormalizedPath(final String path) {
+        return assertInstanceOf(DataPath.class, NORMALIZER.normalizePath(assertApiPath(path))).instance();
     }
 
     private static ApiPath assertApiPath(final String path) {
@@ -471,7 +466,7 @@ class ApiPathNormalizerTest {
     }
 
     private static void assertIdentityrefKeyValue(final String path) {
-        final var pathArgs = assertNormalizedPath(path).path.getPathArguments();
+        final var pathArgs = assertNormalizedPath(path).getPathArguments();
         assertEquals(4, pathArgs.size());
 
         assertEquals("refs", pathArgs.get(0).getNodeType().getLocalName());
