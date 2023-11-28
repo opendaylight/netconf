@@ -23,8 +23,8 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import javax.xml.xpath.XPathExpressionException;
-import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
+import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.slf4j.Logger;
@@ -74,9 +74,9 @@ final class SSEStreamService {
             throw new BadRequestException(e.getMessage(), e);
         }
 
-        final ReceiveEventsParams params;
+        final EventStreamGetParams params;
         try {
-            params = ReceiveEventsParams.ofQueryParameters(queryParameters);
+            params = EventStreamGetParams.ofQueryParameters(queryParameters);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }

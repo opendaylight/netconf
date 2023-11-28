@@ -33,11 +33,11 @@ import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
-import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -80,11 +80,11 @@ public class QueryParamsTest {
     @Test
     public void checkParametersTypesNegativeTest() {
         final var mockDatabind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
-        assertInvalidIAE(ReceiveEventsParams::ofQueryParameters);
+        assertInvalidIAE(EventStreamGetParams::ofQueryParameters);
         assertUnknownParam(QueryParams::newDataGetParams);
         assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mockDatabind, queryParams));
 
-        assertInvalidIAE(ReceiveEventsParams::ofQueryParameters, ContentParam.ALL);
+        assertInvalidIAE(EventStreamGetParams::ofQueryParameters, ContentParam.ALL);
         assertInvalidParam(QueryParams::newDataGetParams, InsertParam.LAST);
         assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mockDatabind, queryParams), ContentParam.ALL);
     }

@@ -28,7 +28,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sender;
@@ -48,7 +48,7 @@ final class WebSocketSender implements Sender {
     private final PingExecutor pingExecutor;
     private final RestconfStream<?> stream;
     private final EncodingName encodingName;
-    private final ReceiveEventsParams params;
+    private final EventStreamGetParams params;
     private final int maximumFragmentLength;
     private final long heartbeatInterval;
 
@@ -73,7 +73,8 @@ final class WebSocketSender implements Sender {
      *                              to keep session up. Ping control frames are disabled if this parameter is set to 0.
      */
     WebSocketSender(final PingExecutor pingExecutor, final RestconfStream<?> stream, final EncodingName encodingName,
-            final @Nullable ReceiveEventsParams params, final int maximumFragmentLength, final long heartbeatInterval) {
+            final @Nullable EventStreamGetParams params, final int maximumFragmentLength,
+            final long heartbeatInterval) {
         this.pingExecutor = requireNonNull(pingExecutor);
         this.stream = requireNonNull(stream);
         this.encodingName = requireNonNull(encodingName);

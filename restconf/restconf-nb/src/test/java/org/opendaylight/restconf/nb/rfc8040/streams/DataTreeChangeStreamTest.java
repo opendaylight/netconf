@@ -35,8 +35,8 @@ import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
-import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.mdsal.streams.dtcl.DataTreeChangeSource;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
@@ -240,7 +240,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
                 case JSON -> EncodingName.RFC8040_JSON;
                 case XML -> EncodingName.RFC8040_XML;
             },
-            new ReceiveEventsParams(null, null, null,
+            new EventStreamGetParams(null, null, null,
                 leafNodesOnly ? LeafNodesOnlyParam.of(true) : null,
                 skipNotificationData ? SkipNotificationDataParam.of(true) : null,
                 changedLeafNodesOnly ? ChangedLeafNodesOnlyParam.of(true) : null,

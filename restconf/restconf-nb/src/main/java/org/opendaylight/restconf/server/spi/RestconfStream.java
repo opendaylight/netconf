@@ -24,7 +24,7 @@ import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
+import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.streams.stream.Access;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -235,7 +235,7 @@ public final class RestconfStream<T> {
      * @throws XPathExpressionException if requested filter is not valid
      */
     public @Nullable Registration addSubscriber(final Sender handler, final EncodingName encoding,
-            final ReceiveEventsParams params) throws UnsupportedEncodingException, XPathExpressionException {
+            final EventStreamGetParams params) throws UnsupportedEncodingException, XPathExpressionException {
         final var factory = source.encodings.get(requireNonNull(encoding));
         if (factory == null) {
             throw new UnsupportedEncodingException("Stream '" + name + "' does not support " + encoding);

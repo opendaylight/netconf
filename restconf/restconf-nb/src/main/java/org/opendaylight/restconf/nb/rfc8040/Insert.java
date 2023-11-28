@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams.optionalParam;
+import static org.opendaylight.restconf.server.api.EventStreamGetParams.optionalParam;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;

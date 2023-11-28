@@ -6,7 +6,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040;
+package org.opendaylight.restconf.server.api;
 
 import static java.util.Objects.requireNonNull;
 
@@ -27,7 +27,7 @@ import org.opendaylight.restconf.api.query.StopTimeParam;
  * Query parameters valid in the scope of a GET request on an event stream resource, as outline in
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-6.3">RFC8040 section 6.3</a>.
  */
-public record ReceiveEventsParams(
+public record EventStreamGetParams(
         StartTimeParam startTime,
         StopTimeParam stopTime,
         FilterParam filter,
@@ -35,7 +35,7 @@ public record ReceiveEventsParams(
         SkipNotificationDataParam skipNotificationData,
         ChangedLeafNodesOnlyParam changedLeafNodesOnly,
         ChildNodesOnlyParam childNodesOnly) {
-    public ReceiveEventsParams {
+    public EventStreamGetParams {
         if (stopTime != null && startTime == null) {
             throw new IllegalArgumentException(StopTimeParam.uriName + " parameter has to be used with "
                 + StartTimeParam.uriName + " parameter");
@@ -53,14 +53,14 @@ public record ReceiveEventsParams(
     }
 
     /**
-     * Return {@link ReceiveEventsParams} for specified query parameters.
+     * Return {@link EventStreamGetParams} for specified query parameters.
      *
      * @param queryParameters Parameters and their values
-     * @return A {@link ReceiveEventsParams}
+     * @return A {@link EventStreamGetParams}
      * @throws NullPointerException if {@code queryParameters} is {@code null}
      * @throws IllegalArgumentException if the parameters are invalid
      */
-    public static @NonNull ReceiveEventsParams ofQueryParameters(final Map<String, String> queryParameters) {
+    public static @NonNull EventStreamGetParams ofQueryParameters(final Map<String, String> queryParameters) {
         StartTimeParam startTime = null;
         StopTimeParam stopTime = null;
         FilterParam filter = null;
@@ -102,7 +102,7 @@ public record ReceiveEventsParams(
             }
         }
 
-        return new ReceiveEventsParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
+        return new EventStreamGetParams(startTime, stopTime, filter, leafNodesOnly, skipNotificationData,
             changedLeafNodesOnly, childNodesOnly);
     }
 
@@ -133,7 +133,8 @@ public record ReceiveEventsParams(
         return helper.toString();
     }
 
-    static <T> @Nullable T optionalParam(final Function<String, @NonNull T> factory, final String name,
+    // FIXME: find a better place for this method
+    public static <T> @Nullable T optionalParam(final Function<String, @NonNull T> factory, final String name,
             final String value) {
         try {
             return factory.apply(requireNonNull(value));
