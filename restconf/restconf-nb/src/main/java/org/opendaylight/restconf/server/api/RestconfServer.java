@@ -152,7 +152,6 @@ public interface RestconfServer {
      */
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support ang-ext:mount,
     //        and hence it is a path right now
-    // FIXME: use ApiPath instead of String
     RestconfFuture<OperationsPostResult> operationsPOST(URI restconfURI, ApiPath operation, OperationInputBody body);
 
     /**
