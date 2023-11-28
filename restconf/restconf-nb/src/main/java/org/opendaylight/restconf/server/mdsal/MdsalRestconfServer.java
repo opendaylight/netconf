@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.mdsal;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -66,6 +65,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.restconf.server.api.DataGetParams;
@@ -200,18 +200,11 @@ public final class MdsalRestconfServer
 
     private @NonNull MdsalRestconfStrategy createLocalStrategy(final EffectiveModelContext modelContext) {
         return new MdsalRestconfStrategy(DatabindContext.ofModel(modelContext), dataBroker, rpcService, sourceProvider,
-            localRpcs);
+            mountPointService, localRpcs);
     }
 
     private @NonNull MdsalRestconfStrategy localStrategy() {
         return verifyNotNull((MdsalRestconfStrategy) LOCAL_STRATEGY.getAcquire(this));
-    }
-
-    @Deprecated(forRemoval = true)
-    private @NonNull MdsalRestconfStrategy localStrategy(final DatabindContext databind) {
-        final var local = localStrategy();
-        return local.databind().equals(databind) ? local
-            : new MdsalRestconfStrategy(databind, dataBroker, rpcService, sourceProvider, localRpcs);
     }
 
     @PreDestroy
@@ -224,14 +217,14 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<Empty> dataDELETE(final ApiPath identifier) {
-        final var reqPath = bindRequestPath(identifier);
-        final var strategy = getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint());
-        return strategy.delete(reqPath.getInstanceIdentifier());
+        final var stratAndPath = localStrategy().resolveStrategyPath(identifier);
+        return stratAndPath.strategy().delete(stratAndPath.instance());
     }
 
     @Override
     public RestconfFuture<NormalizedNodePayload> dataGET(final DataGetParams params) {
-        return readData(bindRequestRoot(), params);
+        final var strategy = localStrategy();
+        return readData(strategy, InstanceIdentifierContext.ofLocalRoot(strategy.databind()), params);
     }
 
     @Override
@@ -239,8 +232,8 @@ public final class MdsalRestconfServer
         return readData(bindRequestPath(identifier), params);
     }
 
-    private @NonNull RestconfFuture<NormalizedNodePayload> readData(final InstanceIdentifierContext reqPath,
-            final DataGetParams params) {
+    private static @NonNull RestconfFuture<NormalizedNodePayload> readData(final RestconfStrategy strategy,
+            final InstanceIdentifierContext reqPath, final DataGetParams params) {
         final var fields = params.fields();
         final QueryParameters queryParams;
         if (fields != null) {
@@ -258,7 +251,6 @@ public final class MdsalRestconfServer
         }
 
         final var fieldPaths = queryParams.fieldPaths();
-        final var strategy = getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint());
         final NormalizedNode node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
             node = strategy.readData(params.content(), reqPath.getInstanceIdentifier(), params.withDefaults(),
@@ -277,51 +269,73 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<Empty> dataPATCH(final ResourceBody body) {
-        return dataPATCH(bindRequestRoot(), body);
+        final var strategy = localStrategy();
+        return dataPATCH(strategy, new DataPutPath(strategy.databind()), body);
     }
 
     @Override
     public RestconfFuture<Empty> dataPATCH(final ApiPath identifier, final ResourceBody body) {
-        return dataPATCH(bindRequestPath(identifier), body);
+        final var strategyAndInstance = localStrategy().resolveStrategyPath(identifier);
+        final var strategy = strategyAndInstance.strategy();
+        return dataPATCH(strategy,
+            new DataPutPath(strategy.databind(), strategyAndInstance.inference(), strategyAndInstance.instance()),
+            body);
     }
 
-    private @NonNull RestconfFuture<Empty> dataPATCH(final InstanceIdentifierContext reqPath, final ResourceBody body) {
-        final var req = bindResourceRequest(reqPath, body);
-        return req.strategy().merge(req.path(), req.data());
+    private static @NonNull RestconfFuture<Empty> dataPATCH(final RestconfStrategy strategy, final DataPutPath path,
+            final ResourceBody body) {
+        final NormalizedNode data;
+        try {
+            data = body.toNormalizedNode(path);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+        return strategy.merge(path.instance(), data);
     }
 
     @Override
     public RestconfFuture<PatchStatusContext> dataPATCH(final PatchBody body) {
-        return dataPATCH(bindRequestRoot(), body);
+        final var strategy = localStrategy();
+        return dataPATCH(strategy, new DataPatchPath(strategy.databind(), YangInstanceIdentifier.of()), body);
     }
 
     @Override
     public RestconfFuture<PatchStatusContext> dataPATCH(final ApiPath identifier, final PatchBody body) {
-        return dataPATCH(bindRequestPath(identifier), body);
+        final var stratAndPath = localStrategy().resolveStrategyPath(identifier);
+        final var strategy = stratAndPath.strategy();
+        return dataPATCH(strategy, new DataPatchPath(strategy.databind(), stratAndPath.instance()), body);
     }
 
-    private @NonNull RestconfFuture<PatchStatusContext> dataPATCH(final InstanceIdentifierContext reqPath,
-            final PatchBody body) {
-        final var patchPath = new DataPatchPath(reqPath.databind(), reqPath.getInstanceIdentifier());
+    private static @NonNull RestconfFuture<PatchStatusContext> dataPATCH(final RestconfStrategy strategy,
+            final DataPatchPath path, final PatchBody body) {
         final PatchContext patch;
         try {
-            patch = body.toPatchContext(patchPath);
+            patch = body.toPatchContext(path);
         } catch (IOException e) {
             LOG.debug("Error parsing YANG Patch input", e);
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
         }
-        return getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint()).patchData(patch);
+        return strategy.patchData(patch);
     }
 
     @Override
     public RestconfFuture<CreateResource> dataPOST(final ChildBody body, final Map<String, String> queryParameters) {
-        return dataCreatePOST(bindRequestRoot(), body, queryParameters);
+        return dataCreatePOST(localStrategy(), body, queryParameters);
     }
 
     @Override
     public RestconfFuture<? extends DataPostResult> dataPOST(final ApiPath identifier, final DataPostBody body,
             final Map<String, String> queryParameters) {
+        final var strategyAndTail = localStrategy().resolveStrategy(identifier);
+        final var strategy = strategyAndTail.strategy();
+        final var tail = strategyAndTail.tail();
+        if (tail.steps().isEmpty()) {
+            return dataCreatePOST(strategy, body.toResource(), queryParameters);
+        }
+
+
+        final var postPath = new DataPostPath(reqPath.databind(), reqPath.inference(), reqPath.getInstanceIdentifier());
         final var reqPath = bindRequestPath(identifier);
         if (reqPath.getSchemaNode() instanceof ActionDefinition) {
             try (var inputBody = body.toOperationInput()) {
@@ -334,21 +348,26 @@ public final class MdsalRestconfServer
         }
     }
 
-    private @NonNull RestconfFuture<CreateResource> dataCreatePOST(final InstanceIdentifierContext reqPath,
+    private static @NonNull RestconfFuture<CreateResource> dataCreatePOST(final RestconfStrategy strategy,
             final ChildBody body, final Map<String, String> queryParameters) {
-        final var postPath = new DataPostPath(reqPath.databind(), reqPath.inference(), reqPath.getInstanceIdentifier());
+        final var databind = strategy.databind();
+        return dataCreatePOST(strategy, new DataPostPath(databind,
+            SchemaInferenceStack.of(databind.modelContext()).toInference(), YangInstanceIdentifier.of()), body,
+            queryParameters);
+    }
 
+    private static @NonNull RestconfFuture<CreateResource> dataCreatePOST(final RestconfStrategy strategy,
+            final DataPostPath path, final ChildBody body, final Map<String, String> queryParameters) {
         final Insert insert;
         try {
-            insert = Insert.ofQueryParameters(postPath.databind(), queryParameters);
+            insert = Insert.ofQueryParameters(path.databind(), queryParameters);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
         }
 
-        final var payload = body.toPayload(postPath);
-        return getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint())
-            .postData(concat(postPath.instance(), payload.prefix()), payload.body(), insert);
+        final var payload = body.toPayload(path);
+        return strategy.postData(concat(path.instance(), payload.prefix()), payload.body(), insert);
     }
 
     private static YangInstanceIdentifier concat(final YangInstanceIdentifier parent, final List<PathArgument> args) {
@@ -446,26 +465,36 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<DataPutResult> dataPUT(final ResourceBody body, final Map<String, String> query) {
-        return dataPUT(bindRequestRoot(), body, query);
+        final var strategy = localStrategy();
+        return dataPUT(strategy, new DataPutPath(strategy.databind()), body, query);
     }
 
     @Override
     public RestconfFuture<DataPutResult> dataPUT(final ApiPath identifier, final ResourceBody body,
              final Map<String, String> queryParameters) {
-        return dataPUT(bindRequestPath(identifier), body, queryParameters);
+        final var strategyAndInstance = localStrategy().resolveStrategyPath(identifier);
+        final var strategy = strategyAndInstance.strategy();
+        return dataPUT(strategy,
+            new DataPutPath(strategy.databind(), strategyAndInstance.inference(), strategyAndInstance.instance()),
+            body, queryParameters);
     }
 
-    private @NonNull RestconfFuture<DataPutResult> dataPUT(final InstanceIdentifierContext reqPath,
-            final ResourceBody body, final Map<String, String> queryParameters) {
+    private static @NonNull RestconfFuture<DataPutResult> dataPUT(final RestconfStrategy strategy,
+            final DataPutPath path, final ResourceBody body, final Map<String, String> queryParameters) {
         final Insert insert;
         try {
-            insert = Insert.ofQueryParameters(reqPath.databind(), queryParameters);
+            insert = Insert.ofQueryParameters(strategy.databind(), queryParameters);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
         }
-        final var req = bindResourceRequest(reqPath, body);
-        return req.strategy().putData(req.path(), req.data(), insert);
+        final NormalizedNode data;
+        try {
+            data = body.toNormalizedNode(path);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+        return strategy.putData(path.instance(), data, insert);
     }
 
     @Override
@@ -502,20 +531,14 @@ public final class MdsalRestconfServer
             return RestconfFuture.failed(new RestconfDocumentedException("Mount path has to end with yang-ext:mount"));
         }
 
-        final InstanceIdentifierContext point;
+        final StrategyAndTail stratAndTail;
         try {
-            point = InstanceIdentifierContext.ofApiPath(mountPath, localStrategy().databind(), mountPointService);
+            stratAndTail = localStrategy().resolveStrategy(mountPath);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-
-        final RestconfStrategy strategy;
-        try {
-            strategy = forMountPoint(point.databind(), point.getMountPoint());
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
-        }
-        return modulesGET(strategy, fileName, revision, representation);
+        // FIXME: require remnant to be empty
+        return modulesGET(stratAndTail.strategy(), fileName, revision, representation);
     }
 
     private static @NonNull RestconfFuture<ModulesGetResult> modulesGET(final RestconfStrategy strategy,
@@ -559,18 +582,23 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<OperationsGetResult> operationsGET(final ApiPath operation) {
-        // get current module RPCs/actions by RPC/action name
-        final var inference = bindRequestPath(operation).inference();
-        if (inference.isEmpty()) {
-            return operationsGET(inference.getEffectiveModelContext());
+        final var strategyAndTail = localStrategy().resolveStrategy(operation);
+        final var strategy = strategyAndTail.strategy();
+        final var steps = strategyAndTail.tail().steps();
+        if (steps.isEmpty()) {
+            return operationsGET(strategy.modelContext());
+        }
+        if (steps.size() == 1) {
+            final var stack = SchemaInferenceStack.of(strategy.modelContext());
+
+//            final var stmt = inference.toSchemaInferenceStack().currentStatement();
+//            if (stmt instanceof RpcEffectiveStatement rpc) {
+//                return RestconfFuture.of(
+//                    new OperationsGetResult.Leaf(inference.getEffectiveModelContext(), rpc.argument()));
+//            }
         }
 
-        final var stmt = inference.toSchemaInferenceStack().currentStatement();
-        if (stmt instanceof RpcEffectiveStatement rpc) {
-            return RestconfFuture.of(
-                new OperationsGetResult.Leaf(inference.getEffectiveModelContext(), rpc.argument()));
-        }
-        return RestconfFuture.failed(new RestconfDocumentedException("RPC not found",
+        return RestconfFuture.failed(new RestconfDocumentedException(operation + " does not refer to an RPC",
             ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
     }
 
@@ -641,47 +669,5 @@ public final class MdsalRestconfServer
             ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, stack.getEffectiveModelContext()
                 .findModuleStatements("ietf-yang-library").iterator().next().localQNameModule().getRevision()
                 .map(Revision::toString).orElse(""))));
-    }
-
-    private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull ApiPath identifier) {
-        return bindRequestPath(localStrategy(), identifier);
-    }
-
-    private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull MdsalRestconfStrategy strategy,
-            final @NonNull ApiPath identifier) {
-        // FIXME: DatabindContext looks like it should be internal
-        return InstanceIdentifierContext.ofApiPath(identifier, strategy.databind(), mountPointService);
-    }
-
-    private @NonNull InstanceIdentifierContext bindRequestRoot() {
-        return InstanceIdentifierContext.ofLocalRoot(localStrategy().databind());
-    }
-
-    private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
-            final ResourceBody body) {
-        final var putPath = new DataPutPath(reqPath.databind(), reqPath.inference(), reqPath.getInstanceIdentifier());
-        return new ResourceRequest(getRestconfStrategy(putPath.databind(), reqPath.getMountPoint()), putPath.instance(),
-            body.toNormalizedNode(putPath));
-    }
-
-    @VisibleForTesting
-    @NonNull RestconfStrategy getRestconfStrategy(final DatabindContext databind,
-            final @Nullable DOMMountPoint mountPoint) {
-        if (mountPoint == null) {
-            return localStrategy(databind);
-        }
-        return forMountPoint(databind, mountPoint);
-    }
-
-    private static @NonNull RestconfStrategy forMountPoint(final DatabindContext databind,
-            final DOMMountPoint mountPoint) {
-        final var ret = RestconfStrategy.forMountPoint(databind, mountPoint);
-        if (ret == null) {
-            final var mountId = mountPoint.getIdentifier();
-            LOG.warn("Mount point {} does not expose a suitable access interface", mountId);
-            throw new RestconfDocumentedException("Could not find a supported access interface in mount point",
-                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, mountId);
-        }
-        return ret;
     }
 }

@@ -16,9 +16,9 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierSerializer;
 import org.opendaylight.restconf.server.api.DataPatchPath;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -49,6 +49,8 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
             return urlPath;
         }
 
+        // FIXME: NETCONF-1157: these two operations should really be a single ApiPathNormalizer step -- but for that
+        //                      we need to switch to ApiPath forms
         final var databind = path.databind();
         final String targetUrl;
         if (urlPath.isEmpty()) {
@@ -58,8 +60,7 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         }
 
         try {
-            return InstanceIdentifierContext.ofApiPath(ApiPath.parse(targetUrl), databind, null)
-                .getInstanceIdentifier();
+            return new ApiPathNormalizer(databind).normalizePath(ApiPath.parse(targetUrl)).path;
         } catch (ParseException | RestconfDocumentedException e) {
             throw new RestconfDocumentedException("Failed to parse target " + target,
                 ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE, e);

@@ -22,6 +22,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
@@ -47,14 +48,16 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMYangTextSourceProvider sourceProvider,
+            final @Nullable DOMMountPointService mountPointService,
             final ImmutableMap<QName, RpcImplementation> localRpcs) {
-        super(databind, localRpcs, rpcService, sourceProvider);
+        super(databind, localRpcs, rpcService, sourceProvider, mountPointService);
         this.dataBroker = requireNonNull(dataBroker);
     }
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
-            final @Nullable DOMRpcService rpcService, final @Nullable  DOMYangTextSourceProvider sourceProvider) {
-        this(databind, dataBroker, rpcService, sourceProvider, ImmutableMap.of());
+            final @Nullable DOMRpcService rpcService, final @Nullable  DOMYangTextSourceProvider sourceProvider,
+            final @Nullable DOMMountPointService mountPointService) {
+        this(databind, dataBroker, rpcService, sourceProvider, mountPointService, ImmutableMap.of());
     }
 
     @Override

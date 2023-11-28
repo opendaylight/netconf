@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
@@ -39,8 +40,9 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     private final NetconfDataTreeService netconfService;
 
     public NetconfRestconfStrategy(final DatabindContext databind, final NetconfDataTreeService netconfService,
-            final @Nullable DOMRpcService rpcService, final @Nullable DOMYangTextSourceProvider sourceProvider) {
-        super(databind, ImmutableMap.of(), rpcService, sourceProvider);
+            final @Nullable DOMRpcService rpcService, final @Nullable DOMYangTextSourceProvider sourceProvider,
+            final @Nullable DOMMountPointService mountPointService) {
+        super(databind, ImmutableMap.of(), rpcService, sourceProvider, mountPointService);
         this.netconfService = requireNonNull(netconfService);
     }
 
