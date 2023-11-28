@@ -11,12 +11,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.OperationsPostPath;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,14 +28,11 @@ public final class XmlOperationInputBody extends OperationInputBody {
     }
 
     @Override
-    void streamTo(final InputStream inputStream, final Inference inference, final NormalizedNodeStreamWriter writer)
+    void streamTo(final OperationsPostPath path, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
             throws IOException {
-        // Adjust inference to point to input
-        final var stack = inference.toSchemaInferenceStack();
-        stack.enterDataTree(extractInputQName(stack));
-
         try {
-            XmlParserStream.create(writer, stack.toInference()).parse(UntrustedXML.createXMLStreamReader(inputStream));
+            XmlParserStream.create(writer, path.databind().xmlCodecs(), path.input())
+                .parse(UntrustedXML.createXMLStreamReader(inputStream));
         } catch (XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
             throwIfYangError(e);
