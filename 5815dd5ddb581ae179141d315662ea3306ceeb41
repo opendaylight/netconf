@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8662aeaf_107f62a4",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SecuritySchemesEntity.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-28T09:14:38Z",
+      "side": 1,
+      "message": "\"scheme\"",
+      "revId": "5815dd5ddb581ae179141d315662ea3306ceeb41",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
