@@ -14,7 +14,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DataPostBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
@@ -45,19 +44,19 @@ public interface RestconfServer {
     /**
      * Return the content of the datastore.
      *
-     * @param readParams {@link ReadDataParams} for this request
+     * @param params {@link DataGetParams} for this request
      * @return A {@link RestconfFuture} of the {@link NormalizedNodePayload} content
      */
-    RestconfFuture<NormalizedNodePayload> dataGET(ReadDataParams readParams);
+    RestconfFuture<NormalizedNodePayload> dataGET(DataGetParams params);
 
     /**
      * Return the content of a data resource.
      *
      * @param identifier resource identifier
-     * @param readParams {@link ReadDataParams} for this request
+     * @param params {@link DataGetParams} for this request
      * @return A {@link RestconfFuture} of the {@link NormalizedNodePayload} content
      */
-    RestconfFuture<NormalizedNodePayload> dataGET(ApiPath identifier, ReadDataParams readParams);
+    RestconfFuture<NormalizedNodePayload> dataGET(ApiPath identifier, DataGetParams params);
 
     /**
      * Partially modify the target data resource, as defined in

@@ -49,7 +49,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.JsonDataPostBody;
@@ -72,6 +71,7 @@ import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
+import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -161,7 +161,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void dataGET(@Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        final var readParams = QueryParams.newReadDataParams(uriInfo);
+        final var readParams = QueryParams.newDataGetParams(uriInfo);
         completeDataGET(server.dataGET(readParams), readParams, ar);
     }
 
@@ -183,12 +183,12 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
-        final var readParams = QueryParams.newReadDataParams(uriInfo);
+        final var readParams = QueryParams.newDataGetParams(uriInfo);
         completeDataGET(server.dataGET(identifier, readParams), readParams, ar);
     }
 
     private static void completeDataGET(final RestconfFuture<NormalizedNodePayload> future,
-            final ReadDataParams readParams, final AsyncResponse ar) {
+            final DataGetParams readParams, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             Response transform(final NormalizedNodePayload result) {

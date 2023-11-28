@@ -56,7 +56,6 @@ import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
-import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DataPostBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
@@ -81,6 +80,7 @@ import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.OperationsPostPath;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
+import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -230,41 +230,41 @@ public final class MdsalRestconfServer
     }
 
     @Override
-    public RestconfFuture<NormalizedNodePayload> dataGET(final ReadDataParams readParams) {
-        return readData(bindRequestRoot(), readParams);
+    public RestconfFuture<NormalizedNodePayload> dataGET(final DataGetParams params) {
+        return readData(bindRequestRoot(), params);
     }
 
     @Override
-    public RestconfFuture<NormalizedNodePayload> dataGET(final ApiPath identifier, final ReadDataParams readParams) {
-        return readData(bindRequestPath(identifier), readParams);
+    public RestconfFuture<NormalizedNodePayload> dataGET(final ApiPath identifier, final DataGetParams params) {
+        return readData(bindRequestPath(identifier), params);
     }
 
     private @NonNull RestconfFuture<NormalizedNodePayload> readData(final InstanceIdentifierContext reqPath,
-            final ReadDataParams readParams) {
-        final var fields = readParams.fields();
+            final DataGetParams params) {
+        final var fields = params.fields();
         final QueryParameters queryParams;
         if (fields != null) {
             final var modelContext = reqPath.databind().modelContext();
             final var schemaNode = (DataSchemaNode) reqPath.getSchemaNode();
             if (reqPath.getMountPoint() != null) {
-                queryParams = QueryParameters.ofFieldPaths(readParams, NetconfFieldsTranslator.translate(modelContext,
+                queryParams = QueryParameters.ofFieldPaths(params, NetconfFieldsTranslator.translate(modelContext,
                     schemaNode, fields));
             } else {
-                queryParams = QueryParameters.ofFields(readParams, WriterFieldsTranslator.translate(modelContext,
+                queryParams = QueryParameters.ofFields(params, WriterFieldsTranslator.translate(modelContext,
                     schemaNode, fields));
             }
         } else {
-            queryParams = QueryParameters.of(readParams);
+            queryParams = QueryParameters.of(params);
         }
 
         final var fieldPaths = queryParams.fieldPaths();
         final var strategy = getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint());
         final NormalizedNode node;
         if (fieldPaths != null && !fieldPaths.isEmpty()) {
-            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(), readParams.withDefaults(),
+            node = strategy.readData(params.content(), reqPath.getInstanceIdentifier(), params.withDefaults(),
                 fieldPaths);
         } else {
-            node = strategy.readData(readParams.content(), reqPath.getInstanceIdentifier(), readParams.withDefaults());
+            node = strategy.readData(params.content(), reqPath.getInstanceIdentifier(), params.withDefaults());
         }
         if (node == null) {
             return RestconfFuture.failed(new RestconfDocumentedException(
