@@ -7,37 +7,40 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.opendaylight.restconf.server.api.DataPostPath;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public class JsonChildBodyTest extends AbstractBodyTest {
-    private static EffectiveModelContext schemaContext;
+class JsonChildBodyTest extends AbstractBodyTest {
+    private static DataPostPath CONT_PATH;
 
-    @BeforeClass
-    public static void initialization() throws Exception {
+    @BeforeAll
+    static void beforeAll() throws Exception {
         final var testFiles = loadFiles("/instanceidentifier/yang");
         testFiles.addAll(loadFiles("/modules"));
-        schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
+        final var modelContext = YangParserTestUtils.parseYangFiles(testFiles);
+
+        CONT_PATH = new DataPostPath(DatabindContext.ofModel(modelContext),
+            Inference.ofDataTreePath(modelContext, CONT_QNAME), YangInstanceIdentifier.of(CONT_QNAME));
     }
 
     @Test
-    public void moduleSubContainerDataPostTest() throws Exception {
+    void moduleSubContainerDataPostTest() {
         final var body = new JsonChildBody(
             JsonChildBodyTest.class.getResourceAsStream("/instanceidentifier/json/json_sub_container.json"));
-        final var payload = body.toPayload(YangInstanceIdentifier.of(CONT_QNAME),
-            Inference.ofDataTreePath(schemaContext, CONT_QNAME));
+        final var payload = body.toPayload(CONT_PATH);
 
         final var lflst11 = QName.create("augment:module:leaf:list", "2014-01-27", "lflst11");
         assertEquals(List.of(new NodeIdentifier(CONT1_QNAME)), payload.prefix());
@@ -53,11 +56,10 @@ public class JsonChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    public void moduleSubContainerAugmentDataPostTest() throws Exception {
+    void moduleSubContainerAugmentDataPostTest() {
         final var body = new JsonChildBody(
             JsonChildBodyTest.class.getResourceAsStream("/instanceidentifier/json/json_augment_container.json"));
-        final var payload = body.toPayload(YangInstanceIdentifier.of(CONT_QNAME),
-            Inference.ofDataTreePath(schemaContext, CONT_QNAME));
+        final var payload = body.toPayload(CONT_PATH);
 
         final var contAugment = QName.create("augment:module", "2014-01-17", "cont-augment");
         assertEquals(List.of(new NodeIdentifier(contAugment)), payload.prefix());
@@ -68,11 +70,10 @@ public class JsonChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    public void moduleSubContainerChoiceAugmentDataPostTest() throws Exception {
+    void moduleSubContainerChoiceAugmentDataPostTest() {
         final var body = new JsonChildBody(
             JsonChildBodyTest.class.getResourceAsStream("/instanceidentifier/json/json_augment_choice_container.json"));
-        final var payload = body.toPayload(YangInstanceIdentifier.of(new NodeIdentifier(CONT_QNAME)),
-            Inference.ofDataTreePath(schemaContext, CONT_QNAME));
+        final var payload = body.toPayload(CONT_PATH);
 
         final var container1 = QName.create("augment:module", "2014-01-17", "case-choice-case-container1");
         assertEquals(List.of(

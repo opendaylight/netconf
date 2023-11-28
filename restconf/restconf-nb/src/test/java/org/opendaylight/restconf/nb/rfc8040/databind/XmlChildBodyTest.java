@@ -7,11 +7,13 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.opendaylight.restconf.server.api.DataPostPath;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -19,27 +21,32 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public class XmlChildBodyTest extends AbstractBodyTest {
+class XmlChildBodyTest extends AbstractBodyTest {
     private static final QName TOP_LEVEL_LIST = QName.create("foo", "2017-08-09", "top-level-list");
 
-    private static EffectiveModelContext schemaContext;
+    private static DataPostPath EMPTY_PATH;
+    private static DataPostPath CONT_PATH;
 
-    @BeforeClass
-    public static void initialization() throws Exception {
+    @BeforeAll
+    static void beforeAll() throws Exception {
         final var testFiles = loadFiles("/instanceidentifier/yang");
         testFiles.addAll(loadFiles("/modules"));
         testFiles.addAll(loadFiles("/foo-xml-test/yang"));
-        schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
+        final var modelContext = YangParserTestUtils.parseYangFiles(testFiles);
+
+        CONT_PATH = new DataPostPath(DatabindContext.ofModel(modelContext),
+            Inference.ofDataTreePath(modelContext, CONT_QNAME), YangInstanceIdentifier.of(CONT_QNAME));
+        EMPTY_PATH = new DataPostPath(DatabindContext.ofModel(modelContext),
+            Inference.ofDataTreePath(modelContext), YangInstanceIdentifier.of());
     }
 
     @Test
-    public void postXmlTest() throws Exception {
+    void postXmlTest() {
         final var body = new XmlChildBody(XmlChildBodyTest.class.getResourceAsStream("/foo-xml-test/foo.xml"));
-        final var payload = body.toPayload(YangInstanceIdentifier.of(), Inference.ofDataTreePath(schemaContext));
+        final var payload = body.toPayload(EMPTY_PATH);
 
         final var entryId = NodeIdentifierWithPredicates.of(TOP_LEVEL_LIST,
             QName.create(TOP_LEVEL_LIST, "key-leaf"), "key-value");
@@ -52,11 +59,10 @@ public class XmlChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    public void moduleSubContainerDataPostTest() throws Exception {
+    void moduleSubContainerDataPostTest() {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xml_sub_container.xml"));
-        final var payload = body.toPayload(YangInstanceIdentifier.of(CONT_QNAME),
-            Inference.ofDataTreePath(schemaContext, CONT_QNAME));
+        final var payload = body.toPayload(CONT_PATH);
 
         final var lflst11 = QName.create("augment:module:leaf:list", "2014-01-27", "lflst11");
         assertEquals(List.of(new NodeIdentifier(CONT1_QNAME)), payload.prefix());
@@ -77,11 +83,10 @@ public class XmlChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    public void moduleSubContainerAugmentDataPostTest() throws Exception {
+    void moduleSubContainerAugmentDataPostTest() {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xml_augment_container.xml"));
-        final var payload = body.toPayload(YangInstanceIdentifier.of(CONT_QNAME),
-            Inference.ofDataTreePath(schemaContext, CONT_QNAME));
+        final var payload = body.toPayload(CONT_PATH);
 
         final var contAugment = QName.create("augment:module", "2014-01-17", "cont-augment");
         assertEquals(List.of(new NodeIdentifier(contAugment)), payload.prefix());
@@ -92,11 +97,10 @@ public class XmlChildBodyTest extends AbstractBodyTest {
     }
 
     @Test
-    public void moduleSubContainerChoiceAugmentDataPostTest() throws Exception {
+    void moduleSubContainerChoiceAugmentDataPostTest() {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xml_augment_choice_container.xml"));
-        final var payload = body.toPayload(YangInstanceIdentifier.of(CONT_QNAME),
-            Inference.ofDataTreePath(schemaContext, CONT_QNAME));
+        final var payload = body.toPayload(CONT_PATH);
 
         final var container1 = QName.create("augment:module", "2014-01-17", "case-choice-case-container1");
         assertEquals(List.of(
@@ -115,10 +119,10 @@ public class XmlChildBodyTest extends AbstractBodyTest {
      * name, but also by correct namespace used in payload.
      */
     @Test
-    public void findFooContainerUsingNamespaceTest() throws Exception {
+    void findFooContainerUsingNamespaceTest() {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xmlDataFindFooContainer.xml"));
-        final var payload = body.toPayload(YangInstanceIdentifier.of(), Inference.ofDataTreePath(schemaContext));
+        final var payload = body.toPayload(EMPTY_PATH);
 
         final var fooBarContainer = new NodeIdentifier(QName.create("foo:module", "2016-09-29", "foo-bar-container"));
         assertEquals(List.of(fooBarContainer), payload.prefix());
@@ -132,10 +136,10 @@ public class XmlChildBodyTest extends AbstractBodyTest {
      * name, but also by correct namespace used in payload.
      */
     @Test
-    public void findBarContainerUsingNamespaceTest() throws Exception {
+    void findBarContainerUsingNamespaceTest() {
         final var body = new XmlChildBody(
             XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xmlDataFindBarContainer.xml"));
-        final var payload = body.toPayload(YangInstanceIdentifier.of(), Inference.ofDataTreePath(schemaContext));
+        final var payload = body.toPayload(EMPTY_PATH);
 
         final var fooBarContainer = new NodeIdentifier(QName.create("bar:module", "2016-09-29", "foo-bar-container"));
         assertEquals(List.of(fooBarContainer), payload.prefix());

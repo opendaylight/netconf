@@ -17,12 +17,12 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -30,10 +30,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeS
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
-import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -48,10 +46,9 @@ public final class XmlChildBody extends ChildBody {
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final InputStream inputStream, final YangInstanceIdentifier parentPath,
-            final Inference parentInference) {
+    PrefixAndBody toPayload(final DataPostPath path, final InputStream inputStream) {
         try {
-            return parse(parentPath, parentInference, UntrustedXML.newDocumentBuilder().parse(inputStream));
+            return parse(path, UntrustedXML.newDocumentBuilder().parse(inputStream));
         } catch (final RestconfDocumentedException e) {
             throw e;
         } catch (final Exception e) {
@@ -62,8 +59,10 @@ public final class XmlChildBody extends ChildBody {
         }
     }
 
-    private static @NonNull PrefixAndBody parse(final YangInstanceIdentifier path, final Inference pathInference,
-            final Document doc) throws XMLStreamException, IOException, SAXException, URISyntaxException {
+    private static @NonNull PrefixAndBody parse(final DataPostPath path, final Document doc)
+            throws XMLStreamException, IOException, SAXException, URISyntaxException {
+        final var pathInference = path.inference();
+
         final DataSchemaNode parentNode;
         if (pathInference.isEmpty()) {
             parentNode = pathInference.getEffectiveModelContext();
@@ -86,7 +85,9 @@ public final class XmlChildBody extends ChildBody {
         final var qname = QName.create(it.next().localQNameModule(), docRootElm);
 
         final var iiToDataList = ImmutableList.<PathArgument>builder();
-        final var nodeAndStack = DataSchemaContextTree.from(context).enterPath(path).orElseThrow();
+        // FIXME: we should have this readily available: it is the last node the ApiPath->YangInstanceIdentifier parser
+        //        has seen (and it should have the nodeAndStack handy
+        final var nodeAndStack = path.databind().schemaTree().enterPath(path.instance()).orElseThrow();
         final var stack = nodeAndStack.stack();
         var current = nodeAndStack.node();
         do {
@@ -110,7 +111,7 @@ public final class XmlChildBody extends ChildBody {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final var xmlParser = XmlParserStream.create(writer, stack.toInference());
+        final var xmlParser = XmlParserStream.create(writer, path.databind().xmlCodecs(), stack.toInference());
         xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
         var parsed = resultHolder.getResult().data();
 

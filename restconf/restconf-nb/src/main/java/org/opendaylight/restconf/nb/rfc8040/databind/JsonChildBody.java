@@ -15,20 +15,18 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +39,10 @@ public final class JsonChildBody extends ChildBody {
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final InputStream inputStream, final YangInstanceIdentifier parentPath,
-            final Inference parentInference) {
+    PrefixAndBody toPayload(final DataPostPath path, final InputStream inputStream) {
         NormalizedNode result;
         try {
-            result = toNormalizedNode(inputStream, parentInference);
+            result = toNormalizedNode(path, inputStream);
         } catch (Exception e) {
             Throwables.throwIfInstanceOf(e, RestconfDocumentedException.class);
             LOG.debug("Error parsing json input", e);
@@ -77,11 +74,10 @@ public final class JsonChildBody extends ChildBody {
         return new PrefixAndBody(iiToDataList.build(), result);
     }
 
-    private static @NonNull NormalizedNode toNormalizedNode(final InputStream inputStream, final Inference inference) {
+    private static @NonNull NormalizedNode toNormalizedNode(final DataPostPath path, final InputStream inputStream) {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        final var jsonParser = JsonParserStream.create(writer,
-            JSONCodecFactorySupplier.RFC7951.getShared(inference.getEffectiveModelContext()), inference);
+        final var jsonParser = JsonParserStream.create(writer, path.databind().jsonCodecs(), path.inference());
         final var reader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         jsonParser.parse(reader);
 
