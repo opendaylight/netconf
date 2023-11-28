@@ -12,10 +12,9 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableList;
 import java.io.InputStream;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 public abstract sealed class ChildBody extends AbstractBody permits JsonChildBody, XmlChildBody {
     public record PrefixAndBody(@NonNull ImmutableList<PathArgument> prefix, @NonNull NormalizedNode body) {
@@ -29,11 +28,15 @@ public abstract sealed class ChildBody extends AbstractBody permits JsonChildBod
         super(inputStream);
     }
 
-    public final @NonNull PrefixAndBody toPayload(final @NonNull YangInstanceIdentifier parentPath,
-            final @NonNull Inference parentInference) {
-        return toPayload(acquireStream(), parentPath, parentInference);
+    /**
+     * Interpret this object as a child of specified path.
+     *
+     * @param path POST request path
+     * @return A {@link PrefixAndBody}
+     */
+    public final @NonNull PrefixAndBody toPayload(final @NonNull DataPostPath path) {
+        return toPayload(path, acquireStream());
     }
 
-    abstract @NonNull PrefixAndBody toPayload(@NonNull InputStream inputStream,
-        @NonNull YangInstanceIdentifier parentPath, @NonNull Inference parentInference);
+    abstract @NonNull PrefixAndBody toPayload(@NonNull DataPostPath path, @NonNull InputStream inputStream);
 }
