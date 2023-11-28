@@ -45,7 +45,11 @@ class XmlChildBodyTest extends AbstractBodyTest {
 
     @Test
     void postXmlTest() {
-        final var body = new XmlChildBody(XmlChildBodyTest.class.getResourceAsStream("/foo-xml-test/foo.xml"));
+        final var body = new XmlChildBody(stringInputStream("""
+            <top-level-list xmlns="foo">
+                <key-leaf>key-value</key-leaf>
+                <ordinary-leaf>leaf-value</ordinary-leaf>
+            </top-level-list>"""));
         final var payload = body.toPayload(EMPTY_PATH);
 
         final var entryId = NodeIdentifierWithPredicates.of(TOP_LEVEL_LIST,

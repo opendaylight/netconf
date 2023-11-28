@@ -87,7 +87,11 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(TOP_LEVEL_LIST, keyName, "key-value"))
             .withChild(ImmutableNodes.leafNode(keyName, "key-value"))
             .withChild(ImmutableNodes.leafNode(QName.create(keyName, "ordinary-leaf"), "leaf-value"))
-            .build(), parseResource("foo:top-level-list=key-value", "/foo-xml-test/foo.xml"));
+            .build(), parse("foo:top-level-list=key-value", """
+                <top-level-list xmlns="foo">
+                    <key-leaf>key-value</key-leaf>
+                    <ordinary-leaf>leaf-value</ordinary-leaf>
+                </top-level-list>"""));
     }
 
     @Test
