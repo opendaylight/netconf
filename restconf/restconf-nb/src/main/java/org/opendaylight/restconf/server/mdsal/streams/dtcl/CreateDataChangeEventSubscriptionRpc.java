@@ -18,7 +18,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierSerializer;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -112,7 +112,7 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
         return streamRegistry.createStream(restconfURI,
             new DataTreeChangeSource(databindProvider, changeService, datastore, path),
             "Events occuring in " + datastore + " datastore under /"
-                + IdentifierCodec.serialize(path, input.databind()))
+                + new YangInstanceIdentifierSerializer(input.databind()).serializePath(path))
             .transform(stream -> input.newOperationOutput(Builders.containerBuilder()
                 .withNodeIdentifier(OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))

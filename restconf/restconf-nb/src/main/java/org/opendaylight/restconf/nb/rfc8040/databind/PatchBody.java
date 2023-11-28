@@ -17,7 +17,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierSerializer;
 import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -54,7 +54,7 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         if (urlPath.isEmpty()) {
             targetUrl = target.startsWith("/") ? target.substring(1) : target;
         } else {
-            targetUrl = IdentifierCodec.serialize(urlPath, databind) + target;
+            targetUrl = new YangInstanceIdentifierSerializer(databind).serializePath(urlPath) + target;
         }
 
         try {

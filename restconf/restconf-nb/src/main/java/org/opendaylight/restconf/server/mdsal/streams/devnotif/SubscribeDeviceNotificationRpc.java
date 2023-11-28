@@ -15,7 +15,7 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierSerializer;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -82,7 +82,8 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
         }
 
         return streamRegistry.createStream(restconfURI, new DeviceNotificationSource(mountPointService, path),
-            "All YANG notifications occuring on mount point /" + IdentifierCodec.serialize(path, input.databind()))
+            "All YANG notifications occuring on mount point /"
+                + new YangInstanceIdentifierSerializer(input.databind()).serializePath(path))
             .transform(stream -> input.newOperationOutput(Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
                 .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH_NODEID, stream.name()))
