@@ -76,10 +76,10 @@ import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
+import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
-import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.Restconf;
@@ -602,7 +602,7 @@ public final class MdsalRestconfServer
     }
 
     @Override
-    public RestconfFuture<OperationOutput> operationsPOST(final URI restconfURI, final ApiPath apiPath,
+    public RestconfFuture<OperationsPostResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
             final OperationInputBody body) {
         final var reqPath = bindRequestPath(localStrategy(), apiPath);
         final var inference = reqPath.inference();

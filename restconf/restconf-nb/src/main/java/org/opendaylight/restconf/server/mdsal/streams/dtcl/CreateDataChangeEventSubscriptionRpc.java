@@ -19,9 +19,9 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
-import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.CreateDataChangeEventSubscription;
@@ -97,7 +97,7 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
      *     </pre>
      */
     @Override
-    public RestconfFuture<OperationOutput> invoke(final URI restconfURI, final OperationInput input) {
+    public RestconfFuture<OperationsPostResult> invoke(final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final var datastoreName = leaf(body, DATASTORE_NODEID, String.class);
         final var datastore = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)

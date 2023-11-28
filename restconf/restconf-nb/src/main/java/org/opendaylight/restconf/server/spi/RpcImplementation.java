@@ -14,6 +14,7 @@ import java.net.URI;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -47,7 +48,7 @@ public abstract class RpcImplementation {
      * @param input RPC input
      * @return Future RPC output
      */
-    public abstract RestconfFuture<OperationOutput> invoke(URI restconfURI, OperationInput input);
+    public abstract RestconfFuture<OperationsPostResult> invoke(URI restconfURI, OperationInput input);
 
     @Override
     public final String toString() {

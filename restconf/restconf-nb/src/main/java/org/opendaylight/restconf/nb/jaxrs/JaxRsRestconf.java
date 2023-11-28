@@ -71,8 +71,8 @@ import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
+import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
-import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -749,9 +749,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     private void operationsPOST(final ApiPath identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
         server.operationsPOST(uriInfo.getBaseUri(), identifier, body)
-            .addCallback(new JaxRsRestconfCallback<OperationOutput>(ar) {
+            .addCallback(new JaxRsRestconfCallback<OperationsPostResult>(ar) {
                 @Override
-                Response transform(final OperationOutput result) {
+                Response transform(final OperationsPostResult result) {
                     final var body = result.output();
                     return body == null ? Response.noContent().build()
                         : Response.ok().entity(new NormalizedNodePayload(result.operation(), body)).build();

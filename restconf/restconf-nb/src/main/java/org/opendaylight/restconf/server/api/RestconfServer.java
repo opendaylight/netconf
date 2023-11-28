@@ -22,7 +22,6 @@ import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
-import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
@@ -149,12 +148,12 @@ public interface RestconfServer {
      * @param restconfURI Base URI of the request
      * @param operation {@code <operation>} path, really an {@link ApiPath} to an {@code rpc}
      * @param body RPC operation
-     * @return A {@link RestconfFuture} completing with {@link OperationOutput}
+     * @return A {@link RestconfFuture} completing with {@link OperationsPostResult}
      */
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support ang-ext:mount,
     //        and hence it is a path right now
     // FIXME: use ApiPath instead of String
-    RestconfFuture<OperationOutput> operationsPOST(URI restconfURI, ApiPath operation, OperationInputBody body);
+    RestconfFuture<OperationsPostResult> operationsPOST(URI restconfURI, ApiPath operation, OperationInputBody body);
 
     /**
      * Return the revision of {@code ietf-yang-library} module implemented by this server, as defined in

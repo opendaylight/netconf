@@ -16,8 +16,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.spi.OperationInput;
-import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
@@ -60,7 +60,7 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
     }
 
     @Override
-    public RestconfFuture<OperationOutput> invoke(final URI restconfURI, final OperationInput input) {
+    public RestconfFuture<OperationsPostResult> invoke(final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final var pathLeaf = body.childByArg(DEVICE_NOTIFICATION_PATH_NODEID);
         if (pathLeaf == null) {

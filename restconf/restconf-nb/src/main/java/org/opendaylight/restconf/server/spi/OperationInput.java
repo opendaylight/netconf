@@ -13,6 +13,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.server.api.DatabindAware;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -29,12 +30,12 @@ public record OperationInput(DatabindContext databind, Inference operation, Cont
     }
 
     /**
-     * Create an {@link OperationOutput} with equal {@link #databind()} and {@link #operation()}.
+     * Create an {@link OperationsPostResult} with equal {@link #databind()} and {@link #operation()}.
      *
      * @param output Output payload
-     * @return An {@link OperationOutput}
+     * @return An {@link OperationsPostResult}
      */
-    public OperationOutput newOperationOutput(final @Nullable ContainerNode output) {
-        return new OperationOutput(databind, operation, output);
+    public OperationsPostResult newOperationOutput(final @Nullable ContainerNode output) {
+        return new OperationsPostResult(databind, operation, output);
     }
 }

@@ -52,8 +52,8 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.spi.OperationInput;
-import org.opendaylight.restconf.server.spi.OperationOutput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -1057,7 +1057,7 @@ public abstract class RestconfStrategy {
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
     }
 
-    public @NonNull RestconfFuture<OperationOutput> invokeRpc(final URI restconfURI, final QName type,
+    public @NonNull RestconfFuture<OperationsPostResult> invokeRpc(final URI restconfURI, final QName type,
             final OperationInput input) {
         final var local = localRpcs.get(type);
         if (local != null) {
@@ -1069,7 +1069,7 @@ public abstract class RestconfStrategy {
                 ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED));
         }
 
-        final var ret = new SettableRestconfFuture<OperationOutput>();
+        final var ret = new SettableRestconfFuture<OperationsPostResult>();
         Futures.addCallback(rpcService.invokeRpc(requireNonNull(type), input.input()),
             new FutureCallback<DOMRpcResult>() {
                 @Override
