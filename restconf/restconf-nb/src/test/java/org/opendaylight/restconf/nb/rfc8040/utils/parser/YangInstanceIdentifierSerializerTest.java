@@ -29,6 +29,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 class YangInstanceIdentifierSerializerTest {
     private static final DatabindContext DATABIND = DatabindContext.ofModel(
         YangParserTestUtils.parseYangResourceDirectory("/restconf/parser/serializer"));
+    private static final YangInstanceIdentifierSerializer SERIALIZER = new YangInstanceIdentifierSerializer(DATABIND);
 
     /**
      * Positive test of serialization of <code>YangInstanceIdentifier</code> containing container node to
@@ -36,7 +37,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeContainerTest() {
-        assertEquals("serializer-test:contA", YangInstanceIdentifierSerializer.create(DATABIND,
+        assertEquals("serializer-test:contA", SERIALIZER.serializePath(
             YangInstanceIdentifier.of(QName.create("serializer:test", "2016-06-06", "contA"))));
     }
 
@@ -46,7 +47,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeContainerWithLeafTest() {
-        assertEquals("serializer-test:contA/leaf-A", YangInstanceIdentifierSerializer.create(DATABIND,
+        assertEquals("serializer-test:contA/leaf-A", SERIALIZER.serializePath(
             YangInstanceIdentifier.of(
                 QName.create("serializer:test", "2016-06-06", "contA"),
                 QName.create("serializer:test", "2016-06-06", "leaf-A"))));
@@ -61,8 +62,8 @@ class YangInstanceIdentifierSerializerTest {
         final var list = QName.create("serializer:test", "2016-06-06", "list-A");
         final var leafList = QName.create("serializer:test", "2016-06-06", "leaf-list-AA");
 
-        assertEquals("serializer-test:contA/list-A=100/leaf-list-AA=instance",
-            YangInstanceIdentifierSerializer.create(DATABIND, YangInstanceIdentifier.builder()
+        assertEquals("serializer-test:contA/list-A=100/leaf-list-AA=instance", SERIALIZER.serializePath(
+            YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "contA"))
                 .node(list)
                 .node(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), 100))
@@ -78,7 +79,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeListWithNoKeysTest() {
-        assertEquals("serializer-test:list-no-key", YangInstanceIdentifierSerializer.create(DATABIND,
+        assertEquals("serializer-test:list-no-key", SERIALIZER.serializePath(
             YangInstanceIdentifier.of(
                 QName.create("serializer:test", "2016-06-06", "list-no-key"),
                 QName.create("serializer:test", "2016-06-06", "list-no-key"))));
@@ -91,7 +92,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeMapWithNoKeysTest() {
-        assertEquals("serializer-test:list-one-key", YangInstanceIdentifierSerializer.create(DATABIND,
+        assertEquals("serializer-test:list-one-key", SERIALIZER.serializePath(
             YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "list-one-key"))
                 .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-one-key"), Map.of())
@@ -105,7 +106,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeMapWithOneKeyTest() {
-        assertEquals("serializer-test:list-one-key=value", YangInstanceIdentifierSerializer.create(DATABIND,
+        assertEquals("serializer-test:list-one-key=value", SERIALIZER.serializePath(
             YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "list-one-key"))
                 .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-one-key"),
@@ -122,8 +123,8 @@ class YangInstanceIdentifierSerializerTest {
     void serializeMapWithMultipleKeysTest() {
         final var list = QName.create("serializer:test", "2016-06-06", "list-multiple-keys");
 
-        assertEquals("serializer-test:list-multiple-keys=value-1,2,true",
-            YangInstanceIdentifierSerializer.create(DATABIND, YangInstanceIdentifier.builder()
+        assertEquals("serializer-test:list-multiple-keys=value-1,2,true", SERIALIZER.serializePath(
+            YangInstanceIdentifier.builder()
                 .node(list)
                 .nodeWithKey(list, ImmutableMap.of(
                     QName.create(list, "name"), "value-1",
@@ -139,7 +140,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeLeafTest() {
-        assertEquals("serializer-test:leaf-0", YangInstanceIdentifierSerializer.create(DATABIND,
+        assertEquals("serializer-test:leaf-0", SERIALIZER.serializePath(
             YangInstanceIdentifier.of(QName.create("serializer:test", "2016-06-06", "leaf-0"))));
     }
 
@@ -150,7 +151,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeLeafListTest() {
-        assertEquals("serializer-test:leaf-list-0=instance", YangInstanceIdentifierSerializer.create(DATABIND,
+        assertEquals("serializer-test:leaf-list-0=instance", SERIALIZER.serializePath(
             YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "leaf-list-0"))
                 .node(new NodeWithValue<>(QName.create("serializer:test", "2016-06-06", "leaf-list-0"), "instance"))
@@ -164,8 +165,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeNullSchemaContextNegativeTest() {
-        assertThrows(NullPointerException.class,
-            () -> YangInstanceIdentifierSerializer.create(null, YangInstanceIdentifier.of()));
+        assertThrows(NullPointerException.class, () -> new YangInstanceIdentifierSerializer(null));
     }
 
     /**
@@ -175,8 +175,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeNullDataNegativeTest() {
-        assertThrows(NullPointerException.class,
-            () -> YangInstanceIdentifierSerializer.create(DATABIND, null));
+        assertThrows(NullPointerException.class, () -> SERIALIZER.serializePath(null));
     }
 
     /**
@@ -186,7 +185,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeEmptyDataTest() {
-        assertEquals("", YangInstanceIdentifierSerializer.create(DATABIND, YangInstanceIdentifier.of()));
+        assertEquals("", SERIALIZER.serializePath(YangInstanceIdentifier.of()));
     }
 
     /**
@@ -199,8 +198,7 @@ class YangInstanceIdentifierSerializerTest {
                 QName.create("serializer:test", "2016-06-06", "contA"),
                 QName.create("serializer:test", "2016-06-06", "not-existing-leaf"));
 
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierSerializer.create(DATABIND, data));
+        final var ex = assertThrows(RestconfDocumentedException.class, () -> SERIALIZER.serializePath(data));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -217,13 +215,12 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializePercentEncodingTest() {
-        assertEquals("serializer-test:list-one-key=foo%3Afoo bar%2Ffoo%2Cbar%2F%27bar%27",
-            YangInstanceIdentifierSerializer.create(DATABIND,
-                YangInstanceIdentifier.builder()
-                    .node(QName.create("serializer:test", "2016-06-06", "list-one-key"))
-                    .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-one-key"),
-                        QName.create("serializer:test", "2016-06-06", "list-one-key"), "foo:foo bar/foo,bar/'bar'")
-                    .build()));
+        assertEquals("serializer-test:list-one-key=foo%3Afoo bar%2Ffoo%2Cbar%2F%27bar%27", SERIALIZER.serializePath(
+            YangInstanceIdentifier.builder()
+                .node(QName.create("serializer:test", "2016-06-06", "list-one-key"))
+                .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-one-key"),
+                    QName.create("serializer:test", "2016-06-06", "list-one-key"), "foo:foo bar/foo,bar/'bar'")
+                .build()));
     }
 
     /**
@@ -231,7 +228,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeNoPercentEncodingTest() {
-        assertEquals("serializer-test:list-one-key=foo\"b\"bar", YangInstanceIdentifierSerializer.create(DATABIND,
+        assertEquals("serializer-test:list-one-key=foo\"b\"bar", SERIALIZER.serializePath(
             YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "list-one-key"))
                 .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-one-key"),
@@ -249,7 +246,7 @@ class YangInstanceIdentifierSerializerTest {
         final var child = QName.create("serializer:test", "2016-06-06", "augmented-leaf");
 
         assertEquals("serializer-test-included:augmented-list=100/serializer-test:augmented-leaf",
-            YangInstanceIdentifierSerializer.create(DATABIND, YangInstanceIdentifier.builder()
+            SERIALIZER.serializePath(YangInstanceIdentifier.builder()
                 .node(list)
                 .node(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), 100))
                 .node(child)
@@ -273,8 +270,7 @@ class YangInstanceIdentifierSerializerTest {
                 .node(QName.create("serializer:test:included", "2016-06-06", "augmented-leaf"))
                 .build();
 
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> YangInstanceIdentifierSerializer.create(DATABIND, data));
+        final var ex = assertThrows(RestconfDocumentedException.class, () -> SERIALIZER.serializePath(data));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);

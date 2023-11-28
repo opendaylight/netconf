@@ -7,8 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Map.Entry;
 import java.util.Set;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -28,26 +31,30 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * Serializer for {@link YangInstanceIdentifier} to {@link String} for restconf.
  */
 public final class YangInstanceIdentifierSerializer {
+    private final @NonNull DatabindContext databind;
 
-    private YangInstanceIdentifierSerializer() {
-        // Hidden on purpose
+    public YangInstanceIdentifierSerializer(final DatabindContext databind) {
+        this.databind = requireNonNull(databind);
     }
 
     /**
      * Method to create String from {@link Iterable} of {@link PathArgument} which are parsing from data with the help
      * of an {@link EffectiveModelContext}.
      *
-     * @param databind for validate of parsing path arguments
-     * @param data path to data
+     * @param path path to data
      * @return {@link String}
      */
-    public static String create(final DatabindContext databind, final YangInstanceIdentifier data) {
+    public String serializePath(final YangInstanceIdentifier path) {
+        if (path.isEmpty()) {
+            return "";
+        }
+
         final var current = databind.schemaTree().getRoot();
         final var variables = new MainVarsWrapper(current);
-        final var path = new StringBuilder();
+        final var sb = new StringBuilder();
 
         QNameModule parentModule = null;
-        for (final PathArgument arg : data.getPathArguments()) {
+        for (var arg : path.getPathArguments()) {
             // get module of the parent
             final var currentContext = variables.getCurrent();
 
@@ -59,7 +66,7 @@ public final class YangInstanceIdentifierSerializer {
                 ? composite.childByArg(arg) : null;
             if (childContext == null) {
                 throw new RestconfDocumentedException(
-                    "Invalid input '%s': schema for argument '%s' (after '%s') not found".formatted(data, arg, path),
+                    "Invalid input '%s': schema for argument '%s' (after '%s') not found".formatted(path, arg, sb),
                     ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT);
             }
 
@@ -72,24 +79,24 @@ public final class YangInstanceIdentifierSerializer {
             // condition is satisfied also for the first path argument
             if (!arg.getNodeType().getModule().equals(parentModule)) {
                 // append slash if it is not the first path argument
-                if (path.length() > 0) {
-                    path.append('/');
+                if (sb.length() > 0) {
+                    sb.append('/');
                 }
 
-                path.append(prefixForNamespace(arg.getNodeType(), databind.modelContext())).append(':');
+                sb.append(prefixForNamespace(arg.getNodeType())).append(':');
             } else {
-                path.append('/');
+                sb.append('/');
             }
 
-            path.append(arg.getNodeType().getLocalName());
+            sb.append(arg.getNodeType().getLocalName());
             if (arg instanceof NodeIdentifierWithPredicates withPredicates) {
-                prepareNodeWithPredicates(path, withPredicates.entrySet());
+                prepareNodeWithPredicates(sb, withPredicates.entrySet());
             } else if (arg instanceof NodeWithValue<?> withValue) {
-                prepareNodeWithValue(path, withValue.getValue());
+                prepareNodeWithValue(sb, withValue.getValue());
             }
         }
 
-        return path.toString();
+        return sb.toString();
     }
 
     private static void prepareNodeWithValue(final StringBuilder path, final Object value) {
@@ -122,8 +129,8 @@ public final class YangInstanceIdentifierSerializer {
      * @param qname {@link QName}
      * @return {@link String}
      */
-    private static String prefixForNamespace(final QName qname, final EffectiveModelContext schemaContext) {
-        return schemaContext.findModuleStatement(qname.getModule()).orElseThrow().argument().getLocalName();
+    private String prefixForNamespace(final QName qname) {
+        return databind.modelContext().findModuleStatement(qname.getModule()).orElseThrow().argument().getLocalName();
     }
 
     private static final class MainVarsWrapper {
