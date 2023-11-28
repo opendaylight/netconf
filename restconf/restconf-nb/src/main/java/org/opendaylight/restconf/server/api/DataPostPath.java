@@ -40,4 +40,8 @@ public record DataPostPath(DatabindContext databind, Inference inference, YangIn
         requireNonNull(inference);
         requireNonNull(instance);
     }
+
+    public DataPostPath(final DatabindContext databind) {
+        this(databind, Inference.ofDataTreePath(databind.modelContext()), YangInstanceIdentifier.of());
+    }
 }

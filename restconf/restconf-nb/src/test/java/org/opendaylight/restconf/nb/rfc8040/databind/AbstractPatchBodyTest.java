@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -30,7 +31,7 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -38,6 +39,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
     private final Function<InputStream, PatchBody> bodyConstructor;
 
+    @Mock
+    private DOMDataBroker dataBroker;
     @Mock
     DOMMountPointService mountPointService;
     @Mock
@@ -83,10 +86,12 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
             throw new AssertionError(e);
         }
 
-        final var iid = InstanceIdentifierContext.ofApiPath(apiPath, IID_DATABIND, mountPointService);
+        final var strategy = new MdsalRestconfStrategy(IID_DATABIND, dataBroker, null, null, null, mountPointService);
+        final var stratAndPath = strategy.resolveStrategyPath(apiPath);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
-            return body.toPatchContext(new DataPatchPath(iid.databind(), iid.getInstanceIdentifier()));
+            return body.toPatchContext(new DataPatchPath(stratAndPath.strategy().databind(),
+                stratAndPath.path().instance()));
         }
     }
 }
