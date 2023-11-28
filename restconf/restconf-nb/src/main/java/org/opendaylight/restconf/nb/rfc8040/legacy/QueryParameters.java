@@ -28,15 +28,15 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 @Beta
 // FIXME: this probably needs to be renamed back to WriterParams, or somesuch
 public final class QueryParameters {
-    private static final @NonNull QueryParameters EMPTY = of(DataGetParams.empty());
+    private static final @NonNull QueryParameters EMPTY = of(DataGetParams.EMPTY);
 
-    private final @NonNull DataGetParams dataGetParams;
+    private final @NonNull DataGetParams params;
     private final List<YangInstanceIdentifier> fieldPaths;
     private final List<Set<QName>> fields;
 
     private QueryParameters(final DataGetParams params, final List<Set<QName>> fields,
             final List<YangInstanceIdentifier> fieldPaths) {
-        this.dataGetParams = requireNonNull(params);
+        this.params = requireNonNull(params);
         this.fields = fields;
         this.fieldPaths = fieldPaths;
     }
@@ -59,11 +59,11 @@ public final class QueryParameters {
     }
 
     public @Nullable DepthParam depth() {
-        return dataGetParams.depth();
+        return params.depth();
     }
 
     public @Nullable PrettyPrintParam prettyPrint() {
-        return dataGetParams.prettyPrint();
+        return params.prettyPrint();
     }
 
     public @Nullable List<Set<QName>> fields() {

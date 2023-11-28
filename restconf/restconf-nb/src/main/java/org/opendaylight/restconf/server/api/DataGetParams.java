@@ -28,14 +28,9 @@ public record DataGetParams(
         @Nullable FieldsParam fields,
         @Nullable WithDefaultsParam withDefaults,
         @Nullable PrettyPrintParam prettyPrint) implements Immutable {
-    private static final @NonNull DataGetParams EMPTY =
-        new DataGetParams(ContentParam.ALL, null, null, null, null);
+    public static final @NonNull DataGetParams EMPTY = new DataGetParams(ContentParam.ALL, null, null, null, null);
 
     public DataGetParams {
         requireNonNull(content);
-    }
-
-    public static @NonNull DataGetParams empty() {
-        return EMPTY;
     }
 }
