@@ -77,6 +77,7 @@ import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
+import org.opendaylight.restconf.server.api.OperationsPostPath;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
@@ -357,11 +358,11 @@ public final class MdsalRestconfServer
 
     private RestconfFuture<InvokeOperation> dataInvokePOST(final InstanceIdentifierContext reqPath,
             final OperationInputBody body) {
+        final var postPath = new OperationsPostPath(reqPath.databind(), reqPath.inference());
         final var yangIIdContext = reqPath.getInstanceIdentifier();
-        final var inference = reqPath.inference();
         final ContainerNode input;
         try {
-            input = body.toContainerNode(inference);
+            input = body.toContainerNode(postPath);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
@@ -369,7 +370,7 @@ public final class MdsalRestconfServer
         }
 
         final var mountPoint = reqPath.getMountPoint();
-        final var schemaPath = inference.toSchemaInferenceStack().toSchemaNodeIdentifier();
+        final var schemaPath = postPath.operation().toSchemaInferenceStack().toSchemaNodeIdentifier();
         final var future = mountPoint != null ? dataInvokePOST(input, schemaPath, yangIIdContext, mountPoint)
             : dataInvokePOST(input, schemaPath, yangIIdContext, actionService);
 
@@ -607,10 +608,11 @@ public final class MdsalRestconfServer
     public RestconfFuture<OperationsPostResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
             final OperationInputBody body) {
         final var reqPath = bindRequestPath(localStrategy(), apiPath);
-        final var inference = reqPath.inference();
+        final var postPath = new OperationsPostPath(reqPath.databind(), reqPath.inference());
+
         final ContainerNode input;
         try {
-            input = body.toContainerNode(inference);
+            input = body.toContainerNode(postPath);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
@@ -619,7 +621,7 @@ public final class MdsalRestconfServer
 
         final var strategy = getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint());
         return strategy.invokeRpc(restconfURI, reqPath.getSchemaNode().getQName(),
-                new OperationInput(strategy.databind(), inference, input));
+                new OperationInput(strategy.databind(), postPath.operation(), input));
     }
 
     @Override

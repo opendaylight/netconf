@@ -11,17 +11,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.restconf.server.api.OperationsPostPath;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
-import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * Access to an {code rpc}'s or an {@code action}'s input.
@@ -35,39 +30,26 @@ public abstract sealed class OperationInputBody extends AbstractBody
     /**
      * Stream the {@code input} into a {@link NormalizedNodeStreamWriter}.
      *
-     * @param inference An {@link Inference} of parent {@code rpc} or {@code action} statement
+     * @param path The {@link OperationsPostPath} of the operation invocation
      * @return The document body, or an empty container node
      * @throws IOException when an I/O error occurs
      */
-    public @NonNull ContainerNode toContainerNode(final @NonNull Inference inference) throws IOException {
+    public @NonNull ContainerNode toContainerNode(final @NonNull OperationsPostPath path) throws IOException {
         try (var is = new PushbackInputStream(acquireStream())) {
             final var firstByte = is.read();
             if (firstByte == -1) {
-                return Builders.containerBuilder()
-                    .withNodeIdentifier(new NodeIdentifier(extractInputQName(inference.toSchemaInferenceStack())))
-                    .build();
+                return ImmutableNodes.containerNode(path.inputQName());
             }
             is.unread(firstByte);
 
             final var holder = new NormalizationResultHolder();
             try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
-                streamTo(is, inference, streamWriter);
+                streamTo(path, is, streamWriter);
             }
             return (ContainerNode) holder.getResult().data();
         }
     }
 
-    abstract void streamTo(@NonNull InputStream inputStream, @NonNull Inference inference,
+    abstract void streamTo(@NonNull OperationsPostPath path, @NonNull InputStream inputStream,
         @NonNull NormalizedNodeStreamWriter writer) throws IOException;
-
-    static final @NonNull QName extractInputQName(final SchemaInferenceStack stack) {
-        final var stmt = stack.currentStatement();
-        if (stmt instanceof RpcEffectiveStatement rpc) {
-            return rpc.input().argument();
-        } else if (stmt instanceof ActionEffectiveStatement action) {
-            return action.input().argument();
-        } else {
-            throw new IllegalStateException(stack + " does not identify an 'rpc' nor an 'action' statement");
-        }
-    }
 }
