@@ -9,10 +9,16 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.text.ParseException;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -28,9 +34,23 @@ class IdentifierCodecTest {
      * URI contains list identifier and leaf identifier.
      */
     @Test
-    void codecListAndLeafTest() throws Exception {
-        final var dataYangII = IdentifierCodec.deserialize(ApiPath.parse(
-            "list-test:top/list1=%2C%27\"%3A\"%20%2F,,foo/list2=a,b/result"), DATABIND);
+    void codecListAndLeafTest() {
+        final var dataYangII = assertNormalized("list-test:top/list1=%2C%27\"%3A\"%20%2F,,foo/list2=a,b/result");
+        final var list1 = QName.create("list:test", "2016-04-29", "list1");
+        final var list2 = QName.create("list:test", "2016-04-29", "list2");
+        assertEquals(YangInstanceIdentifier.builder()
+            .node(QName.create("list:test", "2016-04-29", "top"))
+            .node(list1)
+            .nodeWithKey(list1, Map.<QName, Object>of(
+                QName.create(list1, "key1"), ",'\":\" /",
+                QName.create(list1, "key2"), "",
+                QName.create(list1, "key3"), "foo"))
+            .node(list2)
+            .nodeWithKey(list2, Map.<QName, Object>of(
+                QName.create(list2, "key4"), "a",
+                QName.create(list2, "key5"), "b"))
+            .node(QName.create("list:test", "2016-04-29", "result"))
+            .build(), dataYangII);
         assertEquals("list-test:top/list1=%2C%27\"%3A\" %2F,,foo/list2=a,b/result",
             IdentifierCodec.serialize(dataYangII, DATABIND));
     }
@@ -41,39 +61,31 @@ class IdentifierCodecTest {
      * URI contains leaf list identifier.
      */
     @Test
-    void codecLeafListTest() throws Exception {
+    void codecLeafListTest() {
         final var str = "list-test:top/Y=4";
-        final var dataYangII = IdentifierCodec.deserialize(ApiPath.parse(str), DATABIND);
+        final var dataYangII = assertNormalized(str);
+        final var y = QName.create("list:test", "2016-04-29", "Y");
+        assertEquals(YangInstanceIdentifier.builder()
+            .node(QName.create("list:test", "2016-04-29", "top"))
+            .node(y)
+            .node(new NodeWithValue<>(y, Uint32.valueOf(4)))
+            .build(), dataYangII);
         assertEquals(str, IdentifierCodec.serialize(dataYangII, DATABIND));
     }
 
     /**
-     * Positive test of deserialization URI <code>String</code> to <code>YangInstanceIdentifier</code> when
-     * <code>String</code> URI is <code>null</code>. <code>YangInstanceIdentifier.EMPTY</code> is
-     * expected to be returned.
+     * Positive test of serialization of an empty {@link YangInstanceIdentifier}.
      */
     @Test
-    void codecDeserializeNullTest() {
-        assertEquals(YangInstanceIdentifier.of(), IdentifierCodec.deserialize(null, DATABIND));
-    }
-
-    /**
-     * Positive test of serialization <code>YangInstanceIdentifier.EMPTY</code>. Empty <code>String</code> is
-     * expected to be returned.
-     */
-    @Test
-    void codecSerializeEmptyTest() {
+    void codecDeserializeAndSerializeEmptyTest() {
         assertEquals("", IdentifierCodec.serialize(YangInstanceIdentifier.of(), DATABIND));
     }
 
-    /**
-     * Positive test of serialization {@link YangInstanceIdentifier#EMPTY} and deserialization of result back to
-     * {@link YangInstanceIdentifier#EMPTY}.
-     */
-    @Test
-    void codecDeserializeAndSerializeEmptyTest() throws Exception {
-        final var serialized = IdentifierCodec.serialize(YangInstanceIdentifier.of(), DATABIND);
-        assertEquals(YangInstanceIdentifier.of(), IdentifierCodec.deserialize(ApiPath.parse(serialized),
-            DATABIND));
+    private static YangInstanceIdentifier assertNormalized(final String str) {
+        try {
+            return new ApiPathNormalizer(DATABIND).normalizePath(ApiPath.parse(str)).path;
+        } catch (ParseException e) {
+            throw new AssertionError(e);
+        }
     }
 }

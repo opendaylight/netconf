@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.utils.parser;
+package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
@@ -16,10 +16,10 @@ import org.opendaylight.yangtools.yang.data.util.AbstractModuleStringInstanceIde
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
-final class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
+final class ApiPathInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
     private final @NonNull DatabindContext databind;
 
-    StringModuleInstanceIdentifierCodec(final DatabindContext databind) {
+    ApiPathInstanceIdentifierCodec(final DatabindContext databind) {
         this.databind = requireNonNull(databind);
     }
 

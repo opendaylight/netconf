@@ -12,14 +12,16 @@ import static org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams.optionalP
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
+import java.text.ParseException;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 
@@ -35,9 +37,9 @@ public final class Insert implements Immutable {
     @Beta
     @NonNullByDefault
     @FunctionalInterface
-    public interface PointParser {
+    public interface PointNormalizer {
 
-        PathArgument parseValue(String value);
+        PathArgument normalizePoint(ApiPath value);
     }
 
     private final @NonNull InsertParam insert;
@@ -77,12 +79,11 @@ public final class Insert implements Immutable {
             }
         }
 
-        return Insert.forParams(insert, point,
-            value -> YangInstanceIdentifierDeserializer.create(databind, value).path.getLastPathArgument());
+        return Insert.forParams(insert, point, new ApiPathNormalizer(databind));
     }
 
     public static @Nullable Insert forParams(final @Nullable InsertParam insert, final @Nullable PointParam point,
-            final PointParser pointParser) {
+            final PointNormalizer pointParser) {
         if (insert == null) {
             if (point != null) {
                 throw invalidPointIAE();
@@ -100,7 +101,7 @@ public final class Insert implements Immutable {
                     throw new IllegalArgumentException(
                         "Insert parameter " + insert.paramValue() + " cannot be used without a Point parameter.");
                 }
-                yield new Insert(insert, pointParser.parseValue(point.value()));
+                yield new Insert(insert, parsePoint(pointParser, point.value()));
             }
             case FIRST, LAST -> {
                 // https://www.rfc-editor.org/rfc/rfc8040#section-4.8.6:
@@ -114,6 +115,16 @@ public final class Insert implements Immutable {
                 yield new Insert(insert, null);
             }
         };
+    }
+
+    private static PathArgument parsePoint(final PointNormalizer pointParser, final String value) {
+        final ApiPath pointPath;
+        try {
+            pointPath = ApiPath.parse(value);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Malformed point parameter '" + value + "': " + e.getMessage(), e);
+        }
+        return pointParser.normalizePoint(pointPath);
     }
 
     private static IllegalArgumentException invalidPointIAE() {

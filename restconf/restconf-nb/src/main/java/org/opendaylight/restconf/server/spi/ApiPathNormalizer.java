@@ -5,20 +5,20 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.utils.parser;
+package org.opendaylight.restconf.server.spi;
 
 import static com.google.common.base.Verify.verify;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.Insert.PointNormalizer;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -39,7 +39,6 @@ import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.IdentityEffectiveStatement;
@@ -52,7 +51,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 /**
  * Deserializer for {@link String} to {@link YangInstanceIdentifier} for restconf.
  */
-public final class YangInstanceIdentifierDeserializer {
+public final class ApiPathNormalizer implements PointNormalizer {
     public static final class Result {
         public final @NonNull YangInstanceIdentifier path;
         public final @NonNull SchemaInferenceStack stack;
@@ -81,37 +80,19 @@ public final class YangInstanceIdentifierDeserializer {
         }
     }
 
-    private final @NonNull DatabindContext databind;
+    private final @NonNull ApiPathInstanceIdentifierCodec instanceIdentifierCodec;
     private final @NonNull EffectiveModelContext modelContext;
-    private final @NonNull ApiPath apiPath;
+    private final @NonNull DatabindContext databind;
 
-    private YangInstanceIdentifierDeserializer(final DatabindContext databind, final ApiPath apiPath) {
+    public ApiPathNormalizer(final DatabindContext databind) {
         this.databind = requireNonNull(databind);
-        this.apiPath = requireNonNull(apiPath);
         modelContext = databind.modelContext();
+        instanceIdentifierCodec = new ApiPathInstanceIdentifierCodec(databind);
     }
 
-    /**
-     * Method to create {@link List} from {@link PathArgument} which are parsing from data by {@link SchemaContext}.
-     *
-     * @param databind for validate of parsing path arguments
-     * @param data path to data, in URL string form
-     * @return {@link Iterable} of {@link PathArgument}
-     * @throws RestconfDocumentedException the path is not valid
-     */
-    public static Result create(final DatabindContext databind, final String data) {
-        final ApiPath path;
-        try {
-            path = ApiPath.parse(requireNonNull(data));
-        } catch (ParseException e) {
-            throw new RestconfDocumentedException("Invalid path '" + data + "' at offset " + e.getErrorOffset(),
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e);
-        }
-        return create(databind, path);
-    }
-
-    public static Result create(final DatabindContext databind, final ApiPath path) {
-        return new YangInstanceIdentifierDeserializer(databind, path).parse();
+    @Override
+    public PathArgument normalizePoint(final ApiPath value) {
+        return normalizePath(value).path.getLastPathArgument();
     }
 
     // FIXME: NETCONF-818: this method really needs to report an Inference and optionally a YangInstanceIdentifier
@@ -122,7 +103,7 @@ public final class YangInstanceIdentifierDeserializer {
     //
     // All of this really is an utter mess because we end up calling into this code from various places which,
     // for example, should not allow RPCs to be valid targets
-    private Result parse() {
+    public @NonNull Result normalizePath(final ApiPath apiPath) {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
             return new Result(modelContext);
@@ -284,7 +265,7 @@ public final class YangInstanceIdentifierDeserializer {
 
         try {
             if (typedef instanceof InstanceIdentifierTypeDefinition) {
-                return new StringModuleInstanceIdentifierCodec(databind).deserialize(value);
+                return instanceIdentifierCodec.deserialize(value);
             }
 
             return verifyNotNull(TypeDefinitionAwareCodec.from(typedef),

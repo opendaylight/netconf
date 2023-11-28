@@ -20,9 +20,8 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierDeserializer;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -128,7 +127,7 @@ public abstract class InstanceIdentifierContext {
                     ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
             }
 
-            final var mountPath = IdentifierCodec.deserialize(path.subPath(prefix, mount), databind);
+            final var mountPath = new ApiPathNormalizer(databind).normalizePath(path.subPath(prefix, mount)).path;
             final var userPath = path.subPath(0, mount);
             final var nextMountPoint = mountService.getMountPoint(mountPath)
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point '" + userPath + "' does not exist",
@@ -148,7 +147,7 @@ public abstract class InstanceIdentifierContext {
             currentMountPoint = nextMountPoint;
         }
 
-        final var result = YangInstanceIdentifierDeserializer.create(currentDatabind, path.subPath(prefix));
+        final var result = new ApiPathNormalizer(currentDatabind).normalizePath(path.subPath(prefix));
         return InstanceIdentifierContext.ofPath(currentDatabind, result.stack, result.node, result.path,
             currentMountPoint);
     }

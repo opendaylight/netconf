@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
-import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -22,10 +21,5 @@ public final class IdentifierCodec {
 
     public static String serialize(final YangInstanceIdentifier data, final DatabindContext databind) {
         return YangInstanceIdentifierSerializer.create(databind, data);
-    }
-
-    public static YangInstanceIdentifier deserialize(final ApiPath data, final DatabindContext databind) {
-        return data == null ? YangInstanceIdentifier.of()
-            : YangInstanceIdentifierDeserializer.create(databind, data).path;
     }
 }

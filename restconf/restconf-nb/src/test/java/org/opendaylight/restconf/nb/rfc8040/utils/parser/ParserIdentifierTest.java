@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.text.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -23,6 +24,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -220,8 +222,7 @@ public class ParserIdentifierTest {
         assertEquals("rpc-test", rpcQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_RPC), DatabindContext.ofModel(MODEL_CONTEXT)),
-            result.getInstanceIdentifier());
+        assertEquals(assertPath(INVOKE_RPC), result.getInstanceIdentifier());
         assertEquals(null, result.getMountPoint());
         assertSame(MODEL_CONTEXT, result.databind().modelContext());
     }
@@ -240,8 +241,7 @@ public class ParserIdentifierTest {
         assertEquals("rpc-test", rpcQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_RPC), DatabindContext.ofModel(MODEL_CONTEXT)),
-            result.getInstanceIdentifier());
+        assertEquals(assertPath(INVOKE_RPC), result.getInstanceIdentifier());
         assertEquals(mountPoint, result.getMountPoint());
         assertSame(MODEL_CONTEXT_ON_MOUNT_POINT, result.databind().modelContext());
     }
@@ -259,8 +259,7 @@ public class ParserIdentifierTest {
         assertEquals("reset", actionQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_ACTION), DatabindContext.ofModel(MODEL_CONTEXT)),
-            result.getInstanceIdentifier());
+        assertEquals(assertPath(INVOKE_ACTION), result.getInstanceIdentifier());
         assertNull(result.getMountPoint());
         assertSame(MODEL_CONTEXT, result.databind().modelContext());
     }
@@ -279,9 +278,17 @@ public class ParserIdentifierTest {
         assertEquals("reset", actionQName.getLocalName());
 
         // other fields
-        assertEquals(IdentifierCodec.deserialize(ApiPath.parse(INVOKE_ACTION), DatabindContext.ofModel(MODEL_CONTEXT)),
-            result.getInstanceIdentifier());
+        assertEquals(assertPath(INVOKE_ACTION), result.getInstanceIdentifier());
         assertEquals(mountPoint, result.getMountPoint());
         assertSame(MODEL_CONTEXT_ON_MOUNT_POINT, result.databind().modelContext());
+    }
+
+    private static YangInstanceIdentifier assertPath(final String path) {
+        try {
+            return new ApiPathNormalizer(DatabindContext.ofModel(MODEL_CONTEXT)).normalizePath(ApiPath.parse(path))
+                .path;
+        } catch (ParseException e) {
+            throw new AssertionError(e);
+        }
     }
 }

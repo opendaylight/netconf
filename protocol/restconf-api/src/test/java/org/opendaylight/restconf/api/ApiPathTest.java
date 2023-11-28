@@ -27,19 +27,19 @@ class ApiPathTest {
 
     @Test
     void testEmpty() {
-        assertEquals(List.of(), parse("").steps());
+        assertEquals(List.of(), assertApiPath("").steps());
     }
 
     @Test
     void testSingleSlash() {
-        final var ex = assertThrows(ParseException.class, () -> ApiPath.parseUrl("/"));
+        final var ex = assertError("/");
         assertEquals("Identifier may not be empty", ex.getMessage());
         assertEquals(0, ex.getErrorOffset());
     }
 
     @Test
     void testTrailingSlash() {
-        final var ex = assertThrows(ParseException.class, () -> ApiPath.parseUrl("foo/"));
+        final var ex = assertError("foo/");
         assertEquals("Identifier may not be empty", ex.getMessage());
         assertEquals(4, ex.getErrorOffset());
     }
@@ -47,7 +47,7 @@ class ApiPathTest {
     @Test
     void testExample1() {
         final var str = "example-top:top/list1=key1,key2,key3/list2=key4,key5/X";
-        final var path = parse(str);
+        final var path = assertApiPath(str);
         assertEquals(str, path.toString());
 
         final var steps = path.steps();
@@ -61,7 +61,7 @@ class ApiPathTest {
     @Test
     void testExample2() {
         final var str = "example-top:top/Y=instance-value";
-        final var path = parse(str);
+        final var path = assertApiPath(str);
         assertEquals(str, path.toString());
 
         final var steps = path.steps();
@@ -72,7 +72,7 @@ class ApiPathTest {
 
     @Test
     void testExample3() {
-        final var path = parse("example-top:top/list1=%2C%27\"%3A\"%20%2F,,foo");
+        final var path = assertApiPath("example-top:top/list1=%2C%27\"%3A\"%20%2F,,foo");
         assertEquals("example-top:top/list1=%2C%27\"%3A\" %2F,,foo", path.toString());
 
         final var steps = path.steps();
@@ -83,7 +83,7 @@ class ApiPathTest {
 
     @Test
     void testEscapedColon() {
-        final var path = parse("foo%3Afoo");
+        final var path = assertApiPath("foo%3Afoo");
         assertEquals("foo:foo", path.toString());
 
         final var steps = path.steps();
@@ -93,21 +93,21 @@ class ApiPathTest {
 
     @Test
     void nonAsciiFirstIdentifier() {
-        final var ex = assertThrows(ParseException.class, () -> ApiPath.parse("a%80"));
+        final var ex = assertError("a%80");
         assertEquals("Expecting %00-%7F, not %80", ex.getMessage());
         assertEquals(1, ex.getErrorOffset());
     }
 
     @Test
     void nonAsciiSecondIdentifier() {
-        final var ex = assertThrows(ParseException.class, () -> ApiPath.parse("foo:a%80"));
+        final var ex = assertError("foo:a%80");
         assertEquals("Expecting %00-%7F, not %80", ex.getMessage());
         assertEquals(5, ex.getErrorOffset());
     }
 
     @Test
     void testIllegalEscape() {
-        final var ex = assertThrows(ParseException.class, () -> ApiPath.parse("foo:foo=%41%FF%42%FF%43"));
+        final var ex = assertError("foo:foo=%41%FF%42%FF%43");
         assertEquals("Invalid UTF-8 sequence 'A�B�C': Input length = 1", ex.getMessage());
         assertEquals(8, ex.getErrorOffset());
     }
@@ -135,6 +135,89 @@ class ApiPathTest {
         assertEquals("", ApiPath.empty().toString());
     }
 
+    /**
+     * Negative test of creating {@code QName} when data ends after prefix and colon.
+     */
+    @Test
+    void prepareQnameErrorParsingNegativeTest() {
+        final var ex = assertError("deserializer-test:");
+        assertEquals("Identifier may not be empty", ex.getMessage());
+        assertEquals(18, ex.getErrorOffset());
+    }
+
+    /**
+     * Negative test of creating {@code QName} when after prefix and colon there is not parseable identifier as local
+     * name.
+     */
+    @Test
+    void prepareQnameNotValidPrefixAndLocalNameNegativeTest() {
+        final var ex = assertError("deserializer-test:*not-parsable-identifier");
+        assertEquals("Expecting [a-zA-Z_], not '*'", ex.getMessage());
+        assertEquals(18, ex.getErrorOffset());
+    }
+
+    /**
+     * Negative test of creating {@code QName} when in identifier there is another sign than colon or equals.
+     */
+    @Test
+    void prepareQnameBuildPathNegativeTest() {
+        final var ex = assertError("deserializer-test*contA");
+        assertEquals("Expecting [a-zA-Z_.-], not '*'", ex.getMessage());
+        assertEquals(17, ex.getErrorOffset());
+    }
+
+    /**
+     * Negative test when identifier is not followed by slash or equals.
+     */
+    @Test
+    void deserializeBadCharMissingSlashOrEqualNegativeTest() {
+        final var ex = assertError("deserializer-test:cont*leaf-A");
+        assertEquals("Expecting [a-zA-Z_.-], not '*'", ex.getMessage());
+        assertEquals(22, ex.getErrorOffset());
+    }
+
+    /**
+     * Negative test of validating identifier when there is a slash after container without next identifier.
+     */
+    @Test
+    void validArgIdentifierContainerEndsWithSlashNegativeTest() {
+        final var ex = assertError("deserializer-test:contA/");
+        assertEquals("Identifier may not be empty", ex.getMessage());
+        assertEquals(24, ex.getErrorOffset());
+    }
+
+    /**
+     * Negative test of validating identifier when there is a slash after list key values without next identifier. Test
+     * is expected to fail with <code>RestconfDocumentedException</code>.
+     */
+    @Test
+    void validArgIdentifierListEndsWithSlashLNegativeTest() {
+        final var ex = assertError("deserializer-test:list-one-key=value/");
+        assertEquals("Identifier may not be empty", ex.getMessage());
+        assertEquals(37, ex.getErrorOffset());
+    }
+
+    /**
+     * Negative test of validating identifier when there are multiple slashes after list key values without next
+     * identifier. Test is expected to fail with <code>RestconfDocumentedException</code>.
+     */
+    @Test
+    void validArgIdentifierListEndsWithSlashesNegativeTest() {
+        final var ex = assertError("deserializer-test:list-one-key=value//");
+        assertEquals("Identifier may not be empty", ex.getMessage());
+        assertEquals(37, ex.getErrorOffset());
+    }
+
+    /**
+     * Negative test of validating identifier when there are multiple slashes after container without next identifier.
+     */
+    @Test
+    void validArgIdentifierContainerEndsWithMultipleSlashesNegativeTest() {
+        final var ex = assertError("deserializer-test:contA///");
+        assertEquals("Identifier may not be empty", ex.getMessage());
+        assertEquals(24, ex.getErrorOffset());
+    }
+
     private static void assertPercentEncoded(final char ch) {
         final var str = ApiPath.PERCENT_ESCAPER.escape(String.valueOf(ch));
         assertEquals(3, str.length());
@@ -155,7 +238,11 @@ class ApiPathTest {
         assertEquals(List.of(keyValues), listInstance.keyValues());
     }
 
-    private static ApiPath parse(final String str) {
+    private static ParseException assertError(final String str) {
+        return assertThrows(ParseException.class, () -> ApiPath.parse(str));
+    }
+
+    private static ApiPath assertApiPath(final String str) {
         try {
             return ApiPath.parse(str);
         } catch (ParseException e) {
