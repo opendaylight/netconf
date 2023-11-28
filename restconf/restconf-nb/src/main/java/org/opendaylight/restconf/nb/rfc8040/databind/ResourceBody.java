@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.restconf.Data;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -31,7 +32,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeS
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,17 +51,17 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
      * Acquire the {@link NormalizedNode} representation of this body.
      *
      * @param path A {@link YangInstanceIdentifier} corresponding to the body
-     * @param inference An {@link Inference} the statement corresponding to the body
      * @throws RestconfDocumentedException if the body cannot be decoded or it does not match {@code path}
      */
     // TODO: pass down DatabindContext corresponding to inference
     @SuppressWarnings("checkstyle:illegalCatch")
-    public @NonNull NormalizedNode toNormalizedNode(final @NonNull YangInstanceIdentifier path,
-            final @NonNull Inference inference, final @NonNull SchemaNode schemaNode) {
-        final var expected = path.isEmpty() ? DATA_NID : path.getLastPathArgument();
+    public @NonNull NormalizedNode toNormalizedNode(final @NonNull DataPutPath path,
+            final @NonNull SchemaNode schemaNode) {
+        final var instance = path.instance();
+        final var expected = instance.isEmpty() ? DATA_NID : instance.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
         try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
-            streamTo(acquireStream(), inference, expected, streamWriter);
+            streamTo(path, expected, acquireStream(), streamWriter);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
@@ -84,12 +84,11 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
         }
 
         validTopLevelNodeName(expected, data);
-        validateListKeysEqualityInPayloadAndUri(schemaNode, path, data);
-
+        validateListKeysEqualityInPayloadAndUri(schemaNode, instance, data);
         return data;
     }
 
-    abstract void streamTo(@NonNull InputStream inputStream, @NonNull Inference inference, @NonNull PathArgument name,
+    abstract void streamTo(@NonNull DataPutPath path, @NonNull PathArgument name, @NonNull InputStream inputStream,
         @NonNull NormalizedNodeStreamWriter writer) throws IOException;
 
     /**

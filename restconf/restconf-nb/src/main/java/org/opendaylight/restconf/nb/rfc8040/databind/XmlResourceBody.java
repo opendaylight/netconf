@@ -12,13 +12,13 @@ import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -34,9 +34,9 @@ public final class XmlResourceBody extends ResourceBody {
     }
 
     @Override
-    void streamTo(final InputStream inputStream, final Inference inference, final PathArgument name,
+    void streamTo(final DataPutPath path, final PathArgument name, final InputStream inputStream,
             final NormalizedNodeStreamWriter writer) throws IOException {
-        try (var xmlParser = XmlParserStream.create(writer, inference)) {
+        try (var xmlParser = XmlParserStream.create(writer, path.databind().xmlCodecs(), path.inference())) {
             final var doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
             final var docRoot = doc.getDocumentElement();
             final var docRootName = docRoot.getLocalName();

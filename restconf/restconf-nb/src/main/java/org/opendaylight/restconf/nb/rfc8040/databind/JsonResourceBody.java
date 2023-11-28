@@ -12,11 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * A JSON-encoded {@link ResourceBody}.
@@ -27,22 +26,23 @@ public final class JsonResourceBody extends ResourceBody {
     }
 
     @Override
-    void streamTo(final InputStream inputStream, final Inference inference, final PathArgument name,
+    void streamTo(final DataPutPath path, final PathArgument name, final InputStream inputStream,
             final NormalizedNodeStreamWriter writer) throws IOException {
-        try (var jsonParser = newParser(inference, writer)) {
+        try (var jsonParser = newParser(path, writer)) {
             try (var reader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
                 jsonParser.parse(reader);
             }
         }
     }
 
-    private static JsonParserStream newParser(final Inference inference, final NormalizedNodeStreamWriter writer) {
-        final var codecs = JSONCodecFactorySupplier.RFC7951.getShared(inference.getEffectiveModelContext());
-        final var stack = inference.toSchemaInferenceStack();
-        if (stack.isEmpty()) {
+    private static JsonParserStream newParser(final DataPutPath path, final NormalizedNodeStreamWriter writer) {
+        final var codecs = path.databind().jsonCodecs();
+        final var inference = path.inference();
+        if (inference.isEmpty()) {
             return JsonParserStream.create(writer, codecs);
         }
 
+        final var stack = inference.toSchemaInferenceStack();
         stack.exit();
         return JsonParserStream.create(writer, codecs, stack.toInference());
     }

@@ -73,6 +73,7 @@ import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
+import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
@@ -656,10 +657,9 @@ public final class MdsalRestconfServer
 
     private @NonNull ResourceRequest bindResourceRequest(final InstanceIdentifierContext reqPath,
             final ResourceBody body) {
-        final var path = reqPath.getInstanceIdentifier();
-        final var data = body.toNormalizedNode(path, reqPath.inference(), reqPath.getSchemaNode());
-
-        return new ResourceRequest(getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint()), path, data);
+        final var putPath = new DataPutPath(reqPath.databind(), reqPath.inference(), reqPath.getInstanceIdentifier());
+        return new ResourceRequest(getRestconfStrategy(putPath.databind(), reqPath.getMountPoint()), putPath.instance(),
+            body.toNormalizedNode(putPath, reqPath.getSchemaNode()));
     }
 
     @VisibleForTesting
