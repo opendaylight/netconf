@@ -64,8 +64,14 @@ class XmlChildBodyTest extends AbstractBodyTest {
 
     @Test
     void moduleSubContainerDataPostTest() {
-        final var body = new XmlChildBody(
-            XmlChildBodyTest.class.getResourceAsStream("/instanceidentifier/xml/xml_sub_container.xml"));
+        final var body = new XmlChildBody(stringInputStream("""
+            <cont1 xmlns="instance:identifier:module">
+              <lflst11 xmlns="augment:module:leaf:list">lflst11_1</lflst11>
+              <lflst11 xmlns="augment:module:leaf:list">lflst11_2</lflst11>
+              <lflst11 xmlns="augment:module:leaf:list">lflst11_3</lflst11>
+              <lf11 xmlns:a="instance:identifier:module" xmlns:b="augment:module:leaf:list" \
+            xmlns="augment:module:leaf:list">/a:cont/a:cont1/b:lflst11[.="lflst11_1"]</lf11>
+            </cont1>"""));
         final var payload = body.toPayload(CONT_PATH);
 
         final var lflst11 = QName.create("augment:module:leaf:list", "2014-01-27", "lflst11");

@@ -174,6 +174,13 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
                 .build())
             .withChild(ImmutableNodes.leafNode(LF11, YangInstanceIdentifier.of(CONT_NID, CONT1_NID,
                 new NodeIdentifier(LFLST11), new NodeWithValue<>(LFLST11, "lflst11_1"))))
-            .build(), parseResource(uriPath, "/instanceidentifier/xml/xml_sub_container.xml"));
+            .build(), parse(uriPath, """
+                <cont1 xmlns="instance:identifier:module">
+                  <lflst11 xmlns="augment:module:leaf:list">lflst11_1</lflst11>
+                  <lflst11 xmlns="augment:module:leaf:list">lflst11_2</lflst11>
+                  <lflst11 xmlns="augment:module:leaf:list">lflst11_3</lflst11>
+                  <lf11 xmlns:a="instance:identifier:module" xmlns:b="augment:module:leaf:list" \
+                xmlns="augment:module:leaf:list">/a:cont/a:cont1/b:lflst11[.="lflst11_1"]</lf11>
+                </cont1>"""));
     }
 }
