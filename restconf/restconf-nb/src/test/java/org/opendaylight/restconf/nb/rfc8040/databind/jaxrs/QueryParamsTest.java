@@ -17,7 +17,6 @@ import static org.mockito.Mockito.withSettings;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -33,7 +32,6 @@ import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -41,13 +39,11 @@ import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class QueryParamsTest {
@@ -175,17 +171,8 @@ public class QueryParamsTest {
         doReturn(containerChild).when(containerChildSchema).getQName();
         doReturn(containerChildSchema).when(containerSchema).dataChildByName(containerChild);
 
-        final var module = mock(ModuleEffectiveStatement.class);
-        doReturn(Optional.of(containerSchema)).when(module).findSchemaTreeNode(containerQName);
-        final var context = mock(EffectiveModelContext.class);
-        doReturn(Map.of(containerQName.getModule(), module)).when(context).getModuleStatements();
-
-        final var stack = SchemaInferenceStack.of(context);
-        stack.enterSchemaTree(containerQName);
-        final var iid = InstanceIdentifierContext.ofStack(DatabindContext.ofModel(context), stack);
-
-        final var queryParameters = QueryParameters.ofFields(params, WriterFieldsTranslator.translate(
-            iid.databind().modelContext(), (DataSchemaNode) iid.getSchemaNode(), paramsFields));
+        final var queryParameters = QueryParameters.of(params, WriterFieldsTranslator.translate(
+            mock(EffectiveModelContext.class), DataSchemaContext.of(containerSchema), paramsFields));
         final var fields = queryParameters.fields();
         assertNotNull(fields);
         assertEquals(1, fields.size());

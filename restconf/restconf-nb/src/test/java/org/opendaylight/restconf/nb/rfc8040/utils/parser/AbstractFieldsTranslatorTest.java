@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -20,17 +19,15 @@ import org.junit.Test;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.legacy.InstanceIdentifierContext;
-import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTest {
@@ -43,14 +40,12 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
 
     private static final EffectiveModelContext TEST_SERVICES_SCHEMA =
         YangParserTestUtils.parseYangResourceDirectory("/test-services");
-    private static final DatabindContext TEST_SERVICES_DATABIND = DatabindContext.ofModel(TEST_SERVICES_SCHEMA);
     private static final EffectiveModelContext FOO_SCHEMA =
         YangParserTestUtils.parseYangResourceDirectory("/same-qname-nodes");
-    private static final DatabindContext FOO_DATABIND = DatabindContext.ofModel(FOO_SCHEMA);
 
-    private DataSchemaNode jukeboxSchemaNode;
-    private DataSchemaNode testServices;
-    private DataSchemaNode foo;
+    private DataSchemaContext jukeboxSchemaNode;
+    private DataSchemaContext testServices;
+    private DataSchemaContext foo;
 
     // container augmented library
     protected static final QName AUGMENTED_LIBRARY_Q_NAME = QName.create(Q_NAME_MODULE_AUGMENTED_JUKEBOX,
@@ -112,16 +107,16 @@ public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTes
 
     @Before
     public void setUp() {
-        jukeboxSchemaNode = assertInstanceOf(DataSchemaNode.class, InstanceIdentifierContext.ofStack(JUKEBOX_DATABIND,
-            SchemaInferenceStack.ofDataTreePath(JUKEBOX_SCHEMA, JUKEBOX_QNAME)).getSchemaNode());
-        testServices = assertInstanceOf(DataSchemaNode.class, InstanceIdentifierContext.ofStack(TEST_SERVICES_DATABIND,
-            SchemaInferenceStack.ofDataTreePath(TEST_SERVICES_SCHEMA, TEST_DATA_Q_NAME)).getSchemaNode());
-        foo = assertInstanceOf(DataSchemaNode.class, InstanceIdentifierContext.ofStack(FOO_DATABIND,
-            SchemaInferenceStack.ofDataTreePath(FOO_SCHEMA, FOO_Q_NAME)).getSchemaNode());
+        jukeboxSchemaNode = DataSchemaContextTree.from(JUKEBOX_SCHEMA).getRoot().childByQName(JUKEBOX_QNAME);
+        assertNotNull(jukeboxSchemaNode);
+        testServices = DataSchemaContextTree.from(TEST_SERVICES_SCHEMA).getRoot().childByQName(TEST_DATA_Q_NAME);
+        assertNotNull(testServices);
+        foo = DataSchemaContextTree.from(FOO_SCHEMA).getRoot().childByQName(FOO_Q_NAME);
+        assertNotNull(foo);
     }
 
     protected abstract List<T> translateFields(@NonNull EffectiveModelContext modelContext,
-        @NonNull DataSchemaNode schemaNode, @NonNull FieldsParam fields);
+        @NonNull DataSchemaContext startNode, @NonNull FieldsParam fields);
 
     /**
      * Test parse fields parameter containing only one child selected.

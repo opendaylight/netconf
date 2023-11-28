@@ -7,7 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -18,6 +21,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,13 +29,22 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -52,19 +65,33 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     @Mock
     private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
-    private DOMDataBroker mockDataBroker;
+    private DOMDataBroker dataBroker;
     @Mock
     private DOMDataTreeReadTransaction read;
     @Mock
     private DOMRpcService rpcService;
-
-    private DatabindContext mockDatabind;
+    @Mock
+    private DOMSchemaService schemaService;
+    @Mock
+    private DOMMountPointService mountPointService;
+    @Mock
+    private DOMMountPoint mountPoint;
+    @Mock
+    private NetconfDataTreeService netconfService;
 
     @Before
     public void before() {
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
-        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
-        mockDatabind = DatabindContext.ofModel(mockSchemaContext);
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+    }
+
+    @Override
+    RestconfStrategy newStrategy(final DatabindContext databind) {
+        return new MdsalRestconfStrategy(databind, dataBroker, rpcService, null, null, mountPointService);
+    }
+
+    private @NonNull RestconfStrategy modulesStrategy() {
+        return newStrategy(MODULES_DATABIND);
     }
 
     @Override
@@ -72,7 +99,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         // assert that data to delete exists
         when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of()))
             .thenReturn(immediateTrueFluentFuture());
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
@@ -80,7 +107,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         // assert that data to delete does NOT exist
         when(readWrite.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of()))
             .thenReturn(immediateFalseFluentFuture());
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
@@ -88,7 +115,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
@@ -96,32 +123,31 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateFailedFluentFuture(domException)).when(readWrite).commit();
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Test
     public void testPutContainerData() {
-        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null)
-            .putData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
+        jukeboxStrategy().putData(JUKEBOX_IID, EMPTY_JUKEBOX, null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
     }
 
     @Test
     public void testPutLeafData() {
-        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture()).when(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null).putData(GAP_IID, GAP_LEAF, null);
+        jukeboxStrategy().putData(GAP_IID, GAP_LEAF, null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, GAP_IID, GAP_LEAF);
     }
@@ -129,15 +155,14 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
 
     @Test
     public void testPutListData() {
-        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFalseFluentFuture())
                 .when(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
 
-        new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null)
-            .putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
+        jukeboxStrategy().putData(JUKEBOX_IID, JUKEBOX_WITH_BANDS, null);
         verify(read).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         verify(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS);
     }
@@ -147,33 +172,33 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
     RestconfStrategy testPatchContainerDataStrategy() {
-        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
     RestconfStrategy testPatchLeafDataStrategy() {
-        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
     RestconfStrategy testPatchListDataStrategy() {
-        doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
+        doReturn(readWrite).when(dataBroker).newReadWriteTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(readWrite).commit();
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
     RestconfStrategy testPatchDataReplaceMergeAndRemoveStrategy() {
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
@@ -181,19 +206,19 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, PLAYER_IID);
         doReturn(immediateTrueFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             CREATE_AND_DELETE_TARGET);
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
     RestconfStrategy testPatchMergePutContainerStrategy() {
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
     RestconfStrategy deleteNonexistentDataTestStrategy() {
         doReturn(immediateFalseFluentFuture()).when(readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             CREATE_AND_DELETE_TARGET);
-        return new MdsalRestconfStrategy(JUKEBOX_DATABIND, mockDataBroker, null, null);
+        return jukeboxStrategy();
     }
 
     @Override
@@ -209,115 +234,115 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
 
     @Override
     RestconfStrategy readDataConfigTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readAllHavingOnlyConfigTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
         doReturn(immediateFluentFuture(Optional.empty())).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
         doReturn(immediateFluentFuture(Optional.empty())).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH_2);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readDataNonConfigTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readContainerDataAllTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
         doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH);
         doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readListDataAllTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(LIST_DATA))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_3);
         doReturn(immediateFluentFuture(Optional.of(LIST_DATA_2))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH_3);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readOrderedListDataAllTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_3);
         doReturn(immediateFluentFuture(Optional.of(ORDERED_MAP_NODE_2))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH_3);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readUnkeyedListDataAllTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, PATH_3);
         doReturn(immediateFluentFuture(Optional.of(UNKEYED_LIST_NODE_2))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, PATH_3);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readLeafListDataAllTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, LEAF_SET_NODE_PATH);
         doReturn(immediateFluentFuture(Optional.of(LEAF_SET_NODE_2))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, LEAF_SET_NODE_PATH);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readOrderedLeafListDataAllTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_1))).when(read)
             .read(LogicalDatastoreType.OPERATIONAL, LEAF_SET_NODE_PATH);
         doReturn(immediateFluentFuture(Optional.of(ORDERED_LEAF_SET_NODE_2))).when(read)
             .read(LogicalDatastoreType.CONFIGURATION, LEAF_SET_NODE_PATH);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Override
     RestconfStrategy readDataWrongPathOrNoContentTestStrategy() {
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.empty())).when(read).read(LogicalDatastoreType.CONFIGURATION, PATH_2);
-        return new MdsalRestconfStrategy(mockDatabind, mockDataBroker, null, null);
+        return mockStrategy();
     }
 
     @Test
@@ -327,14 +352,13 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
             .withChild(ImmutableNodes.leafNode(QName.create(BASE, "exampleLeaf"), "i am leaf"))
             .build();
         final var path = YangInstanceIdentifier.of(CONT_QNAME);
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, path);
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
-        assertEquals(data, new MdsalRestconfStrategy(MODULES_DATABIND, mockDataBroker, null, null)
-            .readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
     }
 
     @Test
@@ -358,14 +382,13 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
                 .build())
             .build();
         final var path = YangInstanceIdentifier.of(CONT_QNAME);
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, path);
         doReturn(immediateFluentFuture(Optional.of(data))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
-        assertEquals(data, new MdsalRestconfStrategy(MODULES_DATABIND, mockDataBroker, null, null)
-            .readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
     }
 
     @Test
@@ -382,13 +405,76 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
                 .build())
             .build();
         final var path = YangInstanceIdentifier.of(CONT_QNAME);
-        doReturn(read).when(mockDataBroker).newReadOnlyTransaction();
+        doReturn(read).when(dataBroker).newReadOnlyTransaction();
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, path);
         doReturn(immediateFluentFuture(Optional.of(content))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, path);
 
-        assertEquals(content, new MdsalRestconfStrategy(MODULES_DATABIND, mockDataBroker, null, null)
-            .readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+        assertEquals(content, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
+    }
+
+    @Test
+    public void testGetRestconfStrategyLocal() {
+        final var strategy = jukeboxStrategy();
+        assertEquals(new StrategyAndTail(strategy, ApiPath.empty()), strategy.resolveStrategy(ApiPath.empty()));
+    }
+
+    @Test
+    public void testGetRestconfStrategyMountDataBroker() throws Exception {
+        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
+        doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
+        doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
+            .getService(DOMSchemaService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
+        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of());
+
+        final var strategy = jukeboxStrategy();
+        final var result = strategy.resolveStrategy(ApiPath.parse("yang-ext:mount"));
+        assertEquals(ApiPath.empty(), result.tail());
+        assertNotSame(strategy, assertInstanceOf(MdsalRestconfStrategy.class, result.strategy()));
+    }
+
+    @Test
+    public void testGetRestconfStrategyMountNetconfService() throws Exception {
+        doReturn(Optional.of(netconfService)).when(mountPoint).getService(NetconfDataTreeService.class);
+        doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
+            .getService(DOMSchemaService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
+        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of());
+
+        final var strategy = jukeboxStrategy();
+        final var result = strategy.resolveStrategy(ApiPath.parse("yang-ext:mount"));
+        assertEquals(ApiPath.empty(), result.tail());
+        assertInstanceOf(NetconfRestconfStrategy.class, result.strategy());
+    }
+
+    @Test
+    public void testGetRestconfStrategyMountNone() throws Exception {
+        doReturn(JUKEBOX_IID).when(mountPoint).getIdentifier();
+        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMDataBroker.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
+        doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
+            .getService(DOMSchemaService.class);
+        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of());
+
+        final var strategy = jukeboxStrategy();
+        final var mountPath = ApiPath.parse("yang-ext:mount");
+
+        final var ex = assertThrows(RestconfDocumentedException.class, () -> strategy.resolveStrategy(mountPath));
+        final var errors = ex.getErrors();
+        assertEquals(1, errors.size());
+        final var error = errors.get(0);
+        assertEquals(ErrorType.APPLICATION, error.getErrorType());
+        assertEquals(ErrorTag.OPERATION_FAILED, error.getErrorTag());
+        assertEquals("Could not find a supported access interface in mount point", error.getErrorMessage());
+        assertEquals(JUKEBOX_IID, error.getErrorPath());
     }
 }

@@ -22,7 +22,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -132,6 +134,8 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of(
@@ -157,6 +161,8 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of(
