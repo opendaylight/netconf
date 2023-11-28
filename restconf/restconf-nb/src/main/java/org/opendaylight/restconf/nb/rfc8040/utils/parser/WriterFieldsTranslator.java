@@ -24,7 +24,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -53,13 +52,9 @@ public final class WriterFieldsTranslator {
      * @return {@link List} of levels; each level contains set of {@link QName}
      */
     public static @NonNull List<Set<QName>> translate(final @NonNull EffectiveModelContext modelContext,
-            final DataSchemaNode schemaNode, final @NonNull FieldsParam input) {
-        if (schemaNode == null) {
-            throw new RestconfDocumentedException(
-                    "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
+            final DataSchemaContext startNode, final @NonNull FieldsParam input) {
         final var parsed = new ArrayList<Set<QName>>();
-        processSelectors(parsed, modelContext, schemaNode.getQName().getModule(), DataSchemaContext.of(schemaNode),
+        processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(), startNode,
             input.nodeSelectors(), 0);
         return parsed;
     }

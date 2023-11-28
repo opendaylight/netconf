@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,21 +24,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionException;
+import org.opendaylight.mdsal.dom.api.DOMActionResult;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -48,11 +58,27 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
+import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.DataPostBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
+import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierSerializer;
+import org.opendaylight.restconf.server.api.DataGetParams;
+import org.opendaylight.restconf.server.api.DataPostPath;
+import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
+import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
+import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.OperationsPostPath;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.DataPath;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.OperationPath;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
@@ -61,6 +87,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -98,6 +125,8 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YinTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,45 +139,171 @@ import org.slf4j.LoggerFactory;
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
 public abstract class RestconfStrategy {
+    @NonNullByDefault
+    public record StrategyAndPath(RestconfStrategy strategy, DataPath path) {
+        public StrategyAndPath {
+            requireNonNull(strategy);
+            requireNonNull(path);
+        }
+    }
+
+    /**
+     * Result of a partial {@link ApiPath} lookup for the purposes of supporting {@code yang-ext:mount}-delimited mount
+     * points with possible nesting.
+     *
+     * @param strategy the strategy to use
+     * @param tail the {@link ApiPath} tail to use with the strategy
+     */
+    @NonNullByDefault
+    public record StrategyAndTail(RestconfStrategy strategy, ApiPath tail) {
+        public StrategyAndTail {
+            requireNonNull(strategy);
+            requireNonNull(tail);
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
 
-    private final @NonNull DatabindContext databind;
     private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
+    private final @NonNull ApiPathNormalizer pathNormalizer;
+    private final @NonNull DatabindContext databind;
     private final DOMYangTextSourceProvider sourceProvider;
+    private final DOMMountPointService mountPointService;
+    private final DOMActionService actionService;
     private final DOMRpcService rpcService;
 
     RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
-            final @Nullable DOMRpcService rpcService, final DOMYangTextSourceProvider sourceProvider) {
+            final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
+            final DOMYangTextSourceProvider sourceProvider, final @Nullable DOMMountPointService mountPointService) {
         this.databind = requireNonNull(databind);
         this.localRpcs = requireNonNull(localRpcs);
         this.rpcService = rpcService;
+        this.actionService = actionService;
         this.sourceProvider = sourceProvider;
+        this.mountPointService = mountPointService;
+        pathNormalizer = new ApiPathNormalizer(databind);
+    }
+
+//    // FIXME: NETCONF-773: this recursion should really live in MdsalRestconfServer
+//    public static @NonNull InstanceIdentifierContext ofApiPath(final ApiPath path, final DatabindContext databind,
+//            final DOMMountPointService mountPointService) {
+//        final var steps = path.steps();
+//        final var limit = steps.size() - 1;
+//
+//        var prefix = 0;
+//        DOMMountPoint currentMountPoint = null;
+//        var currentDatabind = databind;
+//        while (prefix <= limit) {
+//            final var mount = indexOfMount(steps, prefix, limit);
+//            if (mount == -1) {
+//                break;
+//            }
+//
+//            final var mountService = currentMountPoint == null ? mountPointService
+//                : currentMountPoint.getService(DOMMountPointService.class).orElse(null);
+//            if (mountService == null) {
+//                throw new RestconfDocumentedException("Mount point service is not available",
+//                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+//            }
+//
+//            final var mountPath = new ApiPathNormalizer(databind).normalizePath(path.subPath(prefix, mount)).path;
+//            final var userPath = path.subPath(0, mount);
+//            final var nextMountPoint = mountService.getMountPoint(mountPath)
+//                .orElseThrow(() -> new RestconfDocumentedException("Mount point '" + userPath + "' does not exist",
+//                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+//            final var nextModelContext = nextMountPoint.getService(DOMSchemaService.class)
+//                .orElseThrow(() -> new RestconfDocumentedException(
+//                    "Mount point '" + userPath + "' does not expose DOMSchemaService",
+//                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT))
+//                .getGlobalContext();
+//            if (nextModelContext == null) {
+//                throw new RestconfDocumentedException("Mount point '" + userPath + "' does not have any models",
+//                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT);
+//            }
+//
+//            prefix = mount + 1;
+//            currentDatabind = DatabindContext.ofModel(nextModelContext);
+//            currentMountPoint = nextMountPoint;
+//        }
+//
+//        final var result = new ApiPathNormalizer(currentDatabind).normalizePath(path.subPath(prefix));
+//        return InstanceIdentifierContext.ofPath(currentDatabind, result.stack, result.node, result.path,
+//            currentMountPoint);
+//    }
+//
+//    private static int indexOfMount(final ImmutableList<Step> steps, final int fromIndex, final int limit) {
+//        for (int i = fromIndex; i <= limit; ++ i) {
+//            final var step = steps.get(i);
+//            if ("yang-ext".equals(step.module()) && "mount".equals(step.identifier().getLocalName())) {
+//                return i;
+//            }
+//        }
+//        return -1;
+//    }
+
+    public final @NonNull StrategyAndPath resolveStrategyPath(final ApiPath path) {
+        final var andTail = resolveStrategy(path);
+        final var strategy = andTail.strategy();
+        return new StrategyAndPath(strategy, strategy.pathNormalizer.normalizeDataPath(andTail.tail()));
     }
 
     /**
      * Look up the appropriate strategy for a particular mount point.
      *
-     * @param databind {@link DatabindContext} of target mount point
+     * @param mountDatabind {@link DatabindContext} of target mount point
      * @param mountPoint Target mount point
      * @return A strategy, or null if the mount point does not expose a supported interface
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static @Nullable RestconfStrategy forMountPoint(final DatabindContext databind,
-            final DOMMountPoint mountPoint) {
+    public final @NonNull StrategyAndTail resolveStrategy(final ApiPath path) {
+        var mount = path.indexOf("yang-ext", "mount");
+        if (mount == -1) {
+            return new StrategyAndTail(this, path);
+        }
+        if (mountPointService == null) {
+            throw new RestconfDocumentedException("Mount point service is not available",
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+        }
+        final var mountPath = path.subPath(0, mount);
+        final var dataPath = pathNormalizer.normalizeDataPath(path.subPath(0, mount));
+        final var mountPoint = mountPointService.getMountPoint(dataPath.instance())
+            .orElseThrow(() -> new RestconfDocumentedException("Mount point '" + mountPath + "' does not exist",
+                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+
+        return createStrategy(mountPath, mountPoint).resolveStrategy(path.subPath(mount + 1));
+    }
+
+    private static @NonNull RestconfStrategy createStrategy(final ApiPath mountPath, final DOMMountPoint mountPoint) {
+        final var mountSchemaService = mountPoint.getService(DOMSchemaService.class)
+            .orElseThrow(() -> new RestconfDocumentedException(
+                "Mount point '" + mountPath + "' does not expose DOMSchemaService",
+                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+        final var mountModelContext = mountSchemaService.getGlobalContext();
+        if (mountModelContext == null) {
+            throw new RestconfDocumentedException("Mount point '" + mountPath + "' does not have any models",
+                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT);
+        }
+        final var mountDatabind = DatabindContext.ofModel(mountModelContext);
+        final var mountPointService = mountPoint.getService(DOMMountPointService.class).orElse(null);
         final var rpcService = mountPoint.getService(DOMRpcService.class).orElse(null);
+        final var actionService = mountPoint.getService(DOMActionService.class).orElse(null);
         final var sourceProvider = mountPoint.getService(DOMSchemaService.class)
             .flatMap(schema -> Optional.ofNullable(schema.getExtensions().getInstance(DOMYangTextSourceProvider.class)))
             .orElse(null);
 
         final var netconfService = mountPoint.getService(NetconfDataTreeService.class);
         if (netconfService.isPresent()) {
-            return new NetconfRestconfStrategy(databind, netconfService.orElseThrow(), rpcService, sourceProvider);
+            return new NetconfRestconfStrategy(mountDatabind, netconfService.orElseThrow(), rpcService, actionService,
+                sourceProvider, mountPointService);
         }
         final var dataBroker = mountPoint.getService(DOMDataBroker.class);
         if (dataBroker.isPresent()) {
-            return new MdsalRestconfStrategy(databind, dataBroker.orElseThrow(), rpcService, sourceProvider);
+            return new MdsalRestconfStrategy(mountDatabind, dataBroker.orElseThrow(), rpcService, actionService,
+                sourceProvider, mountPointService);
         }
-        return null;
+        LOG.warn("Mount point {} does not expose a suitable access interface", mountPath);
+        throw new RestconfDocumentedException("Could not find a supported access interface in mount point",
+            ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, mountPoint.getIdentifier());
     }
 
     public final @NonNull DatabindContext databind() {
@@ -184,8 +339,8 @@ public abstract class RestconfStrategy {
      * @param fields paths to selected fields relative to parent path
      * @return a ListenableFuture containing the result of the read
      */
-    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path,
-        List<YangInstanceIdentifier> fields);
+//    abstract ListenableFuture<Optional<NormalizedNode>> read(LogicalDatastoreType store, YangInstanceIdentifier path,
+//        List<YangInstanceIdentifier> fields);
 
     /**
      * Check if data already exists in the configuration datastore.
@@ -247,6 +402,26 @@ public abstract class RestconfStrategy {
         }, MoreExecutors.directExecutor());
     }
 
+    public @NonNull RestconfFuture<DataPutResult> dataPUT(final ApiPath apiPath, final ResourceBody body,
+            final Map<String, String> queryParameters) {
+        final var path = pathNormalizer.normalizeDataPath(apiPath);
+
+        final Insert insert;
+        try {
+            insert = Insert.ofQueryParameters(databind, queryParameters);
+        } catch (IllegalArgumentException e) {
+            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+        }
+        final NormalizedNode data;
+        try {
+            data = body.toNormalizedNode(new DataPutPath(databind, path.stack().toInference(), path.instance()));
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+        return putData(path.instance(), data, insert);
+    }
+
     /**
      * Check mount point and prepare variables for put data to DS.
      *
@@ -255,7 +430,7 @@ public abstract class RestconfStrategy {
      * @param insert  {@link Insert}
      * @return A {@link DataPutResult}
      */
-    public final RestconfFuture<DataPutResult> putData(final YangInstanceIdentifier path,
+    public final @NonNull RestconfFuture<DataPutResult> putData(final YangInstanceIdentifier path,
             final NormalizedNode data, final @Nullable Insert insert) {
         final var exists = TransactionUtil.syncAccess(exists(path), path);
 
@@ -613,6 +788,24 @@ public abstract class RestconfStrategy {
         }
     }
 
+    public final @NonNull RestconfFuture<NormalizedNodePayload> dataGET(final ApiPath apiPath,
+            final DataGetParams params) {
+        return dataGET(pathNormalizer.normalizeDataPath(apiPath), params);
+    }
+
+    abstract @NonNull RestconfFuture<NormalizedNodePayload> dataGET(DataPath path, DataGetParams params);
+
+    static final @NonNull RestconfFuture<NormalizedNodePayload> completeDataGET(final Inference inference,
+            final QueryParameters queryParams, final NormalizedNode node) {
+        if (node == null) {
+            return RestconfFuture.failed(new RestconfDocumentedException(
+                "Request could not be completed because the relevant data model content does not exist",
+                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
+        }
+
+        return RestconfFuture.of(new NormalizedNodePayload(inference, node, queryParams));
+    }
+
     /**
      * Read specific type of data from data store via transaction. Close {@link DOMTransactionChain} if any
      * inside of object {@link RestconfStrategy} provided as a parameter.
@@ -623,7 +816,7 @@ public abstract class RestconfStrategy {
      * @return {@link NormalizedNode}
      */
     // FIXME: NETCONF-1155: this method should asynchronous
-    public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
+    public final @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) {
         return switch (content) {
             case ALL -> {
@@ -644,60 +837,12 @@ public abstract class RestconfStrategy {
         };
     }
 
-    /**
-     * Read specific type of data from data store via transaction with specified subtrees that should only be read.
-     * Close {@link DOMTransactionChain} inside of object {@link RestconfStrategy} provided as a parameter.
-     *
-     * @param content  type of data to read (config, state, all)
-     * @param path     the parent path to read
-     * @param withDefa value of with-defaults parameter
-     * @param fields   paths to selected subtrees which should be read, relative to to the parent path
-     * @return {@link NormalizedNode}
-     */
-    // FIXME: NETCONF-1155: this method should asynchronous
-    public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
-            final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
-            final @NonNull List<YangInstanceIdentifier> fields) {
-        return switch (content) {
-            case ALL -> {
-                // PREPARE STATE DATA NODE
-                final var stateDataNode = readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path, fields);
-                // PREPARE CONFIG DATA NODE
-                final var configDataNode = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path, fields);
-
-                yield mergeConfigAndSTateDataIfNeeded(stateDataNode, withDefa == null ? configDataNode
-                    : prepareDataByParamWithDef(configDataNode, path, withDefa.mode()));
-            }
-            case CONFIG -> {
-                final var read = readDataViaTransaction(LogicalDatastoreType.CONFIGURATION, path, fields);
-                yield withDefa == null ? read : prepareDataByParamWithDef(read, path, withDefa.mode());
-            }
-            case NONCONFIG -> readDataViaTransaction(LogicalDatastoreType.OPERATIONAL, path, fields);
-        };
-    }
-
     private @Nullable NormalizedNode readDataViaTransaction(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         return TransactionUtil.syncAccess(read(store, path), path).orElse(null);
     }
 
-    /**
-     * Read specific type of data {@link LogicalDatastoreType} via transaction in {@link RestconfStrategy} with
-     * specified subtrees that should only be read.
-     *
-     * @param store                 datastore type
-     * @param path                  parent path to selected fields
-     * @param closeTransactionChain if it is set to {@code true}, after transaction it will close transactionChain
-     *                              in {@link RestconfStrategy} if any
-     * @param fields                paths to selected subtrees which should be read, relative to to the parent path
-     * @return {@link NormalizedNode}
-     */
-    private @Nullable NormalizedNode readDataViaTransaction(final @NonNull LogicalDatastoreType store,
-            final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields) {
-        return TransactionUtil.syncAccess(read(store, path, fields), path).orElse(null);
-    }
-
-    private NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData, final YangInstanceIdentifier path,
+    final NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData, final YangInstanceIdentifier path,
             final WithDefaultsMode defaultsMode) {
         final boolean trim = switch (defaultsMode) {
             case Trim -> true;
@@ -855,8 +1000,8 @@ public abstract class RestconfStrategy {
         return childCtx;
     }
 
-    private static NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
-                                                                  final NormalizedNode configDataNode) {
+    static final NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
+            final NormalizedNode configDataNode) {
         // if no data exists
         if (stateDataNode == null && configDataNode == null) {
             return null;
@@ -1056,11 +1201,29 @@ public abstract class RestconfStrategy {
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
     }
 
-    public @NonNull RestconfFuture<OperationsPostResult> invokeRpc(final URI restconfURI, final QName type,
-            final OperationInput input) {
+    public @NonNull RestconfFuture<OperationsPostResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
+            final OperationInputBody body) {
+        final OperationPath.Rpc path;
+        try {
+            path = pathNormalizer.normalizeRpcPath(apiPath);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+
+        final var postPath = new OperationsPostPath(databind, path.stack().toInference());
+        final ContainerNode data;
+        try {
+            data = body.toContainerNode(postPath);
+        } catch (IOException e) {
+            LOG.debug("Error reading input", e);
+            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+        }
+
+        final var type = path.rpc().argument();
         final var local = localRpcs.get(type);
         if (local != null) {
-            return local.invoke(restconfURI, input);
+            return local.invoke(restconfURI, new OperationInput(databind, postPath.operation(), data));
         }
         if (rpcService == null) {
             LOG.debug("RPC invocation is not available");
@@ -1069,32 +1232,31 @@ public abstract class RestconfStrategy {
         }
 
         final var ret = new SettableRestconfFuture<OperationsPostResult>();
-        Futures.addCallback(rpcService.invokeRpc(requireNonNull(type), input.input()),
-            new FutureCallback<DOMRpcResult>() {
-                @Override
-                public void onSuccess(final DOMRpcResult response) {
-                    final var errors = response.errors();
-                    if (errors.isEmpty()) {
-                        ret.set(input.newOperationOutput(response.value()));
-                    } else {
-                        LOG.debug("RPC invocation reported {}", response.errors());
-                        ret.setFailure(new RestconfDocumentedException("RPC implementation reported errors", null,
-                            response.errors()));
-                    }
+        Futures.addCallback(rpcService.invokeRpc(type, data), new FutureCallback<DOMRpcResult>() {
+            @Override
+            public void onSuccess(final DOMRpcResult response) {
+                final var errors = response.errors();
+                if (errors.isEmpty()) {
+                    ret.set(new OperationsPostResult(databind, postPath.operation(), response.value()));
+                } else {
+                    LOG.debug("RPC invocation reported {}", response.errors());
+                    ret.setFailure(new RestconfDocumentedException("RPC implementation reported errors", null,
+                        response.errors()));
                 }
+            }
 
-                @Override
-                public void onFailure(final Throwable cause) {
-                    LOG.debug("RPC invocation failed, cause");
-                    if (cause instanceof RestconfDocumentedException ex) {
-                        ret.setFailure(ex);
-                    } else {
-                        // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
-                        ret.setFailure(new RestconfDocumentedException(cause,
-                            new RestconfError(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage())));
-                    }
+            @Override
+            public void onFailure(final Throwable cause) {
+                LOG.debug("RPC invocation failed, cause");
+                if (cause instanceof RestconfDocumentedException ex) {
+                    ret.setFailure(ex);
+                } else {
+                    // TODO: YangNetconfErrorAware if we ever get into a broader invocation scope
+                    ret.setFailure(new RestconfDocumentedException(cause,
+                        new RestconfError(ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage())));
                 }
-            }, MoreExecutors.directExecutor());
+            }
+        }, MoreExecutors.directExecutor());
         return ret;
     }
 
@@ -1156,4 +1318,123 @@ public abstract class RestconfStrategy {
             ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
     }
 
+    public final @NonNull RestconfFuture<? extends DataPostResult> dataPOST(final ApiPath apiPath,
+            final DataPostBody body, final Map<String, String> queryParameters) {
+        if (apiPath.steps().isEmpty()) {
+            return dataCreatePOST(body.toResource(), queryParameters);
+        }
+        final var path = pathNormalizer.normalizeDataOrActionPath(apiPath);
+        if (path instanceof DataPath dataPath) {
+            try (var resourceBody = body.toResource()) {
+                return dataCreatePOST(new DataPostPath(databind, dataPath.stack().toInference(), dataPath.instance()),
+                    resourceBody, queryParameters);
+            }
+        }
+        if (path instanceof OperationPath.Action actionPath) {
+            try (var inputBody = body.toOperationInput()) {
+                return dataInvokePOST(actionPath, inputBody);
+            }
+        }
+        // Note: this should never happen
+        // FIXME: we should be able to eliminate this path with Java 21+ pattern matching
+        return RestconfFuture.failed(new RestconfDocumentedException("Unhandled path " + path));
+    }
+
+    public @NonNull RestconfFuture<CreateResource> dataCreatePOST(final ChildBody body,
+            final Map<String, String> queryParameters) {
+        return dataCreatePOST(new DataPostPath(databind,
+            SchemaInferenceStack.of(databind.modelContext()).toInference(), YangInstanceIdentifier.of()), body,
+            queryParameters);
+    }
+
+    private @NonNull RestconfFuture<CreateResource> dataCreatePOST(final DataPostPath path, final ChildBody body,
+            final Map<String, String> queryParameters) {
+        final Insert insert;
+        try {
+            insert = Insert.ofQueryParameters(path.databind(), queryParameters);
+        } catch (IllegalArgumentException e) {
+            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+        }
+
+        final var payload = body.toPayload(path);
+        return postData(concat(path.instance(), payload.prefix()), payload.body(), insert);
+    }
+
+    private static YangInstanceIdentifier concat(final YangInstanceIdentifier parent, final List<PathArgument> args) {
+        var ret = parent;
+        for (var arg : args) {
+            ret = ret.node(arg);
+        }
+        return ret;
+    }
+
+    private @NonNull RestconfFuture<InvokeOperation> dataInvokePOST(final OperationPath.Action path,
+            final OperationInputBody body) {
+        final var inference = path.stack().toInference();
+        final ContainerNode input;
+        try {
+            input = body.toContainerNode(new OperationsPostPath(databind, inference));
+        } catch (IOException e) {
+            LOG.debug("Error reading input", e);
+            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+        }
+
+        if (actionService == null) {
+            return RestconfFuture.failed(new RestconfDocumentedException("DOMActionService is missing."));
+        }
+
+        final var future = dataInvokePOST(actionService, path, input);
+        return future.transform(result -> result.getOutput()
+            .flatMap(output -> output.isEmpty() ? Optional.empty()
+                : Optional.of(new InvokeOperation(new NormalizedNodePayload(inference, output))))
+            .orElse(InvokeOperation.EMPTY));
+    }
+
+    /**
+     * Invoke Action via ActionServiceHandler.
+     *
+     * @param input input data
+     * @param yangIId invocation context
+     * @param schemaPath schema path of data
+     * @param actionService action service to invoke action
+     * @return {@link DOMActionResult}
+     */
+    private static RestconfFuture<DOMActionResult> dataInvokePOST(final DOMActionService actionService,
+            final OperationPath.Action path, final @NonNull ContainerNode input) {
+        final var ret = new SettableRestconfFuture<DOMActionResult>();
+
+        Futures.addCallback(actionService.invokeAction(path.stack().toSchemaNodeIdentifier(),
+            new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, path.instance()), input),
+            new FutureCallback<DOMActionResult>() {
+                @Override
+                public void onSuccess(final DOMActionResult result) {
+                    final var errors = result.getErrors();
+                    LOG.debug("InvokeAction Error Message {}", errors);
+                    if (errors.isEmpty()) {
+                        ret.set(result);
+                    } else {
+                        ret.setFailure(new RestconfDocumentedException("InvokeAction Error Message ", null, errors));
+                    }
+                }
+
+                @Override
+                public void onFailure(final Throwable cause) {
+                    if (cause instanceof DOMActionException) {
+                        ret.set(new SimpleDOMActionResult(List.of(RpcResultBuilder.newError(
+                            ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage()))));
+                    } else if (cause instanceof RestconfDocumentedException e) {
+                        ret.setFailure(e);
+                    } else if (cause instanceof CancellationException) {
+                        ret.setFailure(new RestconfDocumentedException("Action cancelled while executing",
+                            ErrorType.RPC, ErrorTag.PARTIAL_OPERATION, cause));
+                    } else {
+                        ret.setFailure(new RestconfDocumentedException("Invocation failed", cause));
+                    }
+                }
+            }, MoreExecutors.directExecutor());
+
+        return ret;
+    }
 }

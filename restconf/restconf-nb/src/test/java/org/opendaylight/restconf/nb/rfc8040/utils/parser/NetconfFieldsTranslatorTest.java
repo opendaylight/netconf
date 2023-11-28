@@ -20,7 +20,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
@@ -30,8 +30,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<YangInstanceIdentifier> {
     @Override
     protected List<YangInstanceIdentifier> translateFields(final EffectiveModelContext modelContext,
-            final DataSchemaNode schemaNode, final FieldsParam fields) {
-        return NetconfFieldsTranslator.translate(modelContext, schemaNode, fields);
+            final DataSchemaContext startNode, final FieldsParam fields) {
+        return NetconfFieldsTranslator.translate(modelContext, startNode, fields);
     }
 
     @Override

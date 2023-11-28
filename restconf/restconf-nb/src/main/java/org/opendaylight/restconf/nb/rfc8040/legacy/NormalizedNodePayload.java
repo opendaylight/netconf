@@ -26,6 +26,6 @@ public record NormalizedNodePayload(Inference inference, NormalizedNode data, Qu
     }
 
     public NormalizedNodePayload(final Inference inference, final NormalizedNode data) {
-        this(inference, data, QueryParameters.empty());
+        this(inference, data, QueryParameters.EMPTY);
     }
 }

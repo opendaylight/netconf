@@ -12,22 +12,28 @@ import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATI
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.List;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
+import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.DataPath;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -46,15 +52,19 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final DOMDataBroker dataBroker;
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
-            final @Nullable DOMRpcService rpcService, final @Nullable DOMYangTextSourceProvider sourceProvider,
+            final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
+            final @Nullable DOMYangTextSourceProvider sourceProvider,
+            final @Nullable DOMMountPointService mountPointService,
             final ImmutableMap<QName, RpcImplementation> localRpcs) {
-        super(databind, localRpcs, rpcService, sourceProvider);
+        super(databind, localRpcs, rpcService, actionService, sourceProvider, mountPointService);
         this.dataBroker = requireNonNull(dataBroker);
     }
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
-            final @Nullable DOMRpcService rpcService, final @Nullable  DOMYangTextSourceProvider sourceProvider) {
-        this(databind, dataBroker, rpcService, sourceProvider, ImmutableMap.of());
+            final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
+            final @Nullable DOMYangTextSourceProvider sourceProvider,
+            final @Nullable DOMMountPointService mountPointService) {
+        this(databind, dataBroker, rpcService, actionService, sourceProvider, mountPointService, ImmutableMap.of());
     }
 
     @Override
@@ -102,18 +112,21 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
+    RestconfFuture<NormalizedNodePayload> dataGET(final DataPath path, final DataGetParams params) {
+        final var inference = path.stack().toInference();
+        final var fields = params.fields();
+        final var translatedFields = fields == null ? null
+            : WriterFieldsTranslator.translate(inference.getEffectiveModelContext(), path.schema(), fields);
+        return completeDataGET(inference, QueryParameters.of(params, translatedFields),
+            readData(params.content(), path.instance(), params.withDefaults()));
+    }
+
+    @Override
     ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         try (var tx = dataBroker.newReadOnlyTransaction()) {
             return tx.read(store, path);
         }
-    }
-
-    @Override
-    ListenableFuture<Optional<NormalizedNode>> read(final LogicalDatastoreType store, final YangInstanceIdentifier path,
-            final List<YangInstanceIdentifier> fields) {
-        return Futures.immediateFailedFuture(new UnsupportedOperationException(
-                "Reading of selected subtrees is currently not supported in: " + MdsalRestconfStrategy.class));
     }
 
     @Override
