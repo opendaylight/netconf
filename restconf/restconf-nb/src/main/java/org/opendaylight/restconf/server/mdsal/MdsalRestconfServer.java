@@ -69,6 +69,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
+import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
@@ -331,18 +332,19 @@ public final class MdsalRestconfServer
 
     private @NonNull RestconfFuture<CreateResource> dataCreatePOST(final InstanceIdentifierContext reqPath,
             final ChildBody body, final Map<String, String> queryParameters) {
+        final var postPath = new DataPostPath(reqPath.databind(), reqPath.inference(), reqPath.getInstanceIdentifier());
+
         final Insert insert;
         try {
-            insert = Insert.ofQueryParameters(reqPath.databind(), queryParameters);
+            insert = Insert.ofQueryParameters(postPath.databind(), queryParameters);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
         }
 
-        final var parentPath = reqPath.getInstanceIdentifier();
-        final var payload = body.toPayload(parentPath, reqPath.inference());
+        final var payload = body.toPayload(postPath);
         return getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint())
-            .postData(concat(parentPath, payload.prefix()), payload.body(), insert);
+            .postData(concat(postPath.instance(), payload.prefix()), payload.body(), insert);
     }
 
     private static YangInstanceIdentifier concat(final YangInstanceIdentifier parent, final List<PathArgument> args) {
