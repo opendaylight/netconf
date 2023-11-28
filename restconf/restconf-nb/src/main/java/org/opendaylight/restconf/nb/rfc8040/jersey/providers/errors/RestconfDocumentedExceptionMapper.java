@@ -69,8 +69,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private static final QName ERROR_TAG_QNAME = qnameOf("error-tag");
     private static final QName ERROR_APP_TAG_QNAME = qnameOf("error-app-tag");
     private static final QName ERROR_MESSAGE_QNAME = qnameOf("error-message");
-    // FIXME make this private
-    static final QName ERROR_INFO_QNAME = qnameOf("error-info");
+    private static final QName ERROR_INFO_QNAME = qnameOf("error-info");
     private static final QName ERROR_PATH_QNAME = qnameOf("error-path");
     private static final XMLOutputFactory XML_OUTPUT_FACTORY = createXmlOutputFactory();
 
