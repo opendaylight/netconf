@@ -34,7 +34,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -177,6 +177,6 @@ class CreateNotificationStreamRpcTest {
             stack.enterDataTree(lfQName);
             builder.withChild(ImmutableNodes.leafNode(lfQName, leafValue));
         }
-        return new OperationInput(databindProvider.currentContext(), inference, builder.build());
+        return new OperationInput(databindProvider.currentDatabind(), inference, builder.build());
     }
 }

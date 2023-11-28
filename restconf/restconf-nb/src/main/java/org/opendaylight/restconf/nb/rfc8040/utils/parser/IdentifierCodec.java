@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**

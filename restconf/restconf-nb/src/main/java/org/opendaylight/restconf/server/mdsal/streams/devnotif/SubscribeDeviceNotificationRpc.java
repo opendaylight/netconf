@@ -82,8 +82,7 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
         }
 
         return streamRegistry.createStream(restconfURI, new DeviceNotificationSource(mountPointService, path),
-            "All YANG notifications occuring on mount point /"
-                + IdentifierCodec.serialize(path, input.currentContext()))
+            "All YANG notifications occuring on mount point /" + IdentifierCodec.serialize(path, input.databind()))
             .transform(stream -> input.newOperationOutput(Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
                 .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH_NODEID, stream.name()))

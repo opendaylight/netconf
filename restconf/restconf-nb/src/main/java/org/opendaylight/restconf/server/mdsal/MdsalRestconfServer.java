@@ -59,7 +59,6 @@ import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.ReadDataParams;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DataPostBody;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
@@ -74,6 +73,7 @@ import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -182,7 +182,7 @@ public final class MdsalRestconfServer
     }
 
     @Override
-    public DatabindContext currentContext() {
+    public DatabindContext currentDatabind() {
         return localStrategy().databind();
     }
 

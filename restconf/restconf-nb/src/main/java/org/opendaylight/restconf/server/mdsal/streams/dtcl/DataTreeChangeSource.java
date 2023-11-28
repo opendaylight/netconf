@@ -58,7 +58,7 @@ public final class DataTreeChangeSource extends Source<List<DataTreeCandidate>> 
                 @Override
                 public void onDataTreeChanged(final List<DataTreeCandidate> changes) {
                     // FIXME: format one change at a time?
-                    sink.publish(databindProvider.currentContext().modelContext(), changes, Instant.now());
+                    sink.publish(databindProvider.currentDatabind().modelContext(), changes, Instant.now());
                 }
 
                 @Override

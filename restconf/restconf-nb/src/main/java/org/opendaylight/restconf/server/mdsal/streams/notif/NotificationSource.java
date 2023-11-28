@@ -38,7 +38,7 @@ final class NotificationSource extends AbstractNotificationSource {
     @Override
     protected Registration start(final Sink<DOMNotification> sink) {
         return notificationService.registerNotificationListener(
-            new Listener(sink, () -> databindProvider.currentContext().modelContext()),
+            new Listener(sink, () -> databindProvider.currentDatabind().modelContext()),
             qnames.stream().map(Absolute::of).toList());
     }
 

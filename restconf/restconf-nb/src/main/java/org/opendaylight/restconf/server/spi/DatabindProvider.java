@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.server.spi;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindContext;
 
 /**
  * A service providing access to a {@link DatabindContext}.
@@ -16,9 +16,9 @@ import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
 @NonNullByDefault
 public interface DatabindProvider {
     /**
-     * Acquire current {@link DatabindContext}.
+     * Return the current {@link DatabindContext}.
      *
-     * @return Current {@link DatabindContext}
+     * @return the current {@link DatabindContext}
      */
-    DatabindContext currentContext();
+    DatabindContext currentDatabind();
 }

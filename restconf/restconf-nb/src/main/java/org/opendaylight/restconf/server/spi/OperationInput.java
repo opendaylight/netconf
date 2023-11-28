@@ -11,7 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindAware;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -19,21 +20,21 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
  * Input to an operation invocation.
  */
 @NonNullByDefault
-public record OperationInput(DatabindContext currentContext, Inference operation, ContainerNode input)
-        implements DatabindProvider {
+public record OperationInput(DatabindContext databind, Inference operation, ContainerNode input)
+        implements DatabindAware {
     public OperationInput {
-        requireNonNull(currentContext);
+        requireNonNull(databind);
         requireNonNull(operation);
         requireNonNull(input);
     }
 
     /**
-     * Create an {@link OperationOutput} with equal {@link #currentContext()} and {@link #operation()}.
+     * Create an {@link OperationOutput} with equal {@link #databind()} and {@link #operation()}.
      *
      * @param output Output payload
      * @return An {@link OperationOutput}
      */
     public OperationOutput newOperationOutput(final @Nullable ContainerNode output) {
-        return new OperationOutput(currentContext, operation, output);
+        return new OperationOutput(databind, operation, output);
     }
 }

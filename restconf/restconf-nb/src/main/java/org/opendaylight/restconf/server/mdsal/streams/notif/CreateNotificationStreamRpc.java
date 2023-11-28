@@ -74,7 +74,7 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
             .sorted()
             .collect(ImmutableSet.toImmutableSet());
 
-        final var modelContext = input.currentContext().modelContext();
+        final var modelContext = input.databind().modelContext();
         final var description = new StringBuilder("YANG notifications matching any of {");
         var haveFirst = false;
         for (var qname : qnames) {

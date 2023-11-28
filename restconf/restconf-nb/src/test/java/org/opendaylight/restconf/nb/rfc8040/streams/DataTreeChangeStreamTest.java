@@ -36,7 +36,7 @@ import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
 import org.opendaylight.restconf.nb.rfc8040.ReceiveEventsParams;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfStreamRegistry;
 import org.opendaylight.restconf.server.mdsal.streams.dtcl.DataTreeChangeSource;
 import org.opendaylight.restconf.server.spi.DatabindProvider;

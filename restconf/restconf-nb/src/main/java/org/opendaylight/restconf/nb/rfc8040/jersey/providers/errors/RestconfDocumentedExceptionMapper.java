@@ -177,7 +177,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
              OutputStreamWriter streamStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
         ) {
             return writeNormalizedNode(errorsContainer, outputStream,
-                new JsonStreamWriterWithDisabledValidation(databindProvider.currentContext(), streamStreamWriter));
+                new JsonStreamWriterWithDisabledValidation(databindProvider.currentDatabind(), streamStreamWriter));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output JSON writers", e);
         }
@@ -192,7 +192,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private String serializeErrorsContainerToXml(final ContainerNode errorsContainer) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             return writeNormalizedNode(errorsContainer, outputStream,
-                new XmlStreamWriterWithDisabledValidation(databindProvider.currentContext(), outputStream));
+                new XmlStreamWriterWithDisabledValidation(databindProvider.currentDatabind(), outputStream));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output XML writers", e);
         }

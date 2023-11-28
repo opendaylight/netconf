@@ -11,7 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.nb.rfc8040.databind.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindAware;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -19,11 +20,11 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
  * Output of {@link RpcImplementation#invoke(java.net.URI, OperationInput)}.
  */
 public record OperationOutput(
-        @NonNull DatabindContext currentContext,
+        @NonNull DatabindContext databind,
         @NonNull Inference operation,
-        @Nullable ContainerNode output) implements DatabindProvider {
+        @Nullable ContainerNode output) implements DatabindAware {
     public OperationOutput {
-        requireNonNull(currentContext);
+        requireNonNull(databind);
         requireNonNull(operation);
         if (output != null && output.isEmpty()) {
             output = null;
