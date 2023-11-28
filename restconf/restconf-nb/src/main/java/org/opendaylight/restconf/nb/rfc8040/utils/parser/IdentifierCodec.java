@@ -20,6 +20,6 @@ public final class IdentifierCodec {
     }
 
     public static String serialize(final YangInstanceIdentifier data, final DatabindContext databind) {
-        return YangInstanceIdentifierSerializer.create(databind, data);
+        return new YangInstanceIdentifierSerializer(databind).serializePath(data);
     }
 }
