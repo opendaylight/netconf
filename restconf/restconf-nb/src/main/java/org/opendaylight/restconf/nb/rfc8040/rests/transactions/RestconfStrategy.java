@@ -27,17 +27,20 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -48,11 +51,13 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
+import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierSerializer;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
@@ -110,31 +115,154 @@ import org.slf4j.LoggerFactory;
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
 public abstract class RestconfStrategy {
+    @NonNullByDefault
+    public record StrategyAndInstance(RestconfStrategy strategy, YangInstanceIdentifier instance) {
+        public StrategyAndInstance {
+            requireNonNull(strategy);
+            requireNonNull(instance);
+        }
+    }
+
+    /**
+     * Result of a partial {@link ApiPath} lookup for the purposes of supporting {@code yang-ext:mount}-delimited mount
+     * points with possible nesting.
+     *
+     * @param strategy the strategy to use
+     * @param tail the {@link ApiPath} tail to use with the strategy
+     */
+    @NonNullByDefault
+    public record StrategyAndTail(RestconfStrategy strategy, ApiPath tail) {
+        public StrategyAndTail {
+            requireNonNull(strategy);
+            requireNonNull(tail);
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
 
-    private final @NonNull DatabindContext databind;
     private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
+    private final @NonNull DatabindContext databind;
     private final DOMYangTextSourceProvider sourceProvider;
+    private final DOMMountPointService mountPointService;
     private final DOMRpcService rpcService;
 
     RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
-            final @Nullable DOMRpcService rpcService, final DOMYangTextSourceProvider sourceProvider) {
+            final @Nullable DOMRpcService rpcService, final DOMYangTextSourceProvider sourceProvider,
+            final @Nullable DOMMountPointService mountPointService) {
         this.databind = requireNonNull(databind);
         this.localRpcs = requireNonNull(localRpcs);
         this.rpcService = rpcService;
         this.sourceProvider = sourceProvider;
+        this.mountPointService = mountPointService;
+    }
+
+
+//    // FIXME: NETCONF-773: this recursion should really live in MdsalRestconfServer
+//    public static @NonNull InstanceIdentifierContext ofApiPath(final ApiPath path, final DatabindContext databind,
+//            final DOMMountPointService mountPointService) {
+//        final var steps = path.steps();
+//        final var limit = steps.size() - 1;
+//
+//        var prefix = 0;
+//        DOMMountPoint currentMountPoint = null;
+//        var currentDatabind = databind;
+//        while (prefix <= limit) {
+//            final var mount = indexOfMount(steps, prefix, limit);
+//            if (mount == -1) {
+//                break;
+//            }
+//
+//            final var mountService = currentMountPoint == null ? mountPointService
+//                : currentMountPoint.getService(DOMMountPointService.class).orElse(null);
+//            if (mountService == null) {
+//                throw new RestconfDocumentedException("Mount point service is not available",
+//                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+//            }
+//
+//            final var mountPath = new ApiPathNormalizer(databind).normalizePath(path.subPath(prefix, mount)).path;
+//            final var userPath = path.subPath(0, mount);
+//            final var nextMountPoint = mountService.getMountPoint(mountPath)
+//                .orElseThrow(() -> new RestconfDocumentedException("Mount point '" + userPath + "' does not exist",
+//                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+//            final var nextModelContext = nextMountPoint.getService(DOMSchemaService.class)
+//                .orElseThrow(() -> new RestconfDocumentedException(
+//                    "Mount point '" + userPath + "' does not expose DOMSchemaService",
+//                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT))
+//                .getGlobalContext();
+//            if (nextModelContext == null) {
+//                throw new RestconfDocumentedException("Mount point '" + userPath + "' does not have any models",
+//                    ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT);
+//            }
+//
+//            prefix = mount + 1;
+//            currentDatabind = DatabindContext.ofModel(nextModelContext);
+//            currentMountPoint = nextMountPoint;
+//        }
+//
+//        final var result = new ApiPathNormalizer(currentDatabind).normalizePath(path.subPath(prefix));
+//        return InstanceIdentifierContext.ofPath(currentDatabind, result.stack, result.node, result.path,
+//            currentMountPoint);
+//    }
+//
+//    private static int indexOfMount(final ImmutableList<Step> steps, final int fromIndex, final int limit) {
+//        for (int i = fromIndex; i <= limit; ++ i) {
+//            final var step = steps.get(i);
+//            if ("yang-ext".equals(step.module()) && "mount".equals(step.identifier().getLocalName())) {
+//                return i;
+//            }
+//        }
+//        return -1;
+//    }
+
+    public final @NonNull StrategyAndInstance resolveStrategyPath(final ApiPath path) {
+        final var andTail = resolveStrategy(path);
+        final var strategy = andTail.strategy;
+
+        return new StrategyAndInstance(strategy, strategy.normalizeApiPath(andTail.tail()));
     }
 
     /**
      * Look up the appropriate strategy for a particular mount point.
      *
-     * @param databind {@link DatabindContext} of target mount point
+     * @param mountDatabind {@link DatabindContext} of target mount point
      * @param mountPoint Target mount point
      * @return A strategy, or null if the mount point does not expose a supported interface
      * @throws NullPointerException if any argument is {@code null}
      */
-    public static @Nullable RestconfStrategy forMountPoint(final DatabindContext databind,
-            final DOMMountPoint mountPoint) {
+    public final @NonNull StrategyAndTail resolveStrategy(final ApiPath path) {
+        var mount = path.indexOf("yang-ext", "mount");
+        if (mount == -1) {
+            return new StrategyAndTail(this, path);
+        }
+        if (mountPointService == null) {
+            throw new RestconfDocumentedException("Mount point service is not available",
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+        }
+        final var mountPath = path.subPath(0, mount);
+        final var normalizedPath = new ApiPathNormalizer(databind).normalizePath(path.subPath(0, mount)).path;
+        final var mountPoint = mountPointService.getMountPoint(normalizedPath)
+            .orElseThrow(() -> new RestconfDocumentedException("Mount point '" + mountPath + "' does not exist",
+                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+
+        return createStrategy(mountPath, mountPoint).resolveStrategy(path.subPath(mount + 1));
+    }
+
+    private @NonNull YangInstanceIdentifier normalizeApiPath(final ApiPath path) {
+        return verifyNotNull(new ApiPathNormalizer(databind).normalizePath(path).path);
+    }
+
+    private static @NonNull RestconfStrategy createStrategy(final ApiPath mountPath, final DOMMountPoint mountPoint) {
+        final var mountSchemaService = mountPoint.getService(DOMSchemaService.class)
+            .orElseThrow(() -> new RestconfDocumentedException(
+                "Mount point '" + mountPath + "' does not expose DOMSchemaService",
+                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT));
+        final var mountModelContext = mountSchemaService.getGlobalContext();
+        if (mountModelContext == null) {
+            throw new RestconfDocumentedException("Mount point '" + mountPath + "' does not have any models",
+                ErrorType.PROTOCOL, ErrorTags.RESOURCE_DENIED_TRANSPORT);
+        }
+        final var mountDatabind = DatabindContext.ofModel(mountModelContext);
+        final var mountPointService = mountPoint.getService(DOMMountPointService.class).orElse(null);
         final var rpcService = mountPoint.getService(DOMRpcService.class).orElse(null);
         final var sourceProvider = mountPoint.getService(DOMSchemaService.class)
             .flatMap(schema -> Optional.ofNullable(schema.getExtensions().getInstance(DOMYangTextSourceProvider.class)))
@@ -142,13 +270,17 @@ public abstract class RestconfStrategy {
 
         final var netconfService = mountPoint.getService(NetconfDataTreeService.class);
         if (netconfService.isPresent()) {
-            return new NetconfRestconfStrategy(databind, netconfService.orElseThrow(), rpcService, sourceProvider);
+            return new NetconfRestconfStrategy(mountDatabind, netconfService.orElseThrow(), rpcService, sourceProvider,
+                mountPointService);
         }
         final var dataBroker = mountPoint.getService(DOMDataBroker.class);
         if (dataBroker.isPresent()) {
-            return new MdsalRestconfStrategy(databind, dataBroker.orElseThrow(), rpcService, sourceProvider);
+            return new MdsalRestconfStrategy(mountDatabind, dataBroker.orElseThrow(), rpcService, sourceProvider,
+                mountPointService);
         }
-        return null;
+        LOG.warn("Mount point {} does not expose a suitable access interface", mountPath);
+        throw new RestconfDocumentedException("Could not find a supported access interface in mount point",
+            ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, mountPoint.getIdentifier());
     }
 
     public final @NonNull DatabindContext databind() {
