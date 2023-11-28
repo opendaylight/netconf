@@ -200,17 +200,6 @@ public abstract class InstanceIdentifierContext {
         return new DataPath(databind, schemaNode, mountPoint, stack, path);
     }
 
-    public static @NonNull InstanceIdentifierContext ofMountPointRoot(final DatabindContext databind,
-            final DOMMountPoint mountPoint) {
-        return new Root(databind, requireNonNull(mountPoint));
-    }
-
-    @VisibleForTesting
-    public static @NonNull InstanceIdentifierContext ofMountPointPath(final DatabindContext databind,
-            final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
-        return DataPath.of(databind, path, requireNonNull(mountPoint));
-    }
-
     public final @NonNull DatabindContext databind() {
         return databind;
     }
