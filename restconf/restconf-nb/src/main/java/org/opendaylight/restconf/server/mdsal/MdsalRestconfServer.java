@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.mdsal;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -66,6 +65,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.restconf.server.api.DataGetParams;
@@ -200,7 +200,7 @@ public final class MdsalRestconfServer
 
     private @NonNull MdsalRestconfStrategy createLocalStrategy(final EffectiveModelContext modelContext) {
         return new MdsalRestconfStrategy(DatabindContext.ofModel(modelContext), dataBroker, rpcService, sourceProvider,
-            localRpcs);
+            mountPointService, localRpcs);
     }
 
     private @NonNull MdsalRestconfStrategy localStrategy() {
@@ -211,7 +211,7 @@ public final class MdsalRestconfServer
     private @NonNull MdsalRestconfStrategy localStrategy(final DatabindContext databind) {
         final var local = localStrategy();
         return local.databind().equals(databind) ? local
-            : new MdsalRestconfStrategy(databind, dataBroker, rpcService, sourceProvider, localRpcs);
+            : new MdsalRestconfStrategy(databind, dataBroker, rpcService, sourceProvider, mountPointService, localRpcs);
     }
 
     @PreDestroy
@@ -224,9 +224,8 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<Empty> dataDELETE(final ApiPath identifier) {
-        final var reqPath = bindRequestPath(identifier);
-        final var strategy = getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint());
-        return strategy.delete(reqPath.getInstanceIdentifier());
+        final var stratAndPath = localStrategy().resolveStrategyPath(identifier);
+        return stratAndPath.strategy().delete(stratAndPath.instance());
     }
 
     @Override
@@ -292,26 +291,28 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<PatchStatusContext> dataPATCH(final PatchBody body) {
-        return dataPATCH(bindRequestRoot(), body);
+        final var strategy = localStrategy();
+        return dataPATCH(strategy, new DataPatchPath(strategy.databind(), YangInstanceIdentifier.of()), body);
     }
 
     @Override
     public RestconfFuture<PatchStatusContext> dataPATCH(final ApiPath identifier, final PatchBody body) {
-        return dataPATCH(bindRequestPath(identifier), body);
+        final var stratAndPath = localStrategy().resolveStrategyPath(identifier);
+        final var strategy = stratAndPath.strategy();
+        return dataPATCH(strategy, new DataPatchPath(strategy.databind(), stratAndPath.instance()), body);
     }
 
-    private @NonNull RestconfFuture<PatchStatusContext> dataPATCH(final InstanceIdentifierContext reqPath,
-            final PatchBody body) {
-        final var patchPath = new DataPatchPath(reqPath.databind(), reqPath.getInstanceIdentifier());
+    private static @NonNull RestconfFuture<PatchStatusContext> dataPATCH(final RestconfStrategy strategy,
+            final DataPatchPath path, final PatchBody body) {
         final PatchContext patch;
         try {
-            patch = body.toPatchContext(patchPath);
+            patch = body.toPatchContext(path);
         } catch (IOException e) {
             LOG.debug("Error parsing YANG Patch input", e);
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
         }
-        return getRestconfStrategy(reqPath.databind(), reqPath.getMountPoint()).patchData(patch);
+        return strategy.patchData(patch);
     }
 
     @Override
@@ -502,20 +503,14 @@ public final class MdsalRestconfServer
             return RestconfFuture.failed(new RestconfDocumentedException("Mount path has to end with yang-ext:mount"));
         }
 
-        final InstanceIdentifierContext point;
+        final StrategyAndTail stratAndTail;
         try {
-            point = InstanceIdentifierContext.ofApiPath(mountPath, localStrategy().databind(), mountPointService);
+            stratAndTail = localStrategy().resolveStrategy(mountPath);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-
-        final RestconfStrategy strategy;
-        try {
-            strategy = forMountPoint(point.databind(), point.getMountPoint());
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
-        }
-        return modulesGET(strategy, fileName, revision, representation);
+        // FIXME: require remnant to be empty
+        return modulesGET(stratAndTail.strategy(), fileName, revision, representation);
     }
 
     private static @NonNull RestconfFuture<ModulesGetResult> modulesGET(final RestconfStrategy strategy,
@@ -643,15 +638,15 @@ public final class MdsalRestconfServer
                 .map(Revision::toString).orElse(""))));
     }
 
-    private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull ApiPath identifier) {
-        return bindRequestPath(localStrategy(), identifier);
-    }
+//    private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull ApiPath identifier) {
+//        return bindRequestPath(localStrategy(), identifier);
+//    }
 
-    private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull MdsalRestconfStrategy strategy,
-            final @NonNull ApiPath identifier) {
-        // FIXME: DatabindContext looks like it should be internal
-        return InstanceIdentifierContext.ofApiPath(identifier, strategy.databind(), mountPointService);
-    }
+//    private @NonNull InstanceIdentifierContext bindRequestPath(final @NonNull MdsalRestconfStrategy strategy,
+//            final @NonNull ApiPath identifier) {
+//        // FIXME: DatabindContext looks like it should be internal
+//        return InstanceIdentifierContext.ofApiPath(identifier, strategy.databind(), mountPointService);
+//    }
 
     private @NonNull InstanceIdentifierContext bindRequestRoot() {
         return InstanceIdentifierContext.ofLocalRoot(localStrategy().databind());
@@ -664,24 +659,12 @@ public final class MdsalRestconfServer
             body.toNormalizedNode(putPath, reqPath.getSchemaNode()));
     }
 
-    @VisibleForTesting
-    @NonNull RestconfStrategy getRestconfStrategy(final DatabindContext databind,
-            final @Nullable DOMMountPoint mountPoint) {
-        if (mountPoint == null) {
-            return localStrategy(databind);
-        }
-        return forMountPoint(databind, mountPoint);
-    }
-
-    private static @NonNull RestconfStrategy forMountPoint(final DatabindContext databind,
-            final DOMMountPoint mountPoint) {
-        final var ret = RestconfStrategy.forMountPoint(databind, mountPoint);
-        if (ret == null) {
-            final var mountId = mountPoint.getIdentifier();
-            LOG.warn("Mount point {} does not expose a suitable access interface", mountId);
-            throw new RestconfDocumentedException("Could not find a supported access interface in mount point",
-                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, mountId);
-        }
-        return ret;
-    }
+//    @VisibleForTesting
+//    @NonNull RestconfStrategy getRestconfStrategy(final DatabindContext databind,
+//            final @Nullable DOMMountPoint mountPoint) {
+//        if (mountPoint == null) {
+//            return localStrategy(databind);
+//        }
+//        return forMountPoint(databind, mountPoint);
+//    }
 }
