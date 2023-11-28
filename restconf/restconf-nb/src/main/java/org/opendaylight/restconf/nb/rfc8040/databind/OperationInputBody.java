@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -66,7 +65,7 @@ public abstract sealed class OperationInputBody extends AbstractBody
         if (stmt instanceof RpcEffectiveStatement rpc) {
             return rpc.input().argument();
         } else if (stmt instanceof ActionEffectiveStatement action) {
-            return YangConstants.operationInputQName(action.argument().getModule());
+            return action.input().argument();
         } else {
             throw new IllegalStateException(stack + " does not identify an 'rpc' nor an 'action' statement");
         }
