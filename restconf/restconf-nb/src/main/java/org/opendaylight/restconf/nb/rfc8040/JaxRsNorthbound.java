@@ -19,9 +19,13 @@ import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
-import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsWebHostMetadata;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonPatchStatusBodyWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlPatchStatusBodyWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
@@ -44,7 +48,6 @@ public final class JaxRsNorthbound implements AutoCloseable {
     public JaxRsNorthbound(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
             @Reference final ServletSupport servletSupport,
             @Reference final CustomFilterAdapterConfiguration filterAdapterConfiguration,
-            @Reference final DOMMountPointService mountPointService, @Reference final DOMSchemaService schemaService,
             @Reference final DatabindProvider databindProvider, @Reference final RestconfServer server,
             @Reference final RestconfStreamServletFactory servletFactory) throws ServletException {
         final var restconfBuilder = WebContext.builder()
@@ -54,8 +57,21 @@ public final class JaxRsNorthbound implements AutoCloseable {
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
                 .servlet(servletSupport.createHttpServletBuilder(
-                    new RestconfApplication(databindProvider, server, mountPointService, schemaService))
-                    .build())
+                    new Application() {
+                        @Override
+                        public Set<Class<?>> getClasses() {
+                            return Set.of(
+                                JsonNormalizedNodeBodyWriter.class, XmlNormalizedNodeBodyWriter.class,
+                                JsonPatchStatusBodyWriter.class, XmlPatchStatusBodyWriter.class);
+                        }
+
+                        @Override
+                        public Set<Object> getSingletons() {
+                            return Set.of(
+                                new RestconfDocumentedExceptionMapper(databindProvider),
+                                new JaxRsRestconf(server));
+                        }
+                    }).build())
                 .asyncSupported(true)
                 .build())
             .addServlet(ServletDetails.builder()
