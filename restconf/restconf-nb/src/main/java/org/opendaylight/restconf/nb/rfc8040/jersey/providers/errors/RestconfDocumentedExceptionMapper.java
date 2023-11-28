@@ -38,24 +38,14 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsMediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.errors.Error;
 import org.opendaylight.yangtools.yang.common.QName;
-<<<<<<< HEAD
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-=======
->>>>>>> Rework serializeErrorsContainerToXml method
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,14 +68,10 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private static final QName ERROR_TAG_QNAME = qnameOf("error-tag");
     private static final QName ERROR_APP_TAG_QNAME = qnameOf("error-app-tag");
     private static final QName ERROR_MESSAGE_QNAME = qnameOf("error-message");
-    // FIXME make this private
-    static final QName ERROR_INFO_QNAME = qnameOf("error-info");
-<<<<<<< HEAD
+    private static final QName ERROR_INFO_QNAME = qnameOf("error-info");
     private static final QName ERROR_PATH_QNAME = qnameOf("error-path");
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
-=======
     private static final XMLOutputFactory XML_OUTPUT_FACTORY = createXmlOutputFactory();
->>>>>>> Rework serializeErrorsContainerToXml method
 
     private final DatabindProvider databindProvider;
 
@@ -186,21 +172,9 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * @param exception To be serialized exception.
      * @return XML representation of the exception.
      */
-<<<<<<< HEAD
-    private String serializeErrorsContainerToXml(final ContainerNode errorsContainer) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            return writeNormalizedNode(errorsContainer, outputStream,
-                new XmlStreamWriterWithDisabledValidation(databindProvider.currentDatabind(), outputStream));
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot close some of the output XML writers", e);
-        }
-    }
-=======
     private String serializeExceptionToXml(final RestconfDocumentedException exception) {
         final var currentDatabindContext = exception.modelContext() != null
-            ? DatabindContext.ofModel(exception.modelContext()) : this.databindProvider.currentContext();
->>>>>>> Rework serializeErrorsContainerToXml method
-
+            ? DatabindContext.ofModel(exception.modelContext()) : this.databindProvider.currentDatabind();
         try (var outputStream = new ByteArrayOutputStream()) {
             final var xmlWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(outputStream, StandardCharsets.UTF_8.name());
             xmlWriter.writeStartDocument();
