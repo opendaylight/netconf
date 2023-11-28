@@ -10,7 +10,9 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServlet;
+import javax.ws.rs.core.Application;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.osgi.service.component.annotations.Activate;
@@ -62,8 +64,12 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     public HttpServlet newStreamServlet() {
         return useWebsockets ? new WebSocketInitializer(streamRegistry, pingExecutor, streamsConfiguration)
             : servletSupport.createHttpServletBuilder(
-                new SSEApplication(streamRegistry, pingExecutor, streamsConfiguration))
-            .build();
+                new Application() {
+                    @Override
+                    public Set<Object> getSingletons() {
+                        return Set.of(new SSEStreamService(streamRegistry, pingExecutor, streamsConfiguration));
+                    }
+                }).build();
     }
 
     @Override
