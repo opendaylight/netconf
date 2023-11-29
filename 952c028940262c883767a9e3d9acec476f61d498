@@ -16,6 +16,24 @@
       "message": "if rpc - return value.getDescription().orElse(null);\nif node - return value.getDescription().orElse(\"\");",
       "revId": "952c028940262c883767a9e3d9acec476f61d498",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31917a17_2989c0f5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-29T12:44:03Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "67d724e7_c5e52ef1",
+      "revId": "952c028940262c883767a9e3d9acec476f61d498",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
