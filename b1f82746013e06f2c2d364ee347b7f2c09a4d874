@@ -1,0 +1,169 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d1f9f14_4ca5ea3b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-29T13:33:58Z",
+      "side": 1,
+      "message": "var",
+      "range": {
+        "startLine": 276,
+        "startChar": 14,
+        "endLine": 276,
+        "endChar": 27
+      },
+      "revId": "b1f82746013e06f2c2d364ee347b7f2c09a4d874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2221ae16_fc4175d3",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-29T13:33:58Z",
+      "side": 1,
+      "message": "var",
+      "range": {
+        "startLine": 278,
+        "startChar": 14,
+        "endLine": 278,
+        "endChar": 25
+      },
+      "revId": "b1f82746013e06f2c2d364ee347b7f2c09a4d874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33792a19_ee98f1be",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-29T13:33:58Z",
+      "side": 1,
+      "message": "var",
+      "revId": "b1f82746013e06f2c2d364ee347b7f2c09a4d874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1561c87a_26844bfc",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-29T13:33:58Z",
+      "side": 1,
+      "message": "var",
+      "revId": "b1f82746013e06f2c2d364ee347b7f2c09a4d874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90fc04bc_3d7bd686",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-29T13:33:58Z",
+      "side": 1,
+      "message": "var",
+      "revId": "b1f82746013e06f2c2d364ee347b7f2c09a4d874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "897d9b6f_b4772274",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-29T13:33:58Z",
+      "side": 1,
+      "message": "var",
+      "revId": "b1f82746013e06f2c2d364ee347b7f2c09a4d874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80db318f_67c2a44b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-29T13:33:58Z",
+      "side": 1,
+      "message": "var",
+      "revId": "b1f82746013e06f2c2d364ee347b7f2c09a4d874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2f11e3d_a7311bfd",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-29T13:33:58Z",
+      "side": 1,
+      "message": "var",
+      "revId": "b1f82746013e06f2c2d364ee347b7f2c09a4d874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbe17955_9cd63e75",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2023-11-29T13:33:58Z",
+      "side": 1,
+      "message": "var",
+      "revId": "b1f82746013e06f2c2d364ee347b7f2c09a4d874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
