@@ -34,6 +34,24 @@
       "parentUuid": "754194d6_b1d02413",
       "revId": "779a02c72d93a122dc6c7904854df4433478725b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75ac0e0b_18a6f90a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-29T08:13:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e7becc0_a3b55506",
+      "revId": "779a02c72d93a122dc6c7904854df4433478725b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }

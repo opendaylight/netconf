@@ -16,6 +16,24 @@
       "message": "\"scheme\"",
       "revId": "5815dd5ddb581ae179141d315662ea3306ceeb41",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a775116_ee324d97",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SecuritySchemesEntity.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2023-11-29T08:13:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8662aeaf_107f62a4",
+      "revId": "5815dd5ddb581ae179141d315662ea3306ceeb41",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
