@@ -55,7 +55,6 @@ module netconf-node-topology {
 
         uses netconf-node-fields;
         uses ond:connection-oper;
-        uses nno:netconf-node-augmented-optional-fields;
         ext:mount;
     }
 }
