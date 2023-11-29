@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67d724e7_c5e52ef1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-11-29T08:23:24Z",
+      "side": 0,
+      "message": "if rpc - return value.getDescription().orElse(null);\nif node - return value.getDescription().orElse(\"\");",
+      "revId": "952c028940262c883767a9e3d9acec476f61d498",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
