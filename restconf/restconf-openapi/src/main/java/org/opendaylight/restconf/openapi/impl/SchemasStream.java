@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.SchemaEntity;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
@@ -116,12 +117,24 @@ public final class SchemasStream extends InputStream {
                 final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, OBJECT_TYPE,
                     stack, moduleName, false, definitionNames);
                 result.add(input);
+                stack.enterSchemaTree(rpcInput.getQName());
+                for (final var child : rpcInput.getChildNodes()) {
+                    processDataNodeContainers(child, moduleName, stack, definitionNames,
+                        result, moduleName, false);
+                }
+                stack.exit();
             }
             final var rpcOutput = rpc.getOutput();
             if (!rpcOutput.getChildNodes().isEmpty()) {
                 final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, OBJECT_TYPE,
                     stack, moduleName, false, definitionNames);
                 result.add(output);
+                stack.enterSchemaTree(rpcOutput.getQName());
+                for (final var child : rpcOutput.getChildNodes()) {
+                    processDataNodeContainers(child, moduleName, stack, definitionNames,
+                        result, moduleName, false);
+                }
+                stack.exit();
             }
             stack.exit();
         }
@@ -157,8 +170,16 @@ public final class SchemasStream extends InputStream {
         final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
             final var newTitle = title + "_" + node.getQName().getLocalName();
-            final var child = new SchemaEntity(node, newTitle, OBJECT_TYPE, stack, parentName, isParentConfig,
-                definitionNames);
+            final String discriminator;
+            if (!definitionNames.isListedNode(node)) {
+                final var parentNameConfigLocalName = parentName + "_" + node.getQName().getLocalName();
+                final var names = List.of(parentNameConfigLocalName);
+                discriminator = definitionNames.pickDiscriminator(node, names);
+            } else {
+                discriminator = definitionNames.getDiscriminator(node);
+            }
+            final var child = new SchemaEntity(node, newTitle + discriminator, OBJECT_TYPE, stack, parentName,
+                isParentConfig, definitionNames);
             final boolean isConfig = node.isConfiguration() && isParentConfig;
             result.add(child);
             stack.enterSchemaTree(node.getQName());
