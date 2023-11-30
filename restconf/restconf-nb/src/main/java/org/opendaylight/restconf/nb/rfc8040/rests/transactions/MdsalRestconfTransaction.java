@@ -128,4 +128,9 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     ListenableFuture<Optional<NormalizedNode>> read(final YangInstanceIdentifier path) {
         return verifyNotNull(rwTx).read(CONFIGURATION, path);
     }
+
+    @Override
+    NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) {
+        return (NormalizedNodeContainer<?>) TransactionUtil.syncAccess(read(path), path).orElse(null);
+    }
 }
