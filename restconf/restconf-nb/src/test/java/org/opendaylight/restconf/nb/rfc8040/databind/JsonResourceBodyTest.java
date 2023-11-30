@@ -8,11 +8,14 @@
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -81,7 +84,7 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     @Test
-    void testRangeViolation() throws Exception {
+    void testRangeViolation() {
         assertRangeViolation(() -> parse("netconf786:foo", """
             {
               "netconf786:foo": {
@@ -91,7 +94,7 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     @Test
-    void testMismatchedInput() throws Exception {
+    void testMismatchedInput() {
         final var error = assertError(() -> parse("base:cont", """
             {
               "ietf-restconf:restconf-state" : {
@@ -102,5 +105,36 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
             different from identifier name ((ns?revision=2016-02-28)cont)""", error.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+    }
+
+    @Test
+    void testMissingKeys() {
+        final var ex = assertThrows(IllegalArgumentException.class,
+            () -> parse("nested-module:depth1-cont/depth2-list2=one,two", """
+                {
+                  "depth2-list2" : {
+                    "depth3-lf1-key" : "one"
+                  }
+                }"""));
+        assertNull(ex.getMessage());
+    }
+
+    @Test
+    void testJukeboxBand() throws Exception {
+        final var one = QName.create("urn:nested:module", "2014-06-03", "depth3-lf1-key");
+        final var two = QName.create("urn:nested:module", "2014-06-03", "depth3-lf2-key");
+
+        assertEquals(Builders.mapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(
+                QName.create("urn:nested:module", "2014-06-03", "depth2-list2"), Map.of(one, "one", two, "two")))
+            .withChild(ImmutableNodes.leafNode(one, "one"))
+            .withChild(ImmutableNodes.leafNode(two, "two"))
+            .build(), parse("nested-module:depth1-cont/depth2-list2=one,two", """
+            {
+              "depth2-list2" : {
+                "depth3-lf1-key" : "one",
+                "depth3-lf2-key" : "two"
+              }
+            }"""));
     }
 }
