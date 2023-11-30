@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -195,4 +196,13 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
         assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
     }
 
+    @Test
+    void testMissingKeys() throws Exception {
+        final var ex = assertThrows(IllegalArgumentException.class,
+            () -> parse("nested-module:depth1-cont/depth2-list2=one,two", """
+                <depth2-list2 xmlns="urn:nested:module">
+                  <depth3-lf1-key>one</depth3-lf1-key>
+                </depth2-list2>"""));
+        assertNull(ex.getMessage());
+    }
 }
