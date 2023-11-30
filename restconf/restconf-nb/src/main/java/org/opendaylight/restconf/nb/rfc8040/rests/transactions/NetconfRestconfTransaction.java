@@ -20,11 +20,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -41,7 +44,12 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +59,8 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     private final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures =
         Collections.synchronizedList(new ArrayList<>());
     private final NetconfDataTreeService netconfService;
+    private final Map<YangInstanceIdentifier, Collection<? extends NormalizedNode>> readListCache =
+        new ConcurrentHashMap<>();
 
     private volatile boolean isLocked = false;
 
@@ -78,18 +88,59 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     @Override
     void cancel() {
         resultsFutures.clear();
+        readListCache.clear();
         executeWithLogging(netconfService::discardChanges);
         executeWithLogging(netconfService::unlock);
     }
 
     @Override
     void deleteImpl(final YangInstanceIdentifier path) {
-        enqueueOperation(() -> netconfService.delete(CONFIGURATION, path));
+        if (isListPath(path, modelContext)) {
+            final var items = getListItemsForRemove(path);
+            if (items.isEmpty()) {
+                LOG.debug("Path {} contains no items, delete operation omitted.", path);
+            } else {
+                items.forEach(item ->
+                    enqueueOperation(() -> netconfService.delete(CONFIGURATION, path.node(item.name()))));
+            }
+        } else {
+            enqueueOperation(() -> netconfService.delete(CONFIGURATION, path));
+        }
     }
 
     @Override
     void removeImpl(final YangInstanceIdentifier path) {
-        enqueueOperation(() -> netconfService.remove(CONFIGURATION, path));
+        if (isListPath(path, modelContext)) {
+            final var items = getListItemsForRemove(path);
+            if (items.isEmpty()) {
+                LOG.debug("Path {} contains no items, remove operation omitted.", path);
+            } else {
+                items.forEach(item ->
+                    enqueueOperation(() -> netconfService.remove(CONFIGURATION, path.node(item.name()))));
+            }
+        } else {
+            enqueueOperation(() -> netconfService.remove(CONFIGURATION, path));
+        }
+    }
+
+    @Override
+    @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) {
+        // reading list is mainly invoked for subsequent removal,
+        // cache data to avoid extra read invocation on delete/remove
+        final var result = super.readList(path);
+        readListCache.put(path, result == null ? List.of() : result.body());
+        return result;
+    }
+
+    private @NonNull Collection<? extends NormalizedNode> getListItemsForRemove(final YangInstanceIdentifier path) {
+        final var cached = readListCache.remove(path);
+        if (cached != null) {
+            return cached;
+        }
+        // check if keys only can be retrieved to minimize volume of data to read
+        final var retrieved = (NormalizedNodeContainer<?>) TransactionUtil.syncAccess(
+            netconfService.getConfig(path, keyFieldsFrom(path, modelContext)), path).orElse(null);
+        return retrieved == null ? List.of() : retrieved.body();
     }
 
     @Override
@@ -192,6 +243,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     private List<ListenableFuture<?>> discardAndUnlock() {
+        readListCache.clear();
         // execute discard & unlock operations only if lock operation was completed successfully
         if (isLocked) {
             return List.of(netconfService.discardChanges(), netconfService.unlock());
@@ -229,7 +281,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     // Transform list of futures related to RPC operation into a single Future
     private static ListenableFuture<DOMRpcResult> mergeFutures(
-            final List<ListenableFuture<? extends DOMRpcResult>> futures) {
+        final List<ListenableFuture<? extends DOMRpcResult>> futures) {
         return Futures.whenAllComplete(futures).call(() -> {
             if (futures.size() == 1) {
                 // Fast path
@@ -245,7 +297,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     }
 
     private static TransactionCommitFailedException toCommitFailedException(
-            final Collection<? extends RpcError> errors) {
+        final Collection<? extends RpcError> errors) {
         ErrorType errType = ErrorType.APPLICATION;
         ErrorSeverity errSeverity = ErrorSeverity.ERROR;
         StringJoiner msgBuilder = new StringJoiner(" ");
@@ -283,5 +335,29 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     private static boolean allWarnings(final Collection<? extends @NonNull RpcError> errors) {
         return errors.stream().allMatch(error -> error.getSeverity() == ErrorSeverity.WARNING);
+    }
+
+    static boolean isListPath(final YangInstanceIdentifier path, final EffectiveModelContext modelContext) {
+        if (path.getLastPathArgument() instanceof YangInstanceIdentifier.NodeIdentifier) {
+            // list can be referenced by NodeIdentifier only, prevent list item do be identified as list
+            final var schemaNode = schemaNodeFrom(path, modelContext);
+            return schemaNode instanceof ListSchemaNode || schemaNode instanceof LeafListSchemaNode;
+        }
+        return false;
+    }
+
+    private static List<YangInstanceIdentifier> keyFieldsFrom(final YangInstanceIdentifier path,
+            final EffectiveModelContext modelContext) {
+        final var schemaNode = schemaNodeFrom(path, modelContext);
+        if (schemaNode instanceof ListSchemaNode listSchemaNode && listSchemaNode.getKeyDefinition() != null) {
+            return listSchemaNode.getKeyDefinition().stream().map(YangInstanceIdentifier::of).toList();
+        }
+        return List.of();
+    }
+
+    private static DataSchemaNode schemaNodeFrom(final YangInstanceIdentifier path,
+            final EffectiveModelContext modelContext) {
+        return DataSchemaContextTree.from(modelContext).findChild(path)
+            .map(DataSchemaContext::dataSchemaNode).orElse(null);
     }
 }
