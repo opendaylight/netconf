@@ -16,6 +16,23 @@
       "message": "Please try to invoke:\nPOST http://192.168.56.25:8181/rests/operations/netconf-node-topology:create-device\n\n\u003cinput xmlns\u003d\"urn:opendaylight:netconf-node-topology\"\u003e\n   \u003cnode-id\u003enetconf-test-device\u003c/node-id\u003e\n   \u003chost\u003e192.168.56.25\u003c/host\u003e\n   \u003cport\u003e17830\u003c/port\u003e\n   \u003ctcp-only\u003efalse\u003c/tcp-only\u003e\n   \u003ckeepalive-delay\u003e0\u003c/keepalive-delay\u003e\n\t\u003cignore-missing-schema-sources xmlns\u003d\"urn:opendaylight:netconf-node-topology\"\u003e\n\t\t\u003creconnect-time\u003e0\u003c/reconnect-time\u003e\n\t\t\u003callowed\u003etrue\u003c/allowed\u003e\n\t\u003c/ignore-missing-schema-sources\u003e\n \u003c/input\u003e\n \nand see what NetconfNodeHandler line 146 says.",
       "revId": "c272eb4e33313acaffeb03a23ea4aefbc5711df3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57a8c1aa_6c2e8a48",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-11-30T08:37:22Z",
+      "side": 1,
+      "message": "The RPC \"create-device\" itself is deprecated. Let\u0027s remove duplicity first. Anyway it looks that RPC has a bug and is not working ATM.",
+      "revId": "c272eb4e33313acaffeb03a23ea4aefbc5711df3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
