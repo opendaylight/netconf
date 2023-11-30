@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.openapi.model;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 import static org.opendaylight.restconf.openapi.model.PropertyEntity.isSchemaNodeMandatory;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -34,6 +35,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 public final class SchemaEntity extends OpenApiEntity {
     private final @NonNull SchemaNode value;
     private final @NonNull String title;
+    private final @NonNull String discriminator;
     private final @NonNull String type;
     private final @NonNull SchemaInferenceStack stack;
     private final boolean isParentConfig;
@@ -41,9 +43,10 @@ public final class SchemaEntity extends OpenApiEntity {
     private final @NonNull String parentName;
     private final @NonNull DefinitionNames definitionNames;
 
-    public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title, @NonNull final String type,
-            @NonNull final SchemaInferenceStack context, final String parentName, final boolean isParentConfig,
-            @NonNull final DefinitionNames definitionNames, final SchemasStream.EntityType entityType) {
+    public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title, final String discriminator,
+            @NonNull final String type, @NonNull final SchemaInferenceStack context, final String parentName,
+            final boolean isParentConfig, @NonNull final DefinitionNames definitionNames,
+            final SchemasStream.EntityType entityType) {
         this.value = requireNonNull(value);
         this.title = requireNonNull(title);
         this.type = requireNonNull(type);
@@ -52,11 +55,12 @@ public final class SchemaEntity extends OpenApiEntity {
         this.isParentConfig = isParentConfig;
         this.definitionNames = definitionNames;
         this.entityType = entityType;
+        this.discriminator = requireNonNullElse(discriminator, "");
     }
 
     @Override
     public void generate(final @NonNull JsonGenerator generator) throws IOException {
-        generator.writeObjectFieldStart(title());
+        generator.writeObjectFieldStart(title() + discriminator);
         generator.writeStringField("title", title());
         generator.writeStringField("type", type());
         final var description = description();
