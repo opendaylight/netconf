@@ -661,7 +661,7 @@ public final class MdsalRestconfServer
             final ResourceBody body) {
         final var putPath = new DataPutPath(reqPath.databind(), reqPath.inference(), reqPath.getInstanceIdentifier());
         return new ResourceRequest(getRestconfStrategy(putPath.databind(), reqPath.getMountPoint()), putPath.instance(),
-            body.toNormalizedNode(putPath, reqPath.getSchemaNode()));
+            body.toNormalizedNode(putPath));
     }
 
     @VisibleForTesting
