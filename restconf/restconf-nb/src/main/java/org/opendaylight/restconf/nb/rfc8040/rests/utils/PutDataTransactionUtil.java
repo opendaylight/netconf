@@ -168,6 +168,13 @@ public final class PutDataTransactionUtil {
             transaction.replace(childPath, nodeChild, schemaContext);
             lastInsertedPosition++;
         }
+
+        // In case we are inserting after last element
+        if (!before) {
+            if (lastInsertedPosition == lastItemPosition) {
+                transaction.replace(path, data, schemaContext);
+            }
+        }
     }
 
     private static FluentFuture<? extends CommitInfo> makePut(final YangInstanceIdentifier path,
