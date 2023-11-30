@@ -118,9 +118,7 @@ abstract class RestconfTransaction {
 
     abstract void replaceImpl(@NonNull YangInstanceIdentifier path, @NonNull NormalizedNode data);
 
-    final @Nullable NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) {
-        return (NormalizedNodeContainer<?>) TransactionUtil.syncAccess(read(path), path).orElse(null);
-    }
+    abstract @Nullable NormalizedNodeContainer<?> readList(@NonNull YangInstanceIdentifier path);
 
     abstract ListenableFuture<Optional<NormalizedNode>> read(YangInstanceIdentifier path);
 
