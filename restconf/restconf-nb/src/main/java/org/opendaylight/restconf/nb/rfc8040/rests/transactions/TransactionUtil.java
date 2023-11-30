@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -20,6 +21,8 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,5 +84,18 @@ final class TransactionUtil {
         }
 
         return new RestconfDocumentedException("Transaction(" + txType + ") failed", ex);
+    }
+
+    static boolean isListPath(final YangInstanceIdentifier path, final EffectiveModelContext modelContext) {
+        try {
+            final var pathQNames = path.getPathArguments().stream()
+                .map(YangInstanceIdentifier.PathArgument::getNodeType).toList();
+            final var schemaNode = modelContext.findDataTreeChild(pathQNames).orElse(null);
+            return schemaNode instanceof ListSchemaNode || schemaNode instanceof LeafListSchemaNode;
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            // FIXME path validation before execution is expected to be performed on upper level
+            LOG.debug("Invalid path: {}", path, e);
+            return false;
+        }
     }
 }
