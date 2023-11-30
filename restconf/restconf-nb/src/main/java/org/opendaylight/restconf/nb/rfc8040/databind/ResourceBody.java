@@ -7,31 +7,22 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.restconf.Data;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,10 +44,8 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
      * @param path A {@link YangInstanceIdentifier} corresponding to the body
      * @throws RestconfDocumentedException if the body cannot be decoded or it does not match {@code path}
      */
-    // TODO: pass down DatabindContext corresponding to inference
     @SuppressWarnings("checkstyle:illegalCatch")
-    public @NonNull NormalizedNode toNormalizedNode(final @NonNull DataPutPath path,
-            final @NonNull SchemaNode schemaNode) {
+    public @NonNull NormalizedNode toNormalizedNode(final @NonNull DataPutPath path) {
         final var instance = path.instance();
         final var expectedName = instance.isEmpty() ? DATA_NID : instance.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
@@ -90,46 +79,9 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
 
-        validateListKeysEqualityInPayloadAndUri(schemaNode, instance, data);
         return data;
     }
 
     abstract void streamTo(@NonNull DataPutPath path, @NonNull PathArgument name, @NonNull InputStream inputStream,
         @NonNull NormalizedNodeStreamWriter writer) throws IOException;
-
-    /**
-     * Validates whether keys in {@code payload} are equal to values of keys in
-     * {@code iiWithData} for list schema node.
-     *
-     * @throws RestconfDocumentedException if key values or key count in payload and URI isn't equal
-     */
-    @VisibleForTesting
-    static final void validateListKeysEqualityInPayloadAndUri(final SchemaNode schemaNode,
-            final YangInstanceIdentifier path, final NormalizedNode data) {
-        if (schemaNode instanceof ListSchemaNode listSchema
-            && path.getLastPathArgument() instanceof NodeIdentifierWithPredicates nip
-            && data instanceof MapEntryNode mapEntry) {
-            isEqualUriAndPayloadKeyValues(nip.asMap(), mapEntry, listSchema.getKeyDefinition());
-        }
-    }
-
-    private static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
-            final List<QName> keyDefinitions) {
-        final var mutableCopyUriKeyValues = new HashMap<>(uriKeyValues);
-        for (var keyDefinition : keyDefinitions) {
-            final var uriKeyValue = mutableCopyUriKeyValues.remove(keyDefinition);
-            if (uriKeyValue == null) {
-                throw new RestconfDocumentedException("Missing key " + keyDefinition + " in URI.",
-                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
-            }
-
-            final var dataKeyValue = payload.name().getValue(keyDefinition);
-            if (!uriKeyValue.equals(dataKeyValue)) {
-                throw new RestconfDocumentedException("The value '" + uriKeyValue
-                    + "' for key '" + keyDefinition.getLocalName()
-                    + "' specified in the URI doesn't match the value '" + dataKeyValue
-                    + "' specified in the message body. ", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-            }
-        }
-    }
 }

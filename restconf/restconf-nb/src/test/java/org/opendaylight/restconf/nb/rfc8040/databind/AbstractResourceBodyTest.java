@@ -84,8 +84,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
             final var context = InstanceIdentifierContext.ofApiPath(apiPath, DATABIND, mountPointService);
             return body.toNormalizedNode(
-                new DataPutPath(context.databind(), context.inference(), context.getInstanceIdentifier()),
-                context.getSchemaNode());
+                new DataPutPath(context.databind(), context.inference(), context.getInstanceIdentifier()));
         }
     }
 
