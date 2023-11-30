@@ -8,15 +8,21 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.util.concurrent.Futures;
+import java.util.List;
 import java.util.Optional;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,11 +40,13 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -70,10 +78,13 @@ public class PutDataTransactionUtilTest {
     private ContainerNode buildBaseCont;
     private ContainerNode buildBaseContWithList;
     private MapEntryNode buildListEntry;
+    private MapEntryNode buildSongsListEntry;
+    private MapNode songsList;
     private EffectiveModelContext schema;
     private YangInstanceIdentifier iid;
     private YangInstanceIdentifier iid2;
     private YangInstanceIdentifier iid3;
+    private YangInstanceIdentifier iid4;
 
     @Before
     public void setUp() throws Exception {
@@ -84,12 +95,17 @@ public class PutDataTransactionUtilTest {
         final QName containerQname = QName.create(baseQName, "player");
         final QName leafQname = QName.create(baseQName, "gap");
         final QName listQname = QName.create(baseQName, "playlist");
+        final QName songListQname = QName.create(baseQName, "song");
         final QName listKeyQname = QName.create(baseQName, "name");
+        final QName songListKeyQname = QName.create(baseQName, "index");
+        final QName songListIdQname = QName.create(baseQName, "id");
 
         final NodeIdentifierWithPredicates nodeWithKey =
                 NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band");
         final NodeIdentifierWithPredicates nodeWithKey2 =
                 NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band 2");
+        final NodeIdentifierWithPredicates nodeWithKey3 =
+                NodeIdentifierWithPredicates.of(songListQname, songListKeyQname, Uint32.valueOf(3));
 
         iid = YangInstanceIdentifier.builder()
                 .node(baseQName)
@@ -105,6 +121,14 @@ public class PutDataTransactionUtilTest {
                 .node(baseQName)
                 .node(listQname)
                 .node(nodeWithKey)
+                .build();
+
+        iid4 = YangInstanceIdentifier.builder()
+                .node(baseQName)
+                .node(listQname)
+                .node(NodeIdentifierWithPredicates.of(listQname, listKeyQname, 0))
+                .node(songListQname)
+                .node(nodeWithKey3)
                 .build();
 
         buildLeaf = Builders.leafBuilder()
@@ -126,6 +150,14 @@ public class PutDataTransactionUtilTest {
         final LeafNode<Object> content2 = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
                 .withValue("band description")
+                .build();
+        final LeafNode<Object> songsIndex = Builders.leafBuilder()
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "index")))
+                .withValue(Uint32.valueOf(3))
+                .build();
+        final LeafNode<Object> songsId = Builders.leafBuilder()
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "id")))
+                .withValue("C")
                 .build();
         buildListEntry = Builders.mapEntryBuilder()
                 .withNodeIdentifier(nodeWithKey)
@@ -153,6 +185,30 @@ public class PutDataTransactionUtilTest {
         buildBaseContWithList = Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(baseQName))
                 .withChild(buildList)
+                .build();
+        songsList = Builders.orderedMapBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(songListQname))
+                .withChild(Builders.mapEntryBuilder()
+                        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(songListQname,
+                                songListKeyQname, Uint32.valueOf(1)))
+                        .withChild(Builders.leafBuilder()
+                                .withNodeIdentifier(new NodeIdentifier(QName.create(songListIdQname, "name")))
+                                .withValue("A")
+                                .build())
+                        .build())
+                .withChild(Builders.mapEntryBuilder()
+                        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(songListQname,
+                                songListKeyQname, Uint32.valueOf(2)))
+                        .withChild(Builders.leafBuilder()
+                                .withNodeIdentifier(new NodeIdentifier(QName.create(songListIdQname, "name")))
+                                .withValue("B")
+                                .build())
+                        .build())
+                .build();
+        buildSongsListEntry = Builders.mapEntryBuilder()
+                .withNodeIdentifier(nodeWithKey3)
+                .withChild(songsIndex)
+                .withChild(songsId)
                 .build();
 
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).lock();
@@ -350,5 +406,31 @@ public class PutDataTransactionUtilTest {
             WriteDataParams.empty());
         verify(netconfService).getConfig(iid2);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, iid2, payload.getData(), Optional.empty());
+    }
+
+    @Test
+    public void testPutDataWithInsertAfterLast() {
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iid4);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildSongsListEntry);
+
+        final var spyStrategy = spy(new NetconfRestconfStrategy(netconfService));
+        final var spyTx = spy(spyStrategy.prepareWriteExecution());
+        doReturn(spyTx).when(spyStrategy).prepareWriteExecution();
+
+        doReturn(immediateFluentFuture(Optional.of(songsList))).when(spyStrategy).read(any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).remove(any(), any());
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(spyTx).commit();
+
+        // Creating query params to insert new item after last existing item in list
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("after"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=2"));
+        final var uriInfo = mock(UriInfo.class);
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        PutDataTransactionUtil.putData(payload, schema, spyStrategy, QueryParams.newWriteDataParams(uriInfo));
+
+        // Counting how many times we insert items in list
+        verify(spyTx, times(3)).replace(any(), any(), any());
     }
 }
