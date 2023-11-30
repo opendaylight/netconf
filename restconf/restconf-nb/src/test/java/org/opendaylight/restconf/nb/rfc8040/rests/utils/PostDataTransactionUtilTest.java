@@ -14,15 +14,20 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.util.concurrent.Futures;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -41,10 +46,12 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.WriteDataParams;
+import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -72,9 +79,12 @@ public class PostDataTransactionUtilTest {
 
     private ContainerNode buildBaseCont;
     private EffectiveModelContext schema;
+    private YangInstanceIdentifier iid;
     private YangInstanceIdentifier iid2;
     private YangInstanceIdentifier iidList;
     private MapNode buildList;
+    private MapNode songsList;
+    private MapEntryNode buildSongsListEntry;
 
     @Before
     public void setUp() throws Exception {
@@ -85,9 +95,22 @@ public class PostDataTransactionUtilTest {
         final QName containerQname = QName.create(baseQName, "player");
         final QName leafQname = QName.create(baseQName, "gap");
         final QName listQname = QName.create(baseQName, "playlist");
+        final QName songListQname = QName.create(baseQName, "song");
         final QName listKeyQname = QName.create(baseQName, "name");
+        final QName songListKeyQname = QName.create(baseQName, "index");
+        final QName songListIdQname = QName.create(baseQName, "id");
         final NodeIdentifierWithPredicates nodeWithKey = NodeIdentifierWithPredicates.of(listQname, listKeyQname,
             "name of band");
+        final NodeIdentifierWithPredicates nodeWithKey2 =
+                NodeIdentifierWithPredicates.of(songListQname, songListKeyQname, Uint32.valueOf(3));
+
+        iid = YangInstanceIdentifier.builder()
+                .node(baseQName)
+                .node(listQname)
+                .node(NodeIdentifierWithPredicates.of(listQname, listKeyQname, 0))
+                .node(songListQname)
+                .node(nodeWithKey2)
+                .build();
         iid2 = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .build();
@@ -117,6 +140,14 @@ public class PostDataTransactionUtilTest {
                 .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
                 .withValue("band description")
                 .build();
+        final LeafNode<Object> songsIndex = Builders.leafBuilder()
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "index")))
+                .withValue(Uint32.valueOf(3))
+                .build();
+        final LeafNode<Object> songsId = Builders.leafBuilder()
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "id")))
+                .withValue("C")
+                .build();
         final MapEntryNode mapEntryNode = Builders.mapEntryBuilder()
                 .withNodeIdentifier(nodeWithKey)
                 .withChild(content)
@@ -125,6 +156,30 @@ public class PostDataTransactionUtilTest {
         buildList = Builders.mapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(listQname))
                 .withChild(mapEntryNode)
+                .build();
+        songsList = Builders.orderedMapBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(songListQname))
+                .withChild(Builders.mapEntryBuilder()
+                        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(songListQname,
+                                songListKeyQname, Uint32.valueOf(1)))
+                        .withChild(Builders.leafBuilder()
+                                .withNodeIdentifier(new NodeIdentifier(QName.create(songListIdQname, "name")))
+                                .withValue("A")
+                                .build())
+                        .build())
+                .withChild(Builders.mapEntryBuilder()
+                        .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(songListQname,
+                                songListKeyQname, Uint32.valueOf(2)))
+                        .withChild(Builders.leafBuilder()
+                                .withNodeIdentifier(new NodeIdentifier(QName.create(songListIdQname, "name")))
+                                .withValue("B")
+                                .build())
+                        .build())
+                .build();
+        buildSongsListEntry = Builders.mapEntryBuilder()
+                .withNodeIdentifier(nodeWithKey2)
+                .withChild(songsIndex)
+                .withChild(songsId)
                 .build();
 
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
@@ -229,5 +284,32 @@ public class PostDataTransactionUtilTest {
         assertThat(ex.getErrors().get(0).getErrorInfo(), containsString(domException.getMessage()));
 
         verify(netconfService).create(LogicalDatastoreType.CONFIGURATION, iid2, payload.getData(), Optional.empty());
+    }
+
+    @Test
+    public void testPutDataWithInsertAfterLast() {
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(schema, iid);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildSongsListEntry);
+
+        final var spyStrategy = spy(new NetconfRestconfStrategy(netconfService));
+        final var spyTx = spy(spyStrategy.prepareWriteExecution());
+        doReturn(spyTx).when(spyStrategy).prepareWriteExecution();
+
+        doReturn(immediateFluentFuture(Optional.of(songsList))).when(spyStrategy).read(any(), any());
+        doReturn(immediateFluentFuture(Boolean.FALSE)).when(spyStrategy).exists(any(), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).remove(any(), any());
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult())).when(spyTx).commit();
+
+        // Creating query params to insert new item after last existing item in list
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("after"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=2"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        PostDataTransactionUtil.postData(uriInfo, payload, spyStrategy, schema,
+                QueryParams.newWriteDataParams(uriInfo));
+
+        // Counting how many times we insert items in list
+        verify(spyTx, times(3)).replace(any(), any(), any());
     }
 }
