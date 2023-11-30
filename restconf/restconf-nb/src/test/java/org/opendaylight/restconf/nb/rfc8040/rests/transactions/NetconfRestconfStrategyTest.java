@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,6 +23,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import com.google.common.util.concurrent.Futures;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +36,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -44,8 +47,10 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.DOMException;
 
@@ -82,6 +87,35 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
             "Commit of transaction " + this + " failed", new NetconfDocumentedException("id",
                 ErrorType.RPC, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR)))).when(netconfService).commit();
         return jukeboxStrategy();
+    }
+
+    @Test
+    public void testDeleteFullList() {
+        final var songListPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
+            .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "playlist"))
+            .node(SONG_QNAME).build();
+        final var songListWildcardPath = songListPath.node(NodeIdentifierWithPredicates.of(SONG_QNAME));
+        final var song1Path = songListPath.node(SONG1.name());
+        final var song2Path = songListPath.node(SONG2.name());
+        final var songListData = Builders.orderedMapBuilder()
+            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(SONG_QNAME))
+            .withChild(SONG1).withChild(SONG2).build();
+        final var songKeyFields = List.of(YangInstanceIdentifier.of(SONG_INDEX_QNAME));
+
+        // data fetched using key field names to minimize amount of data returned
+        doReturn(immediateFluentFuture(Optional.of(songListData))).when(netconfService)
+            .getConfig(songListWildcardPath, songKeyFields);
+        // list elements expected to be deleted one by one
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, song1Path);
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
+            .delete(LogicalDatastoreType.CONFIGURATION, song2Path);
+
+        jukeboxStrategy().delete(new SettableRestconfFuture<>(), songListPath);
+        verify(netconfService).getConfig(songListWildcardPath, songKeyFields);
+        verify(netconfService).delete(LogicalDatastoreType.CONFIGURATION, song1Path);
+        verify(netconfService).delete(LogicalDatastoreType.CONFIGURATION, song2Path);
+        verify(netconfService, never()).delete(LogicalDatastoreType.CONFIGURATION, songListPath);
     }
 
     @Override
@@ -230,7 +264,11 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
                 .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "B"))
                 .build())
             .build();
-        doReturn(songsList).when(spyTx).readList(any(YangInstanceIdentifier.class));
+
+        final var songListPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
+            .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "0"))
+            .node(SONG_QNAME).build();
+        doReturn(immediateFluentFuture(Optional.of(songsList))).when(spyTx).read(songListPath);
 
         // Creating query params to insert new item after last existing item in list
         final var queryParams = new HashMap<String, String>();
@@ -281,7 +319,11 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
                     .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "B"))
                     .build())
             .build();
-        doReturn(songsList).when(spyTx).readList(any(YangInstanceIdentifier.class));
+
+        final var songListPath = YangInstanceIdentifier.builder().node(JUKEBOX_QNAME).node(PLAYLIST_QNAME)
+            .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "0"))
+            .node(SONG_QNAME).build();
+        doReturn(immediateFluentFuture(Optional.of(songsList))).when(spyTx).read(songListPath);
 
         // Creating query params to insert new item after last existing item in list
         final var queryParams = new HashMap<String, String>();
