@@ -16,8 +16,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.SchemaEntity;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
@@ -108,20 +110,37 @@ public final class SchemasStream extends InputStream {
         final var definitionNames = new DefinitionNames();
         final var stack = SchemaInferenceStack.of(context);
         final var moduleName = module.getName();
+        final var children = new ArrayList<DataSchemaNode>();
         for (final var rpc : module.getRpcs()) {
             stack.enterSchemaTree(rpc.getQName());
             final var rpcName = rpc.getQName().getLocalName();
             final var rpcInput = rpc.getInput();
             if (!rpcInput.getChildNodes().isEmpty()) {
-                final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, OBJECT_TYPE,
-                    stack, moduleName, false, definitionNames, EntityType.RPC);
+                final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, null,
+                    OBJECT_TYPE, stack, moduleName, false, definitionNames, EntityType.RPC);
                 result.add(input);
+                stack.enterSchemaTree(rpcInput.getQName());
+                for (final var child : rpcInput.getChildNodes()) {
+                    if (!children.contains(child)) {
+                        children.add(child);
+                        processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName, false);
+                    }
+                }
+                stack.exit();
             }
             final var rpcOutput = rpc.getOutput();
             if (!rpcOutput.getChildNodes().isEmpty()) {
-                final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, OBJECT_TYPE,
-                    stack, moduleName, false, definitionNames, EntityType.RPC);
+                final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, null,
+                    OBJECT_TYPE, stack, moduleName, false, definitionNames, EntityType.RPC);
                 result.add(output);
+                stack.enterSchemaTree(rpcOutput.getQName());
+                for (final var child : rpcOutput.getChildNodes()) {
+                    if (!children.contains(child)) {
+                        children.add(child);
+                        processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName, false);
+                    }
+                }
+                stack.exit();
             }
             stack.exit();
         }
@@ -138,8 +157,16 @@ public final class SchemasStream extends InputStream {
             final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
             final var newTitle = title + "_" + node.getQName().getLocalName();
-            final var child = new SchemaEntity(node, newTitle, OBJECT_TYPE, stack, parentName, isParentConfig,
-                definitionNames, EntityType.NODE);
+            final String discriminator;
+            if (!definitionNames.isListedNode(node)) {
+                final var parentNameConfigLocalName = parentName + "_" + node.getQName().getLocalName();
+                final var names = List.of(parentNameConfigLocalName);
+                discriminator = definitionNames.pickDiscriminator(node, names);
+            } else {
+                discriminator = definitionNames.getDiscriminator(node);
+            }
+            final var child = new SchemaEntity(node, newTitle, discriminator, OBJECT_TYPE, stack, parentName,
+                isParentConfig, definitionNames, EntityType.NODE);
             final var isConfig = node.isConfiguration() && isParentConfig;
             result.add(child);
             stack.enterSchemaTree(node.getQName());
@@ -170,13 +197,13 @@ public final class SchemasStream extends InputStream {
             final var actionName = actionDef.getQName().getLocalName();
             final var actionInput = actionDef.getInput();
             if (!actionInput.getChildNodes().isEmpty()) {
-                final var input = new SchemaEntity(actionInput, title + "_" + actionName + INPUT_SUFFIX,
+                final var input = new SchemaEntity(actionInput, title + "_" + actionName + INPUT_SUFFIX, null,
                     OBJECT_TYPE, stack, parentName, false, definitionNames, EntityType.RPC);
                 result.add(input);
             }
             final var actionOutput = actionDef.getOutput();
             if (!actionOutput.getChildNodes().isEmpty()) {
-                final var output = new SchemaEntity(actionOutput, title + "_" + actionName + OUTPUT_SUFFIX,
+                final var output = new SchemaEntity(actionOutput, title + "_" + actionName + OUTPUT_SUFFIX, null,
                     OBJECT_TYPE, stack, parentName, false, definitionNames, EntityType.RPC);
                 result.add(output);
             }
