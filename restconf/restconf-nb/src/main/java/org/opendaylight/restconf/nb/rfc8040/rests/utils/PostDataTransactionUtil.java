@@ -172,6 +172,13 @@ public final class PostDataTransactionUtil {
             transaction.replace(childPath, nodeChild, schemaContext);
             lastInsertedPosition++;
         }
+
+        // In case we are inserting after last element
+        if (!before) {
+            if (lastInsertedPosition == lastItemPosition) {
+                transaction.replace(path, data, schemaContext);
+            }
+        }
     }
 
     private static void makePost(final YangInstanceIdentifier path, final NormalizedNode data,
