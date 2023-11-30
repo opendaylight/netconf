@@ -19,7 +19,11 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,5 +85,15 @@ final class TransactionUtil {
         }
 
         return new RestconfDocumentedException("Transaction(" + txType + ") failed", ex);
+    }
+
+    static boolean isListPath(final YangInstanceIdentifier path, final EffectiveModelContext modelContext) {
+        if (path.getLastPathArgument() instanceof YangInstanceIdentifier.NodeIdentifier) {
+            // list can be referenced by NodeIdentifier only, prevent list item do be identified as list
+            final var schemaNode = DataSchemaContextTree.from(modelContext).findChild(path)
+                .map(DataSchemaContext::dataSchemaNode).orElse(null);
+            return schemaNode instanceof ListSchemaNode || schemaNode instanceof LeafListSchemaNode;
+        }
+        return false;
     }
 }
