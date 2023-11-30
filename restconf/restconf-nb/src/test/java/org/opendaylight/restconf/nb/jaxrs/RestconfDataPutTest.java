@@ -185,4 +185,29 @@ class RestconfDataPutTest extends AbstractRestconfTest {
               ]
             }"""), ar)));
     }
+
+    @Test
+    public void testPutDataWithInsertAfterLast() {
+        // Mocking the query parameters to include 'insert=after' and 'point=example-jukebox:jukebox/playlist=0/song=2'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("after"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=2"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(readTx)
+                .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(rwTx)
+                .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        assertNull(assertEntity(201, ar -> restconf.dataJsonPUT(
+                apiPath("example-jukebox:jukebox/playlist=0/song=3"), uriInfo, stringInputStream("""
+            {
+              "example-jukebox:song" : [
+                {
+                   "index": "3",
+                   "id" = "C"
+                }
+              ]
+            }"""), ar)));
+    }
 }
