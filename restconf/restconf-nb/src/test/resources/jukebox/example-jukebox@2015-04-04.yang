@@ -192,7 +192,7 @@ module example-jukebox {
               "Example nested configuration data resource";
 
             leaf index {    // not really needed
-              type uint32;
+              type string;
               description
                 "An arbitrary integer index for this playlist song.";
             }
