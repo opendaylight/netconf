@@ -347,6 +347,13 @@ public abstract class RestconfStrategy {
             tx.replace(childPath, nodeChild);
             lastInsertedPosition++;
         }
+
+        // In case we are inserting after last element
+//        if (!before) {
+//            if (lastInsertedPosition == lastItemPosition) {
+//                tx.replace(path, data);
+//            }
+//        }
     }
 
     private static ListenableFuture<? extends CommitInfo> replaceAndCommit(final RestconfTransaction tx,
@@ -582,6 +589,13 @@ public abstract class RestconfStrategy {
             tx.replace(grandParentPath.node(nodeChild.name()), nodeChild);
             lastInsertedPosition++;
         }
+
+        // In case we are inserting after last element
+//        if (!before) {
+//            if (lastInsertedPosition == lastItemPosition) {
+//                tx.replace(path, data);
+//            }
+//        }
     }
 
     private static ListenableFuture<? extends CommitInfo> createAndCommit(final RestconfTransaction tx,
