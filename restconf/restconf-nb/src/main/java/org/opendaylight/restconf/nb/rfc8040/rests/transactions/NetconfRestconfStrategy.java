@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -46,7 +47,12 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     @Override
     void delete(final SettableRestconfFuture<Empty> future, final YangInstanceIdentifier path) {
         final var tx = prepareWriteExecution();
-        tx.delete(path);
+        try {
+            tx.delete(path);
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            future.setFailure(TransactionUtil.decodeException(e, "DELETE", path, modelContext()));
+            return;
+        }
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
