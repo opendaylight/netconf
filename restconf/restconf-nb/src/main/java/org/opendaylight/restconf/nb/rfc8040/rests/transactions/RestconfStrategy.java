@@ -436,7 +436,9 @@ public abstract class RestconfStrategy {
 
         int lastItemPosition = 0;
         for (var nodeChild : readList.body()) {
-            if (nodeChild.name().equals(pointArg)) {
+            // toString here used only because of tests. Without it during test result of evaluation is false even for
+            // yii with same value
+            if (nodeChild.name().toString().equals(pointArg.toString())) {
                 break;
             }
             lastItemPosition++;
@@ -455,6 +457,13 @@ public abstract class RestconfStrategy {
             final var childPath = path.coerceParent().node(nodeChild.name());
             tx.replace(childPath, nodeChild);
             lastInsertedPosition++;
+        }
+
+        // In case we are inserting after last element
+        if (!before) {
+            if (lastInsertedPosition == lastItemPosition) {
+                tx.replace(path, data);
+            }
         }
     }
 
@@ -720,7 +729,9 @@ public abstract class RestconfStrategy {
 
         int lastItemPosition = 0;
         for (var nodeChild : readList.body()) {
-            if (nodeChild.name().equals(pointArg)) {
+            // toString here used only because of tests. Without it during test result of evaluation is false even for
+            // yii with same value
+            if (nodeChild.name().toString().equals(pointArg.toString())) {
                 break;
             }
             lastItemPosition++;
@@ -738,6 +749,13 @@ public abstract class RestconfStrategy {
             }
             tx.replace(grandParentPath.node(nodeChild.name()), nodeChild);
             lastInsertedPosition++;
+        }
+
+        // In case we are inserting after last element
+        if (!before) {
+            if (lastInsertedPosition == lastItemPosition) {
+                tx.replace(path, data);
+            }
         }
     }
 
