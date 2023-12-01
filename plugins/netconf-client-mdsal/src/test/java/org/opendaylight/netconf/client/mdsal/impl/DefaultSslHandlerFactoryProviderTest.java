@@ -7,125 +7,105 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStoreException;
-import java.util.ArrayList;
+import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.spec.RSAKeyGenParameterSpec;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.opendaylight.yangtools.yang.binding.DataObject;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class DefaultSslHandlerFactoryProviderTest {
-    private static final String XML_ELEMENT_PRIVATE_KEY = "private-key";
-    private static final String XML_ELEMENT_NAME = "name";
-    private static final String XML_ELEMENT_DATA = "data";
-    private static final String XML_ELEMENT_CERT_CHAIN = "certificate-chain";
-    private static final String XML_ELEMENT_TRUSTED_CERT = "trusted-certificate";
-    private static final String XML_ELEMENT_CERT = "certificate";
+@ExtendWith(MockitoExtension.class)
+class DefaultSslHandlerFactoryProviderTest {
+    private static final AtomicInteger COUNTER = new AtomicInteger(0);
+    private static final String INVALID_DATA = encodeBase64("invalid.data".getBytes(StandardCharsets.UTF_8));
 
     @Mock
     private DataBroker dataBroker;
     @Mock
     private ListenerRegistration<?> listenerRegistration;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void beforeEach() {
         doReturn(listenerRegistration).when(dataBroker)
             .registerDataTreeChangeListener(any(DataTreeIdentifier.class), any(DefaultSslHandlerFactoryProvider.class));
     }
 
     @Test
-    public void testKeystoreAdapterInit() throws Exception {
-        final DefaultSslHandlerFactoryProvider keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
+    void getJavaKeyStore() {
+        final var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
         final var ex = assertThrows(KeyStoreException.class, keystoreAdapter::getJavaKeyStore);
-        assertThat(ex.getMessage(), startsWith("No keystore private key found"));
+        assertNotNull(ex.getMessage());
+        assertTrue(ex.getMessage().startsWith("No keystore private key found"));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    public void testWritePrivateKey() throws Exception {
-        DataTreeModification<Keystore> dataTreeModification = mock(DataTreeModification.class);
-        DataObjectModification<Keystore> keystoreObjectModification = mock(DataObjectModification.class);
-        doReturn(keystoreObjectModification).when(dataTreeModification).getRootNode();
-
-        DataObjectModification<?> childObjectModification = mock(DataObjectModification.class);
-        doReturn(List.of(childObjectModification)).when(keystoreObjectModification).getModifiedChildren();
-        doReturn(PrivateKey.class).when(childObjectModification).getDataType();
-
-        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification).getModificationType();
-
-        final var privateKey = getPrivateKey();
-        doReturn(privateKey).when(childObjectModification).getDataAfter();
+    void getJavaKeyStoreWithAliases() throws Exception {
+        final var validPrivateKey = generatePrivateKey("valid-private-key");
+        final var invalidPrivateKey = new PrivateKeyBuilder()
+            .setName("invalid-private-key").setData(INVALID_DATA).build();
 
         final var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
-        keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification));
+        keystoreAdapter.onDataTreeChanged(List.of(
+            mockModification(PrivateKey.class, validPrivateKey),
+            mockModification(PrivateKey.class, invalidPrivateKey)
+        ));
+        final var keyStore = keystoreAdapter.getJavaKeyStore(Set.of("valid-private-key"));
+        assertTrue(keyStore.containsAlias("valid-private-key"));
 
-        final var keyStore = keystoreAdapter.getJavaKeyStore();
-        assertTrue(keyStore.containsAlias(privateKey.getName()));
+        final var ex = assertThrows(KeyStoreException.class,
+            () -> keystoreAdapter.getJavaKeyStore(Set.of("invalid-private-key", "unknown-alias")));
+        assertNotNull(ex.getMessage());
+        assertTrue(ex.getMessage().startsWith("None of allowed private keys found."));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    public void testWritePrivateKeyAndTrustedCertificate() throws Exception {
-        // Prepare PrivateKey configuration
-        DataTreeModification<Keystore> dataTreeModification1 = mock(DataTreeModification.class);
-        DataObjectModification<Keystore> keystoreObjectModification1 = mock(DataObjectModification.class);
-        doReturn(keystoreObjectModification1).when(dataTreeModification1).getRootNode();
-
-        DataObjectModification<?> childObjectModification1 = mock(DataObjectModification.class);
-        doReturn(List.of(childObjectModification1)).when(keystoreObjectModification1).getModifiedChildren();
-        doReturn(PrivateKey.class).when(childObjectModification1).getDataType();
-
-        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification1).getModificationType();
-
-        final var privateKey = getPrivateKey();
-        doReturn(privateKey).when(childObjectModification1).getDataAfter();
-
-        // Prepare TrustedCertificate configuration
-        DataTreeModification<Keystore> dataTreeModification2 = mock(DataTreeModification.class);
-        DataObjectModification<Keystore> keystoreObjectModification2 = mock(DataObjectModification.class);
-        doReturn(keystoreObjectModification2).when(dataTreeModification2).getRootNode();
-
-        DataObjectModification<?> childObjectModification2 = mock(DataObjectModification.class);
-        doReturn(List.of(childObjectModification2)).when(keystoreObjectModification2).getModifiedChildren();
-        doReturn(TrustedCertificate.class).when(childObjectModification2).getDataType();
-
-        doReturn(DataObjectModification.ModificationType.WRITE)
-            .when(childObjectModification2).getModificationType();
-
-        final var trustedCertificate = geTrustedCertificate();
-        doReturn(trustedCertificate).when(childObjectModification2).getDataAfter();
+    void writePrivateKeyAndTrustedCertificate() throws Exception {
+        final var privateKey = generatePrivateKey("test-private-key");
+        final var trustedCertificate = generateTrustedCertificate("test-trusted-cert");
 
         // Apply configurations
         final var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
-        keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
+        keystoreAdapter.onDataTreeChanged(List.of(
+            mockModification(PrivateKey.class, privateKey),
+            mockModification(TrustedCertificate.class, trustedCertificate)));
 
         // Check result
         final var keyStore = keystoreAdapter.getJavaKeyStore();
@@ -133,65 +113,99 @@ public class DefaultSslHandlerFactoryProviderTest {
         assertTrue(keyStore.containsAlias(trustedCertificate.getName()));
     }
 
-    private PrivateKey getPrivateKey() throws Exception {
-        final List<PrivateKey> privateKeys = new ArrayList<>();
-        final Document document = readKeystoreXML();
-        final NodeList nodeList = document.getElementsByTagName(XML_ELEMENT_PRIVATE_KEY);
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            final Node node = nodeList.item(i);
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final Element element = (Element)node;
-            final String keyName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
-            final String keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent();
-            final NodeList certNodes = element.getElementsByTagName(XML_ELEMENT_CERT_CHAIN);
-            final List<String> certChain = new ArrayList<>();
-            for (int j = 0; j < certNodes.getLength(); j++) {
-                final Node certNode = certNodes.item(j);
-                if (certNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-                certChain.add(certNode.getTextContent());
-            }
+    @Test
+    void invalidCertificatesIgnored() throws Exception {
+        final var validPrivateKey = generatePrivateKey("valid-private-key");
+        final var invalidPrivateKey1 = new PrivateKeyBuilder()
+            .setName("invalid-private-key-1")
+            .setData(INVALID_DATA)
+            .setCertificateChain(validPrivateKey.getCertificateChain())
+            .build();
+        final var invalidPrivateKey2 = new PrivateKeyBuilder()
+            .setName("invalid-private-key-2")
+            .setData(validPrivateKey.getData())
+            .setCertificateChain(List.of(INVALID_DATA)).build();
 
-            final PrivateKey privateKey = new PrivateKeyBuilder()
-                    .withKey(new PrivateKeyKey(keyName))
-                    .setName(keyName)
-                    .setData(keyData)
-                    .setCertificateChain(certChain)
-                    .build();
-            privateKeys.add(privateKey);
-        }
+        final var validTrustedCertificate = generateTrustedCertificate("valid-trusted-cert");
+        final var invalidTrustedCertificate = new TrustedCertificateBuilder()
+            .setName("invalid-trusted-cert").setCertificate(INVALID_DATA).build();
 
-        return privateKeys.get(0);
+        // Apply configurations
+        final var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
+        keystoreAdapter.onDataTreeChanged(List.of(
+            mockModification(PrivateKey.class, validPrivateKey),
+            mockModification(PrivateKey.class, invalidPrivateKey1),
+            mockModification(PrivateKey.class, invalidPrivateKey2),
+            mockModification(TrustedCertificate.class, validTrustedCertificate),
+            mockModification(TrustedCertificate.class, invalidTrustedCertificate)));
+
+        // Check result
+        final var keyStore = keystoreAdapter.getJavaKeyStore();
+        assertTrue(keyStore.containsAlias(validPrivateKey.getName()));
+        assertFalse(keyStore.containsAlias(invalidPrivateKey1.getName()));
+        assertFalse(keyStore.containsAlias(invalidPrivateKey2.getName()));
+
+        assertTrue(keyStore.containsAlias(validTrustedCertificate.getName()));
+        assertFalse(keyStore.containsAlias(invalidTrustedCertificate.getName()));
     }
 
-    private TrustedCertificate geTrustedCertificate() throws Exception {
-        final List<TrustedCertificate> trustedCertificates = new ArrayList<>();
-        final Document document = readKeystoreXML();
-        final NodeList nodeList = document.getElementsByTagName(XML_ELEMENT_TRUSTED_CERT);
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            final Node node = nodeList.item(i);
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final Element element = (Element)node;
-            final String certName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
-            final String certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent();
+    private static <T extends DataObject> DataTreeModification<Keystore> mockModification(final Class<T> type,
+            final T modifiedObj) {
 
-            final TrustedCertificate certificate = new TrustedCertificateBuilder()
-                    .withKey(new TrustedCertificateKey(certName))
-                    .setName(certName)
-                    .setCertificate(certData)
-                    .build();
-            trustedCertificates.add(certificate);
-        }
+        final DataTreeModification<Keystore> dataTreeModification = mock(DataTreeModification.class);
+        final DataObjectModification<Keystore> dataObjectModification = mock(DataObjectModification.class);
+        doReturn(dataObjectModification).when(dataTreeModification).getRootNode();
 
-        return trustedCertificates.get(0);
+        final DataObjectModification<T> childObjectModification = mock(DataObjectModification.class);
+        doReturn(List.of(childObjectModification)).when(dataObjectModification).getModifiedChildren();
+
+        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification).getModificationType();
+        doReturn(type).when(childObjectModification).getDataType();
+        doReturn(modifiedObj).when(childObjectModification).getDataAfter();
+
+        return dataTreeModification;
     }
 
-    private Document readKeystoreXML() throws Exception {
-        return XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/netconf-keystore.xml"));
+    private static PrivateKey generatePrivateKey(final String name) throws Exception {
+        final var certData = generateCertData();
+        return new PrivateKeyBuilder()
+            .setName(name)
+            .setData(encodeBase64(certData.keyPair().getPrivate().getEncoded()))
+            .setCertificateChain(List.of(encodeBase64(certData.certificate().getEncoded())))
+            .build();
+    }
+
+    private static TrustedCertificate generateTrustedCertificate(final String name) throws Exception {
+        final var certData = generateCertData();
+        return new TrustedCertificateBuilder()
+            .setName(name)
+            .setCertificate(encodeBase64(certData.certificate().getEncoded()))
+            .build();
+    }
+
+    private static String encodeBase64(final byte[] bytes) {
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    private static CertData generateCertData() throws Exception {
+        // key pair
+        final var keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4), new SecureRandom());
+        final var keyPair = keyPairGenerator.generateKeyPair();
+        // certificate
+        final var now = Instant.now();
+        final var contentSigner = new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
+        final var x500Name = new X500Name("CN=TestCertificate" + COUNTER.incrementAndGet());
+        final var certificateBuilder = new JcaX509v3CertificateBuilder(x500Name,
+            BigInteger.valueOf(now.toEpochMilli()),
+            Date.from(now), Date.from(now.plus(Duration.ofDays(365))),
+            x500Name,
+            keyPair.getPublic());
+        final var certificate = new JcaX509CertificateConverter()
+            .setProvider(new BouncyCastleProvider()).getCertificate(certificateBuilder.build(contentSigner));
+        return new CertData(keyPair, certificate);
+    }
+
+    private record CertData(KeyPair keyPair, Certificate certificate) {
     }
 }
