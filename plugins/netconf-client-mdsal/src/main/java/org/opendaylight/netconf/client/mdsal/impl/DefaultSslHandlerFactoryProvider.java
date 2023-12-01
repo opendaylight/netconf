@@ -57,12 +57,19 @@ import org.slf4j.LoggerFactory;
 @Component(service = SslHandlerFactoryProvider.class)
 public final class DefaultSslHandlerFactoryProvider
         implements SslHandlerFactoryProvider, ClusteredDataTreeChangeListener<Keystore>, AutoCloseable {
+
+    /**
+     * Parsed private key with certificate chain.
+     */
+    private record PrivateKeyRecord(java.security.PrivateKey privateKey, Certificate[] certificateChain) {
+    }
+
     /**
      * Internal state, updated atomically.
      */
     private record State(
-        @NonNull Map<String, PrivateKey> privateKeys,
-        @NonNull Map<String, TrustedCertificate> trustedCertificates) {
+        @NonNull Map<String, PrivateKeyRecord> privateKeys,
+        @NonNull Map<String, Certificate> trustedCertificates) {
 
         State {
             requireNonNull(privateKeys);
@@ -78,8 +85,8 @@ public final class DefaultSslHandlerFactoryProvider
      * Intermediate builder for State.
      */
     private record StateBuilder(
-        @NonNull HashMap<String, PrivateKey> privateKeys,
-        @NonNull HashMap<String, TrustedCertificate> trustedCertificates) {
+        @NonNull HashMap<String, PrivateKeyRecord> privateKeys,
+        @NonNull HashMap<String, Certificate> trustedCertificates) {
 
         StateBuilder {
             requireNonNull(privateKeys);
@@ -115,8 +122,6 @@ public final class DefaultSslHandlerFactoryProvider
         }
 
         private X509Certificate getCertificate(final String base64Certificate) throws GeneralSecurityException {
-            // TODO: https://stackoverflow.com/questions/43809909/is-certificatefactory-getinstancex-509-thread-safe
-            //        indicates this is thread-safe in most cases, but can we get a better assurance?
             if (certFactory == null) {
                 certFactory = CertificateFactory.getInstance("X.509");
             }
@@ -191,39 +196,25 @@ public final class DefaultSslHandlerFactoryProvider
         if (current.privateKeys.isEmpty()) {
             throw new KeyStoreException("No keystore private key found");
         }
+        if (!allowedKeys.isEmpty()
+                && allowedKeys.stream().filter(current.privateKeys::containsKey).findFirst().isEmpty()) {
+            throw new KeyStoreException("None of allowed private keys found. Allowed: " + allowedKeys);
+        }
 
         final var keyStore = KeyStore.getInstance("JKS");
         keyStore.load(null, null);
-
-        final var helper = new SecurityHelper();
-
-        // Private keys first
+        // Private keys
         for (var entry : current.privateKeys.entrySet()) {
             final var alias = entry.getKey();
-            if (!allowedKeys.isEmpty() && !allowedKeys.contains(alias)) {
-                continue;
+            if (allowedKeys.isEmpty() || allowedKeys.contains(alias)) {
+                keyStore.setKeyEntry(alias, entry.getValue().privateKey(), EMPTY_CHARS,
+                    entry.getValue().certificateChain());
             }
-
-            final var privateKey = entry.getValue();
-            final var key = helper.getJavaPrivateKey(privateKey.getData());
-            // TODO: requireCertificateChain() here and filter in update path
-            final var certChain = privateKey.getCertificateChain();
-            if (certChain == null || certChain.isEmpty()) {
-                throw new CertificateException("No certificate chain associated with private key " + alias + " found");
-            }
-
-            final var chain = new Certificate[certChain.size()];
-            int idx = 0;
-            for (var cert : certChain) {
-                chain[idx++] = helper.getCertificate(cert);
-            }
-            keyStore.setKeyEntry(alias, key, EMPTY_CHARS, chain);
         }
-
+        // trusted certificates
         for (var entry : current.trustedCertificates.entrySet()) {
-            keyStore.setCertificateEntry(entry.getKey(), helper.getCertificate(entry.getValue().getCertificate()));
+            keyStore.setCertificateEntry(entry.getKey(), entry.getValue());
         }
-
         return keyStore;
     }
 
@@ -242,28 +233,34 @@ public final class DefaultSslHandlerFactoryProvider
 
     private static void onDataTreeChanged(final StateBuilder builder,
             final Collection<DataTreeModification<Keystore>> changes) {
+        final var helper = new SecurityHelper();
         for (var change : changes) {
             LOG.debug("Processing change {}", change);
             final var rootNode = change.getRootNode();
 
             for (var changedChild : rootNode.getModifiedChildren()) {
                 if (changedChild.getDataType().equals(PrivateKey.class)) {
-                    onPrivateKeyChanged(builder.privateKeys, (DataObjectModification<PrivateKey>)changedChild);
+                    onPrivateKeyChanged(builder.privateKeys, helper, (DataObjectModification<PrivateKey>)changedChild);
                 } else if (changedChild.getDataType().equals(TrustedCertificate.class)) {
-                    onTrustedCertificateChanged(builder.trustedCertificates,
+                    onTrustedCertificateChanged(builder.trustedCertificates, helper,
                         (DataObjectModification<TrustedCertificate>)changedChild);
                 }
             }
         }
     }
 
-    private static void onPrivateKeyChanged(final HashMap<String, PrivateKey> privateKeys,
-            final DataObjectModification<PrivateKey> objectModification) {
+    private static void onPrivateKeyChanged(final Map<String, PrivateKeyRecord> privateKeys,
+            final SecurityHelper helper, final DataObjectModification<PrivateKey> objectModification) {
         switch (objectModification.getModificationType()) {
             case SUBTREE_MODIFIED:
             case WRITE:
                 final var privateKey = objectModification.getDataAfter();
-                privateKeys.put(privateKey.getName(), privateKey);
+                try {
+                    privateKeys.put(privateKey.getName(), toRecord(helper, privateKey));
+                } catch (GeneralSecurityException e) {
+                    LOG.error("Invalid PrivateKey with alias {} is IGNORED due to parse exception",
+                        privateKey.getName(), e);
+                }
                 break;
             case DELETE:
                 privateKeys.remove(objectModification.getDataBefore().getName());
@@ -273,13 +270,34 @@ public final class DefaultSslHandlerFactoryProvider
         }
     }
 
-    private static void onTrustedCertificateChanged(final HashMap<String, TrustedCertificate> trustedCertificates,
-            final DataObjectModification<TrustedCertificate> objectModification) {
+    private static PrivateKeyRecord toRecord(final SecurityHelper helper, final PrivateKey privateKey)
+            throws GeneralSecurityException {
+        final var javaPrivateKey = helper.getJavaPrivateKey(privateKey.getData());
+        final var certChain = privateKey.getCertificateChain();
+        if (certChain == null || certChain.isEmpty()) {
+            throw new CertificateException("No certificate chain associated with private key");
+        }
+        final var certificateChain = new Certificate[certChain.size()];
+        int index = 0;
+        for (String certData : certChain) {
+            certificateChain[index++] = helper.getCertificate(certData);
+        }
+        return new PrivateKeyRecord(javaPrivateKey, certificateChain);
+    }
+
+    private static void onTrustedCertificateChanged(final HashMap<String, Certificate> trustedCertificates,
+            final SecurityHelper helper, final DataObjectModification<TrustedCertificate> objectModification) {
         switch (objectModification.getModificationType()) {
             case SUBTREE_MODIFIED:
             case WRITE:
                 final var trustedCertificate = objectModification.getDataAfter();
-                trustedCertificates.put(trustedCertificate.getName(), trustedCertificate);
+                try {
+                    trustedCertificates.put(trustedCertificate.getName(),
+                        helper.getCertificate(trustedCertificate.getCertificate()));
+                } catch (GeneralSecurityException e) {
+                    LOG.error("Invalid TrustedCertificate with alias {} is IGNORED due to parse exception",
+                        trustedCertificate.getName(), e);
+                }
                 break;
             case DELETE:
                 trustedCertificates.remove(objectModification.getDataBefore().getName());
