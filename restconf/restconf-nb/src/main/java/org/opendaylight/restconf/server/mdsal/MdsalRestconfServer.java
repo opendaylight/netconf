@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
@@ -34,7 +33,6 @@ import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DataPostBody;
@@ -44,13 +42,10 @@ import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndPath;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.DataGetParams;
-import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
-import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
@@ -68,8 +63,6 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangNames;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
@@ -173,13 +166,13 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<Empty> dataDELETE(final ApiPath identifier) {
-        final StrategyAndPath stratAndPath;
+        final StrategyAndTail stratAndTail;
         try {
-            stratAndPath = localStrategy().resolveStrategyPath(identifier);
+            stratAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-        return stratAndPath.strategy().delete(stratAndPath.path().instance());
+        return stratAndTail.strategy().dataDELETE(stratAndTail.tail());
     }
 
     @Override
@@ -200,63 +193,34 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<Empty> dataPATCH(final ResourceBody body) {
-        final var strategy = localStrategy();
-        return dataPATCH(strategy, new DataPutPath(strategy.databind()), body);
+        return localStrategy().dataPATCH(ApiPath.empty(), body);
     }
 
     @Override
     public RestconfFuture<Empty> dataPATCH(final ApiPath identifier, final ResourceBody body) {
-        final StrategyAndPath strategyAndPath;
+        final StrategyAndTail strategyAndTail;
         try {
-            strategyAndPath = localStrategy().resolveStrategyPath(identifier);
+            strategyAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-        final var strategy = strategyAndPath.strategy();
-        final var path = strategyAndPath.path();
-        return dataPATCH(strategy, new DataPutPath(strategy.databind(), path.inference(), path.instance()), body);
-    }
-
-    private static @NonNull RestconfFuture<Empty> dataPATCH(final RestconfStrategy strategy, final DataPutPath path,
-            final ResourceBody body) {
-        final NormalizedNode data;
-        try {
-            data = body.toNormalizedNode(path);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
-        }
-        return strategy.merge(path.instance(), data);
+        return strategyAndTail.strategy().dataPATCH(strategyAndTail.tail(), body);
     }
 
     @Override
     public RestconfFuture<PatchStatusContext> dataPATCH(final PatchBody body) {
-        final var strategy = localStrategy();
-        return dataPATCH(strategy, new DataPatchPath(strategy.databind(), YangInstanceIdentifier.of()), body);
+        return localStrategy().dataPATCH(ApiPath.empty(), body);
     }
 
     @Override
     public RestconfFuture<PatchStatusContext> dataPATCH(final ApiPath identifier, final PatchBody body) {
-        final StrategyAndPath stratAndPath;
+        final StrategyAndTail strategyAndTail;
         try {
-            stratAndPath = localStrategy().resolveStrategyPath(identifier);
+            strategyAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-        final var strategy = stratAndPath.strategy();
-        return dataPATCH(strategy, new DataPatchPath(strategy.databind(), stratAndPath.path().instance()), body);
-    }
-
-    private static @NonNull RestconfFuture<PatchStatusContext> dataPATCH(final RestconfStrategy strategy,
-            final DataPatchPath path, final PatchBody body) {
-        final PatchContext patch;
-        try {
-            patch = body.toPatchContext(path);
-        } catch (IOException e) {
-            LOG.debug("Error parsing YANG Patch input", e);
-            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
-        }
-        return strategy.patchData(patch);
+        return strategyAndTail.strategy().dataPATCH(strategyAndTail.tail(), body);
     }
 
     @Override
