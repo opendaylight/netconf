@@ -41,7 +41,8 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
     abstract @NonNull PatchContext toPatchContext(@NonNull DataPatchPath path, @NonNull InputStream inputStream)
         throws IOException;
 
-    static final YangInstanceIdentifier parsePatchTarget(final DataPatchPath path, final String target) {
+    static final YangInstanceIdentifier parsePatchTarget(final DataPatchPath path, final String target)
+            throws RestconfDocumentedException {
         final var urlPath = path.instance();
         if (target.equals("/")) {
             verify(!urlPath.isEmpty(),

@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableList;
 import java.io.InputStream;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -34,9 +35,10 @@ public abstract sealed class ChildBody extends AbstractBody permits JsonChildBod
      * @param path POST request path
      * @return A {@link PrefixAndBody}
      */
-    public final @NonNull PrefixAndBody toPayload(final @NonNull DataPostPath path) {
+    public final @NonNull PrefixAndBody toPayload(final @NonNull DataPostPath path) throws RestconfDocumentedException {
         return toPayload(path, acquireStream());
     }
 
-    abstract @NonNull PrefixAndBody toPayload(@NonNull DataPostPath path, @NonNull InputStream inputStream);
+    abstract @NonNull PrefixAndBody toPayload(@NonNull DataPostPath path, @NonNull InputStream inputStream)
+        throws RestconfDocumentedException;
 }
