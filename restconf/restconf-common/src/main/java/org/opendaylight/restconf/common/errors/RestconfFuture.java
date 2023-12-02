@@ -89,7 +89,7 @@ public sealed class RestconfFuture<V> extends AbstractFuture<@NonNull V> permits
      * @return The result
      * @throws RestconfDocumentedException if this future failed or this call is interrupted.
      */
-    public final @NonNull V getOrThrow() {
+    public final @NonNull V getOrThrow() throws RestconfDocumentedException {
         try {
             return get();
         } catch (InterruptedException e) {
