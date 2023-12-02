@@ -44,6 +44,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndPath;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataPatchPath;
@@ -172,7 +173,12 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<Empty> dataDELETE(final ApiPath identifier) {
-        final var stratAndPath = localStrategy().resolveStrategyPath(identifier);
+        final StrategyAndPath stratAndPath;
+        try {
+            stratAndPath = localStrategy().resolveStrategyPath(identifier);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
         return stratAndPath.strategy().delete(stratAndPath.path().instance());
     }
 
@@ -183,7 +189,12 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<NormalizedNodePayload> dataGET(final ApiPath identifier, final DataGetParams params) {
-        final var stratAndTail = localStrategy().resolveStrategy(identifier);
+        final StrategyAndTail stratAndTail;
+        try {
+            stratAndTail = localStrategy().resolveStrategy(identifier);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
         return stratAndTail.strategy().dataGET(stratAndTail.tail(), params);
     }
 
@@ -195,7 +206,12 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<Empty> dataPATCH(final ApiPath identifier, final ResourceBody body) {
-        final var strategyAndPath = localStrategy().resolveStrategyPath(identifier);
+        final StrategyAndPath strategyAndPath;
+        try {
+            strategyAndPath = localStrategy().resolveStrategyPath(identifier);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
         final var strategy = strategyAndPath.strategy();
         final var path = strategyAndPath.path();
         return dataPATCH(strategy, new DataPutPath(strategy.databind(), path.inference(), path.instance()), body);
@@ -220,7 +236,12 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<PatchStatusContext> dataPATCH(final ApiPath identifier, final PatchBody body) {
-        final var stratAndPath = localStrategy().resolveStrategyPath(identifier);
+        final StrategyAndPath stratAndPath;
+        try {
+            stratAndPath = localStrategy().resolveStrategyPath(identifier);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
         final var strategy = stratAndPath.strategy();
         return dataPATCH(strategy, new DataPatchPath(strategy.databind(), stratAndPath.path().instance()), body);
     }
@@ -246,7 +267,12 @@ public final class MdsalRestconfServer
     @Override
     public RestconfFuture<? extends DataPostResult> dataPOST(final ApiPath identifier, final DataPostBody body,
             final Map<String, String> queryParameters) {
-        final var strategyAndTail = localStrategy().resolveStrategy(identifier);
+        final StrategyAndTail strategyAndTail;
+        try {
+            strategyAndTail = localStrategy().resolveStrategy(identifier);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
         return strategyAndTail.strategy().dataPOST(strategyAndTail.tail(), body, queryParameters);
     }
 
@@ -258,7 +284,12 @@ public final class MdsalRestconfServer
     @Override
     public RestconfFuture<DataPutResult> dataPUT(final ApiPath identifier, final ResourceBody body,
              final Map<String, String> queryParameters) {
-        final var strategyAndTail = localStrategy().resolveStrategy(identifier);
+        final StrategyAndTail strategyAndTail;
+        try {
+            strategyAndTail = localStrategy().resolveStrategy(identifier);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
         return strategyAndTail.strategy().dataPUT(strategyAndTail.tail(), body, queryParameters);
     }
 
@@ -347,14 +378,24 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<OperationsGetResult> operationsGET(final ApiPath operation) {
-        final var strategyAndTail = localStrategy().resolveStrategy(operation);
+        final StrategyAndTail strategyAndTail;
+        try {
+            strategyAndTail = localStrategy().resolveStrategy(operation);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
         return strategyAndTail.strategy().operationsGET(strategyAndTail.tail());
     }
 
     @Override
     public RestconfFuture<OperationsPostResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
             final OperationInputBody body) {
-        final var strategyAndTail = localStrategy().resolveStrategy(apiPath);
+        final StrategyAndTail strategyAndTail;
+        try {
+            strategyAndTail = localStrategy().resolveStrategy(apiPath);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
         final var strategy = strategyAndTail.strategy();
         return strategy.operationsPOST(restconfURI, strategyAndTail.tail(), body);
     }

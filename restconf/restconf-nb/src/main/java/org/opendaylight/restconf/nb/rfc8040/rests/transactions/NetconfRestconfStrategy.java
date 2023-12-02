@@ -30,6 +30,7 @@ import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -86,8 +87,12 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         final var fields = params.fields();
         final List<YangInstanceIdentifier> fieldPaths;
         if (fields != null) {
-            final var tmp = NetconfFieldsTranslator.translate(inference.getEffectiveModelContext(), path.schema(),
-                fields);
+            final List<YangInstanceIdentifier> tmp;
+            try {
+                tmp = NetconfFieldsTranslator.translate(inference.getEffectiveModelContext(), path.schema(), fields);
+            } catch (RestconfDocumentedException e) {
+                return RestconfFuture.failed(e);
+            }
             fieldPaths = tmp == null || tmp.isEmpty() ? null : tmp;
         } else {
             fieldPaths = null;

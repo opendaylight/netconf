@@ -78,15 +78,20 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
         final var description = new StringBuilder("YANG notifications matching any of {");
         var haveFirst = false;
         for (var qname : qnames) {
-            final var module = modelContext.findModuleStatement(qname.getModule())
-                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown module",
+            final var optModule = modelContext.findModuleStatement(qname.getModule());
+            if (optModule.isEmpty()) {
+                return RestconfFuture.failed(new RestconfDocumentedException(qname + " refers to an unknown module",
                     ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
-            final var stmt = module.findSchemaTreeNode(qname)
-                .orElseThrow(() -> new RestconfDocumentedException(qname + " refers to an unknown notification",
+            }
+            final var module = optModule.orElseThrow();
+            final var optStmt = module.findSchemaTreeNode(qname);
+            if (optStmt.isEmpty()) {
+                return RestconfFuture.failed(new RestconfDocumentedException(
+                    qname + " refers to an unknown notification", ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
+            }
+            if (!(optStmt.orElseThrow() instanceof NotificationEffectiveStatement)) {
+                return RestconfFuture.failed(new RestconfDocumentedException(qname + " refers to a non-notification",
                     ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
-            if (!(stmt instanceof NotificationEffectiveStatement)) {
-                throw new RestconfDocumentedException(qname + " refers to a non-notification",
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
             }
 
             if (haveFirst) {

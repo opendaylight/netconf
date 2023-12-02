@@ -84,6 +84,7 @@ import org.opendaylight.restconf.server.api.OperationsPostPath;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.DataPath;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.InstanceReference;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.OperationPath;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.OperationPath.Rpc;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -345,7 +346,12 @@ public abstract class RestconfStrategy {
 
     public @NonNull RestconfFuture<DataPutResult> dataPUT(final ApiPath apiPath, final ResourceBody body,
             final Map<String, String> queryParameters) {
-        final var path = pathNormalizer.normalizeDataPath(apiPath);
+        final DataPath path;
+        try {
+            path = pathNormalizer.normalizeDataPath(apiPath);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
 
         final Insert insert;
         try {
@@ -731,7 +737,13 @@ public abstract class RestconfStrategy {
 
     public final @NonNull RestconfFuture<NormalizedNodePayload> dataGET(final ApiPath apiPath,
             final DataGetParams params) {
-        return dataGET(pathNormalizer.normalizeDataPath(apiPath), params);
+        final DataPath path;
+        try {
+            path = pathNormalizer.normalizeDataPath(apiPath);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+        return dataGET(path, params);
     }
 
     abstract @NonNull RestconfFuture<NormalizedNodePayload> dataGET(DataPath path, DataGetParams params);
@@ -1313,7 +1325,12 @@ public abstract class RestconfStrategy {
         if (apiPath.steps().isEmpty()) {
             return dataCreatePOST(body.toResource(), queryParameters);
         }
-        final var path = pathNormalizer.normalizeDataOrActionPath(apiPath);
+        final InstanceReference path;
+        try {
+            path = pathNormalizer.normalizeDataOrActionPath(apiPath);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
         if (path instanceof DataPath dataPath) {
             try (var resourceBody = body.toResource()) {
                 return dataCreatePOST(new DataPostPath(databind, dataPath.inference(), dataPath.instance()),
