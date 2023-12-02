@@ -93,7 +93,7 @@ public final class NetconfFieldsTranslator {
      */
     public static @NonNull List<YangInstanceIdentifier> translate(
             final @NonNull EffectiveModelContext modelContext, final @NonNull DataSchemaContext startNode,
-            final @NonNull FieldsParam input) {
+            final @NonNull FieldsParam input) throws RestconfDocumentedException {
         final var parsed = new HashSet<LinkedPathElement>();
         processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(),
             new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
@@ -102,7 +102,7 @@ public final class NetconfFieldsTranslator {
 
     private static void processSelectors(final Set<LinkedPathElement> parsed, final EffectiveModelContext context,
             final QNameModule startNamespace, final LinkedPathElement startPathElement,
-            final List<NodeSelector> selectors) {
+            final List<NodeSelector> selectors) throws RestconfDocumentedException {
         for (var selector : selectors) {
             var pathElement = startPathElement;
             var namespace = startNamespace;
@@ -131,7 +131,7 @@ public final class NetconfFieldsTranslator {
     }
 
     private static LinkedPathElement addChildPathElement(final LinkedPathElement currentElement,
-            final QName childQName) {
+            final QName childQName) throws RestconfDocumentedException {
         final var collectedMixinNodes = new ArrayList<PathArgument>();
 
         DataSchemaContext currentNode = currentElement.targetNode;
