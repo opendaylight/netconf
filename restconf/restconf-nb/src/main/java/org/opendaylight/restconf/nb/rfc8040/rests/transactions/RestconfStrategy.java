@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -66,12 +67,14 @@ import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DataPostBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
+import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierSerializer;
 import org.opendaylight.restconf.server.api.DataGetParams;
+import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
@@ -294,32 +297,8 @@ public abstract class RestconfStrategy {
     // FIXME: this method should only be needed in MdsalRestconfStrategy
     abstract ListenableFuture<Boolean> exists(YangInstanceIdentifier path);
 
-    /**
-     * Delete data from the configuration datastore. If the data does not exist, this operation will fail, as outlined
-     * in <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.7">RFC8040 section 4.7</a>
-     *
-     * @param path Path to delete
-     * @return A {@link RestconfFuture}
-     * @throws NullPointerException if {@code path} is {@code null}
-     */
-    public final @NonNull RestconfFuture<Empty> delete(final YangInstanceIdentifier path) {
-        final var ret = new SettableRestconfFuture<Empty>();
-        delete(ret, requireNonNull(path));
-        return ret;
-    }
-
-    abstract void delete(@NonNull SettableRestconfFuture<Empty> future, @NonNull YangInstanceIdentifier path);
-
-    /**
-     * Merge data into the configuration datastore, as outlined in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040 section 4.6.1</a>.
-     *
-     * @param path Path to merge
-     * @param data Data to merge
-     * @return A {@link RestconfFuture}
-     * @throws NullPointerException if any argument is {@code null}
-     */
-    public final @NonNull RestconfFuture<Empty> merge(final YangInstanceIdentifier path, final NormalizedNode data) {
+    @VisibleForTesting
+    final @NonNull RestconfFuture<Empty> merge(final YangInstanceIdentifier path, final NormalizedNode data) {
         final var ret = new SettableRestconfFuture<Empty>();
         merge(ret, requireNonNull(path), requireNonNull(data));
         return ret;
@@ -578,6 +557,52 @@ public abstract class RestconfStrategy {
     }
 
     /**
+     * Merge data into the configuration datastore, as outlined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040 section 4.6.1</a>.
+     *
+     * @param apiPath Path to merge
+     * @param body Data to merge
+     * @return A {@link RestconfFuture}
+     * @throws NullPointerException if any argument is {@code null}
+     */
+    public final @NonNull RestconfFuture<Empty> dataPATCH(final ApiPath apiPath, final ResourceBody body) {
+        final DataPath path;
+        try {
+            path = pathNormalizer.normalizeDataPath(apiPath);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+
+        final NormalizedNode data;
+        try {
+            data = body.toNormalizedNode(new DataPutPath(databind, path.inference(), path.instance()));
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+
+        return merge(path.instance(), data);
+    }
+
+    public final @NonNull RestconfFuture<PatchStatusContext> dataPATCH(final ApiPath apiPath, final PatchBody body) {
+        final DataPath path;
+        try {
+            path = pathNormalizer.normalizeDataPath(apiPath);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+
+        final PatchContext patch;
+        try {
+            patch = body.toPatchContext(new DataPatchPath(databind, path.instance()));
+        } catch (IOException e) {
+            LOG.debug("Error parsing YANG Patch input", e);
+            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+        }
+        return patchData(patch);
+    }
+
+    /**
      * Process edit operations of one {@link PatchContext}.
      *
      * @param patch Patch context to be processed
@@ -734,6 +759,31 @@ public abstract class RestconfStrategy {
                 path);
         }
     }
+
+    /**
+     * Delete data from the configuration datastore. If the data does not exist, this operation will fail, as outlined
+     * in <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.7">RFC8040 section 4.7</a>
+     *
+     * @param apiPath Path to delete
+     * @return A {@link RestconfFuture}
+     * @throws NullPointerException if {@code apiPath} is {@code null}
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public final @NonNull RestconfFuture<Empty> dataDELETE(final ApiPath apiPath) {
+        final DataPath path;
+        try {
+            path = pathNormalizer.normalizeDataPath(apiPath);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+
+        // FIXME: reject empty YangInstanceIdentifier, as datastores may not be deleted
+        final var ret = new SettableRestconfFuture<Empty>();
+        delete(ret, path.instance());
+        return ret;
+    }
+
+    abstract void delete(@NonNull SettableRestconfFuture<Empty> future, @NonNull YangInstanceIdentifier path);
 
     public final @NonNull RestconfFuture<NormalizedNodePayload> dataGET(final ApiPath apiPath,
             final DataGetParams params) {
