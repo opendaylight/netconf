@@ -205,7 +205,7 @@ public abstract class RestconfStrategy {
         pathNormalizer = new ApiPathNormalizer(databind);
     }
 
-    public final @NonNull StrategyAndPath resolveStrategyPath(final ApiPath path) {
+    public final @NonNull StrategyAndPath resolveStrategyPath(final ApiPath path) throws RestconfDocumentedException {
         final var andTail = resolveStrategy(path);
         final var strategy = andTail.strategy();
         return new StrategyAndPath(strategy, strategy.pathNormalizer.normalizeDataPath(andTail.tail()));
@@ -218,7 +218,7 @@ public abstract class RestconfStrategy {
      * @return A strategy and the remaining path
      * @throws NullPointerException if {@code path} is {@code null}
      */
-    public final @NonNull StrategyAndTail resolveStrategy(final ApiPath path) {
+    public final @NonNull StrategyAndTail resolveStrategy(final ApiPath path) throws RestconfDocumentedException {
         var mount = path.indexOf("yang-ext", "mount");
         if (mount == -1) {
             return new StrategyAndTail(this, path);
@@ -236,7 +236,8 @@ public abstract class RestconfStrategy {
         return createStrategy(mountPath, mountPoint).resolveStrategy(path.subPath(mount + 1));
     }
 
-    private static @NonNull RestconfStrategy createStrategy(final ApiPath mountPath, final DOMMountPoint mountPoint) {
+    private static @NonNull RestconfStrategy createStrategy(final ApiPath mountPath, final DOMMountPoint mountPoint)
+            throws RestconfDocumentedException {
         final var mountSchemaService = mountPoint.getService(DOMSchemaService.class)
             .orElseThrow(() -> new RestconfDocumentedException(
                 "Mount point '" + mountPath + "' does not expose DOMSchemaService",
@@ -859,7 +860,7 @@ public abstract class RestconfStrategy {
     }
 
     final NormalizedNode prepareDataByParamWithDef(final NormalizedNode readData, final YangInstanceIdentifier path,
-            final WithDefaultsMode defaultsMode) {
+            final WithDefaultsMode defaultsMode) throws RestconfDocumentedException {
         final boolean trim = switch (defaultsMode) {
             case Trim -> true;
             case Explicit -> false;

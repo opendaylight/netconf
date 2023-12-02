@@ -119,7 +119,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
         instanceIdentifierCodec = new ApiPathInstanceIdentifierCodec(databind);
     }
 
-    public @NonNull Path normalizePath(final ApiPath apiPath) {
+    public @NonNull Path normalizePath(final ApiPath apiPath) throws RestconfDocumentedException {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
             return new DataPath(Inference.ofDataTreePath(modelContext), YangInstanceIdentifier.of(),
@@ -241,7 +241,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
         }
     }
 
-    public @NonNull DataPath normalizeDataPath(final ApiPath apiPath) {
+    public @NonNull DataPath normalizeDataPath(final ApiPath apiPath) throws RestconfDocumentedException {
         final var path = normalizePath(apiPath);
         if (path instanceof DataPath dataPath) {
             return dataPath;
@@ -251,7 +251,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
     }
 
     @Override
-    public PathArgument normalizePoint(final ApiPath value) {
+    public PathArgument normalizePoint(final ApiPath value) throws RestconfDocumentedException {
         final var path = normalizePath(value);
         if (path instanceof DataPath dataPath) {
             final var lastArg = dataPath.instance().getLastPathArgument();
@@ -263,7 +263,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
         throw new IllegalArgumentException("Point '" + value + "' resolves to non-data " + path);
     }
 
-    public @NonNull Rpc normalizeRpcPath(final ApiPath apiPath) {
+    public @NonNull Rpc normalizeRpcPath(final ApiPath apiPath) throws RestconfDocumentedException {
         final var steps = apiPath.steps();
         return switch (steps.size()) {
             case 0 -> throw new RestconfDocumentedException("RPC name must be present", ErrorType.PROTOCOL,
@@ -274,7 +274,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
         };
     }
 
-    public @NonNull Rpc normalizeRpcPath(final ApiPath.Step step) {
+    public @NonNull Rpc normalizeRpcPath(final ApiPath.Step step) throws RestconfDocumentedException {
         final var firstModule = step.module();
         if (firstModule == null) {
             throw new RestconfDocumentedException(
@@ -299,9 +299,8 @@ public final class ApiPathNormalizer implements PointNormalizer {
             ErrorTag.DATA_MISSING);
     }
 
-    public @NonNull InstanceReference normalizeDataOrActionPath(final ApiPath apiPath) {
-
-
+    public @NonNull InstanceReference normalizeDataOrActionPath(final ApiPath apiPath)
+            throws RestconfDocumentedException {
         // FIXME: optimize this
         final var path = normalizePath(apiPath);
         if (path instanceof DataPath dataPath) {
@@ -314,7 +313,8 @@ public final class ApiPathNormalizer implements PointNormalizer {
     }
 
     private NodeIdentifierWithPredicates prepareNodeWithPredicates(final SchemaInferenceStack stack, final QName qname,
-            final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues) {
+            final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues)
+                throws RestconfDocumentedException {
         final var keyDef = schema.getKeyDefinition();
         final var keySize = keyDef.size();
         final var varSize = keyValues.size();
@@ -338,7 +338,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
     }
 
     private Object prepareValueByType(final SchemaInferenceStack stack, final DataSchemaNode schemaNode,
-            final @NonNull String value) {
+            final @NonNull String value) throws RestconfDocumentedException {
 
         TypeDefinition<? extends TypeDefinition<?>> typedef;
         if (schemaNode instanceof LeafListSchemaNode leafList) {
@@ -368,14 +368,15 @@ public final class ApiPathNormalizer implements PointNormalizer {
     }
 
     private NodeWithValue<?> prepareNodeWithValue(final SchemaInferenceStack stack, final QName qname,
-            final DataSchemaNode schema, final List<String> keyValues) {
+            final DataSchemaNode schema, final List<String> keyValues) throws RestconfDocumentedException {
         // TODO: qname should be always equal to schema.getQName(), right?
         return new NodeWithValue<>(qname, prepareValueByType(stack, schema,
             // FIXME: ahem: we probably want to do something differently here
             keyValues.get(0)));
     }
 
-    private QName toIdentityrefQName(final String value, final DataSchemaNode schemaNode) {
+    private QName toIdentityrefQName(final String value, final DataSchemaNode schemaNode)
+            throws RestconfDocumentedException {
         final QNameModule namespace;
         final String localName;
         final int firstColon = value.indexOf(':');
@@ -397,7 +398,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
     }
 
-    private @NonNull QNameModule resolveNamespace(final String moduleName) {
+    private @NonNull QNameModule resolveNamespace(final String moduleName) throws RestconfDocumentedException {
         final var it = modelContext.findModuleStatements(moduleName).iterator();
         if (it.hasNext()) {
             return it.next().localQNameModule();

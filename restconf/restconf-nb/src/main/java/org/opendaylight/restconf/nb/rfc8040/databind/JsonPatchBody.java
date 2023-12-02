@@ -299,7 +299,7 @@ public final class JsonPatchBody extends PatchBody {
      * @param edit Instance of PatchEdit
      * @return PatchEntity Patch entity
      */
-    private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) {
+    private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) throws RestconfDocumentedException {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
             && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
             if (!requiresValue(edit.getOperation())) {

@@ -45,7 +45,8 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
      * @throws RestconfDocumentedException if the body cannot be decoded or it does not match {@code path}
      */
     @SuppressWarnings("checkstyle:illegalCatch")
-    public @NonNull NormalizedNode toNormalizedNode(final @NonNull DataPutPath path) {
+    public final @NonNull NormalizedNode toNormalizedNode(final @NonNull DataPutPath path)
+            throws RestconfDocumentedException {
         final var instance = path.instance();
         final var expectedName = instance.isEmpty() ? DATA_NID : instance.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
@@ -55,8 +56,6 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, e);
-        } catch (RestconfDocumentedException e) {
-            throw e;
         } catch (RuntimeException e) {
             throwIfYangError(e);
             throw e;

@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.concepts.Immutable;
@@ -39,7 +40,7 @@ public final class Insert implements Immutable {
     @FunctionalInterface
     public interface PointNormalizer {
 
-        PathArgument normalizePoint(ApiPath value);
+        PathArgument normalizePoint(ApiPath value) throws RestconfDocumentedException;
     }
 
     private final @NonNull InsertParam insert;
@@ -117,7 +118,8 @@ public final class Insert implements Immutable {
         };
     }
 
-    private static PathArgument parsePoint(final PointNormalizer pointParser, final String value) {
+    private static PathArgument parsePoint(final PointNormalizer pointParser, final String value)
+            throws RestconfDocumentedException {
         final ApiPath pointPath;
         try {
             pointPath = ApiPath.parse(value);

@@ -46,7 +46,7 @@ public final class XmlChildBody extends ChildBody {
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final DataPostPath path, final InputStream inputStream) {
+    PrefixAndBody toPayload(final DataPostPath path, final InputStream inputStream) throws RestconfDocumentedException {
         try {
             return parse(path, UntrustedXML.newDocumentBuilder().parse(inputStream));
         } catch (final RestconfDocumentedException e) {

@@ -871,7 +871,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     private static void completeModulesGET(final RestconfFuture<ModulesGetResult> future, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final ModulesGetResult result) {
+            Response transform(final ModulesGetResult result) throws RestconfDocumentedException {
                 final Reader reader;
                 try {
                     reader = result.source().openStream();

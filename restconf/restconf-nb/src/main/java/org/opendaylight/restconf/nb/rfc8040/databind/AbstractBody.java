@@ -74,7 +74,7 @@ public abstract sealed class AbstractBody implements AutoCloseable
      *
      * @param cause Proposed cause of a RestconfDocumentedException
      */
-    static void throwIfYangError(final Exception cause) {
+    static void throwIfYangError(final Exception cause) throws RestconfDocumentedException {
         if (cause instanceof YangNetconfErrorAware infoAware) {
             throw new RestconfDocumentedException(cause, infoAware.getNetconfErrors().stream()
                 .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),

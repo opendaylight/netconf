@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfDeviceNotificationService implements DOMNotificationService {
+public class NetconfDeviceNotificationService implements DOMNotificationService {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceNotificationService.class);
 
     private final Multimap<Absolute, DOMNotificationListener> listeners = HashMultimap.create();
