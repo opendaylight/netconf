@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Optional;
@@ -80,7 +79,7 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
     }
 
     final @NonNull PatchContext parse(final String prefix, final String suffix, final String patchBody)
-            throws IOException {
+            throws Exception {
         final String uriPath;
         if (prefix.isEmpty()) {
             uriPath = suffix;

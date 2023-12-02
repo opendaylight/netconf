@@ -289,21 +289,21 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     abstract @NonNull RestconfStrategy testPostDataFailStrategy(DOMException domException);
 
     @Test
-    public final void testPatchContainerData() {
+    public final void testPatchContainerData() throws Exception {
         testPatchContainerDataStrategy().merge(JUKEBOX_IID, EMPTY_JUKEBOX).getOrThrow();
     }
 
     abstract @NonNull RestconfStrategy testPatchContainerDataStrategy();
 
     @Test
-    public final void testPatchLeafData() {
+    public final void testPatchLeafData() throws Exception {
         testPatchLeafDataStrategy().merge(GAP_IID, GAP_LEAF).getOrThrow();
     }
 
     abstract @NonNull RestconfStrategy testPatchLeafDataStrategy();
 
     @Test
-    public final void testPatchListData() {
+    public final void testPatchListData() throws Exception {
         testPatchListDataStrategy().merge(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST).getOrThrow();
     }
 

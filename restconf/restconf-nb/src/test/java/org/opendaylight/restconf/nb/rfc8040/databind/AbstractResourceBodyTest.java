@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.function.Function;
@@ -77,7 +76,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         DATABIND = DatabindContext.ofModel(YangParserTestUtils.parseYangFiles(testFiles));
     }
 
-    final @NonNull NormalizedNode parse(final String uriPath, final String patchBody) throws IOException {
+    final @NonNull NormalizedNode parse(final String uriPath, final String patchBody) throws Exception {
         final ApiPath apiPath;
         try {
             apiPath = ApiPath.parse(uriPath);
