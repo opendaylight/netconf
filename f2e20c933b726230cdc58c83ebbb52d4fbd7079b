@@ -34,6 +34,29 @@
       "parentUuid": "febdaa63_8ef88aa0",
       "revId": "f2e20c933b726230cdc58c83ebbb52d4fbd7079b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "def38389_9dd5fcd7",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-12-04T08:03:31Z",
+      "side": 1,
+      "message": "requireNonNull()",
+      "range": {
+        "startLine": 99,
+        "startChar": 21,
+        "endLine": 99,
+        "endChar": 26
+      },
+      "revId": "f2e20c933b726230cdc58c83ebbb52d4fbd7079b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
