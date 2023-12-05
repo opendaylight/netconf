@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.security.KeyPair;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -64,7 +65,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
 
     @Override
     public NetconfClientConfigurationBuilder createClientConfigurationBuilder(final NodeId nodeId,
-        final NetconfNode node) {
+            final NetconfNode node) {
         final var builder = NetconfClientConfigurationBuilder.create();
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
@@ -73,11 +74,11 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             builder.withProtocol(NetconfClientProtocol.SSH);
             setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
-            builder.withProtocol(NetconfClientProtocol.TLS).withTransportSslHandlerFactory(channel -> {
-                final var sslHandlerBuilder =
-                    sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification());
-                return sslHandlerBuilder.createSslHandler();
-            });
+            // FIXME key aliases and trusted certificate aliases to be defined in dedicated properties
+            final var specification = protocol.getSpecification();
+            final var keyIds = keyIdsFromCredentials(node.getCredentials());
+            builder.withProtocol(NetconfClientProtocol.TLS).withTransportSslHandlerFactory(ignored ->
+                sslHandlerFactoryProvider.getSslHandlerFactory(specification).createSslHandler(keyIds));
         } else {
             throw new IllegalArgumentException("Unsupported protocol type: " + protocol.getName());
         }
@@ -96,7 +97,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
     }
 
     private void setSshParametersFromCredentials(final NetconfClientConfigurationBuilder confBuilder,
-        final Credentials credentials) {
+            final Credentials credentials) {
         final var sshParamsBuilder = new SshClientParametersBuilder();
         if (credentials instanceof LoginPwUnencrypted unencrypted) {
             final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
@@ -122,6 +123,11 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
         confBuilder.withSshParameters(sshParamsBuilder.build());
+    }
+
+    private static Set<String> keyIdsFromCredentials(final Credentials credentials) {
+        return credentials != null && credentials instanceof KeyAuth keyAuth && keyAuth.getKeyBased().getKeyId() != null
+            ? Set.of(keyAuth.getKeyBased().getKeyId()) : Set.of();
     }
 
     private static ClientIdentity loginPasswordIdentity(final String username, final String password) {
