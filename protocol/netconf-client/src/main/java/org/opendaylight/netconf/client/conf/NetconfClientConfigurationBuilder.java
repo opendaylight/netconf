@@ -11,6 +11,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Set;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -33,6 +34,7 @@ public class NetconfClientConfigurationBuilder {
     private AuthenticationHandler authHandler;
     private NetconfClientConfiguration.NetconfClientProtocol clientProtocol = DEFAULT_CLIENT_PROTOCOL;
     private SslHandlerFactory sslHandlerFactory;
+    private Set<String> privateKeyIds;
     private NetconfSshClient sshClient;
     private List<Uri> odlHelloCapabilities;
     private @NonNegative int maximumIncomingChunkSize =
@@ -87,6 +89,12 @@ public class NetconfClientConfigurationBuilder {
     @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withSslHandlerFactory(final SslHandlerFactory sslHandlerFactory) {
         this.sslHandlerFactory = sslHandlerFactory;
+        return this;
+    }
+
+    @SuppressWarnings("checkstyle:hiddenField")
+    public NetconfClientConfigurationBuilder withPrivateKeyIds(final Set<String> privateKeyIds) {
+        this.privateKeyIds = privateKeyIds;
         return this;
     }
 
@@ -162,7 +170,7 @@ public class NetconfClientConfigurationBuilder {
 
     public NetconfClientConfiguration build() {
         return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
-                sessionListener, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities,
+                sessionListener, authHandler, sslHandlerFactory, privateKeyIds, sshClient, odlHelloCapabilities,
                 maximumIncomingChunkSize, name);
     }
 }
