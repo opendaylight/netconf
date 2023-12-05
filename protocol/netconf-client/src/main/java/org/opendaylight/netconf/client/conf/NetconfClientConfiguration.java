@@ -14,6 +14,7 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -36,6 +37,7 @@ public class NetconfClientConfiguration {
 
     private final AuthenticationHandler authHandler;
     private final SslHandlerFactory sslHandlerFactory;
+    private final Set<String> privateKeyIds;
     private final NetconfSshClient sshClient;
 
     private final List<Uri> odlHelloCapabilities;
@@ -47,7 +49,9 @@ public class NetconfClientConfiguration {
                                final NetconfHelloMessageAdditionalHeader additionalHeader,
                                final NetconfClientSessionListener sessionListener,
                                final AuthenticationHandler authHandler,
-                               final SslHandlerFactory sslHandlerFactory, final NetconfSshClient sshClient,
+                               final SslHandlerFactory sslHandlerFactory,
+                               final Set<String> privateKeyIds,
+                               final NetconfSshClient sshClient,
                                final List<Uri> odlHelloCapabilities, final @NonNegative int maximumIncomingChunkSize,
                                final String name) {
         this.address = address;
@@ -57,6 +61,7 @@ public class NetconfClientConfiguration {
         clientProtocol = protocol;
         this.authHandler = authHandler;
         this.sslHandlerFactory = sslHandlerFactory;
+        this.privateKeyIds = privateKeyIds == null ? Set.of() : privateKeyIds;
         this.sshClient = sshClient;
         this.odlHelloCapabilities = odlHelloCapabilities;
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;
@@ -94,6 +99,10 @@ public class NetconfClientConfiguration {
 
     public SslHandlerFactory getSslHandlerFactory() {
         return sslHandlerFactory;
+    }
+
+    public Set<String> getPrivateKeyIds() {
+        return privateKeyIds;
     }
 
     public NetconfSshClient getSshClient() {

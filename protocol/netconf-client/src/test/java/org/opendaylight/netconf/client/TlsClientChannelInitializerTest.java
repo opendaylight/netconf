@@ -19,6 +19,7 @@ import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.concurrent.Promise;
+import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -55,7 +56,7 @@ public class TlsClientChannelInitializerTest {
 
         Promise<NetconfClientSession> promise = mock(Promise.class);
 
-        TlsClientChannelInitializer initializer = new TlsClientChannelInitializer(sslHandlerFactory,
+        TlsClientChannelInitializer initializer = new TlsClientChannelInitializer(sslHandlerFactory, Set.of(),
                 negotiatorFactory, sessionListener);
         initializer.initialize(channel, promise);
         verify(pipeline, times(1)).addFirst(anyString(), any(ChannelHandler.class));
