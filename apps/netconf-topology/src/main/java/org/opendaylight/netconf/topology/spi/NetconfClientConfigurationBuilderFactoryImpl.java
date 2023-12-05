@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -74,8 +75,10 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             builder.withProtocol(NetconfClientProtocol.SSH);
             setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
-            final var handlerFactory = sslContextFactoryProvider.getSslContextFactory(protocol.getSpecification());
-            final var sslContext = handlerFactory.createSslContext();
+            // FIXME key aliases and trusted certificate aliases for TLS to be defined under in dedicated properties
+            final var keyIds = keyIdsFromCredentials(node.getCredentials());
+            final var contextFactory = sslContextFactoryProvider.getSslContextFactory(protocol.getSpecification());
+            final var sslContext = contextFactory.createSslContext(keyIds);
             builder.withProtocol(NetconfClientProtocol.TLS)
                 .withSslHandlerFactory(new FixedSslHandlerFactory(sslContext));
         } else {
@@ -137,6 +140,11 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
         confBuilder.withSshParameters(sshParamsBuilder.build());
+    }
+
+    private static Set<String> keyIdsFromCredentials(final Credentials credentials) {
+        final var keyId = credentials instanceof KeyAuth keyAuth ? keyAuth.getKeyBased().getKeyId() : null;
+        return keyId == null ? Set.of() : Set.of(keyId);
     }
 
     private static ClientIdentity loginPasswordIdentity(final String username, final String password) {
