@@ -16,6 +16,7 @@ import static org.mockito.Mockito.doReturn;
 
 import io.netty.handler.ssl.SslContext;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +35,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.ProtocolBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.KeyAuthBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.key.auth.KeyBasedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeBuilder;
@@ -121,9 +124,24 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     @Test
     void testTls() {
         doReturn(sslContextFactory).when(sslContextFactoryProvider).getSslContextFactory(any());
-        doReturn(sslContext).when(sslContextFactory).createSslContext();
+        doReturn(sslContext).when(sslContextFactory).createSslContext(Set.of());
         final var config = createConfig(
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build());
+        assertConfig(config);
+        assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
+        assertNotNull(config.getSslHandlerFactory());
+    }
+
+    @Test
+    void testTlsWithKeyId() {
+        doReturn(sslContextFactory).when(sslContextFactoryProvider).getSslContextFactory(any());
+        doReturn(sslContext).when(sslContextFactory).createSslContext(Set.of("key-id"));
+        final var config = createConfig(
+            nodeBuilder.setTcpOnly(false)
+                .setProtocol(new ProtocolBuilder().setName(Name.TLS).build())
+                .setCredentials(new KeyAuthBuilder().setKeyBased(
+                    new KeyBasedBuilder().setKeyId("key-id").build()
+                ).build()).build());
         assertConfig(config);
         assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
         assertNotNull(config.getSslHandlerFactory());
