@@ -18,6 +18,7 @@ import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -77,7 +78,7 @@ final class CallHomeTlsSessionContext implements CallHomeProtocolSessionContext 
         final NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(
             new HashedWheelTimer(), Optional.empty(), TimeUnit.SECONDS.toMillis(5));
         final TlsClientChannelInitializer tlsClientChannelInitializer = new TlsClientChannelInitializer(
-            sslHandlerFactory, negotiatorFactory, listener);
+            sslHandlerFactory, Set.of(), negotiatorFactory, listener);
         tlsClientChannelInitializer.initialize(ch, activationPromise);
         return activationPromise;
     }

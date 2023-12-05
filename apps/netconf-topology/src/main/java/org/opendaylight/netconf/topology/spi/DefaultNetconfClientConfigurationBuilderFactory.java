@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
@@ -67,7 +68,8 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
                 .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
         } else if (protocol.getName() == Name.TLS) {
             builder.withProtocol(NetconfClientProtocol.TLS)
-                .withSslHandlerFactory(sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification()));
+                .withSslHandlerFactory(sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification()))
+                .withPrivateKeyIds(getPrivateKeyIdsFromCredentials(node.getCredentials()));
         } else {
             throw new IllegalArgumentException("Unsupported protocol type: " + protocol.getName());
         }
@@ -100,5 +102,10 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
+    }
+
+    private static Set<String> getPrivateKeyIdsFromCredentials(final Credentials credentials) {
+        return credentials instanceof KeyAuth keyAuth && keyAuth.getKeyBased().getKeyId() != null
+            ? Set.of(keyAuth.getKeyBased().getKeyId()) : Set.of();
     }
 }
