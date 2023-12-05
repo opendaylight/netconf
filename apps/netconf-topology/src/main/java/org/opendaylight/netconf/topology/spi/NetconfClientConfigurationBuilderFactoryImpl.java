@@ -20,6 +20,7 @@ import java.security.Provider;
 import java.security.Security;
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -82,7 +83,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
 
     @Override
     public NetconfClientConfigurationBuilder createClientConfigurationBuilder(final NodeId nodeId,
-        final NetconfNode node) {
+            final NetconfNode node) {
         final var builder = NetconfClientConfigurationBuilder.create();
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
@@ -91,9 +92,11 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             builder.withProtocol(NetconfClientProtocol.SSH);
             setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
+            // FIXME key aliases and trusted certificate aliases to be defined in dedicated properties
+            final var keyIds = keyIdsFromCredentials(node.getCredentials());
             builder.withProtocol(NetconfClientProtocol.TLS).withSslHandlerFactory(
                 channel -> sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification())
-                    .createSslHandler());
+                    .createSslHandler(keyIds));
         } else {
             throw new IllegalArgumentException("Unsupported protocol type: " + protocol.getName());
         }
@@ -145,6 +148,11 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
         }
         confBuilder.withSshParameters(sshParamsBuilder.build());
+    }
+
+    private static Set<String> keyIdsFromCredentials(final Credentials credentials) {
+        final var keyId = credentials instanceof KeyAuth keyAuth ? keyAuth.getKeyBased().getKeyId() : null;
+        return keyId == null ? Set.of() : Set.of(keyId);
     }
 
     private static ClientIdentity loginPasswordIdentity(final String username, final String password) {

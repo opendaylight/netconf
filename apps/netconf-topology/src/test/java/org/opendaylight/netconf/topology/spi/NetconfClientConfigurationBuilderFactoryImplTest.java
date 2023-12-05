@@ -11,8 +11,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+import io.netty.handler.ssl.SslHandler;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
@@ -30,7 +37,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.ProtocolBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.KeyAuthBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.key.auth.KeyBasedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeBuilder;
@@ -53,6 +62,10 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     private CredentialProvider credentialProvider;
     @Mock
     private SslHandlerFactoryProvider sslHandlerFactoryProvider;
+    @Mock
+    private SslHandlerFactory legacyFactory;
+    @Mock
+    private SslHandler sslHandler;
 
     private NetconfNodeBuilder nodeBuilder;
     private NetconfClientConfigurationBuilderFactoryImpl factory;
@@ -117,6 +130,24 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
         assertConfig(config);
         assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
         assertNotNull(config.getSslHandlerFactory());
+    }
+
+    @Test
+    void testTlsWithKeyId() {
+        final var config = createConfig(
+            nodeBuilder.setTcpOnly(false)
+                .setProtocol(new ProtocolBuilder().setName(Name.TLS).build())
+                .setCredentials(new KeyAuthBuilder().setKeyBased(
+                    new KeyBasedBuilder().setKeyId("key-id").build()
+                ).build()).build());
+        assertConfig(config);
+        assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
+        assertNotNull(config.getSslHandlerFactory());
+
+        doReturn(legacyFactory).when(sslHandlerFactoryProvider).getSslHandlerFactory(null);
+        doReturn(sslHandler).when(legacyFactory).createSslHandler(anySet());
+        assertSame(sslHandler, config.getSslHandlerFactory().createSslHandler(null));
+        verify(legacyFactory, times(1)).createSslHandler(Set.of("key-id"));
     }
 
     @Test
