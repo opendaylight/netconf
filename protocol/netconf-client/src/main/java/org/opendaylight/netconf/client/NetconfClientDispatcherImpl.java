@@ -77,6 +77,7 @@ public class NetconfClientDispatcherImpl
         LOG.debug("Creating TLS client with configuration: {}", currentConfiguration);
         return super.createClient(currentConfiguration.getAddress(),
             (ch, sessionPromise) -> new TlsClientChannelInitializer(currentConfiguration.getSslHandlerFactory(),
+                    currentConfiguration.getPrivateKeyIds(),
                     getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener())
                     .initialize(ch, sessionPromise));
     }
