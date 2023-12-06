@@ -19,12 +19,20 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Auxiliary interface for instantiating JAX-RS streams.
+ *
+ * @deprecated This componet exists only to support SSE/Websocket delivery. It will be removed when support for
+ *             WebSockets is removed.
  */
 @Component(factory = DefaultRestconfStreamServletFactory.FACTORY_NAME, service = RestconfStreamServletFactory.class)
+@Deprecated(since = "7.0.0", forRemoval = true)
 public final class DefaultRestconfStreamServletFactory implements RestconfStreamServletFactory, AutoCloseable {
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultRestconfStreamServletFactory.class);
+
     public static final String FACTORY_NAME =
         "org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory";
 
@@ -47,8 +55,13 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
         this.servletSupport = requireNonNull(servletSupport);
         this.streamRegistry = requireNonNull(streamRegistry);
         this.streamsConfiguration = requireNonNull(streamsConfiguration);
-        this.useWebsockets = useWebsockets;
         pingExecutor = new DefaultPingExecutor(namePrefix, corePoolSize);
+        this.useWebsockets = useWebsockets;
+        if (useWebsockets) {
+            LOG.warn("""
+                RESTCONF event streams use WebSockets instead of Server-Sent Events. This option is will be removed in
+                the next major release.""");
+        }
     }
 
     @Activate

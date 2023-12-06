@@ -34,6 +34,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @ExtendWith(MockitoExtension.class)
+@Deprecated(since = "7.0.0", forRemoval = true)
 class WebSocketFactoryTest extends AbstractNotificationListenerTest {
     private static final QName TOASTER = QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster");
 
