@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
  *                              (exceeded message length leads to fragmentation of messages).
  * @param heartbeatInterval     Interval in milliseconds between sending of ping control frames.
  */
+@Deprecated(since = "7.0.0", forRemoval = true)
 record WebSocketFactory(
         RestconfStream.Registry streamRegistry,
         PingExecutor pingExecutor,
