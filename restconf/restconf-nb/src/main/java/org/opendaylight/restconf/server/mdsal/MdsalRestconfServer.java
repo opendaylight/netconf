@@ -44,6 +44,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
+import org.opendaylight.restconf.server.api.DataOptionsResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
@@ -164,6 +165,17 @@ public final class MdsalRestconfServer
     public void close() {
         reg.close();
         localStrategy = null;
+    }
+
+    @Override
+    public RestconfFuture<DataOptionsResult> dataOPTIONS(final ApiPath identifier) {
+        final StrategyAndTail stratAndTail;
+        try {
+            stratAndTail = localStrategy().resolveStrategy(identifier);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+        return stratAndTail.strategy().dataOPTIONS(stratAndTail.tail());
     }
 
     @Override

@@ -54,6 +54,7 @@ import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -76,6 +77,7 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierS
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
+import org.opendaylight.restconf.server.api.DataOptionsResult;
 import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostPath;
@@ -768,6 +770,17 @@ public abstract class RestconfStrategy {
             throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
                 path);
         }
+    }
+
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public final RestconfFuture<DataOptionsResult> dataOPTIONS(final ApiPath apiPath) {
+        // FIXME: resolve the ApiPath to acquire the underlying schema:
+        //        - data tree statements support DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT
+        //        - actions support only OPTIONS and POST methods
+        return RestconfFuture.of(new DataOptionsResult(
+            ImmutableSet.of("DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"),
+            ImmutableSet.of(MediaTypes.APPLICATION_YANG_DATA_JSON, MediaTypes.APPLICATION_YANG_DATA_XML,
+                MediaTypes.APPLICATION_YANG_PATCH_JSON, MediaTypes.APPLICATION_YANG_PATCH_XML)));
     }
 
     /**

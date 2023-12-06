@@ -28,6 +28,15 @@ import org.opendaylight.yangtools.yang.common.Empty;
 @NonNullByDefault
 public interface RestconfServer {
     /**
+     * Inquire supported operations on a data resource.
+     *
+     * @param identifier resource identifier
+     * @return A {@link RestconfFuture} completing with a {@link DataOptionsResult}
+     */
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    RestconfFuture<DataOptionsResult> dataOPTIONS(ApiPath identifier);
+
+    /**
      * Delete a data resource.
      *
      * @param identifier resource identifier

@@ -18,11 +18,13 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -67,6 +69,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.DataGetResult;
+import org.opendaylight.restconf.server.api.DataOptionsResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
@@ -127,6 +130,42 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public <T> ParamConverter<T> getConverter(final Class<T> rawType, final Type genericType,
             final Annotation[] annotations) {
         return ApiPath.class.equals(rawType) ? (ParamConverter<T>) API_PATH_CONVERTER : null;
+    }
+
+    /**
+     * Inquire supported operations on the datastore resource.
+     */
+    @OPTIONS
+    @Path("/data")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public void dataOPTIONS(@Suspended final AsyncResponse ar) {
+        completeDataOPTIONS(server.dataOPTIONS(ApiPath.empty()), ar);
+    }
+
+    /**
+     * Inquire supported operations on a particular data resource.
+     */
+    @OPTIONS
+    @Path("/data/{identifier:.+}")
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    public void dataOPTIONS(@Encoded @PathParam("identifier") final ApiPath identifier,
+            @Suspended final AsyncResponse ar) {
+        completeDataOPTIONS(server.dataOPTIONS(identifier), ar);
+    }
+
+    @SuppressWarnings("checkstyle:abbreviationAsWordInName")
+    private static void completeDataOPTIONS(final RestconfFuture<DataOptionsResult> future, final AsyncResponse ar) {
+        future.addCallback(new JaxRsRestconfCallback<>(ar) {
+            @Override
+            Response transform(final DataOptionsResult result) {
+                final var builder = Response.ok().allow(result.methods());
+                final var patchMediaTypes = result.patchMediaTypes();
+                if (!patchMediaTypes.isEmpty()) {
+                    builder.header("Accept-Patch", patchMediaTypes.stream().collect(Collectors.joining(", ")));
+                }
+                return builder.build();
+            }
+        });
     }
 
     /**
