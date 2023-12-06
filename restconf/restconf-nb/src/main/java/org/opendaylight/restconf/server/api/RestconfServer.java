@@ -20,7 +20,6 @@ import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.ResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
@@ -28,7 +27,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3">RESTCONF API Resource</a>.
  */
 // FIXME: NETCONF-1207: configuration datastore should maintain ETag and Last-Modified headers, so that these can be
-//                      returned when PATCH/POST/PUT modify the data.
+//                      returned when PATCH/PUT modify the data.
 @NonNullByDefault
 public interface RestconfServer {
     /**
@@ -95,7 +94,7 @@ public interface RestconfServer {
      */
     RestconfFuture<PatchStatusContext> dataPATCH(ApiPath identifier, PatchBody body);
 
-    RestconfFuture<CreateResource> dataPOST(ChildBody body, Map<String, String> queryParameters);
+    RestconfFuture<DataPostResult.CreateResource> dataPOST(ChildBody body, Map<String, String> queryParameters);
 
     RestconfFuture<? extends DataPostResult> dataPOST(ApiPath identifier, DataPostBody body,
         Map<String, String> queryParameters);
