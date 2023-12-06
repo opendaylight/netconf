@@ -24,7 +24,6 @@ import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -114,13 +113,12 @@ public abstract class AbstractNetconfTopology {
         LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(node));
 
         // Instantiate the handler ...
-        final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
         final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
 
         final NetconfNodeHandler nodeHandler;
         try {
             nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemas, schemaManager, processingExecutor,
-                builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode, nodeOptional);
+                builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode);
         } catch (IllegalArgumentException e) {
             // This is a workaround for NETCONF-1114 where the encrypted password's lexical structure is not enforced
             // in the datastore and it ends up surfacing when we decrypt the password.

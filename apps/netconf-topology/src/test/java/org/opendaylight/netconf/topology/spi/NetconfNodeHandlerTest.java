@@ -156,7 +156,7 @@ public class NetconfNodeHandlerTest {
                         .setPassword("testpassword")
                         .build())
                     .build())
-                .build(), null);
+                .build());
     }
 
     @Test
