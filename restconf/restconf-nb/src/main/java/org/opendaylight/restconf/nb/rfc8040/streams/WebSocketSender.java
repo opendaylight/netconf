@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * to data-change-event or notification listener, and sending of data over established web-socket session.
  */
 @WebSocket
+@Deprecated(since = "7.0.0", forRemoval = true)
 final class WebSocketSender implements Sender {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketSender.class);
     private static final byte[] PING_PAYLOAD = "ping".getBytes(Charset.defaultCharset());

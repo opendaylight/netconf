@@ -18,6 +18,7 @@ import org.opendaylight.restconf.server.spi.RestconfStream;
 /**
  * Web-socket servlet listening on ws or wss schemas for created data-change-event or notification streams.
  */
+@Deprecated(since = "7.0.0", forRemoval = true)
 final class WebSocketInitializer extends WebSocketServlet {
     @java.io.Serial
     private static final long serialVersionUID = 1L;

@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * Access to notification streams via Server-Sent Events.
  */
 @Path("/")
+// FIXME: integrate this service into JaxRsRestconf once we remove support for WebSockets
 final class SSEStreamService {
     private static final Logger LOG = LoggerFactory.getLogger(SSEStreamService.class);
 

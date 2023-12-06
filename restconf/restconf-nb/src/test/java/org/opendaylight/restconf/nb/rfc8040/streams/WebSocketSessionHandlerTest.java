@@ -35,6 +35,7 @@ import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.yangtools.concepts.Registration;
 
 @ExtendWith(MockitoExtension.class)
+@Deprecated(since = "7.0.0", forRemoval = true)
 class WebSocketSessionHandlerTest {
     private final class WebSocketTestSessionState {
         private final WebSocketSender webSocketSessionHandler;
