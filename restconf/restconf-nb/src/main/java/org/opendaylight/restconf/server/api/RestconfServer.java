@@ -61,8 +61,7 @@ public interface RestconfServer {
      * @param body data node for put to config DS
      * @return A {@link RestconfFuture} of the operation
      */
-    // FIXME: NETCONF-1207: result should carry ConfigurationMetadata
-    RestconfFuture<Empty> dataPATCH(ResourceBody body);
+    RestconfFuture<DataPatchResult> dataPATCH(ResourceBody body);
 
     /**
      * Partially modify the target data resource, as defined in
@@ -72,8 +71,7 @@ public interface RestconfServer {
      * @param body data node for put to config DS
      * @return A {@link RestconfFuture} of the operation
      */
-    // FIXME: NETCONF-1207: result should carry ConfigurationMetadata
-    RestconfFuture<Empty> dataPATCH(ApiPath identifier, ResourceBody body);
+    RestconfFuture<DataPatchResult> dataPATCH(ApiPath identifier, ResourceBody body);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
