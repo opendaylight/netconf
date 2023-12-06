@@ -3,7 +3,7 @@
   "info": {
     "version": "1.0.0",
     "title": "typed-params",
-    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That is because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That's because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
   },
   "servers": [
     {
