@@ -352,7 +352,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     public final void testDeleteNonexistentData() {
         final var status = deleteNonexistentDataTestStrategy().patchData(new PatchContext("patchD",
             List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))))
-            .getOrThrow();
+            .getOrThrow().status();
         assertEquals("patchD", status.patchId());
         assertFalse(status.ok());
         final var edits = status.editCollection();
@@ -496,7 +496,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
-        final var patchStatusContext = strategy.patchData(patchContext).getOrThrow();
+        final var patchStatusContext = strategy.patchData(patchContext).getOrThrow().status();
         for (var entity : patchStatusContext.editCollection()) {
             if (failed) {
                 assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());

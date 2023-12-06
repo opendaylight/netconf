@@ -13,7 +13,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.nb.rfc8040.databind.ChildBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.DataPostBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.OperationInputBody;
@@ -78,10 +77,9 @@ public interface RestconfServer {
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param body YANG Patch body
-     * @return A {@link RestconfFuture} of the {@link PatchStatusContext} content
+     * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    // FIXME: NETCONF-1207: result should carry ConfigurationMetadata
-    RestconfFuture<PatchStatusContext> dataPATCH(PatchBody body);
+    RestconfFuture<DataYangPatchResult> dataPATCH(PatchBody body);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
@@ -89,10 +87,9 @@ public interface RestconfServer {
      *
      * @param identifier path to target
      * @param body YANG Patch body
-     * @return A {@link RestconfFuture} of the {@link PatchStatusContext} content
+     * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    // FIXME: NETCONF-1207: result should carry ConfigurationMetadata
-    RestconfFuture<PatchStatusContext> dataPATCH(ApiPath identifier, PatchBody body);
+    RestconfFuture<DataYangPatchResult> dataPATCH(ApiPath identifier, PatchBody body);
 
     RestconfFuture<DataPostResult.CreateResource> dataPOST(ChildBody body, Map<String, String> queryParameters);
 

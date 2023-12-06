@@ -84,6 +84,7 @@ import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.restconf.server.api.DataPutResult;
+import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.OperationsPostPath;
@@ -590,7 +591,7 @@ public abstract class RestconfStrategy {
         return merge(path.instance(), data);
     }
 
-    public final @NonNull RestconfFuture<PatchStatusContext> dataPATCH(final ApiPath apiPath, final PatchBody body) {
+    public final @NonNull RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath apiPath, final PatchBody body) {
         final DataPath path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
@@ -615,7 +616,7 @@ public abstract class RestconfStrategy {
      * @param patch Patch context to be processed
      * @return {@link PatchStatusContext}
      */
-    public final @NonNull RestconfFuture<PatchStatusContext> patchData(final PatchContext patch) {
+    public final @NonNull RestconfFuture<DataYangPatchResult> patchData(final PatchContext patch) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var tx = prepareWriteExecution();
 
@@ -684,26 +685,28 @@ public abstract class RestconfStrategy {
             }
         }
 
-        final var ret = new SettableRestconfFuture<PatchStatusContext>();
+        final var ret = new SettableRestconfFuture<DataYangPatchResult>();
         // We have errors
         if (!noError) {
             tx.cancel();
-            ret.set(new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), false, null));
+            ret.set(new DataYangPatchResult(
+                new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), false, null)));
             return ret;
         }
 
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), true,
-                    null));
+                ret.set(new DataYangPatchResult(
+                    new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), true, null)));
             }
 
             @Override
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                ret.set(new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), false,
-                    TransactionUtil.decodeException(cause, "PATCH", null, modelContext()).getErrors()));
+                ret.set(new DataYangPatchResult(
+                    new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), false,
+                        TransactionUtil.decodeException(cause, "PATCH", null, modelContext()).getErrors())));
             }
         }, MoreExecutors.directExecutor());
 

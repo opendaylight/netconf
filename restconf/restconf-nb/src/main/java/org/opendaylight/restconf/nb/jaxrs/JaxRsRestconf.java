@@ -72,6 +72,7 @@ import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
+import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
@@ -388,11 +389,15 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         }
     }
 
-    private static void completeDataYangPATCH(final RestconfFuture<PatchStatusContext> future, final AsyncResponse ar) {
+    private static void completeDataYangPATCH(final RestconfFuture<DataYangPatchResult> future,
+            final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final PatchStatusContext result) {
-                return Response.status(statusOf(result)).entity(result).build();
+            Response transform(final DataYangPatchResult result) {
+                final var status = result.status();
+                final var builder = Response.status(statusOf(status)).entity(status);
+                fillConfigurationMetadata(builder, result);
+                return builder.build();
             }
 
             private static Status statusOf(final PatchStatusContext result) {
