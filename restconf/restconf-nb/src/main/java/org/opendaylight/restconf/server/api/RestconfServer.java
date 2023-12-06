@@ -27,9 +27,8 @@ import org.opendaylight.yangtools.yang.common.Empty;
  * An implementation of a RESTCONF server, implementing the
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3">RESTCONF API Resource</a>.
  */
-// FIXME: configuration datastore should maintain ETag and Last-Modified headers, so that these can be returned when
-//        GET/PATCH/POST/PUT modify the data.
-// FIXME: NETCONF-773: as a first step in doing that we should carry those fields in our responses
+// FIXME: NETCONF-1207: configuration datastore should maintain ETag and Last-Modified headers, so that these can be
+//                      returned when PATCH/POST/PUT modify the data.
 @NonNullByDefault
 public interface RestconfServer {
     /**
@@ -45,18 +44,18 @@ public interface RestconfServer {
      * Return the content of the datastore.
      *
      * @param params {@link DataGetParams} for this request
-     * @return A {@link RestconfFuture} of the {@link NormalizedNodePayload} content
+     * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<NormalizedNodePayload> dataGET(DataGetParams params);
+    RestconfFuture<DataGetResult> dataGET(DataGetParams params);
 
     /**
      * Return the content of a data resource.
      *
      * @param identifier resource identifier
      * @param params {@link DataGetParams} for this request
-     * @return A {@link RestconfFuture} of the {@link NormalizedNodePayload} content
+     * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<NormalizedNodePayload> dataGET(ApiPath identifier, DataGetParams params);
+    RestconfFuture<DataGetResult> dataGET(ApiPath identifier, DataGetParams params);
 
     /**
      * Partially modify the target data resource, as defined in
@@ -149,7 +148,7 @@ public interface RestconfServer {
      * @param body RPC operation
      * @return A {@link RestconfFuture} completing with {@link OperationsPostResult}
      */
-    // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support ang-ext:mount,
+    // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support yang-ext:mount,
     //        and hence it is a path right now
     RestconfFuture<OperationsPostResult> operationsPOST(URI restconfURI, ApiPath operation, OperationInputBody body);
 

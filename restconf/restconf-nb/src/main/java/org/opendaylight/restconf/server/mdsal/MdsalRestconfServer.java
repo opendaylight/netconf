@@ -44,6 +44,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.DataGetParams;
+import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPutResult;
@@ -176,12 +177,12 @@ public final class MdsalRestconfServer
     }
 
     @Override
-    public RestconfFuture<NormalizedNodePayload> dataGET(final DataGetParams params) {
+    public RestconfFuture<DataGetResult> dataGET(final DataGetParams params) {
         return localStrategy().dataGET(ApiPath.empty(), params);
     }
 
     @Override
-    public RestconfFuture<NormalizedNodePayload> dataGET(final ApiPath identifier, final DataGetParams params) {
+    public RestconfFuture<DataGetResult> dataGET(final ApiPath identifier, final DataGetParams params) {
         final StrategyAndTail stratAndTail;
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);

@@ -15,9 +15,7 @@ import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.text.ParseException;
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import javax.inject.Singleton;
@@ -34,7 +32,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -64,7 +64,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.server.api.DataGetParams;
+import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
@@ -74,7 +74,6 @@ import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.yangtools.yang.common.Empty;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +87,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public final class JaxRsRestconf implements ParamConverterProvider {
     private static final Logger LOG = LoggerFactory.getLogger(JaxRsRestconf.class);
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
+    private static final CacheControl NO_CACHE = CacheControl.valueOf("no-cache");
     private static final ParamConverter<ApiPath> API_PATH_CONVERTER = new ParamConverter<>() {
         @Override
         public ApiPath fromString(final String value) {
@@ -161,8 +160,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void dataGET(@Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        final var readParams = QueryParams.newDataGetParams(uriInfo);
-        completeDataGET(server.dataGET(readParams), readParams, ar);
+        completeDataGET(server.dataGET(QueryParams.newDataGetParams(uriInfo)), ar);
     }
 
     /**
@@ -183,30 +181,25 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
-        final var readParams = QueryParams.newDataGetParams(uriInfo);
-        completeDataGET(server.dataGET(identifier, readParams), readParams, ar);
+        completeDataGET(server.dataGET(identifier, QueryParams.newDataGetParams(uriInfo)), ar);
     }
 
-    private static void completeDataGET(final RestconfFuture<NormalizedNodePayload> future,
-            final DataGetParams readParams, final AsyncResponse ar) {
+    private static void completeDataGET(final RestconfFuture<DataGetResult> future, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final NormalizedNodePayload result) {
-                return switch (readParams.content()) {
-                    case ALL, CONFIG -> {
-                        final var type = result.data().name().getNodeType();
-                        yield Response.status(Status.OK)
-                            .entity(result)
-                            // FIXME: is this ETag okay?
-                            // FIXME: use tag() method instead
-                            .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
-                                + "-" + type.getLocalName() + '"')
-                            // FIXME: use lastModified() method instead
-                            .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
-                            .build();
-                    }
-                    case NONCONFIG -> Response.status(Status.OK).entity(result).build();
-                };
+            Response transform(final DataGetResult result) {
+                final var builder = Response.status(Status.OK)
+                    .entity(result.payload())
+                    .cacheControl(NO_CACHE);
+                final var etag = result.entityTag();
+                if (etag != null) {
+                    builder.tag(new EntityTag(etag.value(), etag.weak()));
+                }
+                final var lastModified = result.lastModified();
+                if (lastModified != null) {
+                    builder.lastModified(Date.from(lastModified));
+                }
+                return builder.build();
             }
         });
     }
