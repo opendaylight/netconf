@@ -73,7 +73,9 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierSerializer;
+import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.DataGetParams;
+import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.restconf.server.api.DataPostResult;
@@ -785,7 +787,7 @@ public abstract class RestconfStrategy {
 
     abstract void delete(@NonNull SettableRestconfFuture<Empty> future, @NonNull YangInstanceIdentifier path);
 
-    public final @NonNull RestconfFuture<NormalizedNodePayload> dataGET(final ApiPath apiPath,
+    public final @NonNull RestconfFuture<DataGetResult> dataGET(final ApiPath apiPath,
             final DataGetParams params) {
         final DataPath path;
         try {
@@ -796,17 +798,20 @@ public abstract class RestconfStrategy {
         return dataGET(path, params);
     }
 
-    abstract @NonNull RestconfFuture<NormalizedNodePayload> dataGET(DataPath path, DataGetParams params);
+    abstract @NonNull RestconfFuture<DataGetResult> dataGET(DataPath path, DataGetParams params);
 
-    static final @NonNull RestconfFuture<NormalizedNodePayload> completeDataGET(final Inference inference,
-            final QueryParameters queryParams, final NormalizedNode node) {
+    static final @NonNull RestconfFuture<DataGetResult> completeDataGET(final Inference inference,
+            final QueryParameters queryParams, final @Nullable NormalizedNode node,
+            final @Nullable ConfigurationMetadata metadata) {
         if (node == null) {
             return RestconfFuture.failed(new RestconfDocumentedException(
                 "Request could not be completed because the relevant data model content does not exist",
                 ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
         }
 
-        return RestconfFuture.of(new NormalizedNodePayload(inference, node, queryParams));
+        final var payload = new NormalizedNodePayload(inference, node, queryParams);
+        return RestconfFuture.of(metadata == null ? new DataGetResult(payload)
+            : new DataGetResult(payload, metadata.entityTag(), metadata.lastModified()));
     }
 
     /**
