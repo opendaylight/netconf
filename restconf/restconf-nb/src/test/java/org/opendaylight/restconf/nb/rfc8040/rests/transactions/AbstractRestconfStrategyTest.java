@@ -33,6 +33,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
@@ -349,14 +350,21 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testDeleteNonexistentData() {
-        final var patchStatusContext = deleteNonexistentDataTestStrategy().patchData(new PatchContext("patchD",
-            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))));
-        assertFalse(patchStatusContext.getOrThrow().ok());
+        final var status = deleteNonexistentDataTestStrategy().patchData(new PatchContext("patchD",
+            List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))))
+            .getOrThrow();
+        assertEquals("patchD", status.patchId());
+        assertFalse(status.ok());
+        final var edits = status.editCollection();
+        assertEquals(1, edits.size());
+        final var edit = edits.get(0);
+        assertEquals("edit", edit.getEditId());
+        assertTestDeleteNonexistentData(status, edit);
     }
 
     abstract @NonNull RestconfStrategy deleteNonexistentDataTestStrategy();
 
-    abstract void assertTestDeleteNonexistentData(@NonNull PatchStatusContext status);
+    abstract void assertTestDeleteNonexistentData(@NonNull PatchStatusContext status, @NonNull PatchStatusEntity edit);
 
     @Test
     public final void readDataConfigTest() {
