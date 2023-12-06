@@ -4,7 +4,6 @@ module netconf-node-topology {
 
     import network-topology { prefix nt; revision-date 2013-10-21; }
     import yang-ext { prefix ext; revision-date "2013-07-09";}
-    import netconf-node-optional { prefix nno; }
     import odl-netconf-device { prefix ond; }
 
     revision 2022-12-25 {
@@ -13,6 +12,24 @@ module netconf-node-topology {
 
     revision "2015-01-14" {
         description "Initial revision of Topology model";
+    }
+
+    grouping netconf-node-augmented-optional-fields {
+        container ignore-missing-schema-sources {
+            description "Allows mount point to reconnect on the 'missing schema sources' error.
+            WARNING - enabling the reconnection on the 'missing schema sources' error can lead
+            to unexpected errors at runtime.";
+            leaf allowed {
+                type boolean;
+                default false;
+                description "Allows reconnection of the mount point. Default false.";
+            }
+            leaf reconnect-time {
+                type uint32;
+                default 5000;
+                description "Time for reconnection - in units milliseconds. Default 5000 ms.";
+            }
+        }
     }
 
     grouping netconf-node-fields {
@@ -26,7 +43,7 @@ module netconf-node-topology {
         status deprecated;
         input {
             uses netconf-node-fields;
-            uses nno:netconf-node-augmented-optional-fields;
+            uses netconf-node-augmented-optional-fields;
             leaf node-id {
                 type string;
             }
@@ -55,6 +72,7 @@ module netconf-node-topology {
 
         uses netconf-node-fields;
         uses ond:connection-oper;
+        uses netconf-node-augmented-optional-fields;
         ext:mount;
     }
 }
