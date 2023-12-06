@@ -13,7 +13,11 @@ import org.opendaylight.restconf.server.spi.RestconfStream;
 
 /**
  * A helper for creating {@link HttpServlet}s which provide bridge between JAX-RS and {@link RestconfStream.Registry}.
+ *
+ * @deprecated This interface exists only to support SSE/Websocket delivery. It will be removed when support for
+ *             WebSockets is removed.
  */
+@Deprecated(since = "7.0.0", forRemoval = true)
 public interface RestconfStreamServletFactory {
 
     @NonNull HttpServlet newStreamServlet();
