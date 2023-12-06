@@ -37,6 +37,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ParamConverter;
@@ -64,6 +65,7 @@ import org.opendaylight.restconf.nb.rfc8040.databind.XmlResourceBody;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
@@ -191,17 +193,21 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 final var builder = Response.status(Status.OK)
                     .entity(result.payload())
                     .cacheControl(NO_CACHE);
-                final var etag = result.entityTag();
-                if (etag != null) {
-                    builder.tag(new EntityTag(etag.value(), etag.weak()));
-                }
-                final var lastModified = result.lastModified();
-                if (lastModified != null) {
-                    builder.lastModified(Date.from(lastModified));
-                }
+                fillConfigurationMetadata(builder, result);
                 return builder.build();
             }
         });
+    }
+
+    private static void fillConfigurationMetadata(final ResponseBuilder builder, final ConfigurationMetadata metadata) {
+        final var etag = metadata.entityTag();
+        if (etag != null) {
+            builder.tag(new EntityTag(etag.value(), etag.weak()));
+        }
+        final var lastModified = metadata.lastModified();
+        if (lastModified != null) {
+            builder.lastModified(Date.from(lastModified));
+        }
     }
 
     /**
@@ -498,11 +504,12 @@ public final class JaxRsRestconf implements ParamConverterProvider {
             @Override
             Response transform(final DataPostResult result) {
                 if (result instanceof CreateResource createResource) {
-                    return Response.created(uriInfo.getBaseUriBuilder()
-                            .path("data")
-                            .path(createResource.createdPath())
-                            .build())
-                        .build();
+                    final var builder = Response.created(uriInfo.getBaseUriBuilder()
+                        .path("data")
+                        .path(createResource.createdPath())
+                        .build());
+                    fillConfigurationMetadata(builder, createResource);
+                    return builder.build();
                 }
                 if (result instanceof InvokeOperation invokeOperation) {
                     final var output = invokeOperation.output();
