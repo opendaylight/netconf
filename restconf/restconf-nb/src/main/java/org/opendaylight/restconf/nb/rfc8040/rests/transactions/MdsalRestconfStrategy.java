@@ -28,10 +28,10 @@ import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.restconf.server.api.DataGetParams;
+import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.DataPath;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
@@ -112,13 +112,13 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfFuture<NormalizedNodePayload> dataGET(final DataPath path, final DataGetParams params) {
+    RestconfFuture<DataGetResult> dataGET(final DataPath path, final DataGetParams params) {
         final var inference = path.inference();
         final var fields = params.fields();
         final var translatedFields = fields == null ? null
             : WriterFieldsTranslator.translate(inference.getEffectiveModelContext(), path.schema(), fields);
         return completeDataGET(inference, QueryParameters.of(params, translatedFields),
-            readData(params.content(), path.instance(), params.withDefaults()));
+            readData(params.content(), path.instance(), params.withDefaults()), null);
     }
 
     @Override

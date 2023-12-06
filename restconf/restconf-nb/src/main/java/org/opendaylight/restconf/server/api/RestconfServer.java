@@ -45,18 +45,18 @@ public interface RestconfServer {
      * Return the content of the datastore.
      *
      * @param params {@link DataGetParams} for this request
-     * @return A {@link RestconfFuture} of the {@link NormalizedNodePayload} content
+     * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<NormalizedNodePayload> dataGET(DataGetParams params);
+    RestconfFuture<DataGetResult> dataGET(DataGetParams params);
 
     /**
      * Return the content of a data resource.
      *
      * @param identifier resource identifier
      * @param params {@link DataGetParams} for this request
-     * @return A {@link RestconfFuture} of the {@link NormalizedNodePayload} content
+     * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<NormalizedNodePayload> dataGET(ApiPath identifier, DataGetParams params);
+    RestconfFuture<DataGetResult> dataGET(ApiPath identifier, DataGetParams params);
 
     /**
      * Partially modify the target data resource, as defined in
