@@ -48,6 +48,7 @@ public final class OSGiNorthbound {
         //        Integer.MAX_VALUE, which is not what we want
         @AttributeDefinition(min = "0")
         int max$_$thread$_$count() default DefaultPingExecutor.DEFAULT_CORE_POOL_SIZE;
+        @Deprecated(since = "7.0.0", forRemoval = true)
         @AttributeDefinition
         boolean use$_$sse() default true;
     }
@@ -58,6 +59,7 @@ public final class OSGiNorthbound {
     private final ComponentFactory<DefaultRestconfStreamServletFactory> servletFactoryFactory;
 
     private ComponentInstance<MdsalRestconfStreamRegistry> registry;
+    @Deprecated(since = "7.0.0", forRemoval = true)
     private boolean useSSE;
 
     private ComponentInstance<DefaultRestconfStreamServletFactory> servletFactory;
