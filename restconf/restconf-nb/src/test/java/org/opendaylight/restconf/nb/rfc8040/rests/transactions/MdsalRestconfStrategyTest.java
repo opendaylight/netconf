@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -44,6 +45,7 @@ import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -222,12 +224,12 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     }
 
     @Override
-    void assertTestDeleteNonexistentData(final PatchStatusContext status) {
-        final var editCollection = status.editCollection();
-        assertEquals(1, editCollection.size());
-        final var editErrors = editCollection.get(0).getEditErrors();
+    void assertTestDeleteNonexistentData(final PatchStatusContext status, final PatchStatusEntity edit) {
+        assertNull(status.globalErrors());
+        final var editErrors = edit.getEditErrors();
         assertEquals(1, editErrors.size());
         final var editError = editErrors.get(0);
+        assertEquals("Data does not exist", editError.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, editError.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, editError.getErrorTag());
     }

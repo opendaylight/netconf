@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -29,6 +30,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -241,11 +243,13 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
     }
 
     @Override
-    void assertTestDeleteNonexistentData(final PatchStatusContext status) {
+    void assertTestDeleteNonexistentData(final PatchStatusContext status, final PatchStatusEntity edit) {
+        assertNull(edit.getEditErrors());
         final var globalErrors = status.globalErrors();
         assertNotNull(globalErrors);
         assertEquals(1, globalErrors.size());
         final var globalError = globalErrors.get(0);
+        assertEquals("Data does not exist", globalError.getErrorMessage());
         assertEquals(ErrorType.PROTOCOL, globalError.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, globalError.getErrorTag());
     }
