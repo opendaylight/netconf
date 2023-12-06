@@ -179,6 +179,8 @@ public abstract class RestconfStrategy {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
+    private static final @NonNull DataPutResult PUT_CREATED = new DataPutResult(true);
+    private static final @NonNull DataPutResult PUT_REPLACED = new DataPutResult(false);
 
     private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
     private final @NonNull ApiPathNormalizer pathNormalizer;
@@ -376,7 +378,7 @@ public abstract class RestconfStrategy {
         Futures.addCallback(commitFuture, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(exists ? DataPutResult.REPLACED : DataPutResult.CREATED);
+                ret.set(exists ? PUT_REPLACED : PUT_CREATED);
             }
 
             @Override

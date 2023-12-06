@@ -608,11 +608,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             Response transform(final DataPutResult result) {
-                return switch (result) {
-                    // Note: no Location header, as it matches the request path
-                    case CREATED -> Response.status(Status.CREATED).build();
-                    case REPLACED -> Response.noContent().build();
-                };
+                // Note: no Location header, as it matches the request path
+                final var builder = result.created() ? Response.status(Status.CREATED) : Response.noContent();
+                fillConfigurationMetadata(builder, result);
+                return builder.build();
             }
         });
     }
