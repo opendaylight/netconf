@@ -26,8 +26,6 @@ import org.opendaylight.yangtools.yang.common.Empty;
  * An implementation of a RESTCONF server, implementing the
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3">RESTCONF API Resource</a>.
  */
-// FIXME: NETCONF-1207: configuration datastore should maintain ETag and Last-Modified headers, so that these can be
-//                      returned when PATCH/PUT modify the data.
 @NonNullByDefault
 public interface RestconfServer {
     /**
@@ -63,6 +61,7 @@ public interface RestconfServer {
      * @param body data node for put to config DS
      * @return A {@link RestconfFuture} of the operation
      */
+    // FIXME: NETCONF-1207: result should carry ConfigurationMetadata
     RestconfFuture<Empty> dataPATCH(ResourceBody body);
 
     /**
@@ -73,6 +72,7 @@ public interface RestconfServer {
      * @param body data node for put to config DS
      * @return A {@link RestconfFuture} of the operation
      */
+    // FIXME: NETCONF-1207: result should carry ConfigurationMetadata
     RestconfFuture<Empty> dataPATCH(ApiPath identifier, ResourceBody body);
 
     /**
@@ -82,6 +82,7 @@ public interface RestconfServer {
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link PatchStatusContext} content
      */
+    // FIXME: NETCONF-1207: result should carry ConfigurationMetadata
     RestconfFuture<PatchStatusContext> dataPATCH(PatchBody body);
 
     /**
@@ -92,6 +93,7 @@ public interface RestconfServer {
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link PatchStatusContext} content
      */
+    // FIXME: NETCONF-1207: result should carry ConfigurationMetadata
     RestconfFuture<PatchStatusContext> dataPATCH(ApiPath identifier, PatchBody body);
 
     RestconfFuture<DataPostResult.CreateResource> dataPOST(ChildBody body, Map<String, String> queryParameters);
