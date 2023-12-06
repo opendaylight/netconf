@@ -67,6 +67,7 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.DataGetResult;
+import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
@@ -292,11 +293,13 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         }
     }
 
-    private static void completeDataPATCH(final RestconfFuture<Empty> future, final AsyncResponse ar) {
+    private static void completeDataPATCH(final RestconfFuture<DataPatchResult> future, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
-            Response transform(final Empty result) {
-                return Response.ok().build();
+            Response transform(final DataPatchResult result) {
+                final var builder = Response.ok();
+                fillConfigurationMetadata(builder, result);
+                return builder.build();
             }
         });
     }

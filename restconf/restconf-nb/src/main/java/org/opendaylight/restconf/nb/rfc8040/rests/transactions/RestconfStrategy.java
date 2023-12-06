@@ -77,6 +77,7 @@ import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchPath;
+import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
@@ -181,6 +182,7 @@ public abstract class RestconfStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
     private static final @NonNull DataPutResult PUT_CREATED = new DataPutResult(true);
     private static final @NonNull DataPutResult PUT_REPLACED = new DataPutResult(false);
+    private static final @NonNull DataPatchResult PATCH_EMPTY = new DataPatchResult();
 
     private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
     private final @NonNull ApiPathNormalizer pathNormalizer;
@@ -302,14 +304,14 @@ public abstract class RestconfStrategy {
     abstract ListenableFuture<Boolean> exists(YangInstanceIdentifier path);
 
     @VisibleForTesting
-    final @NonNull RestconfFuture<Empty> merge(final YangInstanceIdentifier path, final NormalizedNode data) {
-        final var ret = new SettableRestconfFuture<Empty>();
+    final @NonNull RestconfFuture<DataPatchResult> merge(final YangInstanceIdentifier path, final NormalizedNode data) {
+        final var ret = new SettableRestconfFuture<DataPatchResult>();
         merge(ret, requireNonNull(path), requireNonNull(data));
         return ret;
     }
 
-    private void merge(final @NonNull SettableRestconfFuture<Empty> future, final @NonNull YangInstanceIdentifier path,
-            final @NonNull NormalizedNode data) {
+    private void merge(final @NonNull SettableRestconfFuture<DataPatchResult> future,
+            final @NonNull YangInstanceIdentifier path, final @NonNull NormalizedNode data) {
         final var tx = prepareWriteExecution();
         // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
         tx.ensureParentsByMerge(path);
@@ -317,7 +319,8 @@ public abstract class RestconfStrategy {
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                future.set(Empty.value());
+                // TODO: extract details once CommitInfo can communicate them
+                future.set(PATCH_EMPTY);
             }
 
             @Override
@@ -569,7 +572,7 @@ public abstract class RestconfStrategy {
      * @return A {@link RestconfFuture}
      * @throws NullPointerException if any argument is {@code null}
      */
-    public final @NonNull RestconfFuture<Empty> dataPATCH(final ApiPath apiPath, final ResourceBody body) {
+    public final @NonNull RestconfFuture<DataPatchResult> dataPATCH(final ApiPath apiPath, final ResourceBody body) {
         final DataPath path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
