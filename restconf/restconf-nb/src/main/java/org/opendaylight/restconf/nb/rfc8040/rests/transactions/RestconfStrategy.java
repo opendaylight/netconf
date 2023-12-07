@@ -497,9 +497,8 @@ public abstract class RestconfStrategy {
             final NormalizedNode data, final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
-            final var parentPath = path.coerceParent();
-            checkListAndOrderedType(parentPath);
-            future = insertAndCommitPost(path, data, insert, parentPath);
+            checkListAndOrderedType(path);
+            future = insertAndCommitPost(path, data, insert);
         } else {
             future = createAndCommit(prepareWriteExecution(), path, data);
         }
@@ -523,41 +522,41 @@ public abstract class RestconfStrategy {
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parent) {
-        final var grandParent = parent.coerceParent();
+            final NormalizedNode data, final @NonNull Insert insert) {
+        final var parent = path.coerceParent().coerceParent();
         final var tx = prepareWriteExecution();
 
         return switch (insert.insert()) {
             case FIRST -> {
-                final var readData = tx.readList(grandParent);
+                final var readData = tx.readList(parent);
                 if (readData == null || readData.isEmpty()) {
                     tx.replace(path, data);
                 } else {
                     checkItemDoesNotExists(exists(path), path);
-                    tx.remove(grandParent);
+                    tx.remove(parent);
                     tx.replace(path, data);
-                    tx.replace(grandParent, readData);
+                    tx.replace(parent, readData);
                 }
                 yield tx.commit();
             }
             case LAST -> createAndCommit(tx, path, data);
             case BEFORE -> {
-                final var readData = tx.readList(grandParent);
+                final var readData = tx.readList(parent);
                 if (readData == null || readData.isEmpty()) {
                     tx.replace(path, data);
                 } else {
                     checkItemDoesNotExists(exists(path), path);
-                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, grandParent, true);
+                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, parent, true);
                 }
                 yield tx.commit();
             }
             case AFTER -> {
-                final var readData = tx.readList(grandParent);
+                final var readData = tx.readList(parent);
                 if (readData == null || readData.isEmpty()) {
                     tx.replace(path, data);
                 } else {
                     checkItemDoesNotExists(exists(path), path);
-                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, grandParent, false);
+                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, parent, false);
                 }
                 yield tx.commit();
             }
