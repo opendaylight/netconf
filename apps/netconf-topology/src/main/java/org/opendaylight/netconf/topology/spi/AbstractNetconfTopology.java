@@ -111,7 +111,9 @@ public abstract class AbstractNetconfTopology {
             return;
         }
 
-        LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(node));
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Connecting RemoteDevice{{}}, with config {}", nodeId, hideCredentials(node));
+        }
 
         // Instantiate the handler ...
         final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
@@ -168,9 +170,12 @@ public abstract class AbstractNetconfTopology {
      */
     @VisibleForTesting
     static final String hideCredentials(final Node nodeConfiguration) {
-        final var netconfNodeAugmentation = nodeConfiguration.augmentation(NetconfNode.class);
-        final var nodeCredentials = netconfNodeAugmentation.getCredentials().toString();
         final var nodeConfigurationString = nodeConfiguration.toString();
-        return nodeConfigurationString.replace(nodeCredentials, "***");
+        final var netconfNodeAugmentation = nodeConfiguration.augmentation(NetconfNode.class);
+        if (netconfNodeAugmentation != null && netconfNodeAugmentation.getCredentials() != null) {
+            final var nodeCredentials = netconfNodeAugmentation.getCredentials().toString();
+            return nodeConfigurationString.replace(nodeCredentials, "***");
+        }
+        return nodeConfigurationString;
     }
 }
