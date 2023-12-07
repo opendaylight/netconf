@@ -9,14 +9,19 @@ package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriBuilder;
@@ -27,17 +32,25 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
 @ExtendWith(MockitoExtension.class)
 class RestconfDataPostTest extends AbstractRestconfTest {
+    private static final String BASE_URI = "http://localhost:8181/rests/";
+    private static final String INSERT = "insert";
+    private static final String POINT = "point";
     @Mock
     private DOMDataTreeReadWriteTransaction tx;
+    @Mock
+    private DOMDataTreeReadTransaction readTx;
 
     @BeforeEach
     void beforeEach() {
@@ -51,7 +64,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(tx).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
             Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME)).build());
-        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+        doReturn(UriBuilder.fromUri(BASE_URI)).when(uriInfo).getBaseUriBuilder();
 
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox"),
             assertResponse(201, ar -> restconf.postDataJSON(stringInputStream("""
@@ -67,7 +80,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         final var node = PLAYLIST_IID.node(BAND_ENTRY.name());
         doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(tx).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
-        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+        doReturn(UriBuilder.fromUri(BASE_URI)).when(uriInfo).getBaseUriBuilder();
 
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=name%20of%20band"),
             assertResponse(201, ar -> restconf.postDataJSON(JUKEBOX_API_PATH, stringInputStream("""
@@ -97,5 +110,122 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         final var error = ex.getErrors().get(0);
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.DATA_EXISTS, error.getErrorTag());
+    }
+
+    @Test
+    public void testPostDataWithInsertLast() {
+        // Mocking the query parameters to include 'insert=last'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put(INSERT, List.of("last"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(tx)
+                .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        doNothing().when(tx).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
+                any(NormalizedNode.class));
+        doReturn(UriBuilder.fromUri(BASE_URI)).when(uriInfo).getBaseUriBuilder();
+
+        assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=0/song=3"),
+            assertResponse(201, ar -> restconf.postDataJSON(
+                apiPath("example-jukebox:jukebox/playlist=0"), stringInputStream("""
+                    {
+                      "example-jukebox:song" : [
+                        {
+                           "index": "3"
+                        }
+                      ]
+                    }"""), uriInfo, ar)).getLocation());
+    }
+
+    @Test
+    public void testPostDataWithInsertFirst() {
+        // Mocking the query parameters to include 'insert=first'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put(INSERT, List.of("first"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+        doReturn(readTx).when(dataBroker).newReadOnlyTransaction();
+
+        doReturn(immediateFalseFluentFuture()).when(readTx)
+                .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        // Mocking existed playlist with two songs in DS
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(tx)
+                .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateFalseFluentFuture()).when(tx)
+                .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        doNothing().when(tx).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
+                any(NormalizedNode.class));
+        doReturn(UriBuilder.fromUri(BASE_URI)).when(uriInfo).getBaseUriBuilder();
+
+        assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=0/song=3"),
+            assertResponse(201, ar -> restconf.postDataJSON(
+                apiPath("example-jukebox:jukebox/playlist=0"), stringInputStream("""
+                    {
+                      "example-jukebox:song" : [
+                        {
+                           "index": "3"
+                        }
+                      ]
+                    }"""), uriInfo, ar)).getLocation());
+    }
+
+    @Test
+    public void testPostDataWithInsertBefore() {
+        // Mocking the query parameters to include 'insert=before' and 'point=example-jukebox:jukebox/playlist=0/song=2'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put(INSERT, List.of("before"));
+        queryParams.put(POINT, List.of("example-jukebox:jukebox/playlist=0/song=2"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+        doReturn(readTx).when(dataBroker).newReadOnlyTransaction();
+
+        doReturn(immediateFalseFluentFuture()).when(readTx)
+                .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        // Mocking existed playlist with two songs in DS
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(tx)
+                .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        doReturn(UriBuilder.fromUri(BASE_URI)).when(uriInfo).getBaseUriBuilder();
+
+        assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=0/song=3"),
+            assertResponse(201, ar -> restconf.postDataJSON(
+                apiPath("example-jukebox:jukebox/playlist=0"), stringInputStream("""
+                    {
+                      "example-jukebox:song" : [
+                        {
+                           "index": "3",
+                           "id" = "C"
+                        }
+                      ]
+                    }"""), uriInfo, ar)).getLocation());
+    }
+
+    @Test
+    public void testPostDataWithInsertAfter() {
+        // Mocking the query parameters to include 'insert=after' and 'point=example-jukebox:jukebox/playlist=0/song=1'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put(INSERT, List.of("after"));
+        queryParams.put(POINT, List.of("example-jukebox:jukebox/playlist=0/song=1"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+        doReturn(readTx).when(dataBroker).newReadOnlyTransaction();
+
+        doReturn(immediateFalseFluentFuture()).when(readTx)
+                .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(tx)
+                .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        doReturn(UriBuilder.fromUri(BASE_URI)).when(uriInfo).getBaseUriBuilder();
+
+        assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox/playlist=0/song=3"),
+            assertResponse(201, ar -> restconf.postDataJSON(
+                apiPath("example-jukebox:jukebox/playlist=0"), stringInputStream("""
+                    {
+                      "example-jukebox:song" : [
+                        {
+                           "index": "3",
+                           "id" = "C"
+                        }
+                      ]
+                    }"""), uriInfo, ar)).getLocation());
     }
 }
