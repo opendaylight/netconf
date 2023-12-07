@@ -25,8 +25,7 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(service = NetconfCallHomeTlsService.class,
-    configurationPid = "org.opendaylight.netconf.callhome.mount.tls.server")
+@Component(service = { }, configurationPid = "org.opendaylight.netconf.callhome.mount.tls.server")
 @Designate(ocd = NetconfCallHomeTlsService.Configuration.class)
 @Singleton
 public class NetconfCallHomeTlsService implements AutoCloseable {
@@ -66,18 +65,20 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
                 .withTimeout(configuration.timeoutMillis())
                 .withMaxConnections(configuration.maxConnections())
                 .withAuthProvider(authProvider)
+                .withStatusRecorder(statusRecorder)
                 .withSessionContextManager(
                     mountService.createTlsSessionContextManager(authProvider, statusRecorder))
                 .build();
         } catch (UnknownHostException e) {
             throw new IllegalArgumentException("invalid host", e);
         }
-        LOG.info("Call-Home TLS server started");
+        LOG.info("Call-Home TLS server started successfully");
     }
 
     @Deactivate
     @Override
     public void close() throws Exception {
         server.close();
+        LOG.info("Call-Home TLS server stopped");
     }
 }
