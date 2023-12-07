@@ -14,6 +14,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -76,26 +77,19 @@ public abstract class AbstractJukeboxTest {
         .build();
     protected static final MapEntryNode SONG1 = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
-            "1"))
+                Uint32.valueOf(1)))
         .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "A"))
         .build();
     protected static final MapEntryNode SONG2 = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
-            "2"))
+                Uint32.valueOf(2)))
         .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "B"))
         .build();
     protected static final SystemMapNode PLAYLIST_WITH_SONGS = ImmutableNodes.newSystemMapBuilder()
-        .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-        .withChild(ImmutableNodes.newMapEntryBuilder()
-            .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME,
-                "0"))
-                .withChild(ImmutableNodes.newUserMapBuilder()
-                    .withNodeIdentifier(new NodeIdentifier(SONG_QNAME))
-                    .withChild(SONG1)
-                    .withChild(SONG2)
-                    .build())
-                .build())
-            .build();
+        .withNodeIdentifier(new NodeIdentifier(SONG_QNAME))
+            .withChild(SONG1)
+            .withChild(SONG2)
+        .build();
 
     protected static final @NonNull EffectiveModelContext JUKEBOX_SCHEMA =
         YangParserTestUtils.parseYangResourceDirectory("/jukebox");
