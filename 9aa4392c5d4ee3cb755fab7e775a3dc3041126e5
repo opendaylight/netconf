@@ -39,6 +39,30 @@
       },
       "revId": "9aa4392c5d4ee3cb755fab7e775a3dc3041126e5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9c9fe83_c3ea37ae",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-12-07T13:24:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f60330c1_49b032a0",
+      "range": {
+        "startLine": 113,
+        "startChar": 18,
+        "endLine": 113,
+        "endChar": 25
+      },
+      "revId": "9aa4392c5d4ee3cb755fab7e775a3dc3041126e5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
