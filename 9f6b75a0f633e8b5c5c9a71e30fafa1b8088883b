@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce1104fa_ed85a6a8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-07T15:13:41Z",
+      "side": 1,
+      "message": "This patch serves as an alternative to patch:\nhttps://git.opendaylight.org/gerrit/c/netconf/+/109168",
+      "revId": "9f6b75a0f633e8b5c5c9a71e30fafa1b8088883b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
