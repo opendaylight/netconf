@@ -143,8 +143,10 @@ Payload:
            <node-id>new-netconf-device</node-id>
            <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
            <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
-           <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
-           <password xmlns="urn:opendaylight:netconf-node-topology">admin</password>
+           <login-password-unencrypted xmlns="urn:opendaylight:netconf-node-topology">
+             <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
+             <password xmlns="urn:opendaylight:netconf-node-topology">admin</password>
+           </login-password-unencrypted>
            <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
            <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
            <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
@@ -175,8 +177,10 @@ Payload:
                      "netconf-node-topology:connection-timeout-millis": 20000,
                      "netconf-node-topology:tcp-only": false,
                      "netconf-node-topology:max-connection-attempts": 0,
-                     "netconf-node-topology:username": "admin",
-                     "netconf-node-topology:password": "admin",
+                     "netconf-node-topology:login-password-unencrypted": {
+                        "netconf-node-topology:username": "admin",
+                        "netconf-node-topology:password": "admin"
+                     },
                      "netconf-node-topology:sleep-factor": 1.5,
                      "netconf-node-topology:host": "127.0.0.1",
                      "netconf-node-topology:between-attempts-timeout-millis": 2000,
@@ -317,8 +321,10 @@ configuration of netconf-connector like in the example below:
            <node-id>r5</node-id>
            <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
            <port xmlns="urn:opendaylight:netconf-node-topology">8305</port>
-           <username xmlns="urn:opendaylight:netconf-node-topology">root</username>
-           <password xmlns="urn:opendaylight:netconf-node-topology">root</password>
+           <login-password-unencrypted xmlns="urn:opendaylight:netconf-node-topology">
+             <username xmlns="urn:opendaylight:netconf-node-topology">root</username>
+             <password xmlns="urn:opendaylight:netconf-node-topology">root</password>
+           </login-password-unencrypted>
            <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
            <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">30</keepalive-delay>
            <yang-module-capabilities xmlns="urn:opendaylight:netconf-node-topology">
@@ -344,8 +350,10 @@ configuration of netconf-connector like in the example below:
                  {
                      "node-id": "device",
                      "netconf-node-topology:host": "127.0.0.1",
-                     "netconf-node-topology:password": "root",
-                     "netconf-node-topology:username": "root",
+                     "netconf-node-topology:login-password-unencrypted": {
+                        "netconf-node-topology:password": "root",
+                        "netconf-node-topology:username": "root"
+                     },
                      "netconf-node-topology:yang-module-capabilities": {
                          "override": true,
                          "capability": [
@@ -1700,8 +1708,10 @@ Mounting NETCONF device that runs on NETCONF testtool:
               "netconf-node-topology:port": 17830,
               "netconf-node-topology:keepalive-delay": 100,
               "netconf-node-topology:tcp-only": false,
-              "netconf-node-topology:username": "admin",
-              "netconf-node-topology:password": "admin"
+              "netconf-node-topology:login-password-unencrypted": {
+                  "netconf-node-topology:username": "admin",
+                  "netconf-node-topology:password": "admin"
+              },
           }
       ]
   }'
