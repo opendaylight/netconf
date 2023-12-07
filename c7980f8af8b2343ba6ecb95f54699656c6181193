@@ -33,6 +33,42 @@
       "message": "Please use var to make lines shorter.",
       "revId": "c7980f8af8b2343ba6ecb95f54699656c6181193",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddf89cd4_5fff9f1d",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-07T13:22:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ce5c1be_bbbbb60f",
+      "revId": "c7980f8af8b2343ba6ecb95f54699656c6181193",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32379c18_a95e5658",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-07T13:22:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f731b8a_36b8702e",
+      "revId": "c7980f8af8b2343ba6ecb95f54699656c6181193",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
