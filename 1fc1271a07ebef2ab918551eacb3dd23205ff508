@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "feb0f27b_ff97e2fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 20
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-12-07T12:01:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45f7d75c_a86f5cdc",
+      "revId": "1fc1271a07ebef2ab918551eacb3dd23205ff508",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0115fbac_44529dea",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-12-07T11:00:32Z",
       "side": 1,
       "message": "remove empty line",
+      "revId": "1fc1271a07ebef2ab918551eacb3dd23205ff508",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e86c637_287c1b53",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PropertyEntity.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-12-07T12:01:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0115fbac_44529dea",
       "revId": "1fc1271a07ebef2ab918551eacb3dd23205ff508",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
