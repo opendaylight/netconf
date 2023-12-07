@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c3e12c7_faec129c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsSteam.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-12-07T12:52:34Z",
+      "side": 1,
+      "message": "var",
+      "revId": "823b2f4e5844cb9b3e84eca9e42c33990d891994",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
