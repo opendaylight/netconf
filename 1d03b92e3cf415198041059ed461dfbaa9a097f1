@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3bfb139_4bff96e7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-12-07T14:33:39Z",
+      "side": 1,
+      "message": "Description updated",
+      "parentUuid": "90577c55_fc2c4725",
+      "revId": "1d03b92e3cf415198041059ed461dfbaa9a097f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42fd672d_bd6a94d8",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ecc76b3_4377ae86",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-12-07T14:33:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "42fd672d_bd6a94d8",
+      "revId": "1d03b92e3cf415198041059ed461dfbaa9a097f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c5a5c074_2a32b64b",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-12-07T07:47:47Z",
       "side": 1,
       "message": "The issue is not correctly managed in JIRA.",
+      "revId": "1d03b92e3cf415198041059ed461dfbaa9a097f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b14810c_496df5fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2023-12-07T14:33:39Z",
+      "side": 1,
+      "message": "JIRA describes the symptoms, the cause may not match. \nextended patch description with insert case",
+      "parentUuid": "c5a5c074_2a32b64b",
       "revId": "1d03b92e3cf415198041059ed461dfbaa9a097f1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
