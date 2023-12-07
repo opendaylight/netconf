@@ -26,6 +26,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPwBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.login.pw.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptionalBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDevice;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceOutput;
@@ -42,6 +43,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -84,10 +86,17 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
     }
 
     private ListenableFuture<RpcResult<CreateDeviceOutput>> createDevice(final CreateDeviceInput input) {
-        final NetconfNode node = encryptPassword(input);
+        final var netconfNode = encryptPassword(input);
+        final var nodeId = new NodeId(input.getNodeId());
+        final var nodeBuilder = new NodeBuilder()
+            .setNodeId(nodeId)
+            .addAugmentation(netconfNode);
+        if (input.getIgnoreMissingSchemaSources() != null) {
+            final var netconfNodeOptionalBuilder = new NetconfNodeAugmentedOptionalBuilder(input);
+            nodeBuilder.addAugmentation(netconfNodeOptionalBuilder.build());
+        }
         final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult = SettableFuture.create();
-        final NodeId nodeId = new NodeId(input.getNodeId());
-        writeToConfigDS(node, nodeId, futureResult);
+        writeToConfigDS(nodeBuilder.build(), nodeId, futureResult);
         return futureResult;
     }
 
@@ -144,12 +153,11 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
         return credentials;
     }
 
-    private void writeToConfigDS(final NetconfNode node, final NodeId nodeId,
+    private void writeToConfigDS(final Node node, final NodeId nodeId,
             final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult) {
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final InstanceIdentifier<NetconfNode> niid = topologyPath.child(Node.class,
-                new NodeKey(nodeId)).augmentation(NetconfNode.class);
+        final InstanceIdentifier<Node> niid = topologyPath.child(Node.class, new NodeKey(nodeId));
         writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, niid, node);
         writeTransaction.commit().addCallback(new FutureCallback<CommitInfo>() {
 
