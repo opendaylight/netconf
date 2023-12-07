@@ -42,11 +42,9 @@ import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.DOMException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -216,21 +214,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(spyTx).when(spyStrategy).prepareWriteExecution();
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(any());
 
-        // For this test we are using
-        final var songsList = ImmutableNodes.newUserMapBuilder()
-            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(SONG_QNAME))
-            .withChild(ImmutableNodes.newMapEntryBuilder()
-                .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
-                    Uint32.valueOf(1)))
-                .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "A"))
-                .build())
-            .withChild(ImmutableNodes.newMapEntryBuilder()
-                .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
-                    Uint32.valueOf(2)))
-                .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "B"))
-                .build())
-            .build();
-        doReturn(songsList).when(spyTx).readList(any(YangInstanceIdentifier.class));
+        doReturn(PLAYLIST_WITH_SONGS).when(spyTx).readList(any(YangInstanceIdentifier.class));
 
         // Creating query params to insert new item after last existing item in list
         final var queryParams = new HashMap<String, String>();
@@ -267,21 +251,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(spyTx).when(spyStrategy).prepareWriteExecution();
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(any());
 
-        // For this test we are using
-        final var songsList = ImmutableNodes.newUserMapBuilder()
-            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(SONG_QNAME))
-                .withChild(ImmutableNodes.newMapEntryBuilder()
-                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME,
-                        SONG_INDEX_QNAME, Uint32.valueOf(1)))
-                    .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "A"))
-                    .build())
-                .withChild(ImmutableNodes.newMapEntryBuilder()
-                    .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME,
-                        SONG_INDEX_QNAME, Uint32.valueOf(2)))
-                    .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "B"))
-                    .build())
-            .build();
-        doReturn(songsList).when(spyTx).readList(any(YangInstanceIdentifier.class));
+        doReturn(PLAYLIST_WITH_SONGS).when(spyTx).readList(any(YangInstanceIdentifier.class));
 
         // Creating query params to insert new item after last existing item in list
         final var queryParams = new HashMap<String, String>();
@@ -289,11 +259,16 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         queryParams.put("point", "example-jukebox:jukebox/playlist=0/song=2");
 
         // Inserting new song at 3rd position (aka as last element)
-        spyStrategy.dataPOST(ApiPath.parse("example-jukebox:jukebox/playlist=0/song=3"),
+        spyStrategy.dataPOST(ApiPath.parse("example-jukebox:jukebox/playlist=0"),
             new JsonDataPostBody(stringInputStream("""
-            {
-              "id" = "C"
-            }""")), queryParams);
+                {
+                  "example-jukebox:song" : [
+                    {
+                       "index": "3",
+                       "id" = "C"
+                    }
+                  ]
+                }""")), queryParams);
 
         // Counting how many times we insert items in list
         verify(spyTx, times(3)).replace(any(), any());
