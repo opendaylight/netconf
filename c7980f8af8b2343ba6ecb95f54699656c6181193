@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ce5c1be_bbbbb60f",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-12-07T12:38:42Z",
+      "side": 1,
+      "message": "We can set nodeId directly here IMO.\n\nnew NodeBuilder().setNodeId()",
+      "revId": "c7980f8af8b2343ba6ecb95f54699656c6181193",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f731b8a_36b8702e",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-12-07T12:38:42Z",
+      "side": 1,
+      "message": "Please use var to make lines shorter.",
+      "revId": "c7980f8af8b2343ba6ecb95f54699656c6181193",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
