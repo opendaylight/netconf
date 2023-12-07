@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c65af1c0_a1d46369",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-12-07T12:35:40Z",
+      "side": 1,
+      "message": "Can you provide more details?",
+      "revId": "ac76e2214d394c913912dbcf4510bfc7b5b1719e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
