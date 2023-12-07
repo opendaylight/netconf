@@ -16,6 +16,24 @@
       "message": "Missing JIRA link",
       "revId": "32273dba93fc526b8dacff72911c7a5ee3af6a08",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b519cc1_032212c0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-12-07T12:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dea7e8b8_26c93d4f",
+      "revId": "32273dba93fc526b8dacff72911c7a5ee3af6a08",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
