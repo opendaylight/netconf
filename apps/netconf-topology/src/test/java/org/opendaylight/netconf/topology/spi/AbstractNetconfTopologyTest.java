@@ -7,10 +7,11 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -25,9 +26,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
-public class AbstractNetconfTopologyTest {
+class AbstractNetconfTopologyTest {
     @Test
-    public void hideCredentialsTest() {
+    void hideCredentials() {
         final String userName = "admin";
         final String password = "pa$$word";
         final Node node = new NodeBuilder()
@@ -51,5 +52,21 @@ public class AbstractNetconfTopologyTest {
         assertTrue(transformedNetconfNode.contains("credentials=***"));
         assertFalse(transformedNetconfNode.contains(userName));
         assertFalse(transformedNetconfNode.contains(password));
+    }
+
+    @Test
+    void hideNullCredentials() {
+        final Node node = new NodeBuilder()
+            .setNodeId(new NodeId("id"))
+            .addAugmentation(new NetconfNodeBuilder()
+                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
+                .setSchemaless(false)
+                .setReconnectOnChangedSchema(false)
+                .setMaxConnectionAttempts(Uint32.ZERO)
+                .setLockDatastore(true)
+                .build())
+            .build();
+        assertNotNull(AbstractNetconfTopology.hideCredentials(node));
     }
 }
