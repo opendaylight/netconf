@@ -504,9 +504,8 @@ public abstract class RestconfStrategy {
             final NormalizedNode data, final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
-            final var parentPath = path.coerceParent();
-            checkListAndOrderedType(parentPath);
-            future = insertAndCommitPost(path, data, insert, parentPath);
+            checkListAndOrderedType(path);
+            future = insertAndCommitPost(path, data, insert);
         } else {
             future = createAndCommit(prepareWriteExecution(), path, data);
         }
@@ -530,41 +529,40 @@ public abstract class RestconfStrategy {
     }
 
     private ListenableFuture<? extends CommitInfo> insertAndCommitPost(final YangInstanceIdentifier path,
-            final NormalizedNode data, final @NonNull Insert insert, final YangInstanceIdentifier parent) {
-        final var grandParent = parent.coerceParent();
+            final NormalizedNode data, final @NonNull Insert insert) {
         final var tx = prepareWriteExecution();
 
         return switch (insert.insert()) {
             case FIRST -> {
-                final var readData = tx.readList(grandParent);
+                final var readData = tx.readList(path);
                 if (readData == null || readData.isEmpty()) {
                     tx.replace(path, data);
                 } else {
-                    checkItemDoesNotExists(exists(path), path);
-                    tx.remove(grandParent);
+                    checkListDataDoesNotExist(path, data);
+                    tx.remove(path);
                     tx.replace(path, data);
-                    tx.replace(grandParent, readData);
+                    tx.replace(path, readData);
                 }
                 yield tx.commit();
             }
             case LAST -> createAndCommit(tx, path, data);
             case BEFORE -> {
-                final var readData = tx.readList(grandParent);
+                final var readData = tx.readList(path);
                 if (readData == null || readData.isEmpty()) {
                     tx.replace(path, data);
                 } else {
-                    checkItemDoesNotExists(exists(path), path);
-                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, grandParent, true);
+                    checkListDataDoesNotExist(path, data);
+                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, true);
                 }
                 yield tx.commit();
             }
             case AFTER -> {
-                final var readData = tx.readList(grandParent);
+                final var readData = tx.readList(path);
                 if (readData == null || readData.isEmpty()) {
                     tx.replace(path, data);
                 } else {
-                    checkItemDoesNotExists(exists(path), path);
-                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, grandParent, false);
+                    checkListDataDoesNotExist(path, data);
+                    insertWithPointPost(tx, path, data, verifyNotNull(insert.pointArg()), readData, false);
                 }
                 yield tx.commit();
             }
@@ -722,8 +720,8 @@ public abstract class RestconfStrategy {
 
     private void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
             final NormalizedNode data, final PathArgument pointArg, final NormalizedNodeContainer<?> readList,
-            final YangInstanceIdentifier grandParentPath, final boolean before) {
-        tx.remove(grandParentPath);
+            final boolean before) {
+        tx.remove(path);
 
         int lastItemPosition = 0;
         for (var nodeChild : readList.body()) {
@@ -737,13 +735,11 @@ public abstract class RestconfStrategy {
         }
 
         int lastInsertedPosition = 0;
-        final var emptySubtree = fromInstanceId(modelContext(), grandParentPath);
-        tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 tx.replace(path, data);
             }
-            tx.replace(grandParentPath.node(nodeChild.name()), nodeChild);
+            tx.replace(path.node(nodeChild.name()), nodeChild);
             lastInsertedPosition++;
         }
 
@@ -766,6 +762,23 @@ public abstract class RestconfStrategy {
         }
 
         return tx.commit();
+    }
+
+    /**
+     * Check if child items do NOT already exists in List at specified {@code path}.
+     *
+     * @param data Data to be checked
+     * @param path Path to be checked
+     * @throws RestconfDocumentedException if data already exists.
+     */
+    private void checkListDataDoesNotExist(final YangInstanceIdentifier path, final NormalizedNode data) {
+        if (data instanceof NormalizedNodeContainer<?> dataNode) {
+            for (final var node : dataNode.body()) {
+                checkItemDoesNotExists(exists(path.node(node.name())), path.node(node.name()));
+            }
+        } else {
+            throw new RestconfDocumentedException("Unexpected node type: " + data.getClass().getName());
+        }
     }
 
     /**
