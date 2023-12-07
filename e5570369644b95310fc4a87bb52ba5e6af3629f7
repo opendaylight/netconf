@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a67be69c_f42e8ce1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2023-12-07T13:03:07Z",
+      "side": 1,
+      "message": "Not annotated parameter overrides @NotNull parameter",
+      "range": {
+        "startLine": 125,
+        "startChar": 20,
+        "endLine": 125,
+        "endChar": 38
+      },
+      "revId": "e5570369644b95310fc4a87bb52ba5e6af3629f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
