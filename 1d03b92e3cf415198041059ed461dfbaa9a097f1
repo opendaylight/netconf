@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90577c55_fc2c4725",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-12-07T07:47:47Z",
+      "side": 1,
+      "message": "causes now or before?",
+      "revId": "1d03b92e3cf415198041059ed461dfbaa9a097f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42fd672d_bd6a94d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-12-07T07:47:47Z",
+      "side": 1,
+      "message": "missing \".\"",
+      "revId": "1d03b92e3cf415198041059ed461dfbaa9a097f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5a5c074_2a32b64b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-12-07T07:47:47Z",
+      "side": 1,
+      "message": "The issue is not correctly managed in JIRA.",
+      "revId": "1d03b92e3cf415198041059ed461dfbaa9a097f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
