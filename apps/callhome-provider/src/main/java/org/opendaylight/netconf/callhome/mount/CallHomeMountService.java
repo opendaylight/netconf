@@ -46,6 +46,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPwBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.login.pw.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -108,6 +111,9 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = CallHomeMountService.class, immediate = true)
 @Singleton
 public final class CallHomeMountService implements AutoCloseable {
+
+    private static final Credentials CREDENTIALS = new LoginPwBuilder().setLoginPassword(
+        new LoginPasswordBuilder().setUsername("call-home").setPassword("***").build()).build();
 
     private final Map<String, NetconfLayer> netconfLayerMapping = new ConcurrentHashMap<>();
     private final CallHomeTopology topology;
@@ -188,6 +194,7 @@ public final class CallHomeMountService implements AutoCloseable {
                 .setReconnectOnChangedSchema(false)
                 .setMaxConnectionAttempts(Uint32.ZERO)
                 .setLockDatastore(true)
+                .setCredentials(CREDENTIALS)
                 .build())
             .build();
     }

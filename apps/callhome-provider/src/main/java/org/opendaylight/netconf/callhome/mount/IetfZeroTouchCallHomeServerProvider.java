@@ -25,8 +25,7 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(service = IetfZeroTouchCallHomeServerProvider.class,
-    configurationPid = "org.opendaylight.netconf.callhome.mount.ssh.server")
+@Component(service = { }, configurationPid = "org.opendaylight.netconf.callhome.mount.ssh.server")
 @Designate(ocd = IetfZeroTouchCallHomeServerProvider.Configuration.class)
 @Singleton
 public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable {
@@ -41,8 +40,6 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(IetfZeroTouchCallHomeServerProvider.class);
-    private static final String APP_NAME = "CallHomeServer";
-
     private final CallHomeSshServer server;
 
     @Activate
@@ -54,8 +51,7 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
             final @Reference CallHomeStatusRecorder statusRecorder,
             final Configuration configuration) {
 
-        LOG.info("Initializing provider for {}", APP_NAME);
-        LOG.info("Starting SSH Call-Home server at {}:{}", configuration.host(), configuration.port());
+        LOG.info("Starting Call-Home SSH server at {}:{}", configuration.host(), configuration.port());
 
         try {
             server = CallHomeSshServer.builder()
@@ -69,7 +65,7 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
             throw new IllegalArgumentException("Invalid address", e);
         }
 
-        LOG.info("Initialization complete for {}", APP_NAME);
+        LOG.info("Call-Home SSH server started successfully");
     }
 
     @Deactivate
@@ -78,6 +74,6 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
         if (server != null) {
             server.close();
         }
-        LOG.info("Successfully closed provider for {}", APP_NAME);
+        LOG.info("Call-Home SSH server stopped.");
     }
 }
