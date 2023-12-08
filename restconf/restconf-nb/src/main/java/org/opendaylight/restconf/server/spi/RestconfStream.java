@@ -246,16 +246,12 @@ public final class RestconfStream<T> {
             throw new IllegalArgumentException("Stream " + name + " does not support replay");
         }
 
-        final var leafNodes = params.leafNodesOnly();
-        final var skipData = params.skipNotificationData();
-        final var changedLeafNodes = params.changedLeafNodesOnly();
-        final var childNodes = params.childNodesOnly();
+        final var leafNodes = params.leafNodesOnly() != null && params.leafNodesOnly().value();
+        final var skipData = params.skipNotificationData() != null && params.skipNotificationData().value();
+        final var changedLeafNodes = params.changedLeafNodesOnly() != null && params.changedLeafNodesOnly().value();
+        final var childNodes = params.childNodesOnly() != null && params.childNodesOnly().value();
 
-        final var textParams = new TextParameters(
-            leafNodes != null && leafNodes.value(),
-            skipData != null && skipData.value(),
-            changedLeafNodes != null && changedLeafNodes.value(),
-            childNodes != null && childNodes.value());
+        final var textParams = new TextParameters(leafNodes, skipData, changedLeafNodes, childNodes);
 
         final var filter = params.filter();
         final var filterValue = filter == null ? null : filter.paramValue();
