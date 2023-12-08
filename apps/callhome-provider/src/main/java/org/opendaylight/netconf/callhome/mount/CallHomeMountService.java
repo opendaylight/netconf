@@ -46,10 +46,13 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev230417.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.connection.parameters.Protocol;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.connection.parameters.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.osgi.service.component.annotations.Activate;
@@ -96,8 +99,8 @@ import org.osgi.service.component.annotations.Reference;
  *     {@link #createTlsSessionContextManager(CallHomeTlsAuthProvider, CallHomeStatusRecorder)}</li>
  *     <li>Due to both {@link NetconfClientSessionListener} and {@link SettableFuture} are required to build session
  *     context the {@link CallHomeTopology#enableNode(Node)} (Node)} is called using synthetic {@link Node} instance
- *     composed via {@link #asNode(String, SocketAddress)}. This triggers Netconf client construct/connect logic
- *     (as explained above) resulting captured object placed into {@link #netconfLayerMapping}.</li>
+ *     composed via {@link #asNode(String, SocketAddress, Protocol)}. This triggers Netconf client construct/connect
+ *     logic (as explained above) resulting captured object placed into {@link #netconfLayerMapping}.</li>
  *     <li>Accepted instance of {@link NetconfClientSessionListener} is used to establish Netconf layer --
  *     see {@link org.opendaylight.netconf.callhome.server.CallHomeTransportChannelListener
  *     CallHomeTransportChannelListener} </li>
@@ -108,6 +111,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = CallHomeMountService.class, immediate = true)
 @Singleton
 public final class CallHomeMountService implements AutoCloseable {
+    private static final Protocol SSH_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.SSH).build();
+    private static final Protocol TLS_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.TLS).build();
 
     private final Map<String, NetconfLayer> netconfLayerMapping = new ConcurrentHashMap<>();
     private final CallHomeTopology topology;
@@ -175,7 +180,7 @@ public final class CallHomeMountService implements AutoCloseable {
         };
     }
 
-    private static Node asNode(final String id, final SocketAddress socketAddress) {
+    private static Node asNode(final String id, final SocketAddress socketAddress, final Protocol protocol) {
         final var nodeAddress = socketAddress instanceof InetSocketAddress inetSocketAddress
             ? inetSocketAddress : new InetSocketAddress("0.0.0.0", 0);
         // construct synthetic Node object with minimal required parameters
@@ -184,9 +189,19 @@ public final class CallHomeMountService implements AutoCloseable {
             .addAugmentation(new NetconfNodeBuilder()
                 .setHost(new Host(IetfInetUtil.ipAddressFor(nodeAddress.getAddress())))
                 .setPort(new PortNumber(Uint16.valueOf(nodeAddress.getPort())))
+                .setTcpOnly(false)
+                .setProtocol(protocol)
+                // below parameters are required for NetconfNodeHandler
                 .setSchemaless(false)
                 .setReconnectOnChangedSchema(false)
+                .setConnectionTimeoutMillis(Uint32.valueOf(20000))
+                .setDefaultRequestTimeoutMillis(Uint32.valueOf(60000))
                 .setMaxConnectionAttempts(Uint32.ZERO)
+                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(2000))
+                .setSleepFactor(Decimal64.valueOf("1.5"))
+                .setKeepaliveDelay(Uint32.valueOf(120))
+                .setConcurrentRpcLimit(Uint16.ZERO)
+                .setActorResponseWaitTime(Uint16.valueOf(5))
                 .setLockDatastore(true)
                 .build())
             .build();
@@ -196,7 +211,7 @@ public final class CallHomeMountService implements AutoCloseable {
         return new CallHomeSshSessionContextManager() {
             @Override
             public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {
-                topology.enableNode(asNode(id, clientSession.getRemoteAddress()));
+                topology.enableNode(asNode(id, clientSession.getRemoteAddress(), SSH_PROTOCOL));
                 final var netconfLayer = netconfLayerMapping.remove(id);
                 return netconfLayer == null ? null : new CallHomeSshSessionContext(id, clientSession.getRemoteAddress(),
                     clientSession, netconfLayer.sessionListener, netconfLayer.netconfSessionFuture);
@@ -215,7 +230,7 @@ public final class CallHomeMountService implements AutoCloseable {
         return new CallHomeTlsSessionContextManager(authProvider, statusRecorder) {
             @Override
             public CallHomeTlsSessionContext createContext(final String id, final Channel channel) {
-                topology.enableNode(asNode(id, channel.remoteAddress()));
+                topology.enableNode(asNode(id, channel.remoteAddress(), TLS_PROTOCOL));
                 final var netconfLayer = netconfLayerMapping.remove(id);
                 return netconfLayer == null ? null : new CallHomeTlsSessionContext(id, channel,
                     netconfLayer.sessionListener, netconfLayer.netconfSessionFuture());
