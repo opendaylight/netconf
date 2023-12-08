@@ -503,7 +503,7 @@ the mounted device.
 Receiving Netconf Device Notifications on a http client
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Devices emit netconf alarms and notifictions on certain situtations, which can demand
+Devices emit netconf alarms and notifications in certain situations, which can demand
 attention from Device Administration. The notifications are received as Netconf messages on an
 active Netconf session.
 
