@@ -271,4 +271,20 @@ public class NetconfTopologyImplTest {
         assertFalse(transformedNetconfNode.contains(userName));
         assertFalse(transformedNetconfNode.contains(password));
     }
+
+    @Test
+    public void hideNullCredentials() {
+        final Node node = new NodeBuilder()
+            .setNodeId(new NodeId("id"))
+            .addAugmentation(new NetconfNodeBuilder()
+                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
+                .setSchemaless(false)
+                .setReconnectOnChangedSchema(false)
+                .setMaxConnectionAttempts(Uint32.ZERO)
+                .setLockDatastore(true)
+                .build())
+            .build();
+        assertNotNull(AbstractNetconfTopology.hideCredentials(node));
+    }
 }
