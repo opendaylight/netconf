@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3a27c87_aad387f6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2023-12-08T08:53:14Z",
+      "side": 1,
+      "message": "Please add unit test into NetconfTopologyImplTest.",
+      "revId": "b036ad38f396e78bd79eb4d597fcfc04767a8ea1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
