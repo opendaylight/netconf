@@ -381,7 +381,7 @@ are.
 
 NETCONF connector can communicate also with these devices, but the
 trade-offs are worsened possibilities in utilization of NETCONF
-mountpoints. Using RESTCONF with such devices is not suported. Also
+mountpoints. Using RESTCONF with such devices is not supported. Also
 communicating with schemaless devices from application code is slightly
 different.
 
@@ -503,7 +503,7 @@ the mounted device.
 Receiving Netconf Device Notifications on a http client
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Devices emit netconf alarms and notifictions on certain situtations, which can demand
+Devices emit netconf alarms and notifications in certain situations, which can demand
 attention from Device Administration. The notifications are received as Netconf messages on an
 active Netconf session.
 
@@ -754,7 +754,7 @@ Client <https://chrome.google.com/webstore/detail/simple-websocket-client/pfdhob
 Also, for testing purposes, there is simple Java application named
 WebSocketClient. The application is placed in the
 */restconf/websocket-client* project. It accepts a WebSocket URI
-as and input parameter. After starting the utility (WebSocketClient
+as an input parameter. After starting the utility (WebSocketClient
 class directly in Eclipse/InteliJ Idea) received notifications should be
 displayed in console.
 
@@ -779,32 +779,32 @@ Example use case
 ~~~~~~~~~~~~~~~~
 
 The typical use case is listening to data change events to update web
-page data in real-time. In this tutorial we will be using toaster as the
+page data in real time. In this tutorial we will be using toaster as the
 base.
 
 When you call *make-toast* RPC, it sets *toasterStatus* to "down" to
 reflect that the toaster is busy making toast. When it finishes,
-*toasterStatus* is set to "up" again. We will listen to this toaster
+*toasterStatus* is set to "up" again. We will listen to these toaster
 status changes in data store and will reflect it on our web page in
 real-time thanks to WebSocket data change notification.
 
 Simple javascript client implementation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We will create simple JavaScript web application that will listen
-updates on *toasterStatus* leaf and update some element of our web page
-according to new toaster status state.
+We will create a simple JavaScript web application that will listen for
+updates on *toasterStatus* leaf and update some elements of our web page
+according to the new toaster status state.
 
 Create stream
 ^^^^^^^^^^^^^
 
-First you need to create stream that you are planing to subscribe to.
+First you need to create stream that you are planning to subscribe to.
 This can be achieved by invoking "create-data-change-event-subscription"
 RPC on RESTCONF via AJAX request. You need to provide data store
 **path** that you plan to listen on, **data store type** and **scope**.
 If the request is successful you can extract the **stream-name** from
 the response and use that to subscribe to the newly created stream. The
-*{username}* and *{password}* fields represent your credentials that you
+*{username}* and *{password}* fields represent the credentials that you
 use to connect to OpenDaylight via RESTCONF:
 
 .. note::
@@ -873,7 +873,7 @@ object inside *done()* function call:
 Receive notifications
 ^^^^^^^^^^^^^^^^^^^^^
 
-Once you got WebSocket server location you can now connect to it and
+Once you have WebSocket server location you can now connect to it and
 start receiving data change events. You need to define functions that
 will handle events on WebSocket. In order to process incoming events
 from OpenDaylight you need to provide a function that will handle
@@ -1010,12 +1010,12 @@ OpenDaylight provides 2 types of NETCONF servers:
 
     The reason for having 2 NETCONF servers is that config-subsystem and
     MD-SAL are 2 different components of OpenDaylight and require
-    different approach for NETCONF message handling and data
+    different approaches for NETCONF message handling and data
     translation. These 2 components will probably merge in the future.
 
 .. note::
 
-    Since Nitrogen release, there is performance regression in NETCONF
+    Since Nitrogen release, there has been performance regression in NETCONF
     servers accepting SSH connections. While opening a connection takes
     less than 10 seconds on Carbon, on Nitrogen time can increase up to
     60 seconds. Please see https://jira.opendaylight.org/browse/ODLPARENT-112
@@ -1042,15 +1042,15 @@ In terms of RFCs, these are supported:
 
 For regular users it is recommended to use RESTCONF + the
 controller-config loopback mountpoint instead of using pure NETCONF. How
-to do that is spesific for each component/module/application in
+to do that is specific for each component/module/application in
 OpenDaylight and can be found in their dedicated user guides.
 
 NETCONF server for MD-SAL
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This NETCONF server is just a generic interface to MD-SAL in
-OpenDaylight. It uses the stadard MD-SAL APIs and serves as an
-alternative to RESTCONF. It is fully model driven and supports any data
+OpenDaylight. It uses the standard MD-SAL APIs and serves as an
+alternative to RESTCONF. It is fully model-driven and supports any data
 and rpcs that are supported by MD-SAL.
 
 In terms of RFCs, these are supported:
@@ -1175,7 +1175,7 @@ for each generates URL in form:
 
 On this URL will be hosted YANG source for particular module.
 
-YANGLIB instance also write this URL along with source identifier to
+YANGLIB instance also writes this URL along with source identifier to
 ietf-netconf-yang-library/modules-state/module list.
 
 Netconf-connector with YANG library as fallback
@@ -1238,8 +1238,8 @@ Global Configuration
 Configuring global credentials
 ''''''''''''''''''''''''''''''
 
-ODL Call-Home server allows user to configure global credentials, which will be
-used for connected over SSH transport protocol devices which does not have
+The ODL Call-Home server allows user to configure global credentials, which will be
+used for devices connecting over SSH transport protocol that do not have
 device-specific credentials configured.
 
 This is done by creating
@@ -1271,11 +1271,11 @@ Configuring to accept any ssh server key using global credentials
 By default Netconf Call-Home Server accepts only incoming connections
 from allowed devices
 ``/odl-netconf-callhome-server:netconf-callhome-server/allowed-devices``,
-if user desire to allow all incoming connections, it is possible to set
+if user desires to allow all incoming connections, it is possible to set
 ``accept-all-ssh-keys`` to ``true`` in
 ``/odl-netconf-callhome-server:netconf-callhome-server/global``.
 
-The name of this devices in ``netconf-topology`` will be in format
+The name of these devices in ``netconf-topology`` will be in format
 ``ip-address:port``. For naming devices see Device-Specific
 Configuration.
 
@@ -1380,7 +1380,7 @@ Deprecated configuration models for devices accessed with SSH protocol
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 With `RFC 8071 <https://www.rfc-editor.org/rfc/rfc8071>`__ alignment and adding
-support for TLS transport following configuration models has been marked
+support for TLS transport following configuration models have been marked
 deprecated.
 
 Configuring Device with Global Credentials
@@ -1407,8 +1407,8 @@ Configuring Device with Global Credentials
 Configuring Device with Device-specific Credentials
 '''''''''''''''''''''''''''''''''''''''''''''''''''
 
-Call Home Server also allows to configure credentials per device basis,
-this is done by introducing ``credentials`` container into
+Call Home Server also allows the configuration of credentials per device basis.
+This is done by introducing ``credentials`` container into the
 device-specific configuration. Format is same as in global credentials.
 
 *Configuring Device with Credentials*
@@ -1547,8 +1547,8 @@ among the allowed devices.
 Operational Status
 ^^^^^^^^^^^^^^^^^^
 
-Once an entry is made into the config side of "allowed-devices", the Call-Home Server will
-populate an corresponding operational device that is the same as the config device but
+Once an entry is made on the config side of "allowed-devices", the Call-Home Server will
+populate a corresponding operational device that is the same as the config device but
 has an additional status. By default, this status is *DISCONNECTED*. Once a device calls
 home, this status will change to one of:
 
@@ -1572,7 +1572,7 @@ available for network management.
 Rogue Devices
 '''''''''''''
 
-Devices which are not on the allowlist might try to connect to the Call-Home Server. In
+Devices that are not on the allowlist might try to connect to the Call-Home Server. In
 these cases, the server will keep a record by instantiating an operational device. There
 will be no corresponding config device for these rogues. They can be identified readily
 because their device id, rather than being user-supplied, will be of the form
@@ -1598,8 +1598,8 @@ Reading data with selected fields
 Overview
 ~~~~~~~~
 
-If user would like to read only selected fields from NETCONF device, it is possible to use
-fields query parameter that is described by RFC-8040. RESTCONF parses content of query
+If user would like to read only selected fields from a NETCONF device, it is possible to use
+the fields query parameter that is described by RFC-8040. RESTCONF parses content of query
 parameter into format that is accepted by NETCONF subtree filtering - filtering of data is done
 on NETCONF server, not on NETCONF client side. This approach optimizes network traffic load,
 because data in which user doesn't have interest, is not transferred over network.
@@ -2082,7 +2082,7 @@ Using the OpenAPI Explorer through HTTP
 9.  You can see responses to the given request.
 
 
-OpenAPI Explorer ca be used for connected device too. How to connect device can be found :ref:`here <netconf-connector>`.
+OpenAPI Explorer can also be used for connected device. How to connect a device can be found :ref:`here <netconf-connector>`.
 
 OpenAPI URLs in that case would look like this:
 
