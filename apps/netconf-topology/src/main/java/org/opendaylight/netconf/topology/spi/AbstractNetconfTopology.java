@@ -138,7 +138,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     @Override
     public ListenableFuture<Empty> connectNode(final NodeId nodeId, final Node configNode) {
-        LOG.info("Connecting RemoteDevice{{}} , with config {}", nodeId, hideCredentials(configNode));
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Connecting RemoteDevice{{}} , with config {}", nodeId, hideCredentials(configNode));
+        }
         return setupConnection(nodeId, configNode);
     }
 
@@ -150,10 +152,13 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
      */
     @VisibleForTesting
     public static String hideCredentials(final Node nodeConfiguration) {
-        final NetconfNode netconfNodeAugmentation = nodeConfiguration.augmentation(NetconfNode.class);
-        final String nodeCredentials = netconfNodeAugmentation.getCredentials().toString();
-        final String nodeConfigurationString = nodeConfiguration.toString();
-        return nodeConfigurationString.replace(nodeCredentials, "***");
+        final var nodeConfigurationString = nodeConfiguration.toString();
+        final var netconfNodeAugmentation = nodeConfiguration.augmentation(NetconfNode.class);
+        if (netconfNodeAugmentation != null && netconfNodeAugmentation.getCredentials() != null) {
+            final var nodeCredentials = netconfNodeAugmentation.getCredentials().toString();
+            return nodeConfigurationString.replace(nodeCredentials, "***");
+        }
+        return nodeConfigurationString;
     }
 
     @Override
