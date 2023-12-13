@@ -61,6 +61,7 @@ public class CallHomeMountServiceTest {
 
     private CallHomeMountService service;
     private ListenableFuture<NetconfClientSession> netconfSessionFuture;
+    private Node node1;
 
     @BeforeEach
     void beforeEach() {
@@ -70,11 +71,11 @@ public class CallHomeMountServiceTest {
          * for ID1 only.
          */
         doAnswer(invocation -> {
-            final var node = (Node) invocation.getArguments()[0];
-            if (ID1.equals(node.requireNodeId().getValue())) {
+            node1 = (Node) invocation.getArguments()[0];
+            if (ID1.equals(node1.requireNodeId().getValue())) {
                 final var configBuilderFactory = CallHomeMountService.createClientConfigurationBuilderFactory();
                 final var config = configBuilderFactory
-                    .createClientConfigurationBuilder(node.requireNodeId(), node.augmentation(NetconfNode.class))
+                    .createClientConfigurationBuilder(node1.requireNodeId(), node1.augmentation(NetconfNode.class))
                     .withSessionListener(sessionListener).build();
                 try {
                     netconfSessionFuture = service.createClientFactory().createClient(config);
@@ -106,6 +107,9 @@ public class CallHomeMountServiceTest {
         // id 2 -- netconf layer omitted
         assertNull(sshSessionContextManager.createContext(ID2, sshSession));
 
+        // verify that node is enabled with SSH
+        verify(topology, times(1)).enableNode(node1);
+
         // remove context
         sshSessionContextManager.remove(ID1);
         verify(topology, times(1)).disableNode(eq(NODE_ID1));
@@ -126,6 +130,9 @@ public class CallHomeMountServiceTest {
         assertSame(netconfSessionFuture, context.settableFuture());
         // id 2 -- netconf layer omitted
         assertNull(tlsSessionContextManager.createContext(ID2, nettyChannel));
+
+        // verify that node is enabled with TLS
+        verify(topology, times(1)).enableNode(node1);
 
         // remove context
         tlsSessionContextManager.remove(ID1);
