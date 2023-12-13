@@ -61,6 +61,7 @@ public class CallHomeMountServiceTest {
 
     private CallHomeMountService service;
     private ListenableFuture<NetconfClientSession> netconfSessionFuture;
+    private Node node;
 
     @BeforeEach
     void beforeEach() {
@@ -70,7 +71,7 @@ public class CallHomeMountServiceTest {
          * for ID1 only.
          */
         doAnswer(invocation -> {
-            final var node = (Node) invocation.getArguments()[0];
+            node = (Node) invocation.getArguments()[0];
             if (ID1.equals(node.requireNodeId().getValue())) {
                 final var configBuilderFactory = CallHomeMountService.createClientConfigurationBuilderFactory();
                 final var config = configBuilderFactory
@@ -130,6 +131,49 @@ public class CallHomeMountServiceTest {
         // remove context
         tlsSessionContextManager.remove(ID1);
         verify(topology, times(1)).disableNode(eq(NODE_ID1));
+    }
+
+    @Test
+    void sshConnectDeviceTest() {
+        doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
+        final var sshSessionContextManager = service.createSshSessionContextManager();
+
+        // id 1 -- netconf layer created with SSH
+        final var context = sshSessionContextManager.createContext(ID1, sshSession);
+        assertNotNull(context);
+        assertEquals(ID1, context.id());
+        assertEquals(SOCKET_ADDRESS, context.remoteAddress());
+        assertSame(sshSession, context.sshSession());
+        assertSame(sessionListener, context.netconfSessionListener());
+        assertNotNull(context.settableFuture());
+        assertSame(netconfSessionFuture, context.settableFuture());
+
+        // verify that node is enabled with SSH
+        verify(topology, times(1)).enableNode(node);
+
+        // remove context
+        sshSessionContextManager.remove(ID1);
+    }
+
+    @Test
+    void tlsConnectDeviceTest() {
+        doReturn(SOCKET_ADDRESS).when(nettyChannel).remoteAddress();
+        final var tlsSessionContextManager = service.createTlsSessionContextManager(tlsAuthProvider, statusRecorder);
+
+        // id 1 -- netconf layer created with TLS
+        final var context = tlsSessionContextManager.createContext(ID1, nettyChannel);
+        assertNotNull(context);
+        assertEquals(ID1, context.id());
+        assertSame(nettyChannel, context.nettyChannel());
+        assertSame(sessionListener, context.netconfSessionListener());
+        assertNotNull(context.settableFuture());
+        assertSame(netconfSessionFuture, context.settableFuture());
+
+        // verify that node is enabled with TLS
+        verify(topology, times(1)).enableNode(node);
+
+        // remove context
+        tlsSessionContextManager.remove(ID1);
     }
 
 }
