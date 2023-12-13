@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "c57e02f411304aebf9b45bc247c32f9c41c92a3a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be06e172_5d96d181",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-12-13T15:26:07Z",
+      "side": 1,
+      "message": "rebase pls",
+      "revId": "c57e02f411304aebf9b45bc247c32f9c41c92a3a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35deca1c_08dedcb7",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProvider.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2023-12-13T15:26:07Z",
+      "side": 1,
+      "message": "you can consider using else if here too and throw exception at the end if nothing \"matched\"",
+      "revId": "c57e02f411304aebf9b45bc247c32f9c41c92a3a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
