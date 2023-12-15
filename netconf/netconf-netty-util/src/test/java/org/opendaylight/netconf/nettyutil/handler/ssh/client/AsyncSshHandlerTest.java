@@ -39,6 +39,7 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.junit.After;
@@ -168,6 +169,7 @@ public class AsyncSshHandlerTest {
         doReturn(connectFuture).when(sshClient).connect("usr", remoteAddress);
         doReturn(channelConfig).when(channel).config();
         doReturn(1000).when(channelConfig).getConnectTimeoutMillis();
+        doReturn(new HashMap<String, Object>()).when(sshClient).getProperties();
     }
 
     @Test
