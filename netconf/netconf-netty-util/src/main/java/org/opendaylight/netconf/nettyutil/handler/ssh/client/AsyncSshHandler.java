@@ -34,6 +34,7 @@ import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.core.CoreModuleProperties;
+import org.opendaylight.netconf.shaded.sshd.netty.NettyIoServiceFactoryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
         // TODO make configurable, or somehow reuse netty threadpool
         c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
+        c.setIoServiceFactoryFactory(new NettyIoServiceFactoryFactory());
         c.start();
         DEFAULT_CLIENT = c;
     }
