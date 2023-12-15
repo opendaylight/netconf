@@ -16,6 +16,24 @@
       "message": "I think this requires more investigation.\n* Removing the blocking call from AsyncSshHandler doesn\u0027t seem to be enough. It appears that there is a blocking call in shaded-sshd SSH client\n* Canceling `sshConnectFuture` doesn\u0027t seem to actually cancel the blocking call in the SSH client",
       "revId": "58fffa4e2ce2b1e3fc28146d0cd78d64d0327fcf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40ca4361_b2ee6f62",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-15T14:43:01Z",
+      "side": 1,
+      "message": "Fixed by synchronizing SshClient connection timeout with timeout configured for the device.",
+      "parentUuid": "5b7fe39b_0785b1a8",
+      "revId": "58fffa4e2ce2b1e3fc28146d0cd78d64d0327fcf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
