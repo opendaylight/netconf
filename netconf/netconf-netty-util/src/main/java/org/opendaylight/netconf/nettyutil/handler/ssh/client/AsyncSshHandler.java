@@ -33,6 +33,7 @@ import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.common.PropertyResolverUtils;
 import org.opendaylight.netconf.shaded.sshd.core.CoreModuleProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,10 +156,14 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             //complete connection promise with netconf negotiation future
             negotiationFuture.addListener(negotiationFutureListener);
         }
+        // Synchronize SshClient timeout with timeout configured in device ConnectTimeoutMillis configuration
+        final var connectTimeoutMillis = ctx.channel().config().getConnectTimeoutMillis();
+        PropertyResolverUtils.updateProperty(sshClient.getProperties(),
+            CoreModuleProperties.IO_CONNECT_TIMEOUT.getName(), Duration.ofMillis(connectTimeoutMillis).getSeconds());
 
         LOG.debug("{}: Starting SSH to {} on channel: {}", name, remoteAddress, ctx.channel());
         final var sshConnectFuture = sshClient.connect(authenticationHandler.getUsername(), remoteAddress);
-        final var timeout = setTimeoutToConnectFuture(ctx, sshConnectFuture);
+        final var timeout = setTimeoutToConnectFuture(connectTimeoutMillis, sshConnectFuture);
         sshConnectFuture.addListener(future -> {
             if (timeout != null && !timeout.isExpired()) {
                 timeout.cancel();
@@ -167,7 +172,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         });
     }
 
-    private Timeout setTimeoutToConnectFuture(final ChannelHandlerContext ctx, final ConnectFuture sshConnectFuture) {
+    private Timeout setTimeoutToConnectFuture(final int connectTimeoutMillis, final ConnectFuture sshConnectFuture) {
         return timer.newTimeout(unused -> {
             if (!sshConnectFuture.isDone()) {
                 // Connection timed out
@@ -175,7 +180,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
                     + sshConnectFuture.getId()));
                 sshConnectFuture.cancel();
             }
-        }, ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS);
+        }, connectTimeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     private synchronized void onConnectComplete(final ConnectFuture connectFuture, final ChannelHandlerContext ctx) {
