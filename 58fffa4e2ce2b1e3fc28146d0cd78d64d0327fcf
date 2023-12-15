@@ -34,6 +34,24 @@
       "parentUuid": "5b7fe39b_0785b1a8",
       "revId": "58fffa4e2ce2b1e3fc28146d0cd78d64d0327fcf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a37c4bc6_6a6e60cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-15T16:17:18Z",
+      "side": 1,
+      "message": "A follow-up patch resolves the issue related to the limited number of execution threads restricted by processor cores.",
+      "parentUuid": "40ca4361_b2ee6f62",
+      "revId": "58fffa4e2ce2b1e3fc28146d0cd78d64d0327fcf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
