@@ -182,7 +182,7 @@ public final class SchemasStream extends InputStream {
                 processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
             }
             stack.exit();
-        } else if (node instanceof ChoiceSchemaNode choiceNode) {
+        } else if (node instanceof ChoiceSchemaNode choiceNode && !choiceNode.getCases().isEmpty()) {
             // Process default case or first case
             final var caseNode = choiceNode.getDefaultCase()
                 .orElseGet(() -> choiceNode.getCases().stream().findFirst()
