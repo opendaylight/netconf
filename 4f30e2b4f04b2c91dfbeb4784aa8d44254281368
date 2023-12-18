@@ -22,6 +22,30 @@
       },
       "revId": "4f30e2b4f04b2c91dfbeb4784aa8d44254281368",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fac1c0f_38e3d61c",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-18T11:05:33Z",
+      "side": 1,
+      "message": "I have removed this part of the code since it is not required when using NettyIoConnector instead of Nio2Connector.\n\nThe NettyIoConnector connection is canceled when ConnectFuture.cancel() is called. Nio2Connector does not react to cancellation, and the connection continues to reach the default timeout set in CoreModuleProperties.IO_CONNECT_TIMEOUT. Therefore, this is no longer necessary.\n\nhttps://git.opendaylight.org/gerrit/c/netconf/+/109076/9/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java#174",
+      "parentUuid": "aa286c29_ad9e0e6b",
+      "range": {
+        "startLine": 160,
+        "startChar": 7,
+        "endLine": 160,
+        "endChar": 61
+      },
+      "revId": "4f30e2b4f04b2c91dfbeb4784aa8d44254281368",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
