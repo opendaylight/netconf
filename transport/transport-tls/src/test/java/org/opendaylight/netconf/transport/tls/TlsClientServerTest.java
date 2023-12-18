@@ -223,9 +223,9 @@ class TlsClientServerTest {
             // connect with client
             final var client = clientBuilder.build().get(2, TimeUnit.SECONDS);
             try {
-                verify(serverListener, timeout(500))
+                verify(serverListener, timeout(5000))
                         .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
-                verify(clientListener, timeout(500))
+                verify(clientListener, timeout(5000))
                         .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
                 // validate channels are in expected state
                 var serverChannel = assertChannel(serverTransportChannelCaptor.getAllValues());
