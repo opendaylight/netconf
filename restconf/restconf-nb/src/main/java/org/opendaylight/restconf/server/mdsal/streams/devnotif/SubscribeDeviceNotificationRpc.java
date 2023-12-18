@@ -9,13 +9,18 @@ package org.opendaylight.restconf.server.mdsal.streams.devnotif;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.Beta;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -40,8 +45,10 @@ import org.osgi.service.component.annotations.Reference;
  * RESTCONF implementation of {@link SubscribeDeviceNotification}.
  */
 @Singleton
+@Beta
 @Component(service = RpcImplementation.class)
-public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
+public final class SubscribeDeviceNotificationRpc extends RpcImplementation
+        implements DOMMountPointListener, AutoCloseable  {
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
         NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "path").intern());
     private static final NodeIdentifier DEVICE_NOTIFICATION_STREAM_NAME_NODEID =
@@ -57,6 +64,7 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
         super(SubscribeDeviceNotification.QNAME);
         this.mountPointService = requireNonNull(mountPointService);
         this.streamRegistry = requireNonNull(streamRegistry);
+        this.mountPointService.registerProvisionListener(this);
     }
 
     @Override
@@ -94,5 +102,33 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
                 .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
                 .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_NAME_NODEID, stream.name()))
                 .build());
+    }
+
+    @Override
+    public void close() throws Exception {
+
+    }
+
+    @Override
+    public void onMountPointCreated(YangInstanceIdentifier path) {
+        createDeviceNotificationListenerOnMountPoint(path);
+    }
+
+    @Override
+    public void onMountPointRemoved(YangInstanceIdentifier path) {
+
+    }
+
+    private void createDeviceNotificationListenerOnMountPoint(final YangInstanceIdentifier path) {
+        try {
+            String steamName = null;
+            var url = new URI("http", "", "local", 8080,
+                    "" + '/' + URLConstants.STREAMS_SUBPATH, null, null);
+            DeviceNotificationSource deviceNotificationSource = new DeviceNotificationSource(mountPointService, path);
+            streamRegistry.createStream(url, deviceNotificationSource, "DEVICE NOTIFICATION")
+                    .get().readySource();
+        } catch (URISyntaxException | InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
