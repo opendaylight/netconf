@@ -125,7 +125,6 @@ public final class MdsalRestconfServer
         this.mountPointService = requireNonNull(mountPointService);
         this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
         sourceProvider = schemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
-
         localStrategy = createLocalStrategy(schemaService.getGlobalContext());
         reg = schemaService.registerSchemaContextListener(this);
     }

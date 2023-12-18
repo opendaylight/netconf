@@ -140,6 +140,12 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         maxAttempts = node.requireMaxConnectionAttempts().toJava();
         minSleep = node.requireBetweenAttemptsTimeoutMillis().toJava();
         sleepFactor = node.requireSleepFactor().doubleValue();
+        if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources() != null
+                && nodeOptional.getIgnoreMissingSchemaSources().getAllowed()) {
+            LOG.warn("Ignoring missing schema sources is not currently implemented for {}", deviceId);
+        }
+        final boolean isNotificationSubscriptionEnabled = nodeOptional != null && nodeOptional.getNotification() != null
+                ? true : false;
 
         // Setup reconnection on empty context, if so configured
         // FIXME: NETCONF-925: implement this
@@ -174,6 +180,10 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                 .setSalFacade(salFacade)
                 .setDeviceActionFactory(deviceActionFactory)
                 .setBaseSchemas(baseSchemas)
+                .setNotificationStream(isNotificationSubscriptionEnabled ? nodeOptional.getNotification()
+                .getStreamName() : "NETCONF")
+                .setNotificationSubscribe(isNotificationSubscriptionEnabled ? nodeOptional.getNotification()
+                        .getSubscribe() : false)
                 .build();
             yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
         }
