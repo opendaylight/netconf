@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,9 +53,12 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
     private final ConcurrentMap<String, RestconfStream<?>> streams = new ConcurrentHashMap<>();
     private final RestconfStream.LocationProvider locationProvider;
+    private final RestconfStream.BaseUriProvider baseUriProvider;
 
-    protected AbstractRestconfStreamRegistry(final RestconfStream.LocationProvider locationProvider) {
+    protected AbstractRestconfStreamRegistry(final RestconfStream.LocationProvider locationProvider,
+                                             final RestconfStream.BaseUriProvider baseUriProvider) {
         this.locationProvider = requireNonNull(locationProvider);
+        this.baseUriProvider = requireNonNull(baseUriProvider);
     }
 
     @Override
@@ -87,6 +91,33 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                     request.completeWith(new ServerException("Failed to allocate stream " + name, cause));
                 }
             }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    public final <T> void createStream(final Source<T> source, final String description) throws URISyntaxException {
+
+        final var baseStreamLocation = locationProvider.baseStreamLocation(baseUriProvider.getRestconfUri());
+
+        final var stream = allocateStream(source);
+        final var name = stream.name();
+        if (description.isBlank()) {
+            throw new IllegalArgumentException("Description must be descriptive");
+        }
+
+        Futures.addCallback(putStream(streamEntry(name, description, String.valueOf(baseStreamLocation),
+                        stream.encodings())),
+                new FutureCallback<Object>() {
+                    @Override
+                    public void onSuccess(final Object result) {
+                        LOG.debug("Stream {} added", name);
+                    }
+
+                    @Override
+                    public void onFailure(final Throwable cause) {
+                        LOG.debug("Failed to add stream {}", name, cause);
+                        streams.remove(name, stream);
+                    }
+                }, MoreExecutors.directExecutor());
     }
 
     private <T> RestconfStream<T> allocateStream(final Source<T> source) {
