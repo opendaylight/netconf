@@ -156,7 +156,7 @@ public final class RestconfStream<T> {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStream.class);
-    private static final VarHandle SUBSCRIBERS;
+    public static final VarHandle SUBSCRIBERS;
 
     static {
         try {
@@ -270,10 +270,10 @@ public final class RestconfStream<T> {
             final var witness = (Subscribers<T>) SUBSCRIBERS.compareAndExchangeRelease(this, observed, next);
             if (witness == observed) {
                 LOG.debug("Subscriber {} is added.", handler);
-                if (observed instanceof Subscribers.Empty) {
+                //if (observed instanceof Subscribers.Empty) {
                     // We have became non-empty, start the source
-                    startSource();
-                }
+                startSource();
+                //}
                 return toAdd;
             }
 
@@ -326,6 +326,12 @@ public final class RestconfStream<T> {
             } else {
                 registration = reg;
             }
+        }
+    }
+
+    public void readySource() {
+        synchronized (this) {
+            registration = source.start(sink);
         }
     }
 
