@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c8e323e_baa19ba2",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslHandlerFactoryProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-12-18T12:40:32Z",
+      "side": 1,
+      "message": "should be final ?",
+      "revId": "d22444c9f4acde086d69619134fe803fb5c3cbdd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f92eaa40_1549a2c8",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslHandlerFactoryProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-12-18T12:40:32Z",
+      "side": 1,
+      "message": "should be final var ?",
+      "revId": "d22444c9f4acde086d69619134fe803fb5c3cbdd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
