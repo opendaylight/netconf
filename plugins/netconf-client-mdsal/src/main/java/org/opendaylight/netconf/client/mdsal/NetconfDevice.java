@@ -9,6 +9,7 @@ package org.opendaylight.netconf.client.mdsal;
 
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
+import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toId;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -43,6 +44,7 @@ import org.opendaylight.yangtools.rfc8528.model.api.SchemaMountConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -56,6 +58,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
     private static final QName RFC8528_SCHEMA_MOUNTS_QNAME = QName.create(
         SchemaMountConstants.RFC8528_MODULE, "schema-mounts").intern();
+    public static final @NonNull QName CREATE_SUBSCRIPTION_RPC_QNAME =
+            QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
+    public static final QName STREAM_NAME = QName.create(CREATE_SUBSCRIPTION_RPC_QNAME, "stream-name");
     private static final YangInstanceIdentifier RFC8528_SCHEMA_MOUNTS = YangInstanceIdentifier.of(
         NodeIdentifier.create(RFC8528_SCHEMA_MOUNTS_QNAME));
 
@@ -68,7 +73,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final DeviceActionFactory deviceActionFactory;
     private final NotificationHandler notificationHandler;
     private final boolean reconnectOnSchemasChange;
-
+    private final String notificationStream;
+    private final boolean isNotificationSubscribe;
     @GuardedBy("this")
     private ListenableFuture<?> schemaFuture;
     @GuardedBy("this")
@@ -76,15 +82,19 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     public NetconfDevice(final RemoteDeviceId id,final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,
-            final Executor globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
+            final Executor globalProcessingExecutor, final boolean reconnectOnSchemasChange,
+            final String notificationStream, final boolean isNotificationSubscribe) {
         this(id, baseSchemaProvider, deviceSchemaProvider, salFacade, globalProcessingExecutor,
-            reconnectOnSchemasChange, null);
+            reconnectOnSchemasChange, null, notificationStream, isNotificationSubscribe);
     }
 
     public NetconfDevice(final RemoteDeviceId id, final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,
             final Executor globalProcessingExecutor, final boolean reconnectOnSchemasChange,
-            final DeviceActionFactory deviceActionFactory) {
+            final DeviceActionFactory deviceActionFactory,final String notificationStream,
+            final boolean isNotificationSubscribe) {
+        this.notificationStream = notificationStream;
+        this.isNotificationSubscribe = isNotificationSubscribe;
         this.id = requireNonNull(id);
         this.baseSchemaProvider = requireNonNull(baseSchemaProvider);
         this.deviceSchemaProvider = requireNonNull(deviceSchemaProvider);
@@ -141,14 +151,16 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     private void registerToBaseNetconfStream(final NetconfRpcService deviceRpc,
                                              final NetconfDeviceCommunicator listener) {
+        ContainerNode createSubscriptionRpcContainer = ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(toId(CREATE_SUBSCRIPTION_RPC_QNAME))
+                .withChild(ImmutableNodes.leafNode(STREAM_NAME, this.notificationStream))
+                .build();
         // TODO check whether the model describing create subscription is present in schema
         // Perhaps add a default schema context to support create-subscription if the model was not provided
         // (same as what we do for base netconf operations in transformer)
         final var rpcResultListenableFuture = deviceRpc.invokeNetconf(CreateSubscription.QNAME,
-            ImmutableNodes.newContainerBuilder()
-                .withNodeIdentifier(NodeIdentifier.create(CreateSubscriptionInput.QNAME))
+            createSubscriptionRpcContainer);
                 // Note: default 'stream' is 'NETCONF', we do not need to create an explicit leaf
-                .build());
 
         Futures.addCallback(rpcResultListenableFuture, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -174,7 +186,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     private boolean shouldListenOnSchemaChange(final NetconfSessionPreferences remoteSessionCapabilities) {
-        return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
+        return remoteSessionCapabilities.isNotificationsSupported()
+            && (reconnectOnSchemasChange || isNotificationSubscribe);
     }
 
     private synchronized void handleSalInitializationSuccess(final NetconfDeviceCommunicator listener,
