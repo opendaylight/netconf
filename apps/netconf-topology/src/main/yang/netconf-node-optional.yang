@@ -29,6 +29,21 @@ module netconf-node-optional {
                 description "Time for reconnection - in units milliseconds. Default 5000 ms.";
             }
         }
+        container notification {
+            description "Allows user to subscribe device notification.
+            It notifies whend device is connected and disconnected.
+            It also gives notification for ping";
+            leaf subscribe {
+                type boolean;
+                default false;
+                description "Subscribe device notification. Default false.";
+            }
+            leaf stream-name {
+                type string;
+                default "NETCONF";
+                description "Device notification stream name.";
+            }
+        }
     }
 
     augment "/nt:network-topology/nt:topology/nt:node/" {
