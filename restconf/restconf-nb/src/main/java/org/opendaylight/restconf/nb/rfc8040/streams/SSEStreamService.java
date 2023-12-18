@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 // FIXME: integrate this service into JaxRsRestconf once we remove support for WebSockets
-final class SSEStreamService {
+public class SSEStreamService {
     private static final Logger LOG = LoggerFactory.getLogger(SSEStreamService.class);
 
     private final RestconfStream.Registry streamRegistry;
@@ -43,7 +43,7 @@ final class SSEStreamService {
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
 
-    SSEStreamService(final RestconfStream.Registry streamRegistry, final PingExecutor pingExecutor,
+    public SSEStreamService(final RestconfStream.Registry streamRegistry, final PingExecutor pingExecutor,
             final StreamsConfiguration configuration) {
         this.streamRegistry = requireNonNull(streamRegistry);
         this.pingExecutor = requireNonNull(pingExecutor);
