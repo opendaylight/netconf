@@ -70,6 +70,30 @@
       },
       "revId": "4f30e2b4f04b2c91dfbeb4784aa8d44254281368",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b5ce54f_6a699bd1",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-12-18T18:16:34Z",
+      "side": 1,
+      "message": "This effectively limits the maximum connect timeout to 60 seconds, `IO_CONNECT_TIMEOUT` default.\n\nFor example, with `connection-timeout-millis` set to `90000`, 90 seconds, connection attempt times out after 60 seconds:\n```\n17:55:00.318 DEBUG [globalWorkerGroup-3-3] connect(netconf@10.100.18.43:831) effective: 10.100.18.43: netconf@10.100.18.43:831\n17:56:00.323 DEBUG [nioEventLoopGroup-4-3] operationComplete(netconf@/10.100.18.43:831) failed (ConnectTimeoutException): connection timed out: /10.100.18.43:831\n17:56:00.326 WARN [nioEventLoopGroup-4-3] ncserver-u01: Unable to setup SSH connection on channel: [id: 0x4ae69c74]\nio.netty.channel.ConnectTimeoutException: connection timed out: /10.100.18.43:831\n\tat io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe$1.run(AbstractNioChannel.java:261) [bundleFile:4.1.100.Final]\n```\n\nWhen `connection-timeout-millis` is set to a value less than 60 seconds, then connection attempt times out after the configuration value, for example 20 seconds:\n```\n17:47:01.579 DEBUG [globalWorkerGroup-3-1] connect(netconf@10.100.18.43:831) effective: 10.100.18.43: netconf@10.100.18.43:831\n17:47:21.688 WARN [pool-13-thread-1] ncserver-u01: Unable to setup SSH connection on channel: [id: 0xfc52f9dd]\njava.util.concurrent.TimeoutException: Connection timed out for session: netconf@/10.100.18.43:831\n\tat org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler.lambda$setTimeoutToConnectFuture$2(AsyncSshHandler.java:177) ~[bundleFile:?]\n```\n\nBut the operation is not completed in `SshClient` until 60 seconds have passed:\n```\n17:48:01.597 DEBUG [nioEventLoopGroup-4-1] operationComplete(netconf@/10.100.18.43:831) failed (ConnectTimeoutException): connection timed out: /10.100.18.43:831\n```\n\nManaging connection timeout in two different places doesn\u0027t seem to work well.",
+      "parentUuid": "4eb8ee08_ee70e3fc",
+      "range": {
+        "startLine": 160,
+        "startChar": 7,
+        "endLine": 160,
+        "endChar": 61
+      },
+      "revId": "4f30e2b4f04b2c91dfbeb4784aa8d44254281368",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
