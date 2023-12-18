@@ -10,10 +10,14 @@ package org.opendaylight.restconf.server.mdsal.streams.devnotif;
 import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.opendaylight.aaa.web.WebServer;
+import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
 import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
@@ -34,28 +38,39 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * RESTCONF implementation of {@link SubscribeDeviceNotification}.
  */
 @Singleton
 @Component(service = RpcImplementation.class)
-public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
+public final class SubscribeDeviceNotificationRpc extends RpcImplementation
+        implements DOMMountPointListener, AutoCloseable  {
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
         NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "path").intern());
     private static final NodeIdentifier DEVICE_NOTIFICATION_STREAM_NAME_NODEID =
         NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "stream-name").intern());
+    private static final Logger LOG = LoggerFactory.getLogger(SubscribeDeviceNotificationRpc.class);
 
     private final DOMMountPointService mountPointService;
     private final RestconfStream.Registry streamRegistry;
+    private final WebServer webServer;
+    private final RestconfStreamServletFactory  restconfStreamServletFactory;
 
     @Inject
     @Activate
     public SubscribeDeviceNotificationRpc(@Reference final RestconfStream.Registry streamRegistry,
-            @Reference final DOMMountPointService mountPointService) {
+                                          @Reference final DOMMountPointService mountPointService,
+                                          @Reference final WebServer webServer,
+                                          @Reference RestconfStreamServletFactory restconfStreamServletFactory) {
         super(SubscribeDeviceNotification.QNAME);
         this.mountPointService = requireNonNull(mountPointService);
         this.streamRegistry = requireNonNull(streamRegistry);
+        this.webServer = requireNonNull(webServer);
+        this.restconfStreamServletFactory = requireNonNull(restconfStreamServletFactory);
+        this.mountPointService.registerProvisionListener(this);
     }
 
     @Override
@@ -100,4 +115,37 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
             restconfURI, new DeviceNotificationSource(mountPointService, path),
             "All YANG notifications occuring on mount point /" + apiPath.toString());
     }
+
+    @Override
+    public void close() throws Exception {
+
+    }
+
+    @Override
+    public void onMountPointCreated(YangInstanceIdentifier path) {
+        createDeviceNotificationListenerOnMountPoint(path);
+    }
+
+    @Override
+    public void onMountPointRemoved(YangInstanceIdentifier path) {
+
+    }
+
+    private void createDeviceNotificationListenerOnMountPoint(final YangInstanceIdentifier path) {
+        String nodeId = "";
+        try {
+            if (path.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+                final NodeIdentifierWithPredicates node =
+                        ((NodeIdentifierWithPredicates) path.getLastPathArgument());
+                nodeId = node.getValue(QName.create(node.getNodeType(), "node-id"), String.class);
+            }
+
+            URI restconfURI = new URI(webServer.getBaseURL() + restconfStreamServletFactory.restconf() + "/");
+            streamRegistry.createStream(restconfURI, new DeviceNotificationSource(mountPointService, path),
+                    "Stream created for node " + nodeId);
+        } catch (URISyntaxException e) {
+            LOG.error("Failed to crete stream for nodeId {} cause {}", nodeId, e.getMessage());
+        }
+    }
+
 }
