@@ -17,7 +17,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @param idleTimeout           Maximum idle time of web-socket session before the session is closed (milliseconds).
  * @param heartbeatInterval     Interval in milliseconds between sending of ping control frames.
  */
-public record StreamsConfiguration(int maximumFragmentLength, int idleTimeout, int heartbeatInterval) {
+public record  StreamsConfiguration(int maximumFragmentLength, int idleTimeout, int heartbeatInterval) {
     // FIXME: can this be 64KiB exactly? if so, maximumFragmentLength should become a Uint16 and validation should be
     //        pushed out to users
     public static final int MAXIMUM_FRAGMENT_LENGTH_LIMIT = 65534;
