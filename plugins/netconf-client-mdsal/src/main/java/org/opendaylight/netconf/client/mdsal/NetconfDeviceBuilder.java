@@ -26,7 +26,9 @@ public final class NetconfDeviceBuilder {
     // FIXME: this should not be here
     private Executor processingExecutor;
     private DeviceActionFactory deviceActionFactory;
-    private BaseNetconfSchemaProvider baseSchemaProvider;
+    private BaseNetconfSchemas baseSchemas;
+    private String notificationStream;
+    private boolean isNotificationSubscribe;
 
     public @NonNull NetconfDeviceBuilder setReconnectOnSchemasChange(final boolean reconnectOnSchemasChange) {
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
@@ -58,10 +60,21 @@ public final class NetconfDeviceBuilder {
         return this;
     }
 
-    public @NonNull NetconfDeviceBuilder setDeviceSchemaProvider(
-            final DeviceNetconfSchemaProvider deviceSchemaProvider) {
-        this.deviceSchemaProvider = requireNonNull(deviceSchemaProvider);
+    public NetconfDeviceBuilder setNotificationStream(String notificationStream) {
+        this.notificationStream = notificationStream;
         return this;
+    }
+
+    public NetconfDeviceBuilder setNotificationSubscribe(boolean notificationSubscribe) {
+        this.isNotificationSubscribe = notificationSubscribe;
+        return this;
+    }
+
+    public NetconfDevice build() {
+        validation();
+        return new NetconfDevice(schemaResourcesDTO, baseSchemas, id, salFacade,
+            globalProcessingExecutor, reconnectOnSchemasChange, deviceActionFactory, notificationStream,
+                isNotificationSubscribe);
     }
 
     public @NonNull NetconfDevice build() {
