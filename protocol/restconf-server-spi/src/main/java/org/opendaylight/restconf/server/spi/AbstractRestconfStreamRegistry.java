@@ -89,6 +89,30 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
             }, MoreExecutors.directExecutor());
     }
 
+    @Override
+    public final <T> void createStream(final URI restconfURI, final Source<T> source, final String description) {
+        final var baseStreamLocation = baseStreamLocation(restconfURI);
+        final var stream = allocateStream(source);
+        final var name = stream.name();
+        if (description.isBlank()) {
+            throw new IllegalArgumentException("Description must be descriptive");
+        }
+
+        Futures.addCallback(putStream(streamEntry(name, description, baseStreamLocation, stream.encodings())),
+                new FutureCallback<Object>() {
+                    @Override
+                    public void onSuccess(final Object result) {
+                        LOG.debug("Stream {} added", name);
+                    }
+
+                    @Override
+                    public void onFailure(final Throwable cause) {
+                        LOG.debug("Failed to add stream {}", name, cause);
+                        streams.remove(name, stream);
+                    }
+                }, MoreExecutors.directExecutor());
+    }
+
     private <T> RestconfStream<T> allocateStream(final Source<T> source) {
         String name;
         RestconfStream<T> stream;
