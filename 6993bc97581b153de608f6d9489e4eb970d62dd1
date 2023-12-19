@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "939fb1e6_d5ed82f1",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-19T18:54:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ef4b6a8_a078399d",
+      "range": {
+        "startLine": 165,
+        "startChar": 16,
+        "endLine": 165,
+        "endChar": 31
+      },
+      "revId": "6993bc97581b153de608f6d9489e4eb970d62dd1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a614b2f_d6c70dce",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-12-19T09:19:22Z",
       "side": 1,
       "message": "same race as below...\n\nif (!timeout.cancel()) {\n    onConnectComplete(future, ctx);\n}",
+      "range": {
+        "startLine": 166,
+        "startChar": 16,
+        "endLine": 168,
+        "endChar": 42
+      },
+      "revId": "6993bc97581b153de608f6d9489e4eb970d62dd1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "703a6375_edccc213",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-19T18:54:58Z",
+      "side": 1,
+      "message": "Resolved, but with a reversed condition, as we aim to terminate the connection when the timeout is reached, rather than allowing it to continue.",
+      "parentUuid": "3a614b2f_d6c70dce",
       "range": {
         "startLine": 166,
         "startChar": 16,
@@ -70,6 +118,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "159f0034_48af3b12",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-19T18:54:58Z",
+      "side": 1,
+      "message": "Fixed. The sshConnectFuture().cancel() returns a CancelFuture, and there is no need to wait for it.",
+      "parentUuid": "c0f76c6e_5514eb1a",
+      "range": {
+        "startLine": 174,
+        "startChar": 16,
+        "endLine": 174,
+        "endChar": 42
+      },
+      "revId": "6993bc97581b153de608f6d9489e4eb970d62dd1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9aa0b36a_f7eea2f4",
@@ -83,6 +155,30 @@
       "writtenOn": "2023-12-19T09:19:22Z",
       "side": 1,
       "message": "setException() does not make sense with cancel()\n\nso just log the timeout and cancel the future",
+      "range": {
+        "startLine": 178,
+        "startChar": 33,
+        "endLine": 178,
+        "endChar": 39
+      },
+      "revId": "6993bc97581b153de608f6d9489e4eb970d62dd1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc6726d9_af41b64d",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-19T18:54:58Z",
+      "side": 1,
+      "message": "This exception was used to successfully terminate an inactive connection in the `onConnectComplete` method\nhttps://github.com/opendaylight/netconf/blob/6.0.x/netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java#L162\n\nSince this is not very visible, I have removed setException() here and instead handle this in the SshFutureListener when timeout.cancel() \u003d\u003d false.",
+      "parentUuid": "9aa0b36a_f7eea2f4",
       "range": {
         "startLine": 178,
         "startChar": 33,

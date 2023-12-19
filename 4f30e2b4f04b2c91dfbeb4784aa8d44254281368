@@ -94,6 +94,30 @@
       },
       "revId": "4f30e2b4f04b2c91dfbeb4784aa8d44254281368",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7652b60_ac8ca14e",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-19T18:54:58Z",
+      "side": 1,
+      "message": "Fixed by setting the maximum possible timeout for SshClient.\n(If a null, negative, or zero value is specified, the default value will be used instead. Therefore, Duration.ofMillis(Integer.MAX_VALUE))",
+      "parentUuid": "5b5ce54f_6a699bd1",
+      "range": {
+        "startLine": 160,
+        "startChar": 7,
+        "endLine": 160,
+        "endChar": 61
+      },
+      "revId": "4f30e2b4f04b2c91dfbeb4784aa8d44254281368",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
