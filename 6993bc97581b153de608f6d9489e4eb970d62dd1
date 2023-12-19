@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ef4b6a8_a078399d",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-12-19T09:19:22Z",
+      "side": 1,
+      "message": "when can this be null?",
+      "range": {
+        "startLine": 165,
+        "startChar": 16,
+        "endLine": 165,
+        "endChar": 31
+      },
+      "revId": "6993bc97581b153de608f6d9489e4eb970d62dd1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a614b2f_d6c70dce",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-12-19T09:19:22Z",
+      "side": 1,
+      "message": "same race as below...\n\nif (!timeout.cancel()) {\n    onConnectComplete(future, ctx);\n}",
+      "range": {
+        "startLine": 166,
+        "startChar": 16,
+        "endLine": 168,
+        "endChar": 42
+      },
+      "revId": "6993bc97581b153de608f6d9489e4eb970d62dd1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0f76c6e_5514eb1a",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-12-19T09:19:22Z",
+      "side": 1,
+      "message": "this is inherently racy:\n\nT1: isDone() returns false\n    -- is suspended\nT2: finishes connect, sets value\nT1: -- resumes\n    calls setException()\n\nin other words, with the below, just do sshConnectFuture().cancel() and if it returns true, then log the timeout",
+      "range": {
+        "startLine": 174,
+        "startChar": 16,
+        "endLine": 174,
+        "endChar": 42
+      },
+      "revId": "6993bc97581b153de608f6d9489e4eb970d62dd1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9aa0b36a_f7eea2f4",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2023-12-19T09:19:22Z",
+      "side": 1,
+      "message": "setException() does not make sense with cancel()\n\nso just log the timeout and cancel the future",
+      "range": {
+        "startLine": 178,
+        "startChar": 33,
+        "endLine": 178,
+        "endChar": 39
+      },
+      "revId": "6993bc97581b153de608f6d9489e4eb970d62dd1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
