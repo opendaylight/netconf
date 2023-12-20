@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74981994_53a44812",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-12-20T00:00:30Z",
+      "side": 1,
+      "message": "This means that it\u0027s holding onto the future resource for up to 24 days after the connection fails. And a WARN log message will appear 24 days later, when it\u0027s completely irrelevant, causing a great deal of confusion.",
+      "revId": "15bc288a64f57c9f3684112412864f47c1326fb6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
