@@ -16,6 +16,24 @@
       "message": "This means that it\u0027s holding onto the future resource for up to 24 days after the connection fails. And a WARN log message will appear 24 days later, when it\u0027s completely irrelevant, causing a great deal of confusion.",
       "revId": "15bc288a64f57c9f3684112412864f47c1326fb6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f1c6753_d7fe0db9",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2023-12-20T10:48:24Z",
+      "side": 1,
+      "message": "Is there something indicating this issue? The connection attempt from NettyIoConnector should be closed with a connection timeout in AsyncSshHandler. \nI have attempted the following:\nCoreModuleProperties.IO_CONNECT_TIMEOUT.set(c, Duration.ofMillis(80000))\n`connection-timeout-millis` set to 30000\n\nEven after 5 minutes, I did not observe any indications of this issue in the trace logs.",
+      "parentUuid": "74981994_53a44812",
+      "revId": "15bc288a64f57c9f3684112412864f47c1326fb6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
