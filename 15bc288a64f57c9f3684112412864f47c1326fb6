@@ -34,6 +34,24 @@
       "parentUuid": "74981994_53a44812",
       "revId": "15bc288a64f57c9f3684112412864f47c1326fb6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e34615e8_ad91296d",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2023-12-21T00:59:32Z",
+      "side": 1,
+      "message": "Right, the issue appears to be fixed - there was no specific mention of addressing the issue, so I thought this behavior didn\u0027t change.\n\nThe reason why there was a lingering future that expired after the default connect-timeout with Patch Set 9 is because `sshConnectFuture.setException()` set a non-cancellation exception to `sshConnectFuture` preventing proper cancellation of `sshConnectFuture` and listeners are not notified of the cancellation: [notifyListeners()](https://github.com/apache/mina-sshd/blob/sshd-2.11.0/sshd-common/src/main/java/org/apache/sshd/common/future/DefaultSshFuture.java#L160) cannot be reached because [result](https://github.com/apache/mina-sshd/blob/sshd-2.11.0/sshd-common/src/main/java/org/apache/sshd/common/future/DefaultSshFuture.java#L151) is already set to `TimeoutException` and not null.\n\n\nSince `setException()` was removed in Patch Set 10, that\u0027s not the case any more and cancellation of `sshConnectFuture` seems to work as expected.",
+      "parentUuid": "3f1c6753_d7fe0db9",
+      "revId": "15bc288a64f57c9f3684112412864f47c1326fb6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
