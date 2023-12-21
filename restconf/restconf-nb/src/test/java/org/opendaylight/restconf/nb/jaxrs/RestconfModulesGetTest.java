@@ -173,6 +173,24 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
         assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.getErrorTag());
     }
 
+    /**
+     * Positive test of getting <code>SchemaExportContext</code> behind mount point for module without revision.
+     * Expected module name, prefix and namespace are verified.
+     */
+    @Test
+    void toSchemaExportContextFromIdentifierNullRevisionTest() {
+        mockMountPoint();
+
+        final var content = assertYang(MOUNT_POINT_IDENT, "module-without-revision", null);
+
+        assertEquals("""
+            module module-without-revision {
+              namespace module:without:revision;
+              prefix mwr;
+            }
+            """, content);
+    }
+
     private void mockMountPoint() {
         doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT_ON_MOUNT_POINT))).when(mountPoint)
             .getService(DOMSchemaService.class);
@@ -185,15 +203,19 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     }
 
     /**
-     * Negative test of module revision validation when there is no revision. Test fails catching
-     * <code>RestconfDocumentedException</code> and checking for correct error type, error tag and error status code.
+     * Positive test of getting <code>SchemaExportContext</code> for module without revision.
+     * Expected module name, prefix and namespace are verified.
      */
     @Test
-    void validateAndGetRevisionNotSuppliedTest() {
-        final var error = assertError(ar -> restconf.modulesYangGET("module", null, ar));
-        assertEquals("Source module not found", error.getErrorMessage());
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
+    void validateAndGetModuleWithoutRevisionTest() {
+        final var content = assertYang(null, "module-without-revision", null);
+
+        assertEquals("""
+            module module-without-revision {
+              namespace module:without:revision;
+              prefix mwr;
+            }
+            """, content);
     }
 
     /**

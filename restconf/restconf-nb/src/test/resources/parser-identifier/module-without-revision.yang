@@ -1,0 +1,4 @@
+module module-without-revision {
+    namespace "module:without:revision";
+    prefix "mwr";
+}

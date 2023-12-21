@@ -15,6 +15,7 @@ import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertErro
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.Futures;
+import java.io.IOException;
 import java.io.Reader;
 import org.junit.Before;
 import org.junit.Test;
@@ -150,5 +151,18 @@ public class RestconfSchemaServiceTest {
         assertEquals("Source module not found", error.getErrorMessage());
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
         assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
+    }
+
+    /**
+     * Try to get schema with identifier which does not contain revision catching and check
+     * if the correct module was found.
+     */
+    @Test
+    public void getSchemaWithoutRevisionYangSourceTest() throws IOException {
+        doReturn(Futures.immediateFuture(yangSource)).when(sourceProvider)
+            .getSource(new SourceIdentifier("module-without-revision", (Revision) null));
+        doReturn(yangReader).when(yangSource).openStream();
+        assertSame(yangReader, assertEntity(Reader.class, 200,
+            ar -> restconf.modulesYangGET("module-without-revision", null, ar)));
     }
 }
