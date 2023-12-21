@@ -33,6 +33,24 @@
       "message": "The underlying problem has been fixed in https://git.opendaylight.org/gerrit/c/netconf/+/109063. This patch needs to be rebased and just add the appropriate test.",
       "revId": "b657d11fdfe75490a1844125b25e3ee1608f2b8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4483d49c_20c6e2d1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2023-12-21T11:33:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af39a3a6_16e8a76e",
+      "revId": "b657d11fdfe75490a1844125b25e3ee1608f2b8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
