@@ -173,6 +173,20 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
         assertEquals(ErrorTags.RESOURCE_DENIED_TRANSPORT, error.getErrorTag());
     }
 
+    @Test
+    void toSchemaExportContextFromIdentifierNullRevisionTest() {
+        mockMountPoint();
+
+        final var content = assertYang(MOUNT_POINT_IDENT, "module-without-revision", null);
+
+        assertEquals("""
+            module module-without-revision {
+              namespace module:without:revision;
+              prefix mwr;
+            }
+            """, content);
+    }
+
     private void mockMountPoint() {
         doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT_ON_MOUNT_POINT))).when(mountPoint)
             .getService(DOMSchemaService.class);
@@ -190,10 +204,14 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
      */
     @Test
     void validateAndGetRevisionNotSuppliedTest() {
-        final var error = assertError(ar -> restconf.modulesYangGET("module", null, ar));
-        assertEquals("Source module not found", error.getErrorMessage());
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
+        final var content = assertYang(null, "module-without-revision", null);
+
+        assertEquals("""
+            module module-without-revision {
+              namespace module:without:revision;
+              prefix mwr;
+            }
+            """, content);
     }
 
     /**
