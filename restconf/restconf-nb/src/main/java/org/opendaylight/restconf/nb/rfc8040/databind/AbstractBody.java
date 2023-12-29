@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static java.util.Objects.requireNonNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
@@ -40,6 +41,7 @@ public abstract sealed class AbstractBody implements AutoCloseable
     }
 
     @SuppressWarnings("unused")
+    @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile InputStream inputStream;
 
     AbstractBody(final InputStream inputStream) {

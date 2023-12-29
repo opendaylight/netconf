@@ -13,6 +13,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.EOFException;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
@@ -87,6 +88,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     //
     // This field is manipulated using CLOSING VarHandle
     @SuppressWarnings("unused")
+    @SuppressFBWarnings(value = "UUF_UNUSED_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile boolean closing;
 
     public boolean isSessionClosing() {

@@ -23,7 +23,8 @@ public class DefaultStopExi extends AbstractSingletonNetconfOperation implements
     private static final Logger LOG = LoggerFactory.getLogger(DefaultStopExi.class);
 
     public static final String STOP_EXI = "stop-exi";
-    private NetconfServerSession netconfSession;
+
+    private NetconfServerSession netconfSession = null;
 
     public DefaultStopExi(final SessionIdType sessionId) {
         super(sessionId);
