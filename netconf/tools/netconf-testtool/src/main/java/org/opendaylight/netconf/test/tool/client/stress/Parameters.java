@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.stress;
 
 import com.google.common.base.Preconditions;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -32,6 +32,7 @@ public class Parameters {
     public File editContent;
 
     @Arg(dest = "edit-batch-size")
+    @SuppressFBWarnings("PA_PUBLIC_PRIMITIVE_ATTRIBUTE")
     public int editBatchSize;
 
     @Arg(dest = "candidate-datastore")

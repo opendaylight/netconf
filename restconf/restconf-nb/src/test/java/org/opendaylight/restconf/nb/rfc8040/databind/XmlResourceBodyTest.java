@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -208,11 +207,14 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
 
     @Test
     void testMissingKeys() throws Exception {
-        final var ex = assertThrows(IllegalArgumentException.class,
-            () -> parse("nested-module:depth1-cont/depth2-list2=one,two", """
+        final var error = assertError(() -> parse("nested-module:depth1-cont/depth2-list2=one,two", """
                 <depth2-list2 xmlns="urn:nested:module">
                   <depth3-lf1-key>one</depth3-lf1-key>
                 </depth2-list2>"""));
-        assertNull(ex.getMessage());
+        assertEquals("""
+            Error parsing input: List entry (urn:nested:module?revision=2014-06-03)depth2-list2 is missing leaf values \
+            for [depth3-lf2-key]""", error.getErrorMessage());
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
     }
 }
