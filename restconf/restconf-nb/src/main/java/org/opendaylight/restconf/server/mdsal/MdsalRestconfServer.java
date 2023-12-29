@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.net.URI;
@@ -110,6 +111,7 @@ public final class MdsalRestconfServer
     private final Registration reg;
 
     @SuppressWarnings("unused")
+    @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile MdsalRestconfStrategy localStrategy;
 
     @Inject
