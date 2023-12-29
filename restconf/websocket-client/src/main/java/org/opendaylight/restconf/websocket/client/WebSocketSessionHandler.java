@@ -30,11 +30,10 @@ import org.slf4j.LoggerFactory;
  */
 @WebSocket
 public class WebSocketSessionHandler {
-
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketSessionHandler.class);
 
     private final CountDownLatch sessionCloseLatch = new CountDownLatch(1);
-    Session webSocketSession;
+    Session webSocketSession = null;
 
     /**
      * Handling of the initialized web-socket session. Created web-socket session is saved.

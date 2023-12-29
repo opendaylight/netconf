@@ -29,7 +29,8 @@ public class DefaultStartExi extends AbstractSingletonNetconfOperation implement
     public static final String START_EXI = "start-exi";
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultStartExi.class);
-    private NetconfServerSession netconfSession;
+
+    private NetconfServerSession netconfSession = null;
 
     public DefaultStartExi(final SessionIdType sessionId) {
         super(sessionId);

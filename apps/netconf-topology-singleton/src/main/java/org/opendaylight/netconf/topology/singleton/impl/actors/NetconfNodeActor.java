@@ -88,9 +88,9 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private Timeout actorResponseWaitTime;
     private RemoteDeviceId id;
     private NetconfTopologySetup setup;
-    private List<SourceIdentifier> sourceIdentifiers;
-    private DOMRpcService deviceRpc;
-    private DOMActionService deviceAction;
+    private List<SourceIdentifier> sourceIdentifiers = null;
+    private DOMRpcService deviceRpc = null;
+    private DOMActionService deviceAction = null;
     private SlaveSalFacade slaveSalManager;
     private DOMDataBroker deviceDataBroker;
     private NetconfDataTreeService netconfService;
