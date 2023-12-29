@@ -129,7 +129,7 @@ public class DefinitionGenerator {
             "\\\\D", "[^0-9]", "\\\\s", "[ \t\n\f\r]", "\\\\S", "[^ \t\n\f\r]",
             "\\\\w", "[a-zA-Z_0-9]", "\\\\W", "[^a-zA-Z_0-9]");
 
-    private Module topLevelModule;
+    private Module topLevelModule = null;
 
     public DefinitionGenerator() {
     }
@@ -593,9 +593,9 @@ public class DefinitionGenerator {
                     } else if (leafTypeDef instanceof DecimalTypeDefinition
                             || leafTypeDef instanceof Uint64TypeDefinition) {
                         setDefaultValue(property, new BigDecimal(stringDefaultValue));
-                    } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition) {
+                    } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition<?, ?> rangeRestricted) {
                         //uint8,16,32 int8,16,32,64
-                        if (isHexadecimalOrOctal((RangeRestrictedTypeDefinition<?, ?>)leafTypeDef)) {
+                        if (isHexadecimalOrOctal(rangeRestricted)) {
                             setDefaultValue(property, stringDefaultValue);
                         } else {
                             setDefaultValue(property, Long.valueOf(stringDefaultValue));
@@ -613,7 +613,7 @@ public class DefinitionGenerator {
     }
 
     private static String processBinaryType(final BinaryTypeDefinition definition, final ObjectNode property) {
-        definition.getDefaultValue().ifPresent(v -> setDefaultValue(property, ((String) v)));
+        definition.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
         property.put(FORMAT_KEY, "byte");
         return STRING_TYPE;
     }
@@ -626,7 +626,7 @@ public class DefinitionGenerator {
         }
 
         property.set(ENUM_KEY, enumNames);
-        enumLeafType.getDefaultValue().ifPresent(v -> setDefaultValue(property, ((String) v)));
+        enumLeafType.getDefaultValue().ifPresent(v -> setDefaultValue(property, (String) v));
         setExampleValue(property, enumLeafType.getValues().iterator().next().getName());
         return STRING_TYPE;
     }
@@ -791,7 +791,7 @@ public class DefinitionGenerator {
         final var module = schemaContext.findModule(node.getQName().getModule());
         if (module.isPresent()) {
             final var container = module.orElseThrow().getChildNodes().stream()
-                    .filter(n -> n instanceof ContainerSchemaNode)
+                    .filter(ContainerSchemaNode.class::isInstance)
                     .findFirst();
             container.ifPresent(c -> setExampleValue(property, String.format("/%s:%s", module.orElseThrow().getPrefix(),
                     c.getQName().getLocalName())));

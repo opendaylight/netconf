@@ -49,10 +49,10 @@ final class RemoteNetconfCommand implements AsyncCommand {
     private IoInputStream in;
     private IoOutputStream out;
     private ExitCallback callback;
-    private NetconfHelloMessageAdditionalHeader netconfHelloMessageAdditionalHeader;
+    private NetconfHelloMessageAdditionalHeader netconfHelloMessageAdditionalHeader = null;
 
     private Channel clientChannel;
-    private ChannelFuture clientChannelFuture;
+    private ChannelFuture clientChannelFuture = null;
 
     RemoteNetconfCommand(final EventLoopGroup clientEventGroup, final LocalAddress localAddress) {
         this.clientEventGroup = clientEventGroup;

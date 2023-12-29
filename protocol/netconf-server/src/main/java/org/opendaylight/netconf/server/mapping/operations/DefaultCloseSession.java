@@ -30,7 +30,7 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
     public static final String CLOSE_SESSION = "close-session";
 
     private final AutoCloseable sessionResources;
-    private NetconfServerSession session;
+    private NetconfServerSession session = null;
 
     public DefaultCloseSession(final SessionIdType sessionId, final AutoCloseable sessionResources) {
         super(sessionId);

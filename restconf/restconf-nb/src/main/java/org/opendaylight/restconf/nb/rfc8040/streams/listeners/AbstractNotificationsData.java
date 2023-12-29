@@ -41,8 +41,8 @@ abstract class AbstractNotificationsData {
 
     private final String localName;
 
-    protected DatabindProvider databindProvider;
-    private DOMDataBroker dataBroker;
+    protected DatabindProvider databindProvider = null;
+    private DOMDataBroker dataBroker = null;
 
     AbstractNotificationsData(final QName lastQName) {
         localName = lastQName.getLocalName();

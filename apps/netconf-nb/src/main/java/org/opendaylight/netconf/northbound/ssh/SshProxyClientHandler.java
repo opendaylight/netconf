@@ -30,8 +30,8 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
     private final IoInputStream in;
     private final IoOutputStream out;
 
-    private AsyncSshHandlerReader asyncSshHandlerReader;
-    private AsyncSshHandlerWriter asyncSshHandlerWriter;
+    private AsyncSshHandlerReader asyncSshHandlerReader = null;
+    private AsyncSshHandlerWriter asyncSshHandlerWriter = null;
 
     private final NetconfHelloMessageAdditionalHeader netconfHelloMessageAdditionalHeader;
     private final ExitCallback callback;
