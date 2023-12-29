@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -43,6 +44,7 @@ final class TransportServerSession extends ServerSessionImpl {
     }
 
     @SuppressWarnings("unused")
+    @SuppressFBWarnings(value = "UUF_UNUSED_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile State state;
 
     TransportServerSession(final TransportSshServer server, final IoSession ioSession) throws Exception {

@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.test.tool.client.stress;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
@@ -19,28 +20,30 @@ abstract class AbstractExecutionStrategy implements ExecutionStrategy {
     private final List<Integer> editBatches;
     private final int editAmount;
 
+    @SuppressFBWarnings("PA_PUBLIC_PRIMITIVE_ATTRIBUTE")
     AbstractExecutionStrategy(final Parameters params, final List<NetconfMessage> editConfigMsgs,
                               final NetconfDeviceCommunicator sessionListener) {
         editAmount = editConfigMsgs.size();
         this.params = params;
-        this.preparedMessages = editConfigMsgs;
+        preparedMessages = editConfigMsgs;
         this.sessionListener = sessionListener;
-        this.editBatches = countEditBatchSizes(params, editConfigMsgs.size());
+        editBatches = countEditBatchSizes(params.editBatchSize, editAmount);
     }
 
-    private static List<Integer> countEditBatchSizes(final Parameters params, final int amount) {
-        final List<Integer> editBatches = new ArrayList<>();
-        if (params.editBatchSize != amount) {
-            final int fullBatches = amount / params.editBatchSize;
+    private static List<Integer> countEditBatchSizes(final int editBatchSize, final int amount) {
+        final var editBatches = new ArrayList<Integer>();
+        if (editBatchSize != amount) {
+            final int fullBatches = amount / editBatchSize;
             for (int i = 0; i < fullBatches; i++) {
-                editBatches.add(params.editBatchSize);
+                editBatches.add(editBatchSize);
             }
 
-            if (amount % params.editBatchSize != 0) {
-                editBatches.add(amount % params.editBatchSize);
+            final var remainder = amount % editBatchSize;
+            if (remainder != 0) {
+                editBatches.add(remainder);
             }
         } else {
-            editBatches.add(params.editBatchSize);
+            editBatches.add(editBatchSize);
         }
         return editBatches;
     }
