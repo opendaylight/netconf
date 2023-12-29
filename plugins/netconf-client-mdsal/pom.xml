@@ -225,12 +225,6 @@
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-test-util</artifactId>
         </dependency>
-        <!-- FIXME: needed for NetconfDeviceCommunicatorTest -->
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-subclass</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <scm>
