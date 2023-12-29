@@ -14,12 +14,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,12 +78,21 @@ public abstract sealed class AbstractBody implements AutoCloseable
      */
     static void throwIfYangError(final Exception cause) {
         if (cause instanceof YangNetconfErrorAware infoAware) {
-            throw new RestconfDocumentedException(cause, infoAware.getNetconfErrors().stream()
-                .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),
-                    // FIXME: pass down error info
-                    null, error.path()))
-                .toList());
+            throw mapException(cause, infoAware.getNetconfErrors());
         }
+    }
+
+    static @NonNull RestconfDocumentedException mapException(final NormalizationException cause) {
+        return mapException(cause, cause.getNetconfErrors());
+    }
+
+    private static @NonNull RestconfDocumentedException mapException(final Exception cause,
+            final List<YangNetconfError> errors) {
+        return new RestconfDocumentedException(cause, errors.stream()
+            .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),
+                // FIXME: pass down error info
+                null, error.path()))
+            .toList());
     }
 
     private @Nullable InputStream getStream() {
