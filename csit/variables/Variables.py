@@ -171,9 +171,6 @@ NEUTRON_PORTS_API = NEUTRON_NB_API + "/" + "ports"
 NEUTRON_ROUTERS_API = NEUTRON_NB_API + "/" + "routers"
 OSREST = "/v2.0/networks"
 
-# Openstack System Prompt
-OS_SYSTEM_PROMPT = "$"
-
 # Other global variables
 # TODO: Move these to more apropriate sections.
 PORT = "8080"
