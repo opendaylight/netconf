@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8432ec1c_a0177bcd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-03T15:37:23Z",
+      "side": 1,
+      "message": "#1 encryptionService.encrypt makes from \"admin\" -\u003e \"007KJsAFY3Wp1LVWTUIlWQ\u003d\u003d\", why do we see something else stored in database?\n\n#2 even when password type is binary, we use \"admin\" in input of PUT request we are ending with \"YWRtaW4K\" in database what still makes error: \"Input length must be multiple of 16 when decrypting with padded cipher...\"",
+      "revId": "83df993e988a89631cf94f7a10f23a7694100d66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
