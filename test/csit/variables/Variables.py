@@ -147,14 +147,6 @@ CREATE_VLAN_TOPOLOGY_FILE_PATH = "MininetTopo/" + CREATE_VLAN_TOPOLOGY_FILE
 CREATE_PATHPOLICY_TOPOLOGY_FILE = "topo-3sw-2host_multipath.py"
 CREATE_PATHPOLICY_TOPOLOGY_FILE_PATH = "MininetTopo/" + CREATE_PATHPOLICY_TOPOLOGY_FILE
 
-GBP_REGEP_API = "/restconf/operations/endpoint:register-endpoint"
-GBP_UNREGEP_API = "/restconf/operations/endpoint:unregister-endpoint"
-GBP_ENDPOINTS_API = "/restconf/operational/endpoint:endpoints"
-GBP_BASE_ENDPOINTS_API = "/restconf/operational/base-endpoint:endpoints"
-GBP_TENANTS_API = "/restconf/config/policy:tenants"
-OPERATIONAL_GBP_TENANTS_API = "/restconf/operational/policy:tenants"
-GBP_TUNNELS_API = "/restconf/config/opendaylight-inventory:nodes"
-
 # LISP Flow Mapping variables
 LFM_RPC_API = "/restconf/operations/odl-mappingservice"
 LFM_RPC_API_LI = "/restconf/operations/lfm-mapping-database"
