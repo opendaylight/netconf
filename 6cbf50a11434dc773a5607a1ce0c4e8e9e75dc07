@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe7e0069_43701e3d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-01-03T11:51:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d719e1a2_57a69dfd",
+      "revId": "6cbf50a11434dc773a5607a1ce0c4e8e9e75dc07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "720ca0bb_ff218d7e",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-01-02T15:59:56Z",
       "side": 1,
       "message": "can be on previous line",
+      "revId": "6cbf50a11434dc773a5607a1ce0c4e8e9e75dc07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89445454_edd8b0bc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-01-03T11:51:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "720ca0bb_ff218d7e",
       "revId": "6cbf50a11434dc773a5607a1ce0c4e8e9e75dc07",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "933c44f9_6174979d",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-01-03T11:51:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "018882e7_91d68235",
+      "revId": "6cbf50a11434dc773a5607a1ce0c4e8e9e75dc07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "88cdf794_95936205",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-01-02T15:59:56Z",
       "side": 1,
       "message": "Why timeout.cancel() and not timeout.isExpired()?",
+      "revId": "6cbf50a11434dc773a5607a1ce0c4e8e9e75dc07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8c60e2b_1a02ef74",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-01-03T11:51:39Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/109076/comment/3a614b2f_d6c70dce/\n\nBecause it creates a thread race.",
+      "parentUuid": "88cdf794_95936205",
       "revId": "6cbf50a11434dc773a5607a1ce0c4e8e9e75dc07",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8ce0f9e_5ad48f54",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/SshClientChannelInitializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-01-03T11:51:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b78e59ac_2e9c3a08",
+      "revId": "6cbf50a11434dc773a5607a1ce0c4e8e9e75dc07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87dfef87_3d4555f9",
@@ -120,6 +210,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6692c04_5cb48ea1",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/SshClientChannelInitializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-01-03T11:51:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87dfef87_3d4555f9",
+      "revId": "6cbf50a11434dc773a5607a1ce0c4e8e9e75dc07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7e9640c_a91a92c2",
@@ -133,6 +241,24 @@
       "writtenOn": "2024-01-02T15:59:56Z",
       "side": 1,
       "message": "requireNonNull()",
+      "revId": "6cbf50a11434dc773a5607a1ce0c4e8e9e75dc07",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fac0057_2e9e3a83",
+        "filename": "protocol/netconf-client/src/main/java/org/opendaylight/netconf/client/SshClientChannelInitializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-01-03T11:51:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7e9640c_a91a92c2",
       "revId": "6cbf50a11434dc773a5607a1ce0c4e8e9e75dc07",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
