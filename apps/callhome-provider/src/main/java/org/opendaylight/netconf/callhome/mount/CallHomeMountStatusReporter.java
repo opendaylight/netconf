@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -36,6 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParamsBuilder;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -55,11 +57,15 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
 
     private final DataBroker dataBroker;
     private final Registration syncReg;
+    private final CallHomeMountService mountService;
 
     @Activate
     @Inject
-    public CallHomeMountStatusReporter(final @Reference DataBroker broker) {
+    public CallHomeMountStatusReporter(
+            final @Reference DataBroker broker,
+            final @Reference CallHomeMountService mountService) {
         dataBroker = broker;
+        this.mountService = mountService;
         syncReg = dataBroker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES_II.child(Device.class)),
             this::onConfigurationDataTreeChanged);
@@ -212,7 +218,8 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
         }
     }
 
-    private void syncDeletedDevices(final List<InstanceIdentifier<Device>> deletedDeviceIdentifiers) {
+    @VisibleForTesting
+    public void syncDeletedDevices(final List<InstanceIdentifier<Device>> deletedDeviceIdentifiers) {
         if (deletedDeviceIdentifiers.isEmpty()) {
             return;
         }
@@ -231,5 +238,13 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
                 LOG.warn("Failed to commit device deletions", cause);
             }
         }, MoreExecutors.directExecutor());
+
+        // Disconnect deleted devices
+        deletedDeviceIdentifiers.forEach(identifier -> {
+            assert identifier instanceof KeyedInstanceIdentifier<?,?>;
+            assert ((KeyedInstanceIdentifier<?,?>)identifier).getKey() instanceof DeviceKey;
+            mountService.createSshSessionContextManager().remove(
+                ((DeviceKey)((KeyedInstanceIdentifier<?,?>)identifier).getKey()).getUniqueId());
+        });
     }
 }
