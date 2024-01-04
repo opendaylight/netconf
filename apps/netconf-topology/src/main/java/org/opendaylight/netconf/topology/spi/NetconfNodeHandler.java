@@ -307,14 +307,17 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         }
 
         // First connection attempt gets initialized to minimum sleep, each subsequent is exponentially backed off
-        // by sleepFactor.
+        // by randomSleepFactor which is in range +- 0.1 of set sleepFactor (default 1.5).
         if (attempts != 0) {
-            final long nextSleep = (long) (lastSleep * sleepFactor);
+            final double randomSleepFactor = Math.random() * 0.2 + (sleepFactor - 0.1);
+            final long nextSleep = (long) (lastSleep * randomSleepFactor);
             // check for overflow
             if (nextSleep < maxSleep) {
                 delayMillis = nextSleep >= 0 ? nextSleep : Long.MAX_VALUE;
             } else {
-                delayMillis = maxSleep;
+                // randomize the max sleep time between 90% and 110% of maxSleep
+                final double randomMaxSleepFactor = Math.random() * 0.2 + 0.9;
+                delayMillis = (long) (maxSleep * randomMaxSleepFactor);
             }
         } else {
             delayMillis = minSleep;
