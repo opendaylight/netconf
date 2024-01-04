@@ -188,6 +188,13 @@ module odl-netconf-device {
       default 1.5;
     }
 
+    leaf max-timeout-between-attempts-millis {
+      description "Maximum timeout in milliseconds to wait between connection attempts.";
+      config true;
+      type uint32;
+      default 1800000;
+    }
+
     // Keepalive configuration
     leaf keepalive-delay {
       config true;
