@@ -14,12 +14,16 @@ import io.netty.channel.Channel;
 import java.math.RoundingMode;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientSession;
@@ -45,9 +49,14 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.cli
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240611.connection.parameters.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.NetconfCallhomeServer;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.AllowedDevices;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -185,6 +194,7 @@ public final class CallHomeMountService implements AutoCloseable {
     private final Map<String, NetconfLayer> netconfLayerMapping = new ConcurrentHashMap<>();
     private final CallHomeTopology topology;
     private final Configuration config;
+    private final Registration allowedDeviceReg;
 
     @Activate
     @Inject
@@ -206,6 +216,10 @@ public final class CallHomeMountService implements AutoCloseable {
             final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory,
             final Configuration config) {
         this.config = config;
+        final var identifier = InstanceIdentifier.builder(NetconfCallhomeServer.class).child(AllowedDevices.class)
+            .child(Device.class).build();
+        allowedDeviceReg = dataBroker.registerTreeChangeListener(DataTreeIdentifier.of(
+            LogicalDatastoreType.CONFIGURATION, identifier), this::onAllowedDevicesChanged);
         final var clientConfBuilderFactory = createClientConfigurationBuilderFactory();
         final var clientFactory = createClientFactory();
         topology = new CallHomeTopology(topologyId, clientFactory, timer, schemaAssembler,
@@ -217,6 +231,7 @@ public final class CallHomeMountService implements AutoCloseable {
     CallHomeMountService(final CallHomeTopology topology, final Configuration config) {
         this.topology = topology;
         this.config = config;
+        allowedDeviceReg = null;
     }
 
     @VisibleForTesting
@@ -318,12 +333,33 @@ public final class CallHomeMountService implements AutoCloseable {
         };
     }
 
+    @VisibleForTesting
+    public void onAllowedDevicesChanged(final List<DataTreeModification<Device>> changes) {
+        for (final var change : changes) {
+            final var rootNode = change.getRootNode();
+            switch (rootNode.modificationType()) {
+                case DELETE:
+                case WRITE:
+                case SUBTREE_MODIFIED:
+                    final var deletedDevice = rootNode.dataBefore();
+                    final var uniqueId = deletedDevice.getUniqueId();
+                    topology.disableNode(new NodeId(uniqueId));
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     @PreDestroy
     @Deactivate
     @Override
     public void close() {
         netconfLayerMapping.forEach((key, value) -> value.netconfSessionFuture.cancel(true));
         netconfLayerMapping.clear();
+        if (allowedDeviceReg != null) {
+            allowedDeviceReg.close();
+        }
     }
 
     private record NetconfLayer(String id, NetconfClientSessionListener sessionListener,
