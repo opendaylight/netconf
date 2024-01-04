@@ -16,26 +16,41 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.DELETE;
+import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.Channel;
 import java.lang.annotation.Annotation;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.List;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240611.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.NetconfCallhomeServer;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.AllowedDevices;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.Device;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.DeviceKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.binding.DataObjectIdentifier;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 @ExtendWith(MockitoExtension.class)
 class CallHomeMountServiceTest {
@@ -44,6 +59,8 @@ class CallHomeMountServiceTest {
     private static final String ID1 = "id1";
     private static final NodeId NODE_ID1 = new NodeId(ID1);
     private static final String ID2 = "id2";
+    private static final InstanceIdentifier<Device> IDENTIFIER = InstanceIdentifier.builder(
+        NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class, new DeviceKey(ID1)).build();
 
     @Mock
     private CallHomeTopology topology;
@@ -65,32 +82,11 @@ class CallHomeMountServiceTest {
     @BeforeEach
     void beforeEach() {
         service = new CallHomeMountService(topology, defaultConfig());
-        /*
-         * Reproduce behavior of org.opendaylight.netconf.topology.spi.AbstractNetconfTopology#ensureNode(Node)
-         * for ID1 only.
-         */
-        doAnswer(invocation -> {
-            node1 = (Node) invocation.getArguments()[0];
-            if (ID1.equals(node1.requireNodeId().getValue())) {
-                final var configBuilderFactory = service.createClientConfigurationBuilderFactory();
-                final var config = configBuilderFactory
-                    .createClientConfigurationBuilder(node1.requireNodeId(), node1.augmentation(NetconfNode.class))
-                    .withSessionListener(sessionListener).build();
-                try {
-                    netconfSessionFuture = service.createClientFactory().createClient(config);
-                } catch (UnsupportedConfigurationException e) {
-                    netconfSessionFuture = null;
-                }
-            } else {
-                netconfSessionFuture = null;
-            }
-            return null;
-        }).when(topology).enableNode(any(Node.class));
-        doNothing().when(topology).disableNode(any(NodeId.class));
     }
 
     @Test
-    void sshSessionContextManager() throws Exception {
+    void sshSessionContextManager() {
+        reproduceEnsureNodeId2();
         doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
         final var sshSessionContextManager = service.createSshSessionContextManager();
 
@@ -116,6 +112,7 @@ class CallHomeMountServiceTest {
 
     @Test
     void tlsSessionContextManager() {
+        reproduceEnsureNodeId2();
         doReturn(SOCKET_ADDRESS).when(nettyChannel).remoteAddress();
         final var tlsSessionContextManager = service.createTlsSessionContextManager(tlsAuthProvider, statusRecorder);
 
@@ -136,6 +133,82 @@ class CallHomeMountServiceTest {
         // remove context
         tlsSessionContextManager.remove(ID1);
         verify(topology, times(1)).disableNode(eq(NODE_ID1));
+    }
+
+    @Test
+    void testDeletingDeviceFromTopologyAfterModification() {
+        final var mockDeviceBeforeAddition = createMockDevice(ID1);
+        final var mockObjectModification = mock(DataObjectModification.class);
+
+        // modification of overriding device inside 'allowed-devices' container
+        when(mockObjectModification.modificationType()).thenReturn(WRITE);
+        when(mockObjectModification.dataBefore()).thenReturn(mockDeviceBeforeAddition);
+        service.onAllowedDevicesChanged(List.of(new CustomTreeModification(LogicalDatastoreType.CONFIGURATION,
+            IDENTIFIER.toIdentifier(), mockObjectModification)));
+        verify(topology, times(1)).disableNode(NODE_ID1);
+
+        // modification of deleting device from 'allowed-devices' container
+        when(mockObjectModification.modificationType()).thenReturn(DELETE);
+        service.onAllowedDevicesChanged(List.of(new CustomTreeModification(LogicalDatastoreType.CONFIGURATION,
+            IDENTIFIER.toIdentifier(), mockObjectModification)));
+        verify(topology, times(2)).disableNode(NODE_ID1);
+    }
+
+    @Test
+    void testDeletingMultipleDevices() {
+        final var mockDevice1 = createMockDevice(ID1);
+        final var mockDevice2 = createMockDevice(ID2);
+
+        // Mock DataObjectModifications for each device
+        final var mockModification1 = mock(DataObjectModification.class);
+        final var mockModification2 = mock(DataObjectModification.class);
+
+        when(mockModification1.modificationType()).thenReturn(DELETE);
+        when(mockModification1.dataBefore()).thenReturn(mockDevice1);
+
+        when(mockModification2.modificationType()).thenReturn(DELETE);
+        when(mockModification2.dataBefore()).thenReturn(mockDevice2);
+
+        service.onAllowedDevicesChanged(List.of(
+            new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER.toIdentifier(),
+                mockModification1),
+            new CustomTreeModification(LogicalDatastoreType.CONFIGURATION, IDENTIFIER.toIdentifier(),
+                mockModification2)
+        ));
+
+        verify(topology, times(1)).disableNode(new NodeId(ID1));
+        verify(topology, times(1)).disableNode(new NodeId(ID2));
+    }
+
+    private void reproduceEnsureNodeId2() {
+        /*
+         * Reproduce behavior of org.opendaylight.netconf.topology.spi.AbstractNetconfTopology#ensureNode(Node)
+         * for ID1 only.
+         */
+        doAnswer(invocation -> {
+            node1 = (Node) invocation.getArguments()[0];
+            if (ID1.equals(node1.requireNodeId().getValue())) {
+                final var configBuilderFactory = service.createClientConfigurationBuilderFactory();
+                final var config = configBuilderFactory
+                    .createClientConfigurationBuilder(node1.requireNodeId(), node1.augmentation(NetconfNode.class))
+                    .withSessionListener(sessionListener).build();
+                try {
+                    netconfSessionFuture = service.createClientFactory().createClient(config);
+                } catch (UnsupportedConfigurationException e) {
+                    netconfSessionFuture = null;
+                }
+            } else {
+                netconfSessionFuture = null;
+            }
+            return null;
+        }).when(topology).enableNode(any(Node.class));
+        doNothing().when(topology).disableNode(any(NodeId.class));
+    }
+
+    private static Device createMockDevice(final String deviceId) {
+        final var device = mock(Device.class);
+        when(device.getUniqueId()).thenReturn(deviceId);
+        return device;
     }
 
     private static CallHomeMountService.Configuration defaultConfig() {
@@ -230,5 +303,33 @@ class CallHomeMountServiceTest {
                 return null;
             }
         };
+    }
+
+    private static class CustomTreeModification implements DataTreeModification<Device> {
+        private final LogicalDatastoreType datastore;
+        private final DataObjectIdentifier<Device> path;
+        private final DataObjectModification<Device> rootNode;
+
+        CustomTreeModification(final LogicalDatastoreType datastore, final DataObjectIdentifier<Device> path,
+            final DataObjectModification<Device> rootNode) {
+            this.datastore = datastore;
+            this.path = path;
+            this.rootNode = rootNode;
+        }
+
+        @Override
+        public DataObjectModification<Device> getRootNode() {
+            return rootNode;
+        }
+
+        @Override
+        public LogicalDatastoreType datastore() {
+            return datastore;
+        }
+
+        @Override
+        public @NonNull DataObjectIdentifier<Device> path() {
+            return path;
+        }
     }
 }
