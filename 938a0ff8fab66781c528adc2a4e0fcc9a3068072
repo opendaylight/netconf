@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6d28760a_93d7bc99",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProvider.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-04T09:37:23Z",
+      "side": 1,
+      "message": "If you expected here result of encoding \"admin\" into base64 - that is not how it was working on master - I was trying to left RPCs unchanged",
+      "parentUuid": "2f2bc389_37c487f1",
+      "revId": "938a0ff8fab66781c528adc2a4e0fcc9a3068072",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0f09be60_47201c83",
         "filename": "apps/netconf-topology/src/main/yang/netconf-node-optional.yang",
         "patchSetId": 12
