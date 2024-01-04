@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62a3bebc_a32859e9",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-04T18:51:16Z",
+      "side": 1,
+      "message": "I think we don\u0027t need double names here anymore?",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 69
+      },
+      "revId": "c9216c33b4534c9960801ce3268fa269d8842581",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d10fa43b_039ccde9",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-04T18:51:16Z",
+      "side": 1,
+      "message": "Since we are improving configuration in general in this patch - may be we also can deal with rest of the hardcoded values?",
+      "range": {
+        "startLine": 237,
+        "startChar": 64,
+        "endLine": 237,
+        "endChar": 68
+      },
+      "revId": "c9216c33b4534c9960801ce3268fa269d8842581",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
