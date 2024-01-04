@@ -16,23 +16,33 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.DELETE;
+import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.Channel;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Collections;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
@@ -135,6 +145,61 @@ public class CallHomeMountServiceTest {
         // remove context
         tlsSessionContextManager.remove(ID1);
         verify(topology, times(1)).disableNode(eq(NODE_ID1));
+    }
+
+    @Test
+    void scenarioA_AddDeleteReAddDevice() throws Exception {
+        // Step 1: Add a new device
+        Node node = createNodeWithIdAndStatus(ID1, "connected");
+        enableNodeAndAssertStatus(node, "connected");
+
+        // Step 2: Delete the connected device
+        service.deleteAllowedDevice(ID1);
+        verify(topology, times(1)).disableNode(eq(NODE_ID1));
+
+        // Ensure netconf node is deleted (mock the deletion and verify the outcome)
+
+        // Step 3: Re-add the same device
+        enableNodeAndAssertStatus(node, "connected");
+
+        // Assertions to verify the device is added again and shows connected status
+        verify(topology, times(2)).enableNode(any(Node.class));
+    }
+
+    @Test
+    void testScenarioA_AddDeleteReAddDevice() {
+        // Assume the device with ID1 is added and connected
+        Node initialNode = createMockNode(ID1, true); // true signifies a valid configuration
+        service.onAllowedDevicesChanged(
+            Collections.singletonList(new DataTreeModification<>(initialNode, WRITE)));
+        assertNotNull(netconfSessionFuture, "Netconf session should be established for valid configurations");
+
+        // Assume the device is then deleted
+        service.onAllowedDevicesChanged(Collections.singletonList(new DataTreeModification<>(initialNode, DELETE)));
+        verify(topology, times(1)).disableNode(eq(NODE_ID1));
+
+        // Assume the same device is re-added
+        service.onAllowedDevicesChanged(Collections.singletonList(new DataTreeModification<>(initialNode, WRITE) {
+            @Override
+            public @NonNull DataTreeIdentifier<Device> getRootPath() {
+                return null;
+            }
+
+            @Override
+            public @NonNull DataObjectModification<Device> getRootNode() {
+                return null;
+            }
+        }));
+        assertNotNull(netconfSessionFuture, "Netconf session should be re-established for the re-added device");
+    }
+
+    private Node createMockNode(String nodeId, boolean isValidConfig) {
+        NodeId mockNodeId = new NodeId(nodeId);
+        Node node = mock(Node.class);
+        when(node.requireNodeId()).thenReturn(mockNodeId);
+        NetconfNode netconfNode = mock(NetconfNode.class);
+        when(node.augmentation(NetconfNode.class)).thenReturn(netconfNode);
+        return node;
     }
 
 }

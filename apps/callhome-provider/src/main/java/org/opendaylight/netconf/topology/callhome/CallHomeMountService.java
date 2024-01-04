@@ -13,12 +13,16 @@ import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientSession;
@@ -42,9 +46,13 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.cli
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.NetconfCallhomeServer;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.AllowedDevices;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
@@ -102,6 +110,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = CallHomeMountService.class, immediate = true)
 @Singleton
 public final class CallHomeMountService implements AutoCloseable {
+    private static final InstanceIdentifier<Device> IDENTIFIER = InstanceIdentifier.builder(
+        NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class).build();
     private static final Protocol SSH_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.SSH).build();
     private static final Protocol TLS_PROTOCOL = new ProtocolBuilder().setName(Protocol.Name.TLS).build();
 
@@ -120,6 +130,8 @@ public final class CallHomeMountService implements AutoCloseable {
             final @Reference DeviceActionFactory deviceActionFactory) {
         this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer, schemaAssembler, schemaRepositoryProvider,
             baseSchemaProvider, dataBroker, mountService, deviceActionFactory);
+        dataBroker.registerTreeChangeListener(DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
+            IDENTIFIER), this::onAllowedDevicesChanged);
     }
 
     public CallHomeMountService(final String topologyId, final NetconfTimer timer,
@@ -235,6 +247,22 @@ public final class CallHomeMountService implements AutoCloseable {
                 topology.disableNode(new NodeId(id));
             }
         };
+    }
+
+    @VisibleForTesting
+    public void onAllowedDevicesChanged(final Collection<DataTreeModification<Device>> changes) {
+        for (final var change : changes) {
+            final var rootNode = change.getRootNode();
+            switch (rootNode.modificationType()) {
+                case DELETE:
+                    final var deletedDevice = rootNode.dataBefore();
+                    final var uniqueId = deletedDevice.getUniqueId();
+                    topology.disableNode(new NodeId(uniqueId));
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     @PreDestroy
