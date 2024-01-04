@@ -30,11 +30,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.cli
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentity;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev230417.ssh.client.grouping.client.identity.PasswordBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.connection.parameters.Protocol.Name;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.KeyAuth;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev231025.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.credentials.KeyAuth;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.credentials.LoginPwUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.osgi.service.component.annotations.Activate;
