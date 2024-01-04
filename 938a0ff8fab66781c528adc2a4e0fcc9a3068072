@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2f2bc389_37c487f1",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProvider.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-04T09:25:49Z",
+      "side": 1,
+      "message": "This is OK.",
+      "parentUuid": "f0bca6e9_c0728796",
+      "revId": "938a0ff8fab66781c528adc2a4e0fcc9a3068072",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0f09be60_47201c83",
         "filename": "apps/netconf-topology/src/main/yang/netconf-node-optional.yang",
         "patchSetId": 12
@@ -48,6 +66,24 @@
       "writtenOn": "2024-01-03T11:52:54Z",
       "side": 1,
       "message": "There is no impact on this file, right?",
+      "revId": "938a0ff8fab66781c528adc2a4e0fcc9a3068072",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82f550b4_f6ad31e9",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-optional.yang",
+        "patchSetId": 12
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-04T09:25:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f09be60_47201c83",
       "revId": "938a0ff8fab66781c528adc2a4e0fcc9a3068072",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57e46e15_10c1a5d7",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 12
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-04T09:25:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "460a1477_99407884",
+      "revId": "938a0ff8fab66781c528adc2a4e0fcc9a3068072",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f44defc5_cc87f990",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-01-03T11:52:54Z",
       "side": 1,
       "message": "This is not what has happened.",
+      "revId": "938a0ff8fab66781c528adc2a4e0fcc9a3068072",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c45a0a93_6e7b4e04",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 12
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-04T09:25:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f44defc5_cc87f990",
       "revId": "938a0ff8fab66781c528adc2a4e0fcc9a3068072",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
