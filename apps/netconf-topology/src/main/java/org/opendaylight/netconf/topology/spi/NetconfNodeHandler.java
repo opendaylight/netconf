@@ -115,6 +115,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final @NonNull Timer timer;
     private final @NonNull RemoteDeviceId deviceId;
 
+    private final long maxSleep;
     private final long maxAttempts;
     private final int minSleep;
     private final double sleepFactor;
@@ -140,6 +141,8 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         maxAttempts = node.requireMaxConnectionAttempts().toJava();
         minSleep = node.requireBetweenAttemptsTimeoutMillis().toJava();
         sleepFactor = node.requireSleepFactor().doubleValue();
+        final long potentialMaxSleep = node.requireMaxTimeoutBetweenAttemptsMillis().toJava();
+        maxSleep = potentialMaxSleep >= minSleep ? potentialMaxSleep : minSleep;
 
         // Setup reconnection on empty context, if so configured
         // FIXME: NETCONF-925: implement this
@@ -308,8 +311,12 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         // by sleepFactor.
         if (attempts != 0) {
             final long nextSleep = (long) (lastSleep * sleepFactor);
-            // check for overflow
-            delayMillis = nextSleep >= 0 ? nextSleep : Long.MAX_VALUE;
+            if (nextSleep <= maxSleep) {
+                // check for overflow
+                delayMillis = nextSleep >= 0 ? nextSleep : maxSleep;
+            } else {
+                delayMillis = maxSleep;
+            }
         } else {
             delayMillis = minSleep;
         }
