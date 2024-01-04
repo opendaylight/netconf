@@ -70,6 +70,30 @@
       },
       "revId": "36ff56febb76b9c00d5a5d849cb62846f32121cd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddde0c4d_1ecf8480",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-04T09:19:54Z",
+      "side": 0,
+      "message": "It is private in fact. Idk why gerrit showing it like this. But after checking in Intellij - it looks ok.",
+      "parentUuid": "8a0238fe_ceb8b128",
+      "range": {
+        "startLine": 73,
+        "startChar": 4,
+        "endLine": 73,
+        "endChar": 16
+      },
+      "revId": "36ff56febb76b9c00d5a5d849cb62846f32121cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
