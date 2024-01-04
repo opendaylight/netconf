@@ -225,7 +225,7 @@ public class NetconfNodeHandlerTest {
         handler.connect();
         assertEquals(1, handler.attempts());
 
-        doReturn(timeout).when(timer).newTimeout(timerCaptor.capture(), eq(150L), eq(TimeUnit.MILLISECONDS));
+        doReturn(timeout).when(timer).newTimeout(timerCaptor.capture(), anyLong(), eq(TimeUnit.MILLISECONDS));
         firstFuture.setException(new AssertionError("first"));
 
         assertEquals(2, handler.attempts());
