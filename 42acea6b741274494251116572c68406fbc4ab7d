@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab610143_b6c41a16",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-05T13:25:20Z",
+      "side": 1,
+      "message": "doesn\u0027t really represent what this patch does",
+      "revId": "42acea6b741274494251116572c68406fbc4ab7d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "834d5438_6b320036",
@@ -14,6 +31,57 @@
       "writtenOn": "2024-01-03T08:19:18Z",
       "side": 1,
       "message": "recheck",
+      "revId": "42acea6b741274494251116572c68406fbc4ab7d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9d34854_4cdcadac",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfModulesGetTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-05T13:25:20Z",
+      "side": 1,
+      "message": "this doc is no longer correct",
+      "revId": "42acea6b741274494251116572c68406fbc4ab7d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dfc5404_c95267ed",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfSchemaServiceTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-05T13:25:20Z",
+      "side": 1,
+      "message": "imo this is redundant if you look at what assertEntity() does",
+      "revId": "42acea6b741274494251116572c68406fbc4ab7d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17c46283_8e08c250",
+        "filename": "restconf/restconf-nb/src/test/resources/parser-identifier/module-without-revision.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-05T13:25:20Z",
+      "side": 1,
+      "message": "No newline at end of right file.",
       "revId": "42acea6b741274494251116572c68406fbc4ab7d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
