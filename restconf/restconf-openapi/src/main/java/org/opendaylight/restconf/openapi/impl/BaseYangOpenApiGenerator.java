@@ -39,9 +39,10 @@ public abstract class BaseYangOpenApiGenerator {
         final var host = createHostFromUriInfo(uriInfo);
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + BASE_PATH;
+        final var basePath = getBasePath();
         final var modules = context.getModules();
         return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
-            modules);
+            modules, basePath);
     }
 
     public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo)
@@ -70,9 +71,10 @@ public abstract class BaseYangOpenApiGenerator {
         final var host = createHostFromUriInfo(uriInfo);
         final var title = module.getName();
         final var url = schema + "://" + host + BASE_PATH;
+        final var basePath = getBasePath();
         final var modules = List.of(module);
         return new OpenApiInputStream(schemaContext, title, url, SECURITY,  deviceName, urlPrefix, true, false,
-            modules);
+            modules, basePath);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -87,4 +89,6 @@ public abstract class BaseYangOpenApiGenerator {
     public String createSchemaFromUriInfo(final UriInfo uriInfo) {
         return uriInfo.getBaseUri().getScheme();
     }
+
+    public abstract String getBasePath();
 }

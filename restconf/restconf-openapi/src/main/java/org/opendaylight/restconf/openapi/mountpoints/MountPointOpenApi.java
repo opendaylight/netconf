@@ -179,9 +179,10 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var title = deviceName + " modules of RESTCONF";
         final var url = schema + "://" + host + BASE_PATH;
+        final var basePath = openApiGenerator.getBasePath();
         final var modules = context.getModules();
         return new OpenApiInputStream(context, title, url, SECURITY, deviceName, urlPrefix, false, includeDataStore,
-            modules);
+            modules, basePath);
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -194,9 +195,10 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var url = schema + "://" + host + BASE_PATH;
+        final var basePath = openApiGenerator.getBasePath();
         final var modules = modelContext.getModules();
         return new OpenApiInputStream(modelContext, urlPrefix, url, SECURITY, deviceName, urlPrefix, true, false,
-            modules);
+            modules, basePath);
     }
 
     @Override
