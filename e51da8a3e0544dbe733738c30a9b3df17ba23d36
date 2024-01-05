@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd9ffff7_d65596f2",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfModulesGetTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-05T15:01:28Z",
+      "side": 1,
+      "message": "Document this test like all other tests here",
+      "revId": "e51da8a3e0544dbe733738c30a9b3df17ba23d36",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "896ba180_21764fad",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfModulesGetTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-05T15:01:28Z",
+      "side": 1,
+      "message": "Change test name - it is positive test now",
+      "range": {
+        "startLine": 206,
+        "startChar": 31,
+        "endLine": 206,
+        "endChar": 34
+      },
+      "revId": "e51da8a3e0544dbe733738c30a9b3df17ba23d36",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
