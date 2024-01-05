@@ -10,8 +10,5 @@
     <feature name="odl-restconf-nb" version="${project.version}">
         <feature version="[11,12)">odl-mdsal-model-rfc8072</feature>
         <feature version="[7,8)">odl-controller-exp-netty-config</feature>
-        <configfile finalname="etc/org.opendaylight.restconf.nb.rfc8040.cfg">
-            mvn:org.opendaylight.netconf/restconf-nb/${project.version}/cfg/config
-        </configfile>
     </feature>
 </features>
