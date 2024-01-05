@@ -66,8 +66,8 @@ public final class PathsStream extends InputStream {
     private final boolean isForSingleModule;
     private final boolean includeDataStore;
 
-    private static final String OPERATIONS = "/rests/operations";
-    private static final String DATA = "/rests/data";
+    private static String operations;
+    private static String data;
 
     private boolean hasRootPostLink;
     private boolean hasAddedDataStore;
@@ -78,7 +78,7 @@ public final class PathsStream extends InputStream {
     public PathsStream(final EffectiveModelContext schemaContext, final OpenApiBodyWriter writer,
             final JsonGenerator generator, final ByteArrayOutputStream stream, final String deviceName,
             final String urlPrefix, final boolean isForSingleModule, final boolean includeDataStore,
-            final Iterator<? extends Module> iterator) {
+            final Iterator<? extends Module> iterator, final String basePath) {
         this.iterator = iterator;
         this.generator = generator;
         this.writer = writer;
@@ -88,6 +88,8 @@ public final class PathsStream extends InputStream {
         this.deviceName = deviceName;
         this.urlPrefix = urlPrefix;
         this.includeDataStore = includeDataStore;
+        this.operations = basePath + "operations";
+        this.data = basePath + "data";
         hasRootPostLink = false;
         hasAddedDataStore = false;
     }
@@ -131,11 +133,11 @@ public final class PathsStream extends InputStream {
     private Deque<PathEntity> toPaths(final Module module) {
         final var result = new ArrayDeque<PathEntity>();
         if (includeDataStore && !hasAddedDataStore) {
-            final var dataPath = DATA + urlPrefix;
+            final var dataPath = data + urlPrefix;
             result.add(new PathEntity(dataPath, null, null, null,
                 new GetEntity(null, deviceName, "data", null, null, false),
                 null));
-            final var operationsPath = OPERATIONS + urlPrefix;
+            final var operationsPath = operations + urlPrefix;
             result.add(new PathEntity(operationsPath, null, null, null,
                 new GetEntity(null, deviceName, "operations", null, null, false),
                 null));
@@ -146,7 +148,7 @@ public final class PathsStream extends InputStream {
             // TODO connect path with payload
             final var localName = rpc.getQName().getLocalName();
             final var post = new PostEntity(rpc, deviceName, module.getName(), new ArrayList<>(), localName, null);
-            final var resolvedPath = OPERATIONS + urlPrefix + "/" + module.getName() + ":" + localName;
+            final var resolvedPath = operations + urlPrefix + "/" + module.getName() + ":" + localName;
             final var entity = new PathEntity(resolvedPath, post, null, null, null, null);
             result.add(entity);
         }
@@ -157,7 +159,7 @@ public final class PathsStream extends InputStream {
 
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                 if (isConfig && !hasRootPostLink && isForSingleModule) {
-                    final var resolvedPath = DATA + urlPrefix;
+                    final var resolvedPath = data + urlPrefix;
                     result.add(new PathEntity(resolvedPath, new PostEntity(node, deviceName, moduleName,
                         new ArrayList<>(), nodeLocalName, module), null, null, null, null));
                     hasRootPostLink = true;
@@ -176,7 +178,7 @@ public final class PathsStream extends InputStream {
     private static void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
             final boolean isConfig, final EffectiveModelContext schemaContext, final String deviceName) {
-        final var resourcePath = DATA + path;
+        final var resourcePath =  data + path;
         final var fullName = resolveFullNameFromNode(node.getQName(), schemaContext);
         final var firstChild = getListOrContainerChildNode((DataNodeContainer) node);
         if (firstChild != null && node instanceof ContainerSchemaNode) {
@@ -192,7 +194,7 @@ public final class PathsStream extends InputStream {
             actionContainer.getActions().forEach(actionDef -> {
                 final var resourceActionPath = path + "/" + resolvePathArgumentsName(actionDef.getQName(),
                     node.getQName(), schemaContext);
-                final var childPath = OPERATIONS + resourceActionPath;
+                final var childPath = operations + resourceActionPath;
                 result.add(processRootAndActionPathEntity(actionDef, childPath, actionParams, moduleName,
                     refPath, deviceName));
             });
