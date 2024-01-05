@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e41d35c5_bcf8f43d",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-05T15:59:19Z",
+      "side": 1,
+      "message": "(max - min) is always 0.2 am I correct?\nmakes the max value pointless",
+      "revId": "a23ad9319564a05a977004ead8988d989c8de9dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
