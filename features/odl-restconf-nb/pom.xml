@@ -49,11 +49,5 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-nb</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-nb</artifactId>
-            <type>cfg</type>
-            <classifier>config</classifier>
-        </dependency>
     </dependencies>
 </project>
