@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a11e6cf_4854c71c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-05T14:30:16Z",
+      "side": 1,
+      "message": "JIRA: NETCONF-1219",
+      "revId": "9c29bfabc11e899c8dc357a1fe9b2661f27d78d5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "a4646304_d59e481f",
