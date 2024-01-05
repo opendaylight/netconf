@@ -24,7 +24,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 public abstract class BaseYangOpenApiGenerator {
 
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
-    public static final String BASE_PATH = "/";
     public static final List<Map<String, List<String>>> SECURITY = List.of(Map.of("basicAuth", List.of()));
 
     private final DOMSchemaService schemaService;
@@ -38,10 +37,11 @@ public abstract class BaseYangOpenApiGenerator {
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
         final var title = "Controller modules of RESTCONF";
-        final var url = schema + "://" + host + BASE_PATH;
+        final var url = schema + "://" + host + "/";
+        final var basePath = getBasePath();
         final var modules = context.getModules();
         return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
-            modules);
+            modules, basePath);
     }
 
     public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo)
@@ -69,10 +69,11 @@ public abstract class BaseYangOpenApiGenerator {
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
         final var title = module.getName();
-        final var url = schema + "://" + host + BASE_PATH;
+        final var url = schema + "://" + host + "/";
+        final var basePath = getBasePath();
         final var modules = List.of(module);
         return new OpenApiInputStream(schemaContext, title, url, SECURITY,  deviceName, urlPrefix, true, false,
-            modules);
+            modules, basePath);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -87,4 +88,6 @@ public abstract class BaseYangOpenApiGenerator {
     public String createSchemaFromUriInfo(final UriInfo uriInfo) {
         return uriInfo.getBaseUri().getScheme();
     }
+
+    public abstract String getBasePath();
 }

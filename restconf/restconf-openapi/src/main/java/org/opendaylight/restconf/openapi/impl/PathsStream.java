@@ -64,22 +64,21 @@ public final class PathsStream extends InputStream {
     private final EffectiveModelContext schemaContext;
     private final String deviceName;
     private final String urlPrefix;
+    private final String basePath;
     private final boolean isForSingleModule;
     private final boolean includeDataStore;
 
-    private static final String OPERATIONS = "/rests/operations";
-    private static final String DATA = "/rests/data";
-
+    private static final String OPERATIONS = "operations";
+    private static final String DATA = "data";
     private boolean hasRootPostLink;
     private boolean hasAddedDataStore;
-
     private Reader reader;
     private boolean eof;
 
     public PathsStream(final EffectiveModelContext schemaContext, final OpenApiBodyWriter writer,
             final JsonGenerator generator, final ByteArrayOutputStream stream, final String deviceName,
             final String urlPrefix, final boolean isForSingleModule, final boolean includeDataStore,
-            final Iterator<? extends Module> iterator) {
+            final Iterator<? extends Module> iterator, final String basePath) {
         this.iterator = iterator;
         this.generator = generator;
         this.writer = writer;
@@ -89,6 +88,7 @@ public final class PathsStream extends InputStream {
         this.deviceName = deviceName;
         this.urlPrefix = urlPrefix;
         this.includeDataStore = includeDataStore;
+        this.basePath = basePath;
         hasRootPostLink = false;
         hasAddedDataStore = false;
     }
@@ -134,11 +134,11 @@ public final class PathsStream extends InputStream {
     private Deque<PathEntity> toPaths(final Module module) {
         final var result = new ArrayDeque<PathEntity>();
         if (includeDataStore && !hasAddedDataStore) {
-            final var dataPath = DATA + urlPrefix;
+            final var dataPath = basePath + DATA + urlPrefix;
             result.add(new PathEntity(dataPath, null, null, null,
                 new GetEntity(null, deviceName, "data", null, null, false),
                 null));
-            final var operationsPath = OPERATIONS + urlPrefix;
+            final var operationsPath = basePath + OPERATIONS + urlPrefix;
             result.add(new PathEntity(operationsPath, null, null, null,
                 new GetEntity(null, deviceName, "operations", null, null, false),
                 null));
@@ -148,7 +148,7 @@ public final class PathsStream extends InputStream {
         for (final var rpc : module.getRpcs()) {
             final var localName = rpc.getQName().getLocalName();
             final var post = new PostEntity(rpc, deviceName, module.getName(), new ArrayList<>(), localName, null);
-            final var resolvedPath = OPERATIONS + urlPrefix + "/" + module.getName() + ":" + localName;
+            final var resolvedPath = basePath + OPERATIONS + urlPrefix + "/" + module.getName() + ":" + localName;
             final var entity = new PathEntity(resolvedPath, post, null, null, null, null);
             result.add(entity);
         }
@@ -159,7 +159,7 @@ public final class PathsStream extends InputStream {
 
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                 if (isConfig && !hasRootPostLink && isForSingleModule) {
-                    final var resolvedPath = DATA + urlPrefix;
+                    final var resolvedPath = basePath + DATA + urlPrefix;
                     result.add(new PathEntity(resolvedPath, new PostEntity(node, deviceName, moduleName,
                         new ArrayList<>(), nodeLocalName, module), null, null, null, null));
                     hasRootPostLink = true;
@@ -169,7 +169,7 @@ public final class PathsStream extends InputStream {
                 final var localName = moduleName + ":" + nodeLocalName;
                 final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
                 processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, schemaContext,
-                    deviceName);
+                    deviceName, basePath);
             }
         }
         return result;
@@ -177,8 +177,9 @@ public final class PathsStream extends InputStream {
 
     private static void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
-            final boolean isConfig, final EffectiveModelContext schemaContext, final String deviceName) {
-        final var resourcePath = DATA + path;
+            final boolean isConfig, final EffectiveModelContext schemaContext, final String deviceName,
+            final String basePath) {
+        final var resourcePath = basePath + DATA + path;
         final var fullName = resolveFullNameFromNode(node.getQName(), schemaContext);
         final var firstChild = getListOrContainerChildNode((DataNodeContainer) node);
         if (firstChild != null && node instanceof ContainerSchemaNode) {
@@ -194,7 +195,7 @@ public final class PathsStream extends InputStream {
             actionContainer.getActions().forEach(actionDef -> {
                 final var resourceActionPath = path + "/" + resolvePathArgumentsName(actionDef.getQName(),
                     node.getQName(), schemaContext);
-                final var childPath = OPERATIONS + resourceActionPath;
+                final var childPath = basePath + OPERATIONS + resourceActionPath;
                 result.add(processRootAndActionPathEntity(actionDef, childPath, actionParams, moduleName,
                     refPath, deviceName));
             });
@@ -207,7 +208,7 @@ public final class PathsStream extends InputStream {
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
                 processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
-                    schemaContext, deviceName);
+                    schemaContext, deviceName, basePath);
             }
         }
     }
