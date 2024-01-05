@@ -41,14 +41,14 @@ public final class OpenApiInputStream extends InputStream {
 
     public OpenApiInputStream(final EffectiveModelContext context, final String title, final String url,
             final List<Map<String, List<String>>> security, final String deviceName, final String urlPrefix,
-            final boolean isForSingleModule, final boolean includeDataStore, final Collection<? extends Module> modules)
-            throws IOException {
+            final boolean isForSingleModule, final boolean includeDataStore, final Collection<? extends Module> modules,
+            final String basePath) throws IOException {
         final OpenApiBodyWriter writer = new OpenApiBodyWriter(generator, stream);
         stack.add(new OpenApiVersionStream(new OpenApiVersionEntity(), writer));
         stack.add(new InfoStream(new InfoEntity(title), writer));
         stack.add(new ServersStream(new ServersEntity(List.of(new ServerEntity(url))), writer));
         stack.add(new PathsStream(context, writer, generator, stream, deviceName, urlPrefix, isForSingleModule,
-            includeDataStore, modules.iterator()));
+            includeDataStore, modules.iterator(), basePath));
         stack.add(new SchemasStream(context, writer, generator, stream, modules.iterator()));
         stack.add(new SecurityStream(writer, new SecurityEntity(security)));
     }
