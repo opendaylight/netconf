@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
 import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshAuthProvider;
 import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshServer;
@@ -45,7 +44,6 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
     @Activate
     @Inject
     public IetfZeroTouchCallHomeServerProvider(
-            final @Reference DataBroker dataBroker,
             final @Reference CallHomeMountService mountService,
             final @Reference CallHomeSshAuthProvider authProvider,
             final @Reference CallHomeStatusRecorder statusRecorder,
