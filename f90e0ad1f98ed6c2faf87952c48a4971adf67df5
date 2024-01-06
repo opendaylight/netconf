@@ -16,6 +16,24 @@
       "message": "this should be just in PostEntity overriding this. We avoid changes in other entities.",
       "revId": "f90e0ad1f98ed6c2faf87952c48a4971adf67df5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93dcddf8_2119aeb6",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/OperationEntity.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-01-06T11:20:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f23c6425_9aa9b636",
+      "revId": "f90e0ad1f98ed6c2faf87952c48a4971adf67df5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
