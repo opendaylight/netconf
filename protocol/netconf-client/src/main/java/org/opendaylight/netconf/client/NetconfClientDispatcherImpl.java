@@ -90,7 +90,7 @@ public class NetconfClientDispatcherImpl
         LOG.debug("Creating SSH client with configuration: {}", currentConfiguration);
         return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
             (ch, sessionPromise) -> new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
-                        getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(),
+                        getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(), timer,
                         currentConfiguration.getSshClient(), currentConfiguration.getName())
                     .initialize(ch, sessionPromise));
     }
