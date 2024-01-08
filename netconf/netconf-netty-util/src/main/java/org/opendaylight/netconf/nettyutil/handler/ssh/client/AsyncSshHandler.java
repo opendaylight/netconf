@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import java.io.IOException;
@@ -21,8 +22,10 @@ import java.lang.invoke.VarHandle;
 import java.net.SocketAddress;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
@@ -64,6 +67,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         CoreModuleProperties.IDLE_TIMEOUT.set(c, zero);
         CoreModuleProperties.NIO2_READ_TIMEOUT.set(c, zero);
         CoreModuleProperties.TCP_NODELAY.set(c, true);
+        CoreModuleProperties.IO_CONNECT_TIMEOUT.set(c, zero);
 
         // TODO make configurable, or somehow reuse netty threadpool
         c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
@@ -76,6 +80,7 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private final Future<?> negotiationFuture;
     private final NetconfSshClient sshClient;
     private final String name;
+    private final Timer timer;
 
     // Initialized by connect()
     @GuardedBy("this")
@@ -89,16 +94,17 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private volatile boolean disconnected;
 
     private AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
-            final @Nullable Future<?> negotiationFuture, final @Nullable String name) {
+            @NonNull final Timer timer, final @Nullable Future<?> negotiationFuture, final @Nullable String name) {
         this.authenticationHandler = requireNonNull(authenticationHandler);
         this.sshClient = requireNonNull(sshClient);
+        this.timer = requireNonNull(timer);
         this.negotiationFuture = negotiationFuture;
         this.name = name != null && !name.isBlank() ? name : "UNNAMED";
     }
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
-            final @Nullable Future<?> negotiationFuture) {
-        this(authenticationHandler, sshClient, negotiationFuture, null);
+            @NonNull final Timer timer, final @Nullable Future<?> negotiationFuture) {
+        this(authenticationHandler, sshClient, timer, negotiationFuture, null);
     }
 
     /**
@@ -107,12 +113,14 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @param authenticationHandler authentication handler
      * @param sshClient             started SshClient
      */
-    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient) {
-        this(authenticationHandler, sshClient, null);
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
+            final Timer timer) {
+        this(authenticationHandler, sshClient, timer, null);
     }
 
-    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) {
-        return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT);
+    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
+            final Timer timer) {
+        return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT, timer);
     }
 
     /**
@@ -124,9 +132,9 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @return                      {@code AsyncSshHandler}
      */
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
-            final Future<?> negotiationFuture, final @Nullable NetconfSshClient sshClient,
+            final Future<?> negotiationFuture, @NonNull final Timer timer, final @Nullable NetconfSshClient sshClient,
             final @Nullable String name) {
-        return new AsyncSshHandler(authenticationHandler, sshClient != null ? sshClient : DEFAULT_CLIENT,
+        return new AsyncSshHandler(authenticationHandler, sshClient != null ? sshClient : DEFAULT_CLIENT, timer,
                 negotiationFuture, name);
     }
 
@@ -152,11 +160,17 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         }
 
         LOG.debug("{}: Starting SSH to {} on channel: {}", name, remoteAddress, ctx.channel());
-        sshClient.connect(authenticationHandler.getUsername(), remoteAddress)
-            // FIXME: this is a blocking call, we should handle this with a concurrently-scheduled timeout. We do not
-            //        have a Timer ready, so perhaps we should be using the event loop?
-            .verify(ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS)
-            .addListener(future -> onConnectComplete(future, ctx));
+        final var sshConnectFuture = sshClient.connect(authenticationHandler.getUsername(), remoteAddress);
+        final var timeout = timer.newTimeout(unused -> sshConnectFuture.cancel(),
+            ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS);
+        sshConnectFuture.addListener(future -> {
+            if (timeout.cancel()) {
+                onConnectComplete(future, ctx);
+            } else {
+                onOpenFailure(ctx, new TimeoutException("Connection timed out for session: "
+                    + sshConnectFuture.getId()));
+            }
+        });
     }
 
     private synchronized void onConnectComplete(final ConnectFuture connectFuture, final ChannelHandlerContext ctx) {
