@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e11a362b_4dba48bc",
+        "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-01-08T08:08:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23c03a23_ea1caf3d",
+      "revId": "49fd945d259ed57288a43f3f00032f851a6599d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3db7efb1_adef9e05",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-01-05T06:39:16Z",
       "side": 1,
       "message": "Why 2000?",
+      "revId": "49fd945d259ed57288a43f3f00032f851a6599d3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b452cd80_58f5fd29",
+        "filename": "netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-01-08T08:08:46Z",
+      "side": 1,
+      "message": "The ConnectTimeout is set to 1000 milliseconds\nhttps://git.opendaylight.org/gerrit/c/netconf/+/109076/12/netconf/netconf-netty-util/src/test/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerTest.java#172\n\nIndicating that a TimeoutException should be triggered for a blocked connection after 1 second. This timeout should occur after the normal connection completes. Total time allocated for this process is set at 2000 milliseconds, allowing 1000 ms for the normal connection to finish and an additional 1000 ms for the exception to be triggered. If the exception is not set within this timeframe, the test would fail.",
+      "parentUuid": "3db7efb1_adef9e05",
       "revId": "49fd945d259ed57288a43f3f00032f851a6599d3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
