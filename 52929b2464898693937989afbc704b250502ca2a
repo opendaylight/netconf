@@ -16,6 +16,23 @@
       "message": "Blocked by other issues.",
       "revId": "52929b2464898693937989afbc704b250502ca2a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45e8f0de_1398a55f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-08T16:18:40Z",
+      "side": 1,
+      "message": "But solution for them will not be major change as here where we are changing the data type in YANG.\n\nThis patch has been tested with netopeer2 device and has worked well.",
+      "revId": "52929b2464898693937989afbc704b250502ca2a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
