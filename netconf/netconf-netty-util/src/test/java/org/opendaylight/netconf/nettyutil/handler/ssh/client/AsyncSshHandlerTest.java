@@ -15,7 +15,9 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -32,11 +34,15 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelPromise;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timer;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -47,6 +53,7 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.Authenticat
 import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
 import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
+import org.opendaylight.netconf.shaded.sshd.client.future.DefaultConnectFuture;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.future.CloseFuture;
@@ -86,6 +93,7 @@ public class AsyncSshHandlerTest {
     private SshFutureListener<AuthFuture> sshAuthListener;
     private SshFutureListener<OpenFuture> sshChannelOpenListener;
     private ChannelPromise promise;
+    private Timer timer;
 
     @Before
     public void setUp() throws Exception {
@@ -95,12 +103,13 @@ public class AsyncSshHandlerTest {
         stubCtx();
 
         promise = getMockedPromise();
-
-        asyncSshHandler = new AsyncSshHandler(authHandler, sshClient);
+        timer = new HashedWheelTimer(100, TimeUnit.MILLISECONDS);
+        asyncSshHandler = new AsyncSshHandler(authHandler, sshClient, timer);
     }
 
     @After
     public void tearDown() throws Exception {
+        timer.stop();
         sshConnectListener = null;
         sshAuthListener = null;
         sshChannelOpenListener = null;
@@ -160,8 +169,45 @@ public class AsyncSshHandlerTest {
         }, MoreExecutors.directExecutor());
         doReturn(connectFuture).when(sshClient).connect("usr", remoteAddress);
         doReturn(channelConfig).when(channel).config();
-        doReturn(1).when(channelConfig).getConnectTimeoutMillis();
-        doReturn(connectFuture).when(connectFuture).verify(1,TimeUnit.MILLISECONDS);
+        doReturn(2000).when(channelConfig).getConnectTimeoutMillis();
+    }
+
+    @Test
+    public void testNoDelayAfterPendingConnection() throws Exception {
+        // Prepare pending connection.
+        final var blockedFuture = "test blocked future";
+        final var blockedConnection = new DefaultConnectFuture(blockedFuture, blockedFuture);
+        doReturn(false).when(promise).isDone();
+        doReturn(null).when(promise).setFailure(any(IllegalStateException.class));
+        final var mockStuckAddress = mock(SocketAddress.class);
+        doReturn(blockedConnection).when(sshClient).connect("usr", mockStuckAddress);
+
+        // Start pending connection.
+        asyncSshHandler.connect(ctx, mockStuckAddress, localAddress, promise);
+        // Start normal connection.
+        asyncSshHandler.connect(ctx, remoteAddress, localAddress, promise);
+
+        // Handle normal connection.
+        final var asyncOut = getMockedIoInputStream();
+        final var asyncIn = getMockedIoOutputStream();
+        final var subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final var sshSession = getMockedSshSession(subsystemChannel);
+        final var connectFuture = getSuccessConnectFuture(sshSession);
+        sshConnectListener.operationComplete(connectFuture);
+        sshAuthListener.operationComplete(getSuccessAuthFuture());
+        sshChannelOpenListener.operationComplete(getSuccessOpenFuture());
+        verify(subsystemChannel).setStreaming(ClientChannel.Streaming.Async);
+
+        // Verify that pending connection is still waiting.
+        Assert.assertFalse(blockedConnection.isConnected());
+        verify(promise, never()).setFailure(any(TimeoutException.class));
+        // Verify that normal connection successfully finished.
+        verify(promise).setSuccess();
+        verify(ctx).fireChannelActive();
+        // Verify that pending connection set TimeoutException.
+        verify(promise, timeout(2500)).setFailure(any(TimeoutException.class));
+        asyncSshHandler.close(ctx, getMockedPromise());
+        verify(ctx).fireChannelInactive();
     }
 
     @Test
