@@ -16,6 +16,24 @@
       "message": "2024",
       "revId": "736376ba4ecb6b59751e9cd0d5ce18707d6d9e50",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1191664_d868a072",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/ComponentsStream.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-08T15:57:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6be0fd52_61207aad",
+      "revId": "736376ba4ecb6b59751e9cd0d5ce18707d6d9e50",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
