@@ -67,7 +67,8 @@ public final class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         CoreModuleProperties.IDLE_TIMEOUT.set(c, zero);
         CoreModuleProperties.NIO2_READ_TIMEOUT.set(c, zero);
         CoreModuleProperties.TCP_NODELAY.set(c, true);
-        CoreModuleProperties.IO_CONNECT_TIMEOUT.set(c, zero);
+        // Set the maximum possible timeout for SshClient to approximately 24 days.
+        CoreModuleProperties.IO_CONNECT_TIMEOUT.set(c, Duration.ofMillis(Integer.MAX_VALUE));
 
         // TODO make configurable, or somehow reuse netty threadpool
         c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
