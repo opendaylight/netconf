@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d915f42_c459bd91",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-08T09:35:04Z",
+      "side": 1,
+      "message": "IMO we can use zero: https://github.com/apache/mina-sshd/blob/72224fa6f76ef33fd80eebc46a8661866e6f7f62/sshd-mina/src/main/java/org/apache/sshd/mina/MinaConnector.java#L64.",
+      "revId": "af0ba7771f3750713b5c816d95db7a103a1e0b19",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
