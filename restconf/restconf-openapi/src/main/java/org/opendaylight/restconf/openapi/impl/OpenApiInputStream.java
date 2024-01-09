@@ -9,6 +9,7 @@ package org.opendaylight.restconf.openapi.impl;
 
 import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.core.JsonGenerator;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -61,7 +62,8 @@ public final class OpenApiInputStream extends InputStream {
         if (reader == null) {
             generator.writeStartObject();
             generator.flush();
-            reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8);
+            reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
             stream.reset();
         }
 
@@ -70,12 +72,13 @@ public final class OpenApiInputStream extends InputStream {
             if (stack.isEmpty()) {
                 generator.writeEndObject();
                 generator.flush();
-                reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8);
+                reader = new BufferedReader(
+                    new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
                 stream.reset();
                 eof = true;
                 return reader.read();
             }
-            reader = new InputStreamReader(stack.pop(), StandardCharsets.UTF_8);
+            reader = new BufferedReader(new InputStreamReader(stack.pop(), StandardCharsets.UTF_8));
             read = reader.read();
         }
 

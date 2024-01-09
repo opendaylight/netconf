@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.openapi.impl;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -69,7 +70,8 @@ public final class SchemasStream extends InputStream {
             generator.writeObjectFieldStart("components");
             generator.writeObjectFieldStart("schemas");
             generator.flush();
-            reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8);
+            reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
             stream.reset();
         }
         if (eof) {
@@ -83,22 +85,25 @@ public final class SchemasStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (iterator.hasNext()) {
-                reader = new InputStreamReader(new SchemaStream(toComponents(iterator.next(), context), writer),
-                    StandardCharsets.UTF_8);
+                reader = new BufferedReader(
+                    new InputStreamReader(new SchemaStream(toComponents(iterator.next(), context), writer),
+                        StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
             }
             if (!schemesWritten) {
                 generator.writeEndObject();
-                reader = new InputStreamReader(new SecuritySchemesStream(writer, Map.of(BASIC_AUTH_NAME,
-                    OPEN_API_BASIC_AUTH)), StandardCharsets.UTF_8);
+                reader = new BufferedReader(
+                    new InputStreamReader(new SecuritySchemesStream(writer, Map.of(BASIC_AUTH_NAME,
+                        OPEN_API_BASIC_AUTH)), StandardCharsets.UTF_8));
                 read = reader.read();
                 schemesWritten = true;
                 continue;
             }
             generator.writeEndObject();
             generator.flush();
-            reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8);
+            reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
             stream.reset();
             eos = true;
             return reader.read();

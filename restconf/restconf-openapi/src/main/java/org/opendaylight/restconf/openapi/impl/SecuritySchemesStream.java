@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,8 +35,9 @@ public final class SecuritySchemesStream extends InputStream {
     @Override
     public int read() throws IOException {
         if (reader == null) {
-            reader = new InputStreamReader(new ByteArrayInputStream(writeNextEntity(securitySchemesEntity)),
-                StandardCharsets.UTF_8);
+            reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(writeNextEntity(securitySchemesEntity)),
+                    StandardCharsets.UTF_8));
         }
         return reader.read();
     }
