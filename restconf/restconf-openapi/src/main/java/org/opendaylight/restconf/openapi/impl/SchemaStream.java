@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,8 +36,8 @@ public final class SchemaStream extends InputStream {
             if (stack.isEmpty()) {
                 return -1;
             }
-            reader = new InputStreamReader(new ByteArrayInputStream(writeNextEntity(stack.pop())),
-                StandardCharsets.UTF_8);
+            reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(writeNextEntity(stack.pop())),
+                StandardCharsets.UTF_8));
         }
 
         var read = reader.read();
@@ -44,8 +45,8 @@ public final class SchemaStream extends InputStream {
             if (stack.isEmpty()) {
                 return -1;
             }
-            reader = new InputStreamReader(new ByteArrayInputStream(writeNextEntity(stack.pop())),
-                StandardCharsets.UTF_8);
+            reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(writeNextEntity(stack.pop())),
+                StandardCharsets.UTF_8));
             read = reader.read();
         }
 

@@ -11,6 +11,7 @@ import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolveFullN
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -100,21 +101,23 @@ public final class PathsStream extends InputStream {
         if (reader == null) {
             generator.writeObjectFieldStart("paths");
             generator.flush();
-            reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8);
+            reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
             stream.reset();
         }
 
         var read = reader.read();
         while (read == -1) {
             if (iterator.hasNext()) {
-                reader = new InputStreamReader(new PathStream(toPaths(iterator.next()), writer),
-                    StandardCharsets.UTF_8);
+                reader = new BufferedReader(
+                    new InputStreamReader(new PathStream(toPaths(iterator.next()), writer), StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
             }
             generator.writeEndObject();
             generator.flush();
-            reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8);
+            reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
             stream.reset();
             eof = true;
             return reader.read();
