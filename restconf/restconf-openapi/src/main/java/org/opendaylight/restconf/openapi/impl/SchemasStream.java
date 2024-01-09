@@ -83,7 +83,7 @@ public final class SchemasStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (iterator.hasNext()) {
-                reader = new InputStreamReader(new SchemaStream(toComponents(iterator.next()), writer),
+                reader = new InputStreamReader(new SchemaStream(toComponents(iterator.next(), context), writer),
                     StandardCharsets.UTF_8);
                 read = reader.read();
                 continue;
@@ -112,7 +112,7 @@ public final class SchemasStream extends InputStream {
         return super.read(array, off, len);
     }
 
-    private Deque<SchemaEntity> toComponents(final Module module) {
+    private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context) {
         final var result = new ArrayDeque<SchemaEntity>();
         final var definitionNames = new DefinitionNames();
         final var stack = SchemaInferenceStack.of(context);
