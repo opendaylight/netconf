@@ -64,6 +64,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     @Mock
     private UriInfo uriInfo;
     @Mock
+    private URI baseUri;
+    @Mock
     private DOMNotificationService notificationService;
 
     private StreamsConfiguration configurationWs;
@@ -88,6 +90,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(UriBuilder.fromUri("http://localhost:8181")).when(uriInfo).getBaseUriBuilder();
         doReturn(new URI("http://127.0.0.1/" + URI)).when(uriInfo).getAbsolutePath();
+        doReturn(baseUri).when(uriInfo).getBaseUri();
+        doReturn("/rests/").when(baseUri).getPath();
 
         modelContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications"));
         databindProvider = () -> DatabindContext.ofModel(modelContext);
