@@ -13,6 +13,7 @@ import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.BA
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -45,12 +46,9 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     private final DOMSchemaService globalSchema;
     private final DOMMountPointService mountService;
     private final BaseYangOpenApiGenerator openApiGenerator;
-    private final Map<YangInstanceIdentifier, Long> instanceIdToLongId =
-            new TreeMap<>((o1, o2) -> o1.toString().compareToIgnoreCase(o2.toString()));
-    private final Map<Long, YangInstanceIdentifier> longIdToInstanceId = new HashMap<>();
-
-    private final Object lock = new Object();
-
+    private final Map<YangInstanceIdentifier, Long> instanceIdToLongId = Collections.synchronizedMap(
+            new TreeMap<>((o1, o2) -> o1.toString().compareToIgnoreCase(o2.toString())));
+    private final Map<Long, YangInstanceIdentifier> longIdToInstanceId = Collections.synchronizedMap(new HashMap<>());
     private final AtomicLong idKey = new AtomicLong(0);
 
     private ListenerRegistration<DOMMountPointListener> registration;
@@ -75,7 +73,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     public Map<String, Long> getInstanceIdentifiers() {
         final Map<String, Long> urlToId = new HashMap<>();
-        synchronized (lock) {
+        synchronized (instanceIdToLongId) {
             final SchemaContext context = globalSchema.getGlobalContext();
             for (final Entry<YangInstanceIdentifier, Long> entry : instanceIdToLongId.entrySet()) {
                 final String modName = findModuleName(entry.getKey(), context);
@@ -119,14 +117,6 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         return builder.toString();
     }
 
-    private YangInstanceIdentifier getInstanceId(final Long id) {
-        final YangInstanceIdentifier instanceId;
-        synchronized (lock) {
-            instanceId = longIdToInstanceId.get(id);
-        }
-        return instanceId;
-    }
-
     private EffectiveModelContext getSchemaContext(final YangInstanceIdentifier id) {
         if (id == null) {
             return null;
@@ -141,7 +131,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
             final String revision) throws IOException  {
-        final YangInstanceIdentifier iid = getInstanceId(id);
+        final YangInstanceIdentifier iid = longIdToInstanceId.get(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
         final String deviceName = extractDeviceName(iid);
@@ -158,7 +148,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final @Nullable String strPageNum)
             throws IOException {
-        final var iid = getInstanceId(id);
+        final var iid = longIdToInstanceId.get(id);
         final var context = getSchemaContext(iid);
         final var urlPrefix = getYangMountUrl(iid);
         final var deviceName = extractDeviceName(iid);
@@ -201,20 +191,16 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     @Override
     public void onMountPointCreated(final YangInstanceIdentifier path) {
-        synchronized (lock) {
-            LOG.debug("Mount point {} created", path);
-            final Long idLong = idKey.incrementAndGet();
-            instanceIdToLongId.put(path, idLong);
-            longIdToInstanceId.put(idLong, path);
-        }
+        LOG.debug("Mount point {} created", path);
+        final Long idLong = idKey.incrementAndGet();
+        instanceIdToLongId.put(path, idLong);
+        longIdToInstanceId.put(idLong, path);
     }
 
     @Override
     public void onMountPointRemoved(final YangInstanceIdentifier path) {
-        synchronized (lock) {
-            LOG.debug("Mount point {} removed", path);
-            final Long id = instanceIdToLongId.remove(path);
-            longIdToInstanceId.remove(id);
-        }
+        LOG.debug("Mount point {} removed", path);
+        final Long id = instanceIdToLongId.remove(path);
+        longIdToInstanceId.remove(id);
     }
 }
