@@ -143,7 +143,6 @@ public final class PathsStream extends InputStream {
         }
         // RPC operations (via post) - RPCs have their own path
         for (final var rpc : module.getRpcs()) {
-            // TODO connect path with payload
             final var localName = rpc.getQName().getLocalName();
             final var post = new PostEntity(rpc, deviceName, module.getName(), new ArrayList<>(), localName, null);
             final var resolvedPath = OPERATIONS + urlPrefix + "/" + module.getName() + ":" + localName;
