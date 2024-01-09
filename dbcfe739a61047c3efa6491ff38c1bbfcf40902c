@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48a0e202_7c1a8e1c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/jaxrs/WebInitializer.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-09T11:49:28Z",
+      "side": 1,
+      "message": "Wrong format 😊",
+      "revId": "dbcfe739a61047c3efa6491ff38c1bbfcf40902c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
