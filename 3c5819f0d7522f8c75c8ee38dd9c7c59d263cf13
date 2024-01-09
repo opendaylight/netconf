@@ -16,6 +16,24 @@
       "message": "//by randomSleepFactor, which...",
       "revId": "3c5819f0d7522f8c75c8ee38dd9c7c59d263cf13",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84a48534_1aa78d64",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-09T12:28:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1757fc6_84ad2126",
+      "revId": "3c5819f0d7522f8c75c8ee38dd9c7c59d263cf13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
