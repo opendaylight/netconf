@@ -52,7 +52,7 @@ abstract class SubscribeToStreamUtil {
         @Override
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
             final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-            return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/'
+            return uriBuilder.replacePath(uriInfo.getBaseUri().getPath() + '/'
                     + RestconfConstants.NOTIF + '/' + streamName).build();
         }
     }
