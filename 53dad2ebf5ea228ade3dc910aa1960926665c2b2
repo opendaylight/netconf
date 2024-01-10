@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2509d82b_0db2a5bd",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-10T12:55:33Z",
+      "side": 1,
+      "message": "IMO we could check if max timeout is at least as much as timeout.",
+      "revId": "53dad2ebf5ea228ade3dc910aa1960926665c2b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ca8b74b_1a5f0b12",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-10T12:55:33Z",
+      "side": 1,
+      "message": "Move the comment to the concerned code.",
+      "revId": "53dad2ebf5ea228ade3dc910aa1960926665c2b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4534f60d_a809a588",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-10T12:55:33Z",
+      "side": 1,
+      "message": "\u003c\u003d maxSleep",
+      "revId": "53dad2ebf5ea228ade3dc910aa1960926665c2b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
