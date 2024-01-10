@@ -16,6 +16,24 @@
       "message": "The problem is that test AsyncSshHandlerTest.testWrite:245 goes into else branch, instead of being successful.",
       "revId": "880a54f471ffe15087ede5077c6f54ad14c8f7fd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13e1e836_05386a53",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-10T13:02:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18fe1246_34ef9380",
+      "revId": "880a54f471ffe15087ede5077c6f54ad14c8f7fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
