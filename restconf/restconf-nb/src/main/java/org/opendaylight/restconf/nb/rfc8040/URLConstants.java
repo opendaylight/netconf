@@ -15,9 +15,10 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public final class URLConstants {
     /**
-     * The first URL path element for RESTCONF implementation, i.e. {@code https://localhost/BASE_PATH}.
+     * Configuration property name for the first URL path element for RESTCONF implementation, i.e.
+     * {@code https://localhost/BASE_PATH}.
      */
-    public static final String BASE_PATH = "rests";
+    public static final String PROP_BASE_PATH = "base_path";
     /**
      * The second URL path element for streams support, i.e. {@code https://localhost/BASE_PATH/STREAMS}.
      */

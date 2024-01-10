@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040;
 
 import com.google.common.annotations.Beta;
+import java.io.IOException;
 import java.util.Set;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
@@ -30,29 +31,39 @@ import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.Designate;
 
 /**
  * Main entrypoint into RFC8040 northbound. Take care of wiring up all applications activating them through JAX-RS.
  */
 @Beta
 @Component(service = { })
+@Designate(ocd = OSGiNorthbound.Configuration.class)
 public final class JaxRsNorthbound implements AutoCloseable {
     private final Registration discoveryReg;
     private final Registration restconfReg;
+
+    private String basePath;
 
     @Activate
     public JaxRsNorthbound(@Reference final WebServer webServer, @Reference final WebContextSecurer webContextSecurer,
             @Reference final ServletSupport servletSupport,
             @Reference final CustomFilterAdapterConfiguration filterAdapterConfiguration,
             @Reference final DatabindProvider databindProvider, @Reference final RestconfServer server,
-            @Reference final RestconfStreamServletFactory servletFactory) throws ServletException {
+            @Reference final RestconfStreamServletFactory servletFactory,
+            @Reference final ConfigurationAdmin configAdmin) throws ServletException, IOException {
+        Configuration conf = configAdmin.getConfiguration("org.opendaylight.restconf.nb.rfc8040");
+        this.basePath = String.valueOf(conf.getProperties().get(URLConstants.PROP_BASE_PATH));
+
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
-            .contextPath("/" + URLConstants.BASE_PATH)
+            .contextPath("/" + basePath)
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
@@ -102,7 +113,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                     new Application() {
                         @Override
                         public Set<Object> getSingletons() {
-                            return Set.of(new JaxRsWebHostMetadata(URLConstants.BASE_PATH));
+                            return Set.of(new JaxRsWebHostMetadata(basePath));
                         }
                     }).build())
                 .name("Rootfound")

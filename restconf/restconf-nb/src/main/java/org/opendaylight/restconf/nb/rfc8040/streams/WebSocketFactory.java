@@ -35,7 +35,7 @@ record WebSocketFactory(
         int heartbeatInterval) implements WebSocketCreator {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketFactory.class);
     private static final String STREAMS_PREFIX =
-        "/" + URLConstants.BASE_PATH + "/" + URLConstants.STREAMS_SUBPATH + "/";
+        "/rests/" + URLConstants.STREAMS_SUBPATH + "/";
 
     WebSocketFactory {
         requireNonNull(pingExecutor);
