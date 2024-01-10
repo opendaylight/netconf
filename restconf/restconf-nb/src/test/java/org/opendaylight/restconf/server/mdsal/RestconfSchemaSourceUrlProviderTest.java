@@ -21,10 +21,13 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yangtools.yang.common.Revision;
 
 class RestconfSchemaSourceUrlProviderTest {
+
+    public static final String BASE_PATH = "rests";
+
     @Test
     @DisplayName("Unsupported module-set name.")
     void unsupportedModuleSet() {
-        final var urlProvider = new RestconfSchemaSourceUrlProvider();
+        final var urlProvider = new RestconfSchemaSourceUrlProvider(BASE_PATH);
         final var result = urlProvider.getSchemaSourceUrl("some-module-set", "module", null);
         assertTrue(result.isEmpty());
     }
@@ -32,7 +35,7 @@ class RestconfSchemaSourceUrlProviderTest {
     @ParameterizedTest(name = "Supported module-set name. URL: {2}")
     @MethodSource
     void getSchemaSourceUrl(final String moduleName, final Revision revision, final Uri expected) {
-        final var urlProvider = new RestconfSchemaSourceUrlProvider();
+        final var urlProvider = new RestconfSchemaSourceUrlProvider(BASE_PATH);
         final var result = urlProvider.getSchemaSourceUrl("ODL_modules", moduleName, revision);
         assertEquals(Optional.of(expected), result);
     }
