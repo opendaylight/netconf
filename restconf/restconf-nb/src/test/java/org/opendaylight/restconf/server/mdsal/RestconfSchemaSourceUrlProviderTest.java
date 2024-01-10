@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.mdsal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +24,7 @@ import org.opendaylight.yangtools.yang.common.Revision;
 class RestconfSchemaSourceUrlProviderTest {
     @Test
     @DisplayName("Unsupported module-set name.")
-    void unsupportedModuleSet() {
+    void unsupportedModuleSet() throws IOException {
         final var urlProvider = new RestconfSchemaSourceUrlProvider();
         final var result = urlProvider.getSchemaSourceUrl("some-module-set", "module", null);
         assertTrue(result.isEmpty());
@@ -31,7 +32,7 @@ class RestconfSchemaSourceUrlProviderTest {
 
     @ParameterizedTest(name = "Supported module-set name. URL: {2}")
     @MethodSource
-    void getSchemaSourceUrl(final String moduleName, final Revision revision, final Uri expected) {
+    void getSchemaSourceUrl(final String moduleName, final Revision revision, final Uri expected) throws IOException {
         final var urlProvider = new RestconfSchemaSourceUrlProvider();
         final var result = urlProvider.getSchemaSourceUrl("ODL_modules", moduleName, revision);
         assertEquals(Optional.of(expected), result);
