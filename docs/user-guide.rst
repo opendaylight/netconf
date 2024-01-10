@@ -734,11 +734,15 @@ WebSocket notifications subscription process
 Enabling WebSocket notifications in OpenDaylight requires a manual setup before starting the application.
 The following steps can be followed to enable WebSocket notifications in OpenDaylight:
 
-1. Open the file `restconf8040.cfg`, at `etc/` folder inside your Karaf distribution.
+1. Open the file `org.opendaylight.restconf.nb.rfc8040.cfg`, at `etc/` folder inside your Karaf distribution.
 2. Locate the `use-sse` configuration parameter and change its value from `true` to `false`.
 3. Uncomment the `use-sse` parameter if it is commented out.
-4. Save the changes made to the `restconf8040.cfg` file.
+4. Save the changes made to the `org.opendaylight.restconf.nb.rfc8040.cfg` file.
 5. Restart OpenDaylight if it is already running.
+
+.. note::
+
+    The file might not exist and needs to be crated.
 
 Once these steps are completed, WebSocket notifications will be enabled in OpenDaylight,
 and they can be used for receiving notifications instead of SSE.
@@ -1161,6 +1165,7 @@ In order to change these settings, you can either modify the corresponding confi
 file, ``etc/org.opendaylight.netconf.yanglib.cfg``, for example:
 
 ::
+
     cache-folder = cache/newSchema
     binding-address = localhost
     binding-port = 8181
@@ -1168,6 +1173,7 @@ file, ``etc/org.opendaylight.netconf.yanglib.cfg``, for example:
 Or use Karaf CLI:
 
 ::
+
     opendaylight-user@root>config:edit org.opendaylight.netconf.yanglib
     opendaylight-user@root>config:property-set cache-folder cache/newSchema
     opendaylight-user@root>config:property-set binding-address localhost
@@ -1207,6 +1213,44 @@ XML
 
 This will register YANGLIB provided sources as a fallback schemas for
 particular mount point.
+
+Restconf northbound configuration
+~~~~~~~~~~~~~~~~~~~~~
+Restconf-nb configuration works through OSGi Configuration Admin interface, in the
+``org.opendaylight.restconf.nb.rfc8040`` configuration PID. There are six tuneables you can
+set:
+
+* ``maximum-fragment_length``, which defaults to ``0`
+* ``heartbeat-interval``, which defaults to ``10000``
+* ``idle-timeout``, which defaults to ``30000``
+* ``ping-executor-name-prefix``, which defaults to ``ping-executor``
+* ``max-thread-count``, which defaults to ``1``
+* ``use-sse``, which defaults to ``true``
+
+In order to change these settings, you can either modify the corresponding configuration
+file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
+
+::
+
+    maximum-fragment_length=0
+    heartbeat-interval=10000
+    idle-timeout=30000
+    ping-executor-name-prefix="ping-executor"
+    max-thread-count=1
+    use-sse=true
+
+Or use Karaf CLI:
+
+::
+
+    opendaylight-user@root>config:edit org.opendaylight.restconf.nb.rfc8040
+    opendaylight-user@root>config:property-set maximum-fragment_length 0
+    opendaylight-user@root>config:property-set heartbeat-interval 10000
+    opendaylight-user@root>config:property-set idle-timeout 30000
+    opendaylight-user@root>config:property-set ping-executor-name-prefix "ping-executor"
+    opendaylight-user@root>config:property-set max-thread-count 1
+    opendaylight-user@root>config:property-set use-sse true
+    opendaylight-user@root>config:update
 
 NETCONF Call Home
 -----------------
