@@ -726,11 +726,10 @@ WebSocket notifications subscription process
 Enabling WebSocket notifications in OpenDaylight requires a manual setup before starting the application.
 The following steps can be followed to enable WebSocket notifications in OpenDaylight:
 
-1. Open the file `restconf8040.cfg`, at `etc/` folder inside your Karaf distribution.
-2. Locate the `use-sse` configuration parameter and change its value from `true` to `false`.
-3. Uncomment the `use-sse` parameter if it is commented out.
-4. Save the changes made to the `restconf8040.cfg` file.
-5. Restart OpenDaylight if it is already running.
+1. Open the file `org.opendaylight.restconf.nb.rfc8040.cfg`, at `etc/` folder inside your Karaf distribution. Or create in case it does not exist.
+2. Locate the `use-sse` configuration parameter and change its value from `true` to `false`. Or add ``use-sse=false`` as new line in case this parameter is not present.
+3. Save the changes made to the `org.opendaylight.restconf.nb.rfc8040.cfg` file.
+4. Restart OpenDaylight if it is already running.
 
 Once these steps are completed, WebSocket notifications will be enabled in OpenDaylight,
 and they can be used for receiving notifications instead of SSE.
@@ -1199,6 +1198,58 @@ XML
 
 This will register YANGLIB provided sources as a fallback schemas for
 particular mount point.
+
+Restconf northbound configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Restconf-nb configuration works through OSGi Configuration Admin interface, in the
+``org.opendaylight.restconf.nb.rfc8040`` configuration PID. There are six tuneables you can
+set:
+
+* ``maximum-fragment-length``, which defaults to ``0``
+* ``heartbeat-interval``, which defaults to ``10000``
+* ``idle-timeout``, which defaults to ``30000``
+* ``ping-executor-name-prefix``, which defaults to ``ping-executor``
+* ``max-thread-count``, which defaults to ``1``
+* ``use-sse``, which defaults to ``true``
+
+*maximum-fragment-length* — Maximum web-socket fragment length in number of Unicode code units (characters)
+(exceeded message length leads to fragmentation of messages)
+
+*heartbeat-interval* — Interval in milliseconds between sending of ping control frames.
+
+*idle-timeout* — Maximum idle time of web-socket session before the session is closed (milliseconds).
+
+*ping-executor-name-prefix* — Name of thread group Ping Executor will be run with.
+
+*max-thread-count* — Number of threads Ping Executor will be run with.
+
+*use-sse* — In case of ``true`` access to notification streams will be via Server-Sent Events.
+Otherwise web-socket servlet will be initialized.
+
+In order to change these settings, you can either modify the corresponding configuration
+file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
+
+::
+
+    maximum-fragment-length=0
+    heartbeat-interval=10000
+    idle-timeout=30000
+    ping-executor-name-prefix="ping-executor"
+    max-thread-count=1
+    use-sse=true
+
+Or use Karaf CLI:
+
+::
+
+    opendaylight-user@root>config:edit org.opendaylight.restconf.nb.rfc8040
+    opendaylight-user@root>config:property-set maximum-fragment_length 0
+    opendaylight-user@root>config:property-set heartbeat-interval 10000
+    opendaylight-user@root>config:property-set idle-timeout 30000
+    opendaylight-user@root>config:property-set ping-executor-name-prefix "ping-executor"
+    opendaylight-user@root>config:property-set max-thread-count 1
+    opendaylight-user@root>config:property-set use-sse true
+    opendaylight-user@root>config:update
 
 NETCONF Call Home
 -----------------
