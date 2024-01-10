@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d20944c0_39345f83",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-01-10T11:04:04Z",
+      "side": 1,
+      "message": "IMHO should be \"into\" instead of \"in to\"\nTYPO \"ar\" -\u003e \"are\"\nsecond line too long \u003e72 char",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 74
+      },
+      "revId": "d1688c5ef35a5a367874fb1011296b3f098f692d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8f01f8e_e79e30fd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-01-10T11:04:04Z",
+      "side": 1,
+      "message": "just small commit msg suggestions",
+      "revId": "d1688c5ef35a5a367874fb1011296b3f098f692d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
