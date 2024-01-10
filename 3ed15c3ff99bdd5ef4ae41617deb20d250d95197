@@ -16,6 +16,24 @@
       "message": "The maximum value should be capped at `maxSleep`, not `Long.MAX_VALUE`.",
       "revId": "3ed15c3ff99bdd5ef4ae41617deb20d250d95197",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb2daf2e_e7005fa0",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-10T21:16:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd85702f_e11c65e9",
+      "revId": "3ed15c3ff99bdd5ef4ae41617deb20d250d95197",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
