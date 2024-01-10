@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f46797f_69d55531",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-10T12:57:01Z",
+      "side": 1,
+      "message": "Maybe we could use something more funny like https://en.wikipedia.org/wiki/Exponential_backoff#Example.\n\nIn addition, we can make this behavior on/of in yang model.",
+      "revId": "ddaec050ac3322e47ab48e41f24e3b6b80a6d8e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
