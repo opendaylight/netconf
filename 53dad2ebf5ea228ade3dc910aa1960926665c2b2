@@ -18,6 +18,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7a029e9_c24f9fbe",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-10T13:13:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2509d82b_0db2a5bd",
+      "revId": "53dad2ebf5ea228ade3dc910aa1960926665c2b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "721f67eb_f09a14d0",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-10T13:13:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2509d82b_0db2a5bd",
+      "revId": "53dad2ebf5ea228ade3dc910aa1960926665c2b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ca8b74b_1a5f0b12",
@@ -35,6 +71,42 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "63bfc7de_cdf7ff5e",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-10T13:13:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ca8b74b_1a5f0b12",
+      "revId": "53dad2ebf5ea228ade3dc910aa1960926665c2b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae7b92eb_8d9c53de",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-10T13:13:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ca8b74b_1a5f0b12",
+      "revId": "53dad2ebf5ea228ade3dc910aa1960926665c2b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4534f60d_a809a588",
@@ -48,6 +120,42 @@
       "writtenOn": "2024-01-10T12:55:33Z",
       "side": 1,
       "message": "\u003c\u003d maxSleep",
+      "revId": "53dad2ebf5ea228ade3dc910aa1960926665c2b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "606353ae_9831c48b",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-10T13:13:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4534f60d_a809a588",
+      "revId": "53dad2ebf5ea228ade3dc910aa1960926665c2b2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f2233b1_53c143b1",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-10T13:13:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4534f60d_a809a588",
       "revId": "53dad2ebf5ea228ade3dc910aa1960926665c2b2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
