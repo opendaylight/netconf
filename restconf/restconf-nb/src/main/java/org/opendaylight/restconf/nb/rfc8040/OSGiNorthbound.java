@@ -51,6 +51,8 @@ public final class OSGiNorthbound {
         @Deprecated(since = "7.0.0", forRemoval = true)
         @AttributeDefinition
         boolean use$_$sse() default true;
+        @AttributeDefinition
+        String base$_$path() default "rests";
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);

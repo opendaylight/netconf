@@ -12,11 +12,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.yanglib.writer.YangLibrarySchemaSourceUrlProvider;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
+import org.opendaylight.restconf.nb.rfc8040.OSGiNorthbound;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Component composing schema source URL value on per YANG resource basis.
@@ -29,17 +31,19 @@ import org.osgi.service.component.annotations.Component;
 @Singleton
 @Component
 public final class RestconfSchemaSourceUrlProvider implements YangLibrarySchemaSourceUrlProvider {
+    private String basePath;
+
     @Inject
     @Activate
-    public RestconfSchemaSourceUrlProvider() {
-        // Visible for injection
+    public RestconfSchemaSourceUrlProvider(@Reference final OSGiNorthbound.Configuration configuration) {
+        basePath = configuration.base$_$path();
     }
 
     @Override
     public Optional<Uri> getSchemaSourceUrl(final String moduleSetName, final String moduleName,
             final Revision revision) {
         if ("ODL_modules".equals(moduleSetName)) {
-            final var sb = new StringBuilder("/" + URLConstants.BASE_PATH + "/" + URLConstants.MODULES_SUBPATH + "/")
+            final var sb = new StringBuilder("/" + basePath + "/" + URLConstants.MODULES_SUBPATH + "/")
                 .append(moduleName);
             if (revision != null) {
                 sb.append("?" + URLConstants.MODULES_REVISION_QUERY + "=").append(revision);
