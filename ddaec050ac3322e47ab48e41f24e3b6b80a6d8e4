@@ -16,6 +16,24 @@
       "message": "Maybe we could use something more funny like https://en.wikipedia.org/wiki/Exponential_backoff#Example.\n\nIn addition, we can make this behavior on/of in yang model.",
       "revId": "ddaec050ac3322e47ab48e41f24e3b6b80a6d8e4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fe4f77f_74f53f23",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2024-01-10T18:24:48Z",
+      "side": 1,
+      "message": "The Ethernet backoff is designed to avoid collision between multiple senders sharing the transmission medium. Reconnection randomization is just to distribute the load so this jitter-based approach seems to make sense.\n\nThis is similar to the following GRPC backoff mechanism:\nhttps://github.com/grpc/grpc/blob/master/doc/connection-backoff.md\n\nBut probably we want to add a configuration option for the random jitter instead of a fixed value of 0.1. We can set the default to 0.1 as in this patch or 0.0 if we want to make it backward compatible.",
+      "parentUuid": "1f46797f_69d55531",
+      "revId": "ddaec050ac3322e47ab48e41f24e3b6b80a6d8e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
