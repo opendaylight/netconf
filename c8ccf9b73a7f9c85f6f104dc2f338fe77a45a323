@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b391173_b16dc132",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-11T15:55:34Z",
+      "side": 1,
+      "message": "Most probably we will not locate or un-comment - because we have to create a file manually 😊",
+      "revId": "c8ccf9b73a7f9c85f6f104dc2f338fe77a45a323",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
