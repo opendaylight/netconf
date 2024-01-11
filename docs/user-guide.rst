@@ -1161,6 +1161,7 @@ In order to change these settings, you can either modify the corresponding confi
 file, ``etc/org.opendaylight.netconf.yanglib.cfg``, for example:
 
 ::
+
     cache-folder = cache/newSchema
     binding-address = localhost
     binding-port = 8181
@@ -1168,6 +1169,7 @@ file, ``etc/org.opendaylight.netconf.yanglib.cfg``, for example:
 Or use Karaf CLI:
 
 ::
+
     opendaylight-user@root>config:edit org.opendaylight.netconf.yanglib
     opendaylight-user@root>config:property-set cache-folder cache/newSchema
     opendaylight-user@root>config:property-set binding-address localhost
