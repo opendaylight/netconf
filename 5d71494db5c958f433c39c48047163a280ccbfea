@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "347a10c2_7d1f4e68",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 1226,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2024-01-12T18:28:50Z",
+      "side": 1,
+      "message": "The descriptions of `heartbeat-interval` \u0026 `idle-timeout` are reversed.",
+      "revId": "5d71494db5c958f433c39c48047163a280ccbfea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
