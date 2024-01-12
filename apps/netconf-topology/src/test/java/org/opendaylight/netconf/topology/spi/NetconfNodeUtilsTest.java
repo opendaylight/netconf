@@ -51,7 +51,7 @@ public class NetconfNodeUtilsTest {
             // One reconnection attempt
             .setMaxConnectionAttempts(Uint32.TWO)
             .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-            .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+            .setMinBackoffMillis(Uint16.valueOf(100))
             .setKeepaliveDelay(Uint32.valueOf(1000))
             .setConnectionTimeoutMillis(Uint32.valueOf(1000))
             .setCredentials(new LoginPwUnencryptedBuilder()
