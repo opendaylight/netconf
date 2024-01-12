@@ -22,6 +22,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+<<<<<<< HEAD   (9ec481 Update documentation of RFC 8040 configuration)
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.credentials.credentials.LoginPwBuilder;
@@ -32,6 +33,19 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev221225.cr
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.CreateDeviceInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+=======
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDeviceInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.CreateDeviceInputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.RpcCredentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.LoginPwBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.login.pw.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
+>>>>>>> CHANGE (803bfe Support random backoff between connection attempts)
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
