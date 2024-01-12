@@ -147,10 +147,10 @@ public class NetconfNodeHandlerTest {
                 // One reconnection attempt
                 .setMaxConnectionAttempts(Uint32.TWO)
                 .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+                .setMinBackoffMillis(Uint16.valueOf(100))
                 .setKeepaliveDelay(Uint32.valueOf(1000))
                 .setConnectionTimeoutMillis(Uint32.valueOf(1000))
-                .setMaxTimeoutBetweenAttemptsMillis(Uint32.valueOf(1000))
+                .setMaxBackoffMillis(Uint32.valueOf(1000))
                 .setSleepFactorJitter(Decimal64.valueOf("0.0"))
                 .setCredentials(new LoginPwUnencryptedBuilder()
                     .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
