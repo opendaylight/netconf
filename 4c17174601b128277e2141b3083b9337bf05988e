@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "083b6d62_cfe5096b",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 10
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2024-01-12T19:20:41Z",
+      "side": 1,
+      "message": "This description seems a little confusing. The range of the random number itself is between -sleep-factor-jitter \u0026 +sleep-factor-jitter. The effective sleep-factor taking into account the random jitter is between (sleep-factor - sleep-factor-jitter) and (sleep-factor + sleep-factor-jitter).",
+      "revId": "4c17174601b128277e2141b3083b9337bf05988e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76ef03d5_1a8d3ab3",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 10
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2024-01-12T19:20:41Z",
+      "side": 1,
+      "message": "I think we need `range` to limit the values between `0` \u0026 `0.5` - in theory the upper limit could be `1` but that seems to cause too wide variation.",
+      "revId": "4c17174601b128277e2141b3083b9337bf05988e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
