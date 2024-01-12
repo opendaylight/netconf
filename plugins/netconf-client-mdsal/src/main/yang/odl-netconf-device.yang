@@ -194,7 +194,7 @@ module odl-netconf-device {
       default 0; // retry forever
     }
 
-    leaf between-attempts-timeout-millis {
+    leaf min-backoff-millis {
       description "Initial timeout in milliseconds to wait between connection attempts. Will be multiplied by
                    sleep-factor with every additional attempt";
       config true;
@@ -202,14 +202,14 @@ module odl-netconf-device {
       default 2000;
     }
 
-    leaf max-timeout-between-attempts-millis {
+    leaf max-backoff-millis {
       description "Maximum timeout in milliseconds to wait between connection attempts.";
       config true;
       type uint32;
       default 1800000;
     }
 
-    leaf sleep-factor {
+    leaf backoff-multiplier {
       config true;
       type decimal64 {
         fraction-digits 1;
