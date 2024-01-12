@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8d5e031_c0d6aff3",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-12T09:57:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b391173_b16dc132",
+      "revId": "c8ccf9b73a7f9c85f6f104dc2f338fe77a45a323",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "10e921e3_a6bcbac9",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-01-11T17:34:17Z",
       "side": 1,
       "message": "Should explain what the parameters do.",
+      "revId": "c8ccf9b73a7f9c85f6f104dc2f338fe77a45a323",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fd945f2_5cd5467a",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 1217,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-12T09:57:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10e921e3_a6bcbac9",
       "revId": "c8ccf9b73a7f9c85f6f104dc2f338fe77a45a323",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
