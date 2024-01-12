@@ -22,8 +22,8 @@
         <name>controller-config</name>
         <port xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">1830</port>
         <connection-timeout-millis xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">20000</connection-timeout-millis>
-        <between-attempts-timeout-millis xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">2000</between-attempts-timeout-millis>
-        <sleep-factor xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">1.5</sleep-factor>
+        <min-backoff-millis xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">2000</min-backoff-millis>
+        <backoff-multiplier xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">1.5</backoff-multiplier>
         <password xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">admin</password>
         <dom-registry xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">
           <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">prefix:dom-broker-osgi-registry</type>

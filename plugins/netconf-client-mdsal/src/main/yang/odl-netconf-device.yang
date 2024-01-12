@@ -9,6 +9,11 @@ module odl-netconf-device {
   import ietf-inet-types { prefix inet; }
   import ietf-netconf { prefix nc; }
 
+  revision 2024-01-19 {
+    description "Rename between-attempts-timeout-millis, max-timeout-between-attempts-millis and sleep-factor
+    to min-backoff-millis, max-backoff-millis and backoff-multiplier.";
+  }
+
   revision 2024-01-18 {
     description "Mark between-attempts-timeout-millis, max-timeout-between-attempts-millis and sleep-factor
     as deprecated. They will be renamed to min-backoff-millis, max-backoff-millis and backoff-multiplier
@@ -200,25 +205,24 @@ module odl-netconf-device {
       default 0; // retry forever
     }
 
-    leaf between-attempts-timeout-millis {
-      status deprecated;
+    leaf min-backoff-millis {
       description "Initial timeout in milliseconds to wait between connection attempts. Will be multiplied by
-                   sleep-factor with every additional attempt";
+                   backoff-multiplier with every additional attempt";
       config true;
       type uint16;
       default 2000;
     }
 
-    leaf max-timeout-between-attempts-millis {
-      status deprecated;
+    leaf max-backoff-millis {
       description "Maximum timeout in milliseconds to wait between connection attempts.";
       config true;
       type uint32;
       default 1800000;
     }
 
-    leaf sleep-factor {
-      status deprecated;
+    leaf backoff-multiplier {
+      description "Multiplier for backoff timeout. The backoff will be multiplied by this value with every
+                   additional attempt.";
       config true;
       type decimal64 {
         fraction-digits 1;
