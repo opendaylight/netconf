@@ -63,7 +63,7 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
             .setHost(HOST).setPort(PORT)
             .setReconnectOnChangedSchema(true)
             .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-            .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+            .setMinBackoffMillis(Uint16.valueOf(100))
             .setKeepaliveDelay(Uint32.valueOf(1000))
             .setCredentials(new LoginPwUnencryptedBuilder()
                 .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
@@ -72,7 +72,7 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
                     .build())
                 .build())
             .setMaxConnectionAttempts(Uint32.ZERO)
-            .setSleepFactor(Decimal64.valueOf("1.5"))
+            .setBackoffMultiplier(Decimal64.valueOf("1.5"))
             .setConnectionTimeoutMillis(Uint32.valueOf(20000));
         factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
             sslHandlerFactoryProvider);

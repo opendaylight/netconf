@@ -115,16 +115,16 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final @NonNull Timer timer;
     private final @NonNull RemoteDeviceId deviceId;
 
-    private final long maxSleep;
+    private final long maxBackoff;
     private final long maxAttempts;
-    private final int minSleep;
+    private final int minBackoff;
     private final double sleepFactor;
     private final double jitter;
 
     @GuardedBy("this")
     private long attempts;
     @GuardedBy("this")
-    private long lastSleep;
+    private long lastBackoff;
     @GuardedBy("this")
     private Task currentTask;
 
@@ -140,10 +140,10 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         this.deviceId = requireNonNull(deviceId);
 
         maxAttempts = node.requireMaxConnectionAttempts().toJava();
-        minSleep = node.requireBetweenAttemptsTimeoutMillis().toJava();
-        sleepFactor = node.requireSleepFactor().doubleValue();
-        final long potentialMaxSleep = node.requireMaxTimeoutBetweenAttemptsMillis().toJava();
-        maxSleep = potentialMaxSleep >= minSleep ? potentialMaxSleep : minSleep;
+        minBackoff = node.requireMinBackoffMillis().toJava();
+        sleepFactor = node.requireBackoffMultiplier().doubleValue();
+        final long potentialMaxBackoff = node.requireMaxBackoffMillis().toJava();
+        maxBackoff = potentialMaxBackoff >= minBackoff ? potentialMaxBackoff : minBackoff;
         jitter = node.getBackoffJitter().doubleValue();
 
         // Setup reconnection on empty context, if so configured
@@ -202,7 +202,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     public synchronized void connect() {
         attempts = 1;
-        lastSleep = minSleep;
+        lastBackoff = minBackoff;
         lockedConnect();
     }
 
@@ -301,7 +301,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             return null;
         }
 
-        final long delayMillis;
+        final long backoffMillis;
 
         // We have exceeded the number of connection attempts
         if (maxAttempts > 0 && attempts >= maxAttempts) {
@@ -309,24 +309,24 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             return new ConnectGivenUpException("Given up connecting " + deviceId + " after " + attempts + " attempts");
         }
 
-        // First connection attempt gets initialized to minimum sleep, each subsequent is exponentially backed off
+        // First connection attempt gets initialized to minimum backoff, each subsequent is exponentially backed off
         // by sleepFactor (default 1.5) until reach max sleep and randomized by +/- jitter (default 0.1).
         if (attempts != 0) {
-            final var currentBackoff = Math.min(lastSleep * sleepFactor, maxSleep);
-            delayMillis = (long) (currentBackoff * (Math.random() * (jitter * 2) + (1 - jitter)));
+            final var currentBackoff = Math.min(lastBackoff * sleepFactor, maxBackoff);
+            backoffMillis = (long) (currentBackoff * (Math.random() * (jitter * 2) + (1 - jitter)));
         } else {
-            delayMillis = minSleep;
+            backoffMillis = minBackoff;
         }
 
         attempts++;
-        lastSleep = delayMillis;
-        LOG.debug("Retrying {} connection attempt {} after {} milliseconds", deviceId, attempts, delayMillis);
+        lastBackoff = backoffMillis;
+        LOG.debug("Retrying {} connection attempt {} after {} milliseconds", deviceId, attempts, backoffMillis);
 
         // Schedule a task for the right time. We always go through the executor to eliminate the special case of
         // immediate reconnect. While we could check and got to lockedConnect(), it makes for a rare special case.
         // That special case makes for more code paths to test and introduces additional uncertainty as to whether
         // the attempt was executed on this thread or not.
-        currentTask = new SleepingTask(timer.newTimeout(this::reconnect, delayMillis, TimeUnit.MILLISECONDS));
+        currentTask = new SleepingTask(timer.newTimeout(this::reconnect, backoffMillis, TimeUnit.MILLISECONDS));
         return null;
     }
 

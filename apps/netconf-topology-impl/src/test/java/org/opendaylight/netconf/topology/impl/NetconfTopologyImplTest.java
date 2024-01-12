@@ -113,7 +113,7 @@ class NetconfTopologyImplTest {
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+                .setMinBackoffMillis(Uint16.valueOf(100))
                 .setKeepaliveDelay(Uint32.valueOf(1000))
                 .setTcpOnly(true)
                 .setCredentials(new LoginPwUnencryptedBuilder()
