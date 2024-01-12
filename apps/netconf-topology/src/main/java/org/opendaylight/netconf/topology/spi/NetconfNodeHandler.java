@@ -119,6 +119,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private final long maxAttempts;
     private final int minSleep;
     private final double sleepFactor;
+    private final double jitter;
 
     @GuardedBy("this")
     private long attempts;
@@ -143,6 +144,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         sleepFactor = node.requireSleepFactor().doubleValue();
         final long potentialMaxSleep = node.requireMaxTimeoutBetweenAttemptsMillis().toJava();
         maxSleep = potentialMaxSleep >= minSleep ? potentialMaxSleep : minSleep;
+        jitter = node.getSleepFactorJitter().doubleValue();
 
         // Setup reconnection on empty context, if so configured
         // FIXME: NETCONF-925: implement this
@@ -308,15 +310,10 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         }
 
         // First connection attempt gets initialized to minimum sleep, each subsequent is exponentially backed off
-        // by sleepFactor.
+        // by sleepFactor (default 1.5) until reach max sleep and randomized by jitter (default 0.1).
         if (attempts != 0) {
-            final long nextSleep = (long) (lastSleep * sleepFactor);
-            if (nextSleep <= maxSleep) {
-                // check for overflow
-                delayMillis = nextSleep >= 0 ? nextSleep : maxSleep;
-            } else {
-                delayMillis = maxSleep;
-            }
+            final var currentBackoff = Math.min(lastSleep * sleepFactor, maxSleep);
+            delayMillis = (long) (currentBackoff * (Math.random() * (jitter * 2) + (1 - jitter)));
         } else {
             delayMillis = minSleep;
         }

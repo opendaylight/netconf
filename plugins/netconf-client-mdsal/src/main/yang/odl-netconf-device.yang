@@ -9,6 +9,10 @@ module odl-netconf-device {
   import ietf-inet-types { prefix inet; }
   import ietf-netconf { prefix nc; }
 
+  revision 2024-01-10 {
+    description "Add possibility to set range of randomized sleep factor";
+  }
+
   revision 2024-01-04 {
     description "Add possibility to set max timeout between connection attempts";
   }
@@ -198,6 +202,13 @@ module odl-netconf-device {
       default 2000;
     }
 
+    leaf max-timeout-between-attempts-millis {
+      description "Maximum timeout in milliseconds to wait between connection attempts.";
+      config true;
+      type uint32;
+      default 1800000;
+    }
+
     leaf sleep-factor {
       config true;
       type decimal64 {
@@ -206,11 +217,14 @@ module odl-netconf-device {
       default 1.5;
     }
 
-    leaf max-timeout-between-attempts-millis {
-      description "Maximum timeout in milliseconds to wait between connection attempts.";
+    leaf sleep-factor-jitter {
+      description "Range of randomized sleep factor. The sleep factor will be multiplied by a random number
+                   between sleep-factor and +-range-of-randomized-sleep-factor.";
       config true;
-      type uint32;
-      default 1800000;
+      type decimal64 {
+        fraction-digits 1;
+      }
+      default 0.1;
     }
 
     // Keepalive configuration
