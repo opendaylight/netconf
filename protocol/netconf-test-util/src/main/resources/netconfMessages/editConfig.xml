@@ -35,9 +35,9 @@
                         <from-grouping>
                             <enum-in-grouping>version1</enum-in-grouping>
                         </from-grouping>
-                        <sleep-factor>
+                        <backoff-multiplier>
                             2.58
-                        </sleep-factor>
+                        </backoff-multiplier>
 
                         <extended>
                                 10
