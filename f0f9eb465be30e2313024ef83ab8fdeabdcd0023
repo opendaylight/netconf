@@ -16,6 +16,24 @@
       "message": "4 spaces",
       "revId": "f0f9eb465be30e2313024ef83ab8fdeabdcd0023",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cc2db02_048e87e2",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/IetfZeroTouchCallHomeServerProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-15T09:41:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3274e94_1494c985",
+      "revId": "f0f9eb465be30e2313024ef83ab8fdeabdcd0023",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
