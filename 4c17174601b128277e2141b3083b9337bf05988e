@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd983bb3_872821b8",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 10
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-15T06:20:11Z",
+      "side": 1,
+      "message": "Sorry for that, but now it\u0027s backoff * (1-backoff-jitter) and (1+ backoff-jitter) like here https://github.com/grpc/grpc/blob/master/doc/connection-backoff.md",
+      "parentUuid": "083b6d62_cfe5096b",
+      "revId": "4c17174601b128277e2141b3083b9337bf05988e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76ef03d5_1a8d3ab3",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-01-12T19:20:41Z",
       "side": 1,
       "message": "I think we need `range` to limit the values between `0` \u0026 `0.5` - in theory the upper limit could be `1` but that seems to cause too wide variation.",
+      "revId": "4c17174601b128277e2141b3083b9337bf05988e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecb0e255_66b85a29",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 10
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-15T06:20:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76ef03d5_1a8d3ab3",
       "revId": "4c17174601b128277e2141b3083b9337bf05988e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
