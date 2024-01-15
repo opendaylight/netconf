@@ -50,6 +50,24 @@
       "message": "imo you can use here @VisibleForTesting",
       "revId": "63e831e490c5bf14f65a25ac4377c2af1a6d8ab7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8658d064_6ca7bbc6",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/RestconfSchemaSourceUrlProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-15T17:04:19Z",
+      "side": 1,
+      "message": "I can. But it is fine without it tho",
+      "parentUuid": "ad4f8c56_386887d4",
+      "revId": "63e831e490c5bf14f65a25ac4377c2af1a6d8ab7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
