@@ -19,8 +19,8 @@ import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 import org.opendaylight.restconf.openapi.model.ServersEntity;
 
 public final class ServersStream extends InputStream {
-    private ServersEntity entity;
-    private OpenApiBodyWriter writer;
+    private final ServersEntity entity;
+    private final OpenApiBodyWriter writer;
 
     private Reader reader;
 
