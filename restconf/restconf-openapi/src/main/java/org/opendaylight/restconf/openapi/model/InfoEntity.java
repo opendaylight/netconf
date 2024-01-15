@@ -15,7 +15,7 @@ public final class InfoEntity extends OpenApiEntity {
     private final String title;
     private static final String DESCRIPTION = """
         We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).
-        For operational data we only provide GET API.\n
+        For operational data we only provide GET API.
         For majority of request you can see only config data in examples. That's because we can show only one example
         per request. The exception when you can see operational data in example is when data are representing
         operational (config false) container with no config data in it.""";
