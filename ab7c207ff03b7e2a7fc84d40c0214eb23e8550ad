@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f036f3b3_baa45e90",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfTransaction.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-15T12:00:42Z",
+      "side": 1,
+      "message": "IMO we can get rid of overriding this. Everything we need in NetconfRestconfTransaction class is to call a parent method and cache entries into map.",
+      "revId": "ab7c207ff03b7e2a7fc84d40c0214eb23e8550ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b5460c9_47d75318",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/TransactionUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-15T12:00:42Z",
+      "side": 1,
+      "message": "I would propose:\n```\n        final var schema \u003d DataSchemaContextTree.from(modelContext).childByPath(path).dataSchemaNode();\n        final var isList \u003d schema instanceof ListSchemaNode;\n        final var isLeafList \u003d schema instanceof LeafListSchemaNode;\n        return isList || isLeafList;\n```",
+      "revId": "ab7c207ff03b7e2a7fc84d40c0214eb23e8550ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
