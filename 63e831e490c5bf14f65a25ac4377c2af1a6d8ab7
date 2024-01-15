@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d39f0d3_65375ea4",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/JaxRsNorthbound.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-15T15:42:30Z",
+      "side": 1,
+      "message": "something like this \n@Reference final OSGiNorthbound.Configuration conf\nshould be possible here instead of using ConfigurationAdmin\nyou can consider this solution",
+      "revId": "63e831e490c5bf14f65a25ac4377c2af1a6d8ab7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52cdcf1f_36527319",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/RestconfSchemaSourceUrlProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-15T15:42:30Z",
+      "side": 1,
+      "message": "something like this\n@Reference final OSGiNorthbound.Configuration conf\nshould be possible here instead of using ConfigurationAdmin\nyou can consider this solution",
+      "revId": "63e831e490c5bf14f65a25ac4377c2af1a6d8ab7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad4f8c56_386887d4",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/RestconfSchemaSourceUrlProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-15T15:42:30Z",
+      "side": 1,
+      "message": "imo you can use here @VisibleForTesting",
+      "revId": "63e831e490c5bf14f65a25ac4377c2af1a6d8ab7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
