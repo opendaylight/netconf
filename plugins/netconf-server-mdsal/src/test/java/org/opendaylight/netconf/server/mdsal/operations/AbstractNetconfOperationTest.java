@@ -50,7 +50,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -92,7 +92,7 @@ public abstract class AbstractNetconfOperationTest {
         final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
 
         currentSchemaContext = CurrentSchemaContext.create(schemaService,
-            sourceIdentifier -> Futures.immediateFuture(YangTextSchemaSource.delegateForCharSource(sourceIdentifier,
+            sourceIdentifier -> Futures.immediateFuture(new DelegatedYangTextSource(sourceIdentifier,
                 CharSource.wrap("module test"))));
 
         final var datastores = new EnumMap<LogicalDatastoreType, DOMStore>(LogicalDatastoreType.class);

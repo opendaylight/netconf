@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -52,6 +53,9 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     final boolean rollbackSupport;
     final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
     private final List<TxListener> listeners = new CopyOnWriteArrayList<>();
+    private final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
+    private final @NonNull FluentFuture<CommitInfo> completionFuture = FluentFuture.from(resultFuture);
+
     // Allow commit to be called only once
     volatile boolean finished = false;
     final boolean isLockAllowed;
@@ -75,6 +79,11 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     abstract void init();
 
     abstract void cleanup();
+
+    @Override
+    public final FluentFuture<?> completionFuture() {
+        return completionFuture;
+    }
 
     @Override
     public synchronized boolean cancel() {
@@ -145,8 +154,7 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     @Override
     // Non-final for testing
     public FluentFuture<? extends CommitInfo> commit() {
-        final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
-        Futures.addCallback(commitConfiguration(), new FutureCallback<RpcResult<Void>>() {
+        Futures.addCallback(commitConfiguration(), new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> result) {
                 if (!result.isSuccessful()) {
@@ -166,15 +174,15 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
             }
         }, MoreExecutors.directExecutor());
 
-        return FluentFuture.from(resultFuture);
+        return completionFuture;
     }
 
     final ListenableFuture<RpcResult<Void>> commitConfiguration() {
         listeners.forEach(listener -> listener.onTransactionSubmitted(this));
         checkNotFinished();
         finished = true;
-        final ListenableFuture<RpcResult<Void>> result = performCommit();
-        Futures.addCallback(result, new FutureCallback<RpcResult<Void>>() {
+        final var result = performCommit();
+        Futures.addCallback(result, new FutureCallback<>() {
             @Override
             public void onSuccess(final RpcResult<Void> rpcResult) {
                 if (rpcResult.isSuccessful()) {
@@ -210,7 +218,7 @@ abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     final ListenableFuture<RpcResult<Void>> resultsToTxStatus() {
         final var transformed = SettableFuture.<RpcResult<Void>>create();
 
-        Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<List<DOMRpcResult>>() {
+        Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<>() {
             @Override
             public void onSuccess(final List<DOMRpcResult> domRpcResults) {
                 if (!transformed.isDone()) {

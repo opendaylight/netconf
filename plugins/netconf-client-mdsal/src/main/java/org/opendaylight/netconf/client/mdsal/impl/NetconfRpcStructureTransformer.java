@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -57,23 +58,22 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     @Override
-    public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode> data,
-                                                         final YangInstanceIdentifier dataPath,
-                                                         final Optional<EffectiveOperation> operation) {
+    public AnyxmlNode<DOMSource> createEditConfigStructure(final Optional<NormalizedNode> data,
+            final YangInstanceIdentifier dataPath, final Optional<EffectiveOperation> operation) {
         // FIXME: propagate MountPointContext
-        return NetconfMessageTransformUtil.createEditConfigAnyxml(mountContext.getEffectiveModelContext(), dataPath,
-            operation, data);
+        return NetconfMessageTransformUtil.createEditConfigAnyxml(mountContext.modelContext(), dataPath, operation,
+            data);
     }
 
     @Override
     public AnyxmlNode<?> toFilterStructure(final YangInstanceIdentifier path) {
         // FIXME: propagate MountPointContext
-        return NetconfMessageTransformUtil.toFilterStructure(path, mountContext.getEffectiveModelContext());
+        return NetconfMessageTransformUtil.toFilterStructure(path, mountContext.modelContext());
     }
 
     @Override
     public AnyxmlNode<?> toFilterStructure(final List<FieldsFilter> fieldsFilters) {
         // FIXME: propagate MountPointContext
-        return NetconfMessageTransformUtil.toFilterStructure(fieldsFilters, mountContext.getEffectiveModelContext());
+        return NetconfMessageTransformUtil.toFilterStructure(fieldsFilters, mountContext.modelContext());
     }
 }
