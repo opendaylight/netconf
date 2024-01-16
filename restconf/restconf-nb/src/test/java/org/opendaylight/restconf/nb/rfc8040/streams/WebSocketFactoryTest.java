@@ -23,7 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -49,7 +49,7 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
     @Mock
     private DOMDataTreeWriteTransaction tx;
     @Mock
-    private DOMDataTreeChangeService changeService;
+    private DataTreeChangeExtension changeService;
     @Mock
     private DatabindProvider databindProvider;
     @Mock

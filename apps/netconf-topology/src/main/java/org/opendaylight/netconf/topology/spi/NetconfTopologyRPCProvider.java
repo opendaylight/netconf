@@ -15,7 +15,8 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -119,7 +120,6 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
         final SettableFuture<RpcResult<DeleteDeviceOutput>> rpcFuture = SettableFuture.create();
 
         wtx.commit().addCallback(new FutureCallback<CommitInfo>() {
-
             @Override
             public void onSuccess(final CommitInfo result) {
                 LOG.info("delete-device RPC: Removed netconf node successfully.");
@@ -147,10 +147,18 @@ public final class NetconfTopologyRPCProvider implements AutoCloseable {
     private Credentials translate(final RpcCredentials credentialsRpc) {
         if (credentialsRpc instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
+            final byte[] cipherBytes;
+
+            try {
+                cipherBytes = encryptionService.encrypt(loginPassword.getPassword().getBytes(StandardCharsets.UTF_8));
+            } catch (GeneralSecurityException e) {
+                throw new IllegalArgumentException("Failed to encrypt password", e);
+            }
+
             return new LoginPwBuilder()
                 .setLoginPassword(new LoginPasswordBuilder()
                     .setUsername(loginPassword.getUsername())
-                    .setPassword(Base64.getDecoder().decode(encryptionService.encrypt(loginPassword.getPassword())))
+                    .setPassword(cipherBytes)
                     .build())
                 .build();
         } else if (credentialsRpc instanceof LoginPwUnencrypted loginPwUnencrypted) {

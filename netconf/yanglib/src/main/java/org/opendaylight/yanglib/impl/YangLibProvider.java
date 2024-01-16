@@ -39,15 +39,15 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yanglib.api.YangLibService;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaListenerRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
@@ -91,14 +91,13 @@ public final class YangLibProvider implements YangLibService, SchemaSourceListen
     private static final Logger LOG = LoggerFactory.getLogger(YangLibProvider.class);
 
     private static final Predicate<PotentialSchemaSource<?>> YANG_SCHEMA_SOURCE =
-        input -> YangTextSchemaSource.class.isAssignableFrom(input.getRepresentation());
+        input -> YangTextSource.class.isAssignableFrom(input.getRepresentation());
 
     private final DataBroker dataBroker;
     private final String bindingAddress;
     private final Uint32 bindingPort;
     private final SharedSchemaRepository schemaRepository;
-
-    private final SchemaListenerRegistration schemaListenerRegistration;
+    private final Registration schemaListenerRegistration;
 
     @Inject
     @Activate
@@ -126,8 +125,7 @@ public final class YangLibProvider implements YangLibService, SchemaSourceListen
         checkArgument(cacheFolderFile.isDirectory(), "cache-folder %s is not a directory", cacheFolderFile);
 
         schemaRepository = new SharedSchemaRepository("yang-library", parserFactory);
-        final var cache = new FilesystemSchemaSourceCache<>(schemaRepository, YangTextSchemaSource.class,
-            cacheFolderFile);
+        final var cache = new FilesystemSchemaSourceCache<>(schemaRepository, YangTextSource.class, cacheFolderFile);
         schemaRepository.registerSchemaSourceListener(cache);
 
         schemaListenerRegistration = schemaRepository.registerSchemaSourceListener(this);
@@ -143,7 +141,7 @@ public final class YangLibProvider implements YangLibService, SchemaSourceListen
     }
 
     @Override
-    public void schemaSourceEncountered(final SchemaSourceRepresentation source) {
+    public void schemaSourceEncountered(final SourceRepresentation source) {
         // NOOP
     }
 
@@ -226,7 +224,7 @@ public final class YangLibProvider implements YangLibService, SchemaSourceListen
 
     private String getYangModel(final String name, final String revision) {
         final var sourceId = new SourceIdentifier(name, revision);
-        final var yangTextSchemaFuture = schemaRepository.getSchemaSource(sourceId, YangTextSchemaSource.class);
+        final var yangTextSchemaFuture = schemaRepository.getSchemaSource(sourceId, YangTextSource.class);
         try {
             final var yangTextSchemaSource = yangTextSchemaFuture.get();
             return yangTextSchemaSource.read();

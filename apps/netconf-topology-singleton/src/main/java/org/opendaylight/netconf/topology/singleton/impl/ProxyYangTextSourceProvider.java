@@ -16,7 +16,7 @@ import java.util.Set;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSourceRequest;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
 

@@ -66,17 +66,17 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyRe
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 
 public class NetconfNodeActor extends AbstractUntypedActor {
@@ -96,7 +96,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private NetconfDataTreeService netconfService;
     //readTxActor can be shared
     private ActorRef readTxActor;
-    private List<SchemaSourceRegistration<YangTextSchemaSource>> registeredSchemas;
+    private List<Registration> registeredSchemas;
 
     public static Props props(final NetconfTopologySetup setup, final RemoteDeviceId id,
             final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
@@ -213,26 +213,24 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     }
 
     private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
-        final ListenableFuture<YangTextSchemaSource> schemaSourceFuture =
-                schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
-
-        Futures.addCallback(schemaSourceFuture, new FutureCallback<YangTextSchemaSource>() {
-            @Override
-            public void onSuccess(final YangTextSchemaSource yangTextSchemaSource) {
-                try {
-                    LOG.debug("{}: getSchemaSource for {} succeeded", id, sourceIdentifier);
-                    sender.tell(new YangTextSchemaSourceSerializationProxy(yangTextSchemaSource), getSelf());
-                } catch (IOException e) {
-                    sender.tell(new Failure(e), getSelf());
+        Futures.addCallback(schemaRepository.getSchemaSource(sourceIdentifier, YangTextSource.class),
+            new FutureCallback<>() {
+                @Override
+                public void onSuccess(final YangTextSource yangTextSchemaSource) {
+                    try {
+                        LOG.debug("{}: getSchemaSource for {} succeeded", id, sourceIdentifier);
+                        sender.tell(new YangTextSchemaSourceSerializationProxy(yangTextSchemaSource), getSelf());
+                    } catch (IOException e) {
+                        sender.tell(new Failure(e), getSelf());
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(final Throwable throwable) {
-                LOG.debug("{}: getSchemaSource for {} failed", id, sourceIdentifier, throwable);
-                sender.tell(new Failure(throwable), getSelf());
-            }
-        }, MoreExecutors.directExecutor());
+                @Override
+                public void onFailure(final Throwable throwable) {
+                    LOG.debug("{}: getSchemaSource for {} failed", id, sourceIdentifier, throwable);
+                    sender.tell(new Failure(throwable), getSelf());
+                }
+            }, MoreExecutors.directExecutor());
     }
 
     private void invokeSlaveRpc(final QName qname, final NormalizedNodeMessage normalizedNodeMessage,
@@ -322,7 +320,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         registeredSchemas = sourceIdentifiers.stream()
                 .map(sourceId ->
                         schemaRegistry.registerSchemaSource(remoteProvider, PotentialSchemaSource.create(sourceId,
-                                YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())))
+                                YangTextSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())))
                 .collect(Collectors.toList());
 
         return schemaRepository.createEffectiveModelContextFactory();
@@ -330,17 +328,16 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
     private void resolveSchemaContext(final EffectiveModelContextFactory schemaContextFactory,
             final SlaveSalFacade localSlaveSalManager, final ActorRef masterReference, final int tries) {
-        final ListenableFuture<EffectiveModelContext> schemaContextFuture =
-                schemaContextFactory.createEffectiveModelContext(sourceIdentifiers);
-        Futures.addCallback(schemaContextFuture, new FutureCallback<EffectiveModelContext>() {
+        final var schemaContextFuture = schemaContextFactory.createEffectiveModelContext(sourceIdentifiers);
+        Futures.addCallback(schemaContextFuture, new FutureCallback<>() {
             @Override
             public void onSuccess(final EffectiveModelContext result) {
                 executeInSelf(() -> {
                     // Make sure the slaveSalManager instance hasn't changed since we initiated the schema context
                     // resolution.
                     if (slaveSalManager == localSlaveSalManager) {
-                        LOG.info("{}: Schema context resolved: {} - registering slave mount point",
-                                id, result.getModules());
+                        LOG.info("{}: Schema context resolved: {} - registering slave mount point", id,
+                            result.getModules());
                         final var actorSystem = setup.getActorSystem();
                         slaveSalManager.registerSlaveMountPoint(result, masterReference, new RemoteDeviceServices(
                             new ProxyDOMRpcService(actorSystem, masterReference, id, actorResponseWaitTime),
@@ -374,7 +371,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
     private void closeSchemaSourceRegistrations() {
         if (registeredSchemas != null) {
-            registeredSchemas.forEach(SchemaSourceRegistration::close);
+            registeredSchemas.forEach(Registration::close);
             registeredSchemas = null;
         }
     }

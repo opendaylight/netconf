@@ -9,11 +9,9 @@ package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMExtensibleService;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMService;
-import org.opendaylight.mdsal.dom.api.DOMServiceExtension;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.CancelCommit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.CloseSession;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
@@ -36,7 +34,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
  * A {@link DOMService} capturing the ability to invoke NETCONF RPCs through
  * {@link #invokeNetconf(QName, ContainerNode)}.
  */
-public interface NetconfRpcService extends DOMExtensibleService<NetconfRpcService, NetconfRpcService.Extension> {
+public interface NetconfRpcService extends DOMService<NetconfRpcService, NetconfRpcService.Extension> {
     /**
      * Invoke a well-known RPC. This method is guaranteed to support the following RPCs:
      * <ul>
@@ -65,7 +63,7 @@ public interface NetconfRpcService extends DOMExtensibleService<NetconfRpcServic
      * Extensions to {@link NetconfRpcService} defining additional RPC availability.
      */
     // Note: This is not an interface on purpose, to make the set of extensions well-known
-    enum Extension implements DOMServiceExtension<NetconfRpcService, Extension> {
+    enum Extension implements DOMService.Extension<NetconfRpcService, Extension> {
         /**
          * This device supports
          * <a href="https://www.rfc-editor.org/rfc/rfc4741#section-8.3">Candidate Configuration Capability</a>.
