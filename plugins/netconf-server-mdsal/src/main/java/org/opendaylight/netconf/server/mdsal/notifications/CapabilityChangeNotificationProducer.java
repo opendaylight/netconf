@@ -9,10 +9,9 @@ package org.opendaylight.netconf.server.mdsal.notifications;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -25,7 +24,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.osgi.service.component.annotations.Activate;
@@ -43,15 +42,15 @@ public final class CapabilityChangeNotificationProducer implements DataTreeChang
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityChangeNotificationProducer.class);
 
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
-    private final ListenerRegistration<?> capabilityChangeListenerRegistration;
+    private final Registration capabilityChangeListenerRegistration;
 
     @Activate
     public CapabilityChangeNotificationProducer(
             @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
         baseNotificationPublisherRegistration = notifManager.registerBaseNotificationPublisher();
-        capabilityChangeListenerRegistration = dataBroker.registerDataTreeChangeListener(
-                DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL,
+        capabilityChangeListenerRegistration = dataBroker.registerTreeChangeListener(
+                DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL,
                     InstanceIdentifier.builder(NetconfState.class).child(Capabilities.class).build()), this);
     }
 
@@ -67,14 +66,14 @@ public final class CapabilityChangeNotificationProducer implements DataTreeChang
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeModification<Capabilities>> changes) {
-        for (DataTreeModification<Capabilities> change : changes) {
-            final DataObjectModification<Capabilities> rootNode = change.getRootNode();
-            final DataObjectModification.ModificationType modificationType = rootNode.getModificationType();
+    public void onDataTreeChanged(final List<DataTreeModification<Capabilities>> changes) {
+        for (var change : changes) {
+            final var rootNode = change.getRootNode();
+            final var modificationType = rootNode.modificationType();
             switch (modificationType) {
                 case WRITE: {
-                    final Capabilities dataAfter = rootNode.getDataAfter();
-                    final Capabilities dataBefore = rootNode.getDataBefore();
+                    final Capabilities dataAfter = rootNode.dataAfter();
+                    final Capabilities dataBefore = rootNode.dataBefore();
                     final Set<Uri> before = dataBefore != null ? ImmutableSet.copyOf(dataBefore.getCapability())
                         : Set.of();
                     final Set<Uri> after = dataAfter != null ? ImmutableSet.copyOf(dataAfter.getCapability())
@@ -85,7 +84,7 @@ public final class CapabilityChangeNotificationProducer implements DataTreeChang
                     break;
                 }
                 case DELETE: {
-                    final Capabilities dataBeforeDelete = rootNode.getDataBefore();
+                    final Capabilities dataBeforeDelete = rootNode.dataBefore();
                     if (dataBeforeDelete != null) {
                         final Set<Uri> removed = ImmutableSet.copyOf(dataBeforeDelete.getCapability());
                         publishNotification(Set.of(), removed);

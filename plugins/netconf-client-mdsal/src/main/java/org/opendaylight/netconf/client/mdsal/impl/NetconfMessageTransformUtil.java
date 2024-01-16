@@ -296,9 +296,9 @@ public final class NetconfMessageTransformUtil {
      * @param lastChildOverride Optional of {@code NormalizedNode} data on which action will be invoked
      * @return {@link DOMSourceAnyxmlNode} containing edit-config structure
      */
-    public static DOMSourceAnyxmlNode createEditConfigAnyxml(
-            final EffectiveModelContext ctx, final YangInstanceIdentifier dataPath,
-            final Optional<EffectiveOperation> operation, final Optional<NormalizedNode> lastChildOverride) {
+    public static AnyxmlNode<DOMSource> createEditConfigAnyxml(final EffectiveModelContext ctx,
+            final YangInstanceIdentifier dataPath, final Optional<EffectiveOperation> operation,
+            final Optional<NormalizedNode> lastChildOverride) {
         if (dataPath.isEmpty()) {
             final var override = lastChildOverride.orElseThrow(() -> new IllegalArgumentException(
                 "Data has to be present when creating structure for top level element"));

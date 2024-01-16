@@ -13,6 +13,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.util.concurrent.FutureCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,15 +25,15 @@ import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainClosedException;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.Empty;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class TxChainTest {
     @Mock
     private DOMDataBroker broker;
     @Mock
-    private DOMTransactionChainListener listener;
+    private FutureCallback<Empty> listener;
     @Mock
     private DOMDataTreeReadTransaction readOnlyTx;
     @Mock
@@ -59,7 +60,8 @@ public class TxChainTest {
         when(writeOnlyTx1.addListener(any())).thenReturn(registration1);
         when(writeOnlyTx2.addListener(any())).thenReturn(registration2);
         when(writeOnlyTx3.addListener(any())).thenReturn(registration3);
-        chain = new TxChain(broker, listener);
+        chain = new TxChain(broker);
+        chain.addCallback(listener);
     }
 
     @Test
@@ -107,7 +109,7 @@ public class TxChainTest {
     @Test
     public void testCloseAfterFinished() {
         chain.close();
-        verify(listener).onTransactionChainSuccessful(chain);
+        verify(listener).onSuccess(Empty.value());
         assertThrows(DOMTransactionChainClosedException.class, chain::newReadOnlyTransaction);
     }
 
@@ -119,7 +121,7 @@ public class TxChainTest {
         final TransactionCommitFailedException cause = new TransactionCommitFailedException("fail");
         captor.getValue().onTransactionFailed(writeOnlyTx1, cause);
         verify(registration1).close();
-        verify(listener).onTransactionChainFailed(chain, writeOnlyTx1, cause);
+        verify(listener).onFailure(cause);
     }
 
     @Test
@@ -130,7 +132,7 @@ public class TxChainTest {
         writeTx.commit();
         captor.getValue().onTransactionSuccessful(writeOnlyTx1);
         verify(registration1).close();
-        verify(listener).onTransactionChainSuccessful(chain);
+        verify(listener).onSuccess(Empty.value());
     }
 
     @Test
@@ -146,7 +148,7 @@ public class TxChainTest {
     public void testMultiplePendingTransactions() {
         //create 1st tx
         final AbstractWriteTx writeTx1 = chain.newWriteOnlyTransaction();
-        final ArgumentCaptor<TxListener> captor1 = ArgumentCaptor.forClass(TxListener.class);
+        final var captor1 = ArgumentCaptor.forClass(TxListener.class);
         verify(writeOnlyTx1).addListener(captor1.capture());
         //submit 1st tx
         writeTx1.commit();
@@ -154,7 +156,7 @@ public class TxChainTest {
 
         //create 2nd tx
         final AbstractWriteTx writeTx2 = chain.newWriteOnlyTransaction();
-        final ArgumentCaptor<TxListener> captor2 = ArgumentCaptor.forClass(TxListener.class);
+        final var captor2 = ArgumentCaptor.forClass(TxListener.class);
         verify(writeTx2).addListener(captor2.capture());
         //submit 2nd tx
         writeTx2.commit();
@@ -162,7 +164,7 @@ public class TxChainTest {
 
         //create 3rd tx
         final AbstractWriteTx writeTx3 = chain.newWriteOnlyTransaction();
-        final ArgumentCaptor<TxListener> captor3 = ArgumentCaptor.forClass(TxListener.class);
+        final var captor3 = ArgumentCaptor.forClass(TxListener.class);
         verify(writeTx3).addListener(captor3.capture());
         //cancel 3rd tx
         writeTx3.cancel();
@@ -178,14 +180,14 @@ public class TxChainTest {
         verify(registration1).close();
         verify(registration2).close();
         verify(registration3).close();
-        verify(listener).onTransactionChainSuccessful(chain);
+        verify(listener).onSuccess(Empty.value());
     }
 
     @Test
     public void testMultiplePendingTransactionsFail() {
         //create 1st tx
         final AbstractWriteTx writeTx1 = chain.newWriteOnlyTransaction();
-        final ArgumentCaptor<TxListener> captor1 = ArgumentCaptor.forClass(TxListener.class);
+        final var captor1 = ArgumentCaptor.forClass(TxListener.class);
         verify(writeOnlyTx1).addListener(captor1.capture());
         //submit 1st tx
         writeTx1.commit();
@@ -193,7 +195,7 @@ public class TxChainTest {
 
         //create 2nd tx
         final AbstractWriteTx writeTx2 = chain.newWriteOnlyTransaction();
-        final ArgumentCaptor<TxListener> captor2 = ArgumentCaptor.forClass(TxListener.class);
+        final var captor2 = ArgumentCaptor.forClass(TxListener.class);
         verify(writeTx2).addListener(captor2.capture());
         //submit 2nd tx
         writeTx2.commit();
@@ -201,7 +203,7 @@ public class TxChainTest {
 
         //create 3rd tx
         final AbstractWriteTx writeTx3 = chain.newWriteOnlyTransaction();
-        final ArgumentCaptor<TxListener> captor3 = ArgumentCaptor.forClass(TxListener.class);
+        final var captor3 = ArgumentCaptor.forClass(TxListener.class);
         verify(writeTx3).addListener(captor3.capture());
 
         chain.close();
@@ -218,8 +220,8 @@ public class TxChainTest {
         verify(registration1).close();
         verify(registration2).close();
         verify(registration3).close();
-        verify(listener).onTransactionChainFailed(chain, writeOnlyTx1, cause1);
+        verify(listener).onFailure(cause1);
         // 1 transaction failed, onTransactionChainSuccessful must not be called
-        verify(listener, never()).onTransactionChainSuccessful(chain);
+        verify(listener, never()).onSuccess(any());
     }
 }
