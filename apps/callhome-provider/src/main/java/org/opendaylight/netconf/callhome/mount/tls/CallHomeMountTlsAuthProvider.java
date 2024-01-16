@@ -18,7 +18,7 @@ import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Base64;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,7 +70,7 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
     public CallHomeMountTlsAuthProvider(
             final @Reference SslHandlerFactoryProvider sslHandlerFactoryProvider,
             final @Reference DataBroker dataBroker) {
-        this.sslHandlerFactory = sslHandlerFactoryProvider.getSslHandlerFactory(null);
+        sslHandlerFactory = sslHandlerFactoryProvider.getSslHandlerFactory(null);
         allowedDevicesReg = dataBroker.registerDataTreeChangeListener(
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                 InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class)),
@@ -120,23 +120,24 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
 
     private final class CertificatesMonitor implements ClusteredDataTreeChangeListener<Keystore> {
         @Override
-        public void onDataTreeChanged(@NonNull final Collection<DataTreeModification<Keystore>> changes) {
-            changes.stream().map(DataTreeModification::getRootNode)
-                .flatMap(v -> v.getModifiedChildren().stream())
-                .filter(v -> v.getDataType().equals(TrustedCertificate.class))
+        public void onDataTreeChanged(@NonNull final List<DataTreeModification<Keystore>> changes) {
+            changes.stream()
+                .map(DataTreeModification::getRootNode)
+                .flatMap(v -> v.modifiedChildren().stream())
+                .filter(v -> v.dataType().equals(TrustedCertificate.class))
                 .map(v -> (DataObjectModification<TrustedCertificate>) v)
                 .forEach(this::updateCertificate);
         }
 
         private void updateCertificate(final DataObjectModification<TrustedCertificate> change) {
-            switch (change.getModificationType()) {
+            switch (change.modificationType()) {
                 case DELETE:
-                    deleteCertificate(change.getDataBefore());
+                    deleteCertificate(change.dataBefore());
                     break;
                 case SUBTREE_MODIFIED:
                 case WRITE:
-                    deleteCertificate(change.getDataBefore());
-                    writeCertificate(change.getDataAfter());
+                    deleteCertificate(change.dataBefore());
+                    writeCertificate(change.dataAfter());
                     break;
                 default:
                     break;
@@ -173,17 +174,17 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
 
     private final class AllowedDevicesMonitor implements ClusteredDataTreeChangeListener<Device> {
         @Override
-        public void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
-            for (final DataTreeModification<Device> dataTreeModification : mods) {
-                final DataObjectModification<Device> deviceMod = dataTreeModification.getRootNode();
-                switch (deviceMod.getModificationType()) {
+        public void onDataTreeChanged(final List<DataTreeModification<Device>> mods) {
+            for (var dataTreeModification : mods) {
+                final var deviceMod = dataTreeModification.getRootNode();
+                switch (deviceMod.modificationType()) {
                     case DELETE:
-                        deleteDevice(deviceMod.getDataBefore());
+                        deleteDevice(deviceMod.dataBefore());
                         break;
                     case SUBTREE_MODIFIED:
                     case WRITE:
-                        deleteDevice(deviceMod.getDataBefore());
-                        writeDevice(deviceMod.getDataAfter());
+                        deleteDevice(deviceMod.dataBefore());
+                        writeDevice(deviceMod.dataAfter());
                         break;
                     default:
                         break;

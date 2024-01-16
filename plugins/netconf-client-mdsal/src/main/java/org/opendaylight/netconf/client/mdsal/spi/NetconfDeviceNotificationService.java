@@ -20,9 +20,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
@@ -48,16 +46,13 @@ public final class NetconfDeviceNotificationService implements DOMNotificationSe
     }
 
     @Override
-    public <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(final T listener,
+    public Registration registerNotificationListener(final DOMNotificationListener listener,
             final Collection<Absolute> types) {
         final var lsnr = requireNonNull(listener);
         final var typesArray = types.stream().map(Objects::requireNonNull).distinct().toArray(Absolute[]::new);
         return switch (typesArray.length) {
-            case 0 -> new AbstractListenerRegistration<>(lsnr) {
-                @Override
-                protected void removeRegistration() {
-                    // No-op
-                }
+            case 0 -> () -> {
+                // No-op
             };
             case 1 -> registerOne(lsnr, typesArray[0]);
             default -> registerMultiple(lsnr, typesArray);
@@ -65,8 +60,7 @@ public final class NetconfDeviceNotificationService implements DOMNotificationSe
     }
 
     @Override
-    public <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(final T listener,
-            final Absolute... types) {
+    public Registration registerNotificationListener(final DOMNotificationListener listener, final Absolute... types) {
         return registerNotificationListener(listener, Arrays.asList(types));
     }
 
@@ -90,30 +84,30 @@ public final class NetconfDeviceNotificationService implements DOMNotificationSe
         return listeners.size();
     }
 
-    private synchronized <T extends DOMNotificationListener> @NonNull ListenerRegistration<T> registerOne(
-            final @NonNull T listener, final Absolute type) {
+    private synchronized @NonNull Registration registerOne(final @NonNull DOMNotificationListener listener,
+            final Absolute type) {
         listeners.put(type, listener);
-        return new AbstractListenerRegistration<>(listener) {
+        return new AbstractRegistration() {
             @Override
             protected void removeRegistration() {
                 synchronized (NetconfDeviceNotificationService.this) {
-                    listeners.remove(type, getInstance());
+                    listeners.remove(type, listener);
                 }
             }
         };
     }
 
-    private synchronized <T extends DOMNotificationListener> @NonNull ListenerRegistration<T> registerMultiple(
-            final @NonNull T listener, final Absolute[] types) {
+    private synchronized @NonNull Registration registerMultiple(final @NonNull DOMNotificationListener listener,
+            final Absolute[] types) {
         for (var type : types) {
             listeners.put(type, listener);
         }
-        return new AbstractListenerRegistration<>(listener) {
+        return new AbstractRegistration() {
             @Override
             protected void removeRegistration() {
                 synchronized (NetconfDeviceNotificationService.this) {
                     for (var type : types) {
-                        listeners.remove(type, getInstance());
+                        listeners.remove(type, listener);
                     }
                 }
             }

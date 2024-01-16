@@ -87,10 +87,11 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 
@@ -153,9 +154,9 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         SOURCE_IDENTIFIERS.stream().map(
             sourceId -> masterSchemaRepository.registerSchemaSource(
-                id -> Futures.immediateFuture(YangTextSchemaSource.delegateForCharSource(id,
+                id -> Futures.immediateFuture(new DelegatedYangTextSource(id,
                         CharSource.wrap(yangTemplate.replaceAll("ID", id.name().getLocalName())))),
-                PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class, 1)))
+                PotentialSchemaSource.create(sourceId, YangTextSource.class, 1)))
         .collect(Collectors.toList());
 
         NetconfTopologySetup masterSetup = NetconfTopologySetup.builder()
@@ -218,12 +219,12 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNode).build();
 
         DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
-        doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).getIdentifier();
-        doReturn(WRITE).when(mockDataObjModification).getModificationType();
-        doReturn(node).when(mockDataObjModification).getDataAfter();
+        doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).step();
+        doReturn(WRITE).when(mockDataObjModification).modificationType();
+        doReturn(node).when(mockDataObjModification).dataAfter();
 
         netconfNodeManager.onDataTreeChanged(List.of(
-                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.of(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointBuilder, timeout(5000)).register();
@@ -234,10 +235,10 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         // Notify that the NetconfNode operational state was deleted. Expect the slave mount point closed.
 
-        doReturn(DELETE).when(mockDataObjModification).getModificationType();
+        doReturn(DELETE).when(mockDataObjModification).modificationType();
 
         netconfNodeManager.onDataTreeChanged(List.of(
-                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.of(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointReg, timeout(5000)).close();
@@ -246,12 +247,12 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         setupMountPointMocks();
 
-        doReturn(WRITE).when(mockDataObjModification).getModificationType();
-        doReturn(null).when(mockDataObjModification).getDataBefore();
-        doReturn(node).when(mockDataObjModification).getDataAfter();
+        doReturn(WRITE).when(mockDataObjModification).modificationType();
+        doReturn(null).when(mockDataObjModification).dataBefore();
+        doReturn(node).when(mockDataObjModification).dataAfter();
 
         netconfNodeManager.onDataTreeChanged(List.of(
-                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.of(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointBuilder, timeout(5000)).register();
@@ -261,10 +262,10 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
         setupMountPointMocks();
 
-        doReturn(node).when(mockDataObjModification).getDataBefore();
+        doReturn(node).when(mockDataObjModification).dataBefore();
 
         netconfNodeManager.onDataTreeChanged(List.of(
-                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.of(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointReg, timeout(5000)).close();
@@ -282,12 +283,12 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                     .build())
                 .build();
 
-        doReturn(SUBTREE_MODIFIED).when(mockDataObjModification).getModificationType();
-        doReturn(node).when(mockDataObjModification).getDataBefore();
-        doReturn(updatedNode).when(mockDataObjModification).getDataAfter();
+        doReturn(SUBTREE_MODIFIED).when(mockDataObjModification).modificationType();
+        doReturn(node).when(mockDataObjModification).dataBefore();
+        doReturn(updatedNode).when(mockDataObjModification).dataAfter();
 
         netconfNodeManager.onDataTreeChanged(List.of(
-                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.of(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointReg, timeout(5000)).close();
@@ -310,14 +311,14 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNode).build();
 
         DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
-        doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).getIdentifier();
-        doReturn(WRITE).when(mockDataObjModification).getModificationType();
-        doReturn(node).when(mockDataObjModification).getDataAfter();
+        doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).step();
+        doReturn(WRITE).when(mockDataObjModification).modificationType();
+        doReturn(node).when(mockDataObjModification).dataAfter();
 
         // First try the registration where the perceived master hasn't been initialized as the master.
 
         netconfNodeManager.onDataTreeChanged(List.of(
-                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.of(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointBuilder, after(1000).never()).register();
@@ -332,7 +333,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 yangTextSchemaSourceRequestFuture);
 
         netconfNodeManager.onDataTreeChanged(List.of(
-                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.of(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         yangTextSchemaSourceRequestFuture.get(5, TimeUnit.SECONDS);
@@ -348,7 +349,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 askForMasterMountPointFuture);
 
         netconfNodeManager.onDataTreeChanged(List.of(
-                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.of(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         askForMasterMountPointFuture.get(5, TimeUnit.SECONDS);

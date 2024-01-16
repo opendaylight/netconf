@@ -12,13 +12,16 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableMap;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import org.junit.Test;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
+import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint64;
+import org.opendaylight.yangtools.yang.common.Uint8;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -55,12 +58,12 @@ public class Bug8084 {
                 .put(QName.create(BASE, "id3"), Short.valueOf("-30000"))
                 .put(QName.create(BASE, "id4"), Integer.valueOf("-2000000000"))
                 .put(QName.create(BASE, "id5"), Long.valueOf("-2000000000000000"))
-                .put(QName.create(BASE, "id6"), Short.valueOf("9"))
-                .put(QName.create(BASE, "id7"), Integer.valueOf("30000"))
-                .put(QName.create(BASE, "id8"), Long.valueOf("2000000000"))
-                .put(QName.create(BASE, "id9"), BigInteger.valueOf(Long.parseLong("2000000000000000")))
+                .put(QName.create(BASE, "id6"), Uint8.valueOf(9))
+                .put(QName.create(BASE, "id7"), Uint16.valueOf(30000))
+                .put(QName.create(BASE, "id8"), Uint32.valueOf(2000000000))
+                .put(QName.create(BASE, "id9"), Uint64.valueOf(2000000000000000L))
                 .put(QName.create(BASE, "id10"), true)
-                .put(QName.create(BASE, "id11"), BigDecimal.valueOf(128.55))
+                .put(QName.create(BASE, "id11"), Decimal64.valueOf("128.55"))
                 .put(id12, idExpected)
                 .put(QName.create(BASE, "id13"),
                     QName.create("urn:opendaylight:mdsal:mapping:test", "2015-02-26", "foo"))

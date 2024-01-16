@@ -23,8 +23,8 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.PreDestroy;
@@ -232,7 +232,7 @@ public final class DefaultSslHandlerFactoryProvider
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeModification<Keystore>> changes) {
+    public void onDataTreeChanged(final List<DataTreeModification<Keystore>> changes) {
         LOG.debug("Starting update with {} changes", changes.size());
         final var builder = state.newBuilder();
         onDataTreeChanged(builder, changes);
@@ -241,15 +241,15 @@ public final class DefaultSslHandlerFactoryProvider
     }
 
     private static void onDataTreeChanged(final StateBuilder builder,
-            final Collection<DataTreeModification<Keystore>> changes) {
+            final List<DataTreeModification<Keystore>> changes) {
         for (var change : changes) {
             LOG.debug("Processing change {}", change);
             final var rootNode = change.getRootNode();
 
-            for (var changedChild : rootNode.getModifiedChildren()) {
-                if (changedChild.getDataType().equals(PrivateKey.class)) {
+            for (var changedChild : rootNode.modifiedChildren()) {
+                if (changedChild.dataType().equals(PrivateKey.class)) {
                     onPrivateKeyChanged(builder.privateKeys, (DataObjectModification<PrivateKey>)changedChild);
-                } else if (changedChild.getDataType().equals(TrustedCertificate.class)) {
+                } else if (changedChild.dataType().equals(TrustedCertificate.class)) {
                     onTrustedCertificateChanged(builder.trustedCertificates,
                         (DataObjectModification<TrustedCertificate>)changedChild);
                 }
@@ -259,14 +259,14 @@ public final class DefaultSslHandlerFactoryProvider
 
     private static void onPrivateKeyChanged(final HashMap<String, PrivateKey> privateKeys,
             final DataObjectModification<PrivateKey> objectModification) {
-        switch (objectModification.getModificationType()) {
+        switch (objectModification.modificationType()) {
             case SUBTREE_MODIFIED:
             case WRITE:
-                final var privateKey = objectModification.getDataAfter();
+                final var privateKey = objectModification.dataAfter();
                 privateKeys.put(privateKey.getName(), privateKey);
                 break;
             case DELETE:
-                privateKeys.remove(objectModification.getDataBefore().getName());
+                privateKeys.remove(objectModification.dataBefore().getName());
                 break;
             default:
                 break;
@@ -275,14 +275,14 @@ public final class DefaultSslHandlerFactoryProvider
 
     private static void onTrustedCertificateChanged(final HashMap<String, TrustedCertificate> trustedCertificates,
             final DataObjectModification<TrustedCertificate> objectModification) {
-        switch (objectModification.getModificationType()) {
+        switch (objectModification.modificationType()) {
             case SUBTREE_MODIFIED:
             case WRITE:
-                final var trustedCertificate = objectModification.getDataAfter();
+                final var trustedCertificate = objectModification.dataAfter();
                 trustedCertificates.put(trustedCertificate.getName(), trustedCertificate);
                 break;
             case DELETE:
-                trustedCertificates.remove(objectModification.getDataBefore().getName());
+                trustedCertificates.remove(objectModification.dataBefore().getName());
                 break;
             default:
                 break;

@@ -65,7 +65,7 @@ public final class XmlChildBody extends ChildBody {
 
         final DataSchemaNode parentNode;
         if (pathInference.isEmpty()) {
-            parentNode = pathInference.getEffectiveModelContext();
+            parentNode = pathInference.modelContext();
         } else {
             final var hackStack = pathInference.toSchemaInferenceStack();
             final var hackStmt = hackStack.currentStatement();
@@ -79,7 +79,7 @@ public final class XmlChildBody extends ChildBody {
         var schemaNode = parentNode;
         final String docRootElm = doc.getDocumentElement().getLocalName();
         final XMLNamespace docRootNamespace = XMLNamespace.of(doc.getDocumentElement().getNamespaceURI());
-        final var context = pathInference.getEffectiveModelContext();
+        final var context = pathInference.modelContext();
         final var it = context.findModuleStatements(docRootNamespace).iterator();
         checkState(it.hasNext(), "Failed to find module for %s", docRootNamespace);
         final var qname = QName.create(it.next().localQNameModule(), docRootElm);

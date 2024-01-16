@@ -35,7 +35,7 @@ import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterA
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,8 +154,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
             actorResponseWaitTime);
         final NetconfDataTreeService proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
-        mount.onDeviceConnected(mountContext.getEffectiveModelContext(), deviceServices,
-            proxyDataBroker, proxyNetconfService);
+        mount.onDeviceConnected(mountContext.modelContext(), deviceServices, proxyDataBroker, proxyNetconfService);
     }
 
     protected DOMDataBroker newDeviceDataBroker(final MountPointContext mountContext,
@@ -170,7 +169,7 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
 
     private Future<Object> sendInitialDataToActor() {
         final List<SourceIdentifier> sourceIdentifiers = List.copyOf(SchemaContextUtil.getConstituentModuleIdentifiers(
-            currentSchema.mountContext().getEffectiveModelContext()));
+            currentSchema.mountContext().modelContext()));
 
         LOG.debug("{}: Sending CreateInitialMasterActorData with sourceIdentifiers {} to {}", id, sourceIdentifiers,
             masterActorRef);

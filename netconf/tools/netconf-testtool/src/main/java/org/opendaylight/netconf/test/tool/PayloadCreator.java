@@ -14,11 +14,11 @@ import java.util.List;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencrypted;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeFields;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.svc.v1.urn.opendaylight.netconf.node.topology.rev231121.YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 final class PayloadCreator {
     private static final Logger LOG = LoggerFactory.getLogger(PayloadCreator.class);
     private static final EffectiveModelContext NETWORK_TOPOLOGY_SCHEMA_CONTEXT =
-        BindingRuntimeHelpers.createEffectiveModel(List.of($YangModuleInfoImpl.getInstance()));
+        BindingRuntimeHelpers.createEffectiveModel(List.of(YangModuleInfoImpl.getInstance()));
     private static final JSONCodecFactory NETWORK_TOPOLOGY_JSON_CODEC_FACTORY =
         JSONCodecFactorySupplier.RFC7951.getShared(NETWORK_TOPOLOGY_SCHEMA_CONTEXT);
 

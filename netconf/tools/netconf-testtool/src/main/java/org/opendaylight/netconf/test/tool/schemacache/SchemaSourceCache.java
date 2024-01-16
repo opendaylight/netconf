@@ -17,21 +17,20 @@ import java.util.stream.Collectors;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.AbstractSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource.Costs;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
+import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Cache implementation that stores schemas in form of files under provided folder.
  */
-public final class SchemaSourceCache<T extends SchemaSourceRepresentation> extends AbstractSchemaSourceCache<T> {
-
+public final class SchemaSourceCache<T extends SourceRepresentation> extends AbstractSchemaSourceCache<T> {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaSourceCache.class);
 
     private final Class<T> representation;
@@ -98,17 +97,17 @@ public final class SchemaSourceCache<T extends SchemaSourceRepresentation> exten
     public synchronized ListenableFuture<? extends T> getSource(final SourceIdentifier sourceIdentifier) {
         final YangModuleInfo yangModuleInfo = cachedSchemas.get(sourceIdentifier);
         if (yangModuleInfo != null) {
-            final YangTextSchemaSource yangTextSchemaSource = YangTextSchemaSource.delegateForCharSource(
-                    sourceIdentifier, yangModuleInfo.getYangTextCharSource());
+            final var yangTextSchemaSource = new DelegatedYangTextSource(sourceIdentifier,
+                yangModuleInfo.getYangTextCharSource());
             return Futures.immediateFuture(representation.cast(yangTextSchemaSource));
         }
 
         LOG.debug("Source {} not found in cache", sourceIdentifier);
-        return Futures.immediateFailedFuture(new MissingSchemaSourceException("Source not found", sourceIdentifier));
+        return Futures.immediateFailedFuture(new MissingSchemaSourceException(sourceIdentifier, "Source not found"));
     }
 
     @Override
     protected synchronized void offer(final T source) {
-        LOG.trace("Source {} offered to cache", source.getIdentifier());
+        LOG.trace("Source {} offered to cache", source.sourceId());
     }
 }

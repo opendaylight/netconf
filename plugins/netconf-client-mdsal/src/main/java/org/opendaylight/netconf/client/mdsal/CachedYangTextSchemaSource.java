@@ -12,30 +12,27 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 
 /**
- * A {@link YangTextSchemaSource} cached from a remote service.
+ * A {@link YangTextSource} cached from a remote service.
  */
-public final class CachedYangTextSchemaSource extends YangTextSchemaSource {
-    private final RemoteDeviceId id;
-    private final String schemaString;
-    private final String symbolicName;
+// FIXME: subclass StringYangTextSource and cleanup addToStringAttributes()
+public final class CachedYangTextSchemaSource extends YangTextSource {
+    private final @NonNull SourceIdentifier sourceId;
+    private final @NonNull RemoteDeviceId id;
+    private final @NonNull String symbolicName;
+    private final @NonNull String schemaString;
 
-    public CachedYangTextSchemaSource(final RemoteDeviceId id, final SourceIdentifier sourceIdentifier,
+    public CachedYangTextSchemaSource(final RemoteDeviceId id, final SourceIdentifier sourceId,
             final String symbolicName, final String schemaString) {
-        super(sourceIdentifier);
-        this.symbolicName = requireNonNull(symbolicName);
         this.id = requireNonNull(id);
+        this.sourceId = requireNonNull(sourceId);
+        this.symbolicName = requireNonNull(symbolicName);
         this.schemaString = requireNonNull(schemaString);
-    }
-
-    @Override
-    protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
-        return toStringHelper.add("device", id);
     }
 
     @Override
@@ -44,7 +41,17 @@ public final class CachedYangTextSchemaSource extends YangTextSchemaSource {
     }
 
     @Override
-    public Optional<String> getSymbolicName() {
-        return Optional.of(symbolicName);
+    public SourceIdentifier sourceId() {
+        return sourceId;
+    }
+
+    @Override
+    public String symbolicName() {
+        return symbolicName;
+    }
+
+    @Override
+    protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
+        return toStringHelper.add("device", id);
     }
 }

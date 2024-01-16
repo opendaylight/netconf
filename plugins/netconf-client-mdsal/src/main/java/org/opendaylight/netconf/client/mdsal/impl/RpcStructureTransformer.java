@@ -9,10 +9,10 @@ package org.opendaylight.netconf.client.mdsal.impl;
 
 import java.util.List;
 import java.util.Optional;
+import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -29,8 +29,8 @@ interface RpcStructureTransformer {
      * @param operation operation
      * @return config structure
      */
-    DOMSourceAnyxmlNode createEditConfigStructure(Optional<NormalizedNode> data, YangInstanceIdentifier dataPath,
-                                                  Optional<EffectiveOperation> operation);
+    AnyxmlNode<DOMSource> createEditConfigStructure(Optional<NormalizedNode> data, YangInstanceIdentifier dataPath,
+        Optional<EffectiveOperation> operation);
 
     /**
      * Transforms path to filter structure.

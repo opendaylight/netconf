@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.PreDestroy;
@@ -33,7 +32,7 @@ import org.opendaylight.yang.gen.v1.org.opendaylight.coretutorials.ncmount.examp
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -54,10 +53,10 @@ public final class MountedDeviceListener implements DOMMountPointListener {
     private static final QName CREATE_SUBSCRIPTION_QNAME = QName.create(CreateSubscriptionInput.QNAME,
         "create-subscription");
 
-    private final ConcurrentMap<YangInstanceIdentifier, ListenerRegistration<?>> listeners = new ConcurrentHashMap<>();
+    private final ConcurrentMap<YangInstanceIdentifier, Registration> listeners = new ConcurrentHashMap<>();
     private final DOMMountPointService mountPointService;
     private final BindingNormalizedNodeSerializer serializer;
-    private final ListenerRegistration<?> reg;
+    private final Registration reg;
 
     @Inject
     @Activate
@@ -72,7 +71,7 @@ public final class MountedDeviceListener implements DOMMountPointListener {
     @Deactivate
     public void stop() {
         reg.close();
-        final Iterator<ListenerRegistration<?>> it = listeners.values().iterator();
+        final var it = listeners.values().iterator();
         while (it.hasNext()) {
             it.next().close();
             it.remove();
@@ -91,7 +90,7 @@ public final class MountedDeviceListener implements DOMMountPointListener {
 
     @Override
     public void onMountPointRemoved(final YangInstanceIdentifier path) {
-        final ListenerRegistration<?> listener = listeners.remove(path);
+        final var listener = listeners.remove(path);
         if (listener != null) {
             listener.close();
         }

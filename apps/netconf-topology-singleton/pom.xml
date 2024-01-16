@@ -56,7 +56,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-singleton-common-api</artifactId>
+            <artifactId>mdsal-singleton-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
@@ -78,7 +78,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>mdsal-singleton-dom-impl</artifactId>
+            <artifactId>mdsal-singleton-impl</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
