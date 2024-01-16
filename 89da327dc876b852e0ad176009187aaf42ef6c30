@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbc95d1d_0f1d8b93",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2024-01-16T22:14:45Z",
+      "side": 1,
+      "message": "How about also changing this to something like `backoff-multiplier` to make the parameter names more consistent?",
+      "revId": "89da327dc876b852e0ad176009187aaf42ef6c30",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
