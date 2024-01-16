@@ -9,14 +9,11 @@ package org.opendaylight.netconf.client.mdsal.spi;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.ImmutableClassToInstanceMap;
-import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
+import java.util.List;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.mdsal.dom.spi.PingPongMergingDOMDataBroker;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -76,13 +73,13 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
     }
 
     @Override
-    public DOMTransactionChain createTransactionChain(final DOMTransactionChainListener listener) {
-        return new TxChain(this, listener);
+    public DOMTransactionChain createTransactionChain() {
+        return new TxChain(this);
     }
 
     @Override
-    public ClassToInstanceMap<DOMDataBrokerExtension> getExtensions() {
-        return ImmutableClassToInstanceMap.of(NetconfDOMDataBrokerFieldsExtension.class, fieldsExtension);
+    public List<Extension> supportedExtensions() {
+        return List.of(fieldsExtension);
     }
 
     private final class NetconfDOMDataBrokerFieldsExtensionImpl implements NetconfDOMDataBrokerFieldsExtension {
@@ -97,8 +94,8 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
         }
 
         @Override
-        public NetconfDOMFieldsTransactionChain createTransactionChain(final DOMTransactionChainListener listener) {
-            return new FieldsAwareTxChain(NetconfDeviceDataBroker.this, listener, this);
+        public NetconfDOMFieldsTransactionChain createTransactionChain() {
+            return new FieldsAwareTxChain(NetconfDeviceDataBroker.this, this);
         }
     }
 }

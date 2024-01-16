@@ -64,7 +64,7 @@ public final class DatabindContext {
     }
 
     public @NonNull EffectiveModelContext modelContext() {
-        return mountContext.getEffectiveModelContext();
+        return mountContext.modelContext();
     }
 
     public @NonNull DataSchemaContextTree schemaTree() {
@@ -84,7 +84,7 @@ public final class DatabindContext {
     }
 
     private @NonNull JSONCodecFactory createJsonCodecs() {
-        final var created = JSONCodecFactorySupplier.RFC7951.getShared(mountContext.getEffectiveModelContext());
+        final var created = JSONCodecFactorySupplier.RFC7951.getShared(mountContext.modelContext());
         final var witness = (JSONCodecFactory) JSON_CODECS.compareAndExchangeRelease(this, null, created);
         return witness != null ? witness : created;
     }

@@ -42,7 +42,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
@@ -61,7 +61,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
     public void setUp() {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(rpcService).invokeNetconf(any(), any());
         netconService = getNetconService();
-        final var model = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class, NetconfState.class);
+        final var model = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfState.class);
         netconfMessageTransformer = new NetconfMessageTransformer(MountPointContext.of(model), true,
                 BASE_SCHEMAS.baseSchema());
     }
