@@ -16,6 +16,24 @@
       "message": "Private key is no more String, but is base64 encoded. We are expecting that when invoking PUT with the bas64 encoded key and invoking RPC with plain String we can see the same data written in datastore retrieved using GET operation. Please prepare a demo.",
       "revId": "2250d125d66ca2c7f67b042bab18546aa0ddaf92",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "711dfbc4_a862594a",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfSalKeystoreRpcs.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-16T10:29:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bce1190f_ef5af369",
+      "revId": "2250d125d66ca2c7f67b042bab18546aa0ddaf92",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
