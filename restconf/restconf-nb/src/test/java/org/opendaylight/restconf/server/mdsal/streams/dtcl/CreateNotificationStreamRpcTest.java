@@ -17,8 +17,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,8 +83,7 @@ class CreateNotificationStreamRpcTest {
     public void before() {
         databindProvider = () -> DatabindContext.ofModel(SCHEMA_CTX);
 
-        doReturn(ImmutableClassToInstanceMap.of(DOMDataTreeChangeService.class, treeChange))
-            .when(dataBroker).getExtensions();
+        doReturn(List.of(treeChange)).when(dataBroker).supportedExtensions();
         rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(dataBroker), databindProvider,
             dataBroker);
     }

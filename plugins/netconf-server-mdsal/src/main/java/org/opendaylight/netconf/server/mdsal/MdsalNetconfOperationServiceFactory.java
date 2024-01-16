@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
@@ -31,9 +31,7 @@ import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -50,7 +48,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     private final DOMRpcService rpcService;
 
     private final CurrentSchemaContext currentSchemaContext;
-    private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency;
+    private final YangTextSourceExtension rootSchemaSourceProviderDependency;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
     @Activate
@@ -62,8 +60,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
         this.rpcService = requireNonNull(rpcService);
         this.netconfOperationServiceFactoryListener = requireNonNull(netconfOperationServiceFactoryListener);
 
-        rootSchemaSourceProviderDependency = schemaService.getExtensions()
-                .getInstance(DOMYangTextSourceProvider.class);
+        rootSchemaSourceProviderDependency = schemaService.extension(YangTextSourceExtension.class);
         currentSchemaContext = CurrentSchemaContext.create(requireNonNull(schemaService),
                 rootSchemaSourceProviderDependency);
         netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
@@ -89,7 +86,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
 
     // FIXME: ImmutableSet
     static Set<Capability> transformCapabilities(final EffectiveModelContext currentContext,
-            final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
+            final YangTextSourceExtension rootSchemaSourceProviderDependency) {
         final var capabilities = new HashSet<Capability>();
 
         // Added by netconf-impl by default
@@ -107,7 +104,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     }
 
     private static Optional<YangModuleCapability> moduleToCapability(final ModuleLike module,
-            final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency) {
+            final YangTextSourceExtension rootSchemaSourceProviderDependency) {
         final String moduleNamespace = module.getNamespace().toString();
         final String moduleName = module.getName();
         final String revision = module.getRevision().map(Revision::toString).orElse(null);
@@ -115,7 +112,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
 
         String source;
         try {
-            source = rootSchemaSourceProviderDependency.getSource(moduleSourceIdentifier).get().read();
+            source = rootSchemaSourceProviderDependency.getYangTexttSource(moduleSourceIdentifier).get().read();
         } catch (ExecutionException | InterruptedException | IOException e) {
             LOG.warn("Ignoring source for module {}. Unable to read content", moduleSourceIdentifier, e);
             source = null;
@@ -133,7 +130,7 @@ public final class MdsalNetconfOperationServiceFactory implements NetconfOperati
     @Override
     public Registration registerCapabilityListener(final CapabilityListener listener) {
         // Advertise validate capability only if DOMDataBroker provides DOMDataTransactionValidator
-        if (dataBroker.getExtensions().get(DOMDataTransactionValidator.class) != null) {
+        if (dataBroker.extension(DOMDataTransactionValidator.class) != null) {
             // FIXME: support VALIDATE_1_1 as well!
             listener.onCapabilitiesChanged(Set.of(VALIDATE_CAPABILITY), Set.of());
         }
