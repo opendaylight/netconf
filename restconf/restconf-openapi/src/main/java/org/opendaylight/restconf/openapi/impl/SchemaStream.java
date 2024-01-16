@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
@@ -24,6 +27,7 @@ public final class SchemaStream extends InputStream {
     private final OpenApiBodyWriter writer;
 
     private Reader reader;
+    private ReadableByteChannel channel;
 
     public SchemaStream(final Deque<SchemaEntity> schemas, final OpenApiBodyWriter writer) {
         this.stack = schemas;
@@ -55,7 +59,23 @@ public final class SchemaStream extends InputStream {
 
     @Override
     public int read(final byte[] array, final int off, final int len) throws IOException {
-        return super.read(array, off, len);
+        if (channel == null) {
+            if (stack.isEmpty()) {
+                return -1;
+            }
+            channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(stack.pop())));
+        }
+
+        var read = channel.read(ByteBuffer.wrap(array));
+        while (read == -1) {
+            if (stack.isEmpty()) {
+                return -1;
+            }
+            channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(stack.pop())));
+            read = channel.read(ByteBuffer.wrap(array));
+        }
+
+        return read;
     }
 
     private byte[] writeNextEntity(final OpenApiEntity entity) throws IOException {
