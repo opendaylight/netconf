@@ -15,16 +15,16 @@ import java.util.List;
 import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.spi.TextParameters;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.DataChangedNotification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.data.changed.notification.DataChangeEvent;
+import org.opendaylight.yang.svc.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.remote.rev140114.YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 final class JSONDataTreeCandidateFormatter extends DataTreeCandidateFormatter {
     private static final @NonNull String DATA_CHANGED_EVENT_NAME = DataChangeEvent.QNAME.getLocalName();
     private static final @NonNull String DATA_CHANGED_NOTIFICATION_NAME =
-        $YangModuleInfoImpl.getInstance().getName().getLocalName() + ":" + DataChangedNotification.QNAME.getLocalName();
+        YangModuleInfoImpl.getInstance().getName().getLocalName() + ":" + DataChangedNotification.QNAME.getLocalName();
     private static final JSONDataTreeCandidateFormatter EMPTY =
         new JSONDataTreeCandidateFormatter(TextParameters.EMPTY);
 
