@@ -38,12 +38,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangIRSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.api.YinSchemaSourceRepresentation;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
+import org.opendaylight.yangtools.yang.model.api.source.YinSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource.Costs;
+import org.opendaylight.yangtools.yang.model.spi.source.YangIRSource;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -101,9 +101,9 @@ public class YangLibProviderTest {
         // test list of non yang schema sources registered
         yangLibProvider.schemaSourceRegistered(List.of(
             PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
-                YinSchemaSourceRepresentation.class, Costs.IMMEDIATE.getValue()),
+                YinSourceRepresentation.class, Costs.IMMEDIATE.getValue()),
             PotentialSchemaSource.create(new SourceIdentifier("asts-schema-source"),
-                YangIRSchemaSource.class, Costs.IMMEDIATE.getValue())));
+                YangIRSource.class, Costs.IMMEDIATE.getValue())));
 
         // expected behavior is to do nothing
         verifyNoMoreInteractions(dataBroker, writeTransaction);
@@ -116,7 +116,7 @@ public class YangLibProviderTest {
         // try to unregister YANG source with revision
         final var schemaSourceWithRevision = PotentialSchemaSource.create(
             new SourceIdentifier("unregistered-yang-with-revision", "2016-04-28"),
-            YangTextSchemaSource.class, Costs.LOCAL_IO.getValue());
+            YangTextSource.class, Costs.LOCAL_IO.getValue());
         yangLibProvider.schemaSourceUnregistered(schemaSourceWithRevision);
 
         // source is unregistered
@@ -135,7 +135,7 @@ public class YangLibProviderTest {
 
         // try to unregister YANG source without revision
         final var schemaSourceWithoutRevision = PotentialSchemaSource.create(
-            new SourceIdentifier("unregistered-yang-schema-without-revision"), YangTextSchemaSource.class,
+            new SourceIdentifier("unregistered-yang-schema-without-revision"), YangTextSource.class,
             Costs.LOCAL_IO.getValue());
         yangLibProvider.schemaSourceUnregistered(schemaSourceWithoutRevision);
 
@@ -155,7 +155,7 @@ public class YangLibProviderTest {
 
         // try to unregister non-YANG source
         final var nonYangSources = PotentialSchemaSource.create(new SourceIdentifier("yin-source-representation"),
-            YinSchemaSourceRepresentation.class, Costs.IMMEDIATE.getValue());
+            YinSourceRepresentation.class, Costs.IMMEDIATE.getValue());
         yangLibProvider.schemaSourceUnregistered(nonYangSources);
 
         // expected behaviour is to do nothing if non yang based source is unregistered

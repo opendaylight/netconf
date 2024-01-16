@@ -87,7 +87,7 @@ public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBo
             final JsonWriter jsonWriter, final QueryParameters writerParameters,
             final @Nullable XMLNamespace initialNamespace) {
         // TODO: Performance: Cache JSON Codec factory and schema context
-        final var codecs = JSONCodecFactorySupplier.RFC7951.getShared(inference.getEffectiveModelContext());
+        final var codecs = JSONCodecFactorySupplier.RFC7951.getShared(inference.modelContext());
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(
             JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, inference,
                 initialNamespace, jsonWriter), writerParameters.depth(), writerParameters.fields());

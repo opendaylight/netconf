@@ -72,7 +72,7 @@ class RestconfDataDeleteTest extends AbstractRestconfTest {
     @Test
     public void testDeleteDataMountPoint() {
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
-        doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
+        doReturn(Optional.of(new FixedDOMSchemaService(JUKEBOX_SCHEMA))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);

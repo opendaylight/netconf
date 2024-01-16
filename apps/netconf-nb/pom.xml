@@ -47,10 +47,6 @@
             <artifactId>mdsal-binding-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>threadpool-config-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-api</artifactId>
         </dependency>
