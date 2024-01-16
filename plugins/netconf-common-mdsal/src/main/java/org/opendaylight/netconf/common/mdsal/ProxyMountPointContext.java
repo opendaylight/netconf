@@ -33,8 +33,8 @@ final class ProxyMountPointContext implements Delegator<MountPointContext>, Moun
     }
 
     @Override
-    public EffectiveModelContext getEffectiveModelContext() {
-        return new ProxyEffectiveModelContext(delegate.getEffectiveModelContext());
+    public EffectiveModelContext modelContext() {
+        return new ProxyEffectiveModelContext(delegate.modelContext());
     }
 
     @Override

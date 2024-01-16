@@ -25,8 +25,8 @@ import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -53,7 +53,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     public NetconfRestconfStrategy(final DatabindContext databind, final NetconfDataTreeService netconfService,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final @Nullable DOMYangTextSourceProvider sourceProvider,
+            final @Nullable YangTextSourceExtension sourceProvider,
             final @Nullable DOMMountPointService mountPointService) {
         super(databind, ImmutableMap.of(), rpcService, actionService, sourceProvider, mountPointService);
         this.netconfService = requireNonNull(netconfService);
@@ -89,7 +89,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         if (fields != null) {
             final List<YangInstanceIdentifier> tmp;
             try {
-                tmp = NetconfFieldsTranslator.translate(inference.getEffectiveModelContext(), path.schema(), fields);
+                tmp = NetconfFieldsTranslator.translate(inference.modelContext(), path.schema(), fields);
             } catch (RestconfDocumentedException e) {
                 return RestconfFuture.failed(e);
             }

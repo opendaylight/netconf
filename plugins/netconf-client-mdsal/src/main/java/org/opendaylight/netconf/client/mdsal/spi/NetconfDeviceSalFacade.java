@@ -45,7 +45,7 @@ public class NetconfDeviceSalFacade implements RemoteDeviceHandler, AutoCloseabl
     public synchronized void onDeviceConnected(final NetconfDeviceSchema deviceSchema,
             final NetconfSessionPreferences sessionPreferences, final RemoteDeviceServices services) {
         final var mountContext = deviceSchema.mountContext();
-        final var modelContext = mountContext.getEffectiveModelContext();
+        final var modelContext = mountContext.modelContext();
 
         final var deviceRpc = services.rpcs();
 
