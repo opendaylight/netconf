@@ -7,12 +7,13 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-import java.util.Base64;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,22 +60,18 @@ public class NetconfTopologyRPCProviderTest {
     private NetconfTopologyRPCProvider rpcProvider;
 
     @Before
-    public void setUp() {
-        doReturn(ENC_PWD).when(encryptionService).encrypt(TEST_PWD);
+    public void setUp() throws Exception {
+        doReturn(ENC_PWD.getBytes()).when(encryptionService).encrypt(TEST_PWD.getBytes());
         doReturn(rpcReg).when(rpcProviderService).registerRpcImplementations(any());
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, TOPOLOGY_ID);
     }
 
     @Test
     public void testEncryptPassword() {
+        final var encryptedPwNode = rpcProvider.encryptPassword(getInput(true));
+        final var loginPw = assertInstanceOf(LoginPw.class, encryptedPwNode.getCredentials());
 
-        final NetconfNode encryptedPwNode = rpcProvider.encryptPassword(getInput(true));
-
-        final Credentials credentials = encryptedPwNode.getCredentials();
-        assertTrue(credentials instanceof LoginPw);
-        final LoginPw loginPw = (LoginPw) credentials;
-
-        assertEquals(ENC_PWD, Base64.getEncoder().encodeToString(loginPw.getLoginPassword().getPassword()));
+        assertArrayEquals(ENC_PWD.getBytes(), loginPw.getLoginPassword().getPassword());
     }
 
     @Test

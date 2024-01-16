@@ -17,6 +17,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutionException;
@@ -29,7 +30,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
-import org.opendaylight.mdsal.binding.api.TransactionChainListener;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -61,7 +61,7 @@ public class NetconfDeviceTopologyAdapterTest {
     @Mock
     private WriteTransaction mockTx;
     @Captor
-    private ArgumentCaptor<TransactionChainListener> listeners;
+    private ArgumentCaptor<FutureCallback<Empty>> listeners;
 
     private NetconfDeviceTopologyAdapter adapter;
 
@@ -74,7 +74,8 @@ public class NetconfDeviceTopologyAdapterTest {
         doReturn("test transaction").when(mockTx).getIdentifier();
         doReturn(CommitInfo.emptyFluentFuture()).when(mockTx).commit();
 
-        doReturn(mockChain).when(mockBroker).createMergingTransactionChain(listeners.capture());
+        doReturn(mockChain).when(mockBroker).createMergingTransactionChain();
+        doNothing().when(mockChain).addCallback(listeners.capture());
         adapter = new NetconfDeviceTopologyAdapter(mockBroker, TEST_TOPOLOGY_ID, id);
     }
 
@@ -82,8 +83,8 @@ public class NetconfDeviceTopologyAdapterTest {
     public void replaceChainIfFailed() {
         doNothing().when(mockChain).close();
         doReturn("mockChain").when(mockChain).toString();
-        adapter.onTransactionChainFailed(mockChain, mockTx, new Exception("chain failed"));
-        verify(mockBroker, times(2)).createMergingTransactionChain(any());
+        adapter.onFailure(new Exception("chain failed"));
+        verify(mockBroker, times(2)).createMergingTransactionChain();
     }
 
     @Test
@@ -131,7 +132,7 @@ public class NetconfDeviceTopologyAdapterTest {
         assertSame(future, adapter.shutdown());
 
         // future completes
-        listeners.getValue().onTransactionChainSuccessful(mockChain);
+        listeners.getValue().onSuccess(Empty.value());
         assertSame(Empty.value(), Futures.getDone(future));
     }
 
@@ -155,7 +156,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
         // future completes
         final var cause = new Throwable();
-        listeners.getValue().onTransactionChainFailed(mockChain, mockTx, cause);
+        listeners.getValue().onFailure(cause);
         final var ex = assertThrows(ExecutionException.class, () -> Futures.getDone(future));
         assertSame(cause, ex.getCause());
     }

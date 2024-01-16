@@ -36,8 +36,8 @@ import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.w3c.dom.DOMException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -143,7 +143,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Test
     public void testPutReplaceContainerData() {
-        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)
+        doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(netconfService)
             .getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -169,7 +169,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Test
     public void testPutReplaceLeafData() {
-        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)
+        doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(netconfService)
             .getConfig(GAP_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
@@ -195,7 +195,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
 
     @Test
     public void testPutReplaceListData() {
-        doReturn(immediateFluentFuture(Optional.of(mock(NormalizedNode.class)))).when(netconfService)
+        doReturn(immediateFluentFuture(Optional.of(mock(ContainerNode.class)))).when(netconfService)
             .getConfig(JUKEBOX_IID);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)

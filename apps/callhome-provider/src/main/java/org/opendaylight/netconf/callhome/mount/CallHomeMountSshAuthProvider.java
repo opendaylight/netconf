@@ -7,13 +7,12 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -21,8 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
-import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -64,7 +61,7 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
     public CallHomeMountSshAuthProvider(final @Reference DataBroker broker,
             final @Reference CallHomeMountStatusReporter statusReporter) {
         configReg = broker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
+            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
                 InstanceIdentifier.create(NetconfCallhomeServer.class).child(Global.class)),
             globalConfig);
 
@@ -72,10 +69,10 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
             InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class);
 
         deviceReg = broker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, allowedDeviceWildcard),
+            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, allowedDeviceWildcard),
             deviceConfig);
         deviceOpReg = broker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, allowedDeviceWildcard),
+            DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, allowedDeviceWildcard),
             deviceOp);
 
         this.statusReporter = statusReporter;
@@ -144,18 +141,18 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
     private abstract static class AbstractDeviceListener implements DataTreeChangeListener<Device> {
 
         @Override
-        public final void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
-            for (DataTreeModification<Device> dataTreeModification : mods) {
-                final DataObjectModification<Device> deviceMod = dataTreeModification.getRootNode();
-                final ModificationType modType = deviceMod.getModificationType();
+        public final void onDataTreeChanged(final List<DataTreeModification<Device>> mods) {
+            for (var dataTreeModification : mods) {
+                final var deviceMod = dataTreeModification.getRootNode();
+                final var modType = deviceMod.modificationType();
                 switch (modType) {
                     case DELETE:
-                        deleteDevice(deviceMod.getDataBefore());
+                        deleteDevice(deviceMod.dataBefore());
                         break;
                     case SUBTREE_MODIFIED:
                     case WRITE:
-                        deleteDevice(deviceMod.getDataBefore());
-                        writeDevice(deviceMod.getDataAfter());
+                        deleteDevice(deviceMod.dataBefore());
+                        writeDevice(deviceMod.dataAfter());
                         break;
                     default:
                         throw new IllegalStateException("Unhandled modification type " + modType);
@@ -262,9 +259,9 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         private volatile Global current = null;
 
         @Override
-        public void onDataTreeChanged(final Collection<DataTreeModification<Global>> mods) {
+        public void onDataTreeChanged(final List<DataTreeModification<Global>> mods) {
             if (!mods.isEmpty()) {
-                current = Iterables.getLast(mods).getRootNode().getDataAfter();
+                current = mods.get(mods.size() - 1).getRootNode().dataAfter();
             }
         }
 

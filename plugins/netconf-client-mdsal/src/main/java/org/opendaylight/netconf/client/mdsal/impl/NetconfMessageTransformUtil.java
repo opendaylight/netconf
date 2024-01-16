@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.client.mdsal.impl;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl.qnameOf;
+import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.YangModuleInfoImpl.qnameOf;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -248,9 +248,9 @@ public final class NetconfMessageTransformUtil {
      * @param lastChildOverride Optional of {@code NormalizedNode} data on which action will be invoked
      * @return {@link DOMSourceAnyxmlNode} containing edit-config structure
      */
-    public static DOMSourceAnyxmlNode createEditConfigAnyxml(
-            final EffectiveModelContext ctx, final YangInstanceIdentifier dataPath,
-            final Optional<EffectiveOperation> operation, final Optional<NormalizedNode> lastChildOverride) {
+    public static AnyxmlNode<DOMSource> createEditConfigAnyxml(final EffectiveModelContext ctx,
+            final YangInstanceIdentifier dataPath, final Optional<EffectiveOperation> operation,
+            final Optional<NormalizedNode> lastChildOverride) {
         if (dataPath.isEmpty()) {
             final var override = lastChildOverride.orElseThrow(() -> new IllegalArgumentException(
                 "Data has to be present when creating structure for top level element"));
@@ -387,7 +387,7 @@ public final class NetconfMessageTransformUtil {
         final Element actionNS = document.createElementNS(YangConstants.RFC6020_YANG_NAMESPACE_STRING, "action");
         final DataSchemaContext rootSchemaContextNode = dataSchemaContextTree.getRoot();
         final Element actionData = prepareActionData(rootSchemaContextNode, actionNS,
-                domDataTreeIdentifier.getRootIdentifier().getPathArguments().iterator(), document);
+                domDataTreeIdentifier.path().getPathArguments().iterator(), document);
 
         final Element specificActionElement =
                 document.createElementNS(action.getNamespace().toString(), action.getLocalName());

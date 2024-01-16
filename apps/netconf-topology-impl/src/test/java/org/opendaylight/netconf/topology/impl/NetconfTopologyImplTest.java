@@ -123,10 +123,10 @@ class NetconfTopologyImplTest {
                     .build())
                 .build();
 
-            doReturn(DataObjectModification.ModificationType.WRITE).when(objMod).getModificationType();
-            doReturn(node).when(objMod).getDataAfter();
+            doReturn(DataObjectModification.ModificationType.WRITE).when(objMod).modificationType();
+            doReturn(node).when(objMod).dataAfter();
 
-            doReturn(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
+            doReturn(DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
                 TOPOLOGY_PATH.child(Node.class, key))).when(treeMod).getRootPath();
             final var changes = List.of(treeMod);
 
@@ -134,11 +134,11 @@ class NetconfTopologyImplTest {
             spyTopology.onDataTreeChanged(changes);
             verify(spyTopology).ensureNode(node);
 
-            doReturn(DataObjectModification.ModificationType.DELETE).when(objMod).getModificationType();
+            doReturn(DataObjectModification.ModificationType.DELETE).when(objMod).modificationType();
             spyTopology.onDataTreeChanged(changes);
             verify(spyTopology).deleteNode(key.getNodeId());
 
-            doReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED).when(objMod).getModificationType();
+            doReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED).when(objMod).modificationType();
             spyTopology.onDataTreeChanged(changes);
 
             // one in previous creating and deleting node and one in updating

@@ -40,11 +40,12 @@ import scala.concurrent.Future;
 public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyReadWriteTransaction.class);
 
-    private final RemoteDeviceId id;
-    private final AtomicBoolean opened = new AtomicBoolean(true);
-
     @GuardedBy("queuedTxOperations")
     private final List<Consumer<ProxyTransactionFacade>> queuedTxOperations = new ArrayList<>();
+    private final SettableFuture<CommitInfo> settableFuture = SettableFuture.create();
+    private final @NonNull FluentFuture<CommitInfo> completionFuture = FluentFuture.from(settableFuture);
+    private final AtomicBoolean opened = new AtomicBoolean(true);
+    private final RemoteDeviceId id;
 
     private volatile ProxyTransactionFacade transactionFacade;
 
@@ -68,6 +69,11 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
                 executePriorTransactionOperations(newTransactionFacade);
             }
         }, executionContext);
+    }
+
+    @Override
+    public FluentFuture<?> completionFuture() {
+        return completionFuture;
     }
 
     @Override
@@ -122,13 +128,12 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
     }
 
     @Override
-    public @NonNull FluentFuture<? extends @NonNull CommitInfo> commit() {
+    public FluentFuture<CommitInfo> commit() {
         Preconditions.checkState(opened.compareAndSet(true, false), "%s: Transaction is already closed", id);
         LOG.debug("{}: Commit", id);
 
-        final SettableFuture<CommitInfo> returnFuture = SettableFuture.create();
-        processTransactionOperation(facade -> returnFuture.setFuture(facade.commit()));
-        return FluentFuture.from(returnFuture);
+        processTransactionOperation(facade -> settableFuture.setFuture(facade.commit()));
+        return completionFuture;
     }
 
     @Override

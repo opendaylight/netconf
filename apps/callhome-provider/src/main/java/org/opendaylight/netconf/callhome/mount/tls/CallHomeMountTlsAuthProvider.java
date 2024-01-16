@@ -18,7 +18,7 @@ import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Base64;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,10 +27,9 @@ import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -70,13 +69,13 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
     public CallHomeMountTlsAuthProvider(
             final @Reference SslHandlerFactoryProvider sslHandlerFactoryProvider,
             final @Reference DataBroker dataBroker) {
-        this.sslHandlerFactory = sslHandlerFactoryProvider.getSslHandlerFactory(null);
-        allowedDevicesReg = dataBroker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
+        sslHandlerFactory = sslHandlerFactoryProvider.getSslHandlerFactory(null);
+        allowedDevicesReg = dataBroker.registerTreeChangeListener(
+            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
                 InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class)),
             new AllowedDevicesMonitor());
-        certificatesReg = dataBroker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
+        certificatesReg = dataBroker.registerTreeChangeListener(
+            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
             new CertificatesMonitor());
     }
 
@@ -105,12 +104,15 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
         // In real world scenario it is not possible to have multiple certificates with the same private/public key,
         // but in theory/synthetic tests it is practically possible to generate multiple certificates from a single
         // private key. In such case it's not possible to pin certificate to particular device.
-        if (deviceNames.size() > 1) {
-            LOG.error("Unable to find device by provided certificate. Possible reason: one certificate configured "
-                + "with multiple devices/names or multiple certificates contain same public key");
-            return null;
-        }
-        return deviceNames.isEmpty() ? null : deviceNames.get(0);
+        return switch (deviceNames.size()) {
+            case 0 -> null;
+            case 1 -> deviceNames.get(0);
+            default -> {
+                LOG.error("Unable to find device by provided certificate. Possible reason: one certificate configured "
+                    + "with multiple devices/names or multiple certificates contain same public key");
+                yield null;
+            }
+        };
     }
 
     @Override
@@ -118,28 +120,27 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
         return sslHandlerFactory.createSslHandler(Set.copyOf(deviceToPrivateKey.values()));
     }
 
-    private final class CertificatesMonitor implements ClusteredDataTreeChangeListener<Keystore> {
+    private final class CertificatesMonitor implements DataTreeChangeListener<Keystore> {
         @Override
-        public void onDataTreeChanged(@NonNull final Collection<DataTreeModification<Keystore>> changes) {
-            changes.stream().map(DataTreeModification::getRootNode)
-                .flatMap(v -> v.getModifiedChildren().stream())
-                .filter(v -> v.getDataType().equals(TrustedCertificate.class))
+        public void onDataTreeChanged(final List<DataTreeModification<Keystore>> changes) {
+            changes.stream()
+                .map(DataTreeModification::getRootNode)
+                .flatMap(v -> v.modifiedChildren().stream())
+                .filter(v -> v.dataType().equals(TrustedCertificate.class))
                 .map(v -> (DataObjectModification<TrustedCertificate>) v)
                 .forEach(this::updateCertificate);
         }
 
         private void updateCertificate(final DataObjectModification<TrustedCertificate> change) {
-            switch (change.getModificationType()) {
-                case DELETE:
-                    deleteCertificate(change.getDataBefore());
-                    break;
-                case SUBTREE_MODIFIED:
-                case WRITE:
-                    deleteCertificate(change.getDataBefore());
-                    writeCertificate(change.getDataAfter());
-                    break;
-                default:
-                    break;
+            switch (change.modificationType()) {
+                case DELETE -> deleteCertificate(change.dataBefore());
+                case SUBTREE_MODIFIED, WRITE -> {
+                    deleteCertificate(change.dataBefore());
+                    writeCertificate(change.dataAfter());
+                }
+                default -> {
+                    // Should never happen
+                }
             }
         }
 
@@ -171,22 +172,20 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
         }
     }
 
-    private final class AllowedDevicesMonitor implements ClusteredDataTreeChangeListener<Device> {
+    private final class AllowedDevicesMonitor implements DataTreeChangeListener<Device> {
         @Override
-        public void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
-            for (final DataTreeModification<Device> dataTreeModification : mods) {
-                final DataObjectModification<Device> deviceMod = dataTreeModification.getRootNode();
-                switch (deviceMod.getModificationType()) {
-                    case DELETE:
-                        deleteDevice(deviceMod.getDataBefore());
-                        break;
-                    case SUBTREE_MODIFIED:
-                    case WRITE:
-                        deleteDevice(deviceMod.getDataBefore());
-                        writeDevice(deviceMod.getDataAfter());
-                        break;
-                    default:
-                        break;
+        public void onDataTreeChanged(final List<DataTreeModification<Device>> mods) {
+            for (var dataTreeModification : mods) {
+                final var deviceMod = dataTreeModification.getRootNode();
+                switch (deviceMod.modificationType()) {
+                    case DELETE -> deleteDevice(deviceMod.dataBefore());
+                    case SUBTREE_MODIFIED, WRITE -> {
+                        deleteDevice(deviceMod.dataBefore());
+                        writeDevice(deviceMod.dataAfter());
+                    }
+                    default -> {
+                        // Should never happen
+                    }
                 }
             }
         }

@@ -10,14 +10,10 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import akka.actor.ActorRef;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.ImmutableClassToInstanceMap;
-import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.mdsal.dom.spi.PingPongMergingDOMDataBroker;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadTransaction;
@@ -73,12 +69,7 @@ public class ProxyDOMDataBroker implements PingPongMergingDOMDataBroker {
     }
 
     @Override
-    public DOMTransactionChain createTransactionChain(final DOMTransactionChainListener listener) {
+    public DOMTransactionChain createTransactionChain() {
         throw new UnsupportedOperationException(id + ": Transaction chains not supported for netconf mount point");
-    }
-
-    @Override
-    public ClassToInstanceMap<DOMDataBrokerExtension> getExtensions() {
-        return ImmutableClassToInstanceMap.of();
     }
 }

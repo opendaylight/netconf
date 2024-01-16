@@ -25,9 +25,8 @@ import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -45,7 +44,7 @@ public class BaseRpcSchemalessTransformer implements RpcTransformer<NormalizedNo
     public BaseRpcSchemalessTransformer(final BaseNetconfSchemas baseSchemas, final MessageCounter counter) {
         final var baseSchema = baseSchemas.baseSchema();
         mappedRpcs = baseSchema.getMappedRpcs();
-        modelContext = baseSchema.getEffectiveModelContext();
+        modelContext = baseSchema.modelContext();
         this.counter = counter;
     }
 
@@ -89,14 +88,14 @@ public class BaseRpcSchemalessTransformer implements RpcTransformer<NormalizedNo
             final Element xmlData = NetconfMessageTransformUtil.getDataSubtree(message.getDocument());
             final Document data = XmlUtil.newDocument();
             data.appendChild(data.importNode(xmlData, true));
-            DOMSourceAnyxmlNode xmlDataNode = Builders.anyXmlBuilder()
+
+            normalizedNode = ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
+                .withChild(ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
                     .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
                     .withValue(new DOMSource(data))
-                    .build();
-
-            normalizedNode = Builders.containerBuilder()
-                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
-                    .withChild(xmlDataNode).build();
+                    .build())
+                .build();
         } else {
             //other base rpcs don't have any output, we can simply construct the payload here
             checkArgument(isOkPresent(message.getDocument()),

@@ -28,6 +28,7 @@ import akka.util.Timeout;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -52,14 +53,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
-import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
-import org.opendaylight.mdsal.binding.api.Transaction;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
-import org.opendaylight.mdsal.binding.api.TransactionChainListener;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
@@ -82,10 +79,10 @@ import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
-import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
-import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
-import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProviderImpl;
+import org.opendaylight.mdsal.eos.dom.simple.SimpleDOMEntityOwnershipService;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
+import org.opendaylight.mdsal.singleton.api.ServiceGroupIdentifier;
+import org.opendaylight.mdsal.singleton.impl.EOSClusterSingletonServiceProvider;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
@@ -135,6 +132,7 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -154,9 +152,10 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,7 +199,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private final DOMMountPointService masterMountPointService = new DOMMountPointServiceImpl();
     private Rpcs.Normalized deviceRpcService;
 
-    private DOMClusterSingletonServiceProviderImpl masterClusterSingletonServiceProvider;
+    private EOSClusterSingletonServiceProvider masterClusterSingletonServiceProvider;
     private DataBroker masterDataBroker;
     private DOMDataBroker deviceDOMDataBroker;
     private ActorSystem masterSystem;
@@ -211,7 +210,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     @Mock
     private ClusterSingletonServiceProvider mockSlaveClusterSingletonServiceProvider;
     @Mock
-    private ClusterSingletonServiceRegistration mockSlaveClusterSingletonServiceReg;
+    private Registration mockSlaveClusterSingletonServiceReg;
     @Mock
     private DOMMountPointListener slaveMountPointListener;
     private final DOMMountPointService slaveMountPointService = new DOMMountPointServiceImpl();
@@ -247,15 +246,15 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         deviceSchemaContext = BindingRuntimeHelpers.createEffectiveModel(Top.class);
 
-        final var router = new DOMRpcRouter(FixedDOMSchemaService.of(deviceSchemaContext));
+        final var router = new DOMRpcRouter(new FixedDOMSchemaService(deviceSchemaContext));
 
         putTopRpcSchemaPath = findRpcDefinition("put-top").getQName();
         getTopRpcSchemaPath = findRpcDefinition("get-top").getQName();
 
-        router.getRpcProviderService().registerRpcImplementation(topRpcImplementation,
+        router.rpcProviderService().registerRpcImplementation(topRpcImplementation,
                 DOMRpcIdentifier.create(putTopRpcSchemaPath), DOMRpcIdentifier.create(getTopRpcSchemaPath));
 
-        final var rpcService = router.getRpcService();
+        final var rpcService = router.rpcService();
         deviceRpcService = () -> rpcService;
 
         builderFactory = new NetconfClientConfigurationBuilderFactoryImpl(mockEncryptionService, credentialProvider,
@@ -293,16 +292,15 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         masterSystem = ActorSystem.create(ACTOR_SYSTEM_NAME, ConfigFactory.load().getConfig("Master"));
 
-        masterClusterSingletonServiceProvider = new DOMClusterSingletonServiceProviderImpl();
-        masterClusterSingletonServiceProvider.initializeProvider();
+        masterClusterSingletonServiceProvider = new EOSClusterSingletonServiceProvider(
+            new SimpleDOMEntityOwnershipService());
 
         final var resources =  resourceManager.getSchemaResources(TEST_DEFAULT_SUBDIR, "test");
         resources.getSchemaRegistry().registerSchemaSource(
-            id -> Futures.immediateFuture(YangTextSchemaSource.delegateForCharSource(id,
-                    topModuleInfo.getYangTextCharSource())),
+            id -> Futures.immediateFuture(new DelegatedYangTextSource(id, topModuleInfo.getYangTextCharSource())),
             PotentialSchemaSource.create(new SourceIdentifier(TOP_MODULE_NAME,
                     topModuleInfo.getName().getRevision().map(Revision::toString).orElse(null)),
-                YangTextSchemaSource.class, 1));
+                YangTextSource.class, 1));
 
         masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
                 masterClusterSingletonServiceProvider, mockTimer, schemaAssembler, masterSystem,
@@ -358,15 +356,15 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
 
         verifyTopologyNodesCreated(slaveDataBroker);
 
-        slaveTxChain = slaveDataBroker.createTransactionChain(new TransactionChainListener() {
+        slaveTxChain = slaveDataBroker.createTransactionChain();
+        slaveTxChain.addCallback(new FutureCallback<Empty>() {
             @Override
-            public void onTransactionChainSuccessful(final TransactionChain chain) {
+            public void onSuccess(final Empty result) {
                 // No-op
             }
 
             @Override
-            public void onTransactionChainFailed(final TransactionChain chain, final Transaction transaction,
-                    final Throwable cause) {
+            public void onFailure(final Throwable cause) {
                 LOG.error("Slave transaction chain failed", cause);
             }
         });
@@ -418,16 +416,16 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         // Since the master and slave use separate DataBrokers we need to copy the master's oper node to the slave.
         // This is essentially what happens in a clustered environment but we'll use a DTCL here.
 
-        masterDataBroker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, NODE_INSTANCE_ID), changes -> {
+        masterDataBroker.registerTreeChangeListener(
+            DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, NODE_INSTANCE_ID), changes -> {
                 final WriteTransaction slaveTx = slaveTxChain.newWriteOnlyTransaction();
-                for (DataTreeModification<Node> dataTreeModification : changes) {
-                    DataObjectModification<Node> rootNode = dataTreeModification.getRootNode();
-                    InstanceIdentifier<Node> path = dataTreeModification.getRootPath().getRootIdentifier();
-                    switch (rootNode.getModificationType()) {
+                for (var dataTreeModification : changes) {
+                    var rootNode = dataTreeModification.getRootNode();
+                    var path = dataTreeModification.getRootPath().path();
+                    switch (rootNode.modificationType()) {
                         case WRITE:
                         case SUBTREE_MODIFIED:
-                            slaveTx.merge(LogicalDatastoreType.OPERATIONAL, path, rootNode.getDataAfter());
+                            slaveTx.merge(LogicalDatastoreType.OPERATIONAL, path, rootNode.dataAfter());
                             break;
                         case DELETE:
                             slaveTx.delete(LogicalDatastoreType.OPERATIONAL, path);
@@ -697,9 +695,10 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         return getMountPointService(mountPoint, DOMActionService.class);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private static <T extends DOMService> T getMountPointService(final DOMMountPoint mountPoint,
             final Class<T> serviceClass) {
-        return mountPoint.getService(serviceClass).orElseThrow();
+        return (T) mountPoint.getService((Class) serviceClass).orElseThrow();
     }
 
     private DOMMountPoint awaitMountPoint(final DOMMountPointService mountPointService) {

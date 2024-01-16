@@ -16,10 +16,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
 import org.opendaylight.mdsal.dom.spi.store.DOMStore;
 import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStoreFactory;
@@ -43,8 +45,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
-import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -60,9 +60,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBui
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,12 +68,12 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
     private final Set<Capability> caps;
     private final EffectiveModelContext schemaContext;
-    private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
+    private final YangTextSourceExtension sourceProvider;
 
     MdsalOperationProvider(final SessionIdProvider idProvider,
                            final Set<Capability> caps,
                            final EffectiveModelContext schemaContext,
-                           final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
+                           final YangTextSourceExtension sourceProvider) {
         this.caps = caps;
         this.schemaContext = schemaContext;
         this.sourceProvider = sourceProvider;
@@ -104,11 +101,10 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         private final Set<Capability> caps;
         private final DOMSchemaService schemaService;
         private final DOMDataBroker dataBroker;
-        private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
+        private final YangTextSourceExtension sourceProvider;
 
         MdsalOperationService(final SessionIdType currentSessionId, final EffectiveModelContext schemaContext,
-                              final Set<Capability> caps,
-                              final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
+                              final Set<Capability> caps, final YangTextSourceExtension sourceProvider) {
             this.currentSessionId = requireNonNull(currentSessionId);
             this.schemaContext = schemaContext;
             this.caps = caps;
@@ -116,7 +112,6 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             schemaService = createSchemaService();
 
             dataBroker = createDataStore(schemaService, currentSessionId);
-
         }
 
         @Override
@@ -219,14 +214,10 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                 }
 
                 @Override
-                public ListenerRegistration<EffectiveModelContextListener> registerSchemaContextListener(
-                        final EffectiveModelContextListener listener) {
-                    listener.onModelContextUpdated(getGlobalContext());
-                    return new AbstractListenerRegistration<>(listener) {
-                        @Override
-                        protected void removeRegistration() {
-                            // No-op
-                        }
+                public Registration registerSchemaContextListener(final Consumer<EffectiveModelContext> listener) {
+                    listener.accept(getGlobalContext());
+                    return () -> {
+                        // No-op
                     };
                 }
             };

@@ -7,21 +7,16 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
-import java.time.Instant;
-import java.util.Map;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
-import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,7 +39,7 @@ public class SchemalessMessageTransformer implements NotificationTransformer, Rp
 
     @Override
     public DOMNotification toNotification(final NetconfMessage message) {
-        final Map.Entry<Instant, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
+        final var stripped = NetconfMessageTransformUtil.stripNotification(message);
         final QName notificationNoRev;
         try {
             notificationNoRev =
@@ -54,17 +49,13 @@ public class SchemalessMessageTransformer implements NotificationTransformer, Rp
                     + message + ", cannot find namespace", e);
         }
 
-        final DOMSourceAnyxmlNode notificationPayload = Builders.anyXmlBuilder()
+        return new NetconfMessageTransformer.NetconfDeviceNotification(Builders.containerBuilder()
+            .withNodeIdentifier(SCHEMALESS_NOTIFICATION_PAYLOAD)
+            .withChild(Builders.anyXmlBuilder()
                 .withNodeIdentifier(new NodeIdentifier(notificationNoRev))
                 .withValue(new DOMSource(stripped.getValue().getDomElement()))
-                .build();
-
-        final ContainerNode notificationBody = Builders.containerBuilder()
-                .withNodeIdentifier(SCHEMALESS_NOTIFICATION_PAYLOAD)
-                .withChild(notificationPayload)
-                .build();
-
-        return new NetconfMessageTransformer.NetconfDeviceNotification(notificationBody, stripped.getKey());
+                .build())
+            .build(), stripped.getKey());
     }
 
     @Override

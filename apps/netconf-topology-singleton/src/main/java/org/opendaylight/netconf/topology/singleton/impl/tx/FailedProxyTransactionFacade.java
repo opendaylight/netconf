@@ -30,17 +30,26 @@ import org.slf4j.LoggerFactory;
 class FailedProxyTransactionFacade implements ProxyTransactionFacade {
     private static final Logger LOG = LoggerFactory.getLogger(FailedProxyTransactionFacade.class);
 
+    private final @NonNull FluentFuture<CommitInfo> completionFuture;
     private final RemoteDeviceId id;
     private final Throwable failure;
 
     FailedProxyTransactionFacade(final RemoteDeviceId id, final Throwable failure) {
         this.id = Objects.requireNonNull(id);
         this.failure = Objects.requireNonNull(failure);
+        completionFuture = FluentFutures.immediateFailedFluentFuture(
+            failure instanceof TransactionCommitFailedException commitFailed ? commitFailed
+                : new TransactionCommitFailedException("commit", failure));
     }
 
     @Override
     public Object getIdentifier() {
         return id;
+    }
+
+    @Override
+    public FluentFuture<?> completionFuture() {
+        return completionFuture;
     }
 
     @Override
@@ -80,14 +89,8 @@ class FailedProxyTransactionFacade implements ProxyTransactionFacade {
     }
 
     @Override
-    public @NonNull FluentFuture<? extends @NonNull CommitInfo> commit() {
+    public FluentFuture<CommitInfo> commit() {
         LOG.debug("{}: Commit - failure", id, failure);
-        final TransactionCommitFailedException txCommitEx;
-        if (failure instanceof TransactionCommitFailedException) {
-            txCommitEx = (TransactionCommitFailedException) failure;
-        } else {
-            txCommitEx = new TransactionCommitFailedException("commit", failure);
-        }
-        return FluentFutures.immediateFailedFluentFuture(txCommitEx);
+        return completionFuture;
     }
 }
