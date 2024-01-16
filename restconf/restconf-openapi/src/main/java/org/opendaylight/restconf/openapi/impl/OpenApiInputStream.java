@@ -50,7 +50,7 @@ public final class OpenApiInputStream extends InputStream {
         stack.add(new ServersStream(new ServersEntity(List.of(new ServerEntity(url))), writer));
         stack.add(new PathsStream(context, writer, deviceName, urlPrefix, isForSingleModule, includeDataStore, modules,
             basePath));
-        stack.add(new ComponentsStream(context, writer, generator, stream, modules.iterator()));
+        stack.add(new ComponentsStream(context, writer, generator, stream, modules.iterator(), isForSingleModule));
         stack.add(new SecurityStream(writer, new SecurityEntity(security)));
     }
 
