@@ -56,16 +56,16 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -123,7 +123,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
         };
 
-        doReturn(mock(SchemaSourceRegistration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
+        doReturn(mock(Registration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
                 .SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaFactory, stateSchemasResolver);
 
@@ -193,7 +193,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final MissingSchemaSourceException schemaResolutionException =
                 new MissingSchemaSourceException("fail first", TEST_SID);
         doReturn(Futures.immediateFailedFuture(schemaResolutionException))
-                .when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(YangTextSchemaSource.class));
+                .when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(YangTextSource.class));
         doAnswer(invocation -> {
             if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
                 return Futures.immediateFailedFuture(schemaResolutionException);
@@ -212,7 +212,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
         };
 
-        doReturn(mock(SchemaSourceRegistration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
+        doReturn(mock(Registration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
                 .SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaFactory, stateSchemasResolver);
 
@@ -236,9 +236,9 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     private static SchemaRepository getSchemaRepository() {
         final SchemaRepository mock = mock(SchemaRepository.class);
-        final YangTextSchemaSource mockRep = mock(YangTextSchemaSource.class);
+        final YangTextSource mockRep = mock(YangTextSource.class);
         doReturn(Futures.immediateFuture(mockRep))
-                .when(mock).getSchemaSource(any(SourceIdentifier.class), eq(YangTextSchemaSource.class));
+                .when(mock).getSchemaSource(any(SourceIdentifier.class), eq(YangTextSource.class));
         return mock;
     }
 
