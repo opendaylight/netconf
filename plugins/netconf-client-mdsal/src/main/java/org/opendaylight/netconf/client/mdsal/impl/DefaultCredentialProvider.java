@@ -7,17 +7,14 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
-import com.google.common.collect.Iterables;
-import java.util.Collection;
 import java.util.Map;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
-import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
@@ -34,8 +31,7 @@ import org.slf4j.LoggerFactory;
 
 @Singleton
 @Component(service = CredentialProvider.class)
-public final class DefaultCredentialProvider
-        implements CredentialProvider, ClusteredDataTreeChangeListener<Keystore>, AutoCloseable {
+public final class DefaultCredentialProvider implements CredentialProvider, DataListener<Keystore>, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCredentialProvider.class);
 
     private final @NonNull Registration reg;
@@ -45,9 +41,8 @@ public final class DefaultCredentialProvider
     @Inject
     @Activate
     public DefaultCredentialProvider(@Reference final DataBroker dataBroker) {
-        reg = dataBroker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
-            this);
+        reg = dataBroker.registerDataListener(
+            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)), this);
     }
 
     @Deactivate
@@ -63,9 +58,8 @@ public final class DefaultCredentialProvider
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeModification<Keystore>> changes) {
-        final var keystore = Iterables.getLast(changes).getRootNode().getDataAfter();
-        final var newCredentials = keystore != null ? keystore.nonnullKeyCredential()
+    public void dataChangedTo(final Keystore data) {
+        final var newCredentials = data != null ? data.nonnullKeyCredential()
             : Map.<KeyCredentialKey, KeyCredential>of();
         LOG.debug("Updating to {} credentials", newCredentials.size());
         credentials = newCredentials;

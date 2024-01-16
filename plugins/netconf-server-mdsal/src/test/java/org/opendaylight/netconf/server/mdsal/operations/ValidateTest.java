@@ -18,7 +18,7 @@ import static org.opendaylight.netconf.server.mdsal.operations.AbstractNetconfOp
 import static org.opendaylight.netconf.server.mdsal.operations.AbstractNetconfOperationTest.executeOperation;
 import static org.opendaylight.netconf.server.mdsal.operations.AbstractNetconfOperationTest.verifyResponse;
 
-import com.google.common.collect.ImmutableClassToInstanceMap;
+import java.util.List;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -114,12 +114,11 @@ public class ValidateTest {
     }
 
     private void whenValidatorIsNotDefined() {
-        doReturn(ImmutableClassToInstanceMap.of()).when(dataBroker).getExtensions();
+        doReturn(List.of()).when(dataBroker).supportedExtensions();
     }
 
     private void whenUsingValidator(final DOMDataTransactionValidator validator) {
-        doReturn(ImmutableClassToInstanceMap.of(DOMDataTransactionValidator.class, validator))
-            .when(dataBroker).getExtensions();
+        doReturn(List.of(validator)).when(dataBroker).supportedExtensions();
     }
 
     private TransactionProvider initCandidateTransaction() {

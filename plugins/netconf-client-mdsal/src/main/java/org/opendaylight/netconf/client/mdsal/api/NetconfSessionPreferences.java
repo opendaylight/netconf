@@ -26,8 +26,8 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
+import org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.slf4j.Logger;
@@ -164,7 +164,7 @@ public record NetconfSessionPreferences(
 
     public boolean isNotificationsSupported() {
         return containsPartialNonModuleCapability(CapabilityURN.NOTIFICATION)
-            || containsModuleCapability($YangModuleInfoImpl.getInstance().getName());
+            || containsModuleCapability(YangModuleInfoImpl.getInstance().getName());
     }
 
     public boolean isMonitoringSupported() {
