@@ -30,7 +30,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
@@ -231,7 +231,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
             final boolean changedLeafNodesOnly, final boolean childNodesOnly) throws Exception {
         final var stream = streamRegistry.createStream(URI.create("baseURI"),
             new DataTreeChangeSource(databindProvider,
-                domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class),
+                domDataBroker.extension(DataTreeChangeExtension.class),
                 LogicalDatastoreType.CONFIGURATION, path), "test")
             .getOrThrow();
         final var handler = new TestHandler();

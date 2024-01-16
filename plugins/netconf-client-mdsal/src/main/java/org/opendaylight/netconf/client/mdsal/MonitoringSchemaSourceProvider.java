@@ -30,19 +30,19 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 /**
- * A {@link SchemaSourceProvider} producing {@link YangTextSchemaSource}s based on a device's
+ * A {@link SchemaSourceProvider} producing {@link YangTextSource}s based on a device's
  * {@code ietf-netconf-monitoring} interface. The set of available sources is not pre-determined and each request is
  * dispatched to the device, i.e. this provider reflects real-time updates to available schemas.
  */
-public final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangTextSchemaSource> {
+public final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangTextSource> {
     private static final Logger LOG = LoggerFactory.getLogger(MonitoringSchemaSourceProvider.class);
     private static final NodeIdentifier FORMAT_PATHARG =
             NodeIdentifier.create(QName.create(GetSchema.QNAME, "format").intern());
@@ -90,7 +90,7 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
     }
 
     @Override
-    public ListenableFuture<YangTextSchemaSource> getSource(final SourceIdentifier sourceIdentifier) {
+    public ListenableFuture<YangTextSource> getSource(final SourceIdentifier sourceIdentifier) {
         final String moduleName = sourceIdentifier.name().getLocalName();
 
         final Optional<String> revision = Optional.ofNullable(sourceIdentifier.revision()).map(Revision::toString);

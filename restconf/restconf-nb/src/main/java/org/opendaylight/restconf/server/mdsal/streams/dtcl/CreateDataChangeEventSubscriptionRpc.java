@@ -15,7 +15,7 @@ import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierSerializer;
@@ -55,7 +55,7 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
         NodeIdentifier.create(CreateDataChangeEventSubscriptionOutput.QNAME);
 
     private final DatabindProvider databindProvider;
-    private final DOMDataTreeChangeService changeService;
+    private final DataTreeChangeExtension changeService;
     private final RestconfStream.Registry streamRegistry;
 
     @Inject
@@ -64,7 +64,7 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
             @Reference final DatabindProvider databindProvider, @Reference final DOMDataBroker dataBroker) {
         super(CreateDataChangeEventSubscription.QNAME);
         this.databindProvider = requireNonNull(databindProvider);
-        changeService = dataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
+        changeService = dataBroker.extension(DataTreeChangeExtension.class);
         if (changeService == null) {
             throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService");
         }

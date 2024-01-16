@@ -38,7 +38,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.slf4j.Logger;
@@ -370,8 +370,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         }
 
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
-            final T rpcListener) {
+        public Registration registerRpcListener(final DOMRpcAvailabilityListener rpcListener) {
             // There is no real communication with the device (yet), hence no recordActivity() or anything
             return delegate.registerRpcListener(rpcListener);
         }
