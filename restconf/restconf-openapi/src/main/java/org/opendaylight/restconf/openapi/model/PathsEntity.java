@@ -9,15 +9,21 @@ package org.opendaylight.restconf.openapi.model;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
+import java.util.Deque;
 
-/**
- * TODO use this class to simplify PathsStream.
- */
 public final class PathsEntity extends OpenApiEntity {
+    private final Deque<PathEntity> paths;
+
+    public PathsEntity(final Deque<PathEntity> paths) {
+        this.paths = paths;
+    }
 
     @Override
     public void generate(final JsonGenerator generator) throws IOException {
         generator.writeObjectFieldStart("paths");
+        for (final var path : paths) {
+            path.generate(generator);
+        }
         generator.writeEndObject();
     }
 }
