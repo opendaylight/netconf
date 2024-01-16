@@ -131,7 +131,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
 
     @Test
     void invokeRpcViaMountPointTest() throws Exception {
-        doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT))).when(mountPoint)
+        doReturn(Optional.of(new FixedDOMSchemaService(MODEL_CONTEXT))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
@@ -158,7 +158,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
 
     @Test
     void invokeRpcMissingMountPointServiceTest() {
-        doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT))).when(mountPoint)
+        doReturn(Optional.of(new FixedDOMSchemaService(MODEL_CONTEXT))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
