@@ -25,7 +25,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
  * The {@code <edit-config>} operation is extended according its attributes (merge, replace, create, delete, remove), as
  * per RFC6241.
  */
-public interface NetconfDataTreeService extends DOMService {
+public interface NetconfDataTreeService extends DOMService<NetconfDataTreeService, NetconfDataTreeService.Extension> {
+    /**
+     * Type capture of a {@link DOMService.Extension} applicable to {@link NetconfDataTreeService} implementations.
+     */
+    interface Extension extends DOMService.Extension<NetconfDataTreeService, Extension> {
+        // Marker interface
+    }
+
     /**
      * Return device identifier.
      *

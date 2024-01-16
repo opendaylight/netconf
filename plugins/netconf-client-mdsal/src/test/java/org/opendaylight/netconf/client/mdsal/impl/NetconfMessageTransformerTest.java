@@ -52,7 +52,7 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.client.mdsal.MonitoringSchemaSourceProvider;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Datastores;
@@ -165,7 +165,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @BeforeClass
     public static void beforeClass() {
         PARTIAL_SCHEMA = BindingRuntimeHelpers.createEffectiveModel(NetconfState.class);
-        SCHEMA = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class, NetconfState.class,
+        SCHEMA = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfState.class,
             NetconfConfigChange.class);
         ACTION_SCHEMA = YangParserTestUtils.parseYangResources(NetconfMessageTransformerTest.class,
             "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang",
@@ -418,7 +418,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 .node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME)
                 .nodeWithKey(Schema.QNAME, keys).build();
         final var editConfigStructure =
-                createEditConfigStructure(BASE_SCHEMAS.baseSchemaWithNotifications().getEffectiveModelContext(), id,
+                createEditConfigStructure(BASE_SCHEMAS.baseSchemaWithNotifications().modelContext(), id,
                     Optional.empty(), Optional.ofNullable(schemaNode));
 
         final var target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_NODEID);

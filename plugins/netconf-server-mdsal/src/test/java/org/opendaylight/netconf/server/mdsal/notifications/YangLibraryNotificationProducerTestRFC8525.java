@@ -10,22 +10,16 @@ package org.opendaylight.netconf.server.mdsal.notifications;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
-import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.server.api.notifications.YangLibraryPublisherRegistration;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdateBuilder;
@@ -53,16 +47,10 @@ public class YangLibraryNotificationProducerTestRFC8525 {
     @Test
     public void testOnDataTreeChanged() {
         final String contentId = "1";
-        YangLibrary yangLibraryAfter = new YangLibraryBuilder().setContentId(contentId).build();
 
-        final DataTreeModification<YangLibrary> treeChange = mock(DataTreeModification.class);
-        final DataObjectModification<Capabilities> objectChange = mock(DataObjectModification.class);
-        doReturn(objectChange).when(treeChange).getRootNode();
-        doReturn(yangLibraryAfter).when(objectChange).getDataAfter();
+        yangLibraryNotificationProducer.dataChangedTo(new YangLibraryBuilder().setContentId(contentId).build());
 
         YangLibraryUpdate yangLibraryUpdate = new YangLibraryUpdateBuilder().setContentId(contentId).build();
-        yangLibraryNotificationProducer.onDataTreeChanged(List.of(treeChange));
-
         verify(yangLibraryPublisherRegistration).onYangLibraryUpdate(yangLibraryUpdate);
     }
 }

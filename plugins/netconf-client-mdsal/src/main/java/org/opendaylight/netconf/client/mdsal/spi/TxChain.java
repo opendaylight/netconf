@@ -11,14 +11,13 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 
 /**
  * {@link DOMTransactionChain} implementation for Netconf connector.
  */
 final class TxChain extends AbstractTxChain {
-    TxChain(final DOMDataBroker dataBroker, final DOMTransactionChainListener listener) {
-        super(dataBroker, listener);
+    TxChain(final DOMDataBroker dataBroker) {
+        super(dataBroker);
     }
 
     @Override
