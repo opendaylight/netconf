@@ -25,7 +25,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.osgi.service.component.annotations.Activate;
@@ -43,7 +43,7 @@ public final class CapabilityChangeNotificationProducer implements DataTreeChang
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityChangeNotificationProducer.class);
 
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
-    private final ListenerRegistration<?> capabilityChangeListenerRegistration;
+    private final Registration capabilityChangeListenerRegistration;
 
     @Activate
     public CapabilityChangeNotificationProducer(
@@ -51,7 +51,7 @@ public final class CapabilityChangeNotificationProducer implements DataTreeChang
             @Reference final DataBroker dataBroker) {
         baseNotificationPublisherRegistration = notifManager.registerBaseNotificationPublisher();
         capabilityChangeListenerRegistration = dataBroker.registerDataTreeChangeListener(
-                DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL,
+                DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL,
                     InstanceIdentifier.builder(NetconfState.class).child(Capabilities.class).build()), this);
     }
 
@@ -70,11 +70,11 @@ public final class CapabilityChangeNotificationProducer implements DataTreeChang
     public void onDataTreeChanged(final Collection<DataTreeModification<Capabilities>> changes) {
         for (DataTreeModification<Capabilities> change : changes) {
             final DataObjectModification<Capabilities> rootNode = change.getRootNode();
-            final DataObjectModification.ModificationType modificationType = rootNode.getModificationType();
+            final DataObjectModification.ModificationType modificationType = rootNode.modificationType();
             switch (modificationType) {
                 case WRITE: {
-                    final Capabilities dataAfter = rootNode.getDataAfter();
-                    final Capabilities dataBefore = rootNode.getDataBefore();
+                    final Capabilities dataAfter = rootNode.dataAfter();
+                    final Capabilities dataBefore = rootNode.dataBefore();
                     final Set<Uri> before = dataBefore != null ? ImmutableSet.copyOf(dataBefore.getCapability())
                         : Set.of();
                     final Set<Uri> after = dataAfter != null ? ImmutableSet.copyOf(dataAfter.getCapability())
