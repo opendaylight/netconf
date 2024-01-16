@@ -407,7 +407,7 @@ public class PropertyEntity {
         } else if (leafTypeDef instanceof EnumTypeDefinition enumType) {
             jsonType = processEnumType(enumType, def);
         } else if (leafTypeDef instanceof IdentityrefTypeDefinition identityrefType) {
-            jsonType = processIdentityRefType(identityrefType, stack.getEffectiveModelContext(), def);
+            jsonType = processIdentityRefType(identityrefType, stack.modelContext(), def);
         } else if (leafTypeDef instanceof StringTypeDefinition stringType) {
             jsonType = processStringType(stringType, schemaNode.getQName().getLocalName(), def);
         } else if (leafTypeDef instanceof UnionTypeDefinition unionType) {
@@ -426,7 +426,7 @@ public class PropertyEntity {
             jsonType = processNumberType(rangeRestrictedType, def);
         } else if (leafTypeDef instanceof InstanceIdentifierTypeDefinition instanceIdentifierType) {
             jsonType = processInstanceIdentifierType(instanceIdentifierType, schemaNode,
-                stack.getEffectiveModelContext(), def);
+                stack.modelContext(), def);
         } else {
             jsonType = STRING_TYPE;
         }

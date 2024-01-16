@@ -28,7 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.restconf.openapi.impl.OpenApiInputStream;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -58,7 +58,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     private final AtomicLong idKey = new AtomicLong(0);
 
-    private ListenerRegistration<DOMMountPointListener> registration;
+    private Registration registration;
 
     public MountPointOpenApi(final DOMSchemaService globalSchema, final DOMMountPointService mountService,
             final BaseYangOpenApiGenerator openApiGenerator) {
@@ -190,7 +190,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private OpenApiInputStream generateDataStoreOpenApi(EffectiveModelContext modelContext,
+    private OpenApiInputStream generateDataStoreOpenApi(final EffectiveModelContext modelContext,
             final UriInfo uriInfo, final String urlPrefix, final String deviceName) throws IOException {
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);

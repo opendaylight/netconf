@@ -8,13 +8,15 @@
 package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertEntity;
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertError;
 
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.io.CharStreams;
 import java.io.Reader;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
@@ -35,7 +37,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -59,7 +61,7 @@ public class RestconfSchemaServiceMountTest {
     @Mock
     private DOMSchemaService schemaService;
     @Mock
-    private DOMYangTextSourceProvider sourceProvider;
+    private YangTextSourceExtension sourceProvider;
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
@@ -67,7 +69,7 @@ public class RestconfSchemaServiceMountTest {
     @Mock
     private DOMRpcService rpcService;
     @Mock
-    private YangTextSchemaSource yangSource;
+    private YangTextSource yangSource;
     @Mock
     private Reader yangReader;
 
@@ -80,15 +82,15 @@ public class RestconfSchemaServiceMountTest {
         // create and register mount points
         mountPointService
                 .createMountPoint(YangInstanceIdentifier.of(QName.create("mount:point:1", "2016-01-01", "cont")))
-                .addService(DOMSchemaService.class, FixedDOMSchemaService.of(SCHEMA_CONTEXT_BEHIND_MOUNT_POINT))
+                .addService(DOMSchemaService.class, new FixedDOMSchemaService(SCHEMA_CONTEXT_BEHIND_MOUNT_POINT))
                 .addService(DOMDataBroker.class, dataBroker)
                 .register();
         mountPointService
                 .createMountPoint(YangInstanceIdentifier.of(QName.create("mount:point:2", "2016-01-01", "cont")))
                 .register();
 
-        doReturn(ImmutableClassToInstanceMap.of(DOMYangTextSourceProvider.class, sourceProvider)).when(schemaService)
-            .getExtensions();
+        doCallRealMethod().when(schemaService).extension(any());
+        doReturn(List.of(sourceProvider)).when(schemaService).supportedExtensions();
         doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(schemaService).getGlobalContext();
 
         restconf = new JaxRsRestconf(new MdsalRestconfServer(schemaService, dataBroker, rpcService, actionService,

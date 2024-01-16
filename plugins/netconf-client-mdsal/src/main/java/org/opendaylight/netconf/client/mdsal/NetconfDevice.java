@@ -64,14 +64,14 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +139,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
         final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
-        final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.getEffectiveModelContext(), listener,
+        final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.modelContext(), listener,
             new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
         final var sourceResolverFuture = Futures.submit(new DeviceSourcesResolver(id, baseSchema, initRpc,
                 remoteSessionCapabilities, stateSchemasResolver), processingExecutor);
@@ -284,9 +284,11 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             new NetconfMessageTransformer(emptyContext, false, baseSchema));
 
         return Futures.transform(deviceRpc.invokeRpc(NetconfMessageTransformUtil.NETCONF_GET_QNAME,
-            Builders.containerBuilder().withNodeIdentifier(NETCONF_GET_NODEID)
+            ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(NETCONF_GET_NODEID)
                 .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS, schemaContext))
-                .build()), rpcResult -> processSchemaMounts(rpcResult, emptyContext), MoreExecutors.directExecutor());
+                .build()),
+            rpcResult -> processSchemaMounts(rpcResult, emptyContext), MoreExecutors.directExecutor());
     }
 
     private MountPointContext processSchemaMounts(final DOMRpcResult rpcResult, final MountPointContext emptyContext) {
@@ -320,7 +322,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
             final RemoteDeviceCommunicator listener, final BaseSchema schema) {
-        return new NetconfDeviceRpc(result.getEffectiveModelContext(), listener,
+        return new NetconfDeviceRpc(result.modelContext(), listener,
             new NetconfMessageTransformer(result, true, schema));
     }
 
@@ -408,10 +410,10 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             if (remoteSessionCapabilities.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
                 // FIXME: mutable collection modification!
                 deviceSources.getRequiredSourcesQName().addAll(List.of(
-                    org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                        .$YangModuleInfoImpl.getInstance().getName(),
-                    org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                        .$YangModuleInfoImpl.getInstance().getName())
+                    org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                        .YangModuleInfoImpl.getInstance().getName(),
+                    org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                        .YangModuleInfoImpl.getInstance().getName())
                 );
             }
 
@@ -487,7 +489,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         private List<SourceIdentifier> filterMissingSources(final Collection<SourceIdentifier> origSources) {
             return origSources.parallelStream().filter(sourceIdentifier -> {
                 try {
-                    schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class).get();
+                    schemaRepository.getSchemaSource(sourceIdentifier, YangTextSource.class).get();
                     return false;
                 } catch (InterruptedException | ExecutionException e) {
                     return true;
@@ -504,7 +506,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         private List<SourceIdentifier> handleMissingSchemaSourceException(
                 final MissingSchemaSourceException exception) {
             // In case source missing, try without it
-            final SourceIdentifier missingSource = exception.getSourceId();
+            final SourceIdentifier missingSource = exception.sourceId();
             LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it",
                 id, missingSource);
             LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it",
@@ -521,16 +523,16 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             // In case resolution error, try only with resolved sources
             // There are two options why schema resolution exception occurred : unsatisfied imports or flawed model
             // FIXME Do we really have assurance that these two cases cannot happen at once?
-            if (resolutionException.getFailedSource() != null) {
+            final var failedSourceId = resolutionException.sourceId();
+            if (failedSourceId != null) {
                 // flawed model - exclude it
-                final SourceIdentifier failedSourceId = resolutionException.getFailedSource();
                 LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
                     id, failedSourceId);
                 LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
                     id, failedSourceId, resolutionException);
                 addUnresolvedCapabilities(getQNameFromSourceIdentifiers(List.of(failedSourceId)),
                         UnavailableCapability.FailureReason.UnableToResolve);
-                return stripUnavailableSource(resolutionException.getFailedSource());
+                return stripUnavailableSource(failedSourceId);
             }
             // unsatisfied imports
             addUnresolvedCapabilities(

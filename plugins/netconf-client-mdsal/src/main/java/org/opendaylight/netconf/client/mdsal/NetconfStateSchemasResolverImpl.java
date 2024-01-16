@@ -12,7 +12,7 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.$YangModuleInfoImpl;
+import org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -22,7 +22,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * Default implementation resolving schemas QNames from netconf-state or from modules-state.
  */
 public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchemasResolver {
-    private static final QName RFC8525_YANG_LIBRARY_CAPABILITY = $YangModuleInfoImpl.getInstance().getName();
+    private static final QName RFC8525_YANG_LIBRARY_CAPABILITY = YangModuleInfoImpl.getInstance().getName();
     private static final QName RFC7895_YANG_LIBRARY_CAPABILITY = RFC8525_YANG_LIBRARY_CAPABILITY
         .bindTo(QNameModule.create(RFC8525_YANG_LIBRARY_CAPABILITY.getNamespace(), Revision.of("2016-06-21"))).intern();
 
