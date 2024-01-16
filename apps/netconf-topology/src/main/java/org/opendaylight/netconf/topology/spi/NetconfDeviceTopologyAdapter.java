@@ -17,9 +17,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.Transaction;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
-import org.opendaylight.mdsal.binding.api.TransactionChainListener;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -48,7 +46,7 @@ import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class NetconfDeviceTopologyAdapter implements TransactionChainListener {
+public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceTopologyAdapter.class);
 
     private final @NonNull KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath;
@@ -65,7 +63,8 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
         this.dataBroker = requireNonNull(dataBroker);
         this.topologyPath = requireNonNull(topologyPath);
         this.id = requireNonNull(id);
-        txChain = dataBroker.createMergingTransactionChain(this);
+        txChain = dataBroker.createMergingTransactionChain();
+        txChain.addCallback(this);
 
         final var tx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Init device state transaction {} putting if absent operational data started.", id,
@@ -186,25 +185,25 @@ public final class NetconfDeviceTopologyAdapter implements TransactionChainListe
     }
 
     @Override
-    public synchronized void onTransactionChainFailed(final TransactionChain chain, final Transaction transaction,
-            final Throwable cause) {
-        LOG.warn("{}: TransactionChain({}) {} FAILED!", id, chain, transaction.getIdentifier(), cause);
+    public synchronized void onFailure(final Throwable cause) {
+        LOG.warn("{}: transaction chain FAILED!", id, cause);
         if (closeFuture != null) {
             closeFuture.setException(cause);
             return;
         }
 
         // FIXME: move this up once we have MDSAL-838 fixed
-        chain.close();
+        txChain.close();
 
-        txChain = dataBroker.createMergingTransactionChain(this);
+        txChain = dataBroker.createMergingTransactionChain();
         LOG.info("{}: TransactionChain reset to {}", id, txChain);
+        txChain.addCallback(this);
         // FIXME: restart last update
     }
 
     @Override
-    public synchronized void onTransactionChainSuccessful(final TransactionChain chain) {
-        LOG.trace("{}: TransactionChain({}) SUCCESSFUL", id, chain);
+    public synchronized void onSuccess(final Empty result) {
+        LOG.trace("{}: transaction chain SUCCESSFUL", id);
         closeFuture.set(Empty.value());
     }
 

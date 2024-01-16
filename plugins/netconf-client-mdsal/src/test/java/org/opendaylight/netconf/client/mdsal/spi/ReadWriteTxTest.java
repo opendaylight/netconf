@@ -78,7 +78,7 @@ public class ReadWriteTxTest {
 
     @Test
     public void getIdentifier() throws Exception {
-        final ReadWriteTx<?> tx2 = new ReadWriteTx<>(null, null);
+        final ReadWriteTx<?> tx2 = new ReadWriteTx<>(delegateReadTx, delegateWriteTx);
         assertNotEquals(tx.getIdentifier(), tx2.getIdentifier());
     }
 }

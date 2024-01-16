@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
 
 import akka.actor.ActorSystem;
 import akka.actor.Status.Success;
@@ -16,6 +16,7 @@ import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.Test;
@@ -87,13 +88,13 @@ public class ProxyDOMDataBrokerTest {
         masterActor.expectMsgClass(ReadRequest.class);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testCreateTransactionChain() {
-        proxy.createTransactionChain(null);
+        assertThrows(UnsupportedOperationException.class, proxy::createTransactionChain);
     }
 
     @Test
     public void testGetSupportedExtensions() {
-        assertTrue(proxy.getExtensions().isEmpty());
+        assertEquals(List.of(), proxy.supportedExtensions());
     }
 }

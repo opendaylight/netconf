@@ -5,14 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.messages;
 
 import akka.actor.ActorRef;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 
 /**
  * Master sends the message to slave with necessary parameters for creating slave mount point.
@@ -24,7 +23,7 @@ public class RegisterMountPoint implements Serializable {
     private final List<SourceIdentifier> allSourceIdentifiers;
     private final ActorRef masterActorRef;
 
-    public RegisterMountPoint(final List<SourceIdentifier> allSourceIdentifiers, ActorRef masterActorRef) {
+    public RegisterMountPoint(final List<SourceIdentifier> allSourceIdentifiers, final ActorRef masterActorRef) {
         this.allSourceIdentifiers = allSourceIdentifiers;
         this.masterActorRef = masterActorRef;
     }

@@ -27,7 +27,7 @@ import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessage;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -98,7 +98,7 @@ public class ProxyDOMRpcService implements DOMRpcService {
     }
 
     @Override
-    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T listener) {
+    public Registration registerRpcListener(final DOMRpcAvailabilityListener listener) {
         // NOOP, only proxy
         throw new UnsupportedOperationException("RegisterRpcListener: DOMRpc service not working in cluster.");
     }

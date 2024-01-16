@@ -100,6 +100,7 @@ import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterAc
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -112,16 +113,16 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
+import org.opendaylight.yangtools.yang.model.spi.source.DelegatedYangTextSource;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import scala.concurrent.Await;
@@ -158,9 +159,9 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     @Mock
     private NetconfDataTreeService netconfService;
     @Mock
-    private SchemaSourceRegistration<?> mockSchemaSourceReg1;
+    private Registration mockSchemaSourceReg1;
     @Mock
-    private SchemaSourceRegistration<?> mockSchemaSourceReg2;
+    private Registration mockSchemaSourceReg2;
     @Mock
     private SchemaSourceRegistry mockRegistry;
     @Mock
@@ -280,7 +281,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         doReturn(mockSchemaSourceReg1).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
 
-        final SchemaSourceRegistration<?> newMockSchemaSourceReg = mock(SchemaSourceRegistration.class);
+        final var newMockSchemaSourceReg = mock(Registration.class);
 
         final EffectiveModelContextFactory newMockSchemaContextFactory = mock(EffectiveModelContextFactory.class);
         doReturn(Futures.immediateFuture(mockSchemaContext))
@@ -345,7 +346,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         // Test unrecoverable failure.
 
-        doReturn(Futures.immediateFailedFuture(new SchemaResolutionException("mock")))
+        doReturn(Futures.immediateFailedFuture(
+            new SchemaResolutionException("mock", new SourceIdentifier("foo"), null)))
                 .when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());
 
         slaveRef.tell(new RegisterMountPoint(ImmutableList.of(SOURCE_IDENTIFIER1, SOURCE_IDENTIFIER2),
@@ -364,7 +366,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         reset(mockSchemaSourceReg1, mockSchemaSourceReg2);
 
-        doReturn(Futures.immediateFailedFuture(new SchemaResolutionException("mock",
+        doReturn(Futures.immediateFailedFuture(new SchemaResolutionException("mock", new SourceIdentifier("foo"),
                 new AskTimeoutException("timeout"))))
             .doReturn(Futures.immediateFuture(mockSchemaContext))
             .when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());
@@ -396,7 +398,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
                 slaveRef.tell(new RegisterMountPoint(ImmutableList.of(SOURCE_IDENTIFIER1, SOURCE_IDENTIFIER2),
                         masterRef), testKit.getRef());
 
-                future.setException(new SchemaResolutionException("mock", new AskTimeoutException("timeout")));
+                future.setException(new SchemaResolutionException("mock", new SourceIdentifier("foo"),
+                    new AskTimeoutException("timeout")));
             }).start();
             return future;
         }).when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());
@@ -443,21 +446,21 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final ProxyYangTextSourceProvider proxyYangProvider =
                 new ProxyYangTextSourceProvider(masterRef, system.dispatcher(), TIMEOUT);
 
-        final YangTextSchemaSource yangTextSchemaSource = YangTextSchemaSource.delegateForCharSource(sourceIdentifier,
-                CharSource.wrap("YANG"));
+        final YangTextSource yangTextSchemaSource = new DelegatedYangTextSource(sourceIdentifier,
+            CharSource.wrap("YANG"));
 
         // Test success.
 
-        final SchemaSourceRegistration<YangTextSchemaSource> schemaSourceReg = masterSchemaRepository
-                .registerSchemaSource(id -> Futures.immediateFuture(yangTextSchemaSource),
-                     PotentialSchemaSource.create(sourceIdentifier, YangTextSchemaSource.class, 1));
+        final var schemaSourceReg = masterSchemaRepository.registerSchemaSource(
+            id -> Futures.immediateFuture(yangTextSchemaSource),
+            PotentialSchemaSource.create(sourceIdentifier, YangTextSource.class, 1));
 
         final Future<YangTextSchemaSourceSerializationProxy> resolvedSchemaFuture =
                 proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
 
         final YangTextSchemaSourceSerializationProxy success = Await.result(resolvedSchemaFuture, TIMEOUT.duration());
 
-        assertEquals(sourceIdentifier, success.getRepresentation().getIdentifier());
+        assertEquals(sourceIdentifier, success.getRepresentation().sourceId());
         assertEquals("YANG", success.getRepresentation().read());
 
         // Test missing source failure.

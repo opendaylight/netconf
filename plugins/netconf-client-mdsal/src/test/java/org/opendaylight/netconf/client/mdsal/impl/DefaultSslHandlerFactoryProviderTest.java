@@ -35,7 +35,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateKey;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -53,12 +53,12 @@ public class DefaultSslHandlerFactoryProviderTest {
     @Mock
     private DataBroker dataBroker;
     @Mock
-    private ListenerRegistration<?> listenerRegistration;
+    private Registration listenerRegistration;
 
     @Before
     public void setUp() {
         doReturn(listenerRegistration).when(dataBroker)
-            .registerDataTreeChangeListener(any(DataTreeIdentifier.class), any(DefaultSslHandlerFactoryProvider.class));
+            .registerTreeChangeListener(any(DataTreeIdentifier.class), any(DefaultSslHandlerFactoryProvider.class));
     }
 
     @Test
@@ -76,13 +76,13 @@ public class DefaultSslHandlerFactoryProviderTest {
         doReturn(keystoreObjectModification).when(dataTreeModification).getRootNode();
 
         DataObjectModification<?> childObjectModification = mock(DataObjectModification.class);
-        doReturn(List.of(childObjectModification)).when(keystoreObjectModification).getModifiedChildren();
-        doReturn(PrivateKey.class).when(childObjectModification).getDataType();
+        doReturn(List.of(childObjectModification)).when(keystoreObjectModification).modifiedChildren();
+        doReturn(PrivateKey.class).when(childObjectModification).dataType();
 
-        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification).getModificationType();
+        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification).modificationType();
 
         final var privateKey = getPrivateKey();
-        doReturn(privateKey).when(childObjectModification).getDataAfter();
+        doReturn(privateKey).when(childObjectModification).dataAfter();
 
         final var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
         keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification));
@@ -100,13 +100,13 @@ public class DefaultSslHandlerFactoryProviderTest {
         doReturn(keystoreObjectModification1).when(dataTreeModification1).getRootNode();
 
         DataObjectModification<?> childObjectModification1 = mock(DataObjectModification.class);
-        doReturn(List.of(childObjectModification1)).when(keystoreObjectModification1).getModifiedChildren();
-        doReturn(PrivateKey.class).when(childObjectModification1).getDataType();
+        doReturn(List.of(childObjectModification1)).when(keystoreObjectModification1).modifiedChildren();
+        doReturn(PrivateKey.class).when(childObjectModification1).dataType();
 
-        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification1).getModificationType();
+        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification1).modificationType();
 
         final var privateKey = getPrivateKey();
-        doReturn(privateKey).when(childObjectModification1).getDataAfter();
+        doReturn(privateKey).when(childObjectModification1).dataAfter();
 
         // Prepare TrustedCertificate configuration
         DataTreeModification<Keystore> dataTreeModification2 = mock(DataTreeModification.class);
@@ -114,14 +114,14 @@ public class DefaultSslHandlerFactoryProviderTest {
         doReturn(keystoreObjectModification2).when(dataTreeModification2).getRootNode();
 
         DataObjectModification<?> childObjectModification2 = mock(DataObjectModification.class);
-        doReturn(List.of(childObjectModification2)).when(keystoreObjectModification2).getModifiedChildren();
-        doReturn(TrustedCertificate.class).when(childObjectModification2).getDataType();
+        doReturn(List.of(childObjectModification2)).when(keystoreObjectModification2).modifiedChildren();
+        doReturn(TrustedCertificate.class).when(childObjectModification2).dataType();
 
         doReturn(DataObjectModification.ModificationType.WRITE)
-            .when(childObjectModification2).getModificationType();
+            .when(childObjectModification2).modificationType();
 
         final var trustedCertificate = geTrustedCertificate();
-        doReturn(trustedCertificate).when(childObjectModification2).getDataAfter();
+        doReturn(trustedCertificate).when(childObjectModification2).dataAfter();
 
         // Apply configurations
         final var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);

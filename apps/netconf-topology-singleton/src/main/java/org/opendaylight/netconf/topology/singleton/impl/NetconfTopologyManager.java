@@ -16,7 +16,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PreDestroy;
@@ -24,9 +24,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
-import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
@@ -34,9 +33,8 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
-import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
-import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
+import org.opendaylight.mdsal.singleton.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
@@ -57,7 +55,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.osgi.service.component.annotations.Activate;
@@ -74,7 +72,7 @@ import org.slf4j.LoggerFactory;
 @Component(service = { }, configurationPid = "org.opendaylight.netconf.topology.singleton")
 @Designate(ocd = NetconfTopologyManager.Configuration.class)
 // Non-final for testing
-public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<Node>, AutoCloseable {
+public class NetconfTopologyManager implements DataTreeChangeListener<Node>, AutoCloseable {
     @ObjectClassDefinition
     public @interface Configuration {
         @AttributeDefinition(min = "1", description = "Name of the Network Topology instance to manage")
@@ -89,8 +87,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyManager.class);
 
     private final Map<InstanceIdentifier<Node>, NetconfTopologyContext> contexts = new ConcurrentHashMap<>();
-    private final Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration>
-            clusterRegistrations = new ConcurrentHashMap<>();
+    private final Map<InstanceIdentifier<Node>, Registration> clusterRegistrations = new ConcurrentHashMap<>();
 
     private final BaseNetconfSchemas baseSchemas;
     private final DataBroker dataBroker;
@@ -106,7 +103,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     private final NetconfClientConfigurationBuilderFactory builderFactory;
     private final SchemaResourceManager resourceManager;
 
-    private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
+    private Registration dataChangeListenerRegistration;
     private NetconfTopologyRPCProvider rpcProvider;
 
     @Activate
@@ -173,23 +170,23 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeModification<Node>> changes) {
-        for (final DataTreeModification<Node> change : changes) {
-            final DataObjectModification<Node> rootNode = change.getRootNode();
-            final InstanceIdentifier<Node> dataModifIdent = change.getRootPath().getRootIdentifier();
-            final NodeId nodeId = NetconfTopologyUtils.getNodeId(rootNode.getIdentifier());
-            switch (rootNode.getModificationType()) {
+    public void onDataTreeChanged(final List<DataTreeModification<Node>> changes) {
+        for (var change : changes) {
+            final var rootNode = change.getRootNode();
+            final var dataModifIdent = change.getRootPath().path();
+            final NodeId nodeId = NetconfTopologyUtils.getNodeId(rootNode.step());
+            switch (rootNode.modificationType()) {
                 case SUBTREE_MODIFIED:
                     LOG.debug("Config for node {} updated", nodeId);
-                    refreshNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
+                    refreshNetconfDeviceContext(dataModifIdent, rootNode.dataAfter());
                     break;
                 case WRITE:
                     if (contexts.containsKey(dataModifIdent)) {
                         LOG.debug("RemoteDevice{{}} was already configured, reconfiguring node...", nodeId);
-                        refreshNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
+                        refreshNetconfDeviceContext(dataModifIdent, rootNode.dataAfter());
                     } else {
                         LOG.debug("Config for node {} created", nodeId);
-                        startNetconfDeviceContext(dataModifIdent, rootNode.getDataAfter());
+                        startNetconfDeviceContext(dataModifIdent, rootNode.dataAfter());
                     }
                     break;
                 case DELETE:
@@ -218,8 +215,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         final Timeout actorResponseWaitTime = Timeout.create(
                 Duration.ofSeconds(netconfNode.getActorResponseWaitTime().toJava()));
 
-        final ServiceGroupIdentifier serviceGroupIdent =
-                ServiceGroupIdentifier.create(instanceIdentifier.toString());
+        final ServiceGroupIdentifier serviceGroupIdent = new ServiceGroupIdentifier(instanceIdentifier.toString());
 
         final NetconfTopologyContext newNetconfTopologyContext = newNetconfTopologyContext(
             createSetup(instanceIdentifier, node), serviceGroupIdent, actorResponseWaitTime, deviceActionFactory);
@@ -227,7 +223,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         int tries = 3;
         while (true) {
             try {
-                final ClusterSingletonServiceRegistration clusterSingletonServiceRegistration =
+                final var clusterSingletonServiceRegistration =
                         clusterSingletonServiceProvider.registerClusterSingletonService(newNetconfTopologyContext);
                 clusterRegistrations.put(instanceIdentifier, clusterSingletonServiceRegistration);
                 contexts.put(instanceIdentifier, newNetconfTopologyContext);
@@ -290,7 +286,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         }
     }
 
-    private ListenerRegistration<NetconfTopologyManager> registerDataTreeChangeListener() {
+    private Registration registerDataTreeChangeListener() {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
         // FIXME: how does this play out with lifecycle? In a cluster, someone needs to ensure this call happens, but
         //        also we need to to make sure config -> oper is properly synchronized. Non-clustered case relies on
@@ -311,7 +307,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
         }, MoreExecutors.directExecutor());
 
         LOG.debug("Registering datastore listener");
-        return dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
+        return dataBroker.registerTreeChangeListener(DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
             NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
     }
 

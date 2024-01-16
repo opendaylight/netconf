@@ -36,18 +36,18 @@ public record DefaultBaseNetconfSchemas(BaseSchema baseSchema, BaseSchema baseSc
     public DefaultBaseNetconfSchemas(@Reference final YangParserFactory parserFactory) throws YangParserException {
         this(
             new BaseSchema(BindingRuntimeHelpers.createEffectiveModel(parserFactory, List.of(
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601
-                    .$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004
-                    .$YangModuleInfoImpl.getInstance()))),
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601
+                    .YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004
+                    .YangModuleInfoImpl.getInstance()))),
             new BaseSchema(BindingRuntimeHelpers.createEffectiveModel(parserFactory, List.of(
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                    .$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601
-                    .$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004
-                    .$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206
-                    .$YangModuleInfoImpl.getInstance()))));
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                    .YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601
+                    .YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004
+                    .YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206
+                    .YangModuleInfoImpl.getInstance()))));
     }
 }
