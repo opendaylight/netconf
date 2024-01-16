@@ -9,14 +9,10 @@ package org.opendaylight.netconf.server.mdsal.operations;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.ImmutableClassToInstanceMap;
+import java.util.function.Consumer;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaServiceExtension;
-import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 
 final class SchemaServiceStub implements DOMSchemaService {
     private final EffectiveModelContext schemaContext;
@@ -31,19 +27,10 @@ final class SchemaServiceStub implements DOMSchemaService {
     }
 
     @Override
-    public ListenerRegistration<EffectiveModelContextListener> registerSchemaContextListener(
-        final EffectiveModelContextListener listener) {
-        listener.onModelContextUpdated(schemaContext);
-        return new AbstractListenerRegistration<>(listener) {
-            @Override
-            protected void removeRegistration() {
-                // No-op
-            }
+    public Registration registerSchemaContextListener(final Consumer<EffectiveModelContext> listener) {
+        listener.accept(schemaContext);
+        return () -> {
+            // No-op
         };
-    }
-
-    @Override
-    public ClassToInstanceMap<DOMSchemaServiceExtension> getExtensions() {
-        return ImmutableClassToInstanceMap.of();
     }
 }

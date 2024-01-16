@@ -8,13 +8,12 @@
 package org.opendaylight.netconf.dom.api.tx;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker.Extension;
 
 /**
  * DOM data broker extension with an option to read only selected fields under parent data node.
  */
-public interface NetconfDOMDataBrokerFieldsExtension extends DOMDataBrokerExtension {
+public interface NetconfDOMDataBrokerFieldsExtension extends Extension {
     /**
      * Create a new read-only transaction with an option to read only selected fields from target data node.
      *
@@ -32,9 +31,7 @@ public interface NetconfDOMDataBrokerFieldsExtension extends DOMDataBrokerExtens
     /**
      * Create a new transaction chain with an option to read only selected fields from target data node.
      *
-     * @param listener Transaction chain event listener.
      * @return A new transaction chain.
-     * @throws NullPointerException if {@code listener} is null
      */
-    @NonNull NetconfDOMFieldsTransactionChain createTransactionChain(DOMTransactionChainListener listener);
+    @NonNull NetconfDOMFieldsTransactionChain createTransactionChain();
 }
