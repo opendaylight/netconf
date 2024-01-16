@@ -33,15 +33,15 @@ import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.w3c.dom.Document;
 
 final class NotificationsTransformUtil {
-    private final EffectiveModelContext schemaContext;
+    private final EffectiveModelContext modelContext;
     private final BindingNormalizedNodeSerializer serializer;
 
     NotificationsTransformUtil(final YangParserFactory parserFactory, final BindingRuntimeGenerator generator,
             final BindingDOMCodecFactory codecFactory) throws YangParserException {
         final var ctx = BindingRuntimeHelpers.createRuntimeContext(parserFactory, generator,
             Netconf.class, NetconfConfigChange.class, YangLibraryChange.class, YangLibraryUpdate.class);
-        schemaContext = ctx.getEffectiveModelContext();
-        verify(schemaContext.getOperations().stream()
+        modelContext = ctx.modelContext();
+        verify(modelContext.getOperations().stream()
                 .filter(input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION))
                 .findFirst()
                 .isPresent());
@@ -56,7 +56,7 @@ final class NotificationsTransformUtil {
         final var containerNode = serializer.toNormalizedNodeNotification(notification);
         final var result = new DOMResult(XmlUtil.newDocument());
         try {
-            NormalizedDataUtil.writeNormalizedNode(containerNode, result, schemaContext, path);
+            NormalizedDataUtil.writeNormalizedNode(containerNode, result, modelContext, path);
         } catch (final XMLStreamException | IOException e) {
             throw new IllegalStateException("Unable to serialize " + notification, e);
         }

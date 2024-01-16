@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.topology.impl;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collection;
+import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -119,15 +119,15 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeModification<Node>> changes) {
+    public void onDataTreeChanged(final List<DataTreeModification<Node>> changes) {
         for (var change : changes) {
             final var rootNode = change.getRootNode();
-            final var modType = rootNode.getModificationType();
+            final var modType = rootNode.modificationType();
             switch (modType) {
-                case SUBTREE_MODIFIED -> ensureNode("updated", rootNode.getDataAfter());
-                case WRITE -> ensureNode("created", rootNode.getDataAfter());
+                case SUBTREE_MODIFIED -> ensureNode("updated", rootNode.dataAfter());
+                case WRITE -> ensureNode("created", rootNode.dataAfter());
                 case DELETE -> {
-                    final var nodeId = InstanceIdentifier.keyOf(change.getRootPath().getRootIdentifier()).getNodeId();
+                    final var nodeId = InstanceIdentifier.keyOf(change.getRootPath().path()).getNodeId();
                     LOG.debug("Config for node {} deleted", nodeId);
                     deleteNode(nodeId);
                 }

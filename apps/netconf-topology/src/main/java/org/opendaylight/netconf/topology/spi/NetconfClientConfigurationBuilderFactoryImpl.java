@@ -13,6 +13,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.Provider;
 import java.security.Security;
@@ -119,8 +121,16 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         } else if (credentials instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
             final var username = loginPassword.getUsername();
-            final var password = Base64.getEncoder().encodeToString(loginPassword.getPassword());
-            sshParamsBuilder.setClientIdentity(loginPasswordIdentity(username, encryptionService.decrypt(password)));
+
+            final byte[] plainBytes;
+            try {
+                plainBytes = encryptionService.decrypt(loginPassword.getPassword());
+            } catch (GeneralSecurityException e) {
+                throw new IllegalStateException("Failed to decrypt password", e);
+            }
+
+            sshParamsBuilder.setClientIdentity(loginPasswordIdentity(username,
+                new String(plainBytes, StandardCharsets.UTF_8)));
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyBased = keyAuth.getKeyBased();
             sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder().setUsername(keyBased.getUsername()).build());
@@ -156,12 +166,23 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         }
         final var passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
         try {
-            return decodePrivateKey(encryptionService.decrypt(dsKeypair.getPrivateKey()),
-                encryptionService.decrypt(passPhrase));
+            return decodePrivateKey(decryptString(dsKeypair.getPrivateKey()), decryptString(passPhrase));
         } catch (IOException e) {
             throw new IllegalStateException("Could not decode private key with keyId=" + keyId, e);
         }
     }
+
+    private String decryptString(final String encrypted) {
+        final byte[] cryptobytes = Base64.getDecoder().decode(encrypted);
+        final byte[] clearbytes;
+        try {
+            clearbytes = encryptionService.decrypt(cryptobytes);
+        } catch (GeneralSecurityException e) {
+            throw new IllegalStateException("Failed to decrypt", e);
+        }
+        return new String(clearbytes, StandardCharsets.UTF_8);
+    }
+
 
     @VisibleForTesting
     static KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {

@@ -9,6 +9,7 @@ package org.opendaylight.netconf.yanglib.writer;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.ExecutionException;
@@ -26,7 +27,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -43,10 +43,9 @@ import org.slf4j.LoggerFactory;
  * state to operational data store.
  */
 @Singleton
-@Component(immediate = true, configurationPid = "org.opendaylight.netconf.yanglib")
+@Component(service = { }, configurationPid = "org.opendaylight.netconf.yanglib")
 @Designate(ocd = YangLibraryWriter.Configuration.class)
-public final class YangLibraryWriter implements EffectiveModelContextListener, AutoCloseable {
-
+public final class YangLibraryWriter implements AutoCloseable {
     @ObjectClassDefinition
     public @interface Configuration {
         @AttributeDefinition(description = "Enables legacy content to be written")
@@ -72,10 +71,10 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
     @Inject
     @Activate
     public YangLibraryWriter(final @Reference DOMSchemaService schemaService,
-        final @Reference DataBroker dataBroker, final Configuration configuration) {
+            final @Reference DataBroker dataBroker, final Configuration configuration) {
         this.dataBroker = requireNonNull(dataBroker);
-        this.writeLegacy = configuration.write$_$legacy();
-        reg = schemaService.registerSchemaContextListener(this);
+        writeLegacy = configuration.write$_$legacy();
+        reg = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
     }
 
     @Deactivate
@@ -114,8 +113,7 @@ public final class YangLibraryWriter implements EffectiveModelContextListener, A
         future.get();
     }
 
-    @Override
-    public void onModelContextUpdated(final EffectiveModelContext context) {
+    @VisibleForTesting void onModelContextUpdated(final EffectiveModelContext context) {
         if (context.findModule(YangLibrary.QNAME.getModule()).isPresent()) {
             updateYangLibrary(context);
         } else {

@@ -17,9 +17,9 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.yang.binding.DataObjectStep;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableItem;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.binding.KeyStep;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
@@ -49,9 +49,8 @@ public final class NetconfTopologyUtils {
         return masterAddress.replace("//", "") + "_" + name;
     }
 
-    public static @NonNull NodeId getNodeId(final PathArgument pathArgument) {
-        if (pathArgument instanceof IdentifiableItem<?, ?> identifiableItem
-            && identifiableItem.getKey() instanceof NodeKey nodeKey) {
+    public static @NonNull NodeId getNodeId(final DataObjectStep<?> pathArgument) {
+        if (pathArgument instanceof KeyStep identifiableItem && identifiableItem.key() instanceof NodeKey nodeKey) {
             return nodeKey.getNodeId();
         }
         throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);

@@ -5,19 +5,17 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.messages;
 
-import java.io.Serial;
 import java.io.Serializable;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 
 /**
  * Slave sends message to master when tries to resolve schema with particular sourceIdentifier (proxy call).
  * Master responds with resolved schema source.
  */
 public class YangTextSchemaSourceRequest implements Serializable {
-    @Serial
+    @java.io.Serial
     private static final long serialVersionUID = 1L;
 
     private final SourceIdentifier sourceIdentifier;
