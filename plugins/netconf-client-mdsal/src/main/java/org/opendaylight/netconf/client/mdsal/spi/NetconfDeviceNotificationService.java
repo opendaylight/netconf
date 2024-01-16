@@ -7,15 +7,19 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -23,21 +27,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NetconfDeviceNotificationService implements DOMNotificationService {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceNotificationService.class);
 
     private final Multimap<Absolute, DOMNotificationListener> listeners = HashMultimap.create();
 
     // Notification publish is very simple and hijacks the thread of the caller
-    // TODO shouldnt we reuse the implementation for notification router from sal-broker-impl ?
+    // TODO: should we not reuse the implementation for notification router from mdsal-dom-broker ?
     @SuppressWarnings("checkstyle:IllegalCatch")
     public synchronized void publishNotification(final DOMNotification notification) {
-        for (final DOMNotificationListener domNotificationListener : listeners.get(notification.getType())) {
+        for (var listener : listeners.get(notification.getType())) {
             try {
-                domNotificationListener.onNotification(notification);
-            } catch (final Exception e) {
-                LOG.warn("Listener {} threw an uncaught exception during processing notification {}",
-                        domNotificationListener, notification, e);
+                listener.onNotification(notification);
+            } catch (Exception e) {
+                LOG.warn("Listener {} threw an uncaught exception during processing notification {}", listener,
+                    notification, e);
             }
         }
     }
@@ -45,30 +48,43 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
     @Override
     public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(
             final T listener, final Collection<Absolute> types) {
-        for (final Absolute type : types) {
+        requireNonNull(listener);
+        final var copy = types.stream().map(Objects::requireNonNull).distinct().toArray(Absolute[]::new);
+        for (var type : copy) {
             listeners.put(type, listener);
         }
 
         return new AbstractListenerRegistration<>(listener) {
             @Override
             protected void removeRegistration() {
-                for (final Absolute type : types) {
-                    listeners.remove(type, listener);
+                synchronized (NetconfDeviceNotificationService.this) {
+                    for (var type : copy) {
+                        listeners.remove(type, listener);
+                    }
                 }
             }
         };
     }
 
     @Override
-    public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(
-            final T listener, final Absolute... types) {
-        return registerNotificationListener(listener, Lists.newArrayList(types));
+    public <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(final T listener,
+            final Absolute... types) {
+        return registerNotificationListener(listener, Arrays.asList(types));
     }
 
     @Override
     public synchronized Registration registerNotificationListeners(
             final Map<Absolute, DOMNotificationListener> typeToListener) {
-        // FIXME: implement this
-        throw new UnsupportedOperationException();
+        final var copy = Map.copyOf(typeToListener);
+        copy.forEach(listeners::put);
+
+        return new AbstractRegistration() {
+            @Override
+            protected void removeRegistration() {
+                synchronized (NetconfDeviceNotificationService.this) {
+                    copy.forEach(listeners::remove);
+                }
+            }
+        };
     }
 }
