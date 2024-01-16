@@ -21,11 +21,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.client.mdsal.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
-import org.opendaylight.yangtools.yang.model.repo.api.YangIRSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.SoftSchemaSourceCache;
+import org.opendaylight.yangtools.yang.model.spi.source.YangIRSource;
 import org.opendaylight.yangtools.yang.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
@@ -113,13 +113,13 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         // for a consistent set of modules, as it skips the need to re-parse the text sources multiple times. It also
         // helps establishing different sets of contexts, as they can share this pre-made cache.
         repository.registerSchemaSourceListener(
-            new SoftSchemaSourceCache<>(repository, YangIRSchemaSource.class));
+            new SoftSchemaSourceCache<>(repository, YangIRSource.class));
 
         // Attach the filesystem cache, providing persistence capability, so that restarts do not require us to
         // re-populate the cache. This also acts as a side-load capability, as anything pre-populated into that
         // directory will not be fetched from the device.
         repository.registerSchemaSourceListener(new FilesystemSchemaSourceCache<>(repository,
-                YangTextSchemaSource.class, new File(rootDirectory + File.separator + subdir)));
+                YangTextSource.class, new File(rootDirectory + File.separator + subdir)));
 
         return new SchemaResourcesDTO(repository, repository,
             repository.createEffectiveModelContextFactory(SchemaContextFactoryConfiguration.getDefault()),

@@ -25,7 +25,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.DeleteEntity;
 import org.opendaylight.restconf.openapi.model.GetEntity;
@@ -127,7 +126,7 @@ public final class PathsStream extends InputStream {
     }
 
     @Override
-    public int read(final byte @NonNull [] array, final int off, final int len) throws IOException {
+    public int read(final byte[] array, final int off, final int len) throws IOException {
         return super.read(array, off, len);
     }
 

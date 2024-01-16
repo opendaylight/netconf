@@ -56,16 +56,16 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -123,7 +123,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
         };
 
-        doReturn(mock(SchemaSourceRegistration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
+        doReturn(mock(Registration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
                 .SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaFactory, stateSchemasResolver);
 
@@ -193,7 +193,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final MissingSchemaSourceException schemaResolutionException =
                 new MissingSchemaSourceException("fail first", TEST_SID);
         doReturn(Futures.immediateFailedFuture(schemaResolutionException))
-                .when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(YangTextSchemaSource.class));
+                .when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(YangTextSource.class));
         doAnswer(invocation -> {
             if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
                 return Futures.immediateFailedFuture(schemaResolutionException);
@@ -212,7 +212,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
         };
 
-        doReturn(mock(SchemaSourceRegistration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
+        doReturn(mock(Registration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
                 .SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaFactory, stateSchemasResolver);
 
@@ -236,9 +236,9 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     private static SchemaRepository getSchemaRepository() {
         final SchemaRepository mock = mock(SchemaRepository.class);
-        final YangTextSchemaSource mockRep = mock(YangTextSchemaSource.class);
+        final YangTextSource mockRep = mock(YangTextSource.class);
         doReturn(Futures.immediateFuture(mockRep))
-                .when(mock).getSchemaSource(any(SourceIdentifier.class), eq(YangTextSchemaSource.class));
+                .when(mock).getSchemaSource(any(SourceIdentifier.class), eq(YangTextSource.class));
         return mock;
     }
 
@@ -441,10 +441,10 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 any(RemoteDeviceServices.class));
 
         List<String> notificationModulesName = List.of(
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                        .$YangModuleInfoImpl.getInstance().getName().toString(),
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                        .$YangModuleInfoImpl.getInstance().getName().toString());
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                        .YangModuleInfoImpl.getInstance().getName().toString(),
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                        .YangModuleInfoImpl.getInstance().getName().toString());
 
         final Set<AvailableCapability> resolvedCapabilities = argument.getValue().capabilities().resolvedCapabilities();
 
@@ -481,10 +481,10 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().capabilities();
 
         List<String> notificationModulesName = List.of(
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                        .$YangModuleInfoImpl.getInstance().getName().toString(),
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                        .$YangModuleInfoImpl.getInstance().getName().toString());
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                        .YangModuleInfoImpl.getInstance().getName().toString(),
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                        .YangModuleInfoImpl.getInstance().getName().toString());
 
         assertFalse(netconfDeviceCaps.resolvedCapabilities().stream()
             .anyMatch(entry -> notificationModulesName.contains(entry.getCapability())));
@@ -509,27 +509,27 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false, List.of());
 
-        final Map<QName, CapabilityOrigin> moduleBasedCaps = new HashMap<>();
-        moduleBasedCaps.put(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                        .$YangModuleInfoImpl.getInstance().getName(),
+        final var moduleBasedCaps = new HashMap<QName, CapabilityOrigin>();
+        moduleBasedCaps.put(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                        .YangModuleInfoImpl.getInstance().getName(),
                 CapabilityOrigin.DeviceAdvertised);
-        moduleBasedCaps.put(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                        .$YangModuleInfoImpl.getInstance().getName(),
+        moduleBasedCaps.put(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                        .YangModuleInfoImpl.getInstance().getName(),
                 CapabilityOrigin.DeviceAdvertised);
 
 
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
 
-        final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
                 any(RemoteDeviceServices.class));
         final Set<AvailableCapability> resolvedCapabilities = argument.getValue().capabilities().resolvedCapabilities();
 
-        List<String> notificationModulesName = List.of(
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                        .$YangModuleInfoImpl.getInstance().getName().toString(),
-                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                        .$YangModuleInfoImpl.getInstance().getName().toString());
+        final var notificationModulesName = List.of(
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                        .YangModuleInfoImpl.getInstance().getName().toString(),
+                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                        .YangModuleInfoImpl.getInstance().getName().toString());
 
         assertEquals(2, resolvedCapabilities.size());
         assertTrue(resolvedCapabilities.stream().anyMatch(entry -> notificationModulesName

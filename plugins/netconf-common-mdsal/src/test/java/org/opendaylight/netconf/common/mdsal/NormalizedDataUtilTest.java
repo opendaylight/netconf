@@ -14,10 +14,10 @@ import javax.xml.transform.dom.DOMResult;
 import org.junit.Test;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
+import org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -31,7 +31,7 @@ import org.xmlunit.diff.ElementSelectors;
 public class NormalizedDataUtilTest {
     @Test
     public void testWriteNormalizedNode() throws Exception {
-        final var context = BindingRuntimeHelpers.createEffectiveModel(List.of($YangModuleInfoImpl.getInstance()));
+        final var context = BindingRuntimeHelpers.createEffectiveModel(List.of(YangModuleInfoImpl.getInstance()));
         final var result = new DOMResult(XmlUtil.newDocument());
         NormalizedDataUtil.writeNormalizedNode(Builders.containerBuilder()
             .withNodeIdentifier(new NodeIdentifier(Sessions.QNAME))
