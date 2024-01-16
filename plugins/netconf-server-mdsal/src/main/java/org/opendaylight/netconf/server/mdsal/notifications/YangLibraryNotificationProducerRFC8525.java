@@ -7,17 +7,15 @@
  */
 package org.opendaylight.netconf.server.mdsal.notifications;
 
-import java.util.Collection;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
-import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.server.api.notifications.YangLibraryPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdateBuilder;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -31,8 +29,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(service = { })
 public final class YangLibraryNotificationProducerRFC8525
-        implements DataTreeChangeListener<YangLibrary>, AutoCloseable {
-    private final ListenerRegistration<?> yangLibraryChangeListenerRegistration;
+        implements DataListener<YangLibrary>, AutoCloseable {
+    private final Registration yangLibraryChangeListenerRegistration;
     private final YangLibraryPublisherRegistration yangLibraryPublisherRegistration;
 
     @Activate
@@ -40,8 +38,8 @@ public final class YangLibraryNotificationProducerRFC8525
             @Reference(target = "(type=netconf-notification-manager)") final NetconfNotificationCollector notifManager,
             @Reference final DataBroker dataBroker) {
         yangLibraryPublisherRegistration = notifManager.registerYangLibraryPublisher();
-        yangLibraryChangeListenerRegistration = dataBroker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(YangLibrary.class)),
+        yangLibraryChangeListenerRegistration = dataBroker.registerDataListener(
+            DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(YangLibrary.class)),
             this);
     }
 
@@ -57,14 +55,11 @@ public final class YangLibraryNotificationProducerRFC8525
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeModification<YangLibrary>> changes) {
-        for (DataTreeModification<YangLibrary> change : changes) {
-            final YangLibrary dataAfter = change.getRootNode().getDataAfter();
-            if (dataAfter != null) {
-                yangLibraryPublisherRegistration.onYangLibraryUpdate(new YangLibraryUpdateBuilder()
-                    .setContentId(dataAfter.getContentId())
-                    .build());
-            }
+    public void dataChangedTo(final YangLibrary data) {
+        if (data != null) {
+            yangLibraryPublisherRegistration.onYangLibraryUpdate(new YangLibraryUpdateBuilder()
+                .setContentId(data.getContentId())
+                .build());
         }
     }
 }

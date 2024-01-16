@@ -53,7 +53,7 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
         </operations>""";
 
     private static final EffectiveModelContext MODEL_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(
-        Module1Data.class, Module2Data.class, NetworkTopology.class).getEffectiveModelContext();
+        Module1Data.class, Module2Data.class, NetworkTopology.class).modelContext();
 
     @Override
     EffectiveModelContext modelContext() {
@@ -71,7 +71,7 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
     }
 
     private void mockMountPoint() {
-        doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT))).when(mountPoint)
+        doReturn(Optional.of(new FixedDOMSchemaService(MODEL_CONTEXT))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);

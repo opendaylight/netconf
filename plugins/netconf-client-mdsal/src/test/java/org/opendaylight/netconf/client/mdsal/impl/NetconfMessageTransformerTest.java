@@ -46,7 +46,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Lock;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.output.Data;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscription;
@@ -164,7 +164,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @BeforeClass
     public static void beforeClass() {
         PARTIAL_SCHEMA = BindingRuntimeHelpers.createEffectiveModel(NetconfState.class);
-        SCHEMA = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class, NetconfState.class,
+        SCHEMA = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfState.class,
             NetconfConfigChange.class);
         ACTION_SCHEMA = YangParserTestUtils.parseYangResources(NetconfMessageTransformerTest.class,
             "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang",
@@ -421,7 +421,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 .node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME)
                 .nodeWithKey(Schema.QNAME, keys).build();
         final var editConfigStructure =
-                createEditConfigStructure(BASE_SCHEMAS.baseSchemaWithNotifications().getEffectiveModelContext(), id,
+                createEditConfigStructure(BASE_SCHEMAS.baseSchemaWithNotifications().modelContext(), id,
                     Optional.empty(), Optional.ofNullable(schemaNode));
 
         final var target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_NODEID);

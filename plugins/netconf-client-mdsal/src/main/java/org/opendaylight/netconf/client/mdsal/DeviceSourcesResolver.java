@@ -45,7 +45,7 @@ final class DeviceSourcesResolver implements Callable<DeviceSources> {
     @Override
     public DeviceSources call() {
         final var availableSchemas = stateSchemasResolver.resolve(deviceRpc, remoteSessionCapabilities, id,
-            baseSchema.getEffectiveModelContext());
+            baseSchema.modelContext());
         LOG.debug("{}: Schemas exposed by ietf-netconf-monitoring: {}", id,
             availableSchemas.getAvailableYangSchemasQNames());
 

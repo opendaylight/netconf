@@ -74,7 +74,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
      * @return config structure
      */
     @Override
-    public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode> data,
+    public AnyxmlNode<DOMSource> createEditConfigStructure(final Optional<NormalizedNode> data,
             final YangInstanceIdentifier dataPath, final Optional<EffectiveOperation> operation) {
         final var dataValue = data.orElseThrow();
         if (!(dataValue instanceof DOMSourceAnyxmlNode anxmlData)) {

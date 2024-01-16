@@ -8,6 +8,6 @@
  -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0" name="odl-netconf-${project.version}">
     <feature name="odl-netconf-util" version="${project.version}">
-        <feature version="[11,12)">odl-yangtools-codec</feature>
+        <feature version="[13,14)">odl-yangtools-codec</feature>
     </feature>
 </features>

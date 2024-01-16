@@ -24,8 +24,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
-import org.opendaylight.mdsal.dom.spi.DOMNotificationSubscriptionListenerRegistry;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextProvider;
 
 /**
  * Copy paste from org.opendaylight.controller.sal.restconf.impl.test.incubate.InMemoryMdsalModule.
@@ -44,7 +42,7 @@ public class InMemoryMdsalModule extends AbstractModule {
         };
         dataBrokerTest.setup();
 
-        domNotificationRouter = DOMNotificationRouter.create(NOTIFICATION_SERVICE_QUEUE_DEPTH);
+        domNotificationRouter = new DOMNotificationRouter(NOTIFICATION_SERVICE_QUEUE_DEPTH);
     }
 
     @Override
@@ -73,44 +71,29 @@ public class InMemoryMdsalModule extends AbstractModule {
     }
 
     @Provides
-    @Singleton EffectiveModelContextProvider getSchemaContextProvider() {
-        DOMSchemaService schemaService = dataBrokerTest.getDataBrokerTestCustomizer().getSchemaService();
-        if (schemaService instanceof EffectiveModelContextProvider) {
-            return (EffectiveModelContextProvider) schemaService;
-        }
-        throw new IllegalStateException(
-                "The schema service isn't a SchemaContextProvider, it's a " + schemaService.getClass());
-    }
-
-    @Provides
     @Singleton DOMMountPointService getDOMMountPoint() {
         return new DOMMountPointServiceImpl();
     }
 
     @Provides
     @Singleton DOMNotificationService getDOMNotificationService() {
-        return domNotificationRouter;
+        return domNotificationRouter.notificationService();
     }
 
     @Provides
     @Singleton DOMNotificationPublishService getDOMNotificationPublishService() {
-        return domNotificationRouter;
-    }
-
-    @Provides
-    @Singleton DOMNotificationSubscriptionListenerRegistry getDOMNotificationSubscriptionListenerRegistry() {
-        return domNotificationRouter;
+        return domNotificationRouter.notificationPublishService();
     }
 
     @Provides
     @Singleton DOMRpcService getDOMRpcService(final DOMSchemaService schemaService) {
-        return new DOMRpcRouter(schemaService).getRpcService();
+        return new DOMRpcRouter(schemaService).rpcService();
     }
 
     @Provides
     @Singleton
     DOMActionService getDOMActionService(final DOMSchemaService schemaService) {
-        return new DOMRpcRouter(schemaService).getActionService();
+        return new DOMRpcRouter(schemaService).actionService();
     }
 
     @PreDestroy
