@@ -189,9 +189,11 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         try (var outputStream = new ByteArrayOutputStream()) {
             final var xmlWriter = XML_OUTPUT_FACTORY.createXMLStreamWriter(outputStream,
                 StandardCharsets.UTF_8.name());
+            final var currentDatabindContext = exception.modelContext() != null
+                ? DatabindContext.ofModel(exception.modelContext()) : databindProvider.currentDatabind();
             xmlWriter.writeStartDocument();
             xmlWriter.writeStartElement(Errors.QNAME.getLocalName());
-            xmlWriter.writeNamespace("xmlns", Errors.QNAME.getNamespace().toString());
+            xmlWriter.writeDefaultNamespace(Errors.QNAME.getNamespace().toString());
             if (exception.getErrors() != null && !exception.getErrors().isEmpty()) {
                 for (final var error : exception.getErrors()) {
                     xmlWriter.writeStartElement(Error.QNAME.getLocalName());
@@ -202,7 +204,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
 
                     if (error.getErrorPath() != null) {
                         xmlWriter.writeStartElement(ERROR_PATH_QNAME.getLocalName());
-                        databindProvider.currentDatabind().xmlCodecs().instanceIdentifierCodec()
+                        currentDatabindContext.xmlCodecs().instanceIdentifierCodec()
                             .writeValue(xmlWriter, error.getErrorPath());
                         xmlWriter.writeEndElement();
                     }
