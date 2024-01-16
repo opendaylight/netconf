@@ -30,7 +30,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
@@ -68,11 +68,10 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.api.YinTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
+import org.opendaylight.yangtools.yang.model.api.source.YinTextSource;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -86,8 +85,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Component(service = { RestconfServer.class, DatabindProvider.class })
-public final class MdsalRestconfServer
-        implements RestconfServer, DatabindProvider, EffectiveModelContextListener, AutoCloseable {
+public final class MdsalRestconfServer implements RestconfServer, DatabindProvider, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfServer.class);
     private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
     private static final VarHandle LOCAL_STRATEGY;
@@ -106,7 +104,7 @@ public final class MdsalRestconfServer
     private final @NonNull DOMDataBroker dataBroker;
     private final @Nullable DOMRpcService rpcService;
     private final @Nullable DOMActionService actionService;
-    private final @Nullable DOMYangTextSourceProvider sourceProvider;
+    private final @Nullable YangTextSourceExtension sourceProvider;
 
     private final Registration reg;
 
@@ -126,10 +124,10 @@ public final class MdsalRestconfServer
         this.actionService = requireNonNull(actionService);
         this.mountPointService = requireNonNull(mountPointService);
         this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
-        sourceProvider = schemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
+        sourceProvider = schemaService.extension(YangTextSourceExtension.class);
 
         localStrategy = createLocalStrategy(schemaService.getGlobalContext());
-        reg = schemaService.registerSchemaContextListener(this);
+        reg = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
     }
 
     public MdsalRestconfServer(final DOMSchemaService schemaService, final DOMDataBroker dataBroker,
@@ -143,8 +141,7 @@ public final class MdsalRestconfServer
         return localStrategy().databind();
     }
 
-    @Override
-    public void onModelContextUpdated(final EffectiveModelContext newModelContext) {
+    private void onModelContextUpdated(final EffectiveModelContext newModelContext) {
         final var local = localStrategy();
         if (!newModelContext.equals(local.modelContext())) {
             LOCAL_STRATEGY.setRelease(this, createLocalStrategy(newModelContext));
@@ -263,33 +260,33 @@ public final class MdsalRestconfServer
 
     @Override
     public RestconfFuture<ModulesGetResult> modulesYangGET(final String fileName, final String revision) {
-        return modulesGET(fileName, revision, YangTextSchemaSource.class);
+        return modulesGET(fileName, revision, YangTextSource.class);
     }
 
     @Override
     public RestconfFuture<ModulesGetResult> modulesYangGET(final ApiPath mountPath, final String fileName,
             final String revision) {
-        return modulesGET(mountPath, fileName, revision, YangTextSchemaSource.class);
+        return modulesGET(mountPath, fileName, revision, YangTextSource.class);
     }
 
     @Override
     public RestconfFuture<ModulesGetResult> modulesYinGET(final String fileName, final String revision) {
-        return modulesGET(fileName, revision, YinTextSchemaSource.class);
+        return modulesGET(fileName, revision, YinTextSource.class);
     }
 
     @Override
     public RestconfFuture<ModulesGetResult> modulesYinGET(final ApiPath mountPath, final String fileName,
             final String revision) {
-        return modulesGET(mountPath, fileName, revision, YinTextSchemaSource.class);
+        return modulesGET(mountPath, fileName, revision, YinTextSource.class);
     }
 
     private @NonNull RestconfFuture<ModulesGetResult> modulesGET(final String fileName, final String revision,
-            final Class<? extends SchemaSourceRepresentation> representation) {
+            final Class<? extends SourceRepresentation> representation) {
         return modulesGET(localStrategy(), fileName, revision, representation);
     }
 
     private @NonNull RestconfFuture<ModulesGetResult> modulesGET(final ApiPath mountPath, final String fileName,
-            final String revision, final Class<? extends SchemaSourceRepresentation> representation) {
+            final String revision, final Class<? extends SourceRepresentation> representation) {
         final var mountOffset = mountPath.indexOf("yang-ext", "mount");
         if (mountOffset != mountPath.steps().size() - 1) {
             return RestconfFuture.failed(new RestconfDocumentedException("Mount path has to end with yang-ext:mount"));
@@ -307,7 +304,7 @@ public final class MdsalRestconfServer
 
     private static @NonNull RestconfFuture<ModulesGetResult> modulesGET(final RestconfStrategy strategy,
             final String moduleName, final String revisionStr,
-            final Class<? extends SchemaSourceRepresentation> representation) {
+            final Class<? extends SourceRepresentation> representation) {
         if (moduleName == null) {
             return RestconfFuture.failed(new RestconfDocumentedException("Module name must be supplied",
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
@@ -379,7 +376,7 @@ public final class MdsalRestconfServer
             return RestconfFuture.failed(new RestconfDocumentedException("RESTCONF is not available"));
         }
         return RestconfFuture.of(new NormalizedNodePayload(stack.toInference(),
-            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, stack.getEffectiveModelContext()
+            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, stack.modelContext()
                 .findModuleStatements("ietf-yang-library").iterator().next().localQNameModule().getRevision()
                 .map(Revision::toString).orElse(""))));
     }

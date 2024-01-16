@@ -284,7 +284,7 @@ public final class NetconfBaseOps {
         return addCallback(requireNonNull(callback), rpc.invokeNetconf(NETCONF_GET_QNAME,
             nonEmptyFilter(filterPath)
                 .map(path -> NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
-                    toFilterStructure(path, mountContext.getEffectiveModelContext())))
+                    toFilterStructure(path, mountContext.modelContext())))
                 .orElse(NetconfMessageTransformUtil.GET_RPC_CONTENT)));
     }
 

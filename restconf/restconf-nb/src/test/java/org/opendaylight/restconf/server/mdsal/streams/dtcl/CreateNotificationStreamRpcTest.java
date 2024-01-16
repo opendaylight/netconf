@@ -17,8 +17,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -67,7 +67,7 @@ class CreateNotificationStreamRpcTest {
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
-    private DOMDataTreeChangeService treeChange;
+    private DataTreeChangeExtension treeChange;
     @Mock
     private DOMDataTreeWriteTransaction tx;
     @Captor
@@ -83,8 +83,7 @@ class CreateNotificationStreamRpcTest {
     public void before() {
         databindProvider = () -> DatabindContext.ofModel(SCHEMA_CTX);
 
-        doReturn(ImmutableClassToInstanceMap.of(DOMDataTreeChangeService.class, treeChange))
-            .when(dataBroker).getExtensions();
+        doReturn(List.of(treeChange)).when(dataBroker).supportedExtensions();
         rpc = new CreateDataChangeEventSubscriptionRpc(new MdsalRestconfStreamRegistry(dataBroker), databindProvider,
             dataBroker);
     }

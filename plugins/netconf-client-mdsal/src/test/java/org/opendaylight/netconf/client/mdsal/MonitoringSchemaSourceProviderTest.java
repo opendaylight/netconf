@@ -34,8 +34,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -59,8 +59,8 @@ public class MonitoringSchemaSourceProviderTest {
     @Test
     public void testGetSource() throws Exception {
         final SourceIdentifier identifier = new SourceIdentifier("test", "2016-02-08");
-        final YangTextSchemaSource source = provider.getSource(identifier).get();
-        assertEquals(identifier, source.getIdentifier());
+        final YangTextSource source = provider.getSource(identifier).get();
+        assertEquals(identifier, source.sourceId());
         verify(service).invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME,
                 MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Optional.of("2016-02-08")));
     }
