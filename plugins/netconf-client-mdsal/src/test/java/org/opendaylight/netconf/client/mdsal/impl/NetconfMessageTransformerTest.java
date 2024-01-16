@@ -418,7 +418,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
                 .node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME)
                 .nodeWithKey(Schema.QNAME, keys).build();
         final var editConfigStructure =
-                createEditConfigStructure(BASE_SCHEMAS.baseSchemaWithNotifications().getEffectiveModelContext(), id,
+                createEditConfigStructure(BASE_SCHEMAS.baseSchemaWithNotifications().modelContext(), id,
                     Optional.empty(), Optional.ofNullable(schemaNode));
 
         final var target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_NODEID);

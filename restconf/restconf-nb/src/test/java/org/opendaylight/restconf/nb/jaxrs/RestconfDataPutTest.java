@@ -76,8 +76,8 @@ class RestconfDataPutTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture()).when(readTx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(rwTx).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, EMPTY_JUKEBOX);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any());
-        doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
-        .getService(DOMSchemaService.class);
+        doReturn(Optional.of(new FixedDOMSchemaService(JUKEBOX_SCHEMA))).when(mountPoint)
+            .getService(DOMSchemaService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);

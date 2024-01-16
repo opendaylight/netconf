@@ -231,7 +231,7 @@ public class DataTreeChangeStreamTest extends AbstractConcurrentDataBrokerTest {
             final boolean changedLeafNodesOnly, final boolean childNodesOnly) throws Exception {
         final var stream = streamRegistry.createStream(URI.create("baseURI"),
             new DataTreeChangeSource(databindProvider,
-                domDataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class),
+                domDataBroker.extension(DOMDataTreeChangeService.class),
                 LogicalDatastoreType.CONFIGURATION, path), "test")
             .getOrThrow();
         final var handler = new TestHandler();
