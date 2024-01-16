@@ -44,7 +44,7 @@ public class InMemoryMdsalModule extends AbstractModule {
         };
         dataBrokerTest.setup();
 
-        domNotificationRouter = DOMNotificationRouter.create(NOTIFICATION_SERVICE_QUEUE_DEPTH);
+        domNotificationRouter = new DOMNotificationRouter(NOTIFICATION_SERVICE_QUEUE_DEPTH);
     }
 
     @Override
@@ -89,12 +89,12 @@ public class InMemoryMdsalModule extends AbstractModule {
 
     @Provides
     @Singleton DOMNotificationService getDOMNotificationService() {
-        return domNotificationRouter;
+        return domNotificationRouter.notificationService();
     }
 
     @Provides
     @Singleton DOMNotificationPublishService getDOMNotificationPublishService() {
-        return domNotificationRouter;
+        return domNotificationRouter.notificationPublishService();
     }
 
     @Provides
@@ -104,13 +104,13 @@ public class InMemoryMdsalModule extends AbstractModule {
 
     @Provides
     @Singleton DOMRpcService getDOMRpcService(final DOMSchemaService schemaService) {
-        return new DOMRpcRouter(schemaService).getRpcService();
+        return new DOMRpcRouter(schemaService).rpcService();
     }
 
     @Provides
     @Singleton
     DOMActionService getDOMActionService(final DOMSchemaService schemaService) {
-        return new DOMRpcRouter(schemaService).getActionService();
+        return new DOMRpcRouter(schemaService).actionService();
     }
 
     @PreDestroy

@@ -11,13 +11,14 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
+import java.util.function.Supplier;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.opendaylight.restconf.server.spi.RestconfStream.Sink;
 import org.opendaylight.restconf.server.spi.RestconfStream.Source;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextProvider;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Abstract base class for functionality shared between {@link DOMNotification}-based sources.
@@ -25,16 +26,16 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextProvider;
 public abstract class AbstractNotificationSource extends Source<DOMNotification> {
     protected static final class Listener implements DOMNotificationListener {
         private final Sink<DOMNotification> sink;
-        private final EffectiveModelContextProvider modelContext;
+        private final Supplier<EffectiveModelContext> modelContext;
 
-        public Listener(final Sink<DOMNotification> sink, final EffectiveModelContextProvider modelContext) {
+        public Listener(final Sink<DOMNotification> sink, final Supplier<EffectiveModelContext> modelContext) {
             this.sink = requireNonNull(sink);
             this.modelContext = requireNonNull(modelContext);
         }
 
         @Override
         public void onNotification(final DOMNotification notification) {
-            sink.publish(modelContext.getEffectiveModelContext(), notification,
+            sink.publish(modelContext.get(), notification,
                 notification instanceof DOMEvent domEvent ? domEvent.getEventInstant() : Instant.now());
         }
     }
