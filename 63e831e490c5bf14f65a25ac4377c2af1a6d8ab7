@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a4691ee_efe40681",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/JaxRsNorthbound.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-16T11:24:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d39f0d3_65375ea4",
+      "revId": "63e831e490c5bf14f65a25ac4377c2af1a6d8ab7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52cdcf1f_36527319",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-01-15T15:42:30Z",
       "side": 1,
       "message": "something like this\n@Reference final OSGiNorthbound.Configuration conf\nshould be possible here instead of using ConfigurationAdmin\nyou can consider this solution",
+      "revId": "63e831e490c5bf14f65a25ac4377c2af1a6d8ab7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8817eb75_0a230797",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/RestconfSchemaSourceUrlProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-16T11:24:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52cdcf1f_36527319",
       "revId": "63e831e490c5bf14f65a25ac4377c2af1a6d8ab7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -66,6 +102,24 @@
       "side": 1,
       "message": "I can. But it is fine without it tho",
       "parentUuid": "ad4f8c56_386887d4",
+      "revId": "63e831e490c5bf14f65a25ac4377c2af1a6d8ab7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb375fbb_6d05eb1f",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/RestconfSchemaSourceUrlProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-16T11:24:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8658d064_6ca7bbc6",
       "revId": "63e831e490c5bf14f65a25ac4377c2af1a6d8ab7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
