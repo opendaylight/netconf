@@ -109,10 +109,10 @@ public class CapabilityChangeNotificationProducerTest {
                                       final NetconfCapabilityChange expectedChange) {
         final DataTreeModification<Capabilities> treeChange2 = mock(DataTreeModification.class);
         final DataObjectModification<Capabilities> objectChange2 = mock(DataObjectModification.class);
-        doReturn(modificationType).when(objectChange2).getModificationType();
+        doReturn(modificationType).when(objectChange2).modificationType();
         doReturn(objectChange2).when(treeChange2).getRootNode();
-        doReturn(originalCapabilities).when(objectChange2).getDataBefore();
-        doReturn(updatedCapabilities).when(objectChange2).getDataAfter();
+        doReturn(originalCapabilities).when(objectChange2).dataBefore();
+        doReturn(updatedCapabilities).when(objectChange2).dataAfter();
         capabilityChangeNotificationProducer.onDataTreeChanged(List.of(treeChange2));
         verify(baseNotificationPublisherRegistration).onCapabilityChanged(expectedChange);
     }
