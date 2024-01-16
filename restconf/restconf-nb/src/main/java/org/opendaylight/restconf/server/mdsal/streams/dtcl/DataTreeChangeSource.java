@@ -17,7 +17,7 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.ClusteredDOMDataTreeChangeListener;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -37,12 +37,12 @@ public final class DataTreeChangeSource extends Source<List<DataTreeCandidate>> 
         EncodingName.RFC8040_JSON, JSONDataTreeCandidateFormatter.FACTORY,
         EncodingName.RFC8040_XML, XMLDataTreeCandidateFormatter.FACTORY);
 
-    private final @NonNull DOMDataTreeChangeService changeService;
+    private final @NonNull DataTreeChangeExtension changeService;
     private final @NonNull DatabindProvider databindProvider;
     private final @NonNull LogicalDatastoreType datastore;
     private final @NonNull YangInstanceIdentifier path;
 
-    public DataTreeChangeSource(final DatabindProvider databindProvider, final DOMDataTreeChangeService changeService,
+    public DataTreeChangeSource(final DatabindProvider databindProvider, final DataTreeChangeExtension changeService,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         super(ENCODINGS);
         this.databindProvider = requireNonNull(databindProvider);

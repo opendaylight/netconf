@@ -23,8 +23,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
@@ -53,7 +53,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final @Nullable DOMYangTextSourceProvider sourceProvider,
+            final @Nullable YangTextSourceExtension sourceProvider,
             final @Nullable DOMMountPointService mountPointService,
             final ImmutableMap<QName, RpcImplementation> localRpcs) {
         super(databind, localRpcs, rpcService, actionService, sourceProvider, mountPointService);
@@ -62,7 +62,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final @Nullable DOMYangTextSourceProvider sourceProvider,
+            final @Nullable YangTextSourceExtension sourceProvider,
             final @Nullable DOMMountPointService mountPointService) {
         this(databind, dataBroker, rpcService, actionService, sourceProvider, mountPointService, ImmutableMap.of());
     }
@@ -116,7 +116,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
         final var inference = path.inference();
         final var fields = params.fields();
         final var translatedFields = fields == null ? null
-            : WriterFieldsTranslator.translate(inference.getEffectiveModelContext(), path.schema(), fields);
+            : WriterFieldsTranslator.translate(inference.modelContext(), path.schema(), fields);
         return completeDataGET(inference, QueryParameters.of(params, translatedFields),
             readData(params.content(), path.instance(), params.withDefaults()), null);
     }

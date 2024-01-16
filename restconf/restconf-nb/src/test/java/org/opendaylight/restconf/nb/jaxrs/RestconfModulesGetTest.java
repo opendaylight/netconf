@@ -26,7 +26,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
@@ -54,7 +54,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
         QName.create("mount:point", "2016-06-02", "point-number"));
 
     @Mock
-    private DOMYangTextSourceProvider sourceProvider;
+    private YangTextSourceExtension sourceProvider;
     @Mock
     private DOMSchemaService schemaService;
 
@@ -174,7 +174,7 @@ class RestconfModulesGetTest extends AbstractRestconfTest {
     }
 
     private void mockMountPoint() {
-        doReturn(Optional.of(FixedDOMSchemaService.of(MODEL_CONTEXT_ON_MOUNT_POINT))).when(mountPoint)
+        doReturn(Optional.of(new FixedDOMSchemaService(MODEL_CONTEXT_ON_MOUNT_POINT))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(MOUNT_IID);
         doReturn(Optional.of(mountPointService)).when(mountPoint).getService(DOMMountPointService.class);
