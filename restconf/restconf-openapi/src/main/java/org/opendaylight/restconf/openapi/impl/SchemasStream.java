@@ -43,18 +43,20 @@ public final class SchemasStream extends InputStream {
     private final EffectiveModelContext context;
     private final JsonGenerator generator;
     private final ByteArrayOutputStream stream;
+    private final boolean isForSingleModule;
 
     private Reader reader;
     private boolean schemesWritten;
 
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
             final JsonGenerator generator, final ByteArrayOutputStream stream,
-            final Iterator<? extends Module> iterator) {
+            final Iterator<? extends Module> iterator, final boolean isForSingleModule) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
         this.generator = generator;
         this.stream = stream;
+        this.isForSingleModule = isForSingleModule;
     }
 
     @Override
@@ -71,8 +73,8 @@ public final class SchemasStream extends InputStream {
         while (read == -1) {
             if (iterator.hasNext()) {
                 reader = new BufferedReader(
-                    new InputStreamReader(new SchemaStream(toComponents(iterator.next(), context), writer),
-                        StandardCharsets.UTF_8));
+                    new InputStreamReader(new SchemaStream(toComponents(iterator.next(), context, isForSingleModule),
+                        writer), StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
             }
@@ -96,11 +98,15 @@ public final class SchemasStream extends InputStream {
         return super.read(array, off, len);
     }
 
-    private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context) {
+    private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context,
+            final boolean isForSingleModule) {
         final var result = new ArrayDeque<SchemaEntity>();
         final var definitionNames = new DefinitionNames();
         final var stack = SchemaInferenceStack.of(context);
         final var moduleName = module.getName();
+        if (isForSingleModule) {
+            definitionNames.addUnlinkedName(moduleName + "_module");
+        }
         final var children = new ArrayList<DataSchemaNode>();
         for (final var rpc : module.getRpcs()) {
             stack.enterSchemaTree(rpc.getQName());
