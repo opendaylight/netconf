@@ -16,6 +16,24 @@
       "message": "This will change also response from MdsalRestconfTransaction which was correct.",
       "revId": "8b526054cafc70bea3ddc581b46a96601d6fddc4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d68ab63b_07725b5f",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/TransactionUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-01-16T10:33:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aec3f7fc_da6ade82",
+      "revId": "8b526054cafc70bea3ddc581b46a96601d6fddc4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ],
   "submitRequirementResults": []
