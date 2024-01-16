@@ -95,7 +95,7 @@ public class SchemalessRpcStructureTransformerTest {
 
     @Test
     public void testCreateEditConfigStructure() throws Exception {
-        DOMSourceAnyxmlNode data = Builders.anyXmlBuilder()
+        final var data = Builders.anyXmlBuilder()
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
                 .withValue(source)
                 .build();

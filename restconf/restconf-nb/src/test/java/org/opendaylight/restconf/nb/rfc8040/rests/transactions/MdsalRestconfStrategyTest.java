@@ -427,7 +427,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
-        doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
+        doReturn(Optional.of(new FixedDOMSchemaService(JUKEBOX_SCHEMA))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
@@ -443,7 +443,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     public void testGetRestconfStrategyMountNetconfService() throws Exception {
         doReturn(Optional.of(netconfService)).when(mountPoint).getService(NetconfDataTreeService.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
-        doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
+        doReturn(Optional.of(new FixedDOMSchemaService(JUKEBOX_SCHEMA))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
@@ -463,7 +463,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
         doReturn(Optional.of(rpcService)).when(mountPoint).getService(DOMRpcService.class);
-        doReturn(Optional.of(FixedDOMSchemaService.of(JUKEBOX_SCHEMA))).when(mountPoint)
+        doReturn(Optional.of(new FixedDOMSchemaService(JUKEBOX_SCHEMA))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(YangInstanceIdentifier.of());
 

@@ -15,31 +15,29 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
 // Non-final for mocking
 @SuppressWarnings("checkstyle:FinalClass")
-public class CurrentSchemaContext implements EffectiveModelContextListener, AutoCloseable {
+public class CurrentSchemaContext implements AutoCloseable {
     private final AtomicReference<EffectiveModelContext> currentContext = new AtomicReference<>();
     private final Set<CapabilityListener> listeners = Collections.synchronizedSet(new HashSet<>());
-    private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
+    private final YangTextSourceExtension yangTextSourceExtension;
 
     private Registration schemaContextListenerListenerRegistration;
 
-    private CurrentSchemaContext(final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
-        this.rootSchemaSourceProvider = rootSchemaSourceProvider;
+    private CurrentSchemaContext(final YangTextSourceExtension yangTextSourceExtension) {
+        this.yangTextSourceExtension = yangTextSourceExtension;
     }
 
     // keep spotbugs from complaining about overridable method in constructor
     public static CurrentSchemaContext create(final DOMSchemaService schemaService,
-                         final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
-        var context = new CurrentSchemaContext(rootSchemaSourceProvider);
-        final Registration registration = schemaService.registerSchemaContextListener(context);
+            final YangTextSourceExtension yangTextSourceExtension) {
+        var context = new CurrentSchemaContext(yangTextSourceExtension);
+        final var registration = schemaService.registerSchemaContextListener(context::onModelContextUpdated);
         context.setRegistration(registration);
         return context;
     }
@@ -54,12 +52,11 @@ public class CurrentSchemaContext implements EffectiveModelContextListener, Auto
         return ret;
     }
 
-    @Override
-    public void onModelContextUpdated(final EffectiveModelContext schemaContext) {
+    private void onModelContextUpdated(final EffectiveModelContext schemaContext) {
         currentContext.set(schemaContext);
         // FIXME is notifying all the listeners from this callback wise ?
         final var addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(schemaContext,
-            rootSchemaSourceProvider);
+            yangTextSourceExtension);
         for (var listener : listeners) {
             listener.onCapabilitiesChanged(addedCaps, Set.of());
         }
@@ -74,7 +71,7 @@ public class CurrentSchemaContext implements EffectiveModelContextListener, Auto
 
     public Registration registerCapabilityListener(final CapabilityListener listener) {
         listener.onCapabilitiesChanged(MdsalNetconfOperationServiceFactory.transformCapabilities(currentContext.get(),
-                rootSchemaSourceProvider), Set.of());
+            yangTextSourceExtension), Set.of());
         listeners.add(listener);
         return () -> listeners.remove(listener);
     }
