@@ -14,15 +14,12 @@ import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.Collection;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMActionServiceExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -118,10 +115,5 @@ public class ProxyDOMActionService implements Actions.Normalized {
         }, actorSystem.dispatcher());
 
         return FluentFuture.from(settableFuture);
-    }
-
-    @Override
-    public ClassToInstanceMap<DOMActionServiceExtension> getExtensions() {
-        return ImmutableClassToInstanceMap.of();
     }
 }

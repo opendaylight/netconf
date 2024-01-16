@@ -11,6 +11,7 @@ import com.google.common.annotations.Beta;
 import com.google.common.util.concurrent.ListenableFuture;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMService;
 import org.opendaylight.yangtools.yang.common.QName;
 
@@ -18,7 +19,13 @@ import org.opendaylight.yangtools.yang.common.QName;
  * A {@link DOMService} exposing RPC invocation model based either {@code ContainerNode} or {@code AnyxmlNode}.
  */
 @Beta
-public interface SchemalessRpcService extends DOMService {
+public interface SchemalessRpcService extends DOMService<SchemalessRpcService, SchemalessRpcService.Extension> {
+    /**
+     * Marker interface for an extension to {@link DOMRpcService}.
+     */
+    interface Extension extends DOMService.Extension<SchemalessRpcService, Extension> {
+        // Marker interface
+    }
 
     @NonNull ListenableFuture<? extends DOMSource> invokeRpc(@NonNull QName type, @NonNull DOMSource payload);
 }

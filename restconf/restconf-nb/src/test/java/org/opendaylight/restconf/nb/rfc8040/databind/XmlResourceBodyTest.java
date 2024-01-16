@@ -42,7 +42,7 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
 
     private void mockMount() {
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
-        doReturn(Optional.of(FixedDOMSchemaService.of(IID_SCHEMA))).when(mountPoint)
+        doReturn(Optional.of(new FixedDOMSchemaService(IID_SCHEMA))).when(mountPoint)
             .getService(DOMSchemaService.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);

@@ -7,9 +7,8 @@
  */
 package org.opendaylight.netconf.server.mdsal.notifications;
 
-import java.util.Collection;
+import java.util.List;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -22,7 +21,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionEndBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStartBuilder;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -39,7 +38,7 @@ public final class SessionNotificationProducer implements DataTreeChangeListener
     private static final Logger LOG = LoggerFactory.getLogger(SessionNotificationProducer.class);
 
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
-    private final ListenerRegistration<?> sessionListenerRegistration;
+    private final Registration sessionListenerRegistration;
 
     @Activate
     public SessionNotificationProducer(
@@ -47,7 +46,7 @@ public final class SessionNotificationProducer implements DataTreeChangeListener
             @Reference final DataBroker dataBroker) {
         baseNotificationPublisherRegistration = notifManager.registerBaseNotificationPublisher();
         sessionListenerRegistration = dataBroker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL,
+            DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL,
                 InstanceIdentifier.builder(NetconfState.class).child(Sessions.class).child(Session.class).build()),
             this);
     }
@@ -64,19 +63,19 @@ public final class SessionNotificationProducer implements DataTreeChangeListener
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeModification<Session>> changes) {
-        for (DataTreeModification<Session> change : changes) {
-            final DataObjectModification<Session> rootNode = change.getRootNode();
-            final DataObjectModification.ModificationType modificationType = rootNode.getModificationType();
+    public void onDataTreeChanged(final List<DataTreeModification<Session>> changes) {
+        for (var change : changes) {
+            final var rootNode = change.getRootNode();
+            final var modificationType = rootNode.modificationType();
             switch (modificationType) {
                 case WRITE:
-                    final Session created = rootNode.getDataAfter();
-                    if (created != null && rootNode.getDataBefore() == null) {
+                    final Session created = rootNode.dataAfter();
+                    if (created != null && rootNode.dataBefore() == null) {
                         publishStartedSession(created);
                     }
                     break;
                 case DELETE:
-                    final Session removed = rootNode.getDataBefore();
+                    final Session removed = rootNode.dataBefore();
                     if (removed != null) {
                         publishEndedSession(removed);
                     }

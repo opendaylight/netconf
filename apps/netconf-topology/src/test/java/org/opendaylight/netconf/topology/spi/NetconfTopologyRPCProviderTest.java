@@ -59,8 +59,8 @@ public class NetconfTopologyRPCProviderTest {
     private NetconfTopologyRPCProvider rpcProvider;
 
     @Before
-    public void setUp() {
-        doReturn(ENC_PWD).when(encryptionService).encrypt(TEST_PWD);
+    public void setUp() throws Exception {
+        doReturn(ENC_PWD.getBytes()).when(encryptionService).encrypt(TEST_PWD.getBytes());
         doReturn(rpcReg).when(rpcProviderService).registerRpcImplementations(any());
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, TOPOLOGY_ID);
     }

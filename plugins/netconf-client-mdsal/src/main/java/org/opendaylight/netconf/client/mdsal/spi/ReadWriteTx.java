@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.FluentFuture;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
@@ -23,8 +25,13 @@ class ReadWriteTx<T extends DOMDataTreeReadTransaction> implements DOMDataTreeRe
     final T delegateReadTx;
 
     ReadWriteTx(final T delegateReadTx, final DOMDataTreeWriteTransaction delegateWriteTx) {
-        this.delegateReadTx = delegateReadTx;
-        this.delegateWriteTx = delegateWriteTx;
+        this.delegateReadTx = requireNonNull(delegateReadTx);
+        this.delegateWriteTx = requireNonNull(delegateWriteTx);
+    }
+
+    @Override
+    public final FluentFuture<?> completionFuture() {
+        return delegateWriteTx.completionFuture();
     }
 
     @Override

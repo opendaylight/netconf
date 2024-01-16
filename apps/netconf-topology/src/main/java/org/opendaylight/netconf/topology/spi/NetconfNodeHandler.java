@@ -49,9 +49,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev22
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.concepts.AbstractRegistration;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +106,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeHandler.class);
 
-    private final @NonNull List<SchemaSourceRegistration<?>> yanglibRegistrations;
+    private final @NonNull List<Registration> yanglibRegistrations;
     private final @NonNull NetconfClientFactory clientFactory;
     private final @NonNull NetconfClientConfiguration clientConfig;
     private final @NonNull NetconfDeviceCommunicator communicator;
@@ -259,7 +259,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
         communicator.close();
         delegate.close();
-        yanglibRegistrations.forEach(SchemaSourceRegistration::close);
+        yanglibRegistrations.forEach(Registration::close);
     }
 
     @Override
@@ -337,13 +337,13 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
         }
     }
 
-    private static List<SchemaSourceRegistration<?>> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
+    private static List<Registration> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
             final NetconfNode node, final SchemaResourcesDTO resources) {
         final var yangLibrary = node.getYangLibrary();
         if (yangLibrary != null) {
             final Uri uri = yangLibrary.getYangLibraryUrl();
             if (uri != null) {
-                final var registrations = new ArrayList<SchemaSourceRegistration<?>>();
+                final var registrations = new ArrayList<Registration>();
                 final var yangLibURL = uri.getValue();
                 final var schemaRegistry = resources.getSchemaRegistry();
 
@@ -357,7 +357,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                 for (var entry : schemas.getAvailableModels().entrySet()) {
                     registrations.add(schemaRegistry.registerSchemaSource(new LibrarySchemaSourceProvider(
                         remoteDeviceId, schemas.getAvailableModels()),
-                        PotentialSchemaSource.create(entry.getKey(), YangTextSchemaSource.class,
+                        PotentialSchemaSource.create(entry.getKey(), YangTextSource.class,
                             PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
                 return List.copyOf(registrations);
