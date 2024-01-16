@@ -18,9 +18,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * Provides YANG schema sources from YANG library. The set of available sources is pre-determined when this provider
  * is created, but each source is acquired on demand.
  */
-public final class LibrarySchemaSourceProvider implements SchemaSourceProvider<YangTextSchemaSource> {
+public final class LibrarySchemaSourceProvider implements SchemaSourceProvider<YangTextSource> {
     private static final Logger LOG = LoggerFactory.getLogger(LibrarySchemaSourceProvider.class);
 
     private final ImmutableMap<SourceIdentifier, URL> availableSources;
@@ -41,7 +41,7 @@ public final class LibrarySchemaSourceProvider implements SchemaSourceProvider<Y
     }
 
     @Override
-    public ListenableFuture<? extends YangTextSchemaSource> getSource(final SourceIdentifier sourceIdentifier) {
+    public ListenableFuture<? extends YangTextSource> getSource(final SourceIdentifier sourceIdentifier) {
         final var url = availableSources.get(requireNonNull(sourceIdentifier));
         checkArgument(url != null);
 
@@ -50,7 +50,7 @@ public final class LibrarySchemaSourceProvider implements SchemaSourceProvider<Y
             schemaContent = in.readAllBytes();
         } catch (IOException e) {
             LOG.warn("Unable to download source {} from a yang library's url {}", sourceIdentifier, url, e);
-            return Futures.immediateFailedFuture(new SchemaSourceException(
+            return Futures.immediateFailedFuture(new SchemaSourceException(sourceIdentifier,
                 "Unable to download remote schema for " + sourceIdentifier + " from " + url, e));
         }
 

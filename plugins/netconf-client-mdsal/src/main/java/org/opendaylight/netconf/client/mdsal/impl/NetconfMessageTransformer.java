@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -122,14 +121,14 @@ public class NetconfMessageTransformer
         counter = new MessageCounter();
         this.mountContext = requireNonNull(mountContext);
 
-        final EffectiveModelContext schemaContext = mountContext.getEffectiveModelContext();
-        contextTree = DataSchemaContextTree.from(schemaContext);
+        final EffectiveModelContext modelContext = mountContext.modelContext();
+        contextTree = DataSchemaContextTree.from(modelContext);
 
-        mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
-        actions = getActions(schemaContext);
+        mappedRpcs = Maps.uniqueIndex(modelContext.getOperations(), SchemaNode::getQName);
+        actions = getActions(modelContext);
 
         // RFC6020 normal notifications
-        mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
+        mappedNotifications = Multimaps.index(modelContext.getNotifications(),
             node -> node.getQName().withoutRevision());
         this.baseSchema = baseSchema;
         this.strictParsing = strictParsing;
@@ -201,8 +200,7 @@ public class NetconfMessageTransformer
         try {
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
-                    SchemaInferenceStack.of(mountContext.getEffectiveModelContext(), notificationPath).toInference(),
-                    strictParsing);
+                SchemaInferenceStack.of(mountContext.modelContext(), notificationPath).toInference(), strictParsing);
             xmlParser.traverse(new DOMSource(element));
         } catch (XMLStreamException | IOException | UnsupportedOperationException e) {
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
@@ -212,8 +210,8 @@ public class NetconfMessageTransformer
 
     private Optional<NestedNotificationInfo> findNestedNotification(final NetconfMessage message,
             final Element element) {
-        final Iterator<? extends Module> modules = mountContext.getEffectiveModelContext()
-                .findModules(XMLNamespace.of(element.getNamespaceURI())).iterator();
+        final var modules = mountContext.modelContext().findModules(XMLNamespace.of(element.getNamespaceURI()))
+            .iterator();
         if (!modules.hasNext()) {
             throw new IllegalArgumentException(
                     "Unable to parse notification " + message + ", cannot find top level module");
@@ -354,10 +352,8 @@ public class NetconfMessageTransformer
             // If the schema context for netconf device does not contain model for base netconf operations,
             // use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
-            final EffectiveModelContext ctx = needToUseBaseCtx ? baseSchema.getEffectiveModelContext()
-                    : mountContext.getEffectiveModelContext();
-            NetconfMessageTransformUtil.writeNormalizedOperationInput(payload, result, Absolute.of(rpc),
-                ctx);
+            final var modelContext = needToUseBaseCtx ? baseSchema.modelContext(): mountContext.modelContext();
+            NetconfMessageTransformUtil.writeNormalizedOperationInput(payload, result, Absolute.of(rpc), modelContext);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize input of " + rpc, e);
         }
@@ -387,7 +383,7 @@ public class NetconfMessageTransformer
             domDataTreeIdentifier, counter, actionDef.getQName());
         try {
             NetconfMessageTransformUtil.writeNormalizedOperationInput((ContainerNode) payload, result, action,
-                mountContext.getEffectiveModelContext());
+                mountContext.modelContext());
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize input of " + action, e);
         }
@@ -470,8 +466,7 @@ public class NetconfMessageTransformer
             .add(operOutput.getQName())
             .build());
         // FIXME: we should have a cached inference here, or XMLParserStream should accept Absolute instead
-        final var inference = SchemaInferenceStack.of(mountContext.getEffectiveModelContext(), outputPath)
-            .toInference();
+        final var inference = SchemaInferenceStack.of(mountContext.modelContext(), outputPath).toInference();
 
         final NormalizationResultHolder resultHolder = new NormalizationResultHolder();
         final Element element = message.getDocument().getDocumentElement();

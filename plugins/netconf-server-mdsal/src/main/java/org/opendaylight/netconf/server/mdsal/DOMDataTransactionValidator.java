@@ -11,21 +11,20 @@ import com.google.common.annotations.Beta;
 import com.google.common.util.concurrent.FluentFuture;
 import java.io.Serial;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker.Extension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMServiceExtension;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
 /**
- * A {@link DOMServiceExtension} which allows users to provide Validate capability for {@link DOMDataBroker}.
+ * A {@link DOMDataBroker} {@link Extension} which allows users to provide Validate capability.
  *
  * <p> See <a href="https://tools.ietf.org/html/rfc4741#section-8.6">RFC4741 section 8.6</a> for details.
  */
 @Beta
-public interface DOMDataTransactionValidator extends DOMDataBrokerExtension {
+public interface DOMDataTransactionValidator extends Extension {
     /**
      * Validates state of the data tree associated with the provided {@link DOMDataTreeWriteTransaction}.
      *

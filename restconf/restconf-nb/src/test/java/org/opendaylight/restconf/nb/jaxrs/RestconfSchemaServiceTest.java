@@ -13,9 +13,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertEntity;
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertError;
 
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.Futures;
 import java.io.Reader;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,14 +26,14 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -48,7 +48,7 @@ public class RestconfSchemaServiceTest {
     @Mock
     private DOMSchemaService schemaService;
     @Mock
-    private DOMYangTextSourceProvider sourceProvider;
+    private YangTextSourceExtension sourceProvider;
     @Mock
     private DOMDataBroker dataBroker;
     @Mock
@@ -58,7 +58,7 @@ public class RestconfSchemaServiceTest {
     @Mock
     private DOMMountPointService mountPointService;
     @Mock
-    private YangTextSchemaSource yangSource;
+    private YangTextSource yangSource;
     @Mock
     private Reader yangReader;
 
@@ -68,8 +68,7 @@ public class RestconfSchemaServiceTest {
     @Before
     public void setup() throws Exception {
         doReturn(SCHEMA_CONTEXT).when(schemaService).getGlobalContext();
-        doReturn(ImmutableClassToInstanceMap.of(DOMYangTextSourceProvider.class, sourceProvider)).when(schemaService)
-            .getExtensions();
+        doReturn(List.of(sourceProvider)).when(schemaService).supportedExtensions();
 
         restconf = new JaxRsRestconf(new MdsalRestconfServer(schemaService, dataBroker, rpcService, actionService,
             mountPointService));
@@ -81,7 +80,7 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaTest() throws Exception {
         doReturn(Futures.immediateFuture(yangSource)).when(sourceProvider)
-            .getSource(new SourceIdentifier("module1", Revision.of("2014-01-01")));
+            .getYangTexttSource(new SourceIdentifier("module1", Revision.of("2014-01-01")));
         doReturn(yangReader).when(yangSource).openStream();
 
         assertSame(yangReader, assertEntity(Reader.class, 200,
