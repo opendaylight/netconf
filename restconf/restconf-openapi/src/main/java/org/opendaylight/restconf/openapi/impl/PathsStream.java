@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -70,6 +73,7 @@ public final class PathsStream extends InputStream {
     private boolean hasRootPostLink;
     private boolean hasAddedDataStore;
     private Reader reader;
+    private ReadableByteChannel channel;
 
     public PathsStream(final EffectiveModelContext schemaContext, final OpenApiBodyWriter writer,
             final String deviceName, final String urlPrefix, final boolean isForSingleModule,
@@ -98,7 +102,10 @@ public final class PathsStream extends InputStream {
 
     @Override
     public int read(final byte[] array, final int off, final int len) throws IOException {
-        return super.read(array, off, len);
+        if (channel == null) {
+            channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(new PathsEntity(toPaths()))));
+        }
+        return channel.read(ByteBuffer.wrap(array, off, len));
     }
 
     private byte[] writeNextEntity(final OpenApiEntity next) throws IOException {
