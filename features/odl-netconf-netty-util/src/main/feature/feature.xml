@@ -2,6 +2,6 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0" name="odl-netconf-netty-util-${project.version}">
     <feature name="odl-netconf-netty-util" version="${project.version}">
         <feature version="[13,14)">odl-netty-4</feature>
-        <feature version="[0.18,1)">odl-aaa-encryption-service</feature>
+        <feature version="[0.19,1)">odl-aaa-encryption-service</feature>
     </feature>
 </features>

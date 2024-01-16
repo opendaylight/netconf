@@ -11,12 +11,13 @@ import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
-import org.opendaylight.yangtools.yang.data.util.AbstractModuleStringInstanceIdentifierCodec;
+import org.opendaylight.yangtools.yang.data.util.AbstractStringInstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
-import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 
-final class ApiPathInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {
+final class ApiPathInstanceIdentifierCodec extends AbstractStringInstanceIdentifierCodec {
     private final @NonNull DatabindContext databind;
 
     ApiPathInstanceIdentifierCodec(final DatabindContext databind) {
@@ -29,12 +30,16 @@ final class ApiPathInstanceIdentifierCodec extends AbstractModuleStringInstanceI
     }
 
     @Override
-    protected Module moduleForPrefix(final String prefix) {
-        return databind.modelContext().findModules(prefix).stream().findFirst().orElse(null);
+    protected QNameModule moduleForPrefix(final String prefix) {
+        return databind.modelContext().findModuleStatements(prefix).stream().findFirst()
+            .map(ModuleEffectiveStatement::localQNameModule)
+            .orElse(null);
     }
 
     @Override
     protected String prefixForNamespace(final XMLNamespace namespace) {
-        return databind.modelContext().findModule(namespace).stream().findFirst().map(Module::getName).orElse(null);
+        return databind.modelContext().findModuleStatements(namespace).stream().findFirst()
+            .map(module -> module.argument().getLocalName())
+            .orElse(null);
     }
 }
