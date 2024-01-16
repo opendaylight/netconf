@@ -12,11 +12,14 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Base64;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -26,6 +29,7 @@ import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DefaultDOMRpcException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntry;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryOutput;
@@ -141,21 +145,26 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
     private ListenableFuture<RpcResult<AddKeystoreEntryOutput>> addKeystoreEntry(final AddKeystoreEntryInput input) {
         LOG.debug("Adding keypairs: {}", input);
 
-        final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final List<KeyCredential> keypairs = input.nonnullKeyCredential().values().stream()
-            .map(keypair -> new KeyCredentialBuilder(keypair)
-                .setPrivateKey(encryptionService.encrypt(keypair.getPrivateKey()))
-                .setPassphrase(encryptionService.encrypt(keypair.getPassphrase()))
-                .build())
-            .collect(Collectors.toList());
+        final var plain = input.nonnullKeyCredential();
+        final var encrypted = new ArrayList<KeyCredential>(plain.size());
+        for (var credential : plain.values()) {
+            try {
+                encrypted.add(new KeyCredentialBuilder(credential)
+                    .setPrivateKey(encryptString(credential.getPrivateKey()))
+                    .setPassphrase(encryptString(credential.getPassphrase()))
+                    .build());
+            } catch (GeneralSecurityException e) {
+                return Futures.immediateFailedFuture(new DefaultDOMRpcException("Failed to decrypt " + credential, e));
+            }
+        }
 
-        for (KeyCredential keypair : keypairs) {
+        final var writeTransaction = dataBroker.newWriteOnlyTransaction();
+        for (var keypair : encrypted) {
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
                 KEYSTORE_IID.child(KeyCredential.class, keypair.key()), keypair);
         }
 
-        final SettableFuture<RpcResult<AddKeystoreEntryOutput>> rpcResult = SettableFuture.create();
-
+        final var rpcResult = SettableFuture.<RpcResult<AddKeystoreEntryOutput>>create();
         writeTransaction.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -169,8 +178,11 @@ public final class NetconfSalKeystoreRpcs implements AutoCloseable {
                 rpcResult.setException(throwable);
             }
         }, MoreExecutors.directExecutor());
-
         return rpcResult;
+    }
+
+    private String encryptString(final String plain) throws GeneralSecurityException {
+        return Base64.getEncoder().encodeToString(encryptionService.encrypt(plain.getBytes(StandardCharsets.UTF_8)));
     }
 
     @VisibleForTesting

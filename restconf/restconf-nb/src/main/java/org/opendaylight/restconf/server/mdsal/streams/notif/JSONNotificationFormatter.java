@@ -16,14 +16,14 @@ import javax.xml.xpath.XPathExpressionException;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.restconf.server.spi.TextParameters;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.$YangModuleInfoImpl;
+import org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 final class JSONNotificationFormatter extends NotificationFormatter {
     private static final @NonNull String NOTIFICATION_NAME =
-        $YangModuleInfoImpl.getInstance().getName().getLocalName() + ":notification";
+        YangModuleInfoImpl.getInstance().getName().getLocalName() + ":notification";
     @VisibleForTesting
     static final JSONNotificationFormatter EMPTY = new JSONNotificationFormatter(TextParameters.EMPTY);
 

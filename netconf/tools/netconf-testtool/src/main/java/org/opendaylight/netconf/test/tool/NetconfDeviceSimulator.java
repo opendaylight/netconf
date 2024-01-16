@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
@@ -62,13 +63,13 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 import org.opendaylight.yangtools.yang.model.api.Submodule;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
+import org.opendaylight.yangtools.yang.model.spi.source.URLYangTextSource;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import org.slf4j.Logger;
@@ -93,7 +94,7 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     private ServerTransportInitializer createTransportInitializer(final Set<Capability> capabilities,
-            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
+            final YangTextSourceExtension sourceProvider) {
         final var transformedCapabilities = new HashSet<>(Collections2.transform(capabilities, input -> {
             if (sendFakeSchema) {
                 sendFakeSchema = false;
@@ -115,7 +116,7 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     private NetconfOperationServiceFactory createOperationServiceFactory(
-            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider,
+            final YangTextSourceExtension sourceProvider,
             final Set<Capability> transformedCapabilities, final NetconfMonitoringService monitoringService1,
             final SessionIdProvider idProvider) {
         final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory =
@@ -166,7 +167,7 @@ public class NetconfDeviceSimulator implements Closeable {
         final var schemaRepo = new SharedSchemaRepository("netconf-simulator");
         final var capabilities = parseSchemasToModuleCapabilities(schemaRepo);
         final var transportInitializer = createTransportInitializer(capabilities,
-            sourceIdentifier -> schemaRepo.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class));
+            sourceIdentifier -> schemaRepo.getSchemaSource(sourceIdentifier, YangTextSource.class));
 
         final var ipAddress = getIpAddress(configuration);
         final var startingPort = getStartingPort(configuration);
@@ -232,7 +233,7 @@ public class NetconfDeviceSimulator implements Closeable {
         consumer.registerSchemaSourceListener(TextToIRTransformer.create(consumer, consumer));
         consumer.registerSchemaSourceListener(new SchemaSourceListener() {
             @Override
-            public void schemaSourceEncountered(final SchemaSourceRepresentation schemaSourceRepresentation) {
+            public void schemaSourceEncountered(final SourceRepresentation schemaSourceRepresentation) {
 
             }
 
@@ -251,13 +252,13 @@ public class NetconfDeviceSimulator implements Closeable {
 
         if (configuration.getSchemasDir() != null) {
             LOG.info("Loading models from directory.");
-            final FilesystemSchemaSourceCache<YangTextSchemaSource> cache = new FilesystemSchemaSourceCache<>(
-                consumer, YangTextSchemaSource.class, configuration.getSchemasDir());
+            final FilesystemSchemaSourceCache<YangTextSource> cache = new FilesystemSchemaSourceCache<>(
+                consumer, YangTextSource.class, configuration.getSchemasDir());
             consumer.registerSchemaSourceListener(cache);
         } else if (configuration.getModels() != null) {
             LOG.info("Loading models from classpath.");
-            final SchemaSourceCache<YangTextSchemaSource> cache = new SchemaSourceCache<>(
-                    consumer, YangTextSchemaSource.class, configuration.getModels());
+            final SchemaSourceCache<YangTextSource> cache = new SchemaSourceCache<>(
+                    consumer, YangTextSource.class, configuration.getModels());
             consumer.registerSchemaSourceListener(cache);
         } else {
             LOG.info("Custom module loading skipped.");
@@ -296,7 +297,7 @@ public class NetconfDeviceSimulator implements Closeable {
 
         final String moduleContent;
         try {
-            moduleContent = consumer.getSchemaSource(sourceId, YangTextSchemaSource.class).get().read();
+            moduleContent = consumer.getSchemaSource(sourceId, YangTextSource.class).get().read();
         } catch (ExecutionException | InterruptedException | IOException e) {
             throw new IllegalStateException(
                 "Cannot retrieve schema source for module " + sourceId + " from schema repository", e);
@@ -308,8 +309,8 @@ public class NetconfDeviceSimulator implements Closeable {
     private static void registerSource(final SharedSchemaRepository consumer, final String resource,
             final SourceIdentifier sourceId) {
         consumer.registerSchemaSource(sourceIdentifier -> Futures.immediateFuture(
-            YangTextSchemaSource.forResource(NetconfDeviceSimulator.class, resource)),
-            PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class,
+            new URLYangTextSource(NetconfDeviceSimulator.class.getResource(resource))),
+            PotentialSchemaSource.create(sourceId, YangTextSource.class,
                 PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
     }
 
