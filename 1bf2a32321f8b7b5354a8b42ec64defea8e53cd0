@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce924b1b_5f1c70c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9321
+      },
+      "writtenOn": "2024-01-16T15:14:31Z",
+      "side": 1,
+      "message": "kokoti",
+      "revId": "1bf2a32321f8b7b5354a8b42ec64defea8e53cd0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
