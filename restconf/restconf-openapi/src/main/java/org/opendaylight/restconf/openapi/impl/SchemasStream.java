@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -46,6 +49,7 @@ public final class SchemasStream extends InputStream {
     private final boolean isForSingleModule;
 
     private Reader reader;
+    private ReadableByteChannel channel;
     private boolean schemesWritten;
 
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
@@ -95,7 +99,33 @@ public final class SchemasStream extends InputStream {
 
     @Override
     public int read(final byte[] array, final int off, final int len) throws IOException {
-        return super.read(array, off, len);
+        if (channel == null) {
+            generator.writeObjectFieldStart("schemas");
+            generator.flush();
+            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
+            stream.reset();
+        }
+
+        var read = channel.read(ByteBuffer.wrap(array));
+        while (read == -1) {
+            if (iterator.hasNext()) {
+                channel = Channels.newChannel(new SchemaStream(toComponents(iterator.next(), context,
+                    isForSingleModule), writer));
+                read = channel.read(ByteBuffer.wrap(array));
+                continue;
+            }
+            if (!schemesWritten) {
+                generator.writeEndObject();
+                schemesWritten = true;
+                continue;
+            }
+            generator.flush();
+            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
+            stream.reset();
+            return channel.read(ByteBuffer.wrap(array));
+        }
+
+        return read;
     }
 
     private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context,

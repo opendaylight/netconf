@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -37,6 +40,7 @@ public final class OpenApiInputStream extends InputStream {
     private final Deque<InputStream> stack = new ArrayDeque<>();
 
     private Reader reader;
+    private ReadableByteChannel channel;
 
     private boolean eof;
 
@@ -87,6 +91,30 @@ public final class OpenApiInputStream extends InputStream {
 
     @Override
     public int read(final byte[] array, final int off, final int len) throws IOException {
-        return super.read(array, off, len);
+        if (eof) {
+            return -1;
+        }
+        if (channel == null) {
+            generator.writeStartObject();
+            generator.flush();
+            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
+            stream.reset();
+        }
+
+        var read = channel.read(ByteBuffer.wrap(array));
+        while (read == -1) {
+            if (stack.isEmpty()) {
+                generator.writeEndObject();
+                generator.flush();
+                channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
+                stream.reset();
+                eof = true;
+                return channel.read(ByteBuffer.wrap(array));
+            }
+            channel = Channels.newChannel(stack.pop());
+            read = channel.read(ByteBuffer.wrap(array));
+        }
+
+        return read;
     }
 }

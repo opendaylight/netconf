@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,6 +39,7 @@ public final class ComponentsStream extends InputStream {
     private boolean schemasWritten;
     private boolean securityWritten;
     private Reader reader;
+    private ReadableByteChannel channel;
 
     public ComponentsStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
         final JsonGenerator generator, final ByteArrayOutputStream stream,
@@ -84,6 +88,35 @@ public final class ComponentsStream extends InputStream {
 
     @Override
     public int read(final byte[] array, final int off, final int len) throws IOException {
-        return super.read(array, off, len);
+        if (channel == null) {
+            generator.writeObjectFieldStart("components");
+            generator.flush();
+            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
+            stream.reset();
+        }
+
+        var read = channel.read(ByteBuffer.wrap(array));
+        while (read == -1) {
+            if (!schemasWritten) {
+                channel = Channels.newChannel(new SchemasStream(context, writer, generator, stream, iterator,
+                    isForSingleModule));
+                read = channel.read(ByteBuffer.wrap(array));
+                schemasWritten = true;
+                continue;
+            }
+            if (!securityWritten) {
+                channel = Channels.newChannel(new SecuritySchemesStream(writer, Map.of(BASIC_AUTH_NAME,
+                    OPEN_API_BASIC_AUTH)));
+                read = channel.read(ByteBuffer.wrap(array));
+                securityWritten = true;
+                generator.writeEndObject();
+                continue;
+            }
+            generator.flush();
+            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
+            stream.reset();
+            return channel.read(ByteBuffer.wrap(array));
+        }
+        return read;
     }
 }
