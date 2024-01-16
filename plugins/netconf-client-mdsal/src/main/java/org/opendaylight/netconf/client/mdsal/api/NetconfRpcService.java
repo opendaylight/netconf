@@ -19,7 +19,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 /**
  * A {@link DOMService} capturing the ability to invoke RPCs which are defined in RFC4741 and in RFC6241.
  */
-public interface NetconfRpcService extends DOMService {
+public interface NetconfRpcService extends DOMService<NetconfRpcService, NetconfRpcService.Extension> {
+    /**
+     * Marker interface for an extension to {@link NetconfRpcService}.
+     */
+    interface Extension extends DOMService.Extension<NetconfRpcService, Extension> {
+        // Marker interface
+    }
+
     /**
      * Invoke a base RFC4741/RFC6241 RPC, e.g. those in {@link YangConstants#NETCONF_NAMESPACE}.
      *

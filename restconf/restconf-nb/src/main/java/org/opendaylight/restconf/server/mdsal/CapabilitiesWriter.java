@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.server.mdsal;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.$YangModuleInfoImpl.qnameOf;
+import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.YangModuleInfoImpl.qnameOf;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
@@ -21,10 +21,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.restconf.api.query.AbstractReplayParam;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
@@ -38,12 +36,12 @@ import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.RestconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.monitoring.rev170126.restconf.state.Capabilities;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -56,8 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Component(service = { })
-public final class CapabilitiesWriter
-        implements AutoCloseable, EffectiveModelContextListener, DOMTransactionChainListener {
+public final class CapabilitiesWriter implements AutoCloseable, FutureCallback<Empty> {
     private static final Logger LOG = LoggerFactory.getLogger(CapabilitiesWriter.class);
 
     @VisibleForTesting
@@ -78,7 +75,7 @@ public final class CapabilitiesWriter
     public CapabilitiesWriter(@Reference final DOMDataBroker dataBroker,
             @Reference final DOMSchemaService schemaService) {
         this.dataBroker = requireNonNull(dataBroker);
-        reg = schemaService.registerSchemaContextListener(this);
+        reg = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
     }
 
     @PreDestroy
@@ -97,20 +94,18 @@ public final class CapabilitiesWriter
     }
 
     @Override
-    public synchronized void onTransactionChainFailed(final DOMTransactionChain chain,
-            final DOMDataTreeTransaction transaction, final Throwable cause) {
+    public synchronized void onFailure(final Throwable cause) {
         LOG.warn("Transaction chain failed, updates may not have been propagated", cause);
         txChain = null;
     }
 
     @Override
-    public synchronized void onTransactionChainSuccessful(final DOMTransactionChain chain) {
+    public synchronized void onSuccess(final Empty result) {
         LOG.debug("Transaction chain closed successfully");
         txChain = null;
     }
 
-    @Override
-    public synchronized void onModelContextUpdated(final EffectiveModelContext newModelContext) {
+    private synchronized void onModelContextUpdated(final EffectiveModelContext newModelContext) {
         if (reg != null) {
             LOG.debug("Ignoring model context update");
             return;
@@ -132,7 +127,8 @@ public final class CapabilitiesWriter
 
         LOG.debug("Removing ietf-restconf-monitoring state");
         if (txChain == null) {
-            txChain = dataBroker.createMergingTransactionChain(this);
+            txChain = dataBroker.createMergingTransactionChain();
+            txChain.addCallback(this);
         }
 
         final var tx = txChain.newWriteOnlyTransaction();
@@ -159,7 +155,8 @@ public final class CapabilitiesWriter
 
         LOG.debug("Updating state of ietf-restconf-monitoring");
         if (txChain == null) {
-            txChain = dataBroker.createMergingTransactionChain(this);
+            txChain = dataBroker.createMergingTransactionChain();
+            txChain.addCallback(this);
         }
 
         final var tx = txChain.newWriteOnlyTransaction();
@@ -194,7 +191,7 @@ public final class CapabilitiesWriter
      */
     @VisibleForTesting
     static @NonNull LeafSetNode<String> mapCapabilities() {
-        return Builders.<String>leafSetBuilder()
+        return ImmutableNodes.<String>newSystemLeafSetBuilder()
             .withNodeIdentifier(CAPABILITY)
             .withChildValue(DepthParam.capabilityUri().toString())
             .withChildValue(FieldsParam.capabilityUri().toString())
