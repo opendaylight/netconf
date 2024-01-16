@@ -49,8 +49,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
@@ -136,13 +136,14 @@ import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
+import org.opendaylight.yangtools.yang.model.api.source.YinTextSource;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SubmoduleEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.api.YinTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
@@ -188,14 +189,14 @@ public abstract class RestconfStrategy {
     private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
     private final @NonNull ApiPathNormalizer pathNormalizer;
     private final @NonNull DatabindContext databind;
-    private final DOMYangTextSourceProvider sourceProvider;
+    private final YangTextSourceExtension sourceProvider;
     private final DOMMountPointService mountPointService;
     private final DOMActionService actionService;
     private final DOMRpcService rpcService;
 
     RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final DOMYangTextSourceProvider sourceProvider, final @Nullable DOMMountPointService mountPointService) {
+            final YangTextSourceExtension sourceProvider, final @Nullable DOMMountPointService mountPointService) {
         this.databind = requireNonNull(databind);
         this.localRpcs = requireNonNull(localRpcs);
         this.rpcService = rpcService;
@@ -251,7 +252,7 @@ public abstract class RestconfStrategy {
         final var rpcService = mountPoint.getService(DOMRpcService.class).orElse(null);
         final var actionService = mountPoint.getService(DOMActionService.class).orElse(null);
         final var sourceProvider = mountPoint.getService(DOMSchemaService.class)
-            .flatMap(schema -> Optional.ofNullable(schema.getExtensions().getInstance(DOMYangTextSourceProvider.class)))
+            .flatMap(schema -> Optional.ofNullable(schema.extension(YangTextSourceExtension.class)))
             .orElse(null);
 
         final var netconfService = mountPoint.getService(NetconfDataTreeService.class);
@@ -1262,8 +1263,7 @@ public abstract class RestconfStrategy {
             return RestconfFuture.failed(e);
         }
 
-        return RestconfFuture.of(
-            new OperationsGetResult.Leaf(rpc.inference().getEffectiveModelContext(), rpc.rpc().argument()));
+        return RestconfFuture.of(new OperationsGetResult.Leaf(rpc.inference().modelContext(), rpc.rpc().argument()));
     }
 
     public @NonNull RestconfFuture<OperationsPostResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
@@ -1326,9 +1326,9 @@ public abstract class RestconfStrategy {
     }
 
     public @NonNull RestconfFuture<CharSource> resolveSource(final SourceIdentifier source,
-            final Class<? extends SchemaSourceRepresentation> representation) {
+            final Class<? extends SourceRepresentation> representation) {
         final var src = requireNonNull(source);
-        if (YangTextSchemaSource.class.isAssignableFrom(representation)) {
+        if (YangTextSource.class.isAssignableFrom(representation)) {
             if (sourceProvider != null) {
                 final var ret = new SettableRestconfFuture<CharSource>();
                 Futures.addCallback(sourceProvider.getSource(src), new FutureCallback<YangTextSchemaSource>() {
@@ -1348,7 +1348,7 @@ public abstract class RestconfStrategy {
             }
             return exportSource(modelContext(), src, YangCharSource::new, YangCharSource::new);
         }
-        if (YinTextSchemaSource.class.isAssignableFrom(representation)) {
+        if (YinTextSource.class.isAssignableFrom(representation)) {
             return exportSource(modelContext(), src, YinCharSource.OfModule::new, YinCharSource.OfSubmodule::new);
         }
         return RestconfFuture.failed(new RestconfDocumentedException(

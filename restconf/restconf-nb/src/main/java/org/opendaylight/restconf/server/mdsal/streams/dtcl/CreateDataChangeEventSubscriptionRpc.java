@@ -64,7 +64,7 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
             @Reference final DatabindProvider databindProvider, @Reference final DOMDataBroker dataBroker) {
         super(CreateDataChangeEventSubscription.QNAME);
         this.databindProvider = requireNonNull(databindProvider);
-        changeService = dataBroker.getExtensions().getInstance(DOMDataTreeChangeService.class);
+        changeService = dataBroker.extension(DOMDataTreeChangeService.class);
         if (changeService == null) {
             throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService");
         }
