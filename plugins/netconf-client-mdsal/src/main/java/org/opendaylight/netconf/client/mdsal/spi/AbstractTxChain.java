@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.client.mdsal.spi;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +16,6 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainClosedException;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.yangtools.concepts.Registration;
 
 /**
@@ -28,7 +28,6 @@ abstract class AbstractTxChain implements DOMTransactionChain, TxListener {
     private final Map<DOMDataTreeWriteTransaction, Registration> pendingTransactions = new HashMap<>();
 
     final DOMDataBroker dataBroker;
-    final DOMTransactionChainListener listener;
 
     /**
      * Transaction created by this chain that hasn't been submitted or cancelled yet.
@@ -37,17 +36,18 @@ abstract class AbstractTxChain implements DOMTransactionChain, TxListener {
     private boolean closed = false;
     private boolean successful = true;
 
-    AbstractTxChain(final DOMDataBroker dataBroker, final DOMTransactionChainListener listener) {
-        this.dataBroker = dataBroker;
-        this.listener = listener;
+    AbstractTxChain(final DOMDataBroker dataBroker) {
+        this.dataBroker = requireNonNull(dataBroker);
     }
 
     @Override
     public final synchronized AbstractWriteTx newWriteOnlyTransaction() {
         checkOperationPermitted();
-        final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        checkState(writeTransaction instanceof AbstractWriteTx);
-        final AbstractWriteTx pendingWriteTx = (AbstractWriteTx) writeTransaction;
+
+        final var writeTransaction = dataBroker.newWriteOnlyTransaction();
+        if (!(writeTransaction instanceof AbstractWriteTx pendingWriteTx)) {
+            throw new IllegalStateException("Unexpected transaction " + writeTransaction);
+        }
         pendingTransactions.put(pendingWriteTx, pendingWriteTx.addListener(this));
         currentTransaction = pendingWriteTx;
         return pendingWriteTx;

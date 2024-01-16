@@ -32,13 +32,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContextFactory;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.spi.AbstractEffectiveModelContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // TODO: this should really come from rfc8528-data-util
-final class DeviceMountPointContext extends AbstractEffectiveModelContextProvider implements Immutable,
-        MountPointContext {
+final class DeviceMountPointContext implements Immutable, MountPointContext {
     private static final Logger LOG = LoggerFactory.getLogger(DeviceMountPointContext.class);
     private static final NodeIdentifier MOUNT_POINT = NodeIdentifier.create(
         QName.create(SchemaMountConstants.RFC8528_MODULE, "mount-point").intern());
@@ -58,10 +56,11 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
         QName.create(SchemaMountConstants.RFC8528_MODULE, "parent-reference").intern());
 
     private final ImmutableMap<MountPointLabel, NetconfMountPointContextFactory> mountPoints;
+    private final @NonNull EffectiveModelContext modelContext;
 
-    private DeviceMountPointContext(final EffectiveModelContext schemaContext,
+    private DeviceMountPointContext(final EffectiveModelContext modelContext,
             final Map<MountPointLabel, NetconfMountPointContextFactory> mountPoints) {
-        super(schemaContext);
+        this.modelContext = requireNonNull(modelContext);
         this.mountPoints = ImmutableMap.copyOf(mountPoints);
     }
 
@@ -72,7 +71,7 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
             return emptyContext;
         }
 
-        final EffectiveModelContext schemaContext = emptyContext.getEffectiveModelContext();
+        final EffectiveModelContext schemaContext = emptyContext.modelContext();
         final DataContainerChild mountPoint = optMountPoint.orElseThrow();
         checkArgument(mountPoint instanceof MapNode, "mount-point list %s is not a MapNode", mountPoint);
 
@@ -111,6 +110,11 @@ final class DeviceMountPointContext extends AbstractEffectiveModelContextProvide
         }
 
         return new DeviceMountPointContext(schemaContext, mountPoints);
+    }
+
+    @Override
+    public EffectiveModelContext modelContext() {
+        return modelContext;
     }
 
     @Override
