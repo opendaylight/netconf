@@ -57,10 +57,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.yang.library.parameters.ModuleSetBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.yang.library.parameters.SchemaBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 
 @ExtendWith(MockitoExtension.class)
 class YangLibraryWriterTest {
@@ -82,7 +81,7 @@ class YangLibraryWriterTest {
     @Mock
     private WriteTransaction writeTransaction;
     @Mock
-    private ListenerRegistration<EffectiveModelContextListener> registration;
+    private Registration registration;
     @Mock
     private YangLibraryWriter.Configuration config;
     @Captor

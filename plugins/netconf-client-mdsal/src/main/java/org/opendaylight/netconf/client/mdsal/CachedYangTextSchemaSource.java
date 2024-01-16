@@ -14,13 +14,13 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Optional;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 
 /**
- * A {@link YangTextSchemaSource} cached from a remote service.
+ * A {@link YangTextSource} cached from a remote service.
  */
-public final class CachedYangTextSchemaSource extends YangTextSchemaSource {
+public final class CachedYangTextSchemaSource extends YangTextSource {
     private final RemoteDeviceId id;
     private final String schemaString;
     private final String symbolicName;

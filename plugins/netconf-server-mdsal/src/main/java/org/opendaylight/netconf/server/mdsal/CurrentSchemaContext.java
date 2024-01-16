@@ -18,28 +18,27 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.server.api.monitoring.CapabilityListener;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
 // Non-final for mocking
 @SuppressWarnings("checkstyle:FinalClass")
-public class CurrentSchemaContext implements EffectiveModelContextListener, AutoCloseable {
+public class CurrentSchemaContext implements AutoCloseable {
     private final AtomicReference<EffectiveModelContext> currentContext = new AtomicReference<>();
     private final Set<CapabilityListener> listeners = Collections.synchronizedSet(new HashSet<>());
-    private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
+    private final SchemaSourceProvider<YangTextSource> rootSchemaSourceProvider;
 
     private Registration schemaContextListenerListenerRegistration;
 
-    private CurrentSchemaContext(final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
+    private CurrentSchemaContext(final SchemaSourceProvider<YangTextSource> rootSchemaSourceProvider) {
         this.rootSchemaSourceProvider = rootSchemaSourceProvider;
     }
 
     // keep spotbugs from complaining about overridable method in constructor
     public static CurrentSchemaContext create(final DOMSchemaService schemaService,
-                         final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
+            final SchemaSourceProvider<YangTextSource> rootSchemaSourceProvider) {
         var context = new CurrentSchemaContext(rootSchemaSourceProvider);
-        final Registration registration = schemaService.registerSchemaContextListener(context);
+        final Registration registration = schemaService.registerSchemaContextListener(context::onModelContextUpdated);
         context.setRegistration(registration);
         return context;
     }
@@ -54,8 +53,7 @@ public class CurrentSchemaContext implements EffectiveModelContextListener, Auto
         return ret;
     }
 
-    @Override
-    public void onModelContextUpdated(final EffectiveModelContext schemaContext) {
+    private void onModelContextUpdated(final EffectiveModelContext schemaContext) {
         currentContext.set(schemaContext);
         // FIXME is notifying all the listeners from this callback wise ?
         final var addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(schemaContext,

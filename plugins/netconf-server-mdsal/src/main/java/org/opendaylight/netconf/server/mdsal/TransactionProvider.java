@@ -37,7 +37,7 @@ public final class TransactionProvider implements AutoCloseable {
     public TransactionProvider(final DOMDataBroker dataBroker, final SessionIdType sessionId) {
         this.dataBroker = dataBroker;
         this.sessionId = sessionId;
-        transactionValidator = dataBroker.getExtensions().getInstance(DOMDataTransactionValidator.class);
+        transactionValidator = dataBroker.extension(DOMDataTransactionValidator.class);
     }
 
     @Override

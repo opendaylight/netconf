@@ -8,7 +8,7 @@
   -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.6.0" name="odl-netconf-${project.version}">
     <feature name="odl-netconf-model-rfc8641" version="${project.version}">
-        <feature version="[12,13)">odl-mdsal-model-rfc8072</feature>
-        <feature version="[12,13)">odl-mdsal-model-rfc8342</feature>
+        <feature version="[13,14)">odl-mdsal-model-rfc8072</feature>
+        <feature version="[13,14)">odl-mdsal-model-rfc8342</feature>
     </feature>
 </features>
