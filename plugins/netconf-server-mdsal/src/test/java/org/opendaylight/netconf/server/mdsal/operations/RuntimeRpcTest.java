@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import javax.xml.parsers.ParserConfigurationException;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -48,8 +49,7 @@ import org.opendaylight.netconf.server.api.operations.NetconfOperationChainedExe
 import org.opendaylight.netconf.server.mdsal.CurrentSchemaContext;
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -61,11 +61,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
+import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
@@ -95,8 +94,8 @@ public class RuntimeRpcTest {
         }
 
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T listener) {
-            return NoOpListenerRegistration.of(listener);
+        public Registration registerRpcListener(final DOMRpcAvailabilityListener listener) {
+            return () -> { };
         }
     };
 
@@ -110,8 +109,8 @@ public class RuntimeRpcTest {
         }
 
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T listener) {
-            return NoOpListenerRegistration.of(listener);
+        public Registration registerRpcListener(final DOMRpcAvailabilityListener listener) {
+            return () -> { };
         }
     };
 
@@ -132,8 +131,8 @@ public class RuntimeRpcTest {
         }
 
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T lsnr) {
-            return NoOpListenerRegistration.of(lsnr);
+        public Registration registerRpcListener(final DOMRpcAvailabilityListener lsnr) {
+            return () -> { };
         }
     };
 
@@ -143,11 +142,11 @@ public class RuntimeRpcTest {
     @Mock
     private DOMSchemaService schemaService;
     @Mock
-    private EffectiveModelContextListener listener;
+    private Consumer<EffectiveModelContext> listener;
     @Mock
-    private ListenerRegistration<?> registration;
+    private Registration registration;
     @Mock
-    private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
+    private SchemaSourceProvider<YangTextSource> sourceProvider;
 
     @BeforeClass
     public static void beforeClass() {
@@ -163,15 +162,15 @@ public class RuntimeRpcTest {
     public void setUp() throws Exception {
         doNothing().when(registration).close();
         doAnswer(invocationOnMock -> {
-            ((EffectiveModelContextListener) invocationOnMock.getArguments()[0]).onModelContextUpdated(SCHEMA_CONTEXT);
+            ((Consumer<EffectiveModelContext>) invocationOnMock.getArgument(0)).accept(SCHEMA_CONTEXT);
             return registration;
-        }).when(schemaService).registerSchemaContextListener(any(EffectiveModelContextListener.class));
+        }).when(schemaService).registerSchemaContextListener(any());
 
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
 
         doAnswer(invocationOnMock -> Futures.immediateFuture(YangTextSchemaSource.delegateForCharSource(
-            (SourceIdentifier) invocationOnMock.getArguments()[0], CharSource.wrap("module test"))))
+            invocationOnMock.getArgument(0, SourceIdentifier.class), CharSource.wrap("module test"))))
             .when(sourceProvider).getSource(any(SourceIdentifier.class));
 
         currentSchemaContext = CurrentSchemaContext.create(schemaService, sourceProvider);

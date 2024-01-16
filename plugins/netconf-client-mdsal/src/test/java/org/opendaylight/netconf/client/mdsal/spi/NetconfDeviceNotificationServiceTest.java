@@ -12,7 +12,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
@@ -36,8 +35,7 @@ public class NetconfDeviceNotificationServiceTest {
     private DOMNotification notification2;
 
     private NetconfDeviceNotificationService service;
-    private ListenerRegistration<DOMNotificationListener> registration;
-
+    private Registration registration;
 
     @Before
     public void setUp() throws Exception {
@@ -66,7 +64,6 @@ public class NetconfDeviceNotificationServiceTest {
     @Test
     public void testCloseRegistration() throws Exception {
         service.publishNotification(notification2);
-        Assert.assertEquals(listener2, registration.getInstance());
         registration.close();
         service.publishNotification(notification2);
         verify(listener2, times(1)).onNotification(notification2);

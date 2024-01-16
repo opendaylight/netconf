@@ -17,7 +17,7 @@ import org.opendaylight.netconf.server.api.notifications.NetconfNotificationColl
 import org.opendaylight.netconf.server.api.notifications.YangLibraryPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChangeBuilder;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = { })
 @Deprecated(forRemoval = true)
 public final class YangLibraryNotificationProducer implements DataTreeChangeListener<ModulesState>, AutoCloseable {
-    private final ListenerRegistration<?> yangLibraryChangeListenerRegistration;
+    private final Registration yangLibraryChangeListenerRegistration;
     private final YangLibraryPublisherRegistration yangLibraryPublisherRegistration;
 
     @Activate
@@ -43,7 +43,7 @@ public final class YangLibraryNotificationProducer implements DataTreeChangeList
             @Reference final DataBroker dataBroker) {
         yangLibraryPublisherRegistration = notifManager.registerYangLibraryPublisher();
         yangLibraryChangeListenerRegistration = dataBroker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(ModulesState.class)),
+            DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(ModulesState.class)),
             this);
     }
 

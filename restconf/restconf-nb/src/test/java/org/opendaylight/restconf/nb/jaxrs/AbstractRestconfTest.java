@@ -63,7 +63,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
 
     @BeforeEach
     final void setupRestconf() {
-        restconf = new JaxRsRestconf(new MdsalRestconfServer(FixedDOMSchemaService.of(modelContext()), dataBroker,
+        restconf = new JaxRsRestconf(new MdsalRestconfServer(new FixedDOMSchemaService(modelContext()), dataBroker,
             rpcService, actionService, mountPointService));
     }
 
