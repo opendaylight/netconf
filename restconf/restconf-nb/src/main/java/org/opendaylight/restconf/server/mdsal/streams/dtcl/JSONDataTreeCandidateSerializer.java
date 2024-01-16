@@ -44,7 +44,7 @@ final class JSONDataTreeCandidateSerializer extends DataTreeCandidateSerializer<
 
         final var modificationType = candidate.modificationType();
         if (modificationType != ModificationType.UNMODIFIED) {
-            final var codecs = JSONCodecFactorySupplier.RFC7951.getShared(parent.getEffectiveModelContext());
+            final var codecs = JSONCodecFactorySupplier.RFC7951.getShared(parent.modelContext());
             try (var writer = createNestedWriter(codecs, DATA_CHANGE_EVENT, SAL_REMOTE_NS, jsonWriter)) {
                 writer.startLeafNode(PATH_NID);
                 writer.scalarValue(YangInstanceIdentifier.of(dataPath));

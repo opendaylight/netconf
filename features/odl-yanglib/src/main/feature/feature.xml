@@ -9,6 +9,6 @@
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-${project.version}">
     <feature name="odl-yanglib" version="${project.version}">
         <feature version="[13,14)">odl-karaf-feat-jetty</feature>
-        <feature version="[12,13)">odl-mdsal-model-rfc8525</feature>
+        <feature version="[13,14)">odl-mdsal-model-rfc8525</feature>
     </feature>
 </features>

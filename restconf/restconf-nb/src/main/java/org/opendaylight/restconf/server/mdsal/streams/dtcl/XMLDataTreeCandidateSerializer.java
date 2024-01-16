@@ -41,7 +41,7 @@ final class XMLDataTreeCandidateSerializer extends DataTreeCandidateSerializer<E
             final DataTreeCandidateNode candidate, final boolean skipData) throws Exception {
         final var modificationType = candidate.modificationType();
         if (modificationType != ModificationType.UNMODIFIED) {
-            final var stack = SchemaInferenceStack.of(parent.getEffectiveModelContext());
+            final var stack = SchemaInferenceStack.of(parent.modelContext());
             stack.enterSchemaTree(DataChangedNotification.QNAME);
 
             final var writer = XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, stack.toInference());
