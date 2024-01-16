@@ -37,7 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -47,7 +47,7 @@ public class CapabilityChangeNotificationProducerTest {
     @Mock
     private BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
     @Mock
-    private ListenerRegistration<?> listenerRegistration;
+    private Registration listenerRegistration;
     @Mock
     private NetconfNotificationCollector netconfNotificationCollector;
     @Mock
@@ -57,7 +57,7 @@ public class CapabilityChangeNotificationProducerTest {
 
     @Before
     public void setUp() {
-        doReturn(listenerRegistration).when(dataBroker).registerDataTreeChangeListener(any(DataTreeIdentifier.class),
+        doReturn(listenerRegistration).when(dataBroker).registerTreeChangeListener(any(DataTreeIdentifier.class),
                 any(DataTreeChangeListener.class));
 
         doNothing().when(baseNotificationPublisherRegistration).onCapabilityChanged(any(NetconfCapabilityChange.class));
@@ -109,10 +109,10 @@ public class CapabilityChangeNotificationProducerTest {
                                       final NetconfCapabilityChange expectedChange) {
         final DataTreeModification<Capabilities> treeChange2 = mock(DataTreeModification.class);
         final DataObjectModification<Capabilities> objectChange2 = mock(DataObjectModification.class);
-        doReturn(modificationType).when(objectChange2).getModificationType();
+        doReturn(modificationType).when(objectChange2).modificationType();
         doReturn(objectChange2).when(treeChange2).getRootNode();
-        doReturn(originalCapabilities).when(objectChange2).getDataBefore();
-        doReturn(updatedCapabilities).when(objectChange2).getDataAfter();
+        doReturn(originalCapabilities).when(objectChange2).dataBefore();
+        doReturn(updatedCapabilities).when(objectChange2).dataAfter();
         capabilityChangeNotificationProducer.onDataTreeChanged(List.of(treeChange2));
         verify(baseNotificationPublisherRegistration).onCapabilityChanged(expectedChange);
     }

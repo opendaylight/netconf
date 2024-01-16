@@ -64,14 +64,14 @@ public class NetconfDeviceMount implements AutoCloseable {
         checkState(topologyRegistration == null, "Already initialized");
 
         final var mountBuilder = mountService.createMountPoint(mountPath);
-        mountBuilder.addService(DOMSchemaService.class, FixedDOMSchemaService.of(() -> initialCtx));
+        mountBuilder.addService(DOMSchemaService.class, new FixedDOMSchemaService(initialCtx));
 
         final var rpcs = services.rpcs();
         mountBuilder.addService(NetconfRpcService.class, rpcs);
         if (rpcs instanceof Rpcs.Normalized normalized) {
-            mountBuilder.addService(DOMRpcService.class, normalized);
+            mountBuilder.addService(DOMRpcService.class, normalized.domRpcService());
         } else if (rpcs instanceof Rpcs.Schemaless schemaless) {
-            mountBuilder.addService(SchemalessRpcService.class, schemaless);
+            mountBuilder.addService(SchemalessRpcService.class, schemaless.schemalessRpcService());
         }
         if (services.actions() instanceof Actions.Normalized normalized) {
             mountBuilder.addService(DOMActionService.class, normalized);

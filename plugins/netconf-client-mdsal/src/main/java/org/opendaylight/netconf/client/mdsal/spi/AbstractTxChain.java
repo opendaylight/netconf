@@ -8,27 +8,29 @@
 package org.opendaylight.netconf.client.mdsal.spi;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import java.util.HashMap;
 import java.util.Map;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainClosedException;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
  * {@link DOMTransactionChain} implementation for Netconf connector.
  */
 abstract class AbstractTxChain implements DOMTransactionChain, TxListener {
-    /**
-     * Submitted transactions that haven't completed yet.
-     */
+    // Submitted transactions that haven't completed yet.
     private final Map<DOMDataTreeWriteTransaction, Registration> pendingTransactions = new HashMap<>();
+    private final @NonNull SettableFuture<Empty> future = SettableFuture.create();
 
     final DOMDataBroker dataBroker;
-    final DOMTransactionChainListener listener;
 
     /**
      * Transaction created by this chain that hasn't been submitted or cancelled yet.
@@ -37,17 +39,23 @@ abstract class AbstractTxChain implements DOMTransactionChain, TxListener {
     private boolean closed = false;
     private boolean successful = true;
 
-    AbstractTxChain(final DOMDataBroker dataBroker, final DOMTransactionChainListener listener) {
-        this.dataBroker = dataBroker;
-        this.listener = listener;
+    AbstractTxChain(final DOMDataBroker dataBroker) {
+        this.dataBroker = requireNonNull(dataBroker);
+    }
+
+    @Override
+    public final ListenableFuture<Empty> future() {
+        return future;
     }
 
     @Override
     public final synchronized AbstractWriteTx newWriteOnlyTransaction() {
         checkOperationPermitted();
-        final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        checkState(writeTransaction instanceof AbstractWriteTx);
-        final AbstractWriteTx pendingWriteTx = (AbstractWriteTx) writeTransaction;
+
+        final var writeTransaction = dataBroker.newWriteOnlyTransaction();
+        if (!(writeTransaction instanceof AbstractWriteTx pendingWriteTx)) {
+            throw new IllegalStateException("Unexpected transaction " + writeTransaction);
+        }
         pendingTransactions.put(pendingWriteTx, pendingWriteTx.addListener(this));
         currentTransaction = pendingWriteTx;
         return pendingWriteTx;
@@ -74,7 +82,7 @@ abstract class AbstractTxChain implements DOMTransactionChain, TxListener {
         if (currentTransaction != null) {
             currentTransaction.cancel();
         }
-        listener.onTransactionChainFailed(this, transaction, cause);
+        future.setException(cause);
     }
 
     @Override
@@ -104,7 +112,7 @@ abstract class AbstractTxChain implements DOMTransactionChain, TxListener {
 
     private void notifyChainListenerSuccess() {
         if (closed && pendingTransactions.isEmpty() && successful) {
-            listener.onTransactionChainSuccessful(this);
+            future.set(Empty.value());
         }
     }
 }

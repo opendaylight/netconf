@@ -89,9 +89,9 @@ public class SessionNotificationProducerTest {
         final DataObjectModification<Session> changeObject = mock(DataObjectModification.class);
         final Session sessionBefore = createSessionWithInRpcCount(Uint32.ONE, Uint32.ZERO);
         final Session sessionAfter = createSessionWithInRpcCount(Uint32.ONE, Uint32.ONE);
-        doReturn(sessionBefore).when(changeObject).getDataBefore();
-        doReturn(sessionAfter).when(changeObject).getDataAfter();
-        doReturn(ModificationType.WRITE).when(changeObject).getModificationType();
+        doReturn(sessionBefore).when(changeObject).dataBefore();
+        doReturn(sessionAfter).when(changeObject).dataAfter();
+        doReturn(ModificationType.WRITE).when(changeObject).modificationType();
         doReturn(changeObject).when(treeChange).getRootNode();
         publisher.onDataTreeChanged(List.of(treeChange));
         //session didn't start, only stats changed. No notification should be produced
@@ -132,16 +132,16 @@ public class SessionNotificationProducerTest {
         final DataObjectModification<Session> changeObject = mock(DataObjectModification.class);
         switch (type) {
             case WRITE:
-                doReturn(null).when(changeObject).getDataBefore();
-                doReturn(session).when(changeObject).getDataAfter();
+                doReturn(null).when(changeObject).dataBefore();
+                doReturn(session).when(changeObject).dataAfter();
                 break;
             case DELETE:
-                doReturn(session).when(changeObject).getDataBefore();
+                doReturn(session).when(changeObject).dataBefore();
                 break;
             default:
                 LOG.debug("Received intentionally unhandled type: {}.", type);
         }
-        doReturn(type).when(changeObject).getModificationType();
+        doReturn(type).when(changeObject).modificationType();
         doReturn(changeObject).when(treeChange).getRootNode();
         return treeChange;
     }

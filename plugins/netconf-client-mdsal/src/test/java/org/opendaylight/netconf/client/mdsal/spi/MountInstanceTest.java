@@ -31,7 +31,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfData;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -61,7 +61,7 @@ public class MountInstanceTest {
 
     @BeforeClass
     public static void suiteSetUp() throws Exception {
-        SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class);
+        SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class);
     }
 
     @Before
@@ -80,7 +80,7 @@ public class MountInstanceTest {
             notificationService, broker, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMDataBroker.class, broker);
-        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
+        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService.domRpcService());
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
     }
 
@@ -90,7 +90,7 @@ public class MountInstanceTest {
             notificationService, null, netconfService);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(NetconfDataTreeService.class, netconfService);
-        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
+        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService.domRpcService());
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
     }
 
