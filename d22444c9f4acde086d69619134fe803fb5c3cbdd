@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e30a1469_1960356a",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslHandlerFactoryProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-01-17T11:36:02Z",
+      "side": 1,
+      "message": "we are not using `final` for enhanced `for` loops (`catch` statements as well)\n\nreason: the variable is *effectively final* by default (treated as final,\nunless it\u0027s reassigned within a loop scope), it means compiler does not behave\ndifferently either you define var as final or not. As result explicit `final` \nstatement serves no purpose but acts as noise\n\nsee https://www.baeldung.com/java-effectively-final\nhttps://stackoverflow.com/questions/58517450/why-is-the-loop-variable-effectively-final-when-using-for-each",
+      "parentUuid": "2c8e323e_baa19ba2",
+      "revId": "d22444c9f4acde086d69619134fe803fb5c3cbdd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f92eaa40_1549a2c8",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-12-18T12:40:32Z",
       "side": 1,
       "message": "should be final var ?",
+      "revId": "d22444c9f4acde086d69619134fe803fb5c3cbdd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32fbe1e4_aab843a1",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslHandlerFactoryProvider.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-01-17T11:36:02Z",
+      "side": 1,
+      "message": "same reason, explained above",
+      "parentUuid": "f92eaa40_1549a2c8",
       "revId": "d22444c9f4acde086d69619134fe803fb5c3cbdd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
