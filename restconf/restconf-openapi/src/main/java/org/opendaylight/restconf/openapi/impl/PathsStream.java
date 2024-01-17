@@ -146,7 +146,7 @@ public final class PathsStream extends InputStream {
                     final var localName = moduleName + ":" + nodeLocalName;
                     final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
                     processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, schemaContext,
-                        deviceName, basePath);
+                        deviceName, basePath, node);
                 }
             }
         }
@@ -156,7 +156,7 @@ public final class PathsStream extends InputStream {
     private static void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
             final boolean isConfig, final EffectiveModelContext schemaContext, final String deviceName,
-            final String basePath) {
+            final String basePath, final SchemaNode parentNode) {
         final var resourcePath = basePath + DATA + path;
         final var fullName = resolveFullNameFromNode(node.getQName(), schemaContext);
         final var firstChild = getListOrContainerChildNode((DataNodeContainer) node);
@@ -175,7 +175,7 @@ public final class PathsStream extends InputStream {
                     node.getQName(), schemaContext);
                 final var childPath = basePath + OPERATIONS + resourceActionPath;
                 result.add(processRootAndActionPathEntity(actionDef, childPath, actionParams, moduleName,
-                    refPath, deviceName));
+                    refPath, deviceName, parentNode));
             });
         }
         for (final var childNode : childNodes) {
@@ -186,7 +186,7 @@ public final class PathsStream extends InputStream {
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
                 processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
-                    schemaContext, deviceName, basePath);
+                    schemaContext, deviceName, basePath, node);
             }
         }
     }
@@ -234,9 +234,9 @@ public final class PathsStream extends InputStream {
 
     private static PathEntity processRootAndActionPathEntity(final SchemaNode node, final String resourcePath,
             final List<ParameterEntity> pathParams, final String moduleName, final String refPath,
-            final String deviceName) {
+            final String deviceName, final SchemaNode parentNode) {
         return new PathEntity(resourcePath,
-            new PostEntity(node, deviceName, moduleName, pathParams, refPath, null),
+            new PostEntity(node, deviceName, moduleName, pathParams, refPath, parentNode),
             null, null, null, null);
     }
 
