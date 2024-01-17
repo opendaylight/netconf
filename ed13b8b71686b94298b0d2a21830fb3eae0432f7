@@ -16,6 +16,24 @@
       "message": "Please add `description` while updating the name.",
       "revId": "ed13b8b71686b94298b0d2a21830fb3eae0432f7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "020260f8_d0d0ebf0",
+        "filename": "plugins/netconf-client-mdsal/src/main/yang/odl-netconf-device.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-17T17:04:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9884174_9111445c",
+      "revId": "ed13b8b71686b94298b0d2a21830fb3eae0432f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
