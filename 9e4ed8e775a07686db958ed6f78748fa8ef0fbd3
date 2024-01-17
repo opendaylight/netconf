@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eea495a6_055d70e4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2024-01-17T19:12:15Z",
+      "side": 1,
+      "message": "There are some more places referring to the old names.\n\n* [NetconfTopologyUtils.java](https://github.com/opendaylight/netconf/blob/master/apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/utils/NetconfTopologyUtils.java) although the default parameters there don\u0027t seem to be used at all\n* [user-guide.rst](https://github.com/opendaylight/netconf/blob/master/docs/user-guide.rst)\n\nThere are some test XMLs with the parameters in netconf-test-util although these XML payloads are just used for filtering tests\n* [rpc/8/pre-filter.xml](https://github.com/opendaylight/netconf/blob/master/protocol/netconf-test-util/src/main/resources/subtree/rpc/8/pre-filter.xml)\n* [rpc/10/pre-filter.xml](https://github.com/opendaylight/netconf/blob/master/protocol/netconf-test-util/src/main/resources/subtree/rpc/10/pre-filter.xml)\n* [rpc/10/post-filter.xml](https://github.com/opendaylight/netconf/blob/master/protocol/netconf-test-util/src/main/resources/subtree/rpc/10/post-filter.xml)",
+      "revId": "9e4ed8e775a07686db958ed6f78748fa8ef0fbd3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78185191_ded96ac7",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1927
+      },
+      "writtenOn": "2024-01-17T19:12:15Z",
+      "side": 1,
+      "message": "Please rename this to match the new parameter name.",
+      "revId": "9e4ed8e775a07686db958ed6f78748fa8ef0fbd3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
