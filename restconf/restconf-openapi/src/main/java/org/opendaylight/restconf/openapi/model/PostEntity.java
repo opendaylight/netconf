@@ -18,6 +18,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -53,7 +54,7 @@ public final class PostEntity extends OperationEntity {
         if (parentNode instanceof Module) {
             return SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName(), moduleName(), moduleName());
         }
-        if (parentNode != null) {
+        if (parentNode != null && !(schema() instanceof OperationDefinition)) {
             return SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName(), moduleName(),
                 ((DataSchemaNode) parentNode).getQName().getLocalName());
         }
@@ -68,7 +69,7 @@ public final class PostEntity extends OperationEntity {
             final var operationName = rpc.getQName().getLocalName();
             if (!output.getChildNodes().isEmpty()) {
                 // TODO: add proper discriminator from DefinitionNames when schemas re-implementation is done
-                final var ref = COMPONENTS_PREFIX + moduleName() + "_" + operationName + "_output";
+                final var ref = processOperationsRef(rpc, operationName, "_output");
                 generator.writeObjectFieldStart(String.valueOf(OK.getStatusCode()));
                 generator.writeStringField(DESCRIPTION, String.format("RPC %s success", operationName));
 
@@ -103,7 +104,7 @@ public final class PostEntity extends OperationEntity {
             generator.writeObjectFieldStart(CONTENT);
             if (!input.getChildNodes().isEmpty()) {
                 // TODO: add proper discriminator from DefinitionNames when schemas re-implementation is done
-                final var ref = COMPONENTS_PREFIX + moduleName() + "_" + operationName + INPUT_SUFFIX;
+                final var ref = processOperationsRef(rpc, operationName, INPUT_SUFFIX);
                 generator.writeObjectFieldStart(MediaType.APPLICATION_JSON);
                 generator.writeObjectFieldStart(SCHEMA);
                 generator.writeObjectFieldStart("properties");
@@ -202,10 +203,23 @@ public final class PostEntity extends OperationEntity {
 
     @Override
     @Nullable String description() {
-        if (parentNode != null) {
+        if (parentNode != null && !(schema() instanceof OperationDefinition)) {
             return parentNode.getDescription().orElse("");
         } else {
             return super.description();
         }
+    }
+
+    private String processOperationsRef(final OperationDefinition def, final String operationName, final String suf) {
+        final var ref = COMPONENTS_PREFIX + moduleName() + "_" + operationName + suf;
+        if (def instanceof ActionDefinition && parentNode != null) {
+            final var parentName = ((DataSchemaNode) parentNode).getQName().getLocalName();
+            if (!operationName.contains(parentName)) {
+                return COMPONENTS_PREFIX + moduleName() + "_"
+                    + ((DataSchemaNode) parentNode).getQName().getLocalName() + "_" + operationName
+                    + suf;
+            }
+        }
+        return ref;
     }
 }
