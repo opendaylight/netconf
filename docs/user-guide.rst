@@ -191,6 +191,24 @@ Payload:
              ]
          }
 
+.. note::
+
+    You have the option to use the 'login-password' configuration for authentication as shown below:
+
+    .. code-block:: json
+
+        "login-password": {
+            "netconf-node-topology:username": "netconf",
+            "netconf-node-topology:password": "c5R3aLBss7J8T2VC3pEeAQ=="
+        }
+
+    In OpenDaylight's configuration, the AAAEncryptionServiceImpl generates a new encryption key with
+    each application build. You can use this method if you have access to the current encryption key.
+    Additionally, it is important to ensure that the entire password is encoded in base64 format and
+    that its length is a multiple of 16 bytes for successful authentication.
+
+
+
 Note that the device name in <node-id> element must match the last
 element of the restconf URL.
 
