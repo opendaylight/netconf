@@ -49,8 +49,6 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             new ConcurrentSkipListMap<>((o1, o2) -> o1.toString().compareToIgnoreCase(o2.toString()));
     private final Map<Long, YangInstanceIdentifier> longIdToInstanceId = new ConcurrentHashMap<>();
 
-    private final Object lock = new Object();
-
     private final AtomicLong idKey = new AtomicLong(0);
 
     private ListenerRegistration<DOMMountPointListener> registration;
