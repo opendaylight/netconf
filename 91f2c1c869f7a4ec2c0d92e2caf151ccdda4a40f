@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a6a7b3c_edf70230",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-18T09:57:01Z",
+      "side": 1,
+      "message": "We would need firts to create obsoleting patch for previous values for netconf 6 and 5. Then we can merge this.",
+      "revId": "91f2c1c869f7a4ec2c0d92e2caf151ccdda4a40f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
