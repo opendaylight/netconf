@@ -90,6 +90,7 @@ class CallHomeMountSessionContext {
                         .setDefaultRequestTimeoutMillis(Uint32.valueOf(60000))
                         .setMaxConnectionAttempts(Uint32.ZERO)
                         .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(2000))
+                        .setMaxTimeoutBetweenAttemptsMillis(Uint32.valueOf(1800000))
                         .setSleepFactor(Decimal64.valueOf("1.5"))
                         .setKeepaliveDelay(Uint32.valueOf(120))
                         .setConcurrentRpcLimit(Uint16.ZERO)
