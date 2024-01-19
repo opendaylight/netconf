@@ -198,6 +198,7 @@ public final class CallHomeMountService implements AutoCloseable {
                 .setDefaultRequestTimeoutMillis(Uint32.valueOf(60000))
                 .setMaxConnectionAttempts(Uint32.ZERO)
                 .setMinBackoffMillis(Uint16.valueOf(2000))
+                .setMaxBackoffMillis(Uint32.valueOf(1800000))
                 .setBackoffMultiplier(Decimal64.valueOf("1.5"))
                 .setKeepaliveDelay(Uint32.valueOf(120))
                 .setConcurrentRpcLimit(Uint16.ZERO)
