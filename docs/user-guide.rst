@@ -153,6 +153,7 @@ Payload:
            <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
            <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
            <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
+           <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
            <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
            <!-- keepalive-delay set to 0 turns off keepalives-->
            <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
@@ -181,9 +182,10 @@ Payload:
                         "netconf-node-topology:username": "admin",
                         "netconf-node-topology:password": "admin"
                      },
-                     "netconf-node-topology:backoff-multiplier": 1.5,
                      "netconf-node-topology:host": "127.0.0.1",
                      "netconf-node-topology:min-backoff-millis": 2000,
+                     "netconf-node-topology:max-backoff-millis": 1800000,
+                     "netconf-node-topology:backoff-multiplier": 1.5,
                      "netconf-node-topology:keepalive-delay": 120
                  }
              ]
