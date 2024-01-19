@@ -131,7 +131,8 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         try (var outputStream = new ByteArrayOutputStream();
              var streamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
              var jsonWriter = JsonWriterFactory.createJsonWriter(streamWriter, DEFAULT_INDENT_SPACES_NUM)) {
-            final var currentDatabindContext = databindProvider.currentContext();
+            final var currentDatabindContext = exception.modelContext() != null
+                ? DatabindContext.ofModel(exception.modelContext()) : databindProvider.currentContext();
             jsonWriter.beginObject();
             final var errors = exception.getErrors();
             if (errors != null && !errors.isEmpty()) {
