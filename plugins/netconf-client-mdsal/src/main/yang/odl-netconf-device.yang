@@ -9,6 +9,10 @@ module odl-netconf-device {
   import ietf-inet-types { prefix inet; }
   import ietf-netconf { prefix nc; }
 
+  revision 2024-01-10 {
+    description "Add possibility to set range of backoff randomization";
+  }
+
   revision 2024-01-04 {
     description "Add possibility to set max timeout between connection attempts";
   }
@@ -186,6 +190,13 @@ module odl-netconf-device {
       default 2000;
     }
 
+    leaf max-timeout-between-attempts-millis {
+      description "Maximum timeout in milliseconds to wait between connection attempts.";
+      config true;
+      type uint32;
+      default 1800000;
+    }
+
     leaf sleep-factor {
       config true;
       type decimal64 {
@@ -194,11 +205,15 @@ module odl-netconf-device {
       default 1.5;
     }
 
-    leaf max-timeout-between-attempts-millis {
-      description "Maximum timeout in milliseconds to wait between connection attempts.";
+    leaf backoff-jitter {
+      description "Range of backoff randomization. The backoff will be multiplied by a random number in the range
+                   (1 - backoff-jitter, 1 + backoff-jitter). Backoff-jitter must be in the range (0, 0.5).";
       config true;
-      type uint32;
-      default 1800000;
+      type decimal64 {
+        fraction-digits 1;
+        range 0..0.5;
+      }
+      default 0.1;
     }
 
     // Keepalive configuration
