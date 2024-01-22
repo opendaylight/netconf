@@ -16,9 +16,10 @@ public final class TimedReconnectStrategyFactory implements ReconnectStrategyFac
     private final EventExecutor executor;
     private final double sleepFactor;
     private final int minSleep;
+    private final long maxSleep;
 
     public TimedReconnectStrategyFactory(final EventExecutor executor, final Long maxConnectionAttempts,
-                                  final int minSleep, final BigDecimal sleepFactor) {
+                                  final int minSleep, final BigDecimal sleepFactor, final long maxSleep) {
         if (maxConnectionAttempts != null && maxConnectionAttempts > 0) {
             connectionAttempts = maxConnectionAttempts;
         } else {
@@ -28,11 +29,13 @@ public final class TimedReconnectStrategyFactory implements ReconnectStrategyFac
         this.sleepFactor = sleepFactor.doubleValue();
         this.executor = executor;
         this.minSleep = minSleep;
+        final long potentialMaxSleep = maxSleep >= minSleep ? maxSleep : minSleep;
+        this.maxSleep = potentialMaxSleep;
     }
 
     @Override
     public ReconnectStrategy createReconnectStrategy() {
         return new TimedReconnectStrategy(executor, minSleep,
-                minSleep, sleepFactor, null /*maxSleep*/, connectionAttempts, null /*deadline*/);
+                minSleep, sleepFactor, maxSleep, connectionAttempts, null /*deadline*/);
     }
 }
