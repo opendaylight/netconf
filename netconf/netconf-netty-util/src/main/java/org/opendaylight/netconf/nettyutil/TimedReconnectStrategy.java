@@ -108,7 +108,7 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
         }
 
         // Cap the sleep time to maxSleep
-        if (this.maxSleep != null && this.lastSleep > this.maxSleep) {
+        if (this.maxSleep != null && this.lastSleep > (maxSleep >= minSleep ? maxSleep : minSleep)) {
             LOG.debug("Capped sleep time from {} to {}", this.lastSleep, this.maxSleep);
             this.lastSleep = this.maxSleep;
         }

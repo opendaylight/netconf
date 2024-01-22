@@ -8,6 +8,10 @@ module odl-netconf-device {
 
   import ietf-inet-types { prefix inet; }
 
+  revision 2024-01-04 {
+    description "Add possibility to set max timeout between connection attempts";
+  }
+
   revision 2022-12-25;
 
   grouping username-password {
@@ -179,6 +183,13 @@ module odl-netconf-device {
         fraction-digits 1;
       }
       default 1.5;
+    }
+
+    leaf max-timeout-between-attempts-millis {
+      description "Maximum timeout in milliseconds to wait between connection attempts.";
+      config true;
+      type uint32;
+      default 1800000;
     }
 
     // Keepalive configuration
