@@ -41,6 +41,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     private final SubscribeToStreamUtil streamUtils;
     private final HandlersHolder handlersHolder;
+    private final String basePath;
 
     /**
      * Initialize holder of handlers with holders as parameters.
@@ -56,6 +57,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         handlersHolder = new HandlersHolder(dataBroker, notificationService, databindProvider);
         streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
+        basePath = configuration.basePath();
     }
 
     @Override
@@ -64,9 +66,9 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         final URI response;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            response = streamUtils.subscribeToDataStream(identifier, uriInfo, params, handlersHolder);
+            response = streamUtils.subscribeToDataStream(identifier, uriInfo, basePath, params, handlersHolder);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-            response = streamUtils.subscribeToYangStream(identifier, uriInfo, params, handlersHolder);
+            response = streamUtils.subscribeToYangStream(identifier, uriInfo, basePath, params, handlersHolder);
         } else {
             final String msg = "Bad type of notification of sal-remote";
             LOG.warn(msg);
