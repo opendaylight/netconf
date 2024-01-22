@@ -36,6 +36,7 @@ public final class NetconfTopologyUtils {
     public static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
     public static final long DEFAULT_CONNECTION_TIMEOUT_MILLIS = 20000L;
     public static final Decimal64 DEFAULT_SLEEP_FACTOR = Decimal64.valueOf("1.5");
+    public static final long DEFAULT_MAX_TIMEOUT_BETWEEN_ATTEMPTS_MILLIS = 1800000L;
 
     private NetconfTopologyUtils() {
         // Hidden on purpose
