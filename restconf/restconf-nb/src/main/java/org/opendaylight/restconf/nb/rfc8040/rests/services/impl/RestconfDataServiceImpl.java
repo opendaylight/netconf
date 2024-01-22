@@ -108,6 +108,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final SubscribeToStreamUtil streamUtils;
     private final DOMActionService actionService;
     private final DOMDataBroker dataBroker;
+    private final String  basePath;
 
     public RestconfDataServiceImpl(final DatabindProvider databindProvider,
             final DOMDataBroker dataBroker, final DOMMountPointService  mountPointService,
@@ -121,6 +122,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         this.actionService = requireNonNull(actionService);
         streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
                 : SubscribeToStreamUtil.webSockets();
+        basePath = configuration.basePath();
     }
 
     @Override
@@ -204,7 +206,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
             final UriInfo uriInfo, final DOMDataTreeWriteOperations tx, final NotificationListenerAdapter listener) {
-        final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
+        final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName(), basePath);
         final MapEntryNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().lastNodeIdentifier(), schemaContext.getNotifications(), null,
                 listener.getOutputType(), uri);
