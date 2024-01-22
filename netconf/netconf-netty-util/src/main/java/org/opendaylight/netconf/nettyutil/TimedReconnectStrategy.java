@@ -55,6 +55,7 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
     private final double sleepFactor;
     private final int connectTime;
     private final long minSleep;
+    private final double jitter;
 
     @GuardedBy("this")
     private long attempts;
@@ -66,10 +67,12 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
     private boolean scheduled;
 
     public TimedReconnectStrategy(final EventExecutor executor, final int connectTime, final long minSleep,
-            final double sleepFactor, final Long maxSleep, final Long maxAttempts, final Long deadline) {
+            final double sleepFactor, final Long maxSleep, final Long maxAttempts, final Long deadline,
+            final double jitter) {
         checkArgument(maxSleep == null || minSleep <= maxSleep);
         checkArgument(sleepFactor >= 1);
         checkArgument(connectTime >= 0);
+        checkArgument(jitter >= 0.0);
         this.executor = requireNonNull(executor);
         this.deadline = deadline;
         this.maxAttempts = maxAttempts;
@@ -77,6 +80,7 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
         this.maxSleep = maxSleep;
         this.sleepFactor = sleepFactor;
         this.connectTime = connectTime;
+        this.jitter = jitter;
     }
 
     @Override
@@ -103,14 +107,17 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
          */
         if (this.attempts != 0) {
             this.lastSleep *= this.sleepFactor;
+            // Cap the sleep time to maxSleep
+            if (this.maxSleep != null && this.lastSleep > (maxSleep >= minSleep ? maxSleep : minSleep)) {
+                LOG.debug("Capped sleep time from {} to {}", this.lastSleep, this.maxSleep);
+                this.lastSleep = this.maxSleep;
+            }
+            // Randomization of sleep time
+            final var randomizedSleep = (long) (this.lastSleep * (Math.random() * (jitter * 2) + (1 - jitter)));
+            LOG.debug("Randomized sleep time from {} to {}", this.lastSleep, randomizedSleep);
+            this.lastSleep = randomizedSleep;
         } else {
             this.lastSleep = this.minSleep;
-        }
-
-        // Cap the sleep time to maxSleep
-        if (this.maxSleep != null && this.lastSleep > (maxSleep >= minSleep ? maxSleep : minSleep)) {
-            LOG.debug("Capped sleep time from {} to {}", this.lastSleep, this.maxSleep);
-            this.lastSleep = this.maxSleep;
         }
 
         this.attempts++;
