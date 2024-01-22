@@ -37,17 +37,40 @@ public class WebSocketFactoryTest {
     private final WebSocketFactory webSocketFactory = new WebSocketFactory(mock(ScheduledExecutorService.class),
             5000, 2000);
 
+<<<<<<< HEAD   (5a5cf3 Mark backoff settings deprecated)
     @BeforeClass
     public static void prepareListenersBroker() {
         ListenersBroker.getInstance().registerDataChangeListener(TOASTER_YIID, REGISTERED_STREAM_NAME,
                 NotificationOutputTypeGrouping.NotificationOutputType.JSON);
+=======
+    @BeforeEach
+    void prepareListenersBroker() {
+        doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
+
+        final var streamRegistry = new MdsalRestconfStreamRegistry(dataBroker);
+        webSocketFactory = new WebSocketFactory("restconf", streamRegistry, pingExecutor, 5000, 2000);
+
+        streamName = streamRegistry.createStream(URI.create("https://localhost:8181/restconf"),
+            new DataTreeChangeSource(databindProvider, changeService, LogicalDatastoreType.CONFIGURATION,
+                YangInstanceIdentifier.of(TOASTER)),
+            "description")
+            .getOrThrow()
+            .name();
+>>>>>>> CHANGE (cebda3 Make RESTCONF base path configurable)
     }
 
     @Test
+<<<<<<< HEAD   (5a5cf3 Mark backoff settings deprecated)
     public void createWebSocketSuccessfully() {
         final ServletUpgradeRequest upgradeRequest = mock(ServletUpgradeRequest.class);
         final ServletUpgradeResponse upgradeResponse = mock(ServletUpgradeResponse.class);
         doReturn(URI.create('/' + REGISTERED_STREAM_NAME + '/')).when(upgradeRequest).getRequestURI();
+=======
+    void createWebSocketSuccessfully() {
+        doReturn(URI.create("https://localhost:8181/restconf/streams/xml/" + streamName))
+            .when(upgradeRequest).getRequestURI();
+>>>>>>> CHANGE (cebda3 Make RESTCONF base path configurable)
 
         final Object webSocket = webSocketFactory.createWebSocket(upgradeRequest, upgradeResponse);
         assertThat(webSocket, instanceOf(WebSocketSessionHandler.class));
@@ -56,10 +79,15 @@ public class WebSocketFactoryTest {
     }
 
     @Test
+<<<<<<< HEAD   (5a5cf3 Mark backoff settings deprecated)
     public void createWebSocketUnsuccessfully() {
         final ServletUpgradeRequest upgradeRequest = mock(ServletUpgradeRequest.class);
         final ServletUpgradeResponse upgradeResponse = mock(ServletUpgradeResponse.class);
         doReturn(URI.create('/' + REGISTERED_STREAM_NAME + '/' + "toasterStatus"))
+=======
+    void createWebSocketUnsuccessfully() {
+        doReturn(URI.create("https://localhost:8181/restconf/streams/xml/" + streamName + "/toasterStatus"))
+>>>>>>> CHANGE (cebda3 Make RESTCONF base path configurable)
             .when(upgradeRequest).getRequestURI();
 
         final Object webSocket = webSocketFactory.createWebSocket(upgradeRequest, upgradeResponse);
