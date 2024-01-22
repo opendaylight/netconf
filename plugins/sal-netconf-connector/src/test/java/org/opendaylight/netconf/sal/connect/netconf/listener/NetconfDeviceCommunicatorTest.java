@@ -395,7 +395,7 @@ public class NetconfDeviceCommunicatorTest {
         final RemoteDevice<NetconfDeviceCommunicator> device = mock(RemoteDevice.class);
 
         final TimedReconnectStrategy timedReconnectStrategy =
-                new TimedReconnectStrategy(GlobalEventExecutor.INSTANCE, 10000, 0, 1.0, null, 100L, null);
+                new TimedReconnectStrategy(GlobalEventExecutor.INSTANCE, 10000, 0, 1.0, null, 100L, null, 0.1);
         final ReconnectStrategy reconnectStrategy = spy(new ReconnectStrategy() {
             @Override
             @Deprecated

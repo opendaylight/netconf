@@ -49,12 +49,12 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUti
 import org.opendaylight.netconf.topology.spi.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.connection.parameters.OdlHelloMessageCapabilities;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.connection.parameters.Protocol.Name;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.credentials.KeyAuth;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.connection.parameters.OdlHelloMessageCapabilities;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.credentials.KeyAuth;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.credentials.LoginPwUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.yang.common.Decimal64;
@@ -232,13 +232,15 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final long maxTimeoutBetweenAttemptsMillis = node.getMaxTimeoutBetweenAttemptsMillis() == null
                 ? NetconfTopologyUtils.DEFAULT_MAX_TIMEOUT_BETWEEN_ATTEMPTS_MILLIS
                 : node.getMaxTimeoutBetweenAttemptsMillis().toJava();
+        final double jitter = node.getBackoffJitter() == null
+                ? NetconfTopologyUtils.DEFAULT_BACKOFF_JITTER : node.getBackoffJitter().doubleValue();
 
         final InetSocketAddress socketAddress = NetconfNodeUtils.toInetSocketAddress(node);
 
         final ReconnectStrategyFactory sf =
             new TimedReconnectStrategyFactory(netconfTopologyDeviceSetup.getEventExecutor(), maxConnectionAttempts,
                 betweenAttemptsTimeoutMillis, BigDecimal.valueOf(sleepFactor.unscaledValue(), sleepFactor.scale()),
-                maxTimeoutBetweenAttemptsMillis);
+                maxTimeoutBetweenAttemptsMillis, jitter);
 
 
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
@@ -280,7 +282,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
         if (credentials
-                instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104
+                instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110
                     .credentials.credentials.LoginPassword loginPassword) {
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         }
