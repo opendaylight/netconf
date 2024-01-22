@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.Map;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.security.Http;
@@ -29,7 +29,7 @@ public final class ComponentsStream extends InputStream {
     private static final String BASIC_AUTH_NAME = "basicAuth";
     private static final Http OPEN_API_BASIC_AUTH = new Http("basic", null, null);
 
-    private final Iterator<? extends Module> iterator;
+    private final Collection<? extends Module> modules;
     private final OpenApiBodyWriter writer;
     private final EffectiveModelContext context;
     private final JsonGenerator generator;
@@ -42,9 +42,9 @@ public final class ComponentsStream extends InputStream {
     private ReadableByteChannel channel;
 
     public ComponentsStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
-        final JsonGenerator generator, final ByteArrayOutputStream stream,
-        final Iterator<? extends Module> iterator, final boolean isForSingleModule) {
-        this.iterator = iterator;
+            final JsonGenerator generator, final ByteArrayOutputStream stream,
+            final Collection<? extends Module> modules, final boolean isForSingleModule) {
+        this.modules = modules;
         this.context = context;
         this.writer = writer;
         this.generator = generator;
@@ -64,8 +64,8 @@ public final class ComponentsStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (!schemasWritten) {
-                reader = new InputStreamReader(new SchemasStream(context, writer, generator, stream, iterator,
-                    isForSingleModule), StandardCharsets.UTF_8);
+                reader = new InputStreamReader(new SchemasStream(context, writer, modules, isForSingleModule),
+                    StandardCharsets.UTF_8);
                 read = reader.read();
                 schemasWritten = true;
                 continue;
@@ -98,9 +98,8 @@ public final class ComponentsStream extends InputStream {
         var read = channel.read(ByteBuffer.wrap(array, off, len));
         while (read == -1) {
             if (!schemasWritten) {
-                channel = Channels.newChannel(new SchemasStream(context, writer, generator, stream, iterator,
-                    isForSingleModule));
-                read = channel.read(ByteBuffer.wrap(array));
+                channel = Channels.newChannel(new SchemasStream(context, writer, modules, isForSingleModule));
+                read = channel.read(ByteBuffer.wrap(array, off, len));
                 schemasWritten = true;
                 continue;
             }
