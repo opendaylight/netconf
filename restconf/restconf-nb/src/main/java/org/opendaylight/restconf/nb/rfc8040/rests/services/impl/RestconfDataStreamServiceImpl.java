@@ -37,6 +37,7 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
     private final ScheduledExecutorService executorService;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
+    private final String basePath;
 
     @Inject
     public RestconfDataStreamServiceImpl(final ScheduledThreadPool scheduledThreadPool,
@@ -44,11 +45,12 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
         executorService = scheduledThreadPool.getExecutor();
         heartbeatInterval = configuration.heartbeatInterval();
         maximumFragmentLength = configuration.maximumFragmentLength();
+        basePath = configuration.basePath();
     }
 
     @Override
     public void getSSE(final String identifier, final UriInfo uriInfo, final SseEventSink sink, final Sse sse) {
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
+        final String streamName = ListenersBroker.createStreamNameFromUri(identifier, basePath);
         final BaseListenerInterface listener;
         final String notificaionType =
             uriInfo.getQueryParameters().getFirst(RestconfStreamsConstants.NOTIFICATION_TYPE);
