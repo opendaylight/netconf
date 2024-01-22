@@ -190,7 +190,8 @@ public class RestconfDataServiceImplTest {
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
 
         dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(contextRef), mockDataBroker,
-                mountPointService, delegRestconfSubscrService, actionService, new StreamsConfiguration(0, 1, 0, false));
+                mountPointService, delegRestconfSubscrService, actionService,
+                new StreamsConfiguration(0, 1, 0, false, "rests"));
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(contextRef))).when(mountPoint)

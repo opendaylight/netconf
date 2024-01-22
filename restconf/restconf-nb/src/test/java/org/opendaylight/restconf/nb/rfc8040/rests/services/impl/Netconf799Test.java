@@ -68,7 +68,8 @@ public class Netconf799Test {
 
         final RestconfDataServiceImpl dataService = new RestconfDataServiceImpl(
             () -> DatabindContext.ofModel(contextRef), mockDataBroker, mock(DOMMountPointService.class),
-            mock(RestconfStreamsSubscriptionService.class), actionService, new StreamsConfiguration(0, 1, 0, false));
+            mock(RestconfStreamsSubscriptionService.class), actionService,
+            new StreamsConfiguration(0, 1, 0, false, "rests"));
 
         final var nodeAndStack = DataSchemaContextTree.from(contextRef).enterPath(ACTION_YII).orElseThrow();
         final var node = nodeAndStack.node().getDataSchemaNode();
