@@ -19,6 +19,12 @@ import org.opendaylight.restconf.server.spi.RestconfStream;
  */
 @Deprecated(since = "7.0.0", forRemoval = true)
 public interface RestconfStreamServletFactory {
+    /**
+     * Return the value of {@code {+restconf}} macro. May be empty, guaranteed to not end with {@code /}.
+     *
+     * @return the value of {@code {+restconf}} macro
+     */
+    @NonNull String restconf();
 
     @NonNull HttpServlet newStreamServlet();
 }

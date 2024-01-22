@@ -51,6 +51,9 @@ public final class OSGiNorthbound {
         @Deprecated(since = "7.0.0", forRemoval = true)
         @AttributeDefinition
         boolean use$_$sse() default true;
+        @AttributeDefinition(name = "{+restconf}", description = """
+            The value of RFC8040 {+restconf} URI template, poiting to the root resource. Must not end with '/'.""")
+        String restconf() default "rests";
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -77,7 +80,8 @@ public final class OSGiNorthbound {
         useSSE = configuration.use$_$sse();
         registry = registryFactory.newInstance(FrameworkUtil.asDictionary(MdsalRestconfStreamRegistry.props(useSSE)));
 
-        servletProps = DefaultRestconfStreamServletFactory.props(registry.getInstance(), useSSE,
+        servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(), registry.getInstance(),
+            useSSE,
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
@@ -97,7 +101,8 @@ public final class OSGiNorthbound {
             LOG.debug("ListenersBroker restarted with {}", newUseSSE ? "SSE" : "Websockets");
         }
 
-        final var newServletProps = DefaultRestconfStreamServletFactory.props(registry.getInstance(), useSSE,
+        final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
+            registry.getInstance(), useSSE,
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());

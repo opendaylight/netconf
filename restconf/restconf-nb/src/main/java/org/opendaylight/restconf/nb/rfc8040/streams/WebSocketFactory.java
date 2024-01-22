@@ -28,18 +28,22 @@ import org.slf4j.LoggerFactory;
  * @param heartbeatInterval     Interval in milliseconds between sending of ping control frames.
  */
 @Deprecated(since = "7.0.0", forRemoval = true)
-record WebSocketFactory(
-        RestconfStream.Registry streamRegistry,
-        PingExecutor pingExecutor,
-        int maximumFragmentLength,
-        int heartbeatInterval) implements WebSocketCreator {
+final class WebSocketFactory implements WebSocketCreator {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketFactory.class);
-    private static final String STREAMS_PREFIX =
-        "/" + URLConstants.BASE_PATH + "/" + URLConstants.STREAMS_SUBPATH + "/";
+    private final RestconfStream.Registry streamRegistry;
+    private final PingExecutor pingExecutor;
+    private final int maximumFragmentLength;
+    private final int heartbeatInterval;
 
-    WebSocketFactory {
-        requireNonNull(pingExecutor);
-        requireNonNull(streamRegistry);
+    private final String streamsPath;
+
+    WebSocketFactory(final String restconf, final RestconfStream.Registry streamRegistry,
+            final PingExecutor pingExecutor, final int maximumFragmentLength, final int heartbeatInterval) {
+        this.streamRegistry = requireNonNull(streamRegistry);
+        this.pingExecutor = requireNonNull(pingExecutor);
+        this.maximumFragmentLength = maximumFragmentLength;
+        this.heartbeatInterval = heartbeatInterval;
+        streamsPath = '/' + requireNonNull(restconf) + '/' + URLConstants.STREAMS_SUBPATH + '/';
     }
 
     /**
@@ -55,12 +59,12 @@ record WebSocketFactory(
     @Override
     public Object createWebSocket(final ServletUpgradeRequest req, final ServletUpgradeResponse resp) {
         final var path = req.getRequestURI().getPath();
-        if (!path.startsWith(STREAMS_PREFIX)) {
-            LOG.debug("Request path '{}' does not start with '{}'", path, STREAMS_PREFIX);
+        if (!path.startsWith(streamsPath)) {
+            LOG.debug("Request path '{}' does not start with '{}'", path, streamsPath);
             return notFound(resp);
         }
 
-        final var stripped = path.substring(STREAMS_PREFIX.length());
+        final var stripped = path.substring(streamsPath.length());
         final int slash = stripped.indexOf('/');
         if (slash < 0) {
             LOG.debug("Request path '{}' does not contain encoding", path);
