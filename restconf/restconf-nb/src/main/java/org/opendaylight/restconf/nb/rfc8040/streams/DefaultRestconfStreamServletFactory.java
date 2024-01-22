@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServlet;
 import javax.ws.rs.core.Application;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.osgi.service.component.annotations.Activate;
@@ -41,7 +42,9 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     private static final String PROP_CORE_POOL_SIZE = ".corePoolSize";
     private static final String PROP_USE_WEBSOCKETS = ".useWebsockets";
     private static final String PROP_STREAMS_CONFIGURATION = ".streamsConfiguration";
+    private static final String PROP_RESTCONF = ".restconf";
 
+    private final @NonNull String restconf;
     private final RestconfStream.Registry streamRegistry;
     private final ServletSupport servletSupport;
 
@@ -49,10 +52,14 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     private final StreamsConfiguration streamsConfiguration;
     private final boolean useWebsockets;
 
-    public DefaultRestconfStreamServletFactory(final ServletSupport servletSupport,
+    public DefaultRestconfStreamServletFactory(final ServletSupport servletSupport, final String restconf,
             final RestconfStream.Registry streamRegistry, final StreamsConfiguration streamsConfiguration,
             final String namePrefix, final int corePoolSize, final boolean useWebsockets) {
         this.servletSupport = requireNonNull(servletSupport);
+        this.restconf = requireNonNull(restconf);
+        if (restconf.endsWith("/")) {
+            throw new IllegalArgumentException("{+restconf} value ends with /");
+        }
         this.streamRegistry = requireNonNull(streamRegistry);
         this.streamsConfiguration = requireNonNull(streamsConfiguration);
         pingExecutor = new DefaultPingExecutor(namePrefix, corePoolSize);
@@ -67,15 +74,21 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     @Activate
     public DefaultRestconfStreamServletFactory(@Reference final ServletSupport servletSupport,
             final Map<String, ?> props) {
-        this(servletSupport, (RestconfStream.Registry) props.get(PROP_STREAM_REGISTRY),
+        this(servletSupport, (String) props.get(PROP_RESTCONF),
+            (RestconfStream.Registry) props.get(PROP_STREAM_REGISTRY),
             (StreamsConfiguration) props.get(PROP_STREAMS_CONFIGURATION),
             (String) props.get(PROP_NAME_PREFIX), (int) requireNonNull(props.get(PROP_CORE_POOL_SIZE)),
             (boolean) requireNonNull(props.get(PROP_USE_WEBSOCKETS)));
     }
 
     @Override
+    public String restconf() {
+        return restconf;
+    }
+
+    @Override
     public HttpServlet newStreamServlet() {
-        return useWebsockets ? new WebSocketInitializer(streamRegistry, pingExecutor, streamsConfiguration)
+        return useWebsockets ? new WebSocketInitializer(restconf, streamRegistry, pingExecutor, streamsConfiguration)
             : servletSupport.createHttpServletBuilder(
                 new Application() {
                     @Override
@@ -91,9 +104,11 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
         pingExecutor.close();
     }
 
-    public static Map<String, ?> props(final RestconfStream.Registry streamRegistry, final boolean useSSE,
-            final StreamsConfiguration streamsConfiguration, final String namePrefix, final int corePoolSize) {
+    public static Map<String, ?> props(final String restconf, final RestconfStream.Registry streamRegistry,
+            final boolean useSSE, final StreamsConfiguration streamsConfiguration, final String namePrefix,
+            final int corePoolSize) {
         return Map.of(
+            PROP_RESTCONF, restconf,
             PROP_STREAM_REGISTRY, streamRegistry,
             PROP_USE_WEBSOCKETS, !useSSE,
             PROP_STREAMS_CONFIGURATION, streamsConfiguration,

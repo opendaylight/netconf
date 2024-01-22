@@ -26,9 +26,9 @@ final class WebSocketInitializer extends WebSocketServlet {
     private final transient WebSocketFactory creator;
     private final int idleTimeoutMillis;
 
-    WebSocketInitializer(final RestconfStream.Registry streamRegistry, final PingExecutor pingExecutor,
-            final StreamsConfiguration configuration) {
-        creator = new WebSocketFactory(streamRegistry, pingExecutor,
+    WebSocketInitializer(final String restconf, final RestconfStream.Registry streamRegistry,
+            final PingExecutor pingExecutor, final StreamsConfiguration configuration) {
+        creator = new WebSocketFactory(restconf, streamRegistry, pingExecutor,
             configuration.maximumFragmentLength(), configuration.heartbeatInterval());
         idleTimeoutMillis = configuration.idleTimeout();
     }

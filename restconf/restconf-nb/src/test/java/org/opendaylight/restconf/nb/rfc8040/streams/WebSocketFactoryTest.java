@@ -66,7 +66,7 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
         final var streamRegistry = new MdsalRestconfStreamRegistry(dataBroker);
-        webSocketFactory = new WebSocketFactory(streamRegistry, pingExecutor, 5000, 2000);
+        webSocketFactory = new WebSocketFactory("rests", streamRegistry, pingExecutor, 5000, 2000);
 
         streamName = streamRegistry.createStream(URI.create("https://localhost:8181/rests"),
             new DataTreeChangeSource(databindProvider, changeService, LogicalDatastoreType.CONFIGURATION,
