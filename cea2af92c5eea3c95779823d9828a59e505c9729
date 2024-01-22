@@ -16,6 +16,24 @@
       "message": "I don\u0027t think we want to obsolete things in stable",
       "revId": "cea2af92c5eea3c95779823d9828a59e505c9729",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d6ce894_d04a6f1d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-22T12:23:50Z",
+      "side": 1,
+      "message": "Its deprecated, obsoleted and renamed in netconf-7.\n\nWe (I) wanted to deprecate and obsolete it in netconf-6. Because it will be renamed just the next following release.\n\nWe (I) wanted to deprecate (only) it in netconf-5 because users have time till netconf-7 to migrate.",
+      "parentUuid": "97a642a0_7b8b966d",
+      "revId": "cea2af92c5eea3c95779823d9828a59e505c9729",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
