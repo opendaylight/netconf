@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97a642a0_7b8b966d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-01-22T09:59:21Z",
+      "side": 1,
+      "message": "I don\u0027t think we want to obsolete things in stable",
+      "revId": "cea2af92c5eea3c95779823d9828a59e505c9729",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
