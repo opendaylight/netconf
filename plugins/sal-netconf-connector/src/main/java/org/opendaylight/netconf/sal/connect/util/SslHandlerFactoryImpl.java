@@ -22,8 +22,8 @@ import javax.net.ssl.TrustManagerFactory;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.connection.parameters.protocol.Specification;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.connection.parameters.protocol.specification.TlsCase;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.protocol.Specification;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.protocol.specification.TlsCase;
 
 public final class SslHandlerFactoryImpl implements SslHandlerFactory {
     private final NetconfKeystoreAdapter keystoreAdapter;
