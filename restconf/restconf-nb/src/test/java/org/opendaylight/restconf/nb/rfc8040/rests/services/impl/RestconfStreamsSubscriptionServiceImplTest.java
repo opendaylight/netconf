@@ -124,8 +124,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                         configurationSse);
         final NormalizedNodePayload response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
-        assertEquals("http://localhost:8181/" + RestconfConstants.BASE_URI_PATTERN
-                + "/" + RestconfConstants.NOTIF
+        assertEquals("http://localhost:8181/rests/" + RestconfConstants.NOTIF
                 + "/data-change-event-subscription/toaster:toaster/toasterStatus/"
                 + "datastore=OPERATIONAL/scope=ONE", response.getNewHeaders().get("Location").toString());
     }
@@ -141,8 +140,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                         configurationWs);
         final NormalizedNodePayload response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
-        assertEquals("ws://localhost:8181/" + RestconfConstants.BASE_URI_PATTERN
-                + "/data-change-event-subscription/toaster:toaster/toasterStatus/"
+        assertEquals("ws://localhost:8181/rests/data-change-event-subscription/toaster:toaster/toasterStatus/"
                 + "datastore=OPERATIONAL/scope=ONE", response.getNewHeaders().get("Location").toString());
     }
 
