@@ -38,6 +38,7 @@ public final class WebSocketInitializer extends WebSocketServlet {
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
     private final int idleTimeoutMillis;
+    private final String basePath;
 
     /**
      * Creation of the web-socket initializer.
@@ -52,6 +53,7 @@ public final class WebSocketInitializer extends WebSocketServlet {
         maximumFragmentLength = configuration.maximumFragmentLength();
         heartbeatInterval = configuration.heartbeatInterval();
         idleTimeoutMillis = configuration.idleTimeout();
+        basePath = configuration.basePath();
     }
 
     /**
@@ -62,7 +64,7 @@ public final class WebSocketInitializer extends WebSocketServlet {
     @Override
     public void configure(final WebSocketServletFactory factory) {
         factory.getPolicy().setIdleTimeout(idleTimeoutMillis);
-        factory.setCreator(new WebSocketFactory(executorService, maximumFragmentLength, heartbeatInterval));
+        factory.setCreator(new WebSocketFactory(executorService, maximumFragmentLength, heartbeatInterval, basePath));
     }
 
     /**
@@ -77,6 +79,7 @@ public final class WebSocketInitializer extends WebSocketServlet {
         private final ListenersBroker listenersBroker = ListenersBroker.getInstance();
         private final int maximumFragmentLength;
         private final int heartbeatInterval;
+        private final String basePath;
 
         /**
          * Creation of the web-socket factory.
@@ -87,10 +90,11 @@ public final class WebSocketInitializer extends WebSocketServlet {
          * @param heartbeatInterval     Interval in milliseconds between sending of ping control frames.
          */
         WebSocketFactory(final ScheduledExecutorService executorService, final int maximumFragmentLength,
-                final int heartbeatInterval) {
+                final int heartbeatInterval, final String basePath) {
             this.executorService = executorService;
             this.maximumFragmentLength = maximumFragmentLength;
             this.heartbeatInterval = heartbeatInterval;
+            this.basePath = basePath;
         }
 
         /**
@@ -106,7 +110,7 @@ public final class WebSocketInitializer extends WebSocketServlet {
         public Object createWebSocket(final ServletUpgradeRequest servletUpgradeRequest,
                 final ServletUpgradeResponse servletUpgradeResponse) {
             final var streamName = ListenersBroker.createStreamNameFromUri(
-                servletUpgradeRequest.getRequestURI().getRawPath());
+                servletUpgradeRequest.getRequestURI().getRawPath(), basePath);
 
             final var listener = listenersBroker.listenerFor(streamName);
             if (listener == null) {
