@@ -100,7 +100,11 @@ public final class JaxRsNorthbound implements AutoCloseable {
 
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
+<<<<<<< HEAD   (d5e3ca Mark backoff settings deprecated)
             .contextPath("/" + BASE_URI_PATTERN)
+=======
+            .contextPath("/" + servletFactory.restconf())
+>>>>>>> CHANGE (cebda3 Make RESTCONF base path configurable)
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
@@ -140,7 +144,17 @@ public final class JaxRsNorthbound implements AutoCloseable {
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
+<<<<<<< HEAD   (d5e3ca Mark backoff settings deprecated)
                 .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(BASE_URI_PATTERN)).build())
+=======
+                .servlet(servletSupport.createHttpServletBuilder(
+                    new Application() {
+                        @Override
+                        public Set<Object> getSingletons() {
+                            return Set.of(new JaxRsWebHostMetadata(servletFactory.restconf()));
+                        }
+                    }).build())
+>>>>>>> CHANGE (cebda3 Make RESTCONF base path configurable)
                 .name("Rootfound")
                 .build());
 

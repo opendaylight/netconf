@@ -37,6 +37,7 @@ public final class WebSocketInitializer extends WebSocketServlet {
     private final int heartbeatInterval;
     private final int idleTimeoutMillis;
 
+<<<<<<< HEAD   (d5e3ca Mark backoff settings deprecated)
     /**
      * Creation of the web-socket initializer.
      *
@@ -49,6 +50,12 @@ public final class WebSocketInitializer extends WebSocketServlet {
         executorService = scheduledThreadPool.getExecutor();
         maximumFragmentLength = configuration.maximumFragmentLength();
         heartbeatInterval = configuration.heartbeatInterval();
+=======
+    WebSocketInitializer(final String restconf, final RestconfStream.Registry streamRegistry,
+            final PingExecutor pingExecutor, final StreamsConfiguration configuration) {
+        creator = new WebSocketFactory(restconf, streamRegistry, pingExecutor,
+            configuration.maximumFragmentLength(), configuration.heartbeatInterval());
+>>>>>>> CHANGE (cebda3 Make RESTCONF base path configurable)
         idleTimeoutMillis = configuration.idleTimeout();
     }
 
