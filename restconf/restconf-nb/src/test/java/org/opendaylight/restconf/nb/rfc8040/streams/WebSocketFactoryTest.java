@@ -35,7 +35,7 @@ public class WebSocketFactoryTest {
             .build();
 
     private final WebSocketFactory webSocketFactory = new WebSocketFactory(mock(ScheduledExecutorService.class),
-            5000, 2000);
+            5000, 2000, "rests");
 
     @BeforeClass
     public static void prepareListenersBroker() {
