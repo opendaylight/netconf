@@ -65,6 +65,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     private final DOMRpcService rpcService;
     private final DOMMountPointService mountPointService;
     private final SubscribeToStreamUtil streamUtils;
+    private final String basePath;
 
     public RestconfInvokeOperationsServiceImpl(final DOMRpcService rpcService,
             final DOMMountPointService mountPointService, final StreamsConfiguration configuration) {
@@ -72,6 +73,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         this.mountPointService = requireNonNull(mountPointService);
         streamUtils = configuration.useSSE() ? SubscribeToStreamUtil.serverSentEvents()
             : SubscribeToStreamUtil.webSockets();
+        basePath = configuration.basePath();
     }
 
     @Override
@@ -90,14 +92,14 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             if (SAL_REMOTE_NAMESPACE.equals(rpcName.getModule())) {
                 if (identifier.contains("create-data-change-event-subscription")) {
                     future = Futures.immediateFuture(
-                        CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContext));
+                        CreateStreamUtil.createDataChangeNotifiStream(payload, schemaContext, basePath));
                 } else {
                     future = Futures.immediateFailedFuture(new RestconfDocumentedException("Unsupported operation",
                         ErrorType.RPC, ErrorTag.OPERATION_NOT_SUPPORTED));
                 }
             } else if (DEVICE_NOTIFICATION_NAMESPACE.equals(rpcName.getModule())) {
                 // FIXME: this should be a match on RPC QName
-                final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "").toString();
+                final String baseUrl = streamUtils.prepareUriByStreamName(uriInfo, "", basePath).toString();
                 future = Futures.immediateFuture(CreateStreamUtil.createDeviceNotificationListener(baseUrl, payload,
                     streamUtils, mountPointService));
             } else {
