@@ -94,8 +94,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
         modelContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications"));
         databindProvider = () -> DatabindContext.ofModel(modelContext);
-        configurationWs = new StreamsConfiguration(0, 100, 10, false);
-        configurationSse = new StreamsConfiguration(0, 100, 10, true);
+        configurationWs = new StreamsConfiguration(0, 100, 10, false, "rests");
+        configurationSse = new StreamsConfiguration(0, 100, 10, true, "rests");
     }
 
     @BeforeClass
@@ -124,8 +124,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                         configurationSse);
         final NormalizedNodePayload response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
-        assertEquals("http://localhost:8181/" + RestconfConstants.BASE_URI_PATTERN
-                + "/" + RestconfConstants.NOTIF
+        assertEquals("http://localhost:8181/" + configurationSse.basePath() + "/" + RestconfConstants.NOTIF
                 + "/data-change-event-subscription/toaster:toaster/toasterStatus/"
                 + "datastore=OPERATIONAL/scope=ONE", response.getNewHeaders().get("Location").toString());
     }
@@ -141,7 +140,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                         configurationWs);
         final NormalizedNodePayload response = streamsSubscriptionService.subscribeToStream(
             "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE", uriInfo);
-        assertEquals("ws://localhost:8181/" + RestconfConstants.BASE_URI_PATTERN
+        assertEquals("ws://localhost:8181/" + configurationWs.basePath()
                 + "/data-change-event-subscription/toaster:toaster/toasterStatus/"
                 + "datastore=OPERATIONAL/scope=ONE", response.getNewHeaders().get("Location").toString());
     }

@@ -50,7 +50,7 @@ abstract class SubscribeToStreamUtil {
         static final ServerSentEvents INSTANCE = new ServerSentEvents();
 
         @Override
-        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName, final String basePath) {
             final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
             return uriBuilder.replacePath(uriInfo.getBaseUri().getPath()
                     + RestconfConstants.NOTIF + '/' + streamName).build();
@@ -64,7 +64,7 @@ abstract class SubscribeToStreamUtil {
         static final WebSockets INSTANCE = new WebSockets();
 
         @Override
-        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+        public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName, final String basePath) {
             final String scheme = uriInfo.getAbsolutePath().getScheme();
             final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
             switch (scheme) {
@@ -77,7 +77,7 @@ abstract class SubscribeToStreamUtil {
                     // Unsecured HTTP and others go to unsecured WebSockets
                     uriBuilder.scheme("ws");
             }
-            return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/' + streamName).build();
+            return uriBuilder.replacePath(basePath + '/' + streamName).build();
         }
     }
 
@@ -103,7 +103,7 @@ abstract class SubscribeToStreamUtil {
      * @param streamName name of stream for create
      * @return final URL
      */
-    abstract @NonNull URI prepareUriByStreamName(UriInfo uriInfo, String streamName);
+    abstract @NonNull URI prepareUriByStreamName(UriInfo uriInfo, String streamName, String basePath);
 
     /**
      * Register listener by streamName in identifier to listen to yang notifications, and put or delete information
@@ -111,13 +111,14 @@ abstract class SubscribeToStreamUtil {
      *
      * @param identifier              Name of the stream.
      * @param uriInfo                 URI information.
+     * @param basePath                The first URL path element for RESTCONF implementation.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Stream location for listening.
      */
-    final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
+    final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo, final String basePath,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
+        final String streamName = ListenersBroker.createStreamNameFromUri(identifier, basePath);
         if (isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
@@ -131,7 +132,7 @@ abstract class SubscribeToStreamUtil {
 
         final EffectiveModelContext schemaContext = handlersHolder.getDatabindProvider().currentContext()
             .modelContext();
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri = prepareUriByStreamName(uriInfo, streamName, basePath);
         notificationListenerAdapter.setQueryParams(notificationQueryParams);
         notificationListenerAdapter.listen(handlersHolder.getNotificationServiceHandler());
         final DOMDataBroker dataBroker = handlersHolder.getDataBroker();
@@ -154,11 +155,12 @@ abstract class SubscribeToStreamUtil {
      *
      * @param identifier              Identifier as stream name.
      * @param uriInfo                 Base URI information.
+     * @param basePath                The first URL path element for RESTCONF implementation.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Location for listening.
      */
-    final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
+    final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo, final String basePath,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
 
@@ -176,7 +178,7 @@ abstract class SubscribeToStreamUtil {
             throw new RestconfDocumentedException(message, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
         }
 
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
+        final String streamName = ListenersBroker.createStreamNameFromUri(identifier, basePath);
         final ListenerAdapter listener = ListenersBroker.getInstance().dataChangeListenerFor(streamName);
         if (listener == null) {
             throw new RestconfDocumentedException("No listener found for stream " + streamName,
@@ -190,7 +192,7 @@ abstract class SubscribeToStreamUtil {
         listener.setCloseVars(dataBroker, schemaHandler);
         listener.listen(dataBroker, LogicalDatastoreType.valueOf(datastoreParam));
 
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri = prepareUriByStreamName(uriInfo, streamName, basePath);
         final EffectiveModelContext schemaContext = schemaHandler.currentContext().modelContext();
         final String serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 
