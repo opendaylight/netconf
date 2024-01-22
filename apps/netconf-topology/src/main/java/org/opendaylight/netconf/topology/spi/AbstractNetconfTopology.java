@@ -56,11 +56,11 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSc
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.api.NetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.connection.parameters.Protocol.Name;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.credentials.KeyAuth;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.credentials.KeyAuth;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.credentials.credentials.LoginPwUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -313,7 +313,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                                                   final NetconfNode node, final NodeId nodeId) {
         final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(eventExecutor,
                 node.requireMaxConnectionAttempts().toJava(), node.requireBetweenAttemptsTimeoutMillis().toJava(),
-                node.requireSleepFactor().decimalValue(), node.requireMaxTimeoutBetweenAttemptsMillis().toJava());
+                node.requireSleepFactor().decimalValue(), node.requireMaxTimeoutBetweenAttemptsMillis().toJava(),
+                node.requireBackoffJitter().doubleValue());
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
@@ -349,7 +350,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
         if (credentials
-                instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240104
+                instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110
                     .credentials.credentials.LoginPassword loginPassword) {
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         }

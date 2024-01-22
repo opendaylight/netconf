@@ -55,6 +55,7 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
     private final double sleepFactor;
     private final int connectTime;
     private final long minSleep;
+    private final double jitter;
 
     @GuardedBy("this")
     private long attempts;
@@ -66,7 +67,8 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
     private boolean scheduled;
 
     public TimedReconnectStrategy(final EventExecutor executor, final int connectTime, final long minSleep,
-            final double sleepFactor, final Long maxSleep, final Long maxAttempts, final Long deadline) {
+            final double sleepFactor, final Long maxSleep, final Long maxAttempts, final Long deadline,
+            final double jitter) {
         checkArgument(maxSleep == null || minSleep <= maxSleep);
         checkArgument(sleepFactor >= 1);
         checkArgument(connectTime >= 0);
@@ -77,6 +79,7 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
         this.maxSleep = maxSleep;
         this.sleepFactor = sleepFactor;
         this.connectTime = connectTime;
+        this.jitter = jitter;
     }
 
     @Override
@@ -126,6 +129,9 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
         if (this.lastSleep == 0) {
             return this.executor.newSucceededFuture(null);
         }
+
+        // Randomization of sleep time
+        this.lastSleep = (long) (this.lastSleep * (Math.random() * (jitter * 2) + (1 - jitter)));
 
         // Set the scheduled flag.
         this.scheduled = true;
