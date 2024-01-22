@@ -52,7 +52,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             @Reference final RestconfStreamServletFactory servletFactory) throws ServletException {
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
-            .contextPath("/" + URLConstants.BASE_PATH)
+            .contextPath("/" + servletFactory.restconf())
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
@@ -102,7 +102,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                     new Application() {
                         @Override
                         public Set<Object> getSingletons() {
-                            return Set.of(new JaxRsWebHostMetadata(URLConstants.BASE_PATH));
+                            return Set.of(new JaxRsWebHostMetadata(servletFactory.restconf()));
                         }
                     }).build())
                 .name("Rootfound")

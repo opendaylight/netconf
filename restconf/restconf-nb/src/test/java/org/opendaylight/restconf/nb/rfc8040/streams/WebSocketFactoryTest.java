@@ -66,9 +66,9 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
         final var streamRegistry = new MdsalRestconfStreamRegistry(dataBroker);
-        webSocketFactory = new WebSocketFactory(streamRegistry, pingExecutor, 5000, 2000);
+        webSocketFactory = new WebSocketFactory("restconf", streamRegistry, pingExecutor, 5000, 2000);
 
-        streamName = streamRegistry.createStream(URI.create("https://localhost:8181/rests"),
+        streamName = streamRegistry.createStream(URI.create("https://localhost:8181/restconf"),
             new DataTreeChangeSource(databindProvider, changeService, LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.of(TOASTER)),
             "description")
@@ -78,7 +78,7 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
 
     @Test
     void createWebSocketSuccessfully() {
-        doReturn(URI.create("https://localhost:8181/rests/streams/xml/" + streamName))
+        doReturn(URI.create("https://localhost:8181/restconf/streams/xml/" + streamName))
             .when(upgradeRequest).getRequestURI();
 
         assertInstanceOf(WebSocketSender.class,
@@ -89,7 +89,7 @@ class WebSocketFactoryTest extends AbstractNotificationListenerTest {
 
     @Test
     void createWebSocketUnsuccessfully() {
-        doReturn(URI.create("https://localhost:8181/rests/streams/xml/" + streamName + "/toasterStatus"))
+        doReturn(URI.create("https://localhost:8181/restconf/streams/xml/" + streamName + "/toasterStatus"))
             .when(upgradeRequest).getRequestURI();
 
         assertNull(webSocketFactory.createWebSocket(upgradeRequest, upgradeResponse));
