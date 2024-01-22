@@ -112,7 +112,7 @@ final class CreateStreamUtil {
      *     </pre>
      */
     static DOMRpcResult createDataChangeNotifiStream(final NormalizedNodePayload payload,
-            final EffectiveModelContext refSchemaCtx) {
+            final EffectiveModelContext refSchemaCtx, final String basePath) {
         // parsing out of container with settings and path
         final ContainerNode data = (ContainerNode) requireNonNull(payload).getData();
         final QName qname = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
@@ -120,7 +120,7 @@ final class CreateStreamUtil {
 
         // building of stream name
         final StringBuilder streamNameBuilder = new StringBuilder(
-                prepareDataChangeNotifiStreamName(path, requireNonNull(refSchemaCtx), data));
+                prepareDataChangeNotifiStreamName(path, requireNonNull(refSchemaCtx), data, basePath));
         final NotificationOutputType outputType = prepareOutputType(data);
         if (outputType.equals(NotificationOutputType.JSON)) {
             streamNameBuilder.append('/').append(outputType.getName());
@@ -225,7 +225,7 @@ final class CreateStreamUtil {
      * @return Parsed stream name.
      */
     private static String prepareDataChangeNotifiStreamName(final YangInstanceIdentifier path,
-            final EffectiveModelContext schemaContext, final ContainerNode data) {
+            final EffectiveModelContext schemaContext, final ContainerNode data, final String basePath) {
         final String datastoreName = extractStringLeaf(data, DATASTORE_NODEID);
         final LogicalDatastoreType datastoreType = datastoreName != null ? LogicalDatastoreType.valueOf(datastoreName)
             : LogicalDatastoreType.CONFIGURATION;
@@ -237,7 +237,7 @@ final class CreateStreamUtil {
         return RestconfStreamsConstants.DATA_SUBSCRIPTION
             + "/" + ListenersBroker.createStreamNameFromUri(IdentifierCodec.serialize(path, schemaContext)
                 + "/" + RestconfStreamsConstants.DATASTORE_PARAM_NAME + "=" + datastoreType
-                + "/" + RestconfStreamsConstants.SCOPE_PARAM_NAME + "=" + scope);
+                + "/" + RestconfStreamsConstants.SCOPE_PARAM_NAME + "=" + scope, basePath);
     }
 
     /**

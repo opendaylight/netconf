@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.DATA_SUBSCRIPTION;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
-import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.BASE_URI_PATTERN;
 import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.NOTIF;
 
 import com.google.common.annotations.Beta;
@@ -66,6 +65,9 @@ public final class JaxRsNorthbound implements AutoCloseable {
         int max$_$thread$_$count() default 1;
         @AttributeDefinition
         boolean use$_$sse() default true;
+        @AttributeDefinition(name = "{+restconf}", description = """
+            The value of RFC8040 {+restconf} URI template, poiting to the root resource. Must not end with '/'.""")
+        String restconf() default "rests";
     }
 
     private final Registration discoveryReg;
@@ -84,7 +86,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             mountPointService, notificationService, rpcService, schemaService, databindProvider,
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.idle$_$timeout(),
-                configuration.heartbeat$_$interval(), configuration.use$_$sse()));
+                configuration.heartbeat$_$interval(), configuration.use$_$sse(), configuration.restconf()));
     }
 
     public JaxRsNorthbound(final WebServer webServer, final WebContextSecurer webContextSecurer,
@@ -100,7 +102,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
 
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
-            .contextPath("/" + BASE_URI_PATTERN)
+            .contextPath("/" + streamsConfiguration.basePath())
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
@@ -140,7 +142,8 @@ public final class JaxRsNorthbound implements AutoCloseable {
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
-                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(BASE_URI_PATTERN)).build())
+                .servlet(servletSupport
+                    .createHttpServletBuilder(new RootFoundApplication(streamsConfiguration.basePath())).build())
                 .name("Rootfound")
                 .build());
 
