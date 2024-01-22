@@ -42,8 +42,8 @@ public final class ComponentsStream extends InputStream {
     private ReadableByteChannel channel;
 
     public ComponentsStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
-        final JsonGenerator generator, final ByteArrayOutputStream stream,
-        final Iterator<? extends Module> iterator, final boolean isForSingleModule) {
+            final JsonGenerator generator, final ByteArrayOutputStream stream,
+            final Iterator<? extends Module> iterator, final boolean isForSingleModule) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
@@ -64,8 +64,8 @@ public final class ComponentsStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (!schemasWritten) {
-                reader = new InputStreamReader(new SchemasStream(context, writer, generator, stream, iterator,
-                    isForSingleModule), StandardCharsets.UTF_8);
+                reader = new InputStreamReader(new SchemasStream(context, writer, iterator, isForSingleModule),
+                    StandardCharsets.UTF_8);
                 read = reader.read();
                 schemasWritten = true;
                 continue;
@@ -98,9 +98,8 @@ public final class ComponentsStream extends InputStream {
         var read = channel.read(ByteBuffer.wrap(array, off, len));
         while (read == -1) {
             if (!schemasWritten) {
-                channel = Channels.newChannel(new SchemasStream(context, writer, generator, stream, iterator,
-                    isForSingleModule));
-                read = channel.read(ByteBuffer.wrap(array));
+                channel = Channels.newChannel(new SchemasStream(context, writer, iterator, isForSingleModule));
+                read = channel.read(ByteBuffer.wrap(array, off, len));
                 schemasWritten = true;
                 continue;
             }
