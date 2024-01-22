@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "94fb9c15_1bb357fe",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/JaxRsNorthbound.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-01-22T21:16:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8389a7b9_c51c07b5",
+      "range": {
+        "startLine": 44,
+        "startChar": 17,
+        "endLine": 44,
+        "endChar": 45
+      },
+      "revId": "723610c7ab2e4488fa9bc4b57ace1006002e2fde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "497d2e60_9a585c92",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7646a85a_165de1a1",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/OSGiNorthbound.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-01-22T21:16:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "497d2e60_9a585c92",
+      "range": {
+        "startLine": 34,
+        "startChar": 26,
+        "endLine": 34,
+        "endChar": 42
+      },
+      "revId": "723610c7ab2e4488fa9bc4b57ace1006002e2fde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9068598d_50be09ad",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-01-17T13:37:41Z",
       "side": 1,
       "message": "reference to a configuration?!\nagain, I do not like how this creeps up configuration everywhere",
+      "range": {
+        "startLine": 38,
+        "startChar": 44,
+        "endLine": 38,
+        "endChar": 53
+      },
+      "revId": "723610c7ab2e4488fa9bc4b57ace1006002e2fde",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b3a4eb8_2679309c",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/RestconfSchemaSourceUrlProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-01-22T21:16:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9068598d_50be09ad",
       "range": {
         "startLine": 38,
         "startChar": 44,
