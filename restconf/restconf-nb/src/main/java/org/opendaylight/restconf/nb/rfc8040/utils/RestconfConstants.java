@@ -14,7 +14,6 @@ import com.google.common.base.Splitter;
  */
 public final class RestconfConstants {
     public static final Splitter SLASH_SPLITTER = Splitter.on('/');
-    public static final String BASE_URI_PATTERN = "rests";
     public static final String NOTIF = "notif";
 
     // FIXME: Remove this constant. All logic relying on this constant should instead rely on YangInstanceIdentifier
