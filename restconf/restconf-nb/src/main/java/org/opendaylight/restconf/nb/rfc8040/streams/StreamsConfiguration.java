@@ -18,7 +18,12 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @param heartbeatInterval     Interval in milliseconds between sending of ping control frames.
  * @param useSSE                when is {@code true} use SSE else use WS
  */
-public record StreamsConfiguration(int maximumFragmentLength, int idleTimeout, int heartbeatInterval, boolean useSSE) {
+public record StreamsConfiguration(
+        int maximumFragmentLength,
+        int idleTimeout,
+        int heartbeatInterval,
+        boolean useSSE,
+        String basePath) {
     // FIXME: can this be 64KiB exactly? if so, maximumFragmentLength should become a Uint16 and validation should be
     //        pushed out to users
     public static final int MAXIMUM_FRAGMENT_LENGTH_LIMIT = 65534;

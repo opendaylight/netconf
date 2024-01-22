@@ -77,7 +77,7 @@ abstract class SubscribeToStreamUtil {
                     // Unsecured HTTP and others go to unsecured WebSockets
                     uriBuilder.scheme("ws");
             }
-            return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/' + streamName).build();
+            return uriBuilder.replacePath("rests/" + streamName).build(); //TODO pass this rests somehow
         }
     }
 
@@ -115,9 +115,9 @@ abstract class SubscribeToStreamUtil {
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Stream location for listening.
      */
-    final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
+    final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo, final String basePath,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
+        final String streamName = ListenersBroker.createStreamNameFromUri(identifier, basePath);
         if (isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
@@ -158,7 +158,7 @@ abstract class SubscribeToStreamUtil {
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Location for listening.
      */
-    final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
+    final URI subscribeToDataStream(final String identifier, final UriInfo uriInfo, final String basePath,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
 
@@ -176,7 +176,7 @@ abstract class SubscribeToStreamUtil {
             throw new RestconfDocumentedException(message, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
         }
 
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
+        final String streamName = ListenersBroker.createStreamNameFromUri(identifier, basePath);
         final ListenerAdapter listener = ListenersBroker.getInstance().dataChangeListenerFor(streamName);
         if (listener == null) {
             throw new RestconfDocumentedException("No listener found for stream " + streamName,
