@@ -89,7 +89,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     @Before
     public void setup() {
         invokeOperationsService = new RestconfInvokeOperationsServiceImpl(rpcService, mountPointService,
-            new StreamsConfiguration(0, 1, 0, false));
+            new StreamsConfiguration(0, 1, 0, false, "restconf"));
     }
 
     @Test

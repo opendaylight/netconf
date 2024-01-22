@@ -190,7 +190,8 @@ public class RestconfDataServiceImplTest {
         doReturn(readWrite).when(mockDataBroker).newReadWriteTransaction();
 
         dataService = new RestconfDataServiceImpl(() -> DatabindContext.ofModel(contextRef), mockDataBroker,
-                mountPointService, delegRestconfSubscrService, actionService, new StreamsConfiguration(0, 1, 0, false));
+                mountPointService, delegRestconfSubscrService, actionService,
+                new StreamsConfiguration(0, 1, 0, false, "restconf"));
         doReturn(Optional.of(mountPoint)).when(mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(Optional.of(FixedDOMSchemaService.of(contextRef))).when(mountPoint)
@@ -395,7 +396,7 @@ public class RestconfDataServiceImplTest {
         doReturn(immediateFalseFluentFuture())
                 .when(readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(readWrite).put(LogicalDatastoreType.CONFIGURATION, node, entryNode);
-        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+        doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/")).when(uriInfo).getBaseUriBuilder();
 
         final Response response = dataService.postData(null, payload, uriInfo);
         assertEquals(201, response.getStatus());
