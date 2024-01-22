@@ -26,7 +26,7 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240110.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.Protocol.Name;
 
 public class CallHomeMountSessionContextTest {
     private Inet4Address someAddressIpv4;
