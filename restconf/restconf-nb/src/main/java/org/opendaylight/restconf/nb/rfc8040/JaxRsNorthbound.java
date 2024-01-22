@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040;
 
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.DATA_SUBSCRIPTION;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
-import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.BASE_URI_PATTERN;
 import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.NOTIF;
 
 import com.google.common.annotations.Beta;
@@ -33,7 +32,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.databind.DatabindProvider;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataStreamServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
-import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -66,6 +64,9 @@ public final class JaxRsNorthbound implements AutoCloseable {
         int max$_$thread$_$count() default 1;
         @AttributeDefinition
         boolean use$_$sse() default true;
+        @AttributeDefinition(name = "{+restconf}", description = """
+            The value of RFC8040 {+restconf} URI template, poiting to the root resource. Must not end with '/'.""")
+        String restconf() default "rests";
     }
 
     private final Registration discoveryReg;
@@ -83,8 +84,8 @@ public final class JaxRsNorthbound implements AutoCloseable {
         this(webServer, webContextSecurer, servletSupport, filterAdapterConfiguration, actionService, dataBroker,
             mountPointService, notificationService, rpcService, schemaService, databindProvider,
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count(),
-            new StreamsConfiguration(configuration.maximum$_$fragment$_$length(), configuration.idle$_$timeout(),
-                configuration.heartbeat$_$interval(), configuration.use$_$sse()));
+            configuration.restconf(), new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
+                configuration.idle$_$timeout(), configuration.heartbeat$_$interval(), configuration.use$_$sse()));
     }
 
     public JaxRsNorthbound(final WebServer webServer, final WebContextSecurer webContextSecurer,
@@ -92,15 +93,14 @@ public final class JaxRsNorthbound implements AutoCloseable {
             final DOMActionService actionService, final DOMDataBroker dataBroker,
             final DOMMountPointService mountPointService, final DOMNotificationService notificationService,
             final DOMRpcService rpcService, final DOMSchemaService schemaService,
-            final DatabindProvider databindProvider,
-            final String pingNamePrefix, final int pingMaxThreadCount,
-            final StreamsConfiguration streamsConfiguration) throws ServletException {
+            final DatabindProvider databindProvider, final String pingNamePrefix, final int pingMaxThreadCount,
+            final String restconf, final StreamsConfiguration streamsConfiguration) throws ServletException {
         final var scheduledThreadPool = new ScheduledThreadPoolWrapper(pingMaxThreadCount,
             new NamingThreadPoolFactory(pingNamePrefix));
 
         final var restconfBuilder = WebContext.builder()
             .name("RFC8040 RESTCONF")
-            .contextPath("/" + BASE_URI_PATTERN)
+            .contextPath("/" + restconf)
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
@@ -140,7 +140,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
             .supportsSessions(false)
             .addServlet(ServletDetails.builder()
                 .addUrlPattern("/*")
-                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(BASE_URI_PATTERN)).build())
+                .servlet(servletSupport.createHttpServletBuilder(new RootFoundApplication(restconf)).build())
                 .name("Rootfound")
                 .build());
 
