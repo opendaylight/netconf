@@ -14,14 +14,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.withSettings;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
@@ -43,7 +42,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockMakers;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NamespaceURN;
@@ -76,7 +74,7 @@ public class NetconfDeviceCommunicatorTest {
     private static final SessionIdType SESSION_ID = new SessionIdType(Uint32.ONE);
 
     @Mock
-    RemoteDevice<NetconfDeviceCommunicator> mockDevice;
+    private RemoteDevice<NetconfDeviceCommunicator> mockDevice;
 
     private NetconfClientSession spySession;
     private NetconfDeviceCommunicator communicator;
@@ -85,12 +83,8 @@ public class NetconfDeviceCommunicatorTest {
     public void setUp() throws Exception {
         communicator = new NetconfDeviceCommunicator(
                 new RemoteDeviceId("test", InetSocketAddress.createUnresolved("localhost", 22)), mockDevice, 10);
-        // FIXME: spy() except we override the MockMaker in use
-        spySession = mock(NetconfClientSession.class, withSettings()
-            .spiedInstance(new NetconfClientSession(mock(NetconfClientSessionListener.class), mock(Channel.class),
-                SESSION_ID, Set.of()))
-            .defaultAnswer(CALLS_REAL_METHODS)
-            .mockMaker(MockMakers.SUBCLASS));
+        spySession = spy(new NetconfClientSession(mock(NetconfClientSessionListener.class), mock(Channel.class),
+            SESSION_ID, Set.of()));
     }
 
     void setupSession() {
