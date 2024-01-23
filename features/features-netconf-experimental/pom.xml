@@ -20,7 +20,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>features-netconf-experimental</artifactId>
-    <version>6.0.6-SNAPSHOT</version>
+    <version>6.0.6</version>
     <packaging>feature</packaging>
 
     <dependencyManagement>
