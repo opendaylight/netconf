@@ -179,10 +179,9 @@ abstract class SubscribeToStreamUtil {
             throw new RestconfDocumentedException(message, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
         }
 
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier, basePath);
-        final ListenerAdapter listener = ListenersBroker.getInstance().dataChangeListenerFor(streamName);
+        final ListenerAdapter listener = ListenersBroker.getInstance().dataChangeListenerFor(identifier);
         if (listener == null) {
-            throw new RestconfDocumentedException("No listener found for stream " + streamName,
+            throw new RestconfDocumentedException("No listener found for stream " + identifier,
                 ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
         }
 
@@ -193,7 +192,7 @@ abstract class SubscribeToStreamUtil {
         listener.setCloseVars(dataBroker, schemaHandler);
         listener.listen(dataBroker, LogicalDatastoreType.valueOf(datastoreParam));
 
-        final URI uri = prepareUriByStreamName(uriInfo, streamName, basePath);
+        final URI uri = prepareUriByStreamName(uriInfo, identifier, basePath);
         final EffectiveModelContext schemaContext = schemaHandler.currentContext().modelContext();
         final String serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 
