@@ -31,6 +31,7 @@ import org.w3c.dom.Document;
  */
 public class NetconfMessage {
     private static final Transformer TRANSFORMER;
+    private static final TransformerProvider PROVIDER = new TransformerProvider();
 
     static {
         final Transformer t;
@@ -109,9 +110,12 @@ public class NetconfMessage {
 
         try {
             // Slight critical section is a tradeoff. This should be reasonably fast.
-            synchronized (TRANSFORMER) {
-                TRANSFORMER.transform(source, result);
-            }
+//            synchronized (TRANSFORMER) {
+//                TRANSFORMER.transform(source, result);
+//            }
+
+            PROVIDER.transform(source,result);
+
         } catch (TransformerException e) {
             throw new IllegalStateException("Failed to encode document", e);
         }
