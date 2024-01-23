@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "ad75c1d4b558b56d3a7f0547a964d9c16d0a6bfd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b1c307c_9ffaf515",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-23T11:41:26Z",
+      "side": 1,
+      "message": "This is not equivalent with main branch patch. In main, we apply logic when if (attempts !\u003d 0).",
+      "revId": "ad75c1d4b558b56d3a7f0547a964d9c16d0a6bfd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
