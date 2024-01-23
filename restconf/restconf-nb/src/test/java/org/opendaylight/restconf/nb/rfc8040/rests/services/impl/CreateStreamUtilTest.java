@@ -44,8 +44,6 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CreateStreamUtilTest {
-    private static final String BASE_PATH = "restconf";
-
     private static EffectiveModelContext SCHEMA_CTX;
 
     @BeforeClass
@@ -57,7 +55,7 @@ public class CreateStreamUtilTest {
     public void createStreamTest() {
         final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(
             prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput, "toaster", "path"),
-            SCHEMA_CTX, BASE_PATH);
+            SCHEMA_CTX);
         assertEquals(List.of(), result.errors());
         final NormalizedNode testedNn = result.value();
         assertNotNull(testedNn);
@@ -72,7 +70,7 @@ public class CreateStreamUtilTest {
         final var payload = prepareDomPayload("create-data-change-event-subscription", RpcDefinition::getInput,
             "String value", "path");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> CreateStreamUtil.createDataChangeNotifiStream(payload, SCHEMA_CTX, BASE_PATH)).getErrors();
+            () -> CreateStreamUtil.createDataChangeNotifiStream(payload, SCHEMA_CTX)).getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
@@ -85,7 +83,7 @@ public class CreateStreamUtilTest {
         final var payload = prepareDomPayload("create-data-change-event-subscription2", RpcDefinition::getInput,
             "toaster", "path2");
         final var errors = assertThrows(RestconfDocumentedException.class,
-            () -> CreateStreamUtil.createDataChangeNotifiStream(payload, SCHEMA_CTX, BASE_PATH)).getErrors();
+            () -> CreateStreamUtil.createDataChangeNotifiStream(payload, SCHEMA_CTX)).getErrors();
         assertEquals(1, errors.size());
         final var error = errors.get(0);
         assertEquals(ErrorType.APPLICATION, error.getErrorType());
