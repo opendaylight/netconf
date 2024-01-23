@@ -106,7 +106,7 @@ public final class WebSocketInitializer extends WebSocketServlet {
         public Object createWebSocket(final ServletUpgradeRequest servletUpgradeRequest,
                 final ServletUpgradeResponse servletUpgradeResponse) {
             final var streamName = ListenersBroker.createStreamNameFromUri(
-                servletUpgradeRequest.getRequestURI().getRawPath());
+                servletUpgradeRequest.getRequestURI().getRawPath(), servletUpgradeRequest.getRequestURI().getFragment());
 
             final var listener = listenersBroker.listenerFor(streamName);
             if (listener == null) {

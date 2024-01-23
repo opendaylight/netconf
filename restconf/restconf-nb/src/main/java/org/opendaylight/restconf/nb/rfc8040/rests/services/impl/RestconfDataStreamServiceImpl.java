@@ -48,7 +48,7 @@ public class RestconfDataStreamServiceImpl implements RestconfDataStreamService 
 
     @Override
     public void getSSE(final String identifier, final UriInfo uriInfo, final SseEventSink sink, final Sse sse) {
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
+        final String streamName = ListenersBroker.createStreamNameFromUri(identifier, uriInfo.getBaseUri().getPath());
         final BaseListenerInterface listener;
         final String notificaionType =
             uriInfo.getQueryParameters().getFirst(RestconfStreamsConstants.NOTIFICATION_TYPE);

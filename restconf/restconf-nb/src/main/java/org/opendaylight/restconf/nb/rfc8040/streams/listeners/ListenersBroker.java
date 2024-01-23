@@ -381,16 +381,17 @@ public final class ListenersBroker {
 
     /**
      * Creates string representation of stream name from URI. Removes slash from URI in start and end positions,
-     * and optionally {@link RestconfConstants#BASE_URI_PATTERN} prefix.
+     * and optionally {@code baseUri} prefix.
      *
-     * @param uri URI for creation of stream name.
+     * @param uri     URI for creation of stream name.
+     * @param baseUri Base URI used, for example {@link RestconfConstants#BASE_URI_PATTERN}.
      * @return String representation of stream name.
      */
-    public static String createStreamNameFromUri(final String uri) {
+    public static String createStreamNameFromUri(final String uri, final String baseUri) {
         String result = requireNonNull(uri);
         while (true) {
-            if (result.startsWith(RestconfConstants.BASE_URI_PATTERN)) {
-                result = result.substring(RestconfConstants.BASE_URI_PATTERN.length());
+            if (result.startsWith(baseUri)) {
+                result = result.substring(baseUri.length());
             } else if (result.startsWith("/")) {
                 result = result.substring(1);
             } else {

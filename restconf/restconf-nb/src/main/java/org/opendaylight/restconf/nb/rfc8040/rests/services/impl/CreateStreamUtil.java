@@ -230,9 +230,9 @@ final class CreateStreamUtil {
         final Scope scope = scopeName != null ? Scope.ofName(scopeName) : Scope.BASE;
 
         return RestconfStreamsConstants.DATA_SUBSCRIPTION
-            + "/" + ListenersBroker.createStreamNameFromUri(IdentifierCodec.serialize(path, schemaContext)
-                + "/" + RestconfStreamsConstants.DATASTORE_PARAM_NAME + "=" + datastoreType
-                + "/" + RestconfStreamsConstants.SCOPE_PARAM_NAME + "=" + scope);
+            + "/" + IdentifierCodec.serialize(path, schemaContext)
+            + "/" + RestconfStreamsConstants.DATASTORE_PARAM_NAME + "=" + datastoreType
+            + "/" + RestconfStreamsConstants.SCOPE_PARAM_NAME + "=" + scope;
     }
 
     /**

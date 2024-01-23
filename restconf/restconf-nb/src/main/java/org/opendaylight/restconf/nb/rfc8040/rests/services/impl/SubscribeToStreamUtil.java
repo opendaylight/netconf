@@ -117,7 +117,7 @@ abstract class SubscribeToStreamUtil {
      */
     final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
+        final String streamName = ListenersBroker.createStreamNameFromUri(identifier, uriInfo.getBaseUri().toString());
         if (isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
@@ -176,10 +176,9 @@ abstract class SubscribeToStreamUtil {
             throw new RestconfDocumentedException(message, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
         }
 
-        final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
-        final ListenerAdapter listener = ListenersBroker.getInstance().dataChangeListenerFor(streamName);
+        final ListenerAdapter listener = ListenersBroker.getInstance().dataChangeListenerFor(identifier);
         if (listener == null) {
-            throw new RestconfDocumentedException("No listener found for stream " + streamName,
+            throw new RestconfDocumentedException("No listener found for stream " + identifier,
                 ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
         }
 
@@ -190,7 +189,7 @@ abstract class SubscribeToStreamUtil {
         listener.setCloseVars(dataBroker, schemaHandler);
         listener.listen(dataBroker, LogicalDatastoreType.valueOf(datastoreParam));
 
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri = prepareUriByStreamName(uriInfo, identifier);
         final EffectiveModelContext schemaContext = schemaHandler.currentContext().modelContext();
         final String serializedPath = IdentifierCodec.serialize(listener.getPath(), schemaContext);
 
