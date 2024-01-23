@@ -22,6 +22,30 @@
       },
       "revId": "6899c7c8be986d5070dd3e0be35d67a39e21f3a1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "423a01f6_0a8aebe0",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslHandlerFactoryProvider.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-01-23T15:14:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4011baef_ab63fe73",
+      "range": {
+        "startLine": 298,
+        "startChar": 24,
+        "endLine": 298,
+        "endChar": 29
+      },
+      "revId": "6899c7c8be986d5070dd3e0be35d67a39e21f3a1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
