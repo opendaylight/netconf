@@ -14,7 +14,7 @@ import java.util.Set;
  * Basic interface for {@link SslHandler} builder. Used to establish TSL connection.
  *
  * @deprecated due to design change. SslHandler will be created dynamically based on TLS layer configuration
- *     {@link org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev230417.TlsClientGrouping}
+ *     {@link org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev231228.TlsClientGrouping}
  *     by {@link NetconfClientFactory}.
  */
 @Deprecated
