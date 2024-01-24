@@ -11,6 +11,7 @@
         <feature version="[13,14)">odl-karaf-feat-jetty</feature>
         <feature version="[11,12)">odl-yangtools-export</feature>
         <feature version="[12,13)">odl-mdsal-model-rfc8040</feature>
+        <feature version="[12,13)">odl-mdsal-model-rfc8072</feature>
         <feature version="[12,13)">odl-mdsal-model-rfc8525</feature>
         <feature version="[8,9)">odl-mdsal-broker</feature>
         <feature version="[0.18,1)">odl-aaa-shiro</feature>
