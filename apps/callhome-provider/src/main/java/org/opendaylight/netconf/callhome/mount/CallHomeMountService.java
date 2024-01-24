@@ -200,6 +200,7 @@ public final class CallHomeMountService implements AutoCloseable {
                 .setMinBackoffMillis(Uint16.valueOf(2000))
                 .setMaxBackoffMillis(Uint32.valueOf(1800000))
                 .setBackoffMultiplier(Decimal64.valueOf("1.5"))
+                .setBackoffJitter(Decimal64.valueOf("0.1"))
                 .setKeepaliveDelay(Uint32.valueOf(120))
                 .setConcurrentRpcLimit(Uint16.ZERO)
                 .setActorResponseWaitTime(Uint16.valueOf(5))
