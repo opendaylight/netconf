@@ -36,13 +36,8 @@ module iana-ssh-encryption-algs {
 
   revision 2022-06-16 {
     description
-      "Updated to reflect contents of the encryption algorithms
-       registry on June 16, 2022.";
-  }
-
-  revision 2021-06-01 {
-    description
-      "Initial version";
+      "Reflects contents of the encryption algorithms registry
+       on June 16, 2022.";
     reference
       "RFC EEEE: YANG Groupings for SSH Clients and SSH Servers";
   }
@@ -56,6 +51,7 @@ module iana-ssh-encryption-algs {
     description
       "A reference to a SSH encryption algorithm identifier.";
   }
+
 
   // Identities
 
@@ -138,6 +134,7 @@ module iana-ssh-encryption-algs {
 
   identity aes128-cbc {
     base encryption-alg-base;
+    status deprecated;
     description
       "AES128-CBC";
     reference
@@ -208,6 +205,7 @@ module iana-ssh-encryption-algs {
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
   }
+
   identity des-cbc {
     base encryption-alg-base;
     status obsolete;
@@ -240,6 +238,7 @@ module iana-ssh-encryption-algs {
 
   identity aes128-ctr {
     base encryption-alg-base;
+    status deprecated;
     description
       "AES128-CTR";
     reference
@@ -385,7 +384,7 @@ module iana-ssh-encryption-algs {
     leaf-list supported-algorithm {
       type encryption-algorithm-ref;
       description
-        "A encryption algorithm supported by the server.";
+        "An encryption algorithm supported by the server.";
     }
   }
 
