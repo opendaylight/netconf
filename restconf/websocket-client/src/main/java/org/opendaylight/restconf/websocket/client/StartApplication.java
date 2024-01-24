@@ -5,20 +5,20 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.websocket.client;
 
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.stream.Collectors;
 import org.apache.log4j.BasicConfigurator;
 import org.eclipse.jetty.client.HttpClient;
@@ -26,8 +26,6 @@ import org.eclipse.jetty.client.api.AuthenticationStore;
 import org.eclipse.jetty.client.util.BasicAuthentication.BasicResult;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.opendaylight.controller.config.threadpool.util.NamingThreadPoolFactory;
-import org.opendaylight.controller.config.threadpool.util.ScheduledThreadPoolWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +34,6 @@ import org.slf4j.LoggerFactory;
  * client handlers according to the used scheme.
  */
 public final class StartApplication {
-
     private static final Logger LOG = LoggerFactory.getLogger(StartApplication.class);
 
     private static final String WS_SCHEME = "ws";
@@ -50,11 +47,11 @@ public final class StartApplication {
         BasicConfigurator.configure();
         ApplicationSettings.parseApplicationSettings(args).ifPresent(applicationSettings -> {
             setLoggingLevel(applicationSettings.getLoggingLevel());
-            final SslContextFactory sslContextFactory = getSslContextFactory(applicationSettings);
-            final ThreadFactory threadFactory = new NamingThreadPoolFactory(THREAD_POOL_NAME);
-            final ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolWrapper(
-                    applicationSettings.getThreadPoolSize(), threadFactory).getExecutor();
-            final List<WebSocketClientHandler> clientHandlers = applicationSettings.getStreams().stream()
+            final var sslContextFactory = getSslContextFactory(applicationSettings);
+            final var threadFactory = new ThreadFactoryBuilder().setNameFormat("websockets-%d").build();
+            final var scheduledExecutorService =  Executors.unconfigurableScheduledExecutorService(
+                new ScheduledThreadPoolExecutor(applicationSettings.getThreadPoolSize(), threadFactory));
+            final var clientHandlers = applicationSettings.getStreams().stream()
                     .map(streamName -> getWebSocketClientHandler(applicationSettings, sslContextFactory,
                             scheduledExecutorService, streamName))
                     .filter(Optional::isPresent)
@@ -106,11 +103,10 @@ public final class StartApplication {
      */
     private static void printHandledStreamsOverview(final List<String> streams,
             final List<WebSocketClientHandler> clientHandlers) {
-        final Set<String> successfullyHandledStreams = clientHandlers.stream()
+        final var successfullyHandledStreams = clientHandlers.stream()
                 .map(WebSocketClientHandler::getUri)
                 .collect(Collectors.toSet());
-        final Set<String> unsuccessfullyHandledStreams = Sets.difference(new HashSet<>(streams),
-                successfullyHandledStreams);
+        final var unsuccessfullyHandledStreams = Sets.difference(new HashSet<>(streams), successfullyHandledStreams);
         if (!successfullyHandledStreams.isEmpty()) {
             LOG.info("Successfully created stream handlers ({}): {}.", successfullyHandledStreams.size(),
                     successfullyHandledStreams);
