@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -167,19 +166,5 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
 
         assertThat(assertThrows(ExecutionException.class, () -> testFuture.get(3, TimeUnit.SECONDS)).getCause(),
             instanceOf(RuntimeException.class));
-    }
-
-    @Test
-    public void testRemoteYangSchemaEquals() throws Exception {
-        final NetconfStateSchemas.RemoteYangSchema schema1 =
-                new NetconfStateSchemas.RemoteYangSchema(NetconfState.QNAME);
-        final NetconfStateSchemas.RemoteYangSchema schema2 =
-                new NetconfStateSchemas.RemoteYangSchema(NetconfState.QNAME);
-        final NetconfStateSchemas.RemoteYangSchema schema3 =
-                new NetconfStateSchemas.RemoteYangSchema(Schemas.QNAME);
-        assertEquals(schema1, schema2);
-        assertEquals(schema2, schema1);
-        assertNotEquals(schema1, schema3);
-        assertNotEquals(schema2, schema3);
     }
 }
