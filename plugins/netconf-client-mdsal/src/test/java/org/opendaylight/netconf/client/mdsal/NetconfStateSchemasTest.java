@@ -8,33 +8,29 @@
 package org.opendaylight.netconf.client.mdsal;
 
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -45,10 +41,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -56,43 +53,42 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeS
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemasTest.class);
     private static final NetconfSessionPreferences CAPS = NetconfSessionPreferences.fromStrings(Set.of(
         "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&amp;revision=2010-10-04"));
+
+    private static EffectiveModelContext MODEL_CONTEXT;
+    private static ContainerNode SCHEMAS_PAYLOAD;
 
     private final RemoteDeviceId deviceId = new RemoteDeviceId("device", new InetSocketAddress(99));
     private final int numberOfSchemas = 73;
     private final int numberOfLegalSchemas = numberOfSchemas - 3;
 
-    private ContainerNode compositeNodeSchemas;
-
     @Mock
     private DOMRpcService rpc;
 
-    private EffectiveModelContext schemaContext;
-
-    @Before
-    public void setUp() throws Exception {
-        schemaContext = BASE_SCHEMAS.baseSchemaWithNotifications().getEffectiveModelContext();
+    @BeforeClass
+    public static void setUp() throws Exception {
+        MODEL_CONTEXT = BASE_SCHEMAS.baseSchemaWithNotifications().getEffectiveModelContext();
 
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final var xmlParser = XmlParserStream.create(writer,
-            SchemaInferenceStack.ofDataTreePath(schemaContext, NetconfState.QNAME, Schemas.QNAME).toInference(), false);
+            SchemaInferenceStack.ofDataTreePath(MODEL_CONTEXT, NetconfState.QNAME, Schemas.QNAME).toInference(), false);
 
-        xmlParser.parse(UntrustedXML.createXMLStreamReader(getClass().getResourceAsStream(
+        xmlParser.parse(UntrustedXML.createXMLStreamReader(NetconfStateSchemasTest.class.getResourceAsStream(
                 "/netconf-state.schemas.payload.xml")));
-        compositeNodeSchemas = (ContainerNode) resultHolder.getResult().data();
+        SCHEMAS_PAYLOAD = (ContainerNode) resultHolder.getResult().data();
     }
 
     @Test
     public void testCreate() throws Exception {
-        final var schemas = NetconfStateSchemas.create(deviceId, compositeNodeSchemas);
+        final var future = SettableFuture.<NetconfStateSchemas>create();
+
+        NetconfStateSchemas.create(future, deviceId, SCHEMAS_PAYLOAD);
+        final var schemas = Futures.getDone(future);
 
         final var availableYangSchemasQNames = schemas.getAvailableYangSchemasQNames();
         assertEquals(numberOfLegalSchemas, availableYangSchemasQNames.size());
@@ -104,22 +100,19 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     @Ignore
     @Test
     public void testCreate2() throws Exception {
-        final ContainerNode netconfState = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfState.QNAME))
-                .withChild(compositeNodeSchemas)
-                .build();
-        final ContainerNode data = Builders.containerBuilder()
-                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
-                .withChild(netconfState)
-                .build();
         final ContainerNode rpcReply = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier
-                        .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
-                .withChild(data)
+                .withNodeIdentifier(new NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
+                .withChild(Builders.containerBuilder()
+                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
+                    .withChild(Builders.containerBuilder()
+                        .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NetconfState.QNAME))
+                        .withChild(SCHEMAS_PAYLOAD)
+                        .build())
+                    .build())
                 .build();
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcReply))).when(rpc)
             .invokeRpc(eq(NETCONF_GET_QNAME), any());
-        final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
+        final NetconfStateSchemas stateSchemas = assertSchemas(CAPS);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         assertEquals(numberOfLegalSchemas, availableYangSchemasQNames.size());
 
@@ -129,57 +122,37 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testCreateMonitoringNotSupported() throws Exception {
-        final var caps = NetconfSessionPreferences.fromStrings(Set.of());
-        final var stateSchemas = NetconfStateSchemas.create(rpc, caps, deviceId, schemaContext);
+        final var stateSchemas = assertSchemas(NetconfSessionPreferences.fromStrings(Set.of()));
         assertEquals(Set.of(), stateSchemas.getAvailableYangSchemasQNames());
     }
 
     @Test
     public void testCreateFail() throws Exception {
-        when(rpc.invokeRpc(eq(NETCONF_GET_QNAME), any())).thenReturn(
-                Futures.immediateFailedFuture(new DOMRpcImplementationNotAvailableException("not available")));
-        final var stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
-        assertEquals(Set.of(), stateSchemas.getAvailableYangSchemasQNames());
+        final var domEx = new DOMRpcImplementationNotAvailableException("not available");
+        doReturn(Futures.immediateFailedFuture(domEx)).when(rpc).invokeRpc(eq(NETCONF_GET_QNAME), any());
+        assertSame(domEx, assertSchemasFailure());
     }
 
     @Test
     public void testCreateRpcError() throws Exception {
-        final RpcError rpcError = RpcResultBuilder.newError(ErrorType.RPC, new ErrorTag("fail"), "fail");
+        final var rpcError = RpcResultBuilder.newError(ErrorType.RPC, new ErrorTag("fail"), "fail");
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(rpc)
             .invokeRpc(eq(NETCONF_GET_QNAME), any());
-        final var stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
-        assertEquals(Set.of(), stateSchemas.getAvailableYangSchemasQNames());
+
+        final var ex = assertInstanceOf(OperationFailedException.class, assertSchemasFailure());
+        assertEquals(List.of(rpcError), ex.getErrorList());
     }
 
-    @Test
-    public void testCreateInterrupted() {
-        //NetconfStateSchemas.create calls Thread.currentThread().interrupt(), so it must run in its own thread
-        final var testFuture = Executors.newSingleThreadExecutor().submit(() -> {
-            final ListenableFuture<DOMRpcResult> interruptedFuture = mock(ListenableFuture.class);
-            try {
-                when(interruptedFuture.get()).thenThrow(new InterruptedException("interrupted"));
-                doReturn(interruptedFuture).when(rpc).invokeRpc(eq(NETCONF_GET_QNAME), any());
-                NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
-            } catch (final InterruptedException | ExecutionException e) {
-                LOG.info("Operation failed.", e);
-            }
-        });
-
-        assertThat(assertThrows(ExecutionException.class, () -> testFuture.get(3, TimeUnit.SECONDS)).getCause(),
-            instanceOf(RuntimeException.class));
+    private NetconfStateSchemas assertSchemas(final NetconfSessionPreferences prefs) {
+        try {
+            return Futures.getDone(NetconfStateSchemas.forDevice(rpc, prefs, deviceId, MODEL_CONTEXT));
+        } catch (ExecutionException e) {
+            throw new AssertionError(e);
+        }
     }
 
-    @Test
-    public void testRemoteYangSchemaEquals() throws Exception {
-        final NetconfStateSchemas.RemoteYangSchema schema1 =
-                new NetconfStateSchemas.RemoteYangSchema(NetconfState.QNAME);
-        final NetconfStateSchemas.RemoteYangSchema schema2 =
-                new NetconfStateSchemas.RemoteYangSchema(NetconfState.QNAME);
-        final NetconfStateSchemas.RemoteYangSchema schema3 =
-                new NetconfStateSchemas.RemoteYangSchema(Schemas.QNAME);
-        assertEquals(schema1, schema2);
-        assertEquals(schema2, schema1);
-        assertNotEquals(schema1, schema3);
-        assertNotEquals(schema2, schema3);
+    private Throwable assertSchemasFailure() {
+        final var future = NetconfStateSchemas.forDevice(rpc, CAPS, deviceId, MODEL_CONTEXT);
+        return assertThrows(ExecutionException.class, () -> Futures.getDone(future)).getCause();
     }
 }
