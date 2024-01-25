@@ -11,8 +11,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verify;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toId;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -37,6 +35,8 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetInput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.input.Filter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
@@ -44,6 +44,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -66,7 +67,7 @@ import org.w3c.dom.traversal.TreeWalker;
 import org.xml.sax.SAXException;
 
 /**
- * Holds QNames for all yang modules reported by ietf-netconf-monitoring/state/schemas.
+ * Holds QNames for all YANG modules reported by ietf-netconf-monitoring/state/schemas.
  */
 public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     public static final NetconfStateSchemas EMPTY = new NetconfStateSchemas(ImmutableSet.of());
@@ -90,12 +91,12 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         filterElem.appendChild(stateElem);
 
         GET_SCHEMAS_RPC = Builders.containerBuilder()
-                .withNodeIdentifier(NETCONF_GET_NODEID)
-                .withChild(Builders.anyXmlBuilder()
-                    .withNodeIdentifier(NETCONF_FILTER_NODEID)
-                    .withValue(new DOMSource(filterElem))
-                    .build())
-                .build();
+            .withNodeIdentifier(new NodeIdentifier(GetInput.QNAME))
+            .withChild(Builders.anyXmlBuilder()
+                .withNodeIdentifier(new NodeIdentifier(Filter.QNAME))
+                .withValue(new DOMSource(filterElem))
+                .build())
+            .build();
     }
 
     private final Set<RemoteYangSchema> availableYangSchemas;
