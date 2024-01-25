@@ -576,6 +576,16 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>restconf-nb</artifactId>
                 <version>${project.version}</version>
