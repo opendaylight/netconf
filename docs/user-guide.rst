@@ -125,7 +125,7 @@ without specifying the node in the URL:
    * - rfc8040
      - http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf
 
-Payload:
+Payload for password authentication:
 
 .. tabs::
 
@@ -206,6 +206,77 @@ Payload:
     each application build. You can use this method if you have access to the current encryption key.
     Additionally, it is important to ensure that the entire password is encoded in base64 format and
     that its length is a multiple of 16 bytes for successful authentication.
+
+Payload for key-based authentication:
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+         <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+           <node-id>new-netconf-device</node-id>
+           <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
+           <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
+           <key-based xmlns="urn:opendaylight:netconf-node-topology">
+             <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
+             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</password>
+           </key-based>
+           <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+           <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
+           <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
+           <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
+           <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
+           <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
+           <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
+           <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
+           <!-- keepalive-delay set to 0 turns off keepalives-->
+           <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+         </node>
+
+   .. tab:: JSON
+
+      **Content-type:** ``application/json``
+
+      **Accept:** ``application/json``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: json
+
+         {
+             "node": [
+                 {
+                     "node-id": "new-netconf-device",
+                     "netconf-node-topology:port": 17830,
+                     "netconf-node-topology:reconnect-on-changed-schema": false,
+                     "netconf-node-topology:connection-timeout-millis": 20000,
+                     "netconf-node-topology:tcp-only": false,
+                     "netconf-node-topology:max-connection-attempts": 0,
+                     "netconf-node-topology:key-based": {
+                        "netconf-node-topology:username": "admin",
+                        "netconf-node-topology:key-id": "admin"
+                     },
+                     "netconf-node-topology:host": "127.0.0.1",
+                     "netconf-node-topology:min-backoff-millis": 2000,
+                     "netconf-node-topology:max-backoff-millis": 1800000,
+                     "netconf-node-topology:backoff-multiplier": 1.5,
+                     "netconf-node-topology:keepalive-delay": 120
+                 }
+             ]
+         }
+
+.. note::
+
+    If you want to use key-based authentication than you should create a key before sending this request.
+    See `Configure device to connect over TLS protocol`_.
 
 Note that the device name in <node-id> element must match the last
 element of the restconf URL.
@@ -1004,7 +1075,7 @@ In the payload change the:
 
 -  ip to localhost
 
--  port to 1831.
+-  port to 830.
 
 After netopeer is mounted successfully, its configuration can be read
 using RESTCONF by invoking:
