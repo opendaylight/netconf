@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -33,19 +34,23 @@ public class SchemalessMessageTransformerTest {
     }
 
     private static final String EXP_REQUEST =
-            "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                    + "<test-rpc xmlns=\"test-ns\">\n"
-                    + "<input>aaa</input>\n"
-                    + "</test-rpc>\n"
-                    + "</rpc>";
+            """
+    	<rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    	<test-rpc xmlns="test-ns">
+    	<input>aaa</input>
+    	</test-rpc>
+    	</rpc>""";
     private static final String EXP_REPLY =
-            "<rpc-reply message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                    + "<output xmlns=\"test-ns\">aaa</output>\n"
-                    + "</rpc-reply>";
-    private static final String OK_REPLY = "<rpc-reply message-id=\"101\"\n"
-            + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-            + "<ok/>\n"
-            + "</rpc-reply>\n";
+            """
+    	<rpc-reply message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    	<output xmlns="test-ns">aaa</output>
+    	</rpc-reply>""";
+    private static final String OK_REPLY = """
+    	<rpc-reply message-id="101"
+    	xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+    	<ok/>
+    	</rpc-reply>
+    	""";
 
     private static final QName TEST_RPC = QName.create("test-ns", "2016-10-13", "test-rpc");
 
@@ -94,7 +99,7 @@ public class SchemalessMessageTransformerTest {
     public void toEmptyRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(OK_REPLY);
         final DOMSource result = transformer.toRpcResult(RpcResultBuilder.success(new NetconfMessage(doc)).build(),
-            NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME);
+            Commit.QNAME);
         assertNull(result);
     }
 }

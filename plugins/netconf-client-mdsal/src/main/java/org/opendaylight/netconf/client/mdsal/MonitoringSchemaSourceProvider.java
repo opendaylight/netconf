@@ -9,7 +9,6 @@ package org.opendaylight.netconf.client.mdsal;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.GET_SCHEMA_QNAME;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_DATA_QNAME;
 
 import com.google.common.util.concurrent.Futures;
@@ -20,7 +19,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.GetSchema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -46,17 +45,16 @@ import org.w3c.dom.Element;
 public final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangTextSchemaSource> {
     private static final Logger LOG = LoggerFactory.getLogger(MonitoringSchemaSourceProvider.class);
     private static final NodeIdentifier FORMAT_PATHARG =
-            NodeIdentifier.create(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "format").intern());
-    private static final NodeIdentifier GET_SCHEMA_PATHARG =
-            NodeIdentifier.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME);
+            NodeIdentifier.create(QName.create(GetSchema.QNAME, "format").intern());
+    private static final NodeIdentifier GET_SCHEMA_PATHARG = NodeIdentifier.create(GetSchema.QNAME);
     private static final NodeIdentifier IDENTIFIER_PATHARG =
-            NodeIdentifier.create(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "identifier").intern());
+            NodeIdentifier.create(QName.create(GetSchema.QNAME, "identifier").intern());
     private static final NodeIdentifier VERSION_PATHARG =
-            NodeIdentifier.create(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "version").intern());
+            NodeIdentifier.create(QName.create(GetSchema.QNAME, "version").intern());
     private static final LeafNode<?> FORMAT_LEAF =
             Builders.leafBuilder().withNodeIdentifier(FORMAT_PATHARG).withValue(Yang.QNAME).build();
     private static final QName NETCONF_DATA =
-            QName.create(GET_SCHEMA_QNAME, NETCONF_DATA_QNAME.getLocalName()).intern();
+            QName.create(GetSchema.QNAME, NETCONF_DATA_QNAME.getLocalName()).intern();
     private static final NodeIdentifier NETCONF_DATA_PATHARG = NodeIdentifier.create(NETCONF_DATA);
 
     private final DOMRpcService rpc;
@@ -101,7 +99,7 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
         final ContainerNode getSchemaRequest = createGetSchemaRequest(moduleName, revision);
         LOG.trace("{}: Loading YANG schema source for {}:{}", id, moduleName, revision);
         return Futures.transform(
-            rpc.invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, getSchemaRequest), input -> {
+            rpc.invokeRpc(GetSchema.QNAME, getSchemaRequest), input -> {
                 // Transform composite node to string schema representation and then to ASTSchemaSource.
                 if (input.errors().isEmpty()) {
                     final String schemaString = getSchemaFromRpc(id, input.value())

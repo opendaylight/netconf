@@ -27,7 +27,9 @@ import org.opendaylight.netconf.client.mdsal.AbstractTestModelTest;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
-import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Lock;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Unlock;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -51,15 +53,15 @@ public class WriteRunningTxTest extends AbstractTestModelTest {
         tx.init();
 
         //check, if lock is called
-        verify(rpc).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME), any());
+        verify(rpc).invokeNetconf(eq(Lock.QNAME), any());
         tx.put(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getContainerId(), TxTestUtils.getContainerNode());
         tx.merge(LogicalDatastoreType.CONFIGURATION, TxTestUtils.getLeafId(), TxTestUtils.getLeafNode());
         //check, if no edit-config is called before submit
-        verify(rpc, never()).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), any());
+        verify(rpc, never()).invokeNetconf(eq(EditConfig.QNAME), any());
         tx.commit().get();
         //check, if both edits are called
-        verify(rpc, times(2)).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), any());
+        verify(rpc, times(2)).invokeNetconf(eq(EditConfig.QNAME), any());
         //check, if unlock is called
-        verify(rpc).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME), any());
+        verify(rpc).invokeNetconf(eq(Unlock.QNAME), any());
     }
 }
