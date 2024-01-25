@@ -16,6 +16,24 @@
       "message": "we can use already defined parentName here",
       "revId": "1a0748be1faf6571d1687d170d653626c38d1c77",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbeb8a2a_721a7d15",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PostEntity.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-25T09:08:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1d11ab6_faab1973",
+      "revId": "1a0748be1faf6571d1687d170d653626c38d1c77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
