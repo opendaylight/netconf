@@ -34,5 +34,7 @@
         <module>netconf-server</module>
         <module>netconf-test-util</module>
         <module>restconf-api</module>
+        <module>restconf-client</module>
+        <module>restconf-server</module>
     </modules>
 </project>
