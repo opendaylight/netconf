@@ -30,6 +30,7 @@
 
     <modules>
         <module>transport-api</module>
+        <module>transport-http</module>
         <module>transport-ssh</module>
         <module>transport-tcp</module>
         <module>transport-tls</module>
