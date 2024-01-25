@@ -9,7 +9,6 @@ package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.appendListKeyNodes;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.writeSchemalessFilter;
 
@@ -22,7 +21,9 @@ import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.input.Filter;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
@@ -139,7 +140,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
 
     private static AnyxmlNode<?> buildFilterXmlNode(final Document document) {
         return Builders.anyXmlBuilder()
-            .withNodeIdentifier(NETCONF_FILTER_NODEID)
+            .withNodeIdentifier(new NodeIdentifier(Filter.QNAME))
             .withValue(new DOMSource(document.getDocumentElement()))
             .build();
     }

@@ -51,6 +51,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Validate;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.output.Data;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.input.Filter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -149,8 +150,6 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull ContainerNode GET_RPC_CONTENT = Builders.containerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID).build();
 
-    public static final @NonNull NodeIdentifier NETCONF_FILTER_NODEID = NodeIdentifier.create(qnameOf("filter"));
-
     public static final @NonNull AnyxmlNode<?> EMPTY_FILTER = buildFilterStructure(newFilterElement());
 
     private NetconfMessageTransformUtil() {
@@ -208,9 +207,9 @@ public final class NetconfMessageTransformUtil {
 
     private static AnyxmlNode<?> buildFilterStructure(final Element element) {
         return Builders.anyXmlBuilder()
-                .withNodeIdentifier(NETCONF_FILTER_NODEID)
-                .withValue(new DOMSource(element))
-                .build();
+            .withNodeIdentifier(new NodeIdentifier(Filter.QNAME))
+            .withValue(new DOMSource(element))
+            .build();
     }
 
     public static NodeIdentifier toId(final PathArgument arg) {
@@ -227,8 +226,8 @@ public final class NetconfMessageTransformUtil {
 
     public static boolean isDataRetrievalOperation(final QName rpc) {
         return YangConstants.NETCONF_NAMESPACE.equals(rpc.getNamespace())
-                && (GetConfig.QNAME.getLocalName().equals(rpc.getLocalName())
-                    || Get.QNAME.getLocalName().equals(rpc.getLocalName()));
+            && (GetConfig.QNAME.getLocalName().equals(rpc.getLocalName())
+                || Get.QNAME.getLocalName().equals(rpc.getLocalName()));
     }
 
     @Deprecated
