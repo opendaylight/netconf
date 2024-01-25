@@ -16,6 +16,24 @@
       "message": "Main branch has changed this to \"restconf\".",
       "revId": "90f570a5639eb66f89ca5ab57fab74f147952b09",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfa973c2_f7706a2b",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/streams/WebSocketFactoryTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-25T12:15:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8867be85_4650ea0f",
+      "revId": "90f570a5639eb66f89ca5ab57fab74f147952b09",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
