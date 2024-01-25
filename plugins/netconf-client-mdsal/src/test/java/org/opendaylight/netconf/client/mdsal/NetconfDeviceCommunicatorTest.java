@@ -53,8 +53,8 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -124,7 +124,7 @@ public class NetconfDeviceCommunicatorTest {
         final var testCapability = "urn:opendaylight:params:xml:ns:test?module=test-module&revision=2014-06-02";
         final var serverCapabilities = Set.of(
             CapabilityURN.ROLLBACK_ON_ERROR,
-            NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString(),
+            NetconfState.QNAME.getNamespace().toString(),
             testCapability);
         doReturn(serverCapabilities).when(spySession).getServerCapabilities();
 

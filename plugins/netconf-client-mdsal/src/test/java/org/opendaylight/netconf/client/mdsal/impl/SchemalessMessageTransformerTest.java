@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -94,7 +95,7 @@ public class SchemalessMessageTransformerTest {
     public void toEmptyRpcResult() throws Exception {
         final Document doc = XmlUtil.readXmlToDocument(OK_REPLY);
         final DOMSource result = transformer.toRpcResult(RpcResultBuilder.success(new NetconfMessage(doc)).build(),
-            NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME);
+            Commit.QNAME);
         assertNull(result);
     }
 }

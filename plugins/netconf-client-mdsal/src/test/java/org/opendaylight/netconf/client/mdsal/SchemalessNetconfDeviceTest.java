@@ -25,8 +25,8 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
-import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.SchemalessMessageTransformer;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 
 public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 
@@ -87,7 +87,7 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
                                                             final Collection<String> additionalCapabilities) {
         final var capabilities = Lists.newArrayList(CapabilityURN.BASE, CapabilityURN.BASE_1_1);
         if (addMonitor) {
-            capabilities.add(NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
+            capabilities.add(NetconfState.QNAME.getNamespace().toString());
         }
         capabilities.addAll(additionalCapabilities);
         return NetconfSessionPreferences.fromStrings(capabilities);

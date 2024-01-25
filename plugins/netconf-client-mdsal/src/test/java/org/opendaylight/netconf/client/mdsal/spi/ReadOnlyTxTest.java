@@ -26,7 +26,8 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
-import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
@@ -51,10 +52,9 @@ public class ReadOnlyTxTest {
         try (var readOnlyTx =
                 new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)))) {
             readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
-            verify(rpc).invokeNetconf(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME),
-                any(ContainerNode.class));
+            verify(rpc).invokeNetconf(Mockito.eq(GetConfig.QNAME), any(ContainerNode.class));
             readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
-            verify(rpc).invokeNetconf(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME), any());
+            verify(rpc).invokeNetconf(Mockito.eq(Get.QNAME), any());
         }
     }
 
@@ -63,9 +63,9 @@ public class ReadOnlyTxTest {
         try (var readOnlyTx =
                 new ReadOnlyTx(netconfOps, new RemoteDeviceId("a", new InetSocketAddress("localhost", 196)))) {
             readOnlyTx.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of());
-            verify(rpc).invokeNetconf(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME), any());
+            verify(rpc).invokeNetconf(Mockito.eq(GetConfig.QNAME), any());
             readOnlyTx.exists(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
-            verify(rpc).invokeNetconf(Mockito.eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME), any());
+            verify(rpc).invokeNetconf(Mockito.eq(Get.QNAME), any());
         }
     }
 

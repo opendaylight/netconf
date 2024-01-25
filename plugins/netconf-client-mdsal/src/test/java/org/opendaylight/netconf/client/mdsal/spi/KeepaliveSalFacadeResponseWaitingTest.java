@@ -35,6 +35,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
@@ -97,8 +98,7 @@ class KeepaliveSalFacadeResponseWaitingTest {
         verify(deviceRpc, after(2000).times(1)).invokeRpc(null, null);
 
         //verify the keepalive RPC invoke. Should be never happen.
-        verify(deviceRpc, after(2000).never())
-            .invokeRpc(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME, KEEPALIVE_PAYLOAD);
+        verify(deviceRpc, after(2000).never()).invokeRpc(GetConfig.QNAME, KEEPALIVE_PAYLOAD);
     }
 
     private static final class LocalNetconfSalFacade implements RemoteDeviceHandler {

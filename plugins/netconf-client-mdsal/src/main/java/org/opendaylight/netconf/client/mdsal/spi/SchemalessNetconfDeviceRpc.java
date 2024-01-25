@@ -22,10 +22,10 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.netconf.client.mdsal.impl.BaseRpcSchemalessTransformer;
-import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.SchemalessMessageTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 
 /**
@@ -79,6 +79,6 @@ public final class SchemalessNetconfDeviceRpc implements Rpcs.Schemaless {
     }
 
     private static boolean isBaseRpc(final QName type) {
-        return NetconfMessageTransformUtil.NETCONF_URI.equals(type.getNamespace());
+        return YangConstants.NETCONF_NAMESPACE.equals(type.getNamespace());
     }
 }
