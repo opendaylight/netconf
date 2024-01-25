@@ -25,7 +25,6 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
@@ -57,7 +56,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
@@ -81,7 +79,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             TEST_NAMESPACE + "?module=" + TEST_MODULE + "2" + "&amp;revision=" + TEST_REVISION;
 
     private static final NetconfDeviceSchemasResolver STATE_SCHEMAS_RESOLVER =
-        (deviceRpc, remoteSessionCapabilities, id, schemaContext) -> NetconfStateSchemas.EMPTY;
+        (deviceRpc, remoteSessionCapabilities, id, schemaContext) -> Futures.immediateFuture(NetconfStateSchemas.EMPTY);
 
     private static NetconfMessage NOTIFICATION;
 
@@ -112,15 +110,13 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             }
         }).when(schemaFactory).createEffectiveModelContext(anyCollection());
 
-        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
-                schemaContext) -> {
-            final Module first = SCHEMA_CONTEXT.getModules().iterator().next();
-            final QName qName = QName.create(first.getQNameModule(), first.getName());
-            final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
-            final NetconfStateSchemas.RemoteYangSchema source2 =
-                    new NetconfStateSchemas.RemoteYangSchema(QName.create(first.getQNameModule(), "test-module2"));
-            return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
-        };
+        final NetconfDeviceSchemasResolver stateSchemasResolver =
+            (deviceRpc, remoteSessionCapabilities, id, schemaContext) -> {
+                final var first = SCHEMA_CONTEXT.getModules().iterator().next();
+                final var qName = QName.create(first.getQNameModule(), first.getName());
+                return Futures.immediateFuture(new NetconfStateSchemas(
+                    Set.of(qName, QName.create(first.getQNameModule(), "test-module2"))));
+            };
 
         doReturn(mock(Registration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
@@ -201,15 +197,13 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             }
         }).when(schemaFactory).createEffectiveModelContext(anyCollection());
 
-        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
-            schemaContext) -> {
-            final Module first = SCHEMA_CONTEXT.getModules().iterator().next();
-            final QName qName = QName.create(first.getQNameModule(), first.getName());
-            final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
-            final NetconfStateSchemas.RemoteYangSchema source2 =
-                    new NetconfStateSchemas.RemoteYangSchema(QName.create(first.getQNameModule(), "test-module2"));
-            return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
-        };
+        final NetconfDeviceSchemasResolver stateSchemasResolver =
+            (deviceRpc, remoteSessionCapabilities, id, schemaContext) -> {
+                final var first = SCHEMA_CONTEXT.getModules().iterator().next();
+                final var qName = QName.create(first.getQNameModule(), first.getName());
+                return Futures.immediateFuture(new NetconfStateSchemas(
+                    Set.of(qName, QName.create(first.getQNameModule(), "test-module2"))));
+            };
 
         doReturn(mock(Registration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
