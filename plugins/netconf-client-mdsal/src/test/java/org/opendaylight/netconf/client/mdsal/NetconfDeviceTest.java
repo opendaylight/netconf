@@ -26,7 +26,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
@@ -117,10 +116,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 schemaContext) -> {
             final Module first = SCHEMA_CONTEXT.getModules().iterator().next();
             final QName qName = QName.create(first.getQNameModule(), first.getName());
-            final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
-            final NetconfStateSchemas.RemoteYangSchema source2 =
-                    new NetconfStateSchemas.RemoteYangSchema(QName.create(first.getQNameModule(), "test-module2"));
-            return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
+            return new NetconfStateSchemas(Set.of(qName, QName.create(first.getQNameModule(), "test-module2")));
         };
 
         doReturn(mock(SchemaSourceRegistration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
@@ -206,10 +202,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             schemaContext) -> {
             final Module first = SCHEMA_CONTEXT.getModules().iterator().next();
             final QName qName = QName.create(first.getQNameModule(), first.getName());
-            final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
-            final NetconfStateSchemas.RemoteYangSchema source2 =
-                    new NetconfStateSchemas.RemoteYangSchema(QName.create(first.getQNameModule(), "test-module2"));
-            return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
+            return new NetconfStateSchemas(Set.of(qName, QName.create(first.getQNameModule(), "test-module2")));
         };
 
         doReturn(mock(SchemaSourceRegistration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
