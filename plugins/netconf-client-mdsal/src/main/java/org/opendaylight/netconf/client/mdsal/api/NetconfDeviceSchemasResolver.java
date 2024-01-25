@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.client.mdsal.api;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -15,6 +16,6 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  */
 public interface NetconfDeviceSchemasResolver {
     // FIXME: document this method
-    NetconfDeviceSchemas resolve(NetconfDeviceRpc deviceRpc, NetconfSessionPreferences remoteSessionCapabilities,
-        RemoteDeviceId id, EffectiveModelContext schemaContext);
+    ListenableFuture<? extends NetconfDeviceSchemas> resolve(NetconfDeviceRpc deviceRpc,
+        NetconfSessionPreferences remoteSessionCapabilities, RemoteDeviceId id, EffectiveModelContext schemaContext);
 }

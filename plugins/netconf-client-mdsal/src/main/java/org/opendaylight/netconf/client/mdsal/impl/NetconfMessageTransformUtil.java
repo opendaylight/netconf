@@ -95,16 +95,6 @@ public final class NetconfMessageTransformUtil {
 
     public static final @NonNull QName IETF_NETCONF_MONITORING =
             QName.create(NetconfState.QNAME, "ietf-netconf-monitoring").intern();
-    public static final @NonNull QName IETF_NETCONF_MONITORING_SCHEMA_FORMAT =
-            QName.create(IETF_NETCONF_MONITORING, "format").intern();
-    public static final @NonNull QName IETF_NETCONF_MONITORING_SCHEMA_LOCATION =
-            QName.create(IETF_NETCONF_MONITORING, "location").intern();
-    public static final @NonNull QName IETF_NETCONF_MONITORING_SCHEMA_IDENTIFIER =
-            QName.create(IETF_NETCONF_MONITORING, "identifier").intern();
-    public static final @NonNull QName IETF_NETCONF_MONITORING_SCHEMA_VERSION =
-            QName.create(IETF_NETCONF_MONITORING, "version").intern();
-    public static final @NonNull QName IETF_NETCONF_MONITORING_SCHEMA_NAMESPACE =
-            QName.create(IETF_NETCONF_MONITORING, "namespace").intern();
 
     public static final @NonNull NodeIdentifier NETCONF_DATA_NODEID = NodeIdentifier.create(Data.QNAME);
 

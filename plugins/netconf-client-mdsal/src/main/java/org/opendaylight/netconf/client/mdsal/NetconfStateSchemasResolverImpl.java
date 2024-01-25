@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -27,18 +29,18 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
         .bindTo(QNameModule.create(RFC8525_YANG_LIBRARY_CAPABILITY.getNamespace(), Revision.of("2016-06-21"))).intern();
 
     @Override
-    public NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc,
-            final NetconfSessionPreferences remoteSessionCapabilities,
-            final RemoteDeviceId id, final EffectiveModelContext schemaContext) {
+    public ListenableFuture<? extends NetconfDeviceSchemas> resolve(final NetconfDeviceRpc deviceRpc,
+            final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id,
+            final EffectiveModelContext schemaContext) {
         // FIXME: I think we should prefer YANG library here
         if (remoteSessionCapabilities.isMonitoringSupported()) {
-            return NetconfStateSchemas.create(deviceRpc, remoteSessionCapabilities, id, schemaContext);
+            return NetconfStateSchemas.forDevice(deviceRpc, remoteSessionCapabilities, id, schemaContext);
         }
         if (remoteSessionCapabilities.containsModuleCapability(RFC8525_YANG_LIBRARY_CAPABILITY)
                 || remoteSessionCapabilities.containsModuleCapability(RFC7895_YANG_LIBRARY_CAPABILITY)) {
-            return LibraryModulesSchemas.create(deviceRpc, id);
+            return LibraryModulesSchemas.forDevice(deviceRpc, id);
         }
 
-        return NetconfStateSchemas.EMPTY;
+        return Futures.immediateFuture(NetconfStateSchemas.EMPTY);
     }
 }
