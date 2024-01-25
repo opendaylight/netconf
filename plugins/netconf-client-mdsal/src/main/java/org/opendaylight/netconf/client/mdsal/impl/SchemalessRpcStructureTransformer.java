@@ -8,11 +8,8 @@
 package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CONFIG_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CONFIG_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_OPERATION_QNAME;
-import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_DATA_QNAME;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.appendListKeyNodes;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.writeSchemalessFilter;
 
@@ -23,6 +20,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -56,8 +54,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         }
 
         final var result = XmlUtil.newDocument();
-        final var dataElement = result.createElementNS(NETCONF_DATA_QNAME.getNamespace().toString(),
-            NETCONF_DATA_QNAME.getLocalName());
+        final var dataElement = result.createElementNS(NamespaceURN.BASE, "data");
         result.appendChild(dataElement);
         for (var xmlElement : selectMatchingNodes(getSourceElement(anyxml.body()), path)) {
             dataElement.appendChild(result.importNode(xmlElement.getDomElement(), true));
@@ -88,8 +85,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         final var dataNode = (Element) document.importNode(getSourceElement(anxmlData.body()), true);
         checkDataValidForPath(dataPath, dataNode);
 
-        final var configElement = document.createElementNS(NETCONF_CONFIG_QNAME.getNamespace().toString(),
-                NETCONF_CONFIG_QNAME.getLocalName());
+        final var configElement = document.createElementNS(NamespaceURN.BASE, XmlNetconfConstants.CONFIG_KEY);
         document.appendChild(configElement);
 
         final Element parentXmlStructure;
@@ -191,8 +187,8 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
 
     private static void setOperationAttribute(final EffectiveOperation operation, final Document document,
             final Element dataNode) {
-        final var operationAttribute = document.createAttributeNS(NETCONF_OPERATION_QNAME.getNamespace().toString(),
-            NETCONF_OPERATION_QNAME.getLocalName());
+        final var operationAttribute = document.createAttributeNS(NamespaceURN.BASE,
+            XmlNetconfConstants.OPERATION_ATTR_KEY);
         operationAttribute.setTextContent(operation.xmlValue());
         dataNode.setAttributeNode(operationAttribute);
     }

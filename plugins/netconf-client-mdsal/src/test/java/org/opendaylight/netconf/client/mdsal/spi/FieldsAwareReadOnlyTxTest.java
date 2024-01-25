@@ -12,8 +12,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
@@ -27,6 +25,8 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
@@ -48,10 +48,10 @@ public class FieldsAwareReadOnlyTxTest {
 
             readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(),
                 List.of(YangInstanceIdentifier.of()));
-            verify(rpc).invokeNetconf(eq(NETCONF_GET_CONFIG_QNAME), any());
+            verify(rpc).invokeNetconf(eq(GetConfig.QNAME), any());
 
             readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
-            verify(rpc).invokeNetconf(eq(NETCONF_GET_QNAME), any());
+            verify(rpc).invokeNetconf(eq(Get.QNAME), any());
         }
     }
 }

@@ -13,8 +13,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
@@ -39,6 +37,8 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMDataBrokerFieldsExtension;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadTransaction;
 import org.opendaylight.netconf.dom.api.tx.NetconfDOMFieldsReadWriteTransaction;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.monitoring.rev220718.NetconfTcp;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -73,14 +73,14 @@ public class NetconfDeviceDataBrokerTest {
     public void testNewReadOnlyTransaction() {
         final DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction();
         tx.read(LogicalDatastoreType.OPERATIONAL, null);
-        verify(rpcService).invokeNetconf(eq(NETCONF_GET_QNAME), any());
+        verify(rpcService).invokeNetconf(eq(Get.QNAME), any());
     }
 
     @Test
     public void testNewReadWriteTransaction() {
         final DOMDataTreeReadWriteTransaction tx = dataBroker.newReadWriteTransaction();
         tx.read(LogicalDatastoreType.OPERATIONAL, null);
-        verify(rpcService).invokeNetconf(eq(NETCONF_GET_QNAME), any());
+        verify(rpcService).invokeNetconf(eq(Get.QNAME), any());
     }
 
     @Test
@@ -108,13 +108,13 @@ public class NetconfDeviceDataBrokerTest {
         final NetconfDOMFieldsReadTransaction roTx = fieldsExtension.newReadOnlyTransaction();
         roTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(),
                 List.of(YangInstanceIdentifier.of()));
-        verify(rpcService).invokeNetconf(Mockito.eq(NETCONF_GET_CONFIG_QNAME), any());
+        verify(rpcService).invokeNetconf(Mockito.eq(GetConfig.QNAME), any());
 
         // read-write transaction
         final NetconfDOMFieldsReadWriteTransaction rwTx = fieldsExtension.newReadWriteTransaction();
         rwTx.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of(),
                 List.of(YangInstanceIdentifier.of()));
-        verify(rpcService).invokeNetconf(Mockito.eq(NETCONF_GET_QNAME), any());
+        verify(rpcService).invokeNetconf(Mockito.eq(Get.QNAME), any());
     }
 
     private void testWriteTransaction(final Class<? extends AbstractWriteTx> transaction,

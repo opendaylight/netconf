@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.output.Data;
 import org.opendaylight.yangtools.concepts.Delegator;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -49,7 +50,7 @@ final class ProxyEffectiveModelContext implements EffectiveModelContext, Delegat
     @Override
     @Deprecated
     public QName getQName() {
-        return NormalizedDataUtil.NETCONF_DATA_QNAME;
+        return Data.QNAME;
     }
 
     @Override

@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -46,6 +45,7 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
@@ -163,8 +163,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     public static LibraryModulesSchemas create(final NetconfDeviceRpc deviceRpc, final RemoteDeviceId deviceId) {
         final DOMRpcResult moduleListNodeResult;
         try {
-            moduleListNodeResult =
-                    deviceRpc.invokeRpc(NETCONF_GET_QNAME, GET_MODULES_STATE_MODULE_LIST_RPC).get();
+            moduleListNodeResult = deviceRpc.invokeRpc(Get.QNAME, GET_MODULES_STATE_MODULE_LIST_RPC).get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException(deviceId + ": Interrupted while waiting for response to "
