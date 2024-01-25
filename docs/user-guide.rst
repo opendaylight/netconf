@@ -125,7 +125,7 @@ without specifying the node in the URL:
    * - rfc8040
      - http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf
 
-Payload:
+Payload for password authentication:
 
 .. tabs::
 
@@ -206,6 +206,180 @@ Payload:
     each application build. You can use this method if you have access to the current encryption key.
     Additionally, it is important to ensure that the entire password is encoded in base64 format and
     that its length is a multiple of 16 bytes for successful authentication.
+
+There is also option of using key-based authentication instead
+of password. First we need to create key in datastore.
+
+*Adding a client private key credential to the netconf-keystore*
+
+.. code-block::
+
+    POST HTTP/1.1
+    /rests/operations/netconf-keystore:add-keystore-entry
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+  {
+    "input": {
+      "key-credential": [
+        {
+          "key-id": "example-client-key-id",
+          "private-key": "base64encoded-private-key",
+          "passphrase": "passphrase"
+        }
+      ]
+    }
+  }
+
+After we can use this key to create connector using this key.
+
+Payload for key-based authentication via SSH:
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+         <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+           <node-id>new-netconf-device</node-id>
+           <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
+           <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
+           <key-based xmlns="urn:opendaylight:netconf-node-topology">
+             <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
+             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</password>
+           </key-based>
+           <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+           <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
+           <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
+           <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
+           <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
+           <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
+           <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
+           <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
+           <!-- keepalive-delay set to 0 turns off keepalives-->
+           <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+         </node>
+
+   .. tab:: JSON
+
+      **Content-type:** ``application/json``
+
+      **Accept:** ``application/json``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: json
+
+         {
+             "node": [
+                 {
+                     "node-id": "new-netconf-device",
+                     "netconf-node-topology:port": 17830,
+                     "netconf-node-topology:reconnect-on-changed-schema": false,
+                     "netconf-node-topology:connection-timeout-millis": 20000,
+                     "netconf-node-topology:tcp-only": false,
+                     "netconf-node-topology:max-connection-attempts": 0,
+                     "netconf-node-topology:key-based": {
+                        "netconf-node-topology:username": "admin",
+                        "netconf-node-topology:key-id": "key-id"
+                     },
+                     "netconf-node-topology:host": "127.0.0.1",
+                     "netconf-node-topology:min-backoff-millis": 2000,
+                     "netconf-node-topology:max-backoff-millis": 1800000,
+                     "netconf-node-topology:backoff-multiplier": 1.5,
+                     "netconf-node-topology:keepalive-delay": 120
+                 }
+             ]
+         }
+
+Connecting via TLS protocol is similar to SSH. First setup keystore
+by using three RPCs from `Configure device to connect over TLS protocol`_
+to add a client private key, associate a private key with a client and CA
+certificates chain and add a list of trusted CA and server certificates.
+Only after that we can process and create a new NETCONF connector you need
+to send the following PUT request.
+
+Payload for key-based authentication via TLS:
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+         <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+           <node-id>new-netconf-device</node-id>
+           <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
+           <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
+           <key-based xmlns="urn:opendaylight:netconf-node-topology">
+             <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
+             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</password>
+           </key-based>
+           <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+           <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
+           <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
+           <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
+           <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
+           <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
+           <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
+           <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
+           <!-- keepalive-delay set to 0 turns off keepalives-->
+           <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+           <protocol xmlns="urn:opendaylight:netconf-node-topology">
+             <name xmlns="urn:opendaylight:netconf-node-topology">TLS</name>
+           </protocol>
+         </node>
+
+   .. tab:: JSON
+
+      **Content-type:** ``application/json``
+
+      **Accept:** ``application/json``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: json
+
+         {
+             "node": [
+                 {
+                     "node-id": "new-netconf-device",
+                     "netconf-node-topology:port": 17830,
+                     "netconf-node-topology:reconnect-on-changed-schema": false,
+                     "netconf-node-topology:connection-timeout-millis": 20000,
+                     "netconf-node-topology:tcp-only": false,
+                     "netconf-node-topology:max-connection-attempts": 0,
+                     "netconf-node-topology:key-based": {
+                        "netconf-node-topology:username": "admin",
+                        "netconf-node-topology:key-id": "key-id"
+                     },
+                     "netconf-node-topology:host": "127.0.0.1",
+                     "netconf-node-topology:min-backoff-millis": 2000,
+                     "netconf-node-topology:max-backoff-millis": 1800000,
+                     "netconf-node-topology:backoff-multiplier": 1.5,
+                     "netconf-node-topology:keepalive-delay": 120,
+                     "protocol": {
+                        "name": "TLS"
+                     }
+                 }
+             ]
+         }
+
 
 Note that the device name in <node-id> element must match the last
 element of the restconf URL.
@@ -995,7 +1169,8 @@ Preconditions:
 
 -  Netopeer is up and running in docker
 
-Now just follow the section: `Spawning new NETCONF connectors`_.
+Now just follow the section: `Spawning new NETCONF connectors`_ for
+password authentication.
 In the payload change the:
 
 -  name, e.g., to netopeer
@@ -1004,7 +1179,265 @@ In the payload change the:
 
 -  ip to localhost
 
--  port to 1831.
+-  port to 830.
+
+After netopeer is mounted successfully, its configuration can be read
+using RESTCONF by invoking:
+
+GET
+http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
+
+Mounting netopeer NETCONF server using key-based authentication SSH
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Install docker https://docs.docker.com/get-started/
+
+2. Create RSA key pair - it will be user for connection.
+
+3. Start the netopeer image(this command will also copy you pub key
+   into docker container):
+
+   ::
+
+       docker run -dt -p 830:830 -v {path-to-pub-key}:/home/{netopeer-username}/.ssh/authorized_keys sysrepo/sysrepo-netopeer2:latest netopeer2-server -d -v 2
+
+4. Verify netopeer is running by invoking (netopeer should send its
+   HELLO message right away:
+
+   ::
+
+       ssh root@localhost -p 830 -s netconf
+       (password root)
+
+Now just follow the section: `Spawning new NETCONF connectors`_ for
+key-based authentication(SSH) to create device.
+In the payload change the:
+
+-  name, e.g., to netopeer
+
+-  username/password to your system credentials
+
+-  ip to localhost
+
+-  port to 830.
+
+After netopeer is mounted successfully, its configuration can be read
+using RESTCONF by invoking:
+
+GET
+http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
+
+Mounting netopeer NETCONF server using key-based authentication TLS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Install docker https://docs.docker.com/get-started/
+
+2. Run netopeer2
+
+   ::
+
+       sudo docker pull sysrepo/sysrepo-netopeer2
+       sudo docker run -it --name sysrepo -p 830:830 --rm sysrepo/sysrepo-netopeer2:latest
+
+3. Enable TLS communication on server netopeer2
+
+   ::
+
+       ssh root@localhost -p 830 -s netconf
+       (type password root)
+
+   After successful connecting to netopeer2, copy-paste content
+   of configure-keystore-truststore.xml and configure-tls-listen.xml
+   to your terminal window.
+
+   .. tabs::
+
+      .. tab:: configure-keystore-truststore.xml
+
+         .. code-block:: xml
+
+            <hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <capabilities>
+                    <capability>urn:ietf:params:netconf:base:1.0</capability>
+                </capabilities>
+            </hello>
+            ]]>]]>
+
+            <rpc message-id="m-25" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <lock>
+                    <target>
+                        <candidate/>
+                    </target>
+                </lock>
+            </rpc>]]>]]>
+
+            <rpc message-id="m-101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <edit-config>
+                    <target>
+                        <candidate/>
+                    </target>
+                    <config>
+                        <keystore xmlns="urn:ietf:params:xml:ns:yang:ietf-keystore">
+                            <asymmetric-keys>
+                                <asymmetric-key>
+                                    <name>serverkey</name>
+                                    <algorithm>rsa2048</algorithm>
+                                    <public-key>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3VrgFBOc/kZOADDFEs3dhktPJyB+EPkRSD1EnTDtlsrR0wG7HgAA+gdoEwbb2cqJxYH5hhUec0alDQ4l7PUe9ycw6L99ZsJsRTAAlcD0JhpgPngAuX24NVqQDv7Cg5Yx3BOS+Q0pO6GGyuOv2DczQ9BLYPAUAldaAIaa424YaJJ4oUNbS76FwqTs+WDaWtkqQRAqPa/9zg4hbiyCQpTbPNesU5GcTuWQpuuWpw1ZqXRKwJ92kYRNGCUYntJYwSdKnhukkEHYxMYVdfwaG3xFmPCDKy5OVBJmwuzWZC7KHrCK7yTzGZ7/izAWb+3JzhwYqhzq/ZF17eZWC/JDyUkBLwIDAQAB</public-key>
+                                    <private-key>MIIEogIBAAKCAQEA3VrgFBOc/kZOADDFEs3dhktPJyB+EPkRSD1EnTDtlsrR0wG7HgAA+gdoEwbb2cqJxYH5hhUec0alDQ4l7PUe9ycw6L99ZsJsRTAAlcD0JhpgPngAuX24NVqQDv7Cg5Yx3BOS+Q0pO6GGyuOv2DczQ9BLYPAUAldaAIaa424YaJJ4oUNbS76FwqTs+WDaWtkqQRAqPa/9zg4hbiyCQpTbPNesU5GcTuWQpuuWpw1ZqXRKwJ92kYRNGCUYntJYwSdKnhukkEHYxMYVdfwaG3xFmPCDKy5OVBJmwuzWZC7KHrCK7yTzGZ7/izAWb+3JzhwYqhzq/ZF17eZWC/JDyUkBLwIDAQABAoIBAHWhVFD290fc/ph1UlUi12UFYkPNrZDBeyCjhnHuTWQD1itG0TQpFlvIUdNCotSDIGG4J2zMjkj+MrnUWe0pedInnoMhN7fC/BxsXPM3/ca934Vy6heoqpqXzNRbJ+0bhNWKBWGaT94jgWkSRCEnfHO+HkCedFOmLer3nRndKNVwe+bHoXqnsXdOflc3mb71/BM/qfJI3GZBDTZaodTsS2LkuW4DTSNkxGqfZ0Bu1LyYm4mQ50/3nej9ILoT/ejnd17SPNpoBNnEyVJbExrk9pEoFPPKxQ3rCve7FE7y+ILmB4BdiSZm5lOyyJl1Y2Had6fZDubaNKACNWHMkdJ1GokCgYEA8dV97LUZbtgpMyKdzvAfSCXmGyRtucp2FXy5/9UXYU8MXMcOgbMpyrZLbfEwk0YMxKOw8nI4gCaSvIJb0Pek/agjaXIajoYvVIOhvDEq3+2JeT0eQh+9ue5bVOq65FHorDyRV64wwEucBN5CTCaEHdtEJY5WFkOzbrXVipjQxBsCgYEA6lJIm/Yzn92GQw/44XweoWtATtBwDDMvlWWQ8I7U5Rl6ZItPAGuaMmzDolAZjlRPoEPmxPpLKXYgCahkNnfPuuMgI8wA/65uZAqKfOuiGoIyj9oObJ/xb2zI3s4V8EwtfUE+lgg4D29/Cy33V9G6gHgl+CHjT00AZuvHTBsfwH0CgYAJyTXbSkjJL34bT59LLHRXmxEAsCywg/zbSbzNGXZkvaomZvezT+i1B0NuI4BvtTn3Cxix9uVKakUt06ibgCnxCcjFD5T7h3qK1PjKgMLXZOlXOp3q1xX6XCbd/NGrQ5VCwwCup6HZZjXeDJBqPHTEMIdFbckWBY9RP5JwlVZ9WQKBgCy/8iX26v0I7W85SaqmbaMePHXQ0NVDoT7C2t9WJ8ppBzrUcA4Afr5Kj0IcUgUgjORqk1PjCR+t84hkpF7SmtVyMt0jRL2Prn1klfYtehPd8ZIPbtnH4fAJsoL6kK4HnlhhcXZts2cfP//+k1IuN5P5Xib5MdQfPIhrVvBt7a5xAoGAH59S+aygEEIVf5pO8QmqQUpe3WbbuDvlAx3agP2jkeH5A7ZlxFpH7VJSGAoPIsX+nlixUH1P3Esw9ch7ByJ/JRFUX5+G5coTBQj+PAkyGKtmBmnBFxZydMpTdRMyDrKNKpeMZv7yn05YwnbZdS74L49mkY3pFrjRMDH1ltBxobk=</private-key>
+                                    <certificates>
+                                        <certificate>
+                                            <name>servercert</name>
+                                            <cert>MIIDrDCCApQCFEf4LBXF80V6bTWn6kJ/RuccpJ/BMA0GCSqGSIb3DQEBCwUAMIGQMQswCQYDVQQGEwJDWjEWMBQGA1UECAwNU291dGggTW9yYXZpYTENMAsGA1UEBwwEQnJubzEYMBYGA1UECgwPQ0VTTkVUIHoucy5wLm8uMQwwCgYDVQQLDANUTUMxEzARBgNVBAMMCmV4YW1wbGUgQ0ExHTAbBgkqhkiG9w0BCQEWDmNhQGV4YW1wbGUub3JnMB4XDTIxMDkwMzEwMzAyMloXDTMxMDkwMTEwMzAyMlowgZMxCzAJBgNVBAYTAkNaMRYwFAYDVQQIDA1Tb3V0aCBNb3JhdmlhMQ0wCwYDVQQHDARCcm5vMRgwFgYDVQQKDA9DRVNORVQgei5zLnAuby4xDDAKBgNVBAsMA1RNQzESMBAGA1UEAwwJbG9jYWxob3N0MSEwHwYJKoZIhvcNAQkBFhJzZXJ2ZXJAZXhhbXBsZS5vcmcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDdWuAUE5z+Rk4AMMUSzd2GS08nIH4Q+RFIPUSdMO2WytHTAbseAAD6B2gTBtvZyonFgfmGFR5zRqUNDiXs9R73JzDov31mwmxFMACVwPQmGmA+eAC5fbg1WpAO/sKDljHcE5L5DSk7oYbK46/YNzND0Etg8BQCV1oAhprjbhhoknihQ1tLvoXCpOz5YNpa2SpBECo9r/3ODiFuLIJClNs816xTkZxO5ZCm65anDVmpdErAn3aRhE0YJRie0ljBJ0qeG6SQQdjExhV1/BobfEWY8IMrLk5UEmbC7NZkLsoesIrvJPMZnv+LMBZv7cnOHBiqHOr9kXXt5lYL8kPJSQEvAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAGIBnIrbkvRThfXyhWwf4522fTer4lP0znXCNuQ8/86irl6ZWMF2H0HuUha2g1mqAUjJPeM5x2PHr0Ulm3greKXmHl9Oto4SXPOO8tRD/tE09KRGiV/fk+MzFJqbMQj4Dq9P8yOxMMAj95RKN+fH2cIwOKSe8s3gPjldYDPOwIHZhWw3g0LCu/XVhNV2Os3wcWMx/ZWAvSfBUlldc5/dFW3vCy9UpcNj0lfs2LOcAx7R8mdd7wz/9iIZ6mE0OIh1alqKELAbf2hxX6WLoNCYZeVxixsbKhwgAG0XateRjkGjCy7V0q1dpOIs95stxRKNuOlFHXXyCBG1JzpPTfV+RL0=</cert>
+                                        </certificate>
+                                    </certificates>
+                                </asymmetric-key>
+                            </asymmetric-keys>
+                        </keystore>
+                    </config>
+                </edit-config>
+            </rpc>]]>]]>
+
+            <rpc message-id="m-101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <edit-config>
+                    <target>
+                        <candidate/>
+                    </target>
+                    <config>
+                        <truststore xmlns="urn:ietf:params:xml:ns:yang:ietf-truststore">
+                            <certificates>
+                                <name>clientcerts</name>
+                                <certificate>
+                                    <name>clientcert</name>
+                                    <cert>MIIDqTCCApECFEf4LBXF80V6bTWn6kJ/RuccpJ/AMA0GCSqGSIb3DQEBCwUAMIGQMQswCQYDVQQGEwJDWjEWMBQGA1UECAwNU291dGggTW9yYXZpYTENMAsGA1UEBwwEQnJubzEYMBYGA1UECgwPQ0VTTkVUIHoucy5wLm8uMQwwCgYDVQQLDANUTUMxEzARBgNVBAMMCmV4YW1wbGUgQ0ExHTAbBgkqhkiG9w0BCQEWDmNhQGV4YW1wbGUub3JnMB4XDTIxMDkwMzEwMjgxOFoXDTMxMDkwMTEwMjgxOFowgZAxCzAJBgNVBAYTAkNaMRYwFAYDVQQIDA1Tb3V0aCBNb3JhdmlhMQ0wCwYDVQQHDARCcm5vMRgwFgYDVQQKDA9DRVNORVQgei5zLnAuby4xDDAKBgNVBAsMA1RNQzEPMA0GA1UEAwwGY2xpZW50MSEwHwYJKoZIhvcNAQkBFhJjbGllbnRAZXhhbXBsZS5vcmcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC8zbCEJ0MSbFN+KjWhQKbGVkG+TKKtxMatpKMJ5lYDmB1dwWBHc+jj3+htAtc43BUTxQs/7Cb28VVp7kB1dGOd0b/HGL9n8cBmqRcxe+NEhiIFWANy7dzSNF1uKbBLzjMpgjKBcZ4c4O80pBww0U0Q1DPZ/9AhU9GKgUHiwfHKe8/it7T6lhQ2yXqClkW0xnzTiipYC6T3QNvTHWOCfzsUuHcVcA4seqZYMOOiPqMujgUws2jJ2y0lDXg2bcayDwtahX2oZP+Fil9ifO5CLNv9mw+ze8RxXeDrtFEJzzZfmMp5cmj8LmvdzOszrxfdMoG28gxOGYXXunv3+e4vK32RAgMBAAEwDQYJKoZIhvcNAQELBQADggEBANwq9tqHYiet73ZdZcsUA2Aoa7mdjrYvmTeb4rrRbW5KGxoVhRJYAG/8OTZ3P8liorlPtWDci6iXBk/Ev8f1kqlC35xpRaidXSNAancAj4gS30sdCAAj8KzuWmtYTWT5aR0eAV1UTA4mo2N7OidRk+vVWs5tbbRmFmE/aJj8+Ol8rCgqRW08uLHy4pGljCDJWEiaIpPNflomui35r2F4bXp+7aoYmqL63XVkvlWyZBVQfN6p05l2bTTn2N5IrqPq2r7PF0jZtnEnbFc5Rc7gW25EFym70JQQ2kXOft4++G/NK3JcCk3IHwl7tNN7ZVChbMpbVH5TEV8QXR7DqYG0O7Y=</cert>
+                                </certificate>
+                            </certificates>
+                            <certificates>
+                                <name>cacerts</name>
+                                <certificate>
+                                    <name>cacert</name>
+                                    <cert>MIIEAzCCAuugAwIBAgIURc4sipHvJSlNrQIhRhZilBvV4RowDQYJKoZIhvcNAQELBQAwgZAxCzAJBgNVBAYTAkNaMRYwFAYDVQQIDA1Tb3V0aCBNb3JhdmlhMQ0wCwYDVQQHDARCcm5vMRgwFgYDVQQKDA9DRVNORVQgei5zLnAuby4xDDAKBgNVBAsMA1RNQzETMBEGA1UEAwwKZXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5vcmcwHhcNMjEwOTAzMTAyMTAxWhcNMzEwOTAxMTAyMTAxWjCBkDELMAkGA1UEBhMCQ1oxFjAUBgNVBAgMDVNvdXRoIE1vcmF2aWExDTALBgNVBAcMBEJybm8xGDAWBgNVBAoMD0NFU05FVCB6LnMucC5vLjEMMAoGA1UECwwDVE1DMRMwEQYDVQQDDApleGFtcGxlIENBMR0wGwYJKoZIhvcNAQkBFg5jYUBleGFtcGxlLm9yZzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAN4Ld3JDDocyy9KXNJhEUPeZpQW3UdUNXloeh5n/bxasgThkBuQ7oF/nKyVUe517U1CJA993ZIc0jhIWThAnqXkz70DX5EZ7ancPd01MidA6T8k1RYYJWr+vyIRYYBYzK7LSnU6wMWqPTgzZB+KMWwb065ooLEB5XwqAeTIMPLRqM1Galewl4ZSuRJnrXxRjfF3AWNyC9dZw6wIg8cppvoLdBGQiFJQf9SgiVy+HyedAytFEixqKAAIgQUJwhCgbEd6jGFbeaL8HT4MFp1VmaaUBQMkZj/GnKBwCk5BEMu76EN1pzHc4Dd6DabQNGCnsqOPe31yhQGmNFy9R6zNnWZMCAwEAAaNTMFEwHQYDVR0OBBYEFM7w/pO8vk5oowvWPoCKo0RW/JcnMB8GA1UdIwQYMBaAFM7w/pO8vk5oowvWPoCKo0RW/JcnMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG/xfYuRKnCyiwYC/K7kAjHmCNnLCr1mx8P1ECsSJPme3OThDTNeGf8iN2952tGmMFDa+DaAwPc6Gt3cWTb/NYMTLWlt2yj5rJAcLXxIU0SMafBf+F7E/R8Ab/HDDjs0pQaJ0EJhQJVkMdfj3Wq9l0dJT5iEBUrUQflDufiMdEJEIGKZh86MgzELbcn1QX8dlLc91M2OifWStqLzXPicG+jjuoPUceC0flMQDb2qx03sxvJKfYfS5ArACqvdWyXLoP7DI9THJrMI/vBHJKpl4Wtmsh2OLn9VHauFMzPSGke5GwjXCpbXGepj9qWN8Gd/FWgSDH2OBvZ6aHdB1pPjN9k=</cert>
+                                </certificate>
+                            </certificates>
+                        </truststore>
+                    </config>
+                </edit-config>
+            </rpc>]]>]]>
+
+            <rpc message-id="m-27" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <commit/>
+            </rpc>]]>]]>
+
+            <rpc message-id="m-28" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <unlock>
+                    <target>
+                        <candidate/>
+                    </target>
+                </unlock>
+            </rpc>]]>]]>
+
+      .. tab:: configure-tls-listen.xml
+
+         .. code-block:: xml
+
+            <hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <capabilities>
+                    <capability>urn:ietf:params:netconf:base:1.0</capability>
+                </capabilities>
+            </hello>
+            ]]>]]>
+
+            <rpc message-id="m-25" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <lock>
+                    <target>
+                        <candidate/>
+                    </target>
+                </lock>
+            </rpc>]]>]]>
+
+            <rpc message-id="m-101" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <edit-config>
+                    <target>
+                        <candidate/>
+                    </target>
+                    <config>
+                        <netconf-server xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-server">
+                            <listen>
+                                <endpoint>
+                                    <name>default-tls</name>
+                                    <tls>
+                                        <tcp-server-parameters>
+                                            <local-address>0.0.0.0</local-address>
+                                            <keepalives>
+                                                <idle-time>1</idle-time>
+                                                <max-probes>10</max-probes>
+                                                <probe-interval>5</probe-interval>
+                                            </keepalives>
+                                        </tcp-server-parameters>
+                                        <tls-server-parameters>
+                                            <server-identity>
+                                                <keystore-reference>
+                                                    <asymmetric-key>serverkey</asymmetric-key>
+                                                    <certificate>servercert</certificate>
+                                                </keystore-reference>
+                                            </server-identity>
+                                            <client-authentication>
+                                                <required/>
+                                                <ca-certs>cacerts</ca-certs>
+                                                <client-certs>clientcerts</client-certs>
+                                                <cert-maps>
+                                                    <cert-to-name>
+                                                        <id>1</id>
+                                                        <fingerprint>02:20:E1:AD:CC:92:71:E9:EA:6A:85:DF:A7:FF:8C:BB:B9:D5:E4:EE:74</fingerprint>
+                                                        <map-type xmlns:x509c2n="urn:ietf:params:xml:ns:yang:ietf-x509-cert-to-name">x509c2n:specified</map-type>
+                                                        <name>tls-test</name>
+                                                    </cert-to-name>
+                                                </cert-maps>
+                                            </client-authentication>
+                                        </tls-server-parameters>
+                                    </tls>
+                                </endpoint>
+                            </listen>
+                        </netconf-server>
+                    </config>
+                </edit-config>
+            </rpc>]]>]]>
+
+            <rpc message-id="m-27" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <commit/>
+            </rpc>]]>]]>
+
+            <rpc message-id="m-28" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+                <unlock>
+                    <target>
+                        <candidate/>
+                    </target>
+                </unlock>
+            </rpc>]]>]]>
+
+4. Run ODL:
+
+-  :~/netconf/karaf/target/assembly/bin$ ./karaf
+
+-  feature:install odl-netconf-topology odl-restconf-nb-bierman02 odl-mdsal-apidocs
+
+5. Set up ODL netconf keystore
+
+   To setup keystore is needed to send three RPCs from
+   `Configure device to connect over TLS protocol`_
+   to add a client private key, associate a private key with a client and CA
+   certificates chain and add a list of trusted CA and server certificates.
+
+Now just follow the section: `Spawning new NETCONF connectors`_ for
+key-based authentication(TLS) to create device.
+In the payload change the:
+
+-  name, e.g., to netopeer
+
+-  username/password to your system credentials
+
+-  ip to localhost
+
+-  port to 830.
 
 After netopeer is mounted successfully, its configuration can be read
 using RESTCONF by invoking:
