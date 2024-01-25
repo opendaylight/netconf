@@ -12,7 +12,6 @@ import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransform
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_OPERATION_QNAME;
-import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.NETCONF_DATA_QNAME;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.appendListKeyNodes;
 import static org.opendaylight.netconf.common.mdsal.NormalizedDataUtil.writeSchemalessFilter;
 
@@ -56,8 +55,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         }
 
         final var result = XmlUtil.newDocument();
-        final var dataElement = result.createElementNS(NETCONF_DATA_QNAME.getNamespace().toString(),
-            NETCONF_DATA_QNAME.getLocalName());
+        final var dataElement = result.createElementNS(NamespaceURN.BASE, "data");
         result.appendChild(dataElement);
         for (var xmlElement : selectMatchingNodes(getSourceElement(anyxml.body()), path)) {
             dataElement.appendChild(result.importNode(xmlElement.getDomElement(), true));

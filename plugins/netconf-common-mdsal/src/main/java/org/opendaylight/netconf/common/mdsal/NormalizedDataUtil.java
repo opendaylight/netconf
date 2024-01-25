@@ -20,10 +20,9 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -39,7 +38,6 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +66,7 @@ public final class NormalizedDataUtil {
         void initializeNamespace(XMLStreamWriter writer) throws XMLStreamException;
 
         static NamespaceSetter forFactory(final XMLOutputFactory xmlFactory) {
-            final String netconfNamespace = NETCONF_QNAME.getNamespace().toString();
+            final String netconfNamespace = NamespaceURN.BASE;
             final AnyXmlNamespaceContext namespaceContext = new AnyXmlNamespaceContext(Map.of("op", netconfNamespace));
 
             try {
@@ -89,16 +87,6 @@ public final class NormalizedDataUtil {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(NormalizedDataUtil.class);
-
-    // FIXME: document what exactly this QName means, as it is not referring to a tangible node nor the ietf-module.
-    // FIXME: what is this contract saying?
-    //        - is it saying all data is going to be interpreted with this root?
-    //        - is this saying we are following a specific interface contract (i.e. do we have schema mounts?)
-    //        - is it also inferring some abilities w.r.t. RFC8342?
-    public static final QName NETCONF_QNAME = QName.create(QNameModule.create(SchemaContext.NAME.getNamespace(),
-        Revision.of("2011-06-01")), "netconf").intern();
-    // FIXME: is this the device-bound revision?
-    public static final QName NETCONF_DATA_QNAME = QName.create(NETCONF_QNAME, "data").intern();
 
     public static final XMLOutputFactory XML_FACTORY;
 
