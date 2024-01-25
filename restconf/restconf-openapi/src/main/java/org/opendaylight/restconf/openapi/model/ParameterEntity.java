@@ -7,15 +7,17 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 public record ParameterEntity(@NonNull String name, @NonNull String in, boolean required,
-        @NonNull ParameterSchemaEntity schema, @Nullable String description) {
-    public ParameterEntity(final String name, final String in, final boolean required,
+        @Nullable ParameterSchemaEntity schema, @Nullable String description) {
+    public ParameterEntity(final @NonNull String name, final @NonNull String in, final boolean required,
             final ParameterSchemaEntity schema, final String description) {
-        this.name = name;
-        this.in = in;
+        this.name = requireNonNull(name);
+        this.in = requireNonNull(in);
         this.required = required;
         this.schema = schema;
         this.description = description;
