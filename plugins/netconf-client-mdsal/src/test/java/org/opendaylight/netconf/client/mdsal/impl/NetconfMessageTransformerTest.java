@@ -13,19 +13,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.GET_SCHEMA_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_CANDIDATE_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_LOCK_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.createEditConfigStructure;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toFilterStructure;
@@ -52,7 +46,13 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.client.mdsal.MonitoringSchemaSourceProvider;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.DiscardChanges;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Lock;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscription;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Datastores;
@@ -194,8 +194,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void testLockRequestBaseSchemaNotPresent() throws Exception {
         final var transformer = getTransformer(PARTIAL_SCHEMA);
-        final var netconfMessage = transformer.toRpcRequest(NETCONF_LOCK_QNAME,
-                NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_NODEID));
+        final var netconfMessage = transformer.toRpcRequest(Lock.QNAME,
+            NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_NODEID));
         assertEquals("""
             <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
                 <lock>
@@ -211,7 +211,9 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
         final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
             BASE_SCHEMAS.baseSchemaWithNotifications());
-        var netconfMessage = transformer.toRpcRequest(CREATE_SUBSCRIPTION_RPC_QNAME, CREATE_SUBSCRIPTION_RPC_CONTENT);
+        var netconfMessage = transformer.toRpcRequest(CreateSubscription.QNAME, Builders.containerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(CreateSubscriptionInput.QNAME))
+            .build());
         assertEquals("""
             <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
                 <create-subscription xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0"/>
@@ -220,13 +222,13 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void tesLockSchemaRequest() throws Exception {
+    public void testLockSchemaRequest() throws Exception {
         final var transformer = getTransformer(PARTIAL_SCHEMA);
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         transformer.toRpcResult(
             RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(result))).build(),
-            NETCONF_LOCK_QNAME);
+            Lock.QNAME);
     }
 
     @Test
@@ -251,7 +253,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testDiscardChangesRequest() throws Exception {
-        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_DISCARD_CHANGES_QNAME, null);
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(DiscardChanges.QNAME, null);
         assertEquals("""
             <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
                 <discard-changes/>
@@ -424,7 +426,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final var target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_NODEID);
 
         final var wrap = NetconfMessageTransformUtil.wrap(NETCONF_EDIT_CONFIG_NODEID, editConfigStructure, target);
-        final var netconfMessage = netconfMessageTransformer.toRpcRequest(NETCONF_EDIT_CONFIG_QNAME, wrap);
+        final var netconfMessage = netconfMessageTransformer.toRpcRequest(EditConfig.QNAME, wrap);
 
         assertSimilarXml(netconfMessage, """
             <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
@@ -533,7 +535,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final var compositeNodeRpcResult = netconfMessageTransformer.toRpcResult(
             RpcResultBuilder.success(new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>"))).build(),
-            NETCONF_COMMIT_QNAME);
+            Commit.QNAME);
         assertTrue(compositeNodeRpcResult.errors().isEmpty());
         assertNull(compositeNodeRpcResult.value());
     }

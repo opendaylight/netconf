@@ -40,8 +40,14 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.CommitInput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.CopyConfig;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.DiscardChangesInput;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Lock;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Unlock;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Validate;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -82,9 +88,6 @@ public final class NetconfMessageTransformUtil {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformUtil.class);
 
     public static final String MESSAGE_ID_PREFIX = "m";
-
-    public static final @NonNull QName CREATE_SUBSCRIPTION_RPC_QNAME =
-            QName.create(CreateSubscriptionInput.QNAME, "create-subscription").intern();
 
     // Blank document used for creation of new DOM nodes
     private static final Document BLANK_DOCUMENT = XmlUtil.newDocument();
@@ -133,15 +136,8 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull QName NETCONF_CONFIG_QNAME = QName.create(NETCONF_QNAME, "config").intern();
     public static final @NonNull NodeIdentifier NETCONF_CONFIG_NODEID = NodeIdentifier.create(NETCONF_CONFIG_QNAME);
 
-    public static final @NonNull QName NETCONF_COMMIT_QNAME = QName.create(NETCONF_QNAME, "commit").intern();
-    public static final @NonNull Absolute NETCONF_COMMIT_PATH = toPath(NETCONF_COMMIT_QNAME);
-    public static final @NonNull QName NETCONF_VALIDATE_QNAME = QName.create(NETCONF_QNAME, "validate").intern();
-    public static final @NonNull NodeIdentifier NETCONF_VALIDATE_NODEID = NodeIdentifier.create(NETCONF_VALIDATE_QNAME);
-    public static final @NonNull Absolute NETCONF_VALIDATE_PATH = toPath(NETCONF_VALIDATE_QNAME);
-    public static final @NonNull QName NETCONF_COPY_CONFIG_QNAME = QName.create(NETCONF_QNAME, "copy-config").intern();
-    public static final @NonNull NodeIdentifier NETCONF_COPY_CONFIG_NODEID =
-        NodeIdentifier.create(NETCONF_COPY_CONFIG_QNAME);
-    public static final @NonNull Absolute NETCONF_COPY_CONFIG_PATH = toPath(NETCONF_COPY_CONFIG_QNAME);
+    public static final @NonNull NodeIdentifier NETCONF_VALIDATE_NODEID = NodeIdentifier.create(Validate.QNAME);
+    public static final @NonNull NodeIdentifier NETCONF_COPY_CONFIG_NODEID = NodeIdentifier.create(CopyConfig.QNAME);
 
     public static final @NonNull QName NETCONF_OPERATION_QNAME = QName.create(NETCONF_QNAME, "operation").intern();
     private static final @NonNull QName NETCONF_OPERATION_QNAME_LEGACY =
@@ -150,17 +146,12 @@ public final class NetconfMessageTransformUtil {
             QName.create(NETCONF_OPERATION_QNAME, "default-operation").intern();
     public static final @NonNull NodeIdentifier NETCONF_DEFAULT_OPERATION_NODEID =
             NodeIdentifier.create(NETCONF_DEFAULT_OPERATION_QNAME);
-    public static final @NonNull QName NETCONF_EDIT_CONFIG_QNAME = QName.create(NETCONF_QNAME, "edit-config").intern();
-    public static final @NonNull NodeIdentifier NETCONF_EDIT_CONFIG_NODEID =
-        NodeIdentifier.create(NETCONF_EDIT_CONFIG_QNAME);
-    public static final @NonNull Absolute NETCONF_EDIT_CONFIG_PATH = toPath(NETCONF_EDIT_CONFIG_QNAME);
+    public static final @NonNull NodeIdentifier NETCONF_EDIT_CONFIG_NODEID = NodeIdentifier.create(EditConfig.QNAME);
     public static final @NonNull QName NETCONF_GET_CONFIG_QNAME =
         QName.create(NETCONF_QNAME, XmlNetconfConstants.GET_CONFIG).intern();
     public static final @NonNull NodeIdentifier NETCONF_GET_CONFIG_NODEID =
         NodeIdentifier.create(NETCONF_GET_CONFIG_QNAME);
     public static final @NonNull Absolute NETCONF_GET_CONFIG_PATH = toPath(NETCONF_GET_CONFIG_QNAME);
-    public static final @NonNull QName NETCONF_DISCARD_CHANGES_QNAME = QName.create(NETCONF_QNAME, "discard-changes");
-    public static final @NonNull Absolute NETCONF_DISCARD_CHANGES_PATH = toPath(NETCONF_DISCARD_CHANGES_QNAME);
     public static final @NonNull QName NETCONF_GET_QNAME =
         QName.create(NETCONF_QNAME, XmlNetconfConstants.GET).intern();
     public static final @NonNull NodeIdentifier NETCONF_GET_NODEID = NodeIdentifier.create(NETCONF_GET_QNAME);
@@ -168,32 +159,21 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull QName NETCONF_RPC_QNAME =
         QName.create(NETCONF_QNAME, RpcMessage.ELEMENT_NAME).intern();
 
-    public static final @NonNull QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
-    public static final @NonNull NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);
-    public static final @NonNull Absolute NETCONF_LOCK_PATH = toPath(NETCONF_LOCK_QNAME);
-    public static final @NonNull QName NETCONF_UNLOCK_QNAME = QName.create(NETCONF_QNAME, "unlock").intern();
-    public static final @NonNull NodeIdentifier NETCONF_UNLOCK_NODEID = NodeIdentifier.create(NETCONF_UNLOCK_QNAME);
-    public static final @NonNull Absolute NETCONF_UNLOCK_PATH = toPath(NETCONF_UNLOCK_QNAME);
-
+    public static final @NonNull NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(Lock.QNAME);
+    public static final @NonNull NodeIdentifier NETCONF_UNLOCK_NODEID = NodeIdentifier.create(Unlock.QNAME);
     public static final @NonNull NodeIdentifier EDIT_CONTENT_NODEID = NodeIdentifier.create(EditContent.QNAME);
 
     // Discard changes message
     public static final @NonNull ContainerNode DISCARD_CHANGES_RPC_CONTENT = Builders.containerBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(NETCONF_DISCARD_CHANGES_QNAME)).build();
+            .withNodeIdentifier(NodeIdentifier.create(DiscardChangesInput.QNAME)).build();
 
     // Commit changes message
     public static final @NonNull ContainerNode COMMIT_RPC_CONTENT = Builders.containerBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(NETCONF_COMMIT_QNAME)).build();
+            .withNodeIdentifier(NodeIdentifier.create(CommitInput.QNAME)).build();
 
     // Get message
     public static final @NonNull ContainerNode GET_RPC_CONTENT = Builders.containerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID).build();
-
-    // Create-subscription changes message
-    public static final @NonNull ContainerNode CREATE_SUBSCRIPTION_RPC_CONTENT = Builders.containerBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(CREATE_SUBSCRIPTION_RPC_QNAME)).build();
-
-    public static final @NonNull Absolute CREATE_SUBSCRIPTION_RPC_PATH = toPath(CREATE_SUBSCRIPTION_RPC_QNAME);
 
     public static final @NonNull NodeIdentifier NETCONF_FILTER_NODEID =
         NodeIdentifier.create(QName.create(NETCONF_QNAME, "filter").intern());

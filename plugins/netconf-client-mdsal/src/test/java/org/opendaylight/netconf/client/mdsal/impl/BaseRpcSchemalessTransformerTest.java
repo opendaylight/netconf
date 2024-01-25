@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.target.config.target.Candidate;
@@ -34,9 +35,9 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void toRpcRequest() throws Exception {
-        final var msg = transformer.toRpcRequest(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME,
+        final var msg = transformer.toRpcRequest(EditConfig.QNAME,
             Builders.containerBuilder()
-                .withNodeIdentifier(new NodeIdentifier(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME))
+                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID)
                 .withChild(Builders.choiceBuilder()
                     .withNodeIdentifier(new NodeIdentifier(EditContent.QNAME))
                     .withChild(Builders.anyXmlBuilder()

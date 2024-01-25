@@ -53,6 +53,8 @@ import org.opendaylight.netconf.client.mdsal.impl.BaseSchema;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscription;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapabilityBuilder;
@@ -184,9 +186,10 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         // TODO check whether the model describing create subscription is present in schema
         // Perhaps add a default schema context to support create-subscription if the model was not provided
         // (same as what we do for base netconf operations in transformer)
-        final var rpcResultListenableFuture = deviceRpc.invokeRpc(
-                NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME,
-                NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT);
+        final var rpcResultListenableFuture = deviceRpc.invokeRpc(CreateSubscription.QNAME, Builders.containerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(CreateSubscriptionInput.QNAME))
+            // Note: default 'stream' is 'NETCONF', we do not need to create an explicit leaf
+            .build());
 
         Futures.addCallback(rpcResultListenableFuture, new FutureCallback<DOMRpcResult>() {
             @Override
