@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1d11ab6_faab1973",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PostEntity.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-01-25T08:41:50Z",
+      "side": 1,
+      "message": "we can use already defined parentName here",
+      "revId": "1a0748be1faf6571d1687d170d653626c38d1c77",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
