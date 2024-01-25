@@ -16,6 +16,11 @@ import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransform
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,13 +32,11 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.XMLStreamException;
@@ -50,6 +53,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.common.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
@@ -86,7 +91,6 @@ import org.xml.sax.SAXException;
  * ietf-netconf-yang-library/modules-state/modules node.
  */
 public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
-
     private static final Logger LOG = LoggerFactory.getLogger(LibraryModulesSchemas.class);
     private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
     private static final EffectiveModelContext LIBRARY_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(
@@ -115,6 +119,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             .withNodeIdentifier(NETCONF_GET_NODEID)
             .withChild(NetconfMessageTransformUtil.toFilterStructure(MODULES_STATE_MODULE_LIST, LIBRARY_CONTEXT))
             .build();
+    private static final @NonNull LibraryModulesSchemas EMPTY = new LibraryModulesSchemas(ImmutableMap.of());
 
     private final ImmutableMap<QName, URL> availableModels;
 
@@ -123,9 +128,9 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     public Map<SourceIdentifier, URL> getAvailableModels() {
-        final Map<SourceIdentifier, URL> result = new HashMap<>();
-        for (final Entry<QName, URL> entry : availableModels.entrySet()) {
-            final SourceIdentifier sId = new SourceIdentifier(entry.getKey().getLocalName(),
+        final var result = new HashMap<SourceIdentifier, URL>();
+        for (var entry : availableModels.entrySet()) {
+            final var sId = new SourceIdentifier(entry.getKey().getLocalName(),
                 entry.getKey().getRevision().map(Revision::toString).orElse(null));
             result.put(sId, entry.getValue());
         }
@@ -159,58 +164,87 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         }
     }
 
+    public static ListenableFuture<LibraryModulesSchemas> forDevice(final NetconfDeviceRpc deviceRpc,
+            final RemoteDeviceId deviceId) {
+        final var future = SettableFuture.<LibraryModulesSchemas>create();
+        Futures.addCallback(deviceRpc.invokeRpc(NETCONF_GET_QNAME, GET_MODULES_STATE_MODULE_LIST_RPC),
+            new FutureCallback<>() {
+                @Override
+                public void onSuccess(final DOMRpcResult result) {
+                    onGetModulesStateResult(future, deviceId, result);
+                }
 
-    public static LibraryModulesSchemas create(final NetconfDeviceRpc deviceRpc, final RemoteDeviceId deviceId) {
-        final DOMRpcResult moduleListNodeResult;
-        try {
-            moduleListNodeResult =
-                    deviceRpc.invokeRpc(NETCONF_GET_QNAME, GET_MODULES_STATE_MODULE_LIST_RPC).get();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException(deviceId + ": Interrupted while waiting for response to "
-                    + MODULES_STATE_MODULE_LIST, e);
-        } catch (final ExecutionException e) {
-            LOG.warn("{}: Unable to detect available schemas, get to {} failed", deviceId,
-                    MODULES_STATE_MODULE_LIST, e);
-            return new LibraryModulesSchemas(ImmutableMap.of());
+                @Override
+                public void onFailure(final Throwable cause) {
+                    // debug, because we expect this error to be reported by caller
+                    LOG.debug("{}: Unable to detect available schemas", deviceId, cause);
+                    future.setException(cause);
+                }
+            }, MoreExecutors.directExecutor());
+        return future;
+    }
+
+    private static void onGetModulesStateResult(final SettableFuture<LibraryModulesSchemas> future,
+            final RemoteDeviceId deviceId, final DOMRpcResult result) {
+        // Two-pass error reporting: first check if there is a hard error, then log any remaining warnings
+        final var errors = result.errors();
+        if (errors.stream().anyMatch(error -> error.getSeverity() == ErrorSeverity.ERROR)) {
+            // FIXME: a good exception, which can report the contents of errors?
+            future.setException(new OperationFailedException("Failed to get modules-state", errors));
+            return;
+        }
+        for (var error : errors) {
+            LOG.info("{}: schema retrieval warning: {}", deviceId, error);
         }
 
-        if (!moduleListNodeResult.errors().isEmpty()) {
-            LOG.warn("{}: Unable to detect available schemas, get to {} failed, {}",
-                    deviceId, MODULES_STATE_MODULE_LIST, moduleListNodeResult.errors());
-            return new LibraryModulesSchemas(ImmutableMap.of());
+        final var value = result.value();
+        if (value == null) {
+            LOG.warn("{}: missing RPC output", deviceId);
+            future.set(EMPTY);
+            return;
         }
-
-        final Optional<DataContainerChild> modulesStateNode =
-                findModulesStateNode(moduleListNodeResult.value());
-        if (modulesStateNode.isPresent()) {
-            final DataContainerChild node = modulesStateNode.orElseThrow();
-            checkState(node instanceof ContainerNode, "Expecting container containing schemas, but was %s", node);
-            return create((ContainerNode) node);
+        final var data = value.childByArg(NETCONF_DATA_NODEID);
+        if (data == null) {
+            LOG.warn("{}: missing RPC data", deviceId);
+            future.set(EMPTY);
+            return;
         }
+//        if ()
+//
+//        final var moduleState = data.
+//
+//        return ((DataContainerNode) dataNode.orElseThrow()).findChildByArg(MODULES_STATE_NID);
 
-        LOG.warn("{}: Unable to detect available schemas, get to {} was empty", deviceId, MODULES_STATE_NID);
-        return new LibraryModulesSchemas(ImmutableMap.of());
+
+
+//        final var modulesStateNode = findModulesStateNode(result.value());
+//        if (modulesStateNode.isPresent()) {
+//            final var node = modulesStateNode.orElseThrow();
+//            checkState(node instanceof ContainerNode, "Expecting container containing schemas, but was %s", node);
+//            return create((ContainerNode) node);
+//        }
+//
+//        LOG.warn("{}: Unable to detect available schemas, get to {} was empty", deviceId, MODULES_STATE_NID);
+//        return new LibraryModulesSchemas(ImmutableMap.of());
     }
 
     private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
         final Optional<DataContainerChild> moduleListNode = modulesStateNode.findChildByArg(MODULE_NID);
         checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", MODULE_NID, modulesStateNode);
-        final DataContainerChild node = moduleListNode.orElseThrow();
+        final var node = moduleListNode.orElseThrow();
         checkState(node instanceof MapNode, "Unexpected structure for container: %s in : %s. Expecting a list",
             MODULE_NID, modulesStateNode);
 
-        final MapNode moduleList = (MapNode) node;
-        final Collection<MapEntryNode> modules = moduleList.body();
-        final ImmutableMap.Builder<QName, URL> schemasMapping = ImmutableMap.builderWithExpectedSize(modules.size());
-        for (final MapEntryNode moduleNode : modules) {
-            final Entry<QName, URL> entry = createFromEntry(moduleNode);
+        final var moduleList = (MapNode) node;
+        final var builder = ImmutableMap.<QName, URL>builderWithExpectedSize(moduleList.size());
+        for (var moduleNode : moduleList.body()) {
+            final var entry = createFromEntry(moduleNode);
             if (entry != null) {
-                schemasMapping.put(entry);
+                builder.put(entry);
             }
         }
 
-        return new LibraryModulesSchemas(schemasMapping.build());
+        return new LibraryModulesSchemas(builder.build());
     }
 
     /**
@@ -233,17 +267,15 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         return createFromURLConnection(connection);
     }
 
-    private static Optional<DataContainerChild> findModulesStateNode(final NormalizedNode result) {
-        if (result == null) {
-            return Optional.empty();
-        }
-        final Optional<DataContainerChild> dataNode = ((DataContainerNode) result).findChildByArg(NETCONF_DATA_NODEID);
-        if (dataNode.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return ((DataContainerNode) dataNode.orElseThrow()).findChildByArg(MODULES_STATE_NID);
-    }
+//    private static @Nullable DataContainerChild findModulesStateNode(final @NonNull ContainerNode result) {
+//
+//        final Optional<DataContainerChild> dataNode = result.childByArg(NETCONF_DATA_NODEID);
+//        if (dataNode.isEmpty()) {
+//            return Optional.empty();
+//        }
+//
+//        return ((DataContainerNode) dataNode.orElseThrow()).findChildByArg(MODULES_STATE_NID);
+//    }
 
     private static LibraryModulesSchemas createFromURLConnection(final URLConnection connection) {
 
@@ -293,7 +325,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         jsonParser.parse(reader);
 
-        final NormalizationResult result = resultHolder.result();
+        final NormalizationResult<?> result = resultHolder.result();
         return result == null ? Optional.empty() : Optional.of(result.data());
     }
 

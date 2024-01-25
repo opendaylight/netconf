@@ -138,11 +138,47 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         setConnected(true);
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
-        final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
-        final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.getEffectiveModelContext(), listener,
+        final var baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
+        final var initRpc = new NetconfDeviceRpc(baseSchema.getEffectiveModelContext(), listener,
             new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
-        final var sourceResolverFuture = Futures.submit(new DeviceSourcesResolver(id, baseSchema, initRpc,
-                remoteSessionCapabilities, stateSchemasResolver), processingExecutor);
+
+        // Acquire schemas
+        final var futureSchemas = stateSchemasResolver.resolve(initRpc, remoteSessionCapabilities, id,
+            baseSchema.getEffectiveModelContext());
+
+        // Convert to sources
+        final var sourceResolverFuture = Futures.transform(futureSchemas, availableSchemas -> {
+            LOG.debug("{}: Schemas exposed by ietf-netconf-monitoring: {}", id,
+                availableSchemas.getAvailableYangSchemasQNames());
+
+            final var requiredSources = new HashSet<>(remoteSessionCapabilities.moduleBasedCaps().keySet());
+            final var providedSources = availableSchemas.getAvailableYangSchemasQNames();
+            final var requiredSourcesNotProvided = Sets.difference(requiredSources, providedSources);
+            if (!requiredSourcesNotProvided.isEmpty()) {
+                LOG.warn("{}: Netconf device does not provide all yang models reported in hello message capabilities,"
+                        + " required but not provided: {}", id, requiredSourcesNotProvided);
+                LOG.warn("{}: Attempting to build schema context from required sources", id);
+            }
+
+            // Here all the sources reported in netconf monitoring are merged with those reported in hello.
+            // It is necessary to perform this since submodules are not mentioned in hello but still required.
+            // This clashes with the option of a user to specify supported yang models manually in configuration
+            // for netconf-connector and as a result one is not able to fully override yang models of a device.
+            // It is only possible to add additional models.
+            final var providedSourcesNotRequired = Sets.difference(providedSources, requiredSources);
+            if (!providedSourcesNotRequired.isEmpty()) {
+                LOG.warn("{}: Netconf device provides additional yang models not reported in "
+                        + "hello message capabilities: {}", id, providedSourcesNotRequired);
+                LOG.warn("{}: Adding provided but not required sources as required to prevent failures", id);
+                LOG.debug("{}: Netconf device reported in hello: {}", id, requiredSources);
+                requiredSources.addAll(providedSourcesNotRequired);
+            }
+
+            final var sourceProvider = availableSchemas instanceof LibraryModulesSchemas libraryModule
+                ? new LibrarySchemaSourceProvider(id, libraryModule.getAvailableModels())
+                    : new MonitoringSchemaSourceProvider(id, initRpc);
+            return new DeviceSources(requiredSources, providedSources, sourceProvider);
+        }, MoreExecutors.directExecutor());
 
         if (shouldListenOnSchemaChange(remoteSessionCapabilities)) {
             registerToBaseNetconfStream(initRpc, listener);
