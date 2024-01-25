@@ -10,7 +10,6 @@ package org.opendaylight.netconf.client.mdsal.impl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_URI;
 
@@ -60,6 +59,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.client.mdsal.api.ActionTransformer;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscription;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -106,7 +106,7 @@ public class NetconfMessageTransformer
     private static final ImmutableSet<XMLNamespace> BASE_OR_NOTIFICATION_NS = ImmutableSet.of(
         NETCONF_URI,
         IETF_NETCONF_NOTIFICATIONS.getNamespace(),
-        CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
+        CreateSubscription.QNAME.getNamespace());
 
     private final MountPointContext mountContext;
     private final DataSchemaContextTree contextTree;
@@ -356,8 +356,7 @@ public class NetconfMessageTransformer
             // This way operations like lock/unlock are supported even if the source for base model was not provided
             final EffectiveModelContext ctx = needToUseBaseCtx ? baseSchema.getEffectiveModelContext()
                     : mountContext.getEffectiveModelContext();
-            NetconfMessageTransformUtil.writeNormalizedOperationInput(payload, result, Absolute.of(rpc),
-                ctx);
+            NetconfMessageTransformUtil.writeNormalizedOperationInput(payload, result, Absolute.of(rpc), ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize input of " + rpc, e);
         }

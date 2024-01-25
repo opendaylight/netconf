@@ -27,7 +27,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.GetSchema;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -61,7 +61,7 @@ public class MonitoringSchemaSourceProviderTest {
         final SourceIdentifier identifier = new SourceIdentifier("test", "2016-02-08");
         final YangTextSchemaSource source = provider.getSource(identifier).get();
         assertEquals(identifier, source.getIdentifier());
-        verify(service).invokeRpc(NetconfMessageTransformUtil.GET_SCHEMA_QNAME,
+        verify(service).invokeRpc(GetSchema.QNAME,
                 MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Optional.of("2016-02-08")));
     }
 

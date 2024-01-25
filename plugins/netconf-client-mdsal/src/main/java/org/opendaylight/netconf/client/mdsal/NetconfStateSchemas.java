@@ -14,7 +14,6 @@ import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransform
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
-import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toId;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -38,6 +37,7 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
@@ -131,7 +131,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         final DOMRpcResult schemasNodeResult;
         try {
-            schemasNodeResult = deviceRpc.invokeRpc(NETCONF_GET_QNAME, GET_SCHEMAS_RPC).get();
+            schemasNodeResult = deviceRpc.invokeRpc(Get.QNAME, GET_SCHEMAS_RPC).get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException(id

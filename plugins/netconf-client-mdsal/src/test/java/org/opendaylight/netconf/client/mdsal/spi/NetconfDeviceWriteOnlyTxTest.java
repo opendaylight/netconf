@@ -38,6 +38,11 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.DiscardChanges;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Lock;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Unlock;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -83,14 +88,10 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
         // verify discard changes was sent
         final var inOrder = inOrder(rpc);
-        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME,
-            NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_NODEID));
-        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME,
-            NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
-        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME,
-            DISCARD_CHANGES_RPC_CONTENT);
-        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME,
-            NetconfBaseOps.getUnLockContent(NETCONF_CANDIDATE_NODEID));
+        inOrder.verify(rpc).invokeNetconf(Lock.QNAME, NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_NODEID));
+        inOrder.verify(rpc).invokeNetconf(Commit.QNAME, NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
+        inOrder.verify(rpc).invokeNetconf(DiscardChanges.QNAME, DISCARD_CHANGES_RPC_CONTENT);
+        inOrder.verify(rpc).invokeNetconf(Unlock.QNAME, NetconfBaseOps.getUnLockContent(NETCONF_CANDIDATE_NODEID));
     }
 
     @Test
@@ -123,11 +124,9 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         tx.commit();
         // verify discard changes was sent
         final var inOrder = inOrder(rpc);
-        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME,
-                NetconfBaseOps.getLockContent(NETCONF_RUNNING_NODEID));
-        inOrder.verify(rpc).invokeNetconf(eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), any());
-        inOrder.verify(rpc).invokeNetconf(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME,
-                NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_NODEID));
+        inOrder.verify(rpc).invokeNetconf(Lock.QNAME, NetconfBaseOps.getLockContent(NETCONF_RUNNING_NODEID));
+        inOrder.verify(rpc).invokeNetconf(eq(EditConfig.QNAME), any());
+        inOrder.verify(rpc).invokeNetconf(Unlock.QNAME, NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_NODEID));
     }
 
     @Test
