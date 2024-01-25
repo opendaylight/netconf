@@ -125,7 +125,7 @@ without specifying the node in the URL:
    * - rfc8040
      - http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf
 
-Payload:
+Payload for password authentication:
 
 .. tabs::
 
@@ -206,6 +206,180 @@ Payload:
     each application build. You can use this method if you have access to the current encryption key.
     Additionally, it is important to ensure that the entire password is encoded in base64 format and
     that its length is a multiple of 16 bytes for successful authentication.
+
+There is also option of using key-based authentication instead
+of password. First we need to create key in datastore.
+
+*Adding a client private key credential to the netconf-keystore*
+
+.. code-block::
+
+    POST HTTP/1.1
+    /rests/operations/netconf-keystore:add-keystore-entry
+    Content-Type: application/json
+    Accept: application/json
+
+.. code-block:: json
+
+  {
+    "input": {
+      "key-credential": [
+        {
+          "key-id": "example-client-key-id",
+          "private-key": "PEM-format-private-key",
+          "passphrase": "passphrase"
+        }
+      ]
+    }
+  }
+
+After we can use this key to create connector using this key.
+
+Payload for key-based authentication via SSH:
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+         <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+           <node-id>new-netconf-device</node-id>
+           <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
+           <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
+           <key-based xmlns="urn:opendaylight:netconf-node-topology">
+             <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
+             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</password>
+           </key-based>
+           <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+           <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
+           <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
+           <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
+           <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
+           <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
+           <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
+           <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
+           <!-- keepalive-delay set to 0 turns off keepalives-->
+           <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+         </node>
+
+   .. tab:: JSON
+
+      **Content-type:** ``application/json``
+
+      **Accept:** ``application/json``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: json
+
+         {
+             "node": [
+                 {
+                     "node-id": "new-netconf-device",
+                     "netconf-node-topology:port": 17830,
+                     "netconf-node-topology:reconnect-on-changed-schema": false,
+                     "netconf-node-topology:connection-timeout-millis": 20000,
+                     "netconf-node-topology:tcp-only": false,
+                     "netconf-node-topology:max-connection-attempts": 0,
+                     "netconf-node-topology:key-based": {
+                        "netconf-node-topology:username": "admin",
+                        "netconf-node-topology:key-id": "key-id"
+                     },
+                     "netconf-node-topology:host": "127.0.0.1",
+                     "netconf-node-topology:min-backoff-millis": 2000,
+                     "netconf-node-topology:max-backoff-millis": 1800000,
+                     "netconf-node-topology:backoff-multiplier": 1.5,
+                     "netconf-node-topology:keepalive-delay": 120
+                 }
+             ]
+         }
+
+Connecting via TLS protocol is similar to SSH. First setup keystore
+by using three RPCs from `Configure device to connect over TLS protocol`_
+to add a client private key, associate a private key with a client and CA
+certificates chain and add a list of trusted CA and server certificates.
+Only after that we can process and create a new NETCONF connector you need
+to send the following PUT request.
+
+Payload for key-based authentication via TLS:
+
+.. tabs::
+
+   .. tab:: XML
+
+      **Content-type:** ``application/xml``
+
+      **Accept:** ``application/xml``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: xml
+
+         <node xmlns="urn:TBD:params:xml:ns:yang:network-topology">
+           <node-id>new-netconf-device</node-id>
+           <host xmlns="urn:opendaylight:netconf-node-topology">127.0.0.1</host>
+           <port xmlns="urn:opendaylight:netconf-node-topology">17830</port>
+           <key-based xmlns="urn:opendaylight:netconf-node-topology">
+             <username xmlns="urn:opendaylight:netconf-node-topology">admin</username>
+             <key-id xmlns="urn:opendaylight:netconf-node-topology">key-id</password>
+           </key-based>
+           <tcp-only xmlns="urn:opendaylight:netconf-node-topology">false</tcp-only>
+           <!-- non-mandatory fields with default values, you can safely remove these if you do not wish to override any of these values-->
+           <reconnect-on-changed-schema xmlns="urn:opendaylight:netconf-node-topology">false</reconnect-on-changed-schema>
+           <connection-timeout-millis xmlns="urn:opendaylight:netconf-node-topology">20000</connection-timeout-millis>
+           <max-connection-attempts xmlns="urn:opendaylight:netconf-node-topology">0</max-connection-attempts>
+           <min-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">2000</min-backoff-millis>
+           <max-backoff-millis xmlns="urn:opendaylight:netconf-node-topology">1800000</max-backoff-millis>
+           <backoff-multiplier xmlns="urn:opendaylight:netconf-node-topology">1.5</backoff-multiplier>
+           <!-- keepalive-delay set to 0 turns off keepalives-->
+           <keepalive-delay xmlns="urn:opendaylight:netconf-node-topology">120</keepalive-delay>
+           <protocol xmlns="urn:opendaylight:netconf-node-topology">
+             <name xmlns="urn:opendaylight:netconf-node-topology">TLS</name>
+           </protocol>
+         </node>
+
+   .. tab:: JSON
+
+      **Content-type:** ``application/json``
+
+      **Accept:** ``application/json``
+
+      **Authentication:** ``admin:admin``
+
+      .. code-block:: json
+
+         {
+             "node": [
+                 {
+                     "node-id": "new-netconf-device",
+                     "netconf-node-topology:port": 17830,
+                     "netconf-node-topology:reconnect-on-changed-schema": false,
+                     "netconf-node-topology:connection-timeout-millis": 20000,
+                     "netconf-node-topology:tcp-only": false,
+                     "netconf-node-topology:max-connection-attempts": 0,
+                     "netconf-node-topology:key-based": {
+                        "netconf-node-topology:username": "admin",
+                        "netconf-node-topology:key-id": "key-id"
+                     },
+                     "netconf-node-topology:host": "127.0.0.1",
+                     "netconf-node-topology:min-backoff-millis": 2000,
+                     "netconf-node-topology:max-backoff-millis": 1800000,
+                     "netconf-node-topology:backoff-multiplier": 1.5,
+                     "netconf-node-topology:keepalive-delay": 120,
+                     "protocol": {
+                        "name": "TLS"
+                     }
+                 }
+             ]
+         }
+
 
 Note that the device name in <node-id> element must match the last
 element of the restconf URL.
@@ -995,7 +1169,8 @@ Preconditions:
 
 -  Netopeer is up and running in docker
 
-Now just follow the section: `Spawning new NETCONF connectors`_.
+Now just follow the section: `Spawning new NETCONF connectors`_ for
+password authentication.
 In the payload change the:
 
 -  name, e.g., to netopeer
@@ -1004,7 +1179,101 @@ In the payload change the:
 
 -  ip to localhost
 
--  port to 1831.
+-  port to 830.
+
+After netopeer is mounted successfully, its configuration can be read
+using RESTCONF by invoking:
+
+GET
+http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
+
+Mounting netopeer NETCONF server using key-based authentication SSH
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Install docker https://docs.docker.com/get-started/
+
+2. Create RSA key pair - it will be user for connection.
+
+3. Start the netopeer image(this command will also copy you pub key
+   into docker container):
+
+   ::
+
+       docker run -dt -p 830:830 -v {path-to-pub-key}:/home/{netopeer-username}/.ssh/authorized_keys sysrepo/sysrepo-netopeer2:latest netopeer2-server -d -v 2
+
+4. Verify netopeer is running by invoking (netopeer should send its
+   HELLO message right away:
+
+   ::
+
+       ssh root@localhost -p 830 -s netconf
+       (password root)
+
+Now just follow the section: `Spawning new NETCONF connectors`_ for
+key-based authentication(SSH) to create device.
+In the payload change the:
+
+-  name, e.g., to netopeer
+
+-  username/password to your system credentials
+
+-  ip to localhost
+
+-  port to 830.
+
+After netopeer is mounted successfully, its configuration can be read
+using RESTCONF by invoking:
+
+GET
+http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=netopeer/yang-ext:mount?content:config
+
+Mounting netopeer NETCONF server using key-based authentication TLS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Install docker https://docs.docker.com/get-started/
+
+2. Run netopeer2
+
+   ::
+
+       docker pull sysrepo/sysrepo-netopeer2
+       docker run -it --name sysrepo -p 830:830 --rm sysrepo/sysrepo-netopeer2:latest
+
+3. Enable TLS communication on server netopeer2
+
+   ::
+
+       ssh root@localhost -p 830 -s netconf
+       (type password root)
+
+   After successful connecting to netopeer2 setup your
+   TLS configuration xml
+   (See: https://github.com/CESNET/netopeer2/tree/master/example_configuration).
+
+4. Run ODL:
+
+-  :~/netconf/karaf/target/assembly/bin$ ./karaf
+
+-  feature:install odl-netconf-topology odl-restconf-nb-bierman02 odl-mdsal-apidocs
+
+5. Set up ODL netconf keystore
+
+   To setup keystore is needed to send three RPCs from
+   `Configure device to connect over TLS protocol`_
+   to add a client private key, associate a private key with a client and CA
+   certificates chain and add a list of trusted CA and server certificates.
+
+Now just follow the section: `Spawning new NETCONF connectors`_ for
+key-based authentication(TLS) to create device.
+In the payload change the:
+
+-  name, e.g., to netopeer
+
+-  username/password to your system credentials
+
+-  ip to localhost
+
+-  port to 830.
 
 After netopeer is mounted successfully, its configuration can be read
 using RESTCONF by invoking:
@@ -1537,7 +1806,7 @@ storing them within the netconf-keystore.
       "key-credential": [
         {
           "key-id": "example-client-key-id",
-          "private-key": "base64encoded-private-key",
+          "private-key": "PEM-format-private-key",
           "passphrase": "passphrase"
         }
       ]
