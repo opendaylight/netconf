@@ -211,13 +211,14 @@ public final class PostEntity extends OperationEntity {
     }
 
     private String processOperationsRef(final OperationDefinition def, final String operationName, final String suf) {
-        final var ref = COMPONENTS_PREFIX + moduleName() + "_" + operationName + suf;
         if (def instanceof ActionDefinition && parentNode != null) {
             final var parentName = ((DataSchemaNode) parentNode).getQName().getLocalName();
-            if (!operationName.contains(parentName)) {
+            final boolean hasChildNodes = suf.equals(INPUT_SUFFIX) ? !def.getInput().getChildNodes().isEmpty()
+                    : !def.getOutput().getChildNodes().isEmpty();
+            if (hasChildNodes) {
                 return COMPONENTS_PREFIX + moduleName() + "_" + parentName + "_" + operationName + suf;
             }
         }
-        return ref;
+        return COMPONENTS_PREFIX + moduleName() + "_" + operationName + suf;
     }
 }

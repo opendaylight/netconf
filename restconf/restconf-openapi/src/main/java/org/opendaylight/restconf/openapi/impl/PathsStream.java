@@ -146,7 +146,7 @@ public final class PathsStream extends InputStream {
                     final var localName = moduleName + ":" + nodeLocalName;
                     final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
                     processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, schemaContext,
-                        deviceName, basePath, node);
+                        deviceName, basePath, null);
                 }
             }
         }
