@@ -7,13 +7,15 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
 public record ParameterSchemaEntity(@NonNull String type, @Nullable List<String> schemaEnum) {
-    public ParameterSchemaEntity(final String type, final List<String> schemaEnum) {
-        this.type = type;
+    public ParameterSchemaEntity(final @NonNull String type, final @Nullable List<String> schemaEnum) {
+        this.type = requireNonNull(type);
         this.schemaEnum = schemaEnum;
     }
 }
