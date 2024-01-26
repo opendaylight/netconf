@@ -7,19 +7,22 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.Deque;
+import org.eclipse.jdt.annotation.NonNull;
 
 public final class PathsEntity extends OpenApiEntity {
-    private final Deque<PathEntity> paths;
+    private final @NonNull Deque<PathEntity> paths;
 
-    public PathsEntity(final Deque<PathEntity> paths) {
-        this.paths = paths;
+    public PathsEntity(final @NonNull Deque<PathEntity> paths) {
+        this.paths = requireNonNull(paths);
     }
 
     @Override
-    public void generate(final JsonGenerator generator) throws IOException {
+    public void generate(final @NonNull JsonGenerator generator) throws IOException {
         generator.writeObjectFieldStart("paths");
         for (final var path : paths) {
             path.generate(generator);
