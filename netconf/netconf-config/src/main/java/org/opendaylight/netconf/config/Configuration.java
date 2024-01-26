@@ -25,7 +25,4 @@ public @interface Configuration {
     @AttributeDefinition(min = "0")
     long keep$_$alive$_$millis$_$flexible$_$thread$_$pool()
         default GlobalNetconfProcessingExecutor.DEFAULT_KEEPALIVE_MILLIS;
-    @AttributeDefinition(min = "1")
-    int max$_$thread$_$count$_$scheduled$_$thread$_$pool()
-        default GlobalNetconfSshScheduledExecutor.DEFAULT_MAX_THREAD_COUNT;
 }

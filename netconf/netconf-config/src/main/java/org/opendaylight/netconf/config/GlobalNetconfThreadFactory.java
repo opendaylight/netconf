@@ -12,8 +12,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.controller.config.threadpool.util.NamingThreadPoolFactory;
 
 /**
- * Shared {@link NamingThreadPoolFactory} for {@link GlobalNetconfProcessingExecutor} and
- * {@link GlobalNetconfSshScheduledExecutor}.
+ * Shared {@link NamingThreadPoolFactory} for {@link GlobalNetconfProcessingExecutor}.
  */
 @NonNullByDefault
 public final class GlobalNetconfThreadFactory extends NamingThreadPoolFactory {
