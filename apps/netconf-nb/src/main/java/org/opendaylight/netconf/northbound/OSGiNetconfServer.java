@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.util.Timer;
 import java.util.Map;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
@@ -50,15 +49,12 @@ public final class OSGiNetconfServer {
             final ComponentFactory<DefaultNetconfMonitoringService> monitoringFactory,
             @Reference(target = "(type=mapper-aggregator-registry)")
             final NetconfOperationServiceFactory mapperAggregatorRegistry,
-            @Reference(target = "(type=global-netconf-ssh-scheduled-executor)")
-            final ScheduledThreadPool sshScheduledExecutor,
             @Reference(target = "(type=global-timer)") final Timer timer,
             @Reference final SessionIdProvider sessionIdProvider,
             final Configuration configuration) {
         mappers.onAddNetconfOperationServiceFactory(mapperAggregatorRegistry);
         monitoring = monitoringFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfMonitoringService.props(
-            mapperAggregatorRegistry, sshScheduledExecutor.getExecutor(),
-            configuration.monitoring$_$update$_$interval())));
+            mapperAggregatorRegistry, configuration.monitoring$_$update$_$interval())));
         serverTransportInitializer = new ServerTransportInitializer(NetconfServerSessionNegotiatorFactory.builder()
             .setTimer(timer)
             .setAggregatedOpService(mappers)
