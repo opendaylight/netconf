@@ -33,29 +33,21 @@ public final class GlobalNetconfConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(GlobalNetconfConfiguration.class);
 
     private final ComponentFactory<GlobalNetconfProcessingExecutor> processingFactory;
-    private final ComponentFactory<GlobalNetconfSshScheduledExecutor> sshScheduledFactory;
 
     private GlobalNetconfThreadFactory threadFactory;
     private ComponentInstance<GlobalNetconfProcessingExecutor> processingExecutor;
     private Map<String, ?> processingProps;
-    private ComponentInstance<GlobalNetconfSshScheduledExecutor> sshScheduledExecutor;
-    private Map<String, ?> sshScheduledProps;
 
     @Activate
     public GlobalNetconfConfiguration(
             @Reference(target = "(component.factory=" + GlobalNetconfProcessingExecutor.FACTORY_NAME + ")")
             final ComponentFactory<GlobalNetconfProcessingExecutor> processingFactory,
-            @Reference(target = "(component.factory=" + GlobalNetconfSshScheduledExecutor.FACTORY_NAME + ")")
-            final ComponentFactory<GlobalNetconfSshScheduledExecutor> sshScheduledFactory,
             final Configuration configuration) {
         this.processingFactory = requireNonNull(processingFactory);
-        this.sshScheduledFactory = requireNonNull(sshScheduledFactory);
 
         threadFactory = new GlobalNetconfThreadFactory(configuration.name$_$prefix());
         processingProps = GlobalNetconfProcessingExecutor.props(threadFactory, configuration);
         processingExecutor = processingFactory.newInstance(FrameworkUtil.asDictionary(processingProps));
-        sshScheduledProps = GlobalNetconfSshScheduledExecutor.props(threadFactory, configuration);
-        sshScheduledExecutor = sshScheduledFactory.newInstance(FrameworkUtil.asDictionary(sshScheduledProps));
         LOG.info("Global NETCONF configuration pools started");
     }
 
@@ -65,7 +57,6 @@ public final class GlobalNetconfConfiguration {
         if (!threadFactory.getNamePrefix().equals(newNamePrefix)) {
             threadFactory = new GlobalNetconfThreadFactory(newNamePrefix);
             processingProps = null;
-            sshScheduledProps = null;
             LOG.debug("Forcing restart of all executors");
         }
 
@@ -80,14 +71,6 @@ public final class GlobalNetconfConfiguration {
             LOG.debug("Processing executor restarted with {}", processingProps);
         }
 
-        final var newSshScheduledProps = GlobalNetconfSshScheduledExecutor.props(threadFactory, configuration);
-        if (!newSshScheduledProps.equals(sshScheduledProps)) {
-            sshScheduledProps = newSshScheduledProps;
-            toDispose.add(sshScheduledExecutor);
-            sshScheduledExecutor = sshScheduledFactory.newInstance(FrameworkUtil.asDictionary(sshScheduledProps));
-            LOG.debug("Scheduled executor restarted with {}", sshScheduledProps);
-        }
-
         toDispose.forEach(ComponentInstance::dispose);
     }
 
@@ -95,8 +78,6 @@ public final class GlobalNetconfConfiguration {
     void deactivate() {
         processingExecutor.dispose();
         processingExecutor = null;
-        sshScheduledExecutor.dispose();
-        sshScheduledExecutor = null;
         threadFactory = null;
         LOG.info("Global NETCONF configuration pools stopped");
     }

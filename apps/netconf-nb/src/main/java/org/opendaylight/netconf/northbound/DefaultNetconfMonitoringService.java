@@ -9,8 +9,10 @@ package org.opendaylight.netconf.northbound;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.operations.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.server.osgi.NetconfMonitoringServiceImpl;
@@ -22,14 +24,20 @@ import org.osgi.service.component.annotations.Deactivate;
 public final class DefaultNetconfMonitoringService extends NetconfMonitoringServiceImpl {
     static final String FACTORY_NAME = "org.opendaylight.netconf.impl.mdsal.DefaultNetconfMonitoringService";
 
+    private static final ThreadFactory THREAD_FACTORY = new ThreadFactoryBuilder()
+        .setNameFormat("netconf-server-monitoring-%d")
+        .setDaemon(true)
+        .build();
     private static final String OP_PROVIDER_PROP = ".opProvider";
-    private static final String THREAD_POOL_PROP = ".threadPool";
     private static final String UPDATE_INTERVAL_PROP = ".updateInterval";
+
+    private DefaultNetconfMonitoringService(final NetconfOperationServiceFactory opProvider, final long periodSeconds) {
+        super(opProvider, THREAD_FACTORY, periodSeconds, TimeUnit.SECONDS);
+    }
 
     @Activate
     public DefaultNetconfMonitoringService(final Map<String, ?> properties) {
-        super(OSGiNetconfServer.extractProp(properties, OP_PROVIDER_PROP, NetconfOperationServiceFactory.class),
-            OSGiNetconfServer.extractProp(properties, THREAD_POOL_PROP, ScheduledExecutorService.class),
+        this(OSGiNetconfServer.extractProp(properties, OP_PROVIDER_PROP, NetconfOperationServiceFactory.class),
             OSGiNetconfServer.extractProp(properties, UPDATE_INTERVAL_PROP, Long.class));
     }
 
@@ -39,12 +47,10 @@ public final class DefaultNetconfMonitoringService extends NetconfMonitoringServ
         super.close();
     }
 
-    static Map<String, ?> props(final NetconfOperationServiceFactory opProvider,
-            final ScheduledExecutorService threadPool, final long updateInterval) {
+    static Map<String, ?> props(final NetconfOperationServiceFactory opProvider, final long updateInterval) {
         return Map.of(
             "type", "netconf-server-monitoring",
             OP_PROVIDER_PROP, requireNonNull(opProvider),
-            THREAD_POOL_PROP, requireNonNull(threadPool),
             UPDATE_INTERVAL_PROP, updateInterval);
     }
 }
