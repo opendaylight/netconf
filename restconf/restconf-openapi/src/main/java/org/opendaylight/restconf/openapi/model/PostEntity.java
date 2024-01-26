@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
@@ -29,7 +30,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public final class PostEntity extends OperationEntity {
 
-    private final DocumentedNode parentNode;
+    private final @Nullable DocumentedNode parentNode;
     private static final String INPUT_SUFFIX = "_input";
     private static final String INPUT_KEY = "input";
     private static final String POST_DESCRIPTION = """
@@ -39,21 +40,22 @@ public final class PostEntity extends OperationEntity {
         guidelines of RFC 8040, which allows us to create only one resource in POST request.
         """;
 
-    public PostEntity(final SchemaNode schema, final String deviceName, final String moduleName,
-            final List<ParameterEntity> parameters, final String refPath, final DocumentedNode parentNode) {
-        super(schema, deviceName, moduleName, parameters, refPath);
+    public PostEntity(final @NonNull SchemaNode schema, final @NonNull String deviceName,
+            final @NonNull String moduleName, final @NonNull List<ParameterEntity> parameters,
+            final @NonNull String refPath, final @Nullable DocumentedNode parentNode) {
+        super(requireNonNull(schema), deviceName, moduleName, requireNonNull(parameters), requireNonNull(refPath));
         this.parentNode = parentNode;
     }
 
-    protected String operation() {
+    protected @NonNull String operation() {
         return "post";
     }
 
-    @Nullable String summary() {
-        if (parentNode instanceof Module) {
-            return SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName(), moduleName(), moduleName());
-        }
+    @NonNull String summary() {
         if (parentNode != null) {
+            if (parentNode instanceof Module) {
+                return SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName(), moduleName(), moduleName());
+            }
             return SUMMARY_TEMPLATE.formatted(HttpMethod.POST, deviceName(), moduleName(),
                 ((DataSchemaNode) parentNode).getQName().getLocalName());
         }
@@ -194,18 +196,11 @@ public final class PostEntity extends OperationEntity {
         } else {
             generator.writeStringField(DESCRIPTION, description + POST_DESCRIPTION);
         }
-        final var summary = summary();
-        if (summary != null) {
-            generator.writeStringField(SUMMARY, summary);
-        }
+        generator.writeStringField(SUMMARY, summary());
     }
 
     @Override
-    @Nullable String description() {
-        if (parentNode != null) {
-            return parentNode.getDescription().orElse("");
-        } else {
-            return super.description();
-        }
+    @NonNull String description() {
+        return parentNode == null ? super.description() : parentNode.getDescription().orElse("");
     }
 }
