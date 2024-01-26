@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.Response.Status.OK;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -41,37 +42,38 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
     protected static final String REQUIRED = "required";
     protected static final String REQUEST_BODY = "requestBody";
 
-    private final SchemaNode schema;
-    private final String deviceName;
-    private final String moduleName;
-    private final String refPath;
-    private final List<ParameterEntity> parameters;
+    private final @Nullable SchemaNode schema;
+    private final @NonNull String deviceName;
+    private final @NonNull String moduleName;
+    private final @Nullable String refPath;
+    private final @Nullable List<ParameterEntity> parameters;
 
-    protected SchemaNode schema() {
+    protected @Nullable SchemaNode schema() {
         return schema;
     }
 
-    protected String deviceName() {
+    protected @NonNull String deviceName() {
         return deviceName;
     }
 
-    protected String moduleName() {
+    protected @NonNull String moduleName() {
         return moduleName;
     }
 
-    protected List<ParameterEntity> parameters() {
+    protected @Nullable List<ParameterEntity> parameters() {
         return parameters;
     }
 
-    protected String refPath() {
+    protected @Nullable String refPath() {
         return refPath;
     }
 
-    public OperationEntity(final SchemaNode schema, final String deviceName, final String moduleName,
-            final List<ParameterEntity> parameters, final String refPath) {
+    public OperationEntity(final @Nullable SchemaNode schema, final @NonNull String deviceName,
+            final @NonNull String moduleName, final @Nullable List<ParameterEntity> parameters,
+            final @Nullable String refPath) {
         this.schema = schema;
-        this.deviceName = deviceName;
-        this.moduleName = moduleName;
+        this.deviceName = requireNonNull(deviceName);
+        this.moduleName = requireNonNull(moduleName);
         this.parameters = parameters;
         this.refPath = refPath;
     }
@@ -92,34 +94,25 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
     }
 
     public void generateBasics(@NonNull JsonGenerator generator) throws IOException {
-        final var description = description();
-        if (description != null) {
-            generator.writeStringField(DESCRIPTION, description);
-        }
-        final var summary = summary();
-        if (summary != null) {
-            generator.writeStringField(SUMMARY, summary);
-        }
+        generator.writeStringField(DESCRIPTION, description());
+        generator.writeStringField(SUMMARY, summary());
     }
 
-    protected abstract String operation();
+    protected @NonNull abstract String operation();
 
     @Nullable Boolean deprecated() {
         return Boolean.FALSE;
     }
 
-    @Nullable String description() {
-        return schema.getDescription().orElse("");
+    @NonNull String description() {
+        return schema == null ? "" : schema.getDescription().orElse("");
     }
 
     @Nullable String nodeName() {
-        if (schema() != null) {
-            return schema().getQName().getLocalName();
-        }
-        return null;
+        return schema == null ? null : schema.getQName().getLocalName();
     }
 
-    @Nullable abstract String summary();
+    @NonNull abstract String summary();
 
     void generateRequestBody(final @NonNull JsonGenerator generator) throws IOException {
         // No-op
@@ -137,14 +130,17 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
 
     void generateParams(final @NonNull JsonGenerator generator) throws IOException {
         generator.writeArrayFieldStart(PARAMETERS);
-        if (!parameters().isEmpty()) {
-            for (final var parameter : parameters()) {
+        final var parametersList = requireNonNull(parameters());
+        if (!parametersList.isEmpty()) {
+            for (final var parameter : parametersList) {
                 generator.writeStartObject();
                 generator.writeStringField(NAME, parameter.name());
                 generator.writeStringField(IN, parameter.in());
                 generator.writeBooleanField(REQUIRED, parameter.required());
                 generator.writeObjectFieldStart(SCHEMA);
-                generator.writeStringField(TYPE, parameter.schema().type());
+                if (parameter.schema() != null) {
+                    generator.writeStringField(TYPE, parameter.schema().type());
+                }
                 generator.writeEndObject(); //end of schema
                 if (parameter.description() != null) {
                     generator.writeStringField(DESCRIPTION, parameter.description());
@@ -156,8 +152,8 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
     }
 
 
-    protected static void generateMediaTypeSchemaRef(final JsonGenerator generator, final String mediaType,
-            final String ref) throws IOException {
+    protected static void generateMediaTypeSchemaRef(final @NonNull JsonGenerator generator,
+            final @NonNull String mediaType, final @NonNull String ref) throws IOException {
         generator.writeObjectFieldStart(mediaType);
         generator.writeObjectFieldStart(SCHEMA);
         generator.writeStringField(REF, ref);
@@ -165,7 +161,7 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
         generator.writeEndObject();
     }
 
-    void generateGetRoot(final JsonGenerator generator, final String resourceType)
+    void generateGetRoot(final @NonNull JsonGenerator generator, final @NonNull String resourceType)
             throws IOException {
         generator.writeObjectFieldStart("get");
         if (resourceType.equals("data")) {
