@@ -19,7 +19,6 @@ import io.netty.util.Timer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
@@ -130,7 +129,8 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
     public NetconfNodeHandler(final NetconfClientFactory clientFactory, final Timer timer,
             final BaseNetconfSchemas baseSchemas, final SchemaResourceManager schemaManager,
-            final Executor processingExecutor, final NetconfClientConfigurationBuilderFactory builderFactory,
+            final NetconfTopologySchemaAssembler schemaAssembler,
+            final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
             final RemoteDeviceId deviceId, final NodeId nodeId, final NetconfNode node,
             final NetconfNodeAugmentedOptional nodeOptional) {
@@ -174,7 +174,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(node.requireReconnectOnChangedSchema())
                 .setSchemaResourcesDTO(resources)
-                .setGlobalProcessingExecutor(processingExecutor)
+                .setGlobalProcessingExecutor(schemaAssembler.executor())
                 .setId(deviceId)
                 .setSalFacade(salFacade)
                 .setDeviceActionFactory(deviceActionFactory)

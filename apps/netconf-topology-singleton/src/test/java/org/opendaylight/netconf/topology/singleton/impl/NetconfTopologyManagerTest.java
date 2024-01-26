@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,6 +61,7 @@ import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
+import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -110,6 +112,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     @Mock
     private NetconfClientConfigurationBuilderFactory builderFactory;
 
+    private NetconfTopologySchemaAssembler schemaAssembler;
     private DataBroker dataBroker;
 
     private final Map<InstanceIdentifier<Node>, Function<NetconfTopologySetup, NetconfTopologyContext>>
@@ -117,6 +120,8 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setUp() throws Exception {
+        schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
+
         AbstractDataBrokerTest dataBrokerTest = new AbstractDataBrokerTest() {
             @Override
             protected Set<YangModuleInfo> getModuleInfos() throws Exception {
@@ -132,7 +137,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any());
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
-                timer, processingService, actorSystem, clientFactory, mountPointService, encryptionService,
+                timer, schemaAssembler, actorSystem, clientFactory, mountPointService, encryptionService,
                 rpcProviderService, actionFactory, new DefaultSchemaResourceManager(new DefaultYangParserFactory()),
                 builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
@@ -144,6 +149,11 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
                         "No mock context for " + setup.getInstanceIdentifier()).apply(setup);
             }
         };
+    }
+
+    @After
+    public void after() {
+        schemaAssembler.close();
     }
 
     @Test

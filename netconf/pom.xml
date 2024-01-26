@@ -29,7 +29,6 @@
   </properties>
 
   <modules>
-    <module>netconf-config</module>
     <module>netconf-netty-util</module>
     <module>netconf-auth</module>
     <module>yanglib</module>
