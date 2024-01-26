@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.callhome.mount;
 
 import io.netty.util.Timer;
-import java.util.concurrent.Executor;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
@@ -17,17 +16,18 @@ import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
+import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
 // Non-final for mocking
 class CallHomeTopology extends AbstractNetconfTopology {
     CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
-            final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
+            final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final NetconfClientConfigurationBuilderFactory builderFactory, final BaseNetconfSchemas baseSchemas,
             final DeviceActionFactory deviceActionFactory) {
-        super(topologyId, clientFactory, timer, processingExecutor, schemaRepositoryProvider, dataBroker,
+        super(topologyId, clientFactory, timer, schemaAssembler, schemaRepositoryProvider, dataBroker,
             mountPointService, builderFactory, deviceActionFactory, baseSchemas);
     }
 

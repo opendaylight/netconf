@@ -12,13 +12,13 @@ import static java.util.Objects.requireNonNull;
 import akka.actor.ActorSystem;
 import io.netty.util.Timer;
 import java.time.Duration;
-import java.util.concurrent.Executor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -28,7 +28,7 @@ public final class NetconfTopologySetup {
     private final InstanceIdentifier<Node> instanceIdentifier;
     private final Node node;
     private final Timer timer;
-    private final Executor processingExecutor;
+    private final NetconfTopologySchemaAssembler schemaAssembler;
     private final ActorSystem actorSystem;
     private final NetconfClientFactory netconfClientFactory;
     private final String topologyId;
@@ -42,7 +42,7 @@ public final class NetconfTopologySetup {
         instanceIdentifier = builder.getInstanceIdentifier();
         node = builder.getNode();
         timer = builder.getTimer();
-        processingExecutor = builder.getProcessingExecutor();
+        schemaAssembler = builder.getSchemaAssembler();
         actorSystem = builder.getActorSystem();
         netconfClientFactory = builder.getNetconfClientFactory();
         topologyId = builder.getTopologyId();
@@ -67,8 +67,8 @@ public final class NetconfTopologySetup {
         return node;
     }
 
-    public Executor getProcessingExecutor() {
-        return processingExecutor;
+    public NetconfTopologySchemaAssembler getSchemaAssembler() {
+        return schemaAssembler;
     }
 
     public Timer getTimer() {
@@ -109,7 +109,7 @@ public final class NetconfTopologySetup {
         private InstanceIdentifier<Node> instanceIdentifier;
         private Node node;
         private Timer timer;
-        private Executor processingExecutor;
+        private NetconfTopologySchemaAssembler schemaAssembler;
         private ActorSystem actorSystem;
         private String topologyId;
         private NetconfClientFactory netconfClientFactory;
@@ -180,12 +180,13 @@ public final class NetconfTopologySetup {
             return this;
         }
 
-        Executor getProcessingExecutor() {
-            return processingExecutor;
+
+        NetconfTopologySchemaAssembler getSchemaAssembler() {
+            return schemaAssembler;
         }
 
-        public Builder setProcessingExecutor(final Executor processingExecutor) {
-            this.processingExecutor = processingExecutor;
+        public Builder setSchemaAssembler(final NetconfTopologySchemaAssembler schemaAssembler) {
+            this.schemaAssembler = schemaAssembler;
             return this;
         }
 
