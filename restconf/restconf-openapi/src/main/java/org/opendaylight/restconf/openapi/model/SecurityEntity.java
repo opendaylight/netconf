@@ -7,21 +7,24 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.eclipse.jdt.annotation.NonNull;
 
 public final class SecurityEntity extends OpenApiEntity {
-    private final List<Map<String, List<String>>> security;
+    private final @NonNull List<Map<String, List<String>>> security;
 
-    public SecurityEntity(final List<Map<String, List<String>>> security) {
-        this.security = security;
+    public SecurityEntity(final @NonNull List<Map<String, List<String>>> security) {
+        this.security = requireNonNull(security);
     }
 
     @Override
-    public void generate(final JsonGenerator generator) throws IOException {
-        if (security != null && !security.isEmpty()) {
+    public void generate(final @NonNull JsonGenerator generator) throws IOException {
+        if (!security.isEmpty()) {
             generator.writeFieldName("security");
             generator.writeStartArray();
             for (final var securityMap : security) {
