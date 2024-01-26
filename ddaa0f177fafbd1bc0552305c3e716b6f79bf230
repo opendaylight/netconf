@@ -16,6 +16,24 @@
       "message": "Why?",
       "revId": "ddaa0f177fafbd1bc0552305c3e716b6f79bf230",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99b90324_70c6e186",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-26T13:20:29Z",
+      "side": 1,
+      "message": "Just because in OpenApiInputStream constructor we have collection and now when SchemasStream#read() we need to have collection of all modules if we dont use while cycle, iterator is not necessary IMO. But could be used.",
+      "parentUuid": "006f657a_676d714c",
+      "revId": "ddaa0f177fafbd1bc0552305c3e716b6f79bf230",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
