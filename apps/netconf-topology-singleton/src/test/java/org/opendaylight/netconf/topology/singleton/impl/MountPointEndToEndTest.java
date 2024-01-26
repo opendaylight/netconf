@@ -30,7 +30,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
 import io.netty.util.Timer;
@@ -107,6 +106,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUti
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactoryImpl;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
+import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -234,10 +234,13 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private final ContainerNode getTopInput = ImmutableNodes.containerNode(GetTopInput.QNAME);
 
     private SchemaResourceManager resourceManager;
+    private NetconfTopologySchemaAssembler schemaAssembler;
 
     @Before
     public void setUp() throws Exception {
         deleteCacheDir();
+
+        schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
 
         resourceManager = new DefaultSchemaResourceManager(new DefaultYangParserFactory(), TEST_ROOT_DIRECTORY,
             TEST_DEFAULT_SUBDIR);
@@ -292,6 +295,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         deleteCacheDir();
         TestKit.shutdownActorSystem(slaveSystem, true);
         TestKit.shutdownActorSystem(masterSystem, true);
+        schemaAssembler.close();
     }
 
     private void setupMaster() throws Exception {
@@ -314,7 +318,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 YangTextSchemaSource.class, 1));
 
         masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
-                masterClusterSingletonServiceProvider, mockTimer, MoreExecutors.directExecutor(), masterSystem,
+                masterClusterSingletonServiceProvider, mockTimer, schemaAssembler, masterSystem,
                 mockClientFactory, masterMountPointService, mockEncryptionService, mockRpcProviderService,
                 deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override
@@ -350,7 +354,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 .registerClusterSingletonService(any());
 
         slaveNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, slaveDataBroker,
-                mockSlaveClusterSingletonServiceProvider, mockTimer, MoreExecutors.directExecutor(), slaveSystem,
+                mockSlaveClusterSingletonServiceProvider, mockTimer, schemaAssembler, slaveSystem,
                 mockClientFactory, slaveMountPointService, mockEncryptionService, mockRpcProviderService,
                 deviceActionFactory, resourceManager, builderFactory, TOPOLOGY_ID, Uint16.ZERO) {
             @Override

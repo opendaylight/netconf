@@ -142,7 +142,7 @@ final class NetconfNodeContext implements AutoCloseable {
         masterSalFacade = createSalFacade(netconfNode.requireLockDatastore());
 
         nodeHandler = new NetconfNodeHandler(setup.getNetconfClientFactory(), setup.getTimer(), setup.getBaseSchemas(),
-            schemaManager, setup.getProcessingExecutor(), builderFactory, deviceActionFactory, masterSalFacade,
+            schemaManager, setup.getSchemaAssembler(), builderFactory, deviceActionFactory, masterSalFacade,
             remoteDeviceId, configNode.getNodeId(), netconfNode, nodeOptional);
         nodeHandler.connect();
     }
