@@ -94,15 +94,16 @@ public class PropertyEntity {
         "\\\\D", "[^0-9]", "\\\\s", "[ \t\n\f\r]", "\\\\S", "[^ \t\n\f\r]",
         "\\\\w", "[a-zA-Z_0-9]", "\\\\W", "[^a-zA-Z_0-9]");
 
-    private final DataSchemaNode node;
-    private final JsonGenerator generator;
-    private final List<String> required;
-    private final String parentName;
-    private final DefinitionNames definitionNames;
+    private final @NonNull DataSchemaNode node;
+    private final @NonNull JsonGenerator generator;
+    private final @NonNull List<String> required;
+    private final @NonNull String parentName;
+    private final @NonNull DefinitionNames definitionNames;
 
-    public PropertyEntity(final DataSchemaNode node, final JsonGenerator generator, final SchemaInferenceStack stack,
-            final List<String> required, final String parentName, final boolean isParentConfig,
-            final DefinitionNames definitionNames) throws IOException {
+    public PropertyEntity(final @NonNull DataSchemaNode node, final @NonNull JsonGenerator generator,
+            final @NonNull SchemaInferenceStack stack, final @NonNull List<String> required,
+            final @NonNull String parentName, final boolean isParentConfig,
+            final @NonNull DefinitionNames definitionNames) throws IOException {
         this.node = requireNonNull(node);
         this.generator = requireNonNull(generator);
         this.required = requireNonNull(required);
