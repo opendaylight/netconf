@@ -7,16 +7,18 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 
 public final class ServersEntity extends OpenApiEntity {
-    private final List<ServerEntity> servers;
+    private final @NonNull List<ServerEntity> servers;
 
-    public ServersEntity(final List<ServerEntity> servers) {
-        this.servers = servers;
+    public ServersEntity(final @NonNull List<ServerEntity> servers) {
+        this.servers = requireNonNull(servers);
     }
 
     @Override
