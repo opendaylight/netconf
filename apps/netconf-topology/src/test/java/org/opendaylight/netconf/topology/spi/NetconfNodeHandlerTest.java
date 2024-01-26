@@ -28,8 +28,8 @@ import io.netty.util.Timer;
 import io.netty.util.TimerTask;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -84,8 +84,6 @@ public class NetconfNodeHandlerTest {
     @Mock
     private SchemaResourceManager schemaManager;
     @Mock
-    private Executor processingExecutor;
-    @Mock
     private DeviceActionFactory deviceActionFactory;
     @Mock
     private RemoteDeviceHandler delegate;
@@ -118,6 +116,7 @@ public class NetconfNodeHandlerTest {
     @Mock
     private EffectiveModelContext schemaContext;
 
+    private NetconfTopologySchemaAssembler schemaAssembler;
     private NetconfNodeHandler handler;
 
     @BeforeClass
@@ -132,8 +131,10 @@ public class NetconfNodeHandlerTest {
 
     @Before
     public void before() {
+        schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
+
         // Instantiate the handler
-        handler = new NetconfNodeHandler(clientFactory, timer, BASE_SCHEMAS, schemaManager, processingExecutor,
+        handler = new NetconfNodeHandler(clientFactory, timer, BASE_SCHEMAS, schemaManager, schemaAssembler,
             new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
                 sslHandlerFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
@@ -159,6 +160,11 @@ public class NetconfNodeHandlerTest {
                         .build())
                     .build())
                 .build(), null);
+    }
+
+    @After
+    public void after() {
+        schemaAssembler.close();
     }
 
     @Test

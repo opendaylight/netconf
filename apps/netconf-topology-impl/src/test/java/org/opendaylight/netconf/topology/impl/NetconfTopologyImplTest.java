@@ -12,10 +12,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.Timer;
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -35,6 +34,7 @@ import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemas;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
+import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -86,75 +86,74 @@ class NetconfTopologyImplTest {
     @Mock
     private DataTreeModification<Node> treeMod;
 
-    private TestingNetconfTopologyImpl topology;
-    private TestingNetconfTopologyImpl spyTopology;
-
     @Test
     void testOnDataTreeChange() throws Exception {
         doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
         doReturn(CommitInfo.emptyFluentFuture()).when(wtx).commit();
 
-        topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(), mockedClientFactory,
-            mockedTimer, MoreExecutors.directExecutor(), mockedResourceManager, dataBroker, mountPointService,
-            encryptionService, builderFactory, rpcProviderService,
-            new DefaultBaseNetconfSchemas(new DefaultYangParserFactory()));
-        //verify initialization of topology
-        verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, TOPOLOGY_PATH,
-            new TopologyBuilder().withKey(TOPOLOGY_KEY).build());
+        try (var schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS)) {
+            final var topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(),
+                mockedClientFactory, mockedTimer, schemaAssembler, mockedResourceManager, dataBroker, mountPointService,
+                encryptionService, builderFactory, rpcProviderService,
+                new DefaultBaseNetconfSchemas(new DefaultYangParserFactory()));
+            //verify initialization of topology
+            verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, TOPOLOGY_PATH,
+                new TopologyBuilder().withKey(TOPOLOGY_KEY).build());
 
-        spyTopology = spy(topology);
+            final var spyTopology = spy(topology);
 
-        final var key = new NodeKey(new NodeId("testing-node"));
-        final var node = new NodeBuilder()
-            .withKey(key)
-            .addAugmentation(new NetconfNodeBuilder()
-                .setLockDatastore(true)
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setMinBackoffMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(true)
-                .setCredentials(new LoginPwUnencryptedBuilder()
-                    .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
-                        .setUsername("testuser")
-                        .setPassword("testpassword")
+            final var key = new NodeKey(new NodeId("testing-node"));
+            final var node = new NodeBuilder()
+                .withKey(key)
+                .addAugmentation(new NetconfNodeBuilder()
+                    .setLockDatastore(true)
+                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                    .setPort(new PortNumber(Uint16.valueOf(9999)))
+                    .setReconnectOnChangedSchema(true)
+                    .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+                    .setMinBackoffMillis(Uint16.valueOf(100))
+                    .setKeepaliveDelay(Uint32.valueOf(1000))
+                    .setTcpOnly(true)
+                    .setCredentials(new LoginPwUnencryptedBuilder()
+                        .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                            .setUsername("testuser")
+                            .setPassword("testpassword")
+                            .build())
                         .build())
                     .build())
-                .build())
-            .build();
+                .build();
 
-        doReturn(DataObjectModification.ModificationType.WRITE).when(objMod).getModificationType();
-        doReturn(node).when(objMod).getDataAfter();
+            doReturn(DataObjectModification.ModificationType.WRITE).when(objMod).getModificationType();
+            doReturn(node).when(objMod).getDataAfter();
 
-        doReturn(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, TOPOLOGY_PATH.child(Node.class, key)))
-            .when(treeMod).getRootPath();
-        final var changes = List.of(treeMod);
+            doReturn(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
+                TOPOLOGY_PATH.child(Node.class, key))).when(treeMod).getRootPath();
+            final var changes = List.of(treeMod);
 
-        doReturn(objMod).when(treeMod).getRootNode();
-        spyTopology.onDataTreeChanged(changes);
-        verify(spyTopology).ensureNode(node);
+            doReturn(objMod).when(treeMod).getRootNode();
+            spyTopology.onDataTreeChanged(changes);
+            verify(spyTopology).ensureNode(node);
 
-        doReturn(DataObjectModification.ModificationType.DELETE).when(objMod).getModificationType();
-        spyTopology.onDataTreeChanged(changes);
-        verify(spyTopology).deleteNode(key.getNodeId());
+            doReturn(DataObjectModification.ModificationType.DELETE).when(objMod).getModificationType();
+            spyTopology.onDataTreeChanged(changes);
+            verify(spyTopology).deleteNode(key.getNodeId());
 
-        doReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED).when(objMod).getModificationType();
-        spyTopology.onDataTreeChanged(changes);
+            doReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED).when(objMod).getModificationType();
+            spyTopology.onDataTreeChanged(changes);
 
-        // one in previous creating and deleting node and one in updating
-        verify(spyTopology, times(2)).ensureNode(node);
+            // one in previous creating and deleting node and one in updating
+            verify(spyTopology, times(2)).ensureNode(node);
+        }
     }
 
     private static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
         TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
-                final Executor processingExecutor, final SchemaResourceManager schemaRepositoryProvider,
-                final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                final AAAEncryptionService encryptionService,
+                final NetconfTopologySchemaAssembler schemaAssembler,
+                final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
+                final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
                 final NetconfClientConfigurationBuilderFactory builderFactory,
                 final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas) {
-            super(topologyId, clientFactory, timer, processingExecutor, schemaRepositoryProvider,
+            super(topologyId, clientFactory, timer, schemaAssembler, schemaRepositoryProvider,
                 dataBroker, mountPointService, encryptionService, builderFactory, rpcProviderService, baseSchemas);
         }
 

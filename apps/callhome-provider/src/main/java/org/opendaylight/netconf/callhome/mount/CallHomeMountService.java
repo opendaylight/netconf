@@ -16,11 +16,9 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
@@ -41,6 +39,7 @@ import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
+import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -121,25 +120,24 @@ public final class CallHomeMountService implements AutoCloseable {
     @Inject
     public CallHomeMountService(
             final @Reference(target = "(type=global-timer)") Timer timer,
-            final @Reference(target = "(type=global-netconf-processing-executor)") ThreadPool processingThreadPool,
+            final @Reference NetconfTopologySchemaAssembler schemaAssembler,
             final @Reference SchemaResourceManager schemaRepositoryProvider,
             final @Reference BaseNetconfSchemas baseSchemas,
             final @Reference DataBroker dataBroker,
             final @Reference DOMMountPointService mountService,
             final @Reference DeviceActionFactory deviceActionFactory) {
-        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer,
-            processingThreadPool.getExecutor(), schemaRepositoryProvider, baseSchemas,
+        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer, schemaAssembler, schemaRepositoryProvider, baseSchemas,
             dataBroker, mountService, deviceActionFactory);
     }
 
-    public CallHomeMountService(final String topologyId, final Timer timer, final Executor executor,
-            final SchemaResourceManager schemaRepositoryProvider, final BaseNetconfSchemas baseSchemas,
-            final DataBroker dataBroker, final DOMMountPointService mountService,
+    public CallHomeMountService(final String topologyId, final Timer timer,
+            final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
+            final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker, final DOMMountPointService mountService,
             final DeviceActionFactory deviceActionFactory) {
 
         final var clientConfBuilderFactory = createClientConfigurationBuilderFactory();
         final var clientFactory = createClientFactory();
-        topology = new CallHomeTopology(topologyId, clientFactory, timer, executor,
+        topology = new CallHomeTopology(topologyId, clientFactory, timer, schemaAssembler,
             schemaRepositoryProvider, dataBroker, mountService, clientConfBuilderFactory,
             baseSchemas, deviceActionFactory);
     }
@@ -220,7 +218,7 @@ public final class CallHomeMountService implements AutoCloseable {
             }
 
             @Override
-            public void remove(String id) {
+            public void remove(final String id) {
                 super.remove(id);
                 topology.disableNode(new NodeId(id));
             }
@@ -239,7 +237,7 @@ public final class CallHomeMountService implements AutoCloseable {
             }
 
             @Override
-            public void remove(String id) {
+            public void remove(final String id) {
                 super.remove(id);
                 topology.disableNode(new NodeId(id));
             }
