@@ -16,6 +16,24 @@
       "message": "We are not using TLS protocol. Are we?",
       "revId": "b75f66917f5b70c2b64d6f51c48b5e40b4d431d9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66938a0d_b1011626",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-01-26T18:26:20Z",
+      "side": 1,
+      "message": "We aren\u0027t. But request is same. So I used link to point on it. Should I duplicate this request here instead?",
+      "parentUuid": "ff861c17_ee869a82",
+      "revId": "b75f66917f5b70c2b64d6f51c48b5e40b4d431d9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
