@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.Map;
@@ -15,10 +17,10 @@ import org.opendaylight.restconf.openapi.model.security.Http;
 import org.opendaylight.restconf.openapi.model.security.SecuritySchemeObject;
 
 public final class SecuritySchemesEntity extends OpenApiEntity {
-    private final Map<String, SecuritySchemeObject> schemes;
+    private final @NonNull Map<String, SecuritySchemeObject> schemes;
 
-    public SecuritySchemesEntity(final Map<String, SecuritySchemeObject> schemes) {
-        this.schemes = schemes;
+    public SecuritySchemesEntity(final @NonNull Map<String, SecuritySchemeObject> schemes) {
+        this.schemes = requireNonNull(schemes);
     }
 
     @Override
