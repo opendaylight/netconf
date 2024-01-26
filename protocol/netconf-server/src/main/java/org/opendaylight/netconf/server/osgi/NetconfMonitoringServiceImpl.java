@@ -10,7 +10,9 @@ package org.opendaylight.netconf.server.osgi;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.server.api.monitoring.SessionListener;
@@ -24,15 +26,31 @@ import org.opendaylight.yangtools.concepts.Registration;
 public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, AutoCloseable {
     private final NetconfCapabilityMonitoringService capabilityMonitoring;
     private final NetconfSessionMonitoringService sessionMonitoring;
+    private final ScheduledExecutorService executorService;
 
     private NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider,
             final NetconfSessionMonitoringService sessionMonitoring) {
         capabilityMonitoring = new NetconfCapabilityMonitoringService(opProvider);
         this.sessionMonitoring = requireNonNull(sessionMonitoring);
+        executorService = null;
     }
 
     public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider) {
         this(opProvider, new NetconfSessionMonitoringService.WithoutUpdates());
+    }
+
+    public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider,
+            final ThreadFactory threadFactory, final long period, final TimeUnit timeUnit) {
+        capabilityMonitoring = new NetconfCapabilityMonitoringService(opProvider);
+        if (period > 0) {
+            executorService = Executors.unconfigurableScheduledExecutorService(
+                // Note: 0 core pool size, as we want to shut the thread down when we do not have listeners
+                Executors.newScheduledThreadPool(0, threadFactory));
+            sessionMonitoring = new NetconfSessionMonitoringService.WithUpdates(executorService, period, timeUnit);
+        } else {
+            executorService = null;
+            sessionMonitoring = new NetconfSessionMonitoringService.WithoutUpdates();
+        }
     }
 
     public NetconfMonitoringServiceImpl(final NetconfOperationServiceFactory opProvider,
@@ -85,5 +103,8 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     public void close() {
         capabilityMonitoring.close();
         sessionMonitoring.close();
+        if (executorService != null) {
+            executorService.shutdown();
+        }
     }
 }
