@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.Response.Status.OK;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -23,19 +24,20 @@ public final class GetEntity extends OperationEntity {
 
     private final boolean isConfig;
 
-    public GetEntity(final SchemaNode schema, final String deviceName, final String moduleName,
-            final List<ParameterEntity> parameters, final String refPath, final boolean isConfig) {
+    public GetEntity(final @Nullable SchemaNode schema, final @NonNull String deviceName,
+            final @NonNull String moduleName, final @Nullable List<ParameterEntity> parameters,
+            final @Nullable String refPath, final boolean isConfig) {
         super(schema, deviceName, moduleName, parameters, refPath);
         this.isConfig = isConfig;
     }
 
     @Override
-    protected String operation() {
+    protected @NonNull String operation() {
         return "get";
     }
 
     @Override
-    @Nullable String summary() {
+    @NonNull String summary() {
         return SUMMARY_TEMPLATE.formatted(HttpMethod.GET, deviceName(), moduleName(), nodeName());
     }
 
@@ -74,15 +76,17 @@ public final class GetEntity extends OperationEntity {
     void generateParams(@NonNull JsonGenerator generator) throws IOException {
         final var contentParam = new ParameterEntity(CONTENT, "query", !isConfig,
             new ParameterSchemaEntity("string", List.of("config", "nonconfig", "all")), null);
-        parameters().add(contentParam);
+        final var parameters = requireNonNull(parameters());
+        parameters.add(contentParam);
         generator.writeArrayFieldStart(PARAMETERS);
-        for (final var parameter : parameters()) {
-            final var schemaEnum = parameter.schema().schemaEnum();
+        for (final var parameter : parameters) {
+            final var parameterSchema = requireNonNull(parameter.schema());
             generator.writeStartObject();
             generator.writeStringField(NAME, parameter.name());
             generator.writeStringField(IN, parameter.in());
             generator.writeBooleanField(REQUIRED, parameter.required());
             generator.writeObjectFieldStart(SCHEMA);
+            final var schemaEnum = parameter.schema().schemaEnum();
             if (schemaEnum != null) {
                 generator.writeArrayFieldStart("enum");
                 for (final var enumCase : schemaEnum) {
@@ -90,7 +94,7 @@ public final class GetEntity extends OperationEntity {
                 }
                 generator.writeEndArray(); //end of enum
             }
-            generator.writeStringField(TYPE, parameter.schema().type());
+            generator.writeStringField(TYPE, parameterSchema.type());
             generator.writeEndObject(); //end of schema
             if (parameter.description() != null) {
                 generator.writeStringField(DESCRIPTION, parameter.description());
@@ -98,6 +102,6 @@ public final class GetEntity extends OperationEntity {
             generator.writeEndObject(); //end of parameter
         }
         generator.writeEndArray(); //end of params
-        parameters().remove(contentParam);
+        parameters.remove(contentParam);
     }
 }

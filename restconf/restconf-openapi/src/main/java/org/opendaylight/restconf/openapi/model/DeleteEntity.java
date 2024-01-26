@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -19,18 +20,19 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public final class DeleteEntity extends OperationEntity {
 
-    public DeleteEntity(final SchemaNode schema, final String deviceName, final String moduleName,
-            final List<ParameterEntity> parameters, final String refPath) {
-        super(schema, deviceName, moduleName, parameters, refPath);
+    public DeleteEntity(final @NonNull SchemaNode schema, final @NonNull String deviceName,
+            final @NonNull String moduleName, final @NonNull List<ParameterEntity> parameters,
+            final @Nullable String refPath) {
+        super(requireNonNull(schema), deviceName, moduleName, requireNonNull(parameters), refPath);
     }
 
     @Override
-    protected String operation() {
+    protected @NonNull String operation() {
         return "delete";
     }
 
     @Override
-    @Nullable String summary() {
+    @NonNull String summary() {
         return SUMMARY_TEMPLATE.formatted(HttpMethod.DELETE, deviceName(), moduleName(), nodeName());
     }
 

@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
 
@@ -15,27 +16,27 @@ import java.io.IOException;
 import java.util.List;
 import javax.ws.rs.HttpMethod;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public final class PatchEntity extends OperationEntity {
 
-    private final String fullName;
+    private final @NonNull String fullName;
 
-    public PatchEntity(final SchemaNode schema, final String deviceName, final String moduleName,
-            final List<ParameterEntity> parameters, final String refPath, final String fullName) {
-        super(schema, deviceName, moduleName, parameters, refPath);
-        this.fullName = fullName;
+    public PatchEntity(final @NonNull SchemaNode schema, final @NonNull String deviceName,
+            final @NonNull String moduleName, final @NonNull List<ParameterEntity> parameters,
+            final @NonNull String refPath, final @NonNull String fullName) {
+        super(requireNonNull(schema), deviceName, moduleName, requireNonNull(parameters), requireNonNull(refPath));
+        this.fullName = requireNonNull(fullName);
     }
 
     @Override
-    protected String operation() {
+    protected @NonNull String operation() {
         return "patch";
     }
 
     @Override
-    @Nullable String summary() {
+    @NonNull String summary() {
         return SUMMARY_TEMPLATE.formatted(HttpMethod.PATCH, moduleName(), deviceName(), nodeName());
     }
 
