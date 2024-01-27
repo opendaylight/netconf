@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.netty.channel.Channel;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.HashSet;
@@ -22,6 +21,7 @@ import org.checkerframework.checker.index.qual.NonNegative;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.HelloMessage;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -32,21 +32,21 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 
 // non-final for testing and netconf-testtool (for some reason)
 public class NetconfServerSessionNegotiatorFactory {
-    public static final Set<String> DEFAULT_BASE_CAPABILITIES = ImmutableSet.of(
+    public static final ImmutableSet<String> DEFAULT_BASE_CAPABILITIES = ImmutableSet.of(
         CapabilityURN.BASE,
         CapabilityURN.BASE_1_1,
         CapabilityURN.EXI,
         CapabilityURN.NOTIFICATION);
 
     private final @NonNegative int maximumIncomingChunkSize;
-    private final Timer timer;
+    private final NetconfTimer timer;
     private final SessionIdProvider idProvider;
     private final NetconfOperationServiceFactory aggregatedOpService;
     private final long connectionTimeoutMillis;
     private final NetconfMonitoringService monitoringService;
     private final Set<String> baseCapabilities;
 
-    protected NetconfServerSessionNegotiatorFactory(final Timer timer,
+    protected NetconfServerSessionNegotiatorFactory(final NetconfTimer timer,
             final NetconfOperationServiceFactory netconfOperationProvider, final SessionIdProvider idProvider,
             final long connectionTimeoutMillis,  final NetconfMonitoringService monitoringService,
             final Set<String> baseCapabilities) {
@@ -54,11 +54,11 @@ public class NetconfServerSessionNegotiatorFactory {
             NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
-    private NetconfServerSessionNegotiatorFactory(final Timer timer,
+    private NetconfServerSessionNegotiatorFactory(final NetconfTimer timer,
             final NetconfOperationServiceFactory netconfOperationProvider, final SessionIdProvider idProvider,
             final long connectionTimeoutMillis, final NetconfMonitoringService monitoringService,
             final Set<String> baseCapabilities, final @NonNegative int maximumIncomingChunkSize) {
-        this.timer = timer;
+        this.timer = requireNonNull(timer);
         aggregatedOpService = netconfOperationProvider;
         this.idProvider = idProvider;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
@@ -124,7 +124,7 @@ public class NetconfServerSessionNegotiatorFactory {
     public static final class Builder {
         private @NonNegative int maximumIncomingChunkSize =
             NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE;
-        private Timer timer;
+        private NetconfTimer timer;
         private SessionIdProvider idProvider;
         private NetconfOperationServiceFactory aggregatedOpService;
         private long connectionTimeoutMillis;
@@ -135,8 +135,8 @@ public class NetconfServerSessionNegotiatorFactory {
             // Hidden on purpose
         }
 
-        public Builder setTimer(final Timer timer) {
-            this.timer = timer;
+        public Builder setTimer(final NetconfTimer timer) {
+            this.timer = requireNonNull(timer);
             return this;
         }
 

@@ -19,7 +19,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.Timeout;
-import io.netty.util.Timer;
 import io.netty.util.TimerTask;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +36,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -60,7 +60,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
     private final RemoteDeviceHandler deviceHandler;
     private final RemoteDeviceId deviceId;
-    private final Timer timer;
+    private final NetconfTimer timer;
     private final long keepaliveDelaySeconds;
     private final long timeoutNanos;
     private final long delayNanos;
@@ -68,8 +68,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     private volatile NetconfDeviceCommunicator listener;
     private volatile KeepaliveTask task;
 
-    public KeepaliveSalFacade(final RemoteDeviceId deviceId, final RemoteDeviceHandler deviceHandler, final Timer timer,
-            final long keepaliveDelaySeconds, final long requestTimeoutMillis) {
+    public KeepaliveSalFacade(final RemoteDeviceId deviceId, final RemoteDeviceHandler deviceHandler,
+            final NetconfTimer timer, final long keepaliveDelaySeconds, final long requestTimeoutMillis) {
         this.deviceId = requireNonNull(deviceId);
         this.deviceHandler = requireNonNull(deviceHandler);
         this.timer = requireNonNull(timer);
@@ -79,7 +79,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
     }
 
     public KeepaliveSalFacade(final RemoteDeviceId deviceId, final RemoteDeviceHandler deviceHandler,
-            final Timer timer) {
+            final NetconfTimer timer) {
         this(deviceId, deviceHandler, timer, DEFAULT_DELAY, DEFAULT_TRANSACTION_TIMEOUT_MILLI);
     }
 

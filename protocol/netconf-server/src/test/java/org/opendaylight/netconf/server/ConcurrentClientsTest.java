@@ -17,7 +17,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES;
 
-import io.netty.util.HashedWheelTimer;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -36,7 +35,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -53,6 +51,7 @@ import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.NetconfMessageUtil;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.Capability;
@@ -103,11 +102,11 @@ public class ConcurrentClientsTest {
     private static int serverPort;
     private static TcpServerGrouping serverParams;
     private static TcpClientGrouping clientParams;
+    private static DefaultNetconfTimer timer;
 
     private static NetconfMessage getConfigMessage;
     private static NetconfMessage clientHelloMessage;
 
-    private HashedWheelTimer hashedWheelTimer;
     private BootstrapFactory serverBootstrapFactory;
     private NetconfClientFactory clientFactory;
     private TCPServer server;
@@ -120,6 +119,7 @@ public class ConcurrentClientsTest {
 
     @BeforeAll
     public static void beforeAll() throws Exception {
+        timer = new DefaultNetconfTimer();
         clientExecutor = Executors.newFixedThreadPool(CONCURRENCY, new ThreadFactory() {
             int index = 1;
 
@@ -151,11 +151,7 @@ public class ConcurrentClientsTest {
     @AfterAll
     static void afterAll() {
         clientExecutor.shutdownNow();
-    }
-
-    @BeforeEach
-    void beforeEach() {
-        hashedWheelTimer = new HashedWheelTimer();
+        timer.close();
     }
 
     void startServer(final int threads, final Set<String> serverCapabilities) throws Exception {
@@ -175,7 +171,7 @@ public class ConcurrentClientsTest {
 
         serverBootstrapFactory = new BootstrapFactory("server", threads);
         server = TCPServer.listen(new ServerTransportInitializer(NetconfServerSessionNegotiatorFactory.builder()
-            .setTimer(hashedWheelTimer)
+            .setTimer(timer)
             .setAggregatedOpService(factoriesListener)
             .setIdProvider(ID_PROVIDER)
             .setConnectionTimeoutMillis(TIMEOUT)
@@ -187,7 +183,6 @@ public class ConcurrentClientsTest {
 
     @AfterEach
     void afterEach() throws Exception {
-        hashedWheelTimer.stop();
         server.shutdown().get(TIMEOUT, MILLISECONDS);
         serverBootstrapFactory.close();
         if (clientFactory != null) {
@@ -203,7 +198,7 @@ public class ConcurrentClientsTest {
 
         startServer(threads, serverCaps);
         clientFactory = clientClass == NetconfClientRunnable.class
-            ? new NetconfClientFactoryImpl(new SSHTransportStackFactory("client", threads)) : null;
+            ? new NetconfClientFactoryImpl(timer, new SSHTransportStackFactory("client", threads)) : null;
 
         final var futures = new ArrayList<Future<?>>(CONCURRENCY);
         for (int i = 0; i < CONCURRENCY; i++) {

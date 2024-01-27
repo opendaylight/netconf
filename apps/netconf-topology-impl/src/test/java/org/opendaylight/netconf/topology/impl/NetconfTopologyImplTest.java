@@ -12,7 +12,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import io.netty.util.Timer;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
@@ -33,6 +32,7 @@ import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemas;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -66,7 +66,7 @@ class NetconfTopologyImplTest {
     @Mock
     private NetconfClientFactory mockedClientFactory;
     @Mock
-    private Timer mockedTimer;
+    private NetconfTimer mockedTimer;
     @Mock
     private SchemaResourceManager mockedResourceManager;
     @Mock
@@ -147,8 +147,8 @@ class NetconfTopologyImplTest {
     }
 
     private static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
-        TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
-                final NetconfTopologySchemaAssembler schemaAssembler,
+        TestingNetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory,
+                final NetconfTimer timer, final NetconfTopologySchemaAssembler schemaAssembler,
                 final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
                 final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
                 final NetconfClientConfigurationBuilderFactory builderFactory,

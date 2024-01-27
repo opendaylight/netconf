@@ -13,8 +13,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.SettableFuture;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
 import java.net.InetSocketAddress;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.AfterEach;
@@ -35,6 +33,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
+import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -52,14 +51,14 @@ class KeepaliveSalFacadeResponseWaitingTest {
     private Rpcs.Normalized deviceRpc;
     @Mock
     private NetconfDeviceCommunicator listener;
-    private Timer timer;
+    private DefaultNetconfTimer timer;
 
     private KeepaliveSalFacade keepaliveSalFacade;
     private LocalNetconfSalFacade underlyingSalFacade;
 
     @BeforeEach
     void beforeEach() {
-        timer = new HashedWheelTimer();
+        timer = new DefaultNetconfTimer();
 
         underlyingSalFacade = new LocalNetconfSalFacade();
         keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 2L, 10000L);
@@ -68,7 +67,7 @@ class KeepaliveSalFacadeResponseWaitingTest {
 
     @AfterEach
     void afterEach() {
-        timer.stop();
+        timer.close();
     }
 
     /**

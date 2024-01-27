@@ -10,7 +10,6 @@ package org.opendaylight.netconf.topology.singleton.impl.utils;
 import static java.util.Objects.requireNonNull;
 
 import akka.actor.ActorSystem;
-import io.netty.util.Timer;
 import java.time.Duration;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -18,6 +17,7 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvid
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -27,7 +27,7 @@ public final class NetconfTopologySetup {
     private final DataBroker dataBroker;
     private final InstanceIdentifier<Node> instanceIdentifier;
     private final Node node;
-    private final Timer timer;
+    private final NetconfTimer timer;
     private final NetconfTopologySchemaAssembler schemaAssembler;
     private final ActorSystem actorSystem;
     private final NetconfClientFactory netconfClientFactory;
@@ -71,7 +71,7 @@ public final class NetconfTopologySetup {
         return schemaAssembler;
     }
 
-    public Timer getTimer() {
+    public NetconfTimer getTimer() {
         return timer;
     }
 
@@ -108,7 +108,7 @@ public final class NetconfTopologySetup {
         private DataBroker dataBroker;
         private InstanceIdentifier<Node> instanceIdentifier;
         private Node node;
-        private Timer timer;
+        private NetconfTimer timer;
         private NetconfTopologySchemaAssembler schemaAssembler;
         private ActorSystem actorSystem;
         private String topologyId;
@@ -171,11 +171,11 @@ public final class NetconfTopologySetup {
             return new NetconfTopologySetup(this);
         }
 
-        Timer getTimer() {
+        NetconfTimer getTimer() {
             return timer;
         }
 
-        public Builder setTimer(final Timer timer) {
+        public Builder setTimer(final NetconfTimer timer) {
             this.timer = requireNonNull(timer);
             return this;
         }

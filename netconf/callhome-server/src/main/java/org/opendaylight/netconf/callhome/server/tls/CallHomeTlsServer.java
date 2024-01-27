@@ -8,12 +8,9 @@
 package org.opendaylight.netconf.callhome.server.tls;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES;
 
 import io.netty.channel.ChannelOption;
-import io.netty.util.HashedWheelTimer;
 import java.net.InetAddress;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -92,52 +89,51 @@ public final class CallHomeTlsServer implements AutoCloseable {
                 bootstrapFactory == null ? defaultBootstrapFactory() : bootstrapFactory,
                 maxConnections == null ? DEFAULT_MAX_CONNECTIONS : maxConnections,
                 timeoutMillis == null ? DEFAULT_TIMEOUT_MILLIS : timeoutMillis,
-                negotiationFactory == null ? defaultNegotiationFactory() : negotiationFactory,
-                contextManager, authProvider, statusRecorder);
+                negotiationFactory, contextManager, authProvider, statusRecorder);
         }
 
         public Builder withSessionContextManager(final CallHomeTlsSessionContextManager newContextManager) {
-            this.contextManager = newContextManager;
+            contextManager = newContextManager;
             return this;
         }
 
         public Builder withAuthProvider(final CallHomeTlsAuthProvider newAuthProvider) {
-            this.authProvider = newAuthProvider;
+            authProvider = newAuthProvider;
             return this;
         }
 
         public Builder withStatusRecorder(final CallHomeStatusRecorder newStatusRecorder) {
-            this.statusRecorder = newStatusRecorder;
+            statusRecorder = newStatusRecorder;
             return this;
         }
 
         public Builder withAddress(final InetAddress newAddress) {
-            this.address = newAddress;
+            address = newAddress;
             return this;
         }
 
         public Builder withPort(final int newPort) {
-            this.port = newPort;
+            port = newPort;
             return this;
         }
 
         public Builder withMaxConnections(final int newMaxConnections) {
-            this.maxConnections = newMaxConnections;
+            maxConnections = newMaxConnections;
             return this;
         }
 
         public Builder withTimeout(final int newTimeoutMillis) {
-            this.timeoutMillis = newTimeoutMillis;
+            timeoutMillis = newTimeoutMillis;
             return this;
         }
 
         public Builder withBootstrapFactory(final BootstrapFactory newBootstrapFactory) {
-            this.bootstrapFactory = newBootstrapFactory;
+            bootstrapFactory = newBootstrapFactory;
             return this;
         }
 
         public Builder withNegotiationFactory(final NetconfClientSessionNegotiatorFactory newNegotiationFactory) {
-            this.negotiationFactory = newNegotiationFactory;
+            negotiationFactory = newNegotiationFactory;
             return this;
         }
     }
@@ -151,10 +147,5 @@ public final class CallHomeTlsServer implements AutoCloseable {
 
     private static BootstrapFactory defaultBootstrapFactory() {
         return new BootstrapFactory("tls-call-home-server", 0);
-    }
-
-    private static NetconfClientSessionNegotiatorFactory defaultNegotiationFactory() {
-        return new NetconfClientSessionNegotiatorFactory(new HashedWheelTimer(),
-            Optional.empty(), DEFAULT_TIMEOUT_MILLIS, DEFAULT_CLIENT_CAPABILITIES);
     }
 }

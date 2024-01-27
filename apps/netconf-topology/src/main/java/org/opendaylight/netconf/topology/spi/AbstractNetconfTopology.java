@@ -10,7 +10,6 @@ package org.opendaylight.netconf.topology.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.netty.util.Timer;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
@@ -23,6 +22,7 @@ import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev221225.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -45,7 +45,7 @@ public abstract class AbstractNetconfTopology {
     private final SchemaResourceManager schemaManager;
     private final BaseNetconfSchemas baseSchemas;
     private final NetconfClientConfigurationBuilderFactory builderFactory;
-    private final Timer timer;
+    private final NetconfTimer timer;
 
     protected final NetconfTopologySchemaAssembler schemaAssembler;
     protected final DataBroker dataBroker;
@@ -53,7 +53,7 @@ public abstract class AbstractNetconfTopology {
     protected final String topologyId;
 
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientFactory clientFactory,
-            final Timer timer, final NetconfTopologySchemaAssembler schemaAssembler,
+            final NetconfTimer timer, final NetconfTopologySchemaAssembler schemaAssembler,
             final SchemaResourceManager schemaManager, final DataBroker dataBroker,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas) {

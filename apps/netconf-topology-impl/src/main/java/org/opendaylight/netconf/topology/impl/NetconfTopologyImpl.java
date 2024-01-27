@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.topology.impl;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.netty.util.Timer;
 import java.util.Collection;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -25,6 +24,7 @@ import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
@@ -58,7 +58,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     @Activate
     public NetconfTopologyImpl(
             @Reference(target = "(type=netconf-client-factory)") final NetconfClientFactory clientFactory,
-            @Reference(target = "(type=global-timer)") final Timer timer,
+            @Reference final NetconfTimer timer,
             @Reference final NetconfTopologySchemaAssembler schemaAssembler,
             @Reference final SchemaResourceManager schemaRepositoryProvider, @Reference final DataBroker dataBroker,
             @Reference final DOMMountPointService mountPointService,
@@ -72,7 +72,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     }
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientclientFactory,
-            final Timer timer, final NetconfTopologySchemaAssembler schemaAssembler,
+            final NetconfTimer timer, final NetconfTopologySchemaAssembler schemaAssembler,
             final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
             final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
             final NetconfClientConfigurationBuilderFactory builderFactory, final RpcProviderService rpcProviderService,
@@ -83,12 +83,12 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
 
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
         justification = "DTCL registration of 'this'")
-    public NetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
-            final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
-            final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService, final NetconfClientConfigurationBuilderFactory builderFactory,
-            final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas,
-            final DeviceActionFactory deviceActionFactory) {
+    public NetconfTopologyImpl(final String topologyId, final NetconfClientFactory clientFactory,
+            final NetconfTimer timer, final NetconfTopologySchemaAssembler schemaAssembler,
+            final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
+            final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
+            final NetconfClientConfigurationBuilderFactory builderFactory, final RpcProviderService rpcProviderService,
+            final BaseNetconfSchemas baseSchemas, final DeviceActionFactory deviceActionFactory) {
         super(topologyId, clientFactory, timer, schemaAssembler, schemaRepositoryProvider, dataBroker,
             mountPointService, builderFactory, deviceActionFactory, baseSchemas);
 
