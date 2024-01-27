@@ -211,10 +211,11 @@ public final class CallHomeMountService implements AutoCloseable {
         return new CallHomeSshSessionContextManager() {
             @Override
             public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {
-                topology.enableNode(asNode(id, clientSession.getRemoteAddress(), SSH_PROTOCOL));
+                final var remoteAddr = clientSession.getRemoteAddress();
+                topology.enableNode(asNode(id, remoteAddr, SSH_PROTOCOL));
                 final var netconfLayer = netconfLayerMapping.remove(id);
-                return netconfLayer == null ? null : new CallHomeSshSessionContext(id, clientSession.getRemoteAddress(),
-                    clientSession, netconfLayer.sessionListener, netconfLayer.netconfSessionFuture);
+                return netconfLayer == null ? null : new CallHomeSshSessionContext(id, remoteAddr, clientSession,
+                    netconfLayer.sessionListener, netconfLayer.netconfSessionFuture);
             }
 
             @Override
