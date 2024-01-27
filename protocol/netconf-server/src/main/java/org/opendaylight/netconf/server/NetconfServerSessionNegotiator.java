@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import io.netty.channel.Channel;
 import io.netty.channel.local.LocalAddress;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -22,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public final class NetconfServerSessionNegotiator
     private final @NonNull SessionIdType sessionId;
 
     NetconfServerSessionNegotiator(final HelloMessage hello, final SessionIdType sessionId,
-            final Promise<NetconfServerSession> promise, final Channel channel, final Timer timer,
+            final Promise<NetconfServerSession> promise, final Channel channel, final NetconfTimer timer,
             final NetconfServerSessionListener sessionListener, final long connectionTimeoutMillis,
             final @NonNegative int maximumIncomingChunkSize) {
         super(hello, promise, channel, timer, sessionListener, connectionTimeoutMillis,

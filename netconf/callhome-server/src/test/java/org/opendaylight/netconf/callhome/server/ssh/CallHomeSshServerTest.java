@@ -17,14 +17,11 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.api.TransportConstants.SSH_SUBSYSTEM;
 
 import com.google.common.util.concurrent.SettableFuture;
-import io.netty.util.HashedWheelTimer;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.SocketAddress;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.List;
@@ -39,6 +36,7 @@ import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
 import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshAuthSettings.DefaultAuthSettings;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
@@ -89,24 +87,21 @@ public class CallHomeSshServerTest {
         final var client4Keys = generateKeyPair();
 
         // Auth provider
-        final var authProvider = new CallHomeSshAuthProvider() {
-            @Override
-            public CallHomeSshAuthSettings provideAuth(final SocketAddress remoteAddress, final PublicKey publicKey) {
-                // identify client 2 by password (invalid)
-                if (client2Keys.getPublic().equals(publicKey)) {
-                    return new DefaultAuthSettings("client2-id", USERNAME, Set.of("invalid-password"), null);
-                }
-                // identify client 3 by password (valid)
-                if (client3Keys.getPublic().equals(publicKey)) {
-                    return new DefaultAuthSettings("client3-id", USERNAME, Set.of(PASSWORD), null);
-                }
-                // identify client 4 by public key
-                if (client4Keys.getPublic().equals(publicKey)) {
-                    return new DefaultAuthSettings("client4-id", USERNAME, null, Set.of(serverKeys));
-                }
-                // client 1 is not identified
-                return null;
+        final var authProvider = (CallHomeSshAuthProvider) (remoteAddress, publicKey) -> {
+            // identify client 2 by password (invalid)
+            if (client2Keys.getPublic().equals(publicKey)) {
+                return new DefaultAuthSettings("client2-id", USERNAME, Set.of("invalid-password"), null);
             }
+            // identify client 3 by password (valid)
+            if (client3Keys.getPublic().equals(publicKey)) {
+                return new DefaultAuthSettings("client3-id", USERNAME, Set.of(PASSWORD), null);
+            }
+            // identify client 4 by public key
+            if (client4Keys.getPublic().equals(publicKey)) {
+                return new DefaultAuthSettings("client4-id", USERNAME, null, Set.of(serverKeys));
+            }
+            // client 1 is not identified
+            return null;
         };
         // client side authenticators
         final PasswordAuthenticator passwordAuthenticator =
@@ -118,8 +113,10 @@ public class CallHomeSshServerTest {
         doReturn(serverSessionListener).when(monitoringService).getSessionListener();
         doReturn(EMPTY_CAPABILITIES).when(monitoringService).getCapabilities();
 
+        final var timer = new DefaultNetconfTimer();
+
         final var negotiatorFactory = NetconfServerSessionNegotiatorFactory.builder()
-            .setTimer(new HashedWheelTimer())
+            .setTimer(timer)
             .setAggregatedOpService(new AggregatedNetconfOperationServiceFactory())
             .setIdProvider(new DefaultSessionIdProvider())
             .setConnectionTimeoutMillis(TIMEOUT)
@@ -138,7 +135,7 @@ public class CallHomeSshServerTest {
         final var contextManager = new CallHomeSshSessionContextManager() {
             // inject netconf session listener
             @Override
-            public CallHomeSshSessionContext createContext(String id, ClientSession clientSession) {
+            public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {
                 return new CallHomeSshSessionContext(id, clientSession.getRemoteAddress(), clientSession,
                     clientSessionListener, SettableFuture.create());
             }
@@ -211,6 +208,7 @@ public class CallHomeSshServerTest {
             shutdownClient(client2);
             shutdownClient(client3);
             shutdownClient(client4);
+            timer.close();
         }
 
         // verify disconnect reported
