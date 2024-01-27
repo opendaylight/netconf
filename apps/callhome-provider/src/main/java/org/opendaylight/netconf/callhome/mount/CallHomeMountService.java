@@ -11,7 +11,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
-import io.netty.util.Timer;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map;
@@ -35,6 +34,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfNodeHandler;
@@ -119,7 +119,7 @@ public final class CallHomeMountService implements AutoCloseable {
     @Activate
     @Inject
     public CallHomeMountService(
-            final @Reference(target = "(type=global-timer)") Timer timer,
+            final @Reference NetconfTimer timer,
             final @Reference NetconfTopologySchemaAssembler schemaAssembler,
             final @Reference SchemaResourceManager schemaRepositoryProvider,
             final @Reference BaseNetconfSchemas baseSchemas,
@@ -130,7 +130,7 @@ public final class CallHomeMountService implements AutoCloseable {
             dataBroker, mountService, deviceActionFactory);
     }
 
-    public CallHomeMountService(final String topologyId, final Timer timer,
+    public CallHomeMountService(final String topologyId, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
             final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker, final DOMMountPointService mountService,
             final DeviceActionFactory deviceActionFactory) {

@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNullElseGet;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
-import io.netty.util.HashedWheelTimer;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -27,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.TransportConstants;
+import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.BasicCapability;
@@ -77,7 +77,7 @@ import org.slf4j.LoggerFactory;
 public class NetconfDeviceSimulator implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSimulator.class);
 
-    private final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
+    private final DefaultNetconfTimer timer = new DefaultNetconfTimer();
     private final Configuration configuration;
     private final List<TransportStack> servers;
     private final SSHTransportStackFactory sshStackFactory;
@@ -109,8 +109,8 @@ public class NetconfDeviceSimulator implements Closeable {
         final var aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(
             sourceProvider, transformedCapabilities, monitoringService1, idProvider);
 
-        return new ServerTransportInitializer(new TesttoolNegotiationFactory(
-            hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider,
+        return new ServerTransportInitializer(new TesttoolNegotiationFactory(timer,
+            aggregatedNetconfOperationServiceFactory, idProvider,
             configuration.getGenerateConfigsTimeout(), monitoringService1, configuration.getCapabilities()));
     }
 

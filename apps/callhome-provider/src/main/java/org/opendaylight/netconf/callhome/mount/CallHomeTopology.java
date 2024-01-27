@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
-import io.netty.util.Timer;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
@@ -22,7 +22,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 
 // Non-final for mocking
 class CallHomeTopology extends AbstractNetconfTopology {
-    CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory, final Timer timer,
+    CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final NetconfClientConfigurationBuilderFactory builderFactory, final BaseNetconfSchemas baseSchemas,
