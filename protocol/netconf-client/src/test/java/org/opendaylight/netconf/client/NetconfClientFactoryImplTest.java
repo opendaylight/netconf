@@ -46,6 +46,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.common.DefaultNetconfTimer;
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
@@ -91,7 +92,8 @@ class NetconfClientFactoryImplTest {
     private static final String RSA = "RSA";
     private static final char[] EMPTY_SECRET = new char[0];
 
-    private static SSHTransportStackFactory serverTransportFactory;
+    private static SSHTransportStackFactory SERVER_FACTORY;
+    private static DefaultNetconfTimer TIMER;
 
     @Mock
     private NetconfClientSessionListener sessionListener;
@@ -104,20 +106,21 @@ class NetconfClientFactoryImplTest {
     private TcpServerGrouping tcpServerParams;
     private TcpClientGrouping tcpClientParams;
 
-
     @BeforeAll
     static void beforeAll() {
-        serverTransportFactory = new SSHTransportStackFactory("server", 0);
+        SERVER_FACTORY = new SSHTransportStackFactory("server", 0);
+        TIMER = new DefaultNetconfTimer();
     }
 
     @AfterAll
     static void afterAll() {
-        serverTransportFactory.close();
+        SERVER_FACTORY.close();
+        TIMER.close();
     }
 
     @BeforeEach
     void beforeEach() throws Exception {
-        factory = new NetconfClientFactoryImpl();
+        factory = new NetconfClientFactoryImpl(TIMER);
         doNothing().when(serverTransportListener).onTransportChannelEstablished(any());
 
         // create temp socket to get available port for test
@@ -141,7 +144,7 @@ class NetconfClientFactoryImplTest {
     @Test
     void tcpClient() throws Exception {
         final var server = TCPServer.listen(serverTransportListener,
-            serverTransportFactory.newServerBootstrap(), tcpServerParams).get(1, TimeUnit.SECONDS);
+            SERVER_FACTORY.newServerBootstrap(), tcpServerParams).get(1, TimeUnit.SECONDS);
         try {
             final var clientConfig = NetconfClientConfigurationBuilder.create()
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
@@ -164,7 +167,7 @@ class NetconfClientFactoryImplTest {
         final var serverContext = SslContextBuilder.forServer(keyMgr).trustManager(trustMgr).build();
         final var clientContext = SslContextBuilder.forClient().keyManager(keyMgr).trustManager(trustMgr).build();
 
-        final var server = TLSServer.listen(serverTransportListener, serverTransportFactory.newServerBootstrap(),
+        final var server = TLSServer.listen(serverTransportListener, SERVER_FACTORY.newServerBootstrap(),
             tcpServerParams, channel -> serverContext.newHandler(channel.alloc())).get(1, TimeUnit.SECONDS);
         try {
             final var clientConfig = NetconfClientConfigurationBuilder.create()
@@ -211,7 +214,7 @@ class NetconfClientFactoryImplTest {
         doReturn(null).when(sshServerParams).getTransportParams();
         doReturn(null).when(sshServerParams).getKeepalives();
 
-        final var server = serverTransportFactory.listenServer("netconf", serverTransportListener, tcpServerParams,
+        final var server = SERVER_FACTORY.listenServer("netconf", serverTransportListener, tcpServerParams,
             sshServerParams).get(10, TimeUnit.SECONDS);
 
         try {
@@ -278,7 +281,7 @@ class NetconfClientFactoryImplTest {
                 new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
         };
 
-        final var server = serverTransportFactory.listenServer("netconf", serverTransportListener, tcpServerParams,
+        final var server = SERVER_FACTORY.listenServer("netconf", serverTransportListener, tcpServerParams,
             null, serverConfigurator).get(10, TimeUnit.SECONDS);
         try {
             final var clientConfig = NetconfClientConfigurationBuilder.create()

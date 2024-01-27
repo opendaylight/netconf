@@ -29,8 +29,6 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.io.InputStream;
@@ -42,6 +40,7 @@ import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.RpcMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.common.DefaultNetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
@@ -133,7 +132,7 @@ public class NetconfClientSessionNegotiatorTest {
 
         long timeout = 10L;
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-        Timer timer = new HashedWheelTimer();
+        var timer = new DefaultNetconfTimer();
         return new NetconfClientSessionNegotiator(helloMessage, startExi, promise, channel, timer, sessionListener,
             timeout, 16384);
     }

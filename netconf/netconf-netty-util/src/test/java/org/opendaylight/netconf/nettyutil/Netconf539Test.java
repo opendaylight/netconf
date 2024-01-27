@@ -14,7 +14,6 @@ import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETC
 
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
-import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +25,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
+import org.opendaylight.netconf.common.DefaultNetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
@@ -55,7 +55,8 @@ public class Netconf539Test {
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         final HelloMessage serverHello = HelloMessage.createClientHello(Set.of(CapabilityURN.BASE_1_1),
             Optional.empty());
-        negotiator = new TestSessionNegotiator(serverHello, promise, channel, new HashedWheelTimer(), listener, 100L);
+        negotiator = new TestSessionNegotiator(serverHello, promise, channel, new DefaultNetconfTimer(), listener,
+            100L);
     }
 
     @Test

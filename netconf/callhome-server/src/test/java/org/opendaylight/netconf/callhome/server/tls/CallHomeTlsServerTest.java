@@ -20,7 +20,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.Promise;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -56,6 +55,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.common.DefaultNetconfTimer;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.server.NetconfServerSession;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
@@ -120,7 +120,8 @@ public class CallHomeTlsServerTest {
         // Auth provider
         final var authProvider = new CallHomeTlsAuthProvider() {
             @Override
-            public @Nullable String idFor(@NonNull PublicKey publicKey) {
+            public @Nullable String idFor(@NonNull
+            final PublicKey publicKey) {
                 // identify client 3 only
                 return clientCert3.keyPair.getPublic().equals(publicKey) ? "client-id" : null;
             }
@@ -135,8 +136,10 @@ public class CallHomeTlsServerTest {
         doReturn(serverSessionListener).when(monitoringService).getSessionListener();
         doReturn(EMPTY_CAPABILITIES).when(monitoringService).getCapabilities();
 
+        final var timer = new DefaultNetconfTimer();
+
         final var negotiatorFactory = NetconfServerSessionNegotiatorFactory.builder()
-            .setTimer(new HashedWheelTimer())
+            .setTimer(timer)
             .setAggregatedOpService(new AggregatedNetconfOperationServiceFactory())
             .setIdProvider(new DefaultSessionIdProvider())
             .setConnectionTimeoutMillis(TIMEOUT)
@@ -200,6 +203,7 @@ public class CallHomeTlsServerTest {
             shutdownClient(client1);
             shutdownClient(client2);
             shutdownClient(client3);
+            timer.close();
         }
 
         // validate disconnect reported
