@@ -116,7 +116,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
             @Reference final NetconfTimer timer,
             @Reference final NetconfTopologySchemaAssembler schemaAssembler,
             @Reference final ActorSystemProvider actorSystemProvider,
-            @Reference(target = "(type=netconf-client-factory)") final NetconfClientFactory clientFactory,
+            @Reference final NetconfClientFactory clientFactory,
             @Reference final DOMMountPointService mountPointService,
             @Reference final AAAEncryptionService encryptionService,
             @Reference final RpcProviderService rpcProviderService,

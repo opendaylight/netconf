@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -33,9 +34,8 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 @Singleton
-// FIXME: drop the property and use lazy activation
-@Component(immediate = true, service = NetconfClientFactory.class, property = "type=netconf-client-factory")
-public class NetconfClientFactoryImpl implements NetconfClientFactory {
+@Component(service = NetconfClientFactory.class)
+public final class NetconfClientFactoryImpl implements NetconfClientFactory {
     private final SSHTransportStackFactory factory;
     private final NetconfTimer timer;
 
@@ -44,6 +44,7 @@ public class NetconfClientFactoryImpl implements NetconfClientFactory {
         this.factory = requireNonNull(factory);
     }
 
+    @Inject
     @Activate
     public NetconfClientFactoryImpl(@Reference final NetconfTimer timer) {
         // FIXME: make factory component configurable for OSGi

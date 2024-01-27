@@ -57,8 +57,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     @Inject
     @Activate
     public NetconfTopologyImpl(
-            @Reference(target = "(type=netconf-client-factory)") final NetconfClientFactory clientFactory,
-            @Reference final NetconfTimer timer,
+            @Reference final NetconfClientFactory clientFactory, @Reference final NetconfTimer timer,
             @Reference final NetconfTopologySchemaAssembler schemaAssembler,
             @Reference final SchemaResourceManager schemaRepositoryProvider, @Reference final DataBroker dataBroker,
             @Reference final DOMMountPointService mountPointService,
