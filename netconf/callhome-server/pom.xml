@@ -34,7 +34,12 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-client</artifactId>
         </dependency>
-        <!-- testing -->
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-server</artifactId>
