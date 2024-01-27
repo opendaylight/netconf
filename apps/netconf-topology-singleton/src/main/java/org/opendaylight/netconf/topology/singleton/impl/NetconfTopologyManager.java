@@ -15,7 +15,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.netty.util.Timer;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
@@ -43,6 +42,7 @@ import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
@@ -95,7 +95,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     private final BaseNetconfSchemas baseSchemas;
     private final DataBroker dataBroker;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-    private final Timer timer;
+    private final NetconfTimer timer;
     private final NetconfTopologySchemaAssembler schemaAssembler;
     private final ActorSystem actorSystem;
     private final NetconfClientFactory clientFactory;
@@ -113,7 +113,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     public NetconfTopologyManager(@Reference final BaseNetconfSchemas baseSchemas,
             @Reference final DataBroker dataBroker,
             @Reference final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
-            @Reference(target = "(type=global-timer)") final Timer timer,
+            @Reference final NetconfTimer timer,
             @Reference final NetconfTopologySchemaAssembler schemaAssembler,
             @Reference final ActorSystemProvider actorSystemProvider,
             @Reference(target = "(type=netconf-client-factory)") final NetconfClientFactory clientFactory,
@@ -132,7 +132,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
 
     @Inject
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
-            final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final Timer timer,
+            final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final ActorSystemProvider actorSystemProvider,
             final NetconfClientFactory clientFactory, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
@@ -147,7 +147,7 @@ public class NetconfTopologyManager implements ClusteredDataTreeChangeListener<N
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
         justification = "Non-final for mocking, but we register for DTCL and that leaks 'this'")
     public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
-            final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final Timer timer,
+            final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final ActorSystem actorSystem,
             final NetconfClientFactory clientFactory, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,

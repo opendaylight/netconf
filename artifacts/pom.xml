@@ -52,6 +52,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-common-mdsal</artifactId>
                 <version>${project.version}</version>
             </dependency>

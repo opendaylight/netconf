@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
 import io.netty.channel.Channel;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
@@ -20,6 +19,7 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessageProvider;
@@ -66,16 +66,16 @@ public final class NetconfClientSessionNegotiatorFactory {
     private final @NonNegative int maximumIncomingChunkSize;
     private final Set<String> clientCapabilities;
     private final long connectionTimeoutMillis;
-    private final Timer timer;
+    private final NetconfTimer timer;
     private final EXIParameters options;
 
-    public NetconfClientSessionNegotiatorFactory(final Timer timer,
+    public NetconfClientSessionNegotiatorFactory(final NetconfTimer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis) {
         this(timer, additionalHeader, connectionTimeoutMillis, DEFAULT_OPTIONS);
     }
 
-    public NetconfClientSessionNegotiatorFactory(final Timer timer,
+    public NetconfClientSessionNegotiatorFactory(final NetconfTimer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis,
                                                  final @NonNegative int maximumIncomingChunkSize) {
@@ -83,20 +83,20 @@ public final class NetconfClientSessionNegotiatorFactory {
             maximumIncomingChunkSize);
     }
 
-    public NetconfClientSessionNegotiatorFactory(final Timer timer,
+    public NetconfClientSessionNegotiatorFactory(final NetconfTimer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis, final Set<String> capabilities) {
         this(timer, additionalHeader, connectionTimeoutMillis, DEFAULT_OPTIONS, capabilities);
 
     }
 
-    public NetconfClientSessionNegotiatorFactory(final Timer timer,
+    public NetconfClientSessionNegotiatorFactory(final NetconfTimer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis, final EXIParameters exiOptions) {
         this(timer, additionalHeader, connectionTimeoutMillis, exiOptions, EXI_CLIENT_CAPABILITIES);
     }
 
-    public NetconfClientSessionNegotiatorFactory(final Timer timer,
+    public NetconfClientSessionNegotiatorFactory(final NetconfTimer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis, final EXIParameters exiOptions,
                                                  final Set<String> capabilities) {
@@ -104,7 +104,7 @@ public final class NetconfClientSessionNegotiatorFactory {
             NetconfSessionNegotiator.DEFAULT_MAXIMUM_INCOMING_CHUNK_SIZE);
     }
 
-    public NetconfClientSessionNegotiatorFactory(final Timer timer,
+    public NetconfClientSessionNegotiatorFactory(final NetconfTimer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis, final EXIParameters exiOptions,
                                                  final Set<String> capabilities,

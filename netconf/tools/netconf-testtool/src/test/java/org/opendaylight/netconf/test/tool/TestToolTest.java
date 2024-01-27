@@ -36,6 +36,7 @@ import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
+import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev231228.password.grouping.password.type.CleartextPasswordBuilder;
@@ -101,6 +102,7 @@ public class TestToolTest {
         "ncmon", "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring"
     );
 
+    private static DefaultNetconfTimer timer;
     private static NetconfClientFactory clientFactory;
     private static NetconfDeviceSimulator tcpDeviceSimulator;
     private static NetconfDeviceSimulator sshDeviceSimulator;
@@ -109,7 +111,8 @@ public class TestToolTest {
 
     @BeforeAll
     static void beforeAll() {
-        clientFactory = new NetconfClientFactoryImpl();
+        timer = new DefaultNetconfTimer();
+        clientFactory = new NetconfClientFactoryImpl(timer);
         tcpDeviceSimulator = new NetconfDeviceSimulator(getSimulatorConfig(TCP));
         tcpDevicePort = startSimulator(tcpDeviceSimulator);
         sshDeviceSimulator = new NetconfDeviceSimulator(getSimulatorConfig(SSH));
@@ -123,6 +126,7 @@ public class TestToolTest {
         stopSimulator(sshDeviceSimulator);
         sshDeviceSimulator = null;
         clientFactory.close();
+        timer.close();
     }
 
     @ParameterizedTest(name = "Custom RPC -- RFC7950 {0}")

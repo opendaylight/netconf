@@ -15,11 +15,11 @@ import static org.opendaylight.netconf.client.conf.NetconfClientConfiguration.Ne
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
+import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
@@ -30,27 +30,30 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 
 @Singleton
+// FIXME: drop the property and use lazy activation
 @Component(immediate = true, service = NetconfClientFactory.class, property = "type=netconf-client-factory")
 public class NetconfClientFactoryImpl implements NetconfClientFactory {
-    private final Timer timer = new HashedWheelTimer();
     private final SSHTransportStackFactory factory;
+    private final NetconfTimer timer;
 
-    @Activate
-    public NetconfClientFactoryImpl() {
-        // TODO make factory component configurable for osgi
-        this(new SSHTransportStackFactory("odl-netconf-client", 0));
-    }
-
-    public NetconfClientFactoryImpl(final SSHTransportStackFactory factory) {
+    public NetconfClientFactoryImpl(final NetconfTimer timer, final SSHTransportStackFactory factory) {
+        this.timer = requireNonNull(timer);
         this.factory = requireNonNull(factory);
     }
 
+    @Activate
+    public NetconfClientFactoryImpl(@Reference final NetconfTimer timer) {
+        // FIXME: make factory component configurable for OSGi
+        this(timer, new SSHTransportStackFactory("odl-netconf-client", 0));
+    }
+
+    @PreDestroy
     @Deactivate
     @Override
     public void close() {
-        timer.stop();
         factory.close();
     }
 
