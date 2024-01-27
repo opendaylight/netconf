@@ -13,12 +13,19 @@ import com.google.common.base.Strings;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.KeyPair;
+import java.security.Provider;
+import java.security.Security;
 import java.util.Base64;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.aaa.encrypt.PKIUtil;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
@@ -48,6 +55,13 @@ import org.osgi.service.component.annotations.Reference;
 @Component
 @Singleton
 public final class NetconfClientConfigurationBuilderFactoryImpl implements NetconfClientConfigurationBuilderFactory {
+    private static final Provider BCPROV;
+
+    static {
+        final var prov = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
+        BCPROV = prov != null ? prov : new BouncyCastleProvider();
+    }
+
     private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
     private final AAAEncryptionService encryptionService;
     private final CredentialProvider credentialProvider;
@@ -141,11 +155,29 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         }
         final var passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
         try {
-            return new PKIUtil().decodePrivateKey(
-                new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey()).replace("\\n", "\n")),
+            return decodePrivateKey(encryptionService.decrypt(dsKeypair.getPrivateKey()),
                 encryptionService.decrypt(passPhrase));
         } catch (IOException e) {
             throw new IllegalStateException("Could not decode private key with keyId=" + keyId, e);
+        }
+    }
+
+    private static KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {
+        try (var keyReader = new PEMParser(new StringReader(privateKey.replace("\\n", "\n")))) {
+            final var obj = keyReader.readObject();
+
+            final PEMKeyPair keyPair;
+            if (obj instanceof PEMEncryptedKeyPair encrypted) {
+                keyPair = encrypted.decryptKeyPair(new JcePEMDecryptorProviderBuilder()
+                    .setProvider(BCPROV)
+                    .build(passphrase.toCharArray()));
+            } else if (obj instanceof PEMKeyPair plain) {
+                keyPair = plain;
+            } else {
+                throw new IllegalArgumentException("Unhandled private key " + obj.getClass());
+            }
+
+            return new JcaPEMKeyConverter().getKeyPair(keyPair);
         }
     }
 }
