@@ -10,8 +10,8 @@ package org.opendaylight.netconf.northbound;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
-import io.netty.util.Timer;
 import java.util.Map;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.ServerTransportInitializer;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
@@ -49,8 +49,7 @@ public final class OSGiNetconfServer {
             final ComponentFactory<DefaultNetconfMonitoringService> monitoringFactory,
             @Reference(target = "(type=mapper-aggregator-registry)")
             final NetconfOperationServiceFactory mapperAggregatorRegistry,
-            @Reference(target = "(type=global-timer)") final Timer timer,
-            @Reference final SessionIdProvider sessionIdProvider,
+            @Reference final NetconfTimer timer, @Reference final SessionIdProvider sessionIdProvider,
             final Configuration configuration) {
         mappers.onAddNetconfOperationServiceFactory(mapperAggregatorRegistry);
         monitoring = monitoringFactory.newInstance(FrameworkUtil.asDictionary(DefaultNetconfMonitoringService.props(

@@ -25,7 +25,6 @@ import static org.opendaylight.mdsal.binding.api.DataObjectModification.Modifica
 
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
-import io.netty.util.Timer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +57,7 @@ import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
@@ -94,7 +94,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     @Mock
     private Registration mockRpcReg;
     @Mock
-    private Timer timer;
+    private NetconfTimer timer;
     @Mock
     private ExecutorService processingService;
     @Mock

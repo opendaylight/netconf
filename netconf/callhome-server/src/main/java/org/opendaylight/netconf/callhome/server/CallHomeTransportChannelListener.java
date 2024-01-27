@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.callhome.server;
 
+import static java.util.Objects.requireNonNull;
+
 import io.netty.handler.ssl.SslHandler;
-import io.netty.util.concurrent.Promise;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.ClientChannelInitializer;
 import org.opendaylight.netconf.client.NetconfClientSession;
@@ -21,19 +22,19 @@ import org.slf4j.LoggerFactory;
 public class CallHomeTransportChannelListener implements TransportChannelListener {
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeTransportChannelListener.class);
 
-    final NetconfClientSessionNegotiatorFactory negotiationFactory;
-    final CallHomeSessionContextManager<?> contextManager;
-    final CallHomeStatusRecorder statusRecorder;
+    private final @NonNull NetconfClientSessionNegotiatorFactory negotiationFactory;
+    private final CallHomeSessionContextManager<?> contextManager;
+    private final CallHomeStatusRecorder statusRecorder;
 
     public CallHomeTransportChannelListener(final NetconfClientSessionNegotiatorFactory negotiationFactory,
             final CallHomeSessionContextManager<?> contextManager, final CallHomeStatusRecorder statusRecorder) {
-        this.negotiationFactory = negotiationFactory;
-        this.contextManager = contextManager;
-        this.statusRecorder = statusRecorder;
+        this.negotiationFactory = requireNonNull(negotiationFactory);
+        this.contextManager = requireNonNull(contextManager);
+        this.statusRecorder = requireNonNull(statusRecorder);
     }
 
     @Override
-    public void onTransportChannelEstablished(@NonNull TransportChannel transportChannel) {
+    public void onTransportChannelEstablished(final TransportChannel transportChannel) {
         final var channel = transportChannel.channel();
 
         // identify or create session context associated with current connection
@@ -48,7 +49,7 @@ public class CallHomeTransportChannelListener implements TransportChannelListene
         LOG.info("Starting netconf negotiation for context: {}", context);
 
         // init NETCONF negotiation
-        final Promise<NetconfClientSession> promise = channel.eventLoop().newPromise();
+        final var promise = channel.eventLoop().<NetconfClientSession>newPromise();
         promise.addListener(ignored -> {
             final var cause = promise.cause();
             if (cause != null) {
@@ -72,7 +73,7 @@ public class CallHomeTransportChannelListener implements TransportChannelListene
     }
 
     @Override
-    public void onTransportChannelFailed(@NonNull Throwable cause) {
+    public void onTransportChannelFailed(final Throwable cause) {
         statusRecorder.onTransportChannelFailure(cause);
     }
 }

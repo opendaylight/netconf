@@ -9,12 +9,15 @@ package org.opendaylight.netconf.callhome.mount.tls;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.callhome.mount.CallHomeMountService;
 import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
 import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsAuthProvider;
 import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsServer;
+import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -52,6 +55,7 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
     @Activate
     @Inject
     public NetconfCallHomeTlsService(
+            final @Reference NetconfTimer timer,
             final @Reference CallHomeMountService mountService,
             final @Reference CallHomeTlsAuthProvider authProvider,
             final @Reference CallHomeStatusRecorder statusRecorder,
@@ -68,6 +72,8 @@ public class NetconfCallHomeTlsService implements AutoCloseable {
                 .withStatusRecorder(statusRecorder)
                 .withSessionContextManager(
                     mountService.createTlsSessionContextManager(authProvider, statusRecorder))
+                .withNegotiationFactory(new NetconfClientSessionNegotiatorFactory(timer, Optional.empty(),
+                    configuration.timeoutMillis(), NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES))
                 .build();
         } catch (UnknownHostException e) {
             throw new IllegalArgumentException("invalid host", e);

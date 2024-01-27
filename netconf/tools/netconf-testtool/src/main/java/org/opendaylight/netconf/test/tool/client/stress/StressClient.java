@@ -30,6 +30,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
+import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.test.tool.TestToolUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.CommitInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
@@ -165,29 +166,30 @@ public final class StressClient {
             }
         }
 
-        final var netconfClientFactory = new NetconfClientFactoryImpl();
+        try (var timer = new DefaultNetconfTimer()) {
+            try (var netconfClientFactory = new NetconfClientFactoryImpl(timer)) {
 
-        final var callables = new ArrayList<StressClientCallable>(threadAmount);
-        for (var messages : allPreparedMessages) {
-            callables.add(new StressClientCallable(params, netconfClientFactory, getBaseConfiguration(), messages));
+                final var callables = new ArrayList<StressClientCallable>(threadAmount);
+                for (var messages : allPreparedMessages) {
+                    callables.add(new StressClientCallable(params, netconfClientFactory, getBaseConfiguration(),
+                        messages));
+                }
+
+                final var executorService = Executors.newFixedThreadPool(threadAmount);
+
+                LOG.info("Starting stress test");
+                final var sw = Stopwatch.createStarted();
+                final var futures = executorService.invokeAll(callables);
+                for (var future : futures) {
+                    future.get(4L, TimeUnit.MINUTES);
+                }
+                executorService.shutdownNow();
+                sw.stop();
+
+                LOG.info("FINISHED. Execution time: {}", sw);
+                LOG.info("Requests per second: {}", params.editCount * 1000.0 / sw.elapsed(TimeUnit.MILLISECONDS));
+            }
         }
-
-        final var executorService = Executors.newFixedThreadPool(threadAmount);
-
-        LOG.info("Starting stress test");
-        final var sw = Stopwatch.createStarted();
-        final var futures = executorService.invokeAll(callables);
-        for (var future : futures) {
-            future.get(4L, TimeUnit.MINUTES);
-        }
-        executorService.shutdownNow();
-        sw.stop();
-
-        LOG.info("FINISHED. Execution time: {}", sw);
-        LOG.info("Requests per second: {}", params.editCount * 1000.0 / sw.elapsed(TimeUnit.MILLISECONDS));
-
-        // Cleanup
-        netconfClientFactory.close();
     }
 
     static NetconfMessage prepareMessage(final int id, final String editContentString) {

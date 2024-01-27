@@ -18,7 +18,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.Timeout;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +33,7 @@ import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
@@ -92,7 +92,7 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     private final long connectionTimeoutMillis;
     private final Promise<S> promise;
     private final L sessionListener;
-    private final Timer timer;
+    private final NetconfTimer timer;
 
     @GuardedBy("this")
     private Timeout timeoutTask;
@@ -100,12 +100,12 @@ public abstract class NetconfSessionNegotiator<S extends AbstractNetconfSession<
     private State state = State.IDLE;
 
     protected NetconfSessionNegotiator(final HelloMessage hello, final Promise<S> promise, final Channel channel,
-            final Timer timer, final L sessionListener, final long connectionTimeoutMillis,
+            final NetconfTimer timer, final L sessionListener, final long connectionTimeoutMillis,
             final @NonNegative int maximumIncomingChunkSize) {
         localHello = requireNonNull(hello);
         this.promise = requireNonNull(promise);
         this.channel = requireNonNull(channel);
-        this.timer = timer;
+        this.timer = requireNonNull(timer);
         this.sessionListener = sessionListener;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.maximumIncomingChunkSize = maximumIncomingChunkSize;

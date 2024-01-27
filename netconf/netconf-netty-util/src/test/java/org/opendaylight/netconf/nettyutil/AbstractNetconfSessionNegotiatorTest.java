@@ -32,7 +32,6 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.Timeout;
-import io.netty.util.Timer;
 import io.netty.util.TimerTask;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
@@ -51,6 +50,7 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.EOMFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfChunkAggregator;
@@ -66,7 +66,7 @@ public class AbstractNetconfSessionNegotiatorTest {
     @Mock
     private SslHandler sslHandler;
     @Mock
-    private Timer timer;
+    private NetconfTimer timer;
     @Mock
     private Timeout timeout;
     private EmbeddedChannel channel;

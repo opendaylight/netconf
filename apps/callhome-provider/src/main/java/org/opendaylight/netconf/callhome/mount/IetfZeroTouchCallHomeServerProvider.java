@@ -9,11 +9,14 @@ package org.opendaylight.netconf.callhome.mount;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
 import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshAuthProvider;
 import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshServer;
+import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -44,6 +47,7 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
     @Activate
     @Inject
     public IetfZeroTouchCallHomeServerProvider(
+            final @Reference NetconfTimer timer,
             final @Reference CallHomeMountService mountService,
             final @Reference CallHomeSshAuthProvider authProvider,
             final @Reference CallHomeStatusRecorder statusRecorder,
@@ -58,6 +62,8 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
                 .withAuthProvider(authProvider)
                 .withStatusRecorder(statusRecorder)
                 .withSessionContextManager(mountService.createSshSessionContextManager())
+                .withNegotiationFactory(new NetconfClientSessionNegotiatorFactory(timer, Optional.empty(), 10000L,
+                    NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES))
                 .build();
         } catch (UnknownHostException e) {
             throw new IllegalArgumentException("Invalid address", e);
