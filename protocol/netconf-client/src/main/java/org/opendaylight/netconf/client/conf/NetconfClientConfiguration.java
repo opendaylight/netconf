@@ -35,14 +35,14 @@ public final class NetconfClientConfiguration {
 
     private final TcpClientGrouping tcpParameters;
     private final TlsClientGrouping tlsParameters;
-    private final org.opendaylight.netconf.transport.tls.SslHandlerFactory sslHandlerFactory;
+    private final SslHandlerFactory sslHandlerFactory;
     private final SshClientGrouping sshParameters;
     private final ClientFactoryManagerConfigurator sshConfigurator;
 
     NetconfClientConfiguration(final NetconfClientProtocol protocol,
             final TcpClientGrouping tcpParameters,
             final TlsClientGrouping tlsParameters,
-            final org.opendaylight.netconf.transport.tls.SslHandlerFactory sslHandlerFactory,
+            final SslHandlerFactory sslHandlerFactory,
             final SshClientGrouping sshParameters,
             final ClientFactoryManagerConfigurator sshConfigurator,
             final NetconfClientSessionListener sessionListener,
@@ -51,7 +51,7 @@ public final class NetconfClientConfiguration {
             final @NonNegative int maximumIncomingChunkSize,
             final NetconfHelloMessageAdditionalHeader additionalHeader,
             final String name) {
-        this.clientProtocol = requireNonNull(protocol);
+        clientProtocol = requireNonNull(protocol);
         this.name = name;
         this.tcpParameters = requireNonNull(tcpParameters);
         this.tlsParameters = tlsParameters;
