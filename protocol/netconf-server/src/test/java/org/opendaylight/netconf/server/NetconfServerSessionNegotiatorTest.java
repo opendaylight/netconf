@@ -7,38 +7,34 @@
  */
 package org.opendaylight.netconf.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
-import org.junit.Test;
-import org.opendaylight.netconf.shaded.sshd.common.util.net.SshdSocketAddress;
+import org.junit.jupiter.api.Test;
 
-public class NetconfServerSessionNegotiatorTest {
+class NetconfServerSessionNegotiatorTest {
     @Test
-    public void testGetInetSocketAddress() throws Exception {
+    void testPortTen() {
+        final var address = new InetSocketAddress(10);
+        final var hostname = NetconfServerSessionNegotiator.getHostName(address);
+        assertNotNull(hostname);
+        assertEquals(address.getHostName(), hostname.getValue());
+    }
 
-        InetSocketAddress socketAddress = new InetSocketAddress(10);
+    @Test
+    void testPortTwenty() {
+        final var address = new InetSocketAddress("TestPortInet", 20);
+        final var hostname = NetconfServerSessionNegotiator.getHostName(address);
+        assertEquals(address.getHostName(), hostname.getValue());
+        assertEquals(String.valueOf(address.getPort()), hostname.getKey());
+    }
 
-        assertNotNull(NetconfServerSessionNegotiator.getHostName(socketAddress));
-
-        assertEquals(socketAddress.getHostName(),
-            NetconfServerSessionNegotiator.getHostName(socketAddress).getValue());
-
-        socketAddress = new InetSocketAddress("TestPortInet", 20);
-
-        assertEquals(socketAddress.getHostName(),
-            NetconfServerSessionNegotiator.getHostName(socketAddress).getValue());
-
-        assertEquals(String.valueOf(socketAddress.getPort()),
-            NetconfServerSessionNegotiator.getHostName(socketAddress).getKey());
-
-        LocalAddress localAddress = new LocalAddress("TestPortLocal");
-
-        assertEquals(String.valueOf(localAddress.id()),
-            NetconfServerSessionNegotiator.getHostName(localAddress).getValue());
-
-        SshdSocketAddress embeddedAddress = new SshdSocketAddress("TestSshdName", 10);
+    @Test
+    void testGetInetSocketAddress() {
+        final var address = new LocalAddress("TestPortLocal");
+        final var hostname = NetconfServerSessionNegotiator.getHostName(address);
+        assertEquals(String.valueOf(address.id()), hostname.getValue());
     }
 }
