@@ -21,10 +21,21 @@
     <packaging>bundle</packaging>
 
     <dependencies>
-        <!-- compile dependencies -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jdt</groupId>
+            <artifactId>org.eclipse.jdt.annotation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf.model</groupId>
+            <artifactId>rfc6241</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
@@ -40,10 +51,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-data-util</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-data-impl</artifactId>
         </dependency>
         <dependency>
@@ -54,14 +61,6 @@
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-model-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-model-util</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-api</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
@@ -71,6 +70,11 @@
         <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
             <artifactId>rfc6022</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>yang-binding</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
