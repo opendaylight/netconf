@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.test.tool;
 
-import io.netty.util.Timer;
 import java.net.SocketAddress;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.server.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.server.api.SessionIdProvider;
 import org.opendaylight.netconf.server.api.monitoring.NetconfMonitoringService;
@@ -26,16 +26,17 @@ public class TesttoolNegotiationFactory extends NetconfServerSessionNegotiatorFa
 
     private final ConcurrentMap<SocketAddress, NetconfOperationService> operationServices = new ConcurrentHashMap<>();
 
-    public TesttoolNegotiationFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
-            final SessionIdProvider idProvider, final long connectionTimeoutMillis,
-            final NetconfMonitoringService monitoringService) {
+    public TesttoolNegotiationFactory(final NetconfTimer timer,
+            final NetconfOperationServiceFactory netconfOperationProvider, final SessionIdProvider idProvider,
+            final long connectionTimeoutMillis, final NetconfMonitoringService monitoringService) {
         super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService,
             NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES);
     }
 
-    public TesttoolNegotiationFactory(final Timer timer, final NetconfOperationServiceFactory netconfOperationProvider,
-            final SessionIdProvider idProvider, final long connectionTimeoutMillis,
-            final NetconfMonitoringService monitoringService, final Set<String> baseCapabilities) {
+    public TesttoolNegotiationFactory(final NetconfTimer timer,
+            final NetconfOperationServiceFactory netconfOperationProvider, final SessionIdProvider idProvider,
+            final long connectionTimeoutMillis, final NetconfMonitoringService monitoringService,
+            final Set<String> baseCapabilities) {
         super(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis,
             monitoringService, baseCapabilities);
     }

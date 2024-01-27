@@ -12,18 +12,17 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import io.netty.channel.Channel;
-import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
+import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 
 public class NetconfClientSessionNegotiatorFactoryTest {
     @Test
     public void testGetSessionNegotiator() throws Exception {
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-        Timer timer = new HashedWheelTimer();
+        final var timer = new DefaultNetconfTimer();
         NetconfSessionListenerFactory<NetconfClientSessionListener> listenerFactory =
                 mock(NetconfSessionListenerFactory.class);
         doReturn(sessionListener).when(listenerFactory).getSessionListener();

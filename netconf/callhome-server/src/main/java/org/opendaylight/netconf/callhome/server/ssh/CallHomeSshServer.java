@@ -8,15 +8,12 @@
 package org.opendaylight.netconf.callhome.server.ssh;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.netty.util.HashedWheelTimer;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -164,43 +161,43 @@ public final class CallHomeSshServer implements AutoCloseable {
             return new CallHomeSshServer(
                 toServerParams(address, port),
                 transportStackFactory == null ? defaultTransportStackFactory() : transportStackFactory,
-                negotiationFactory == null ? defaultNegotiationFactory() : negotiationFactory,
+                negotiationFactory,
                 contextManager == null ? new CallHomeSshSessionContextManager() : contextManager,
                 authProvider, statusRecorder);
         }
 
         public Builder withAuthProvider(final CallHomeSshAuthProvider newAuthProvider) {
-            this.authProvider = newAuthProvider;
+            authProvider = newAuthProvider;
             return this;
         }
 
         public Builder withSessionContextManager(final CallHomeSshSessionContextManager newContextManager) {
-            this.contextManager = newContextManager;
+            contextManager = newContextManager;
             return this;
         }
 
         public Builder withStatusRecorder(final CallHomeStatusRecorder newStatusRecorder) {
-            this.statusRecorder = newStatusRecorder;
+            statusRecorder = newStatusRecorder;
             return this;
         }
 
         public Builder withAddress(final InetAddress newAddress) {
-            this.address = newAddress;
+            address = newAddress;
             return this;
         }
 
         public Builder withPort(final int newPort) {
-            this.port = newPort;
+            port = newPort;
             return this;
         }
 
         public Builder withTransportStackFactory(final SSHTransportStackFactory newTransportStackFactory) {
-            this.transportStackFactory = newTransportStackFactory;
+            transportStackFactory = newTransportStackFactory;
             return this;
         }
 
         public Builder withNegotiationFactory(final NetconfClientSessionNegotiatorFactory newNegotiationFactory) {
-            this.negotiationFactory = newNegotiationFactory;
+            negotiationFactory = newNegotiationFactory;
             return this;
         }
     }
@@ -214,10 +211,5 @@ public final class CallHomeSshServer implements AutoCloseable {
 
     private static SSHTransportStackFactory defaultTransportStackFactory() {
         return new SSHTransportStackFactory("ssh-call-home-server", 0);
-    }
-
-    private static NetconfClientSessionNegotiatorFactory defaultNegotiationFactory() {
-        return new NetconfClientSessionNegotiatorFactory(new HashedWheelTimer(),
-            Optional.empty(), DEFAULT_TIMEOUT_MILLIS, DEFAULT_CLIENT_CAPABILITIES);
     }
 }

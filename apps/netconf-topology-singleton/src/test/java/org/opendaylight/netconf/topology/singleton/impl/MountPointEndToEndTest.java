@@ -32,7 +32,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.typesafe.config.ConfigFactory;
-import io.netty.util.Timer;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
@@ -100,6 +99,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
+import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
@@ -190,7 +190,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     @Mock
     private AAAEncryptionService mockEncryptionService;
     @Mock
-    private Timer mockTimer;
+    private NetconfTimer mockTimer;
     @Mock
     private DeviceActionFactory deviceActionFactory;
     @Mock
