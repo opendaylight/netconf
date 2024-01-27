@@ -111,7 +111,7 @@ public final class DefaultNetconfTimer implements NetconfTimer, AutoCloseable {
         if (delegate != null) {
             delegate.stop();
             delegate = null;
-            LOG.info("NETCONF timer started");
+            LOG.info("NETCONF timer stopped");
         }
     }
 }
