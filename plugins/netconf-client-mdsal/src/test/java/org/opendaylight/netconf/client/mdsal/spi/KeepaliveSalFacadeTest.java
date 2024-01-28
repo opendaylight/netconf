@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -52,6 +53,8 @@ class KeepaliveSalFacadeTest {
     private NetconfDeviceCommunicator listener;
     @Mock
     private Rpcs.Normalized deviceRpc;
+    @Mock
+    private DOMRpcService deviceDomRpc;
 
     private DefaultNetconfTimer timer;
     private KeepaliveSalFacade keepaliveSalFacade;
@@ -62,6 +65,7 @@ class KeepaliveSalFacadeTest {
         timer = new DefaultNetconfTimer();
         keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 1L, 1L);
         keepaliveSalFacade.setListener(listener);
+        doReturn(deviceDomRpc).when(deviceRpc).domRpcService();
     }
 
     @AfterEach
@@ -119,14 +123,14 @@ class KeepaliveSalFacadeTest {
         doAnswer(invocation -> proxyRpc = invocation.getArgument(2, RemoteDeviceServices.class).rpcs())
                 .when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(RemoteDeviceServices.class));
         doReturn(Futures.immediateFailedFuture(new IllegalStateException("illegal-state")))
-                .when(deviceRpc).invokeRpc(any(), any());
+                .when(deviceDomRpc).invokeRpc(any(), any());
 
         keepaliveSalFacade = new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, timer, 100L, 1L);
         keepaliveSalFacade.setListener(listener);
 
         keepaliveSalFacade.onDeviceConnected(null, null, new RemoteDeviceServices(deviceRpc, null));
 
-        assertInstanceOf(Rpcs.Normalized.class, proxyRpc)
+        assertInstanceOf(Rpcs.Normalized.class, proxyRpc).domRpcService()
             .invokeRpc(QName.create("foo", "bar"), mock(ContainerNode.class));
 
         verify(listener, times(1)).disconnect();

@@ -28,6 +28,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -35,6 +36,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
+import org.opendaylight.netconf.client.mdsal.api.SchemalessRpcService;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
@@ -356,9 +358,31 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
      * invocation. Version for {@link Rpcs.Normalized}.
      */
     private final class NormalizedKeepaliveRpcs implements Rpcs.Normalized {
+        private final @NonNull KeepaliveDOMRpcService domRpcService;
         private final Rpcs.Normalized delegate;
 
         NormalizedKeepaliveRpcs(final Rpcs.Normalized delegate) {
+            this.delegate = requireNonNull(delegate);
+            domRpcService = new KeepaliveDOMRpcService(delegate.domRpcService());
+        }
+
+        @Override
+        public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
+            // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
+            disableKeepalive();
+            return scheduleTimeout(delegate.invokeNetconf(type, input));
+        }
+
+        @Override
+        public DOMRpcService domRpcService() {
+            return domRpcService;
+        }
+    }
+
+    private final class KeepaliveDOMRpcService implements DOMRpcService {
+        private final @NonNull DOMRpcService delegate;
+
+        KeepaliveDOMRpcService(final DOMRpcService delegate) {
             this.delegate = requireNonNull(delegate);
         }
 
@@ -371,10 +395,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @Override
         public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
-            final T rpcListener) {
+                final T rpcListener) {
             // There is no real communication with the device (yet), hence no recordActivity() or anything
             return delegate.registerRpcListener(rpcListener);
         }
+
     }
 
     /**
@@ -382,10 +407,12 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
      * invocation. Version for {@link Rpcs.Schemaless}.
      */
     private final class SchemalessKeepaliveRpcs implements Rpcs.Schemaless {
+        private final @NonNull KeepaliveSchemalessRpcService schemalessRpcService;
         private final Rpcs.Schemaless delegate;
 
         SchemalessKeepaliveRpcs(final Rpcs.Schemaless delegate) {
             this.delegate = requireNonNull(delegate);
+            schemalessRpcService = new KeepaliveSchemalessRpcService(delegate.schemalessRpcService());
         }
 
         @Override
@@ -396,10 +423,23 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         }
 
         @Override
-        public ListenableFuture<? extends DOMSource> invokeRpc(final QName type, final DOMSource input) {
+        public SchemalessRpcService schemalessRpcService() {
+            return schemalessRpcService;
+        }
+    }
+
+    private final class KeepaliveSchemalessRpcService implements SchemalessRpcService {
+        private final SchemalessRpcService delegate;
+
+        KeepaliveSchemalessRpcService(final SchemalessRpcService delegate) {
+            this.delegate = requireNonNull(delegate);
+        }
+
+        @Override
+        public ListenableFuture<? extends DOMSource> invokeRpc(final QName type, final DOMSource payload) {
             // FIXME: what happens if we disable keepalive and then invokeRpc() throws?
             disableKeepalive();
-            return scheduleTimeout(delegate.invokeRpc(type, input));
+            return scheduleTimeout(delegate.invokeRpc(type, payload));
         }
     }
 }
