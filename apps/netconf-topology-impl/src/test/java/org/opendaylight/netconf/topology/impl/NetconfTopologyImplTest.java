@@ -29,9 +29,9 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.NetconfClientConfigurationBuilderFactory;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
@@ -95,7 +95,7 @@ class NetconfTopologyImplTest {
             final var topology = new TestingNetconfTopologyImpl(TOPOLOGY_KEY.getTopologyId().getValue(),
                 mockedClientFactory, mockedTimer, schemaAssembler, mockedResourceManager, dataBroker, mountPointService,
                 encryptionService, builderFactory, rpcProviderService,
-                new DefaultBaseNetconfSchemas(new DefaultYangParserFactory()));
+                new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory()));
             //verify initialization of topology
             verify(wtx).merge(LogicalDatastoreType.OPERATIONAL, TOPOLOGY_PATH,
                 new TopologyBuilder().withKey(TOPOLOGY_KEY).build());
@@ -152,9 +152,9 @@ class NetconfTopologyImplTest {
                 final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
                 final DOMMountPointService mountPointService, final AAAEncryptionService encryptionService,
                 final NetconfClientConfigurationBuilderFactory builderFactory,
-                final RpcProviderService rpcProviderService, final BaseNetconfSchemas baseSchemas) {
-            super(topologyId, clientFactory, timer, schemaAssembler, schemaRepositoryProvider,
-                dataBroker, mountPointService, encryptionService, builderFactory, rpcProviderService, baseSchemas);
+                final RpcProviderService rpcProviderService, final BaseNetconfSchemaProvider baseSchemaProvider) {
+            super(topologyId, clientFactory, timer, schemaAssembler, schemaRepositoryProvider, dataBroker,
+                mountPointService, encryptionService, builderFactory, rpcProviderService, baseSchemaProvider);
         }
 
         @Override

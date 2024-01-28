@@ -43,7 +43,7 @@ import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -53,7 +53,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
-import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -76,7 +76,7 @@ public class NetconfNodeHandlerTest {
         new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
     private static final NodeId NODE_ID = new NodeId("testing-node");
 
-    private static BaseNetconfSchemas BASE_SCHEMAS;
+    private static BaseNetconfSchemaProvider BASE_SCHEMAS;
 
     // Core setup
     @Mock
@@ -121,7 +121,7 @@ public class NetconfNodeHandlerTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        BASE_SCHEMAS = new DefaultBaseNetconfSchemas(new DefaultYangParserFactory());
+        BASE_SCHEMAS = new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory());
     }
 
     @BeforeClass

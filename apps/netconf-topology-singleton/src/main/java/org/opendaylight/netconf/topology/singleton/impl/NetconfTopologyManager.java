@@ -36,7 +36,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientFactory;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
@@ -89,7 +89,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
     private final Map<InstanceIdentifier<Node>, NetconfTopologyContext> contexts = new ConcurrentHashMap<>();
     private final Map<InstanceIdentifier<Node>, Registration> clusterRegistrations = new ConcurrentHashMap<>();
 
-    private final BaseNetconfSchemas baseSchemas;
+    private final BaseNetconfSchemaProvider baseSchemaProvider;
     private final DataBroker dataBroker;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
     private final NetconfTimer timer;
@@ -107,7 +107,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
     private NetconfTopologyRPCProvider rpcProvider;
 
     @Activate
-    public NetconfTopologyManager(@Reference final BaseNetconfSchemas baseSchemas,
+    public NetconfTopologyManager(@Reference final BaseNetconfSchemaProvider baseSchemaProvider,
             @Reference final DataBroker dataBroker,
             @Reference final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
             @Reference final NetconfTimer timer,
@@ -121,21 +121,21 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             @Reference final SchemaResourceManager resourceManager,
             @Reference final NetconfClientConfigurationBuilderFactory builderFactory,
             final Configuration configuration) {
-        this(baseSchemas, dataBroker, clusterSingletonServiceProvider, timer, schemaAssembler,
+        this(baseSchemaProvider, dataBroker, clusterSingletonServiceProvider, timer, schemaAssembler,
             actorSystemProvider.getActorSystem(), clientFactory, mountPointService, encryptionService,
             rpcProviderService, deviceActionFactory, resourceManager, builderFactory, configuration.topology$_$id(),
             Uint16.valueOf(configuration.write$_$transaction$_$idle$_$timeout()));
     }
 
     @Inject
-    public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
+    public NetconfTopologyManager(final BaseNetconfSchemaProvider baseSchemaProvider, final DataBroker dataBroker,
             final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final ActorSystemProvider actorSystemProvider,
             final NetconfClientFactory clientFactory, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService, final RpcProviderService rpcProviderService,
             final DeviceActionFactory deviceActionFactory, final SchemaResourceManager resourceManager,
             final NetconfClientConfigurationBuilderFactory builderFactory) {
-        this(baseSchemas, dataBroker, clusterSingletonServiceProvider, timer, schemaAssembler,
+        this(baseSchemaProvider, dataBroker, clusterSingletonServiceProvider, timer, schemaAssembler,
             actorSystemProvider.getActorSystem(), clientFactory, mountPointService, encryptionService,
             rpcProviderService, deviceActionFactory, resourceManager, builderFactory,
             NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, Uint16.ZERO);
@@ -143,7 +143,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
 
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
         justification = "Non-final for mocking, but we register for DTCL and that leaks 'this'")
-    public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
+    public NetconfTopologyManager(final BaseNetconfSchemaProvider baseSchemaProvider, final DataBroker dataBroker,
             final ClusterSingletonServiceProvider clusterSingletonServiceProvider, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final ActorSystem actorSystem,
             final NetconfClientFactory clientFactory, final DOMMountPointService mountPointService,
@@ -151,7 +151,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             final DeviceActionFactory deviceActionFactory, final SchemaResourceManager resourceManager,
             final NetconfClientConfigurationBuilderFactory builderFactory, final String topologyId,
             final Uint16 writeTransactionIdleTimeout) {
-        this.baseSchemas = requireNonNull(baseSchemas);
+        this.baseSchemaProvider = requireNonNull(baseSchemaProvider);
         this.dataBroker = requireNonNull(dataBroker);
         this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
         this.timer = requireNonNull(timer);
@@ -317,7 +317,7 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
 
         return NetconfTopologySetup.builder()
             .setClusterSingletonServiceProvider(clusterSingletonServiceProvider)
-            .setBaseSchemas(baseSchemas)
+            .setBaseSchemaProvider(baseSchemaProvider)
             .setDataBroker(dataBroker)
             .setInstanceIdentifier(instanceIdentifier)
             .setNode(node)

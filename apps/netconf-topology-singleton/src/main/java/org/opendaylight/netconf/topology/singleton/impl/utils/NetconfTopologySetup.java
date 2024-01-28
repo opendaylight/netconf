@@ -16,7 +16,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -34,7 +34,7 @@ public final class NetconfTopologySetup {
     private final String topologyId;
     private final NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
     private final Duration idleTimeout;
-    private final BaseNetconfSchemas baseSchemas;
+    private final BaseNetconfSchemaProvider baseSchemaProvider;
 
     private NetconfTopologySetup(final Builder builder) {
         clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
@@ -48,7 +48,7 @@ public final class NetconfTopologySetup {
         topologyId = builder.getTopologyId();
         schemaResourceDTO = builder.getSchemaResourceDTO();
         idleTimeout = builder.getIdleTimeout();
-        baseSchemas = builder.getBaseSchemas();
+        baseSchemaProvider = builder.getBaseSchemaProvider();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -95,8 +95,8 @@ public final class NetconfTopologySetup {
         return idleTimeout;
     }
 
-    public BaseNetconfSchemas getBaseSchemas() {
-        return baseSchemas;
+    public BaseNetconfSchemaProvider getBaseSchemaProvider() {
+        return baseSchemaProvider;
     }
 
     public static @NonNull Builder builder() {
@@ -115,18 +115,18 @@ public final class NetconfTopologySetup {
         private NetconfClientFactory netconfClientFactory;
         private NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
         private Duration idleTimeout;
-        private BaseNetconfSchemas baseSchemas;
+        private BaseNetconfSchemaProvider baseSchemaProvider;
 
         private Builder() {
             // Hidden on purpose
         }
 
-        BaseNetconfSchemas getBaseSchemas() {
-            return requireNonNull(baseSchemas, "BaseSchemas not initialized");
+        BaseNetconfSchemaProvider getBaseSchemaProvider() {
+            return requireNonNull(baseSchemaProvider, "BaseSchemas not initialized");
         }
 
-        public Builder setBaseSchemas(final BaseNetconfSchemas baseSchemas) {
-            this.baseSchemas = requireNonNull(baseSchemas);
+        public Builder setBaseSchemaProvider(final BaseNetconfSchemaProvider baseSchemaProvider) {
+            this.baseSchemaProvider = requireNonNull(baseSchemaProvider);
             return this;
         }
 

@@ -25,7 +25,7 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
@@ -114,24 +114,24 @@ public final class CallHomeMountService implements AutoCloseable {
             final @Reference NetconfTimer timer,
             final @Reference NetconfTopologySchemaAssembler schemaAssembler,
             final @Reference SchemaResourceManager schemaRepositoryProvider,
-            final @Reference BaseNetconfSchemas baseSchemas,
+            final @Reference BaseNetconfSchemaProvider baseSchemaProvider,
             final @Reference DataBroker dataBroker,
             final @Reference DOMMountPointService mountService,
             final @Reference DeviceActionFactory deviceActionFactory) {
-        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer, schemaAssembler, schemaRepositoryProvider, baseSchemas,
-            dataBroker, mountService, deviceActionFactory);
+        this(NetconfNodeUtils.DEFAULT_TOPOLOGY_NAME, timer, schemaAssembler, schemaRepositoryProvider,
+            baseSchemaProvider, dataBroker, mountService, deviceActionFactory);
     }
 
     public CallHomeMountService(final String topologyId, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
-            final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker, final DOMMountPointService mountService,
-            final DeviceActionFactory deviceActionFactory) {
+            final BaseNetconfSchemaProvider baseSchemaProvider, final DataBroker dataBroker,
+            final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory) {
 
         final var clientConfBuilderFactory = createClientConfigurationBuilderFactory();
         final var clientFactory = createClientFactory();
         topology = new CallHomeTopology(topologyId, clientFactory, timer, schemaAssembler,
             schemaRepositoryProvider, dataBroker, mountService, clientConfBuilderFactory,
-            baseSchemas, deviceActionFactory);
+            baseSchemaProvider, deviceActionFactory);
     }
 
     @VisibleForTesting

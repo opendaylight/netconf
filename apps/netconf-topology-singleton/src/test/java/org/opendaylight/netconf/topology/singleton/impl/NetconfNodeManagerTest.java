@@ -164,7 +164,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 .setDataBroker(mockDataBroker)
                 .setSchemaResourceDTO(new NetconfDevice.SchemaResourcesDTO(
                     masterSchemaRepository, masterSchemaRepository, mockSchemaContextFactory, mockSchemasResolver))
-                .setBaseSchemas(BASE_SCHEMAS)
+                .setBaseSchemaProvider(BASE_SCHEMAS)
                 .build();
 
         testMasterActorRef = TestActorRef.create(masterSystem, Props.create(TestMasterActor.class, masterSetup,
@@ -180,7 +180,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
                 .setDataBroker(mockDataBroker)
                 .setSchemaResourceDTO(new NetconfDevice.SchemaResourcesDTO(
                     slaveSchemaRepository, slaveSchemaRepository, mockSchemaContextFactory, mockSchemasResolver))
-                .setBaseSchemas(BASE_SCHEMAS)
+                .setBaseSchemaProvider(BASE_SCHEMAS)
                 .build();
 
         netconfNodeManager = new NetconfNodeManager(slaveSetup, DEVICE_ID, responseTimeout,

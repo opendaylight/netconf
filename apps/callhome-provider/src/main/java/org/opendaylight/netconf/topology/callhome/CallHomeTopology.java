@@ -10,7 +10,7 @@ package org.opendaylight.netconf.topology.callhome;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
@@ -25,10 +25,10 @@ class CallHomeTopology extends AbstractNetconfTopology {
     CallHomeTopology(final String topologyId, final NetconfClientFactory clientFactory, final NetconfTimer timer,
             final NetconfTopologySchemaAssembler schemaAssembler, final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final NetconfClientConfigurationBuilderFactory builderFactory, final BaseNetconfSchemas baseSchemas,
-            final DeviceActionFactory deviceActionFactory) {
+            final NetconfClientConfigurationBuilderFactory builderFactory,
+            final BaseNetconfSchemaProvider baseSchemaProvider, final DeviceActionFactory deviceActionFactory) {
         super(topologyId, clientFactory, timer, schemaAssembler, schemaRepositoryProvider, dataBroker,
-            mountPointService, builderFactory, deviceActionFactory, baseSchemas);
+            mountPointService, builderFactory, deviceActionFactory, baseSchemaProvider);
     }
 
     void disableNode(final NodeId nodeId) {

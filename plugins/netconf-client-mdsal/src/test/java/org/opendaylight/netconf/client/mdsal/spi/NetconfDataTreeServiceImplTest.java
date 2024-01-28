@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,7 +64,7 @@ public class NetconfDataTreeServiceImplTest extends AbstractTestModelTest {
         netconService = getNetconService();
         final var model = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfData.class, NetconfState.class);
         netconfMessageTransformer = new NetconfMessageTransformer(MountPointContext.of(model), true,
-                BASE_SCHEMAS.baseSchema());
+            BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
     }
 
     @Test

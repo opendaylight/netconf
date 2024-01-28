@@ -14,11 +14,13 @@ import static org.junit.Assert.assertTrue;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.toId;
 
 import java.util.Collection;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -60,7 +62,7 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
     @Before
     public void before() {
         messageTransformer = new NetconfMessageTransformer(MountPointContext.of(cfgCtx), true,
-            BASE_SCHEMAS.baseSchema());
+            BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
     }
 
     @Test

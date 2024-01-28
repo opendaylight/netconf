@@ -187,7 +187,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
             .setActorSystem(system)
             .setIdleTimeout(Duration.ofSeconds(1))
             .setSchemaResourceDTO(schemaResourceDTO)
-            .setBaseSchemas(BASE_SCHEMAS)
+            .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
 
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
@@ -226,7 +226,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
                 new InetSocketAddress(InetAddresses.forString("127.0.0.2"), 9999));
 
         final NetconfTopologySetup newSetup = NetconfTopologySetup.builder()
-            .setBaseSchemas(BASE_SCHEMAS)
+            .setBaseSchemaProvider(BASE_SCHEMAS)
             .setSchemaResourceDTO(schemaResourceDTO)
             .setActorSystem(system)
             .build();
@@ -337,7 +337,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
         final NetconfTopologySetup setup = NetconfTopologySetup.builder()
                 .setSchemaResourceDTO(schemaResourceDTO2)
-                .setBaseSchemas(BASE_SCHEMAS)
+                .setBaseSchemaProvider(BASE_SCHEMAS)
                 .setActorSystem(system)
                 .build();
 
@@ -424,7 +424,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
             .setActorSystem(system)
             .setSchemaResourceDTO(schemaResourceDTO2)
             .setIdleTimeout(Duration.ofSeconds(1))
-            .setBaseSchemas(BASE_SCHEMAS)
+            .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
         ActorRef actor = TestActorRef.create(system, props, "master_messages_2");
@@ -673,7 +673,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(NetconfTopologySetup.builder()
                 .setSchemaResourceDTO(schemaResourceDTO2)
                 .setActorSystem(system)
-                .setBaseSchemas(BASE_SCHEMAS)
+                .setBaseSchemaProvider(BASE_SCHEMAS)
                 .build(), remoteDeviceId, TIMEOUT, mockMountPointService));
 
         doReturn(Futures.immediateFuture(mockSchemaContext))
