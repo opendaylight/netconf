@@ -120,7 +120,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
             .when(rpc).invokeNetconf(any(), any());
 
         final var tx = new WriteRunningTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchemaWithNotifications().getMountPointContext()), false, true);
+            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchemaWithNotifications().mountPointContext()), false, true);
         tx.init();
 
         tx.delete(LogicalDatastoreType.CONFIGURATION, STATE);
@@ -137,7 +137,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null)))
             .when(rpc).invokeNetconf(any(), any());
         final var tx = new WriteCandidateTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false, true);
+            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().mountPointContext()), false, true);
         tx.init();
 
         final var listener = mock(TxListener.class);
@@ -153,7 +153,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     @Test
     public void testListenerCancellation() throws Exception {
         final var tx = new WriteCandidateTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false, true);
+            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().mountPointContext()), false, true);
         tx.init();
 
         final var listener = mock(TxListener.class);
@@ -171,7 +171,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         final var cause = new IllegalStateException("Failed tx");
         doReturn(Futures.immediateFailedFuture(cause)).when(rpc).invokeNetconf(any(), any());
         final var tx = new WriteCandidateTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false, true);
+            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().mountPointContext()), false, true);
         tx.init();
 
         final var listener = mock(TxListener.class);

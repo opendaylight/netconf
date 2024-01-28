@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.Executor;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -23,7 +23,7 @@ public class NetconfDeviceBuilder {
     private RemoteDeviceHandler salFacade;
     private Executor globalProcessingExecutor;
     private DeviceActionFactory deviceActionFactory;
-    private BaseNetconfSchemas baseSchemas;
+    private BaseNetconfSchemaProvider baseSchemas;
 
     public NetconfDeviceBuilder setReconnectOnSchemasChange(final boolean reconnectOnSchemasChange) {
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
@@ -55,7 +55,7 @@ public class NetconfDeviceBuilder {
         return this;
     }
 
-    public NetconfDeviceBuilder setBaseSchemas(final BaseNetconfSchemas baseSchemas) {
+    public NetconfDeviceBuilder setBaseSchemas(final BaseNetconfSchemaProvider baseSchemas) {
         this.baseSchemas = requireNonNull(baseSchemas);
         return this;
     }
