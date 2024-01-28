@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
@@ -49,6 +50,8 @@ class KeepaliveSalFacadeResponseWaitingTest {
 
     @Mock
     private Rpcs.Normalized deviceRpc;
+    @Mock
+    private DOMRpcService deviceDomRpc;
     @Mock
     private NetconfDeviceCommunicator listener;
     private DefaultNetconfTimer timer;
@@ -78,7 +81,8 @@ class KeepaliveSalFacadeResponseWaitingTest {
         //This settable future object will be never set to any value. The test wants to simulate waiting for the result
         //of the future object.
         final var settableFuture = SettableFuture.<DOMRpcResult>create();
-        doReturn(settableFuture).when(deviceRpc).invokeRpc(null, null);
+        doReturn(settableFuture).when(deviceDomRpc).invokeRpc(null, null);
+        doReturn(deviceDomRpc).when(deviceRpc).domRpcService();
 
         //This settable future will be used to check the invokation of keepalive RPC. Should be never invoked.
         final var keepaliveSettableFuture = SettableFuture.<DOMRpcResult>create();
@@ -94,10 +98,10 @@ class KeepaliveSalFacadeResponseWaitingTest {
         underlyingSalFacade.invokeNullRpc();
 
         //Invoking of general RPC.
-        verify(deviceRpc, after(2000).times(1)).invokeRpc(null, null);
+        verify(deviceDomRpc, after(2000).times(1)).invokeRpc(null, null);
 
         //verify the keepalive RPC invoke. Should be never happen.
-        verify(deviceRpc, after(2000).never()).invokeRpc(GetConfig.QNAME, KEEPALIVE_PAYLOAD);
+        verify(deviceDomRpc, after(2000).never()).invokeRpc(GetConfig.QNAME, KEEPALIVE_PAYLOAD);
     }
 
     private static final class LocalNetconfSalFacade implements RemoteDeviceHandler {
@@ -132,7 +136,7 @@ class KeepaliveSalFacadeResponseWaitingTest {
         public void invokeNullRpc() {
             final var local = rpcs;
             if (local != null) {
-                local.invokeRpc(null, null);
+                local.domRpcService().invokeRpc(null, null);
             }
         }
     }

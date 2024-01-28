@@ -163,7 +163,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     public static LibraryModulesSchemas create(final NetconfDeviceRpc deviceRpc, final RemoteDeviceId deviceId) {
         final DOMRpcResult moduleListNodeResult;
         try {
-            moduleListNodeResult = deviceRpc.invokeRpc(Get.QNAME, GET_MODULES_STATE_MODULE_LIST_RPC).get();
+            moduleListNodeResult = deviceRpc.domRpcService().invokeRpc(Get.QNAME, GET_MODULES_STATE_MODULE_LIST_RPC)
+                .get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException(deviceId + ": Interrupted while waiting for response to "

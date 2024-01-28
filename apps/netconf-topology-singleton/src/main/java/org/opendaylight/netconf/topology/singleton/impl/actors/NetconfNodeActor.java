@@ -129,7 +129,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
 
             final var deviceServices = masterActorData.getDeviceServices();
-            deviceRpc = deviceServices.rpcs() instanceof Rpcs.Normalized normalized ? normalized : null;
+            deviceRpc = deviceServices.rpcs() instanceof Rpcs.Normalized normalized ? normalized.domRpcService() : null;
             deviceAction = deviceServices.actions() instanceof Actions.Normalized normalized ? normalized : null;
 
             sender().tell(new MasterActorDataInitialized(), self());
@@ -213,10 +213,8 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     }
 
     private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
-        final ListenableFuture<YangTextSchemaSource> schemaSourceFuture =
-                schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
-
-        Futures.addCallback(schemaSourceFuture, new FutureCallback<YangTextSchemaSource>() {
+        final var schemaSourceFuture = schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
+        Futures.addCallback(schemaSourceFuture, new FutureCallback<>() {
             @Override
             public void onSuccess(final YangTextSchemaSource yangTextSchemaSource) {
                 try {
@@ -332,7 +330,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             final SlaveSalFacade localSlaveSalManager, final ActorRef masterReference, final int tries) {
         final ListenableFuture<EffectiveModelContext> schemaContextFuture =
                 schemaContextFactory.createEffectiveModelContext(sourceIdentifiers);
-        Futures.addCallback(schemaContextFuture, new FutureCallback<EffectiveModelContext>() {
+        Futures.addCallback(schemaContextFuture, new FutureCallback<>() {
             @Override
             public void onSuccess(final EffectiveModelContext result) {
                 executeInSelf(() -> {
@@ -342,8 +340,10 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                         LOG.info("{}: Schema context resolved: {} - registering slave mount point",
                                 id, result.getModules());
                         final var actorSystem = setup.getActorSystem();
+                        final var rpcProxy = new ProxyDOMRpcService(actorSystem, masterReference, id,
+                            actorResponseWaitTime);
                         slaveSalManager.registerSlaveMountPoint(result, masterReference, new RemoteDeviceServices(
-                            new ProxyDOMRpcService(actorSystem, masterReference, id, actorResponseWaitTime),
+                            (Rpcs.Normalized) () -> rpcProxy,
                             new ProxyDOMActionService(actorSystem, masterReference, id, actorResponseWaitTime)));
                     }
                 });

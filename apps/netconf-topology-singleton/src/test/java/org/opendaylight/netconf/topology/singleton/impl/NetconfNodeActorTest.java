@@ -142,7 +142,9 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     private final SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository("master");
 
     @Mock
-    private Rpcs.Normalized mockDOMRpcService;
+    private Rpcs.Normalized mockRpc;
+    @Mock
+    private DOMRpcService mockDOMRpcService;
     @Mock
     private Actions.Normalized mockDOMActionService;
     @Mock
@@ -198,8 +200,10 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         doReturn(mockSchemaSourceReg1).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
         doReturn(mockSchemaSourceReg2).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER2));
 
-        doReturn(mockSchemaContextFactory).when(mockSchemaRepository)
-                .createEffectiveModelContextFactory();
+        doReturn(mockSchemaContextFactory).when(mockSchemaRepository).createEffectiveModelContextFactory();
+
+        doReturn(mockDOMRpcService).when(mockRpc).domRpcService();
+
     }
 
     @After
@@ -598,7 +602,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         initializeMaster(List.of());
         registerSlaveMountPoint();
 
-        ArgumentCaptor<DOMDataBroker> domDataBrokerCaptor = ArgumentCaptor.forClass(DOMDataBroker.class);
+        final var domDataBrokerCaptor = ArgumentCaptor.forClass(DOMDataBroker.class);
         verify(mockMountPointBuilder).addService(eq(DOMDataBroker.class), domDataBrokerCaptor.capture());
 
         final DOMDataBroker slaveDOMDataBroker = domDataBrokerCaptor.getValue();
@@ -688,7 +692,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     private void initializeMaster(final List<SourceIdentifier> sourceIdentifiers) {
         masterRef.tell(new CreateInitialMasterActorData(mockDOMDataBroker, netconfService, sourceIdentifiers,
-                new RemoteDeviceServices(mockDOMRpcService, mockDOMActionService)), testKit.getRef());
+                new RemoteDeviceServices(mockRpc, mockDOMActionService)), testKit.getRef());
         testKit.expectMsgClass(MasterActorDataInitialized.class);
     }
 
