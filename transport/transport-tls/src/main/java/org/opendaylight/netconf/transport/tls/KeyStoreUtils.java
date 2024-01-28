@@ -34,7 +34,7 @@ final class KeyStoreUtils {
      * @return key store instance
      * @throws UnsupportedConfigurationException if key store cannot be instantiated
      */
-    static KeyStore newKeyStore() throws UnsupportedConfigurationException {
+    static @NonNull KeyStore newKeyStore() throws UnsupportedConfigurationException {
         final KeyStore keyStore;
         try {
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());

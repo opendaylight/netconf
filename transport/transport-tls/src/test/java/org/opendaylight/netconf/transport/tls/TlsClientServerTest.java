@@ -182,9 +182,9 @@ class TlsClientServerTest {
 
         integrationTest(
             () -> TLSServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
-                tcpServerConfig, tlsServerConfig),
+                tcpServerConfig, new FixedSslHandlerFactory(tlsServerConfig)),
             () -> TLSClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
-                tcpClientConfig, tlsClientConfig)
+                tcpClientConfig, new FixedSslHandlerFactory(tlsClientConfig))
         );
     }
 
@@ -201,9 +201,9 @@ class TlsClientServerTest {
 
         integrationTest(
             () -> TLSServer.listen(serverListener, NettyTransportSupport.newServerBootstrap().group(group),
-                tcpServerConfig, channel -> serverContext.newHandler(channel.alloc())),
+                tcpServerConfig, new FixedSslHandlerFactory(serverContext)),
             () -> TLSClient.connect(clientListener, NettyTransportSupport.newBootstrap().group(group),
-                tcpClientConfig, channel -> clientContext.newHandler(channel.alloc()))
+                tcpClientConfig, new FixedSslHandlerFactory(clientContext))
         );
     }
 
@@ -255,14 +255,14 @@ class TlsClientServerTest {
 
         // start call-home client
         final var client = TLSClient.listen(clientListener, NettyTransportSupport.newServerBootstrap().group(group),
-            tcpServerConfig, channel -> clientContext.newHandler(channel.alloc())).get(2, TimeUnit.SECONDS);
+            tcpServerConfig, new FixedSslHandlerFactory(clientContext)).get(2, TimeUnit.SECONDS);
         try {
             // connect with call-home servers
             final var server1 = TLSServer.connect(serverListener, NettyTransportSupport.newBootstrap().group(group),
-                tcpClientConfig, channel -> serverContext.newHandler(channel.alloc())).get(2, TimeUnit.SECONDS);
+                tcpClientConfig, new FixedSslHandlerFactory(serverContext)).get(2, TimeUnit.SECONDS);
             final var server2 = TLSServer.connect(otherServerListener,
                 NettyTransportSupport.newBootstrap().group(group),
-                tcpClientConfig, channel -> serverContext.newHandler(channel.alloc())).get(2, TimeUnit.SECONDS);
+                tcpClientConfig, new FixedSslHandlerFactory(serverContext)).get(2, TimeUnit.SECONDS);
             try {
                 verify(serverListener, timeout(500))
                     .onTransportChannelEstablished(serverTransportChannelCaptor.capture());
@@ -272,9 +272,9 @@ class TlsClientServerTest {
                     .onTransportChannelEstablished(clientTransportChannelCaptor.capture());
                 // extract channels sorted by server address
                 var serverChannels = assertChannels(serverTransportChannelCaptor.getAllValues(), 2,
-                    Comparator.comparing((Channel channel) -> channel.localAddress().toString()));
+                    Comparator.comparing((final Channel channel) -> channel.localAddress().toString()));
                 var clientChannels = assertChannels(clientTransportChannelCaptor.getAllValues(), 2,
-                    Comparator.comparing((Channel channel) -> channel.remoteAddress().toString()));
+                    Comparator.comparing((final Channel channel) -> channel.remoteAddress().toString()));
                 for (int i = 0; i < 2; i++) {
                     // validate channels are connecting same sockets
                     assertEquals(serverChannels.get(i).remoteAddress(), clientChannels.get(i).localAddress());

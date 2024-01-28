@@ -93,7 +93,7 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultSchemaResourceManager;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
@@ -193,7 +193,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     @Mock
     private CredentialProvider credentialProvider;
     @Mock
-    private SslHandlerFactoryProvider sslHandlerFactoryProvider;
+    private SslContextFactoryProvider sslHandlerFactoryProvider;
     @Mock
     private DOMMountPointListener masterMountPointListener;
     private final DOMMountPointService masterMountPointService = new DOMMountPointServiceImpl();

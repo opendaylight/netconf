@@ -8,8 +8,8 @@
 package org.opendaylight.netconf.callhome.mount.tls;
 
 import com.google.common.collect.ImmutableMultimap;
-import io.netty.channel.Channel;
-import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.SslContext;
+import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +25,8 @@ import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsAuthProvider;
-import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.netconf.client.SslContextFactory;
+import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystore;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.NetconfCallhomeServer;
@@ -45,22 +45,22 @@ import org.slf4j.LoggerFactory;
 
 @Component(service = CallHomeTlsAuthProvider.class, immediate = true)
 @Singleton
-public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvider, AutoCloseable {
+public final class CallHomeMountTlsAuthProvider extends CallHomeTlsAuthProvider implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountTlsAuthProvider.class);
 
     private final ConcurrentMap<String, String> deviceToPrivateKey = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, String> deviceToCertificate = new ConcurrentHashMap<>();
     private final Registration allowedDevicesReg;
     private final Registration certificatesReg;
-    private final SslHandlerFactory sslHandlerFactory;
+    private final SslContextFactory sslContextFactory;
 
     private volatile ImmutableMultimap<PublicKey, String> publicKeyToName = ImmutableMultimap.of();
 
     @Inject
     @Activate
-    public CallHomeMountTlsAuthProvider(final @Reference SslHandlerFactoryProvider sslHandlerFactoryProvider,
-            final @Reference DataBroker dataBroker, final @Reference NetconfKeystoreService keystoreService) {
-        sslHandlerFactory = sslHandlerFactoryProvider.getSslHandlerFactory(null);
+    public CallHomeMountTlsAuthProvider(@Reference final SslContextFactoryProvider sslContextFactoryProvider,
+            @Reference final DataBroker dataBroker, @Reference final NetconfKeystoreService keystoreService) {
+        sslContextFactory = sslContextFactoryProvider.getSslContextFactory(null);
         allowedDevicesReg = dataBroker.registerTreeChangeListener(
             DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
                 InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class)),
@@ -108,8 +108,8 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
     }
 
     @Override
-    public SslHandler createSslHandler(final Channel channel) {
-        return sslHandlerFactory.createSslHandler(Set.copyOf(deviceToPrivateKey.values()));
+    protected SslContext getSslContext(final SocketAddress remoteAddress) {
+        return sslContextFactory.createSslContext(Set.copyOf(deviceToPrivateKey.values()));
     }
 
     private final class AllowedDevicesMonitor implements DataTreeChangeListener<Device> {
