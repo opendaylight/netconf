@@ -33,8 +33,10 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfCl
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
+import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev231228.password.grouping.password.type.CleartextPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev231228.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev231228.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
@@ -134,12 +136,15 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyBased = keyAuth.getKeyBased();
             sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder().setUsername(keyBased.getUsername()).build());
-            confBuilder.withSshConfigurator(factoryMgr -> {
-                final var keyPair = getKeyPair(keyBased.getKeyId());
-                factoryMgr.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
-                final var factory = new UserAuthPublicKeyFactory();
-                factory.setSignatureFactories(factoryMgr.getSignatureFactories());
-                factoryMgr.setUserAuthFactories(List.of(factory));
+            confBuilder.withSshConfigurator(new ClientFactoryManagerConfigurator() {
+                @Override
+                protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
+                    final var keyPair = getKeyPair(keyBased.getKeyId());
+                    factoryManager.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
+                    final var factory = new UserAuthPublicKeyFactory();
+                    factory.setSignatureFactories(factoryManager.getSignatureFactories());
+                    factoryManager.setUserAuthFactories(List.of(factory));
+                }
             });
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());
