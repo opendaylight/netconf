@@ -10,48 +10,30 @@ package org.opendaylight.netconf.client.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
-import java.io.Reader;
-import java.io.StringReader;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
+import org.opendaylight.yangtools.yang.model.spi.source.StringYangTextSource;
 
 /**
  * A {@link YangTextSource} cached from a remote service.
  */
-// FIXME: subclass StringYangTextSource and cleanup addToStringAttributes()
-public final class CachedYangTextSchemaSource extends YangTextSource {
-    private final @NonNull SourceIdentifier sourceId;
-    private final @NonNull RemoteDeviceId id;
-    private final @NonNull String symbolicName;
-    private final @NonNull String schemaString;
+public final class CachedYangTextSchemaSource extends StringYangTextSource {
+    private final @NonNull RemoteDeviceId deviceId;
 
-    public CachedYangTextSchemaSource(final RemoteDeviceId id, final SourceIdentifier sourceId,
-            final String symbolicName, final String schemaString) {
-        this.id = requireNonNull(id);
-        this.sourceId = requireNonNull(sourceId);
-        this.symbolicName = requireNonNull(symbolicName);
-        this.schemaString = requireNonNull(schemaString);
+    public CachedYangTextSchemaSource(final RemoteDeviceId deviceId, final SourceIdentifier sourceId,
+            final String content, final String symbolicName) {
+        super(sourceId, content, symbolicName);
+        this.deviceId = requireNonNull(deviceId);
     }
 
-    @Override
-    public Reader openStream() {
-        return new StringReader(schemaString);
-    }
-
-    @Override
-    public SourceIdentifier sourceId() {
-        return sourceId;
-    }
-
-    @Override
-    public String symbolicName() {
-        return symbolicName;
+    public @NonNull RemoteDeviceId deviceId() {
+        return deviceId;
     }
 
     @Override
     protected MoreObjects.ToStringHelper addToStringAttributes(final MoreObjects.ToStringHelper toStringHelper) {
-        return toStringHelper.add("device", id);
+        return super.addToStringAttributes(toStringHelper.add("deviceId", deviceId));
     }
 }
