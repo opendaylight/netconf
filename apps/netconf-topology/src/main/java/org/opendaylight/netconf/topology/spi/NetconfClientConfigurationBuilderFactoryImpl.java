@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.io.StringReader;
@@ -162,7 +163,8 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         }
     }
 
-    private static KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {
+    @VisibleForTesting
+    static KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {
         try (var keyReader = new PEMParser(new StringReader(privateKey.replace("\\n", "\n")))) {
             final var obj = keyReader.readObject();
 
