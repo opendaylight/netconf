@@ -7,54 +7,46 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 
 public class LibrarySchemaYangSourceProviderTest {
-    private SourceIdentifier workingSid;
-    private LibrarySchemaSourceProvider yangLibrarySchemaYangSourceProvider;
-
-    @Before
-    public void setUp() throws Exception {
-        workingSid = new SourceIdentifier("abc");
-        yangLibrarySchemaYangSourceProvider = new LibrarySchemaSourceProvider(
-            new RemoteDeviceId("id", new InetSocketAddress("localhost", 22)),
-            Map.of(workingSid, getClass().getResource("/schemas/config-test-rpc.yang")));
-    }
+    private final SourceIdentifier workingSid = new SourceIdentifier("abc");
+    private final LibrarySchemaSourceProvider yangLibrarySchemaYangSourceProvider = new LibrarySchemaSourceProvider(
+        new RemoteDeviceId("id", new InetSocketAddress("localhost", 22)),
+        Map.of(workingSid, LibrarySchemaYangSourceProviderTest.class.getResource("/schemas/config-test-rpc.yang")));
 
     @Test
-    public void testGetSource() throws Exception {
+    void testGetSource() throws Exception {
         var source = yangLibrarySchemaYangSourceProvider.getSource(workingSid);
-        final String x = source.get().read();
-        assertThat(x, containsString("module config-test-rpc"));
+        assertThat(source.get().read(), startsWith("module config-test-rpc"));
     }
 
     @Test
-    public void testGetSourceFailure() throws InterruptedException, MalformedURLException {
+    void testGetSourceFailure() throws InterruptedException, MalformedURLException {
         final var sourceIdentifierURLMap = Map.of(workingSid, new URL("http://non-existing-entity.yang"));
         final var failingYangLibrarySchemaYangSourceProvider = new LibrarySchemaSourceProvider(
             new RemoteDeviceId("id", new InetSocketAddress("localhost", 22)), sourceIdentifierURLMap);
 
         final var future = failingYangLibrarySchemaYangSourceProvider.getSource(workingSid);
         final var ex = assertThrows(ExecutionException.class, () -> future.get());
-        assertThat(ex.getCause(), instanceOf(SchemaSourceException.class));
+        assertInstanceOf(SchemaSourceException.class, ex.getCause());
     }
 
     @Test
-    public void testGetSourceNotAvailable() {
+    void testGetSourceNotAvailable() {
         assertThrows(IllegalArgumentException.class,
             () -> yangLibrarySchemaYangSourceProvider.getSource(new SourceIdentifier("aaaaa")));
     }
