@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
+import io.netty.handler.ssl.SslContext;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,11 +23,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.client.SslHandlerFactory;
+import org.opendaylight.netconf.client.SslContextFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -55,9 +56,11 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     @Mock
     private CredentialProvider credentialProvider;
     @Mock
-    private SslHandlerFactoryProvider sslHandlerFactoryProvider;
+    private SslContextFactoryProvider sslContextFactoryProvider;
     @Mock
-    private SslHandlerFactory sslHandlerFactory;
+    private SslContextFactory sslContextFactory;
+    @Mock
+    private SslContext sslContext;
 
     private NetconfNodeBuilder nodeBuilder;
     private NetconfClientConfigurationBuilderFactoryImpl factory;
@@ -80,7 +83,7 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
             .setBackoffMultiplier(Decimal64.valueOf("1.5"))
             .setConnectionTimeoutMillis(Uint32.valueOf(20000));
         factory = new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
-            sslHandlerFactoryProvider);
+            sslContextFactoryProvider);
     }
 
     private void assertConfig(final NetconfClientConfiguration config) {
@@ -117,7 +120,8 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
 
     @Test
     void testTls() {
-        doReturn(sslHandlerFactory).when(sslHandlerFactoryProvider).getSslHandlerFactory(any());
+        doReturn(sslContextFactory).when(sslContextFactoryProvider).getSslHandlerFactory(any());
+        doReturn(sslContext).when(sslContextFactory).createSslContext();
         final var config = createConfig(
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build());
         assertConfig(config);

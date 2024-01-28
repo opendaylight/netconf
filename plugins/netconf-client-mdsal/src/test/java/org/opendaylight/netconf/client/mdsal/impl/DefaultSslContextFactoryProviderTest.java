@@ -46,7 +46,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 @ExtendWith(MockitoExtension.class)
-class DefaultSslHandlerFactoryProviderTest {
+class DefaultSslContextFactoryProviderTest {
     private static final String XML_ELEMENT_PRIVATE_KEY = "private-key";
     private static final String XML_ELEMENT_NAME = "name";
     private static final String XML_ELEMENT_DATA = "data";
@@ -95,8 +95,8 @@ class DefaultSslHandlerFactoryProviderTest {
         keystore.close();
     }
 
-    private DefaultSslHandlerFactoryProvider newProvider() {
-        return new DefaultSslHandlerFactoryProvider(keystore);
+    private DefaultSslContextFactoryProvider newProvider() {
+        return new DefaultSslContextFactoryProvider(keystore);
     }
 
     @Test
@@ -209,6 +209,6 @@ class DefaultSslHandlerFactoryProviderTest {
 
     private static Document readKeystoreXML() throws Exception {
         return XmlUtil.readXmlToDocument(
-            DefaultSslHandlerFactoryProviderTest.class.getResourceAsStream("/netconf-keystore.xml"));
+            DefaultSslContextFactoryProviderTest.class.getResourceAsStream("/netconf-keystore.xml"));
     }
 }
