@@ -9,6 +9,7 @@ package org.opendaylight.netconf.client.mdsal.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import io.netty.handler.ssl.SslContextBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +17,6 @@ import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -185,6 +185,7 @@ public final class DefaultSslHandlerFactoryProvider
      * @throws GeneralSecurityException If any security exception occurred
      * @throws IOException If there is an I/O problem with the keystore data
      */
+    // FIXME: this should actually result in SslContext!
     KeyStore getJavaKeyStore(final Set<String> allowedKeys) throws GeneralSecurityException, IOException {
         requireNonNull(allowedKeys);
         final var current = state;
@@ -197,7 +198,9 @@ public final class DefaultSslHandlerFactoryProvider
 
         final var helper = new SecurityHelper();
 
-        // Private keys first
+        final var builder = SslContextBuilder.forClient();
+
+        // Private keys first... yeah we need to select exactly one key
         for (var entry : current.privateKeys.entrySet()) {
             final var alias = entry.getKey();
             if (!allowedKeys.isEmpty() && !allowedKeys.contains(alias)) {
@@ -206,23 +209,30 @@ public final class DefaultSslHandlerFactoryProvider
 
             final var privateKey = entry.getValue();
             final var key = helper.getJavaPrivateKey(privateKey.getData());
+
             // TODO: requireCertificateChain() here and filter in update path
             final var certChain = privateKey.getCertificateChain();
             if (certChain == null || certChain.isEmpty()) {
                 throw new CertificateException("No certificate chain associated with private key " + alias + " found");
             }
 
-            final var chain = new Certificate[certChain.size()];
+            final var chain = new X509Certificate[certChain.size()];
             int idx = 0;
             for (var cert : certChain) {
                 chain[idx++] = helper.getCertificate(cert);
             }
+
+            builder.keyManager(key, chain);
+
             keyStore.setKeyEntry(alias, key, EMPTY_CHARS, chain);
         }
 
-        for (var entry : current.trustedCertificates.entrySet()) {
-            keyStore.setCertificateEntry(entry.getKey(), helper.getCertificate(entry.getValue().getCertificate()));
+        final var certs = new X509Certificate[current.trustedCertificates.size()];
+        int i = 0;
+        for (var cert : current.trustedCertificates.values()) {
+            certs[i++] = helper.getCertificate(cert.getCertificate());
         }
+        builder.trustManager(certs);
 
         return keyStore;
     }
