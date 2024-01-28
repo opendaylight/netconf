@@ -18,13 +18,14 @@ import static org.mockito.Mockito.verify;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import io.netty.handler.ssl.ClientAuth;
+import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.SslHandler;
 import io.netty.util.concurrent.Promise;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.SocketAddress;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -47,7 +48,6 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,6 +68,7 @@ import org.opendaylight.netconf.server.osgi.AggregatedNetconfOperationServiceFac
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.tcp.BootstrapFactory;
+import org.opendaylight.netconf.transport.tls.FixedSslHandlerFactory;
 import org.opendaylight.netconf.transport.tls.TLSServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -122,15 +123,14 @@ public class CallHomeTlsServerTest {
         // Auth provider
         final var authProvider = new CallHomeTlsAuthProvider() {
             @Override
-            public @Nullable String idFor(@NonNull
-            final PublicKey publicKey) {
+            public String idFor(final PublicKey publicKey) {
                 // identify client 3 only
                 return clientCert3.keyPair.getPublic().equals(publicKey) ? "client-id" : null;
             }
 
             @Override
-            public SslHandler createSslHandler(final Channel channel) {
-                return serverCtx.newHandler(channel.alloc());
+            protected SslContext getSslContext(final SocketAddress remoteAddress) {
+                return serverCtx;
             }
         };
 
@@ -182,21 +182,21 @@ public class CallHomeTlsServerTest {
             // client 1 rejected on handshake, ensure exception
             client1 = TLSServer.connect(
                 netconfTransportListener, bootstrapFactory.newBootstrap(), tcpConnectParams,
-                channel -> clientCtx1.newHandler(channel.alloc())).get(TIMEOUT, TimeUnit.MILLISECONDS);
+                new FixedSslHandlerFactory(clientCtx1)).get(TIMEOUT, TimeUnit.MILLISECONDS);
             verify(statusRecorder, timeout(TIMEOUT).times(1))
                 .onTransportChannelFailure(any(SSLHandshakeException.class));
 
             // client 2 rejected because it's not identified by public key accepted on handshake stage
             client2 = TLSServer.connect(
                 netconfTransportListener, bootstrapFactory.newBootstrap(), tcpConnectParams,
-                channel -> clientCtx2.newHandler(channel.alloc())).get(TIMEOUT, TimeUnit.MILLISECONDS);
+                new FixedSslHandlerFactory(clientCtx2)).get(TIMEOUT, TimeUnit.MILLISECONDS);
             verify(statusRecorder, timeout(TIMEOUT).times(1))
                 .reportUnknown(any(InetSocketAddress.class), eq(clientCert2.keyPair.getPublic()));
 
             // client 3 accepted
             client3 = TLSServer.connect(
                 netconfTransportListener, bootstrapFactory.newBootstrap(), tcpConnectParams,
-                channel -> clientCtx3.newHandler(channel.alloc())).get(TIMEOUT, TimeUnit.MILLISECONDS);
+                new FixedSslHandlerFactory(clientCtx3)).get(TIMEOUT, TimeUnit.MILLISECONDS);
             // verify netconf session established
             verify(clientSessionListener, timeout(TIMEOUT).times(1)).onSessionUp(any(NetconfClientSession.class));
             verify(serverSessionListener, timeout(TIMEOUT).times(1)).onSessionUp(any(NetconfServerSession.class));
