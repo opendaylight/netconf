@@ -17,7 +17,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientFactory;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -43,7 +43,7 @@ public abstract class AbstractNetconfTopology {
     private final NetconfClientFactory clientFactory;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager schemaManager;
-    private final BaseNetconfSchemas baseSchemas;
+    private final BaseNetconfSchemaProvider baseSchemaProvider;
     private final NetconfClientConfigurationBuilderFactory builderFactory;
     private final NetconfTimer timer;
 
@@ -56,7 +56,7 @@ public abstract class AbstractNetconfTopology {
             final NetconfTimer timer, final NetconfTopologySchemaAssembler schemaAssembler,
             final SchemaResourceManager schemaManager, final DataBroker dataBroker,
             final DOMMountPointService mountPointService, final NetconfClientConfigurationBuilderFactory builderFactory,
-            final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemas baseSchemas) {
+            final DeviceActionFactory deviceActionFactory, final BaseNetconfSchemaProvider baseSchemaProvider) {
         this.topologyId = requireNonNull(topologyId);
         this.clientFactory = requireNonNull(clientFactory);
         this.timer = requireNonNull(timer);
@@ -66,7 +66,7 @@ public abstract class AbstractNetconfTopology {
         this.dataBroker = requireNonNull(dataBroker);
         this.mountPointService = mountPointService;
         this.builderFactory = requireNonNull(builderFactory);
-        this.baseSchemas = requireNonNull(baseSchemas);
+        this.baseSchemaProvider = requireNonNull(baseSchemaProvider);
 
         // FIXME: this should be a put(), as we are initializing and will be re-populating the datastore with all the
         //        devices. Whatever has been there before should be nuked to properly re-align lifecycle.
@@ -120,8 +120,9 @@ public abstract class AbstractNetconfTopology {
 
         final NetconfNodeHandler nodeHandler;
         try {
-            nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemas, schemaManager, schemaAssembler,
-                builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode, nodeOptional);
+            nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider, schemaManager,
+                schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode,
+                nodeOptional);
         } catch (IllegalArgumentException e) {
             // This is a workaround for NETCONF-1114 where the encrypted password's lexical structure is not enforced
             // in the datastore and it ends up surfacing when we decrypt the password.

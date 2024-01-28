@@ -12,10 +12,10 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.client.mdsal.impl.BaseSchema;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +29,10 @@ final class DeviceSourcesResolver implements Callable<DeviceSources> {
     private final NetconfSessionPreferences remoteSessionCapabilities;
     private final NetconfDeviceSchemasResolver stateSchemasResolver;
     private final NetconfDeviceRpc deviceRpc;
-    private final BaseSchema baseSchema;
+    private final BaseNetconfSchema baseSchema;
     private final RemoteDeviceId id;
 
-    DeviceSourcesResolver(final RemoteDeviceId id, final BaseSchema baseSchema, final NetconfDeviceRpc deviceRpc,
+    DeviceSourcesResolver(final RemoteDeviceId id, final BaseNetconfSchema baseSchema, final NetconfDeviceRpc deviceRpc,
             final NetconfSessionPreferences remoteSessionCapabilities,
             final NetconfDeviceSchemasResolver stateSchemasResolver) {
         this.id = requireNonNull(id);

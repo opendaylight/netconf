@@ -33,7 +33,7 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
@@ -128,7 +128,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     private Task currentTask;
 
     public NetconfNodeHandler(final NetconfClientFactory clientFactory, final NetconfTimer timer,
-            final BaseNetconfSchemas baseSchemas, final SchemaResourceManager schemaManager,
+            final BaseNetconfSchemaProvider baseSchemaProvider, final SchemaResourceManager schemaManager,
             final NetconfTopologySchemaAssembler schemaAssembler,
             final NetconfClientConfigurationBuilderFactory builderFactory,
             final DeviceActionFactory deviceActionFactory, final RemoteDeviceHandler delegate,
@@ -167,7 +167,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
 
         final RemoteDevice<NetconfDeviceCommunicator> device;
         if (node.requireSchemaless()) {
-            device = new SchemalessNetconfDevice(baseSchemas, deviceId, salFacade);
+            device = new SchemalessNetconfDevice(baseSchemaProvider, deviceId, salFacade);
             yanglibRegistrations = List.of();
         } else {
             final var resources = schemaManager.getSchemaResources(node.getSchemaCacheDirectory(), nodeId.getValue());
@@ -178,7 +178,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                 .setId(deviceId)
                 .setSalFacade(salFacade)
                 .setDeviceActionFactory(deviceActionFactory)
-                .setBaseSchemas(baseSchemas)
+                .setBaseSchemas(baseSchemaProvider)
                 .build();
             yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
         }

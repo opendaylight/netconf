@@ -8,25 +8,27 @@
 package org.opendaylight.netconf.client.mdsal;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.Lists;
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.List;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
-import org.opendaylight.netconf.client.mdsal.impl.SchemalessMessageTransformer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
+import org.w3c.dom.Document;
 
 public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 
@@ -38,24 +40,28 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
     public void testSessionOnMethods() throws Exception {
         final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = mockCloseableClass(NetconfDeviceCommunicator.class);
-        final SchemalessMessageTransformer messageTransformer = mock(SchemalessMessageTransformer.class);
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test-D",
                 InetSocketAddress.createUnresolved("localhost", 22));
 
-        final SchemalessNetconfDevice device = new SchemalessNetconfDevice(BASE_SCHEMAS, remoteDeviceId, facade,
-            messageTransformer);
+        final SchemalessNetconfDevice device = new SchemalessNetconfDevice(BASE_SCHEMAS, remoteDeviceId, facade);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
-                Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
-
-        final NetconfMessage netconfMessage = mock(NetconfMessage.class);
+                List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
 
         device.onRemoteSessionUp(sessionCaps, listener);
         verify(facade).onDeviceConnected(
                 any(NetconfDeviceSchema.class), any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
 
+        final NetconfMessage netconfMessage = mock(NetconfMessage.class);
+        final Document document = XmlUtil.readXmlToDocument("""
+            <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+              <eventTime>2021-11-11T11:26:16Z</eventTime>
+              <netconf-config-change xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-notifications"/>
+            </notification>""");
+        doReturn(document).when(netconfMessage).getDocument();
+
         device.onNotification(netconfMessage);
-        verify(facade).onNotification(isNull());
+        verify(facade).onNotification(any());
 
         device.onRemoteSessionDown();
         verify(facade).onDeviceDisconnected();

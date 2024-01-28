@@ -22,6 +22,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -35,6 +36,7 @@ import org.opendaylight.netconf.api.EffectiveOperation;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractTestModelTest;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
@@ -110,7 +112,8 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         when(listener.sendRequest(any(), eq(Unlock.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
         when(listener.sendRequest(any(), eq(Commit.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
         final var rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, new NetconfMessageTransformer(
-            MountPointContext.of(SCHEMA_CONTEXT), true, BASE_SCHEMAS.baseSchema()));
+            MountPointContext.of(SCHEMA_CONTEXT), true,
+            BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of()))));
         callback = new NetconfRpcFutureCallback("prefix",
             new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830)));
         baseOps = new NetconfBaseOps(rpc, MountPointContext.of(SCHEMA_CONTEXT));
