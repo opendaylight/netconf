@@ -695,10 +695,9 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         return getMountPointService(mountPoint, DOMActionService.class);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private static <T extends DOMService> T getMountPointService(final DOMMountPoint mountPoint,
-            final Class<T> serviceClass) {
-        return (T) mountPoint.getService((Class) serviceClass).orElseThrow();
+    private static <T extends DOMService<T, E>, E extends DOMService.Extension<T, E>> T getMountPointService(
+            final DOMMountPoint mountPoint, final Class<T> serviceClass) {
+        return mountPoint.getService(serviceClass).orElseThrow();
     }
 
     private DOMMountPoint awaitMountPoint(final DOMMountPointService mountPointService) {
