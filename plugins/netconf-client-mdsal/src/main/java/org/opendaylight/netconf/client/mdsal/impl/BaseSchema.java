@@ -17,6 +17,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
 public final class BaseSchema implements Immutable {
+    // FIXME:
+    //    private final @NonNull Set<NetconfRpcService.Extension> rpcExtensions;
     private final @NonNull ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
     private final @NonNull MountPointContext mountContext;
 
