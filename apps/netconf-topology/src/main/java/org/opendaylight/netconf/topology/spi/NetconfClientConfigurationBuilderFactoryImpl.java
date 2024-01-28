@@ -115,16 +115,16 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyBased = keyAuth.getKeyBased();
             sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder().setUsername(keyBased.getUsername()).build());
-            confBuilder.withSshConfigurator(factoryMgr -> {
+            confBuilder.withSshConfigurator(factoryManager -> {
                 final var keyId = keyBased.getKeyId();
                 final var keyPair = credentialProvider.credentialForId(keyId);
                 if (keyPair == null) {
                     throw new IllegalArgumentException("No keypair found with keyId=" + keyId);
                 }
-                factoryMgr.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
+                factoryManager.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
                 final var factory = new UserAuthPublicKeyFactory();
-                factory.setSignatureFactories(factoryMgr.getSignatureFactories());
-                factoryMgr.setUserAuthFactories(List.of(factory));
+                factory.setSignatureFactories(factoryManager.getSignatureFactories());
+                factoryManager.setUserAuthFactories(List.of(factory));
             });
         } else {
             throw new IllegalArgumentException("Unsupported credential type: " + credentials.getClass());

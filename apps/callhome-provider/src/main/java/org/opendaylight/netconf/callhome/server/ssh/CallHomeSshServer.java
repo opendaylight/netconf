@@ -22,6 +22,7 @@ import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
 import org.opendaylight.netconf.callhome.server.CallHomeTransportChannelListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
@@ -70,11 +71,17 @@ public final class CallHomeSshServer implements AutoCloseable {
         // NB actual username will be assigned dynamically but predefined one is required for transport initialization
         final var sshClientParams = new SshClientParametersBuilder().setClientIdentity(
             new ClientIdentityBuilder().setUsername("ignored").build()).build();
-        final ClientFactoryManagerConfigurator configurator = factoryMgr -> {
-            factoryMgr.setServerKeyVerifier(this::verifyServerKey);
-            factoryMgr.addSessionListener(createSessionListener());
-            // supported auth factories
-            factoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory(), new UserAuthPublicKeyFactory()));
+        final var configurator =  new ClientFactoryManagerConfigurator() {
+            @Override
+            protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
+                factoryManager.setServerKeyVerifier((clientSession, remoteAddress, serverKey)
+                    -> verifyServerKey(clientSession, remoteAddress, serverKey));
+                factoryManager.addSessionListener(createSessionListener());
+                // supported auth factories
+                factoryManager.setUserAuthFactories(List.of(
+                    new UserAuthPasswordFactory(),
+                    new UserAuthPublicKeyFactory()));
+            }
         };
         try {
             client = transportStackFactory.listenClient(TransportConstants.SSH_SUBSYSTEM, transportChannelListener,
