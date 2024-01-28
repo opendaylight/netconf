@@ -18,6 +18,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextProvider;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
 public final class BaseSchema implements EffectiveModelContextProvider, Immutable {
+    // FIXME:
+    //    private final @NonNull Set<NetconfRpcService.Extesion> rpcExtensions;
     private final @NonNull ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
     private final @NonNull MountPointContext mountContext;
 
