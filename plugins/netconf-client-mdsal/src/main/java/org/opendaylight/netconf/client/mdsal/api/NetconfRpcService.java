@@ -9,9 +9,11 @@ package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMExtensibleService;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMService;
+import org.opendaylight.mdsal.dom.api.DOMServiceExtension;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -19,7 +21,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 /**
  * A {@link DOMService} capturing the ability to invoke RPCs which are defined in RFC4741 and in RFC6241.
  */
-public interface NetconfRpcService extends DOMService {
+public interface NetconfRpcService extends DOMExtensibleService<NetconfRpcService, NetconfRpcService.Extension> {
+    /**
+     * An extension to {@link NetconfRpcService}.
+     */
+    public interface Extension extends DOMServiceExtension<NetconfRpcService, Extension> {
+        // Marker interface
+    }
+
     /**
      * Invoke a base RFC4741/RFC6241 RPC, e.g. those in {@link YangConstants#NETCONF_NAMESPACE}.
      *
