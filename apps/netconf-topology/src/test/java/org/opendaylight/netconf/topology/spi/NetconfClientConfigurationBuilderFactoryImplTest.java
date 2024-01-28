@@ -22,11 +22,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.client.SslHandlerFactory;
+import org.opendaylight.netconf.client.SslContextFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -55,9 +55,9 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     @Mock
     private CredentialProvider credentialProvider;
     @Mock
-    private SslHandlerFactoryProvider sslHandlerFactoryProvider;
+    private SslContextFactoryProvider sslHandlerFactoryProvider;
     @Mock
-    private SslHandlerFactory sslHandlerFactory;
+    private SslContextFactory sslHandlerFactory;
 
     private NetconfNodeBuilder nodeBuilder;
     private NetconfClientConfigurationBuilderFactoryImpl factory;

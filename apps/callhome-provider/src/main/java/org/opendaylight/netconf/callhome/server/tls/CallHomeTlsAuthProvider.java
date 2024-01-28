@@ -15,7 +15,7 @@ import org.opendaylight.netconf.transport.tls.SslHandlerFactory;
 /**
  * Authentication provider.
  */
-public interface CallHomeTlsAuthProvider extends SslHandlerFactory {
+public abstract class CallHomeTlsAuthProvider extends SslHandlerFactory {
 
-    @Nullable String idFor(@NonNull PublicKey publicKey);
+    public abstract @Nullable String idFor(@NonNull PublicKey publicKey);
 }
