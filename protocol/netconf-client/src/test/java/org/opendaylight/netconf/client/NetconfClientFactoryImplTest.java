@@ -47,6 +47,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
+import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.opendaylight.netconf.shaded.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
@@ -276,10 +277,13 @@ class NetconfClientFactoryImplTest {
                 (usr, psw, session) -> USERNAME.equals(usr) && PASSWORD.equals(psw));
             factoryManager.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
         };
-        final ClientFactoryManagerConfigurator clientConfigurator = factoryManager -> {
-            factoryManager.setPasswordIdentityProvider(PasswordIdentityProvider.wrapPasswords(PASSWORD));
-            factoryManager.setUserAuthFactories(List.of(
-                new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
+        final var clientConfigurator = new ClientFactoryManagerConfigurator() {
+            @Override
+            protected void configureClientFactoryManager(final ClientFactoryManager factoryManager) {
+                factoryManager.setPasswordIdentityProvider(PasswordIdentityProvider.wrapPasswords(PASSWORD));
+                factoryManager.setUserAuthFactories(List.of(
+                    new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
+            }
         };
 
         final var server = SERVER_FACTORY.listenServer("netconf", serverTransportListener, tcpServerParams,
