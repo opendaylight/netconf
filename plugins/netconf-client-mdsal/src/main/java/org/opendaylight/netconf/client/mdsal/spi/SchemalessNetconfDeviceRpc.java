@@ -12,7 +12,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -21,6 +20,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
+import org.opendaylight.netconf.client.mdsal.api.SchemalessRpcService;
 import org.opendaylight.netconf.client.mdsal.impl.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.client.mdsal.impl.SchemalessMessageTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -29,9 +29,10 @@ import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 
 /**
- * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
+ * Invokes RPC by sending NETCONF message via listener. Also transforms result from NetconfMessage to CompositeNode.
  */
 public final class SchemalessNetconfDeviceRpc implements Rpcs.Schemaless {
+    private final @NonNull SchemalessRpcService schemalessRpcService;
     private final RemoteDeviceCommunicator listener;
     private final BaseRpcSchemalessTransformer baseRpcTransformer;
     private final SchemalessMessageTransformer schemalessTransformer;
@@ -44,6 +45,7 @@ public final class SchemalessNetconfDeviceRpc implements Rpcs.Schemaless {
         this.listener = listener;
         this.baseRpcTransformer = baseRpcTransformer;
         schemalessTransformer = messageTransformer;
+        schemalessRpcService = (type, input) -> handleRpc(type, input, schemalessTransformer);
     }
 
     @Override
@@ -55,8 +57,8 @@ public final class SchemalessNetconfDeviceRpc implements Rpcs.Schemaless {
     }
 
     @Override
-    public ListenableFuture<? extends DOMSource> invokeRpc(final QName type, final DOMSource input) {
-        return handleRpc(type, input, schemalessTransformer);
+    public SchemalessRpcService schemalessRpcService() {
+        return schemalessRpcService;
     }
 
     private @NonNull <I, R> ListenableFuture<R> handleRpc(final @NonNull QName type,

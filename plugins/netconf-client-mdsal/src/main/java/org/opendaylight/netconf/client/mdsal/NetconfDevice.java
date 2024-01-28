@@ -187,10 +187,11 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         // TODO check whether the model describing create subscription is present in schema
         // Perhaps add a default schema context to support create-subscription if the model was not provided
         // (same as what we do for base netconf operations in transformer)
-        final var rpcResultListenableFuture = deviceRpc.invokeRpc(CreateSubscription.QNAME, Builders.containerBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(CreateSubscriptionInput.QNAME))
-            // Note: default 'stream' is 'NETCONF', we do not need to create an explicit leaf
-            .build());
+        final var rpcResultListenableFuture = deviceRpc.domRpcService()
+            .invokeRpc(CreateSubscription.QNAME, Builders.containerBuilder()
+                .withNodeIdentifier(NodeIdentifier.create(CreateSubscriptionInput.QNAME))
+                // Note: default 'stream' is 'NETCONF', we do not need to create an explicit leaf
+                .build());
 
         Futures.addCallback(rpcResultListenableFuture, new FutureCallback<DOMRpcResult>() {
             @Override
@@ -287,7 +288,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         final NetconfDeviceRpc deviceRpc = new NetconfDeviceRpc(schemaContext, listener,
             new NetconfMessageTransformer(emptyContext, false, baseSchema));
 
-        return Futures.transform(deviceRpc.invokeRpc(Get.QNAME, Builders.containerBuilder()
+        return Futures.transform(deviceRpc.domRpcService().invokeRpc(Get.QNAME, Builders.containerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID)
             .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS, schemaContext))
             .build()), rpcResult -> processSchemaMounts(rpcResult, emptyContext), MoreExecutors.directExecutor());

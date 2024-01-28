@@ -104,7 +104,8 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
         final RpcResult<NetconfMessage> result = RpcResultBuilder.success(msg).build();
         when(communicatorMock.sendRequest(any(), any())).thenReturn(Futures.immediateFuture(result));
         when(failingTransformer.toRpcResult(any(), any())).thenThrow(new RuntimeException("FAIL"));
-        final NetconfDeviceRpc failingRpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicatorMock, failingTransformer);
+        final var failingRpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicatorMock, failingTransformer)
+            .domRpcService();
         assertThrows(ExecutionException.class, () -> failingRpc.invokeRpc(type, mock(ContainerNode.class)).get());
         assertThrows(ExecutionException.class, () -> failingRpc.invokeRpc(type, null).get());
     }
@@ -112,7 +113,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     @Test
     public void testInvokeRpc() throws Exception {
         ContainerNode input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
-        final DOMRpcResult result = rpc.invokeRpc(type, input).get();
+        final DOMRpcResult result = rpc.domRpcService().invokeRpc(type, input).get();
         assertEquals(expectedReply.value().name(), result.value().name());
         assertEquals(resolveNode(expectedReply), resolveNode(result));
     }
@@ -127,9 +128,9 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testRegisterRpcListener() throws Exception {
-        ArgumentCaptor<Collection> argument = ArgumentCaptor.forClass(Collection.class);
+        final var argument = ArgumentCaptor.forClass(Collection.class);
 
-        rpc.registerRpcListener(listener);
+        rpc.domRpcService().registerRpcListener(listener);
 
         verify(listener).onRpcAvailable(argument.capture());
         final Collection<DOMRpcIdentifier> argValue = argument.getValue();
