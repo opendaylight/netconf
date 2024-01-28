@@ -56,6 +56,7 @@ import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.ssh.ServerFactoryManagerConfigurator;
 import org.opendaylight.netconf.transport.tcp.TCPServer;
+import org.opendaylight.netconf.transport.tls.FixedSslHandlerFactory;
 import org.opendaylight.netconf.transport.tls.TLSServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.crypt.hash.rev140806.CryptHash;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev231228.RsaPrivateKeyFormat;
@@ -168,12 +169,12 @@ class NetconfClientFactoryImplTest {
         final var clientContext = SslContextBuilder.forClient().keyManager(keyMgr).trustManager(trustMgr).build();
 
         final var server = TLSServer.listen(serverTransportListener, SERVER_FACTORY.newServerBootstrap(),
-            tcpServerParams, channel -> serverContext.newHandler(channel.alloc())).get(1, TimeUnit.SECONDS);
+            tcpServerParams, new FixedSslHandlerFactory(serverContext)).get(1, TimeUnit.SECONDS);
         try {
             final var clientConfig = NetconfClientConfigurationBuilder.create()
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
                 .withTcpParameters(tcpClientParams)
-                .withSslHandlerFactory(channel -> clientContext.newHandler(channel.alloc()))
+                .withSslHandlerFactory(new FixedSslHandlerFactory(clientContext))
                 .withSessionListener(sessionListener).build();
             assertNotNull(factory.createClient(clientConfig));
             verify(serverTransportListener, timeout(1000L))
