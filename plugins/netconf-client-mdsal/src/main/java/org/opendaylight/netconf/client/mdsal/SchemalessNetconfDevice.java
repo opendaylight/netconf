@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -23,24 +23,24 @@ import org.opendaylight.netconf.client.mdsal.impl.SchemalessMessageTransformer;
 import org.opendaylight.netconf.client.mdsal.spi.SchemalessNetconfDeviceRpc;
 
 public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
-    private final BaseNetconfSchemas baseSchemas;
+    private final BaseNetconfSchemaProvider baseSchemas;
     private final RemoteDeviceId id;
     private final RemoteDeviceHandler salFacade;
     private final SchemalessMessageTransformer messageTransformer;
     private final BaseRpcSchemalessTransformer rpcTransformer;
 
-    public SchemalessNetconfDevice(final BaseNetconfSchemas baseSchemas, final RemoteDeviceId id,
+    public SchemalessNetconfDevice(final BaseNetconfSchemaProvider baseSchemas, final RemoteDeviceId id,
             final RemoteDeviceHandler salFacade) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.id = id;
         this.salFacade = salFacade;
-        final MessageCounter counter = new MessageCounter();
+        final var counter = new MessageCounter();
         rpcTransformer = new BaseRpcSchemalessTransformer(baseSchemas, counter);
         messageTransformer = new SchemalessMessageTransformer(counter);
     }
 
     @VisibleForTesting
-    SchemalessNetconfDevice(final BaseNetconfSchemas baseSchemas, final RemoteDeviceId id,
+    SchemalessNetconfDevice(final BaseNetconfSchemaProvider baseSchemas, final RemoteDeviceId id,
             final RemoteDeviceHandler salFacade, final SchemalessMessageTransformer messageTransformer) {
         this.baseSchemas = requireNonNull(baseSchemas);
         this.id = id;
@@ -56,7 +56,7 @@ public class SchemalessNetconfDevice implements RemoteDevice<NetconfDeviceCommun
         salFacade.onDeviceConnected(
             // FIXME: or bound from base schema rather?
             new NetconfDeviceSchema(NetconfDeviceCapabilities.empty(),
-            baseSchemas.baseSchema().getMountPointContext()),
+            baseSchemas.baseSchema().mountPointContext()),
             remoteSessionCapabilities, new RemoteDeviceServices(
                 new SchemalessNetconfDeviceRpc(id,netconfDeviceCommunicator, rpcTransformer, messageTransformer),
                 null));

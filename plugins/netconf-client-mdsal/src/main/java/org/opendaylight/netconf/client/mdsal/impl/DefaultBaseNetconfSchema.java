@@ -10,30 +10,31 @@ package org.opendaylight.netconf.client.mdsal.impl;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.yangtools.concepts.Immutable;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
-public final class BaseSchema implements Immutable {
+/**
+ * An {@link EffectiveModelContext} corresponding to a NETCONF baseline advertized by a device..
+ */
+public final class DefaultBaseNetconfSchema implements BaseNetconfSchema {
     private final @NonNull ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
-    private final @NonNull MountPointContext mountContext;
+    private final @NonNull MountPointContext mountPointContext;
 
-    BaseSchema(final EffectiveModelContext context) {
-        mountContext = MountPointContext.of(context);
+    DefaultBaseNetconfSchema(final EffectiveModelContext context) {
+        mountPointContext = MountPointContext.of(context);
         mappedRpcs = Maps.uniqueIndex(context.getOperations(), RpcDefinition::getQName);
     }
 
-    public @NonNull EffectiveModelContext modelContext() {
-        return mountContext.modelContext();
+    @Override
+    public MountPointContext mountPointContext() {
+        return mountPointContext;
     }
 
-    @NonNull ImmutableMap<QName, ? extends RpcDefinition> getMappedRpcs() {
+    @Override
+    public ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs() {
         return mappedRpcs;
-    }
-
-    public @NonNull MountPointContext getMountPointContext() {
-        return mountContext;
     }
 }
