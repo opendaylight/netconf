@@ -15,14 +15,13 @@ import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
  * Extension interface allowing one to customize {@link ClientFactoryManager} before it is used to create the
  * {@link SSHClient} instance.
  */
-@FunctionalInterface
-public interface ClientFactoryManagerConfigurator {
+public abstract class ClientFactoryManagerConfigurator {
     /**
      * Apply custom configuration.
      *
      * @param factoryManager client factory manager instance
      * @throws UnsupportedConfigurationException if the configuration is not acceptable
      */
-    void configureClientFactoryManager(@NonNull ClientFactoryManager factoryManager)
+    protected abstract void configureClientFactoryManager(@NonNull ClientFactoryManager factoryManager)
         throws UnsupportedConfigurationException;
 }
