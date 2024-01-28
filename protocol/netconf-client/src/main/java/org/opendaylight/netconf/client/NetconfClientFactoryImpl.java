@@ -26,6 +26,7 @@ import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
+import org.opendaylight.netconf.transport.tls.FixedSslHandlerFactory;
 import org.opendaylight.netconf.transport.tls.TLSClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.osgi.service.component.annotations.Activate;
@@ -73,7 +74,7 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
         } else if (TLS.equals(protocol)) {
             if (configuration.getTlsParameters() != null) {
                 TLSClient.connect(new ClientTransportChannelListener(future, channelInitializer), bootstrap,
-                    configuration.getTcpParameters(), configuration.getTlsParameters());
+                    configuration.getTcpParameters(), new FixedSslHandlerFactory(configuration.getTlsParameters()));
             } else {
                 TLSClient.connect(new ClientTransportChannelListener(future, channelInitializer), bootstrap,
                     configuration.getTcpParameters(), configuration.getSslHandlerFactory());
