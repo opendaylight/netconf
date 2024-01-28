@@ -103,7 +103,7 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
                             id + ": Unexpected response to get-schema, schema not present in message for: "
                                 + sourceIdentifier));
                     LOG.debug("{}: YANG Schema successfully retrieved for {}:{}", id, moduleName, revision);
-                    return new CachedYangTextSchemaSource(id, sourceIdentifier, moduleName, schemaString);
+                    return new CachedYangTextSource(id, sourceIdentifier, moduleName, schemaString);
                 }
 
                 LOG.warn("{}: YANG schema was not successfully retrieved for {}. Errors: {}", id, sourceIdentifier,
