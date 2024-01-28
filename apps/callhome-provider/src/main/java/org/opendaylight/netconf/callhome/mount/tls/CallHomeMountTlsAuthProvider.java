@@ -9,11 +9,11 @@ package org.opendaylight.netconf.callhome.mount.tls;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
-import io.netty.channel.Channel;
-import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.SslContext;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
@@ -54,7 +55,7 @@ import org.slf4j.LoggerFactory;
 
 @Component(service = CallHomeTlsAuthProvider.class, immediate = true)
 @Singleton
-public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvider, AutoCloseable {
+public final class CallHomeMountTlsAuthProvider extends CallHomeTlsAuthProvider implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountTlsAuthProvider.class);
 
     private final ConcurrentMap<String, String> deviceToPrivateKey = new ConcurrentHashMap<>();
@@ -116,7 +117,9 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
     }
 
     @Override
-    public SslHandler createSslHandler(final Channel channel) {
+    protected @Nullable SslContext getSslContext(final SocketAddress remoteAddress) {
+        // FIXME: err... right, so for this we should have a SslContext first and we should be caching allowed keys, so
+        //        we reuse the same SslContext as long as private keys do not change
         return sslHandlerFactory.createSslHandler(Set.copyOf(deviceToPrivateKey.values()));
     }
 
