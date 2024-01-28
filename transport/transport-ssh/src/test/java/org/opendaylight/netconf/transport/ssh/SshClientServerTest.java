@@ -55,6 +55,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.netconf.shaded.sshd.client.ClientFactoryManager;
 import org.opendaylight.netconf.shaded.sshd.client.auth.password.PasswordIdentityProvider;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.shaded.sshd.common.session.Session;
@@ -338,10 +339,14 @@ public class SshClientServerTest {
     }
 
     private static ClientFactoryManagerConfigurator clientConfigurator(final String username) {
-        return factoryManager -> {
-            factoryManager.setPasswordIdentityProvider(PasswordIdentityProvider.wrapPasswords(PASSWORD));
-            factoryManager.setUserAuthFactories(List.of(
-                new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
+        return new ClientFactoryManagerConfigurator() {
+            @Override
+            protected void configureClientFactoryManager(final ClientFactoryManager factoryManager)
+                    throws UnsupportedConfigurationException {
+                factoryManager.setPasswordIdentityProvider(PasswordIdentityProvider.wrapPasswords(PASSWORD));
+                factoryManager.setUserAuthFactories(List.of(
+                    new org.opendaylight.netconf.shaded.sshd.client.auth.password.UserAuthPasswordFactory()));
+            }
         };
     }
 
