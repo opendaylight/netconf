@@ -69,9 +69,9 @@ public class NetconfDeviceMount implements AutoCloseable {
         final var rpcs = services.rpcs();
         mountBuilder.addService(NetconfRpcService.class, rpcs);
         if (rpcs instanceof Rpcs.Normalized normalized) {
-            mountBuilder.addService(DOMRpcService.class, normalized);
+            mountBuilder.addService(DOMRpcService.class, normalized.domRpcService());
         } else if (rpcs instanceof Rpcs.Schemaless schemaless) {
-            mountBuilder.addService(SchemalessRpcService.class, schemaless);
+            mountBuilder.addService(SchemalessRpcService.class, schemaless.schemalessRpcService());
         }
         if (services.actions() instanceof Actions.Normalized normalized) {
             mountBuilder.addService(DOMActionService.class, normalized);

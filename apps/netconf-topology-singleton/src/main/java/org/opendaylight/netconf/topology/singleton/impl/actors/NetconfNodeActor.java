@@ -129,7 +129,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
 
             final var deviceServices = masterActorData.getDeviceServices();
-            deviceRpc = deviceServices.rpcs() instanceof Rpcs.Normalized normalized ? normalized : null;
+            deviceRpc = deviceServices.rpcs() instanceof Rpcs.Normalized normalized ? normalized.domRpcService() : null;
             deviceAction = deviceServices.actions() instanceof Actions.Normalized normalized ? normalized : null;
 
             sender().tell(new MasterActorDataInitialized(), self());
@@ -342,8 +342,10 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                         LOG.info("{}: Schema context resolved: {} - registering slave mount point",
                                 id, result.getModules());
                         final var actorSystem = setup.getActorSystem();
+                        final var rpcProxy = new ProxyDOMRpcService(actorSystem, masterReference, id,
+                            actorResponseWaitTime);
                         slaveSalManager.registerSlaveMountPoint(result, masterReference, new RemoteDeviceServices(
-                            new ProxyDOMRpcService(actorSystem, masterReference, id, actorResponseWaitTime),
+                            (Rpcs.Normalized) () -> rpcProxy,
                             new ProxyDOMActionService(actorSystem, masterReference, id, actorResponseWaitTime)));
                     }
                 });

@@ -142,7 +142,9 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     private final SharedSchemaRepository masterSchemaRepository = new SharedSchemaRepository("master");
 
     @Mock
-    private Rpcs.Normalized mockDOMRpcService;
+    private Rpcs.Normalized mockRpc;
+    @Mock
+    private DOMRpcService mockDOMRpcService;
     @Mock
     private Actions.Normalized mockDOMActionService;
     @Mock
@@ -688,7 +690,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     private void initializeMaster(final List<SourceIdentifier> sourceIdentifiers) {
         masterRef.tell(new CreateInitialMasterActorData(mockDOMDataBroker, netconfService, sourceIdentifiers,
-                new RemoteDeviceServices(mockDOMRpcService, mockDOMActionService)), testKit.getRef());
+                new RemoteDeviceServices(mockRpc, mockDOMActionService)), testKit.getRef());
         testKit.expectMsgClass(MasterActorDataInitialized.class);
     }
 

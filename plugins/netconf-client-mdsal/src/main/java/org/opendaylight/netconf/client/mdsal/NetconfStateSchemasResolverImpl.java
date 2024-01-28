@@ -32,7 +32,7 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
             final RemoteDeviceId id, final EffectiveModelContext schemaContext) {
         // FIXME: I think we should prefer YANG library here
         if (remoteSessionCapabilities.isMonitoringSupported()) {
-            return NetconfStateSchemas.create(deviceRpc, remoteSessionCapabilities, id, schemaContext);
+            return NetconfStateSchemas.create(deviceRpc.domRpcService(), remoteSessionCapabilities, id, schemaContext);
         }
         if (remoteSessionCapabilities.containsModuleCapability(RFC8525_YANG_LIBRARY_CAPABILITY)
                 || remoteSessionCapabilities.containsModuleCapability(RFC7895_YANG_LIBRARY_CAPABILITY)) {
