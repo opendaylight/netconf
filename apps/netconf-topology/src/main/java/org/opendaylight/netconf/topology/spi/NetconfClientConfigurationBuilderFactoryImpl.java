@@ -21,6 +21,7 @@ import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
+import org.opendaylight.netconf.transport.tls.FixedSslHandlerFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev231228.password.grouping.password.type.CleartextPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev231228.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev231228.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
@@ -71,8 +72,9 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
             final var handlerFactory = sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification());
+            final var sslContext = handlerFactory.createSslHandler();
             builder.withProtocol(NetconfClientProtocol.TLS)
-                .withSslHandlerFactory(channel -> handlerFactory.createSslHandler());
+                .withSslHandlerFactory(new FixedSslHandlerFactory(sslContext));
         } else {
             throw new IllegalArgumentException("Unsupported protocol type: " + protocol.getName());
         }
