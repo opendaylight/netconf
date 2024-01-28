@@ -39,7 +39,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
@@ -49,7 +50,6 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
-import org.opendaylight.netconf.client.mdsal.impl.BaseSchema;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
@@ -103,20 +103,20 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     private final NetconfDeviceSchemasResolver stateSchemasResolver;
     private final NotificationHandler notificationHandler;
     private final boolean reconnectOnSchemasChange;
-    private final BaseNetconfSchemas baseSchemas;
+    private final BaseNetconfSchemaProvider baseSchemas;
 
     @GuardedBy("this")
     private ListenableFuture<List<Object>> schemaFuturesList;
     @GuardedBy("this")
     private boolean connected = false;
 
-    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
+    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemaProvider baseSchemas,
             final RemoteDeviceId id, final RemoteDeviceHandler salFacade, final Executor globalProcessingExecutor,
             final boolean reconnectOnSchemasChange) {
         this(schemaResourcesDTO, baseSchemas, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null);
     }
 
-    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
+    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemaProvider baseSchemas,
             final RemoteDeviceId id, final RemoteDeviceHandler salFacade, final Executor globalProcessingExecutor,
             final boolean reconnectOnSchemasChange, final DeviceActionFactory deviceActionFactory) {
         this.baseSchemas = requireNonNull(baseSchemas);
@@ -141,9 +141,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         setConnected(true);
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
-        final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
-        final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.modelContext(), listener,
-            new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
+        final var baseSchema = baseSchemas.baseSchemaForCapabilities(remoteSessionCapabilities);
+        final var initRpc = new NetconfDeviceRpc(baseSchema.modelContext(), listener,
+            new NetconfMessageTransformer(baseSchema.mountPointContext(), false, baseSchema));
         final var sourceResolverFuture = Futures.submit(new DeviceSourcesResolver(id, baseSchema, initRpc,
                 remoteSessionCapabilities, stateSchemasResolver), processingExecutor);
 
@@ -165,7 +165,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         Futures.addCallback(netconfDeviceSchemaFuture, new FutureCallback<>() {
                 @Override
                 public void onSuccess(final NetconfDeviceSchema result) {
-                    handleSalInitializationSuccess(listener, result, remoteSessionCapabilities,
+                    handleSalInitializationSuccess(listener, baseSchema, result, remoteSessionCapabilities,
                         getDeviceSpecificRpc(result.mountContext(), listener, baseSchema));
                 }
 
@@ -221,8 +221,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     private synchronized void handleSalInitializationSuccess(final RemoteDeviceCommunicator listener,
-            final NetconfDeviceSchema deviceSchema, final NetconfSessionPreferences remoteSessionCapabilities,
-            final Rpcs deviceRpc) {
+            final BaseNetconfSchema baseSchema, final NetconfDeviceSchema deviceSchema,
+            final NetconfSessionPreferences remoteSessionCapabilities, final Rpcs deviceRpc) {
         // NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
         // since salFacade.onDeviceDisconnected was already called.
         if (!connected) {
@@ -230,8 +230,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             return;
         }
 
-        final var messageTransformer = new NetconfMessageTransformer(deviceSchema.mountContext(), true,
-            resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
+        final var messageTransformer = new NetconfMessageTransformer(deviceSchema.mountContext(), true, baseSchema);
 
         // Order is important here: salFacade has to see the device come up and then the notificationHandler can deliver
         // whatever notifications have been held back
@@ -276,7 +275,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     private ListenableFuture<@NonNull MountPointContext> createMountPointContext(
-            final EffectiveModelContext schemaContext, final BaseSchema baseSchema,
+            final EffectiveModelContext schemaContext, final BaseNetconfSchema baseSchema,
             final NetconfDeviceCommunicator listener) {
         final MountPointContext emptyContext = MountPointContext.of(schemaContext);
         if (schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isEmpty()) {
@@ -319,12 +318,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         notificationHandler.handleNotification(notification);
     }
 
-    private BaseSchema resolveBaseSchema(final boolean notificationSupport) {
-        return notificationSupport ? baseSchemas.baseSchemaWithNotifications() : baseSchemas.baseSchema();
-    }
-
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
-            final RemoteDeviceCommunicator listener, final BaseSchema schema) {
+            final RemoteDeviceCommunicator listener, final BaseNetconfSchema schema) {
         return new NetconfDeviceRpc(result.modelContext(), listener,
             new NetconfMessageTransformer(result, true, schema));
     }

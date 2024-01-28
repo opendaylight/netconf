@@ -36,10 +36,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.client.mdsal.MonitoringSchemaSourceProvider;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Commit;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.DiscardChanges;
@@ -186,7 +188,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         netconfMessageTransformer = getTransformer(SCHEMA);
         actionNetconfMessageTransformer = new NetconfMessageTransformer(MountPointContext.of(ACTION_SCHEMA), true,
-            BASE_SCHEMAS.baseSchema());
+            BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
     }
 
     @Test
@@ -208,7 +210,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
         final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
-            BASE_SCHEMAS.baseSchemaWithNotifications());
+            BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(
+                Set.of(CapabilityURN.NOTIFICATION))));
         var netconfMessage = transformer.toRpcRequest(CreateSubscription.QNAME, ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CreateSubscriptionInput.QNAME))
             .build());
@@ -419,9 +422,11 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         final var id = YangInstanceIdentifier.builder()
                 .node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME)
                 .nodeWithKey(Schema.QNAME, keys).build();
-        final var editConfigStructure =
-                createEditConfigStructure(BASE_SCHEMAS.baseSchemaWithNotifications().modelContext(), id,
-                    Optional.empty(), Optional.ofNullable(schemaNode));
+        final var editConfigStructure = createEditConfigStructure(BASE_SCHEMAS.baseSchemaForCapabilities(
+            NetconfSessionPreferences.fromStrings(Set.of(
+                CapabilityURN.CANDIDATE,
+                "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring"
+                    + "&revision=2010-10-04"))).modelContext(), id, Optional.empty(), Optional.ofNullable(schemaNode));
 
         final var target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_NODEID);
 
@@ -529,7 +534,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
-        return new NetconfMessageTransformer(MountPointContext.of(schema), true, BASE_SCHEMAS.baseSchema());
+        return new NetconfMessageTransformer(MountPointContext.of(schema), true,
+            BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
     }
 
     @Test

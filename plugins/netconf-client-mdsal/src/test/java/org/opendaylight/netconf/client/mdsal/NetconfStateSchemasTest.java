@@ -78,7 +78,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setUp() throws Exception {
-        modelContext = BASE_SCHEMAS.baseSchemaWithNotifications().modelContext();
+        modelContext = BASE_SCHEMAS.baseSchemaForCapabilities(CAPS).modelContext();
 
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);

@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.Futures;
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -35,6 +36,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
@@ -78,8 +80,8 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setUp() throws Exception {
-        final var transformer = new NetconfMessageTransformer(
-            MountPointContext.of(SCHEMA_CONTEXT), true, BASE_SCHEMAS.baseSchema());
+        final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA_CONTEXT), true,
+            BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
         final var reply = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                         + "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"101\">\n"

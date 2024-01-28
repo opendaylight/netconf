@@ -25,7 +25,6 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
-import org.opendaylight.netconf.client.mdsal.impl.SchemalessMessageTransformer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 
 public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
@@ -38,12 +37,10 @@ public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
     public void testSessionOnMethods() throws Exception {
         final RemoteDeviceHandler facade = getFacade();
         final NetconfDeviceCommunicator listener = mockCloseableClass(NetconfDeviceCommunicator.class);
-        final SchemalessMessageTransformer messageTransformer = mock(SchemalessMessageTransformer.class);
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test-D",
                 InetSocketAddress.createUnresolved("localhost", 22));
 
-        final SchemalessNetconfDevice device = new SchemalessNetconfDevice(BASE_SCHEMAS, remoteDeviceId, facade,
-            messageTransformer);
+        final SchemalessNetconfDevice device = new SchemalessNetconfDevice(BASE_SCHEMAS, remoteDeviceId, facade);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));

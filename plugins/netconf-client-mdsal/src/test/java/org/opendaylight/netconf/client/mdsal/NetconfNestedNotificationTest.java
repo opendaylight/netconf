@@ -12,12 +12,14 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -41,7 +43,8 @@ public class NetconfNestedNotificationTest extends AbstractBaseSchemasTest {
 
         final NetconfMessage notificationMessage = prepareNotification("/nested-notification-payload.xml");
         NetconfMessageTransformer messageTransformer = new NetconfMessageTransformer(
-            MountPointContext.of(context), true, BASE_SCHEMAS.baseSchema());
+            MountPointContext.of(context), true,
+            BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of())));
         final DOMNotification domNotification = messageTransformer.toNotification(notificationMessage);
         final ContainerNode root = domNotification.getBody();
         assertNotNull(root);
