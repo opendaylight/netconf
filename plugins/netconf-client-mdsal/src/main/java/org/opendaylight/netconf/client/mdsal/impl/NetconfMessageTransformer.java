@@ -333,7 +333,7 @@ public class NetconfMessageTransformer
         final boolean needToUseBaseCtx = mappedRpcs.get(rpc) == null && isBaseOrNotificationRpc(rpc);
         final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
         if (needToUseBaseCtx) {
-            currentMappedRpcs = baseSchema.getMappedRpcs();
+            currentMappedRpcs = baseSchema.mappedRpcs();
         } else {
             currentMappedRpcs = mappedRpcs;
         }
@@ -417,7 +417,7 @@ public class NetconfMessageTransformer
             // If no, use pre built base netconf operations model
             final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
             if (mappedRpcs.get(rpc) == null && isBaseOrNotificationRpc(rpc)) {
-                currentMappedRpcs = baseSchema.getMappedRpcs();
+                currentMappedRpcs = baseSchema.mappedRpcs();
             } else {
                 currentMappedRpcs = mappedRpcs;
             }

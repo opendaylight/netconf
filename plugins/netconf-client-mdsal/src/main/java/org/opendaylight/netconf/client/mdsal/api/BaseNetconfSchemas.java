@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.annotations.Beta;
+import java.util.Collection;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.netconf.client.mdsal.impl.BaseSchema;
 
@@ -15,7 +16,5 @@ import org.opendaylight.netconf.client.mdsal.impl.BaseSchema;
 @NonNullByDefault
 public interface BaseNetconfSchemas {
 
-    BaseSchema baseSchema();
-
-    BaseSchema baseSchemaWithNotifications();
+    BaseSchema baseSchemaForCapabilities(Collection<String> capabilityURNs);
 }

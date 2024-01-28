@@ -143,7 +143,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
         final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
         final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.modelContext(), listener,
-            new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
+            new NetconfMessageTransformer(baseSchema.mountPointContext(), false, baseSchema));
         final var sourceResolverFuture = Futures.submit(new DeviceSourcesResolver(id, baseSchema, initRpc,
                 remoteSessionCapabilities, stateSchemasResolver), processingExecutor);
 

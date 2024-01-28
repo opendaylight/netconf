@@ -9,8 +9,8 @@ package org.opendaylight.netconf.client.mdsal.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
@@ -20,15 +20,12 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemas;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -37,21 +34,18 @@ import org.w3c.dom.Element;
  * Transforms base netconf RPCs.
  */
 public class BaseRpcSchemalessTransformer implements RpcTransformer<NormalizedNode, DOMRpcResult> {
-    private final ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
-    private final EffectiveModelContext modelContext;
+    private final BaseSchema baseSchema;
     private final MessageCounter counter;
 
-    public BaseRpcSchemalessTransformer(final BaseNetconfSchemas baseSchemas, final MessageCounter counter) {
-        final var baseSchema = baseSchemas.baseSchema();
-        mappedRpcs = baseSchema.getMappedRpcs();
-        modelContext = baseSchema.modelContext();
-        this.counter = counter;
+    public BaseRpcSchemalessTransformer(final BaseSchema baseSchema, final MessageCounter counter) {
+        this.baseSchema = requireNonNull(baseSchema);
+        this.counter = requireNonNull(counter);
     }
 
     @Override
     public NetconfMessage toRpcRequest(final QName rpc, final NormalizedNode payload) {
         // In case no input for rpc is defined, we can simply construct the payload here
-
+        final var mappedRpcs = baseSchema.mappedRpcs();
         final var mappedRpc = checkNotNull(mappedRpcs.get(rpc),
             "Unknown rpc %s, available rpcs: %s", rpc, mappedRpcs.keySet());
         final DOMResult domResult = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpc, counter);
@@ -66,7 +60,7 @@ public class BaseRpcSchemalessTransformer implements RpcTransformer<NormalizedNo
         final DOMResult result = domResult;
         try {
             NetconfMessageTransformUtil.writeNormalizedOperationInput((ContainerNode) payload, result, Absolute.of(rpc),
-                modelContext);
+                baseSchema.modelContext());
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize input of " + rpc, e);
         }

@@ -18,22 +18,22 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 
 public final class BaseSchema implements Immutable {
     private final @NonNull ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
-    private final @NonNull MountPointContext mountContext;
+    private final @NonNull MountPointContext mountPointContext;
 
     BaseSchema(final EffectiveModelContext context) {
-        mountContext = MountPointContext.of(context);
+        mountPointContext = MountPointContext.of(context);
         mappedRpcs = Maps.uniqueIndex(context.getOperations(), RpcDefinition::getQName);
     }
 
     public @NonNull EffectiveModelContext modelContext() {
-        return mountContext.modelContext();
+        return mountPointContext.modelContext();
     }
 
-    @NonNull ImmutableMap<QName, ? extends RpcDefinition> getMappedRpcs() {
+    public @NonNull MountPointContext mountPointContext() {
+        return mountPointContext;
+    }
+
+    @NonNull ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs() {
         return mappedRpcs;
-    }
-
-    public @NonNull MountPointContext getMountPointContext() {
-        return mountContext;
     }
 }
