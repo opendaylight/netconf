@@ -18,9 +18,10 @@ import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.shaded.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyIdentityProvider;
+import org.opendaylight.netconf.transport.tls.FixedSslHandlerFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev231228.password.grouping.password.type.CleartextPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev231228.netconf.client.initiate.stack.grouping.transport.ssh.ssh.SshClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev231228.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
@@ -44,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component
 @Singleton
 public final class NetconfClientConfigurationBuilderFactoryImpl implements NetconfClientConfigurationBuilderFactory {
-    private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
+    private final SslContextFactoryProvider sslContextFactoryProvider;
     private final AAAEncryptionService encryptionService;
     private final CredentialProvider credentialProvider;
 
@@ -53,10 +54,10 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
     public NetconfClientConfigurationBuilderFactoryImpl(
             @Reference final AAAEncryptionService encryptionService,
             @Reference final CredentialProvider credentialProvider,
-            @Reference final SslHandlerFactoryProvider sslHandlerFactoryProvider) {
+            @Reference final SslContextFactoryProvider sslHandlerContextProvider) {
         this.encryptionService = requireNonNull(encryptionService);
         this.credentialProvider = requireNonNull(credentialProvider);
-        this.sslHandlerFactoryProvider = requireNonNull(sslHandlerFactoryProvider);
+        sslContextFactoryProvider = requireNonNull(sslHandlerContextProvider);
     }
 
     @Override
@@ -70,9 +71,10 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             builder.withProtocol(NetconfClientProtocol.SSH);
             setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
-            final var handlerFactory = sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification());
+            final var handlerFactory = sslContextFactoryProvider.getSslHandlerFactory(protocol.getSpecification());
+            final var sslContext = handlerFactory.createSslContext();
             builder.withProtocol(NetconfClientProtocol.TLS)
-                .withSslHandlerFactory(channel -> handlerFactory.createSslHandler());
+                .withSslHandlerFactory(new FixedSslHandlerFactory(sslContext));
         } else {
             throw new IllegalArgumentException("Unsupported protocol type: " + protocol.getName());
         }

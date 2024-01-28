@@ -9,21 +9,21 @@ package org.opendaylight.netconf.client.mdsal.api;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.client.SslHandlerFactory;
+import org.opendaylight.netconf.client.SslContextFactory;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.protocol.Specification;
 
 /**
- * A provider for {@link SslHandlerFactory} implementations. This allows the factory to be tailored with a
+ * A provider for {@link SslContextFactory} implementations. This allows the factory to be tailored with a
  * {@link Specification}.
  */
-public interface SslHandlerFactoryProvider {
+public interface SslContextFactoryProvider {
     /**
-     * Return a {@link SslHandlerFactory}, optionally conforming to a particular specification.
+     * Return a {@link SslContextFactory}, optionally conforming to a particular specification.
      *
      * @param specification A {@link Specification}, may be {@code null}
-     * @return A {@link SslHandlerFactory}
+     * @return A {@link SslContextFactory}
      * @throws IllegalArgumentException if {@code specification} is not {@code null} and it is not supported by this
      *         provider.
      */
-    @NonNull SslHandlerFactory getSslHandlerFactory(@Nullable Specification specification);
+    @NonNull SslContextFactory getSslHandlerFactory(@Nullable Specification specification);
 }
