@@ -54,7 +54,7 @@ public final class LibrarySchemaSourceProvider implements SchemaSourceProvider<Y
                 "Unable to download remote schema for " + sourceIdentifier + " from " + url, e));
         }
 
-        final var yangSource = new CachedYangTextSchemaSource(id, sourceIdentifier, url.toString(),
+        final var yangSource = new CachedYangTextSource(id, sourceIdentifier, url.toString(),
             new String(schemaContent, StandardCharsets.UTF_8));
         LOG.debug("Source {} downloaded from a yang library's url {}", sourceIdentifier, url);
         return Futures.immediateFuture(yangSource);
