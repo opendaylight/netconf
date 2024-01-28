@@ -19,8 +19,8 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.client.SslHandlerFactory;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.netconf.client.SslContextFactory;
+import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystore;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.protocol.Specification;
@@ -32,19 +32,19 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 @Singleton
-@Component(service = SslHandlerFactoryProvider.class)
-public final class DefaultSslHandlerFactoryProvider implements SslHandlerFactoryProvider, AutoCloseable {
+@Component(service = SslContextFactoryProvider.class)
+public final class DefaultSslContextFactoryProvider implements SslContextFactoryProvider, AutoCloseable {
     private static final X509Certificate[] EMPTY_CERTS = { };
     private static final char[] EMPTY_CHARS = { };
 
-    private final @NonNull SslHandlerFactory nospecFactory = new SslHandlerFactoryImpl(this, Set.of());
+    private final @NonNull DefaultSslContextFactory nospecFactory = new DefaultSslContextFactory(this);
     private final Registration reg;
 
     private volatile @NonNull NetconfKeystore keystore = NetconfKeystore.EMPTY;
 
     @Inject
     @Activate
-    public DefaultSslHandlerFactoryProvider(@Reference final NetconfKeystoreService keystoreService) {
+    public DefaultSslContextFactoryProvider(@Reference final NetconfKeystoreService keystoreService) {
         reg = keystoreService.registerKeystoreConsumer(this::onKeystoreUpdated);
     }
 
@@ -60,16 +60,16 @@ public final class DefaultSslHandlerFactoryProvider implements SslHandlerFactory
     }
 
     @Override
-    public SslHandlerFactory getSslHandlerFactory(final Specification specification) {
+    public SslContextFactory getSslHandlerFactory(final Specification specification) {
         if (specification == null) {
             return nospecFactory;
-        }
-        if (specification instanceof TlsCase tlsSpecification) {
+        } else if (specification instanceof TlsCase tlsSpecification) {
             final var excludedVersions = tlsSpecification.nonnullTls().getExcludedVersions();
             return excludedVersions == null || excludedVersions.isEmpty() ? nospecFactory
-                : new SslHandlerFactoryImpl(this, excludedVersions);
+                : new FilteredSslContextFactory(this, excludedVersions);
+        } else {
+            throw new IllegalArgumentException("Cannot get TLS specification from: " + specification);
         }
-        throw new IllegalArgumentException("Cannot get TLS specification from: " + specification);
     }
 
     /**

@@ -52,7 +52,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
-import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
+import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemas;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -90,7 +90,7 @@ public class NetconfNodeHandlerTest {
 
     // DefaultNetconfClientConfigurationBuilderFactory setup
     @Mock
-    private SslHandlerFactoryProvider sslHandlerFactoryProvider;
+    private SslContextFactoryProvider sslContextFactoryProvider;
     @Mock
     private AAAEncryptionService encryptionService;
     @Mock
@@ -136,7 +136,7 @@ public class NetconfNodeHandlerTest {
         // Instantiate the handler
         handler = new NetconfNodeHandler(clientFactory, timer, BASE_SCHEMAS, schemaManager, schemaAssembler,
             new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
-                sslHandlerFactoryProvider),
+                sslContextFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
