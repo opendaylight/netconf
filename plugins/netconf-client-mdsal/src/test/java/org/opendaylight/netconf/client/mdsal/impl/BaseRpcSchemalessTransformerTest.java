@@ -11,11 +11,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
 import org.junit.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
@@ -31,7 +33,8 @@ import org.xmlunit.builder.DiffBuilder;
 
 public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
     private final BaseRpcSchemalessTransformer transformer =
-        new BaseRpcSchemalessTransformer(BASE_SCHEMAS, new MessageCounter());
+        new BaseRpcSchemalessTransformer(BASE_SCHEMAS.baseSchemaForCapabilities(
+            NetconfSessionPreferences.fromStrings(Set.of())), new MessageCounter());
 
     @Test
     public void toRpcRequest() throws Exception {

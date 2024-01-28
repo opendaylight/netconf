@@ -54,6 +54,7 @@ import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.client.mdsal.api.ActionTransformer;
+import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.NotificationTransformer;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
@@ -109,7 +110,7 @@ public class NetconfMessageTransformer
 
     private final MountPointContext mountContext;
     private final DataSchemaContextTree contextTree;
-    private final BaseSchema baseSchema;
+    private final BaseNetconfSchema baseSchema;
     private final MessageCounter counter;
     private final ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
     private final Multimap<QName, ? extends NotificationDefinition> mappedNotifications;
@@ -117,7 +118,7 @@ public class NetconfMessageTransformer
     private final ImmutableMap<Absolute, ActionDefinition> actions;
 
     public NetconfMessageTransformer(final MountPointContext mountContext, final boolean strictParsing,
-                                     final BaseSchema baseSchema) {
+                                     final BaseNetconfSchema baseSchema) {
         counter = new MessageCounter();
         this.mountContext = requireNonNull(mountContext);
 
@@ -333,7 +334,7 @@ public class NetconfMessageTransformer
         final boolean needToUseBaseCtx = mappedRpcs.get(rpc) == null && isBaseOrNotificationRpc(rpc);
         final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
         if (needToUseBaseCtx) {
-            currentMappedRpcs = baseSchema.getMappedRpcs();
+            currentMappedRpcs = baseSchema.mappedRpcs();
         } else {
             currentMappedRpcs = mappedRpcs;
         }
@@ -417,7 +418,7 @@ public class NetconfMessageTransformer
             // If no, use pre built base netconf operations model
             final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
             if (mappedRpcs.get(rpc) == null && isBaseOrNotificationRpc(rpc)) {
-                currentMappedRpcs = baseSchema.getMappedRpcs();
+                currentMappedRpcs = baseSchema.mappedRpcs();
             } else {
                 currentMappedRpcs = mappedRpcs;
             }

@@ -23,6 +23,7 @@ import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransform
 
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +33,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps;
@@ -66,6 +69,12 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         final var successFuture = Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null));
         doReturn(successFuture, Futures.immediateFailedFuture(new IllegalStateException("Failed tx")), successFuture)
             .when(rpc).invokeNetconf(any(), any());
+    }
+
+    private static MountPointContext baseMountPointContext() {
+        return BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of(
+            "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&revision=2010-10-04")))
+            .mountPointContext();
     }
 
     @Test
@@ -119,8 +128,10 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
             Futures.immediateFailedFuture(new IllegalStateException("Failed tx")))
             .when(rpc).invokeNetconf(any(), any());
 
-        final var tx = new WriteRunningTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchemaWithNotifications().getMountPointContext()), false, true);
+        final var tx = new WriteRunningTx(ID, new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchemaForCapabilities(
+            NetconfSessionPreferences.fromStrings(Set.of(CapabilityURN.NOTIFICATION,
+                "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring"
+                    + "&revision=2010-10-04"))).mountPointContext()), false, true);
         tx.init();
 
         tx.delete(LogicalDatastoreType.CONFIGURATION, STATE);
@@ -136,8 +147,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     public void testListenerSuccess() throws Exception {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult((ContainerNode) null)))
             .when(rpc).invokeNetconf(any(), any());
-        final var tx = new WriteCandidateTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false, true);
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, baseMountPointContext()), false, true);
         tx.init();
 
         final var listener = mock(TxListener.class);
@@ -152,8 +162,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testListenerCancellation() throws Exception {
-        final var tx = new WriteCandidateTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false, true);
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, baseMountPointContext()), false, true);
         tx.init();
 
         final var listener = mock(TxListener.class);
@@ -170,8 +179,7 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
     public void testListenerFailure() throws Exception {
         final var cause = new IllegalStateException("Failed tx");
         doReturn(Futures.immediateFailedFuture(cause)).when(rpc).invokeNetconf(any(), any());
-        final var tx = new WriteCandidateTx(ID,
-            new NetconfBaseOps(rpc, BASE_SCHEMAS.baseSchema().getMountPointContext()), false, true);
+        final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, baseMountPointContext()), false, true);
         tx.init();
 
         final var listener = mock(TxListener.class);
