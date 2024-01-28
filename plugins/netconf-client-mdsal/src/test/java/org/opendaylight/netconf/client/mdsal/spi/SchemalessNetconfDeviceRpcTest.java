@@ -69,9 +69,9 @@ public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
                 + "      </mainroot>\n"
                 + "    </filter>\n"
                 + "  </get-config>"));
-        deviceRpc.invokeRpc(qName, src);
-        ArgumentCaptor<NetconfMessage> msgCaptor = ArgumentCaptor.forClass(NetconfMessage.class);
-        ArgumentCaptor<QName> qnameCaptor = ArgumentCaptor.forClass(QName.class);
+        deviceRpc.schemalessRpcService().invokeRpc(qName, src);
+        final var msgCaptor = ArgumentCaptor.forClass(NetconfMessage.class);
+        final var qnameCaptor = ArgumentCaptor.forClass(QName.class);
         verify(listener).sendRequest(msgCaptor.capture(), qnameCaptor.capture());
         LOG.info(XmlUtil.toString(msgCaptor.getValue().getDocument()));
     }

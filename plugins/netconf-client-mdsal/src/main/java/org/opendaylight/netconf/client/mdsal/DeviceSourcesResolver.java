@@ -74,7 +74,7 @@ final class DeviceSourcesResolver implements Callable<DeviceSources> {
 
         final var sourceProvider = availableSchemas instanceof LibraryModulesSchemas libraryModule
             ? new LibrarySchemaSourceProvider(id, libraryModule.getAvailableModels())
-                : new MonitoringSchemaSourceProvider(id, deviceRpc);
+                : new MonitoringSchemaSourceProvider(id, deviceRpc.domRpcService());
         return new DeviceSources(requiredSources, providedSources, sourceProvider);
     }
 }

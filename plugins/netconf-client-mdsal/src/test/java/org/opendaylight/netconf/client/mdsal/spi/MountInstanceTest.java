@@ -80,7 +80,7 @@ public class MountInstanceTest {
             notificationService, broker, null);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(DOMDataBroker.class, broker);
-        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
+        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService.domRpcService());
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
     }
 
@@ -90,7 +90,7 @@ public class MountInstanceTest {
             notificationService, null, netconfService);
         verify(mountPointBuilder).addService(eq(DOMSchemaService.class), any());
         verify(mountPointBuilder).addService(NetconfDataTreeService.class, netconfService);
-        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService);
+        verify(mountPointBuilder).addService(DOMRpcService.class, rpcService.domRpcService());
         verify(mountPointBuilder).addService(DOMNotificationService.class, notificationService);
     }
 
