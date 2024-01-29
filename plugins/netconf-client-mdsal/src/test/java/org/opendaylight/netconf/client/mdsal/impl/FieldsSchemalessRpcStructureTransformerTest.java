@@ -107,6 +107,14 @@ class FieldsSchemalessRpcStructureTransformerTest {
         assertSimilar("two-roots-filter.xml", filterStructure);
     }
 
+    @Test
+    void toFilterStructureListItemFields() throws Exception {
+        final var filter = FieldsFilter.of(YangInstanceIdentifier.of(C1_NID, LIST1_NID),
+            List.of(YangInstanceIdentifier.of(KEY1_QNAME), YangInstanceIdentifier.of(KEY2_QNAME)));
+        final var filterStructure = (DOMSourceAnyxmlNode) transformer.toFilterStructure(List.of(filter));
+        assertSimilar("list-items-fields.xml", filterStructure);
+    }
+
     private static void assertSimilar(final String filterFileName, final DOMSourceAnyxmlNode filterStructure)
             throws Exception {
         final var diff = DiffBuilder.compare(FieldsSchemalessRpcStructureTransformerTest.class.getResourceAsStream(
