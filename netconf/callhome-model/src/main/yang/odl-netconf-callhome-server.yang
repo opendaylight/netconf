@@ -12,6 +12,15 @@ module odl-netconf-callhome-server {
   description
    "This module defines the northbound interface for OpenDaylight NETCONF Callhome.";
 
+  revision 2024-01-29 {
+    description
+      "A number of improvements to the sematics of this model. In concrete terms:
+       - every device now has to have a transport
+       - there is now a TCP transport
+       - previously-deprecated 'ssh-host-key' is now obsolete
+       - 'credentials; is obsoleted as well";
+  }
+
   revision 2023-04-28 {
     description "This revision integrates device-status leaf, formerly hosted in callhome-device.yang";
   }
@@ -57,8 +66,8 @@ module odl-netconf-callhome-server {
 
       leaf mount-point-naming-strategy {
         type enumeration {
-            enum IP_PORT;
-            enum IP_ONLY;
+          enum IP_PORT;
+          enum IP_ONLY;
         }
         default IP_PORT;
         description "Mount name will be chosen as per this strategy in the absence of per device settings. Default is IP_PORT";
@@ -73,17 +82,11 @@ module odl-netconf-callhome-server {
           description "Identifier of device, which will be used to identify device.";
           type string;
         }
-        leaf ssh-host-key {
-          description "BASE-64 encoded public key which device will use during connection.
-                       Deprecated, a 'host-key' from the  'ssh-client-params' containers should be used instead.";
-          status deprecated;
-          type string;
-        }
-        unique ssh-host-key;
-        uses credentials;
 
         choice transport {
           description "Provides connectivity details for one of the supported transport protocols";
+          mandatory true;
+
           case ssh {
             container ssh-client-params {
               leaf host-key {
@@ -108,6 +111,11 @@ module odl-netconf-callhome-server {
               }
             }
           }
+          case tcp {
+            container tcp {
+              presence "Presence indicates plain TCP connection should be used";
+            }
+          }
         }
         unique transport/ssh/ssh-client-params/host-key;
         unique transport/tls/tls-client-params/certificate-id;
@@ -122,6 +130,16 @@ module odl-netconf-callhome-server {
             enum DISCONNECTED;
           }
           default DISCONNECTED;
+        }
+
+        leaf ssh-host-key {
+          description "Obsolete, a 'host-key' from the 'ssh-client-params' containers should be used instead.";
+          status obsolete;
+          type string;
+        }
+        unique ssh-host-key;
+        uses credentials {
+          status obsolete;
         }
       }
     }
