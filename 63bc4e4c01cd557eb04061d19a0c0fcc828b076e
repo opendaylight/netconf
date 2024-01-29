@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce38b871_07262b7d",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-01-29T12:11:34Z",
+      "side": 1,
+      "message": "\"topology.callhome\"",
+      "range": {
+        "startLine": 117,
+        "startChar": 49,
+        "endLine": 117,
+        "endChar": 63
+      },
+      "revId": "63bc4e4c01cd557eb04061d19a0c0fcc828b076e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b91e4757_cc40a9c5",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-01-29T12:11:34Z",
+      "side": 1,
+      "message": "let\u0027s use property names that look good in configuration files, so this is\nssh$_$port",
+      "range": {
+        "startLine": 128,
+        "startChar": 12,
+        "endLine": 128,
+        "endChar": 19
+      },
+      "revId": "63bc4e4c01cd557eb04061d19a0c0fcc828b076e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
