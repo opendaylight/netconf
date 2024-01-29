@@ -34,8 +34,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,10 +169,11 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     @VisibleForTesting
     public static final @NonNull MapEntryNode streamEntry(final String name, final String description,
             final String baseStreamLocation, final Set<EncodingName> encodings) {
-        final var accessBuilder = Builders.mapBuilder().withNodeIdentifier(new NodeIdentifier(Access.QNAME));
+        final var accessBuilder = ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(Access.QNAME));
         for (var encoding : encodings) {
             final var encodingName = encoding.name();
-            accessBuilder.withChild(Builders.mapEntryBuilder()
+            accessBuilder.withChild(ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, ENCODING_QNAME, encodingName))
                 .withChild(ImmutableNodes.leafNode(ENCODING_QNAME, encodingName))
                 .withChild(ImmutableNodes.leafNode(LOCATION_QNAME,
@@ -181,7 +181,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
                 .build());
         }
 
-        return Builders.mapEntryBuilder()
+        return ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Stream.QNAME, NAME_QNAME, name))
             .withChild(ImmutableNodes.leafNode(NAME_QNAME, name))
             .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, description))

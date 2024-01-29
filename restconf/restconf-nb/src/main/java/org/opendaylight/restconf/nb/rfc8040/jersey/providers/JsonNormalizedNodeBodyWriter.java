@@ -21,13 +21,14 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -63,7 +64,11 @@ public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBo
 
         // RESTCONF allows returning one list item. We need to wrap it in map node in order to serialize it properly
         final var toSerialize = data instanceof MapEntryNode mapEntry
-            ? ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).withChild(mapEntry).build() : data;
+            ? ImmutableNodes.newSystemMapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
+                .withChild(mapEntry)
+                .build()
+                : data;
 
         try (var jsonWriter = createJsonWriter(entityStream, writerParameters.prettyPrint())) {
             jsonWriter.beginObject();

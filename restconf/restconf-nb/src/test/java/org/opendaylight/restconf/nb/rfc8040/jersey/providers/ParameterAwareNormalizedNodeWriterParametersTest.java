@@ -25,7 +25,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -40,19 +40,19 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
     private final NodeWithValue<String> leafSetEntryNodeIdentifier =
         new NodeWithValue<>(QName.create("namespace", "leaf-set-entry"), leafSetEntryNodeValue);
 
-    private final LeafSetEntryNode<String> leafSetEntryNodeData = Builders.<String>leafSetEntryBuilder()
+    private final LeafSetEntryNode<String> leafSetEntryNodeData = ImmutableNodes.<String>newLeafSetEntryBuilder()
         .withNodeIdentifier(leafSetEntryNodeIdentifier)
         .withValue(leafSetEntryNodeValue)
         .build();
-    private final SystemLeafSetNode<String> leafSetNodeData = Builders.<String>leafSetBuilder()
+    private final SystemLeafSetNode<String> leafSetNodeData = ImmutableNodes.<String>newSystemLeafSetBuilder()
         .withNodeIdentifier(leafSetNodeIdentifier)
         .withChild(leafSetEntryNodeData)
         .build();
-    private final ContainerNode containerNodeData = Builders.containerBuilder()
+    private final ContainerNode containerNodeData = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(containerNodeIdentifier)
         .withChild(leafSetNodeData)
         .build();
-    private final ContainerNode rootDataContainerData = Builders.containerBuilder()
+    private final ContainerNode rootDataContainerData = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(NodeIdentifier.create(
             QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "data")))
         .withChild(leafSetNodeData)
@@ -108,7 +108,7 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
     public void writeEmptyRootContainerTest() throws Exception {
         final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null, null);
 
-        parameterWriter.write(Builders.containerBuilder()
+        parameterWriter.write(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME))
             .build());
     }

@@ -31,7 +31,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.tree.api.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
@@ -199,7 +199,10 @@ abstract class DataTreeCandidateSerializer<T extends Exception> {
     static final @Nullable NormalizedNode getDataAfter(final DataTreeCandidateNode candidate) {
         final var data = candidate.dataAfter();
         if (data instanceof MapEntryNode mapEntry) {
-            return ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).withChild(mapEntry).build();
+            return ImmutableNodes.newSystemMapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
+                .withChild(mapEntry)
+                .build();
         }
         return data;
     }

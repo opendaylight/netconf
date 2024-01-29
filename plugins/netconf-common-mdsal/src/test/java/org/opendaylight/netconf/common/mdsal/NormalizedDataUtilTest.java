@@ -21,8 +21,7 @@ import org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.DefaultNodeMatcher;
@@ -33,11 +32,11 @@ public class NormalizedDataUtilTest {
     public void testWriteNormalizedNode() throws Exception {
         final var context = BindingRuntimeHelpers.createEffectiveModel(List.of(YangModuleInfoImpl.getInstance()));
         final var result = new DOMResult(XmlUtil.newDocument());
-        NormalizedDataUtil.writeNormalizedNode(Builders.containerBuilder()
+        NormalizedDataUtil.writeNormalizedNode(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(Sessions.QNAME))
-            .withChild(Builders.mapBuilder()
+            .withChild(ImmutableNodes.newSystemMapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(Session.QNAME))
-                .withChild(Builders.mapEntryBuilder()
+                .withChild(ImmutableNodes.newMapEntryBuilder()
                     .withNodeIdentifier(
                         NodeIdentifierWithPredicates.of(Session.QNAME, QName.create(Session.QNAME, "session-id"), 1L))
                     .withChild(ImmutableNodes.leafNode(QName.create(Session.QNAME, "username"), "admin"))

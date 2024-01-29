@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -127,8 +128,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.builder.NormalizedNodeContainerBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -446,7 +446,7 @@ public abstract class RestconfStrategy {
         }
 
         int lastInsertedPosition = 0;
-        final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext(), path.getParent());
+        final var emptySubtree = fromInstanceId(modelContext(), path.getParent());
         tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
@@ -730,7 +730,7 @@ public abstract class RestconfStrategy {
         }
 
         int lastInsertedPosition = 0;
-        final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext(), grandParentPath);
+        final var emptySubtree = fromInstanceId(modelContext(), grandParentPath);
         tx.merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
         for (var nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
@@ -870,7 +870,7 @@ public abstract class RestconfStrategy {
         // FIXME: we have this readily available in InstanceIdentifierContext
         final var ctxNode = databind.schemaTree().findChild(path).orElseThrow();
         if (readData instanceof ContainerNode container) {
-            final var builder = Builders.containerBuilder().withNodeIdentifier(container.name());
+            final var builder = ImmutableNodes.newContainerBuilder().withNodeIdentifier(container.name());
             buildCont(builder, container.body(), ctxNode, trim);
             return builder.build();
         } else if (readData instanceof MapEntryNode mapEntry) {
@@ -878,7 +878,7 @@ public abstract class RestconfStrategy {
                 throw new IllegalStateException("Input " + mapEntry + " does not match " + ctxNode);
             }
 
-            final var builder = Builders.mapEntryBuilder().withNodeIdentifier(mapEntry.name());
+            final var builder = ImmutableNodes.newMapEntryBuilder().withNodeIdentifier(mapEntry.name());
             buildMapEntryBuilder(builder, mapEntry.body(), ctxNode, trim, listSchema.getKeyDefinition());
             return builder.build();
         } else {
@@ -908,7 +908,7 @@ public abstract class RestconfStrategy {
 
     private static void appendContainer(final DataContainerNodeBuilder<?, ?> builder, final ContainerNode container,
             final DataSchemaContext ctxNode, final boolean trim) {
-        final var childBuilder = Builders.containerBuilder().withNodeIdentifier(container.name());
+        final var childBuilder = ImmutableNodes.newContainerBuilder().withNodeIdentifier(container.name());
         buildCont(childBuilder, container.body(), ctxNode, trim);
         builder.withChild(childBuilder.build());
     }
@@ -972,8 +972,8 @@ public abstract class RestconfStrategy {
         }
 
         final var childBuilder = switch (map.ordering()) {
-            case SYSTEM -> Builders.mapBuilder();
-            case USER -> Builders.orderedMapBuilder();
+            case SYSTEM -> ImmutableNodes.newSystemMapBuilder();
+            case USER -> ImmutableNodes.newUserMapBuilder();
         };
         buildList(childBuilder.withNodeIdentifier(map.name()), map.body(), childCtx, trim,
             listSchema.getKeyDefinition());
@@ -985,7 +985,7 @@ public abstract class RestconfStrategy {
             final List<@NonNull QName> keys) {
         for (var entry : entries) {
             final var childCtx = getChildContext(ctxNode, entry);
-            final var mapEntryBuilder = Builders.mapEntryBuilder().withNodeIdentifier(entry.name());
+            final var mapEntryBuilder = ImmutableNodes.newMapEntryBuilder().withNodeIdentifier(entry.name());
             buildMapEntryBuilder(mapEntryBuilder, entry.body(), childCtx, trim, keys);
             builder.withChild(mapEntryBuilder.build());
         }
@@ -1079,7 +1079,7 @@ public abstract class RestconfStrategy {
      */
     private static @NonNull NormalizedNode prepareRpcData(final @NonNull NormalizedNode configDataNode,
                                                           final @NonNull NormalizedNode stateDataNode) {
-        final var mapEntryBuilder = Builders.mapEntryBuilder()
+        final var mapEntryBuilder = ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier((NodeIdentifierWithPredicates) configDataNode.name());
 
         // MAP CONFIG DATA
@@ -1087,7 +1087,7 @@ public abstract class RestconfStrategy {
         // MAP STATE DATA
         mapRpcDataNode(stateDataNode, mapEntryBuilder);
 
-        return Builders.mapBuilder()
+        return ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(NodeIdentifier.create(configDataNode.name().getNodeType()))
             .addChild(mapEntryBuilder.build())
             .build();
@@ -1115,23 +1115,23 @@ public abstract class RestconfStrategy {
     private static @NonNull NormalizedNode prepareData(final @NonNull NormalizedNode configDataNode,
                                                        final @NonNull NormalizedNode stateDataNode) {
         if (configDataNode instanceof UserMapNode configMap) {
-            final var builder = Builders.orderedMapBuilder().withNodeIdentifier(configMap.name());
+            final var builder = ImmutableNodes.newUserMapBuilder().withNodeIdentifier(configMap.name());
             mapValueToBuilder(configMap.body(), ((UserMapNode) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof SystemMapNode configMap) {
-            final var builder = Builders.mapBuilder().withNodeIdentifier(configMap.name());
+            final var builder = ImmutableNodes.newSystemMapBuilder().withNodeIdentifier(configMap.name());
             mapValueToBuilder(configMap.body(), ((SystemMapNode) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof MapEntryNode configEntry) {
-            final var builder = Builders.mapEntryBuilder().withNodeIdentifier(configEntry.name());
+            final var builder = ImmutableNodes.newMapEntryBuilder().withNodeIdentifier(configEntry.name());
             mapValueToBuilder(configEntry.body(), ((MapEntryNode) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof ContainerNode configContaienr) {
-            final var builder = Builders.containerBuilder().withNodeIdentifier(configContaienr.name());
+            final var builder = ImmutableNodes.newContainerBuilder().withNodeIdentifier(configContaienr.name());
             mapValueToBuilder(configContaienr.body(), ((ContainerNode) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof ChoiceNode configChoice) {
-            final var builder = Builders.choiceBuilder().withNodeIdentifier(configChoice.name());
+            final var builder = ImmutableNodes.newChoiceBuilder().withNodeIdentifier(configChoice.name());
             mapValueToBuilder(configChoice.body(), ((ChoiceNode) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof LeafNode configLeaf) {
@@ -1139,23 +1139,24 @@ public abstract class RestconfStrategy {
             return configLeaf;
         } else if (configDataNode instanceof UserLeafSetNode) {
             final var configLeafSet = (UserLeafSetNode<Object>) configDataNode;
-            final var builder = Builders.<Object>orderedLeafSetBuilder().withNodeIdentifier(configLeafSet.name());
+            final var builder = ImmutableNodes.<Object>newUserLeafSetBuilder().withNodeIdentifier(configLeafSet.name());
             mapValueToBuilder(configLeafSet.body(), ((UserLeafSetNode<Object>) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof SystemLeafSetNode) {
             final var configLeafSet = (SystemLeafSetNode<Object>) configDataNode;
-            final var builder = Builders.<Object>leafSetBuilder().withNodeIdentifier(configLeafSet.name());
+            final var builder = ImmutableNodes.<Object>newSystemLeafSetBuilder()
+                .withNodeIdentifier(configLeafSet.name());
             mapValueToBuilder(configLeafSet.body(), ((SystemLeafSetNode<Object>) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof LeafSetEntryNode<?> configEntry) {
             // config trumps oper
             return configEntry;
         } else if (configDataNode instanceof UnkeyedListNode configList) {
-            final var builder = Builders.unkeyedListBuilder().withNodeIdentifier(configList.name());
+            final var builder = ImmutableNodes.newUnkeyedListBuilder().withNodeIdentifier(configList.name());
             mapValueToBuilder(configList.body(), ((UnkeyedListNode) stateDataNode).body(), builder);
             return builder.build();
         } else if (configDataNode instanceof UnkeyedListEntryNode configEntry) {
-            final var builder = Builders.unkeyedListEntryBuilder().withNodeIdentifier(configEntry.name());
+            final var builder = ImmutableNodes.newUnkeyedListEntryBuilder().withNodeIdentifier(configEntry.name());
             mapValueToBuilder(configEntry.body(), ((UnkeyedListEntryNode) stateDataNode).body(), builder);
             return builder.build();
         } else {

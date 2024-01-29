@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 /**
  * Unit test for {@link ParameterAwareNormalizedNodeWriter} used with depth parameter.
@@ -75,7 +75,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
         .withNodeIdentifier(mapNodeIdentifier)
         .withChild(mapEntryNodeData)
         .build();
-    private final ContainerNode containerNodeData = Builders.containerBuilder()
+    private final ContainerNode containerNodeData = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(containerNodeIdentifier)
         .withChild(leafSetNodeData)
         .build();
