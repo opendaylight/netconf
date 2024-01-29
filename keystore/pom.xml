@@ -30,6 +30,7 @@
 
     <modules>
         <module>keystore-api</module>
+        <module>keystore-legacy</module>
         <module>keystore-none</module>
     </modules>
 </project>
