@@ -26,14 +26,13 @@ import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshAuthProvider;
 import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshAuthSettings;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.NetconfCallhomeServer;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.AllowedDevices;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.Global;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.Global.MountPointNamingStrategy;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.device.transport.Ssh;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev230428.netconf.callhome.server.allowed.devices.device.transport.ssh.SshClientParams;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.NetconfCallhomeServer;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.AllowedDevices;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.Global;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.Global.MountPointNamingStrategy;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.Device;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.device.transport.Ssh;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
@@ -80,18 +79,14 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
 
     @Override
     public CallHomeSshAuthSettings provideAuth(final SocketAddress remoteAddress, final PublicKey serverKey) {
-        Device deviceSpecific = deviceConfig.get(serverKey);
-        String id;
-        Credentials deviceCred;
+        final String id;
+        final Credentials deviceCred;
 
+        final var deviceSpecific = deviceConfig.get(serverKey);
         if (deviceSpecific != null) {
             id = deviceSpecific.getUniqueId();
-            if (deviceSpecific.getTransport() instanceof Ssh ssh) {
-                final SshClientParams clientParams = ssh.getSshClientParams();
-                deviceCred = clientParams.getCredentials();
-            } else {
-                deviceCred = deviceSpecific.getCredentials();
-            }
+            deviceCred = deviceSpecific.getTransport() instanceof Ssh ssh ? ssh.getSshClientParams().getCredentials()
+                : null;
         } else {
             String syntheticId = fromRemoteAddress(remoteAddress);
             if (globalConfig.allowedUnknownKeys()) {
@@ -109,8 +104,7 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
             }
         }
 
-        final Credentials credentials = deviceCred != null ? deviceCred : globalConfig.getCredentials();
-
+        final var credentials = deviceCred != null ? deviceCred : globalConfig.getCredentials();
         if (credentials == null) {
             LOG.info("No credentials found for {}, rejecting.", id);
             return null;
@@ -183,11 +177,7 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         }
 
         private static String getHostPublicKey(final Device device) {
-            if (device.getTransport() instanceof Ssh ssh) {
-                return ssh.getSshClientParams().getHostKey();
-            } else {
-                return device.getSshHostKey();
-            }
+            return device.getTransport() instanceof Ssh ssh ? ssh.nonnullSshClientParams().getHostKey() : null;
         }
 
         abstract void addDevice(String publicKey, Device device);
