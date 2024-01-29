@@ -23,7 +23,9 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
+import org.opendaylight.restconf.openapi.model.NodeSchemaEntity;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
+import org.opendaylight.restconf.openapi.model.RpcSchemaEntity;
 import org.opendaylight.restconf.openapi.model.SchemaEntity;
 import org.opendaylight.restconf.openapi.model.SchemasEntity;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
@@ -99,8 +101,8 @@ public final class SchemasStream extends InputStream {
                 final var rpcName = rpc.getQName().getLocalName();
                 final var rpcInput = rpc.getInput();
                 if (!rpcInput.getChildNodes().isEmpty()) {
-                    final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, null,
-                        OBJECT_TYPE, stack, moduleName, false, definitionNames, EntityType.RPC);
+                    final var input = new RpcSchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, null,
+                        OBJECT_TYPE, stack, moduleName, false, definitionNames);
                     result.add(input);
                     stack.enterSchemaTree(rpcInput.getQName());
                     for (final var child : rpcInput.getChildNodes()) {
@@ -114,8 +116,8 @@ public final class SchemasStream extends InputStream {
                 }
                 final var rpcOutput = rpc.getOutput();
                 if (!rpcOutput.getChildNodes().isEmpty()) {
-                    final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, null,
-                        OBJECT_TYPE, stack, moduleName, false, definitionNames, EntityType.RPC);
+                    final var output = new RpcSchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, null,
+                        OBJECT_TYPE, stack, moduleName, false, definitionNames);
                     result.add(output);
                     stack.enterSchemaTree(rpcOutput.getQName());
                     for (final var child : rpcOutput.getChildNodes()) {
@@ -151,8 +153,8 @@ public final class SchemasStream extends InputStream {
             } else {
                 discriminator = definitionNames.getDiscriminator(node);
             }
-            final var child = new SchemaEntity(node, newTitle, discriminator, OBJECT_TYPE, stack, parentName,
-                isParentConfig, definitionNames, EntityType.NODE);
+            final var child = new NodeSchemaEntity(node, newTitle, discriminator, OBJECT_TYPE, stack, parentName,
+                isParentConfig, definitionNames);
             final var isConfig = node.isConfiguration() && isParentConfig;
             result.add(child);
             stack.enterSchemaTree(node.getQName());
@@ -183,22 +185,17 @@ public final class SchemasStream extends InputStream {
             final var actionName = actionDef.getQName().getLocalName();
             final var actionInput = actionDef.getInput();
             if (!actionInput.getChildNodes().isEmpty()) {
-                final var input = new SchemaEntity(actionInput, title + "_" + actionName + INPUT_SUFFIX, null,
-                    OBJECT_TYPE, stack, parentName, false, definitionNames, EntityType.RPC);
+                final var input = new RpcSchemaEntity(actionInput, title + "_" + actionName + INPUT_SUFFIX, null,
+                    OBJECT_TYPE, stack, parentName, false, definitionNames);
                 result.add(input);
             }
             final var actionOutput = actionDef.getOutput();
             if (!actionOutput.getChildNodes().isEmpty()) {
-                final var output = new SchemaEntity(actionOutput, title + "_" + actionName + OUTPUT_SUFFIX, null,
-                    OBJECT_TYPE, stack, parentName, false, definitionNames, EntityType.RPC);
+                final var output = new RpcSchemaEntity(actionOutput, title + "_" + actionName + OUTPUT_SUFFIX, null,
+                    OBJECT_TYPE, stack, parentName, false, definitionNames);
                 result.add(output);
             }
             stack.exit();
         }
-    }
-
-    public enum EntityType {
-        NODE,
-        RPC
     }
 }
