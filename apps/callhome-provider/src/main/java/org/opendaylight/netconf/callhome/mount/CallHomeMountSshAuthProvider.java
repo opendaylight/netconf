@@ -59,7 +59,7 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
     @Inject
     public CallHomeMountSshAuthProvider(final @Reference DataBroker broker,
             final @Reference CallHomeMountStatusReporter statusReporter) {
-        configReg = broker.registerDataTreeChangeListener(
+        configReg = broker.registerTreeChangeListener(
             DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
                 InstanceIdentifier.create(NetconfCallhomeServer.class).child(Global.class)),
             globalConfig);
@@ -67,10 +67,10 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         final var allowedDeviceWildcard =
             InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class);
 
-        deviceReg = broker.registerDataTreeChangeListener(
+        deviceReg = broker.registerTreeChangeListener(
             DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, allowedDeviceWildcard),
             deviceConfig);
-        deviceOpReg = broker.registerDataTreeChangeListener(
+        deviceOpReg = broker.registerTreeChangeListener(
             DataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, allowedDeviceWildcard),
             deviceOp);
 
