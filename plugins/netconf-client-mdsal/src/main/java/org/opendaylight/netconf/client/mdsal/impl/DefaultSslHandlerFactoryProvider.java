@@ -13,8 +13,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Set;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -24,7 +23,6 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.keystore.legacy.AbstractNetconfKeystore;
-import org.opendaylight.netconf.keystore.legacy.SecurityHelper;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.protocol.Specification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.protocol.specification.TlsCase;
 import org.osgi.service.component.annotations.Activate;
@@ -36,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = SslHandlerFactoryProvider.class)
 public final class DefaultSslHandlerFactoryProvider extends AbstractNetconfKeystore
         implements SslHandlerFactoryProvider, AutoCloseable {
+    private static final X509Certificate[] EMPTY_CERTS = { };
     private static final char[] EMPTY_CHARS = { };
 
     private final @NonNull SslHandlerFactory nospecFactory = new SslHandlerFactoryImpl(this, Set.of());
@@ -107,33 +106,18 @@ public final class DefaultSslHandlerFactoryProvider extends AbstractNetconfKeyst
         final var keyStore = KeyStore.getInstance("JKS");
         keyStore.load(null, null);
 
-        final var helper = new SecurityHelper();
-
         // Private keys first
         for (var entry : current.privateKeys().entrySet()) {
             final var alias = entry.getKey();
-            if (!allowedKeys.isEmpty() && !allowedKeys.contains(alias)) {
-                continue;
+            if (allowedKeys.isEmpty() || allowedKeys.contains(alias)) {
+                final var privateKey = entry.getValue();
+                keyStore.setKeyEntry(alias, privateKey.key(), EMPTY_CHARS,
+                    privateKey.certificateChain().toArray(EMPTY_CERTS));
             }
-
-            final var privateKey = entry.getValue();
-            final var key = helper.getJavaPrivateKey(privateKey.getData());
-            // TODO: requireCertificateChain() here and filter in update path
-            final var certChain = privateKey.getCertificateChain();
-            if (certChain == null || certChain.isEmpty()) {
-                throw new CertificateException("No certificate chain associated with private key " + alias + " found");
-            }
-
-            final var chain = new Certificate[certChain.size()];
-            int idx = 0;
-            for (var cert : certChain) {
-                chain[idx++] = helper.getCertificate(cert);
-            }
-            keyStore.setKeyEntry(alias, key, EMPTY_CHARS, chain);
         }
 
         for (var entry : current.trustedCertificates().entrySet()) {
-            keyStore.setCertificateEntry(entry.getKey(), helper.getCertificate(entry.getValue().getCertificate()));
+            keyStore.setCertificateEntry(entry.getKey(), entry.getValue());
         }
 
         return keyStore;
