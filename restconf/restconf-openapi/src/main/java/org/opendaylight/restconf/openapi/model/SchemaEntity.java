@@ -32,29 +32,27 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 /**
  * Archetype for a Schema.
  */
-public final class SchemaEntity extends OpenApiEntity {
+public abstract sealed class SchemaEntity extends OpenApiEntity permits NodeSchemaEntity, RpcSchemaEntity {
     private final @NonNull SchemaNode value;
     private final @NonNull String title;
     private final @NonNull String discriminator;
     private final @NonNull String type;
     private final @NonNull SchemaInferenceStack stack;
     private final boolean isParentConfig;
-    private final SchemasStream.EntityType entityType;
     private final @NonNull String parentName;
     private final @NonNull DefinitionNames definitionNames;
 
-    public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title, final String discriminator,
-            @NonNull final String type, @NonNull final SchemaInferenceStack context, final String parentName,
-            final boolean isParentConfig, @NonNull final DefinitionNames definitionNames,
-            final SchemasStream.EntityType entityType) {
+    public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title,
+            final @Nullable String discriminator, @NonNull final String type,
+            final @NonNull SchemaInferenceStack context, final @NonNull String parentName, final boolean isParentConfig,
+            final @NonNull DefinitionNames definitionNames) {
         this.value = requireNonNull(value);
         this.title = requireNonNull(title);
         this.type = requireNonNull(type);
         this.stack = requireNonNull(context.copy());
         this.parentName = requireNonNull(parentName);
         this.isParentConfig = isParentConfig;
-        this.definitionNames = definitionNames;
-        this.entityType = entityType;
+        this.definitionNames = requireNonNull(definitionNames);
         this.discriminator = requireNonNullElse(discriminator, "");
     }
 
@@ -80,6 +78,26 @@ public final class SchemaEntity extends OpenApiEntity {
         generator.writeEndObject();
     }
 
+    protected @NonNull SchemaNode value() {
+        return value;
+    }
+
+    protected @NonNull SchemaInferenceStack stack() {
+        return stack;
+    }
+
+    protected @NonNull DefinitionNames definitionNames() {
+        return definitionNames;
+    }
+
+    protected boolean isParentConfig() {
+        return isParentConfig;
+    }
+
+    protected @NonNull String parentName() {
+        return parentName;
+    }
+
     private @NonNull String title() {
         return title;
     }
@@ -102,7 +120,7 @@ public final class SchemaEntity extends OpenApiEntity {
         // No-op
     }
 
-    private void generateRequired(final @NonNull JsonGenerator generator, final List<String> required)
+    protected void generateRequired(final @NonNull JsonGenerator generator, final List<String> required)
             throws IOException {
         if (!required.isEmpty()) {
             generator.writeArrayFieldStart("required");
@@ -125,42 +143,7 @@ public final class SchemaEntity extends OpenApiEntity {
         // No-op
     }
 
-    private void generateProperties(final @NonNull JsonGenerator generator) throws IOException {
-        final var required = new ArrayList<String>();
-        generator.writeObjectFieldStart("properties");
-        stack.enterSchemaTree(value.getQName());
-        switch (entityType) {
-            case RPC:
-                for (final var childNode : ((ContainerLike) value).getChildNodes()) {
-                    new PropertyEntity(childNode, generator, stack, required, parentName, isParentConfig,
-                        definitionNames);
-                }
-                break;
-            default:
-                final var childNodes = new HashMap<String, DataSchemaNode>();
-                for (final var childNode : ((DataNodeContainer) value).getChildNodes()) {
-                    childNodes.put(childNode.getQName().getLocalName(), childNode);
-                }
-                for (final var childNode : childNodes.values()) {
-                    if (shouldBeAddedAsProperty(childNode)) {
-                        new PropertyEntity(childNode, generator, stack, required, parentName + "_"
-                            + value.getQName().getLocalName(), ((DataSchemaNode) value).isConfiguration(),
-                            definitionNames);
-                    }
-                }
-        }
-        stack.exit();
-        generator.writeEndObject();
-        generateRequired(generator, required);
-    }
-
-    private boolean shouldBeAddedAsProperty(final DataSchemaNode childNode) {
-        if (childNode instanceof ContainerSchemaNode) {
-            return childNode.isConfiguration() || isSchemaNodeMandatory(childNode)
-                || !((DataSchemaNode) value).isConfiguration();
-        }
-        return childNode.isConfiguration() || !((DataSchemaNode) value).isConfiguration();
-    }
+    abstract void generateProperties(final @NonNull JsonGenerator generator) throws IOException;
 
     private void generateXml(final @NonNull JsonGenerator generator) throws IOException {
         generator.writeObjectFieldStart("xml");
