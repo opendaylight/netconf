@@ -22,7 +22,7 @@
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-netty-util</artifactId>
+            <artifactId>odl-netconf-common</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

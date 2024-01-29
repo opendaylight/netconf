@@ -50,13 +50,13 @@
         <module>odl-netconf-callhome-ssh</module>
         <module>odl-netconf-client</module>
         <module>odl-netconf-clustered-topology</module>
+        <module>odl-netconf-common</module>
         <module>odl-netconf-connector-all</module>
         <module>odl-netconf-connector</module>
         <module>odl-netconf-console</module>
         <module>odl-netconf-impl</module>
         <module>odl-netconf-keystore</module>
         <module>odl-netconf-mdsal</module>
-        <module>odl-netconf-netty-util</module>
         <module>odl-netconf-ssh</module>
         <module>odl-netconf-test-tools</module>
         <module>odl-netconf-topology</module>
