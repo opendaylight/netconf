@@ -21,11 +21,12 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
@@ -54,11 +55,12 @@ public class DefaultSslHandlerFactoryProviderTest {
     private DataBroker dataBroker;
     @Mock
     private Registration listenerRegistration;
+    @Mock
+    private ArgumentCaptor<DataTreeChangeListener<Keystore>> listenerCaptor;
 
     @Before
     public void setUp() {
-        doReturn(listenerRegistration).when(dataBroker)
-            .registerTreeChangeListener(any(DataTreeIdentifier.class), any(DefaultSslHandlerFactoryProvider.class));
+        doReturn(listenerRegistration).when(dataBroker).registerTreeChangeListener(any(), listenerCaptor.capture());
     }
 
     @Test
@@ -84,11 +86,12 @@ public class DefaultSslHandlerFactoryProviderTest {
         final var privateKey = getPrivateKey();
         doReturn(privateKey).when(childObjectModification).dataAfter();
 
-        final var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
-        keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification));
+        try (var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker)) {
+            listenerCaptor.getValue().onDataTreeChanged(List.of(dataTreeModification));
 
-        final var keyStore = keystoreAdapter.getJavaKeyStore();
-        assertTrue(keyStore.containsAlias(privateKey.getName()));
+            final var keyStore = keystoreAdapter.getJavaKeyStore();
+            assertTrue(keyStore.containsAlias(privateKey.getName()));
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -123,14 +126,15 @@ public class DefaultSslHandlerFactoryProviderTest {
         final var trustedCertificate = geTrustedCertificate();
         doReturn(trustedCertificate).when(childObjectModification2).dataAfter();
 
-        // Apply configurations
-        final var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
-        keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
+        try (var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker)) {
+            // Apply configurations
+            listenerCaptor.getValue().onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
 
-        // Check result
-        final var keyStore = keystoreAdapter.getJavaKeyStore();
-        assertTrue(keyStore.containsAlias(privateKey.getName()));
-        assertTrue(keyStore.containsAlias(trustedCertificate.getName()));
+            // Check result
+            final var keyStore = keystoreAdapter.getJavaKeyStore();
+            assertTrue(keyStore.containsAlias(privateKey.getName()));
+            assertTrue(keyStore.containsAlias(trustedCertificate.getName()));
+        }
     }
 
     private PrivateKey getPrivateKey() throws Exception {
