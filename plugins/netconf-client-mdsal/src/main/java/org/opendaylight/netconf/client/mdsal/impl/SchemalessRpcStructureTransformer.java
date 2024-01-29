@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -60,7 +60,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         for (var xmlElement : selectMatchingNodes(getSourceElement(anyxml.body()), path)) {
             dataElement.appendChild(result.importNode(xmlElement.getDomElement(), true));
         }
-        return Optional.of(Builders.anyXmlBuilder()
+        return Optional.of(ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
             .withNodeIdentifier(NETCONF_DATA_NODEID)
             .withValue(new DOMSource(result))
             .build());
@@ -102,7 +102,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         operation.ifPresent(modifyAction -> setOperationAttribute(modifyAction, document, dataNode));
         //append data
         parentXmlStructure.appendChild(document.importNode(dataNode, true));
-        return Builders.anyXmlBuilder()
+        return ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
             .withNodeIdentifier(NETCONF_CONFIG_NODEID)
             .withValue(new DOMSource(document.getDocumentElement()))
             .build();
@@ -139,7 +139,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     private static AnyxmlNode<?> buildFilterXmlNode(final Document document) {
-        return Builders.anyXmlBuilder()
+        return ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
             .withNodeIdentifier(new NodeIdentifier(Filter.QNAME))
             .withValue(new DOMSource(document.getDocumentElement()))
             .build();

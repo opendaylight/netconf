@@ -70,9 +70,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
@@ -404,13 +404,13 @@ public class NetconfMessageTransformer
         final var message = resultPayload.getResult();
         final ContainerNode normalizedNode;
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpc)) {
-            normalizedNode = Builders.containerBuilder()
-                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
-                    .withChild(Builders.anyXmlBuilder()
-                        .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
-                        .withValue(new DOMSource(NetconfMessageTransformUtil.getDataSubtree(message.getDocument())))
-                        .build())
-                    .build();
+            normalizedNode = ImmutableNodes.newContainerBuilder()
+                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
+                .withChild(ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
+                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
+                    .withValue(new DOMSource(NetconfMessageTransformUtil.getDataSubtree(message.getDocument())))
+                    .build())
+                .build();
         } else {
             // Determine whether a base netconf operation is being invoked
             // and also check if the device exposed model for base netconf.

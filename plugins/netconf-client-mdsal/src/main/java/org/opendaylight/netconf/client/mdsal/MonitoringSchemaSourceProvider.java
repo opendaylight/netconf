@@ -28,8 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
@@ -51,8 +50,7 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
             NodeIdentifier.create(QName.create(GetSchema.QNAME, "identifier").intern());
     private static final NodeIdentifier VERSION_PATHARG =
             NodeIdentifier.create(QName.create(GetSchema.QNAME, "version").intern());
-    private static final LeafNode<?> FORMAT_LEAF =
-            Builders.leafBuilder().withNodeIdentifier(FORMAT_PATHARG).withValue(Yang.QNAME).build();
+    private static final LeafNode<?> FORMAT_LEAF = ImmutableNodes.leafNode(FORMAT_PATHARG, Yang.QNAME);
     private static final NodeIdentifier NETCONF_DATA_PATHARG = NodeIdentifier.create(Data.QNAME);
 
     private final DOMRpcService rpc;
@@ -65,7 +63,7 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
 
     public static @NonNull ContainerNode createGetSchemaRequest(final String moduleName,
             final Optional<String> revision) {
-        final var builder = Builders.containerBuilder()
+        final var builder = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(GET_SCHEMA_PATHARG)
             .withChild(ImmutableNodes.leafNode(IDENTIFIER_PATHARG, moduleName))
             .withChild(FORMAT_LEAF);

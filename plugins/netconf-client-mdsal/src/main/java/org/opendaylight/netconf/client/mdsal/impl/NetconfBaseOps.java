@@ -63,8 +63,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 /**
  * Provides base operations for NETCONF e.g. {@code get}, {@code get-config}, {@code edit-config}, {@code commit} etc.
@@ -355,7 +354,7 @@ public final class NetconfBaseOps {
 
     public ChoiceNode createEditConfigStructure(final Optional<NormalizedNode> lastChild,
             final Optional<EffectiveOperation> operation, final YangInstanceIdentifier dataPath) {
-        return Builders.choiceBuilder()
+        return ImmutableNodes.newChoiceBuilder()
             .withNodeIdentifier(EDIT_CONTENT_NODEID)
             .withChild(transformer.createEditConfigStructure(lastChild, dataPath, operation))
             .build();
@@ -364,7 +363,7 @@ public final class NetconfBaseOps {
     private static ContainerNode getEditConfigContent(final NodeIdentifier datastore,
             final DataContainerChild editStructure, final Optional<EffectiveOperation> defaultOperation,
             final boolean rollback) {
-        final var editBuilder = Builders.containerBuilder()
+        final var editBuilder = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_EDIT_CONFIG_NODEID)
             // Target
             .withChild(getTargetNode(datastore));
@@ -384,9 +383,9 @@ public final class NetconfBaseOps {
     }
 
     public static @NonNull ContainerNode getSourceNode(final NodeIdentifier datastore) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_SOURCE_NODEID)
-            .withChild(Builders.choiceBuilder()
+            .withChild(ImmutableNodes.newChoiceBuilder()
                 .withNodeIdentifier(CONFIG_SOURCE_NODEID)
                 .withChild(ImmutableNodes.leafNode(datastore, Empty.value()))
                 .build())
@@ -394,16 +393,16 @@ public final class NetconfBaseOps {
     }
 
     public static @NonNull ContainerNode getLockContent(final NodeIdentifier datastore) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_LOCK_NODEID)
             .withChild(getTargetNode(datastore))
             .build();
     }
 
     public static @NonNull ContainerNode getTargetNode(final NodeIdentifier datastore) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_TARGET_NODEID)
-            .withChild(Builders.choiceBuilder()
+            .withChild(ImmutableNodes.newChoiceBuilder()
                 .withNodeIdentifier(CONFIG_TARGET_NODEID)
                 .withChild(ImmutableNodes.leafNode(datastore, Empty.value()))
                 .build())
@@ -412,7 +411,7 @@ public final class NetconfBaseOps {
 
     public static @NonNull ContainerNode getCopyConfigContent(final NodeIdentifier sourceDatastore,
             final NodeIdentifier targetDatastore) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_COPY_CONFIG_NODEID)
             .withChild(getTargetNode(targetDatastore))
             .withChild(getSourceNode(sourceDatastore))
@@ -420,14 +419,14 @@ public final class NetconfBaseOps {
     }
 
     public static @NonNull ContainerNode getValidateContent(final NodeIdentifier sourceDatastore) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_VALIDATE_NODEID)
             .withChild(getSourceNode(sourceDatastore))
             .build();
     }
 
     public static @NonNull ContainerNode getUnLockContent(final NodeIdentifier datastore) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_UNLOCK_NODEID)
             .withChild(getTargetNode(datastore))
             .build();

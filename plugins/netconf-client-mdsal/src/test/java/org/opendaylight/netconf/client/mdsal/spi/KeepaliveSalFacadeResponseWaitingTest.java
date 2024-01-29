@@ -37,7 +37,7 @@ import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.GetConfig;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @ExtendWith(MockitoExtension.class)
 class KeepaliveSalFacadeResponseWaitingTest {
@@ -86,7 +86,7 @@ class KeepaliveSalFacadeResponseWaitingTest {
 
         //This settable future will be used to check the invokation of keepalive RPC. Should be never invoked.
         final var keepaliveSettableFuture = SettableFuture.<DOMRpcResult>create();
-        keepaliveSettableFuture.set(new DefaultDOMRpcResult(Builders.containerBuilder()
+        keepaliveSettableFuture.set(new DefaultDOMRpcResult(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID)
             .build()));
 

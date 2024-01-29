@@ -40,7 +40,7 @@ import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @ExtendWith(MockitoExtension.class)
 class KeepaliveSalFacadeTest {
@@ -76,7 +76,7 @@ class KeepaliveSalFacadeTest {
     @Test
     void testKeepaliveSuccess() throws Exception {
         doNothing().when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any());
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(Builders.containerBuilder()
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID)
             .build()))).when(deviceRpc).invokeNetconf(any(), any());
 

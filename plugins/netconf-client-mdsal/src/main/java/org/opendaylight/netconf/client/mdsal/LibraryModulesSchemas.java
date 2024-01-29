@@ -67,9 +67,9 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -111,7 +111,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static final YangInstanceIdentifier MODULES_STATE_MODULE_LIST =
             YangInstanceIdentifier.of(MODULES_STATE_NID, MODULE_NID);
 
-    private static final @NonNull ContainerNode GET_MODULES_STATE_MODULE_LIST_RPC = Builders.containerBuilder()
+    private static final @NonNull ContainerNode GET_MODULES_STATE_MODULE_LIST_RPC = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID)
             .withChild(NetconfMessageTransformUtil.toFilterStructure(MODULES_STATE_MODULE_LIST, LIBRARY_CONTEXT))
             .build();

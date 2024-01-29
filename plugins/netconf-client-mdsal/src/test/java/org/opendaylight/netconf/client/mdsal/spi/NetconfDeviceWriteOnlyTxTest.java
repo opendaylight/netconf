@@ -51,7 +51,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
@@ -73,7 +73,9 @@ public class NetconfDeviceWriteOnlyTxTest extends AbstractBaseSchemasTest {
         final var tx = new WriteCandidateTx(ID, new NetconfBaseOps(rpc, mock(MountPointContext.class)), false, true);
         tx.init();
 
-        final var emptyList = ImmutableNodes.mapNodeBuilder(new NodeIdentifier(Filter.QNAME)).build();
+        final var emptyList = ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(Filter.QNAME))
+            .build();
         tx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(Filter.QNAME), emptyList);
         tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.of(Filter.QNAME), emptyList);
 

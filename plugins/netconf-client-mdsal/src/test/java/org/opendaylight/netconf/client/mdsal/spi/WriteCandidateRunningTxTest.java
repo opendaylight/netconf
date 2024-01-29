@@ -39,8 +39,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class WriteCandidateRunningTxTest extends AbstractTestModelTest {
@@ -84,11 +83,11 @@ public class WriteCandidateRunningTxTest extends AbstractTestModelTest {
     }
 
     private static ContainerNode getLockContent(final QName op, final NodeIdentifier datastore) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(toId(op))
-            .withChild(Builders.containerBuilder()
+            .withChild(ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(NETCONF_TARGET_NODEID)
-                .withChild(Builders.choiceBuilder()
+                .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(toId(ConfigTarget.QNAME))
                     .withChild(ImmutableNodes.leafNode(datastore, Empty.value()))
                     .build())

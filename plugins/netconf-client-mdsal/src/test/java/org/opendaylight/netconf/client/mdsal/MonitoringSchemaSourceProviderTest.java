@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.w3c.dom.Document;
@@ -75,9 +75,9 @@ public class MonitoringSchemaSourceProviderTest {
         Document xmlDoc = UntrustedXML.newDocumentBuilder().newDocument();
         Element root = xmlDoc.createElement("data");
         root.setTextContent("module test {}");
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(id)
-            .withChild(Builders.anyXmlBuilder()
+            .withChild(ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
                 .withNodeIdentifier(childId)
                 .withValue(new DOMSource(root))
                 .build())

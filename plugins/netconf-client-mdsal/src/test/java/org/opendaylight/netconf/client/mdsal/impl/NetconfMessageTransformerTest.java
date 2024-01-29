@@ -78,8 +78,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -210,7 +209,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
         final var transformer = new NetconfMessageTransformer(MountPointContext.of(SCHEMA), true,
             BASE_SCHEMAS.baseSchemaWithNotifications());
-        var netconfMessage = transformer.toRpcRequest(CreateSubscription.QNAME, Builders.containerBuilder()
+        var netconfMessage = transformer.toRpcRequest(CreateSubscription.QNAME, ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CreateSubscriptionInput.QNAME))
             .build());
         assertEquals("""
@@ -327,7 +326,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
             keys.put(value.name().getNodeType(), value.body());
         }
 
-        final var schemaNode = Builders.mapEntryBuilder()
+        final var schemaNode = ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Schema.QNAME, keys))
             .withValue(values)
             .build();
@@ -412,7 +411,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
             keys.put(value.name().getNodeType(), value.body());
         }
 
-        final var schemaNode = Builders.mapEntryBuilder()
+        final var schemaNode = ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(Schema.QNAME, keys))
             .withValue(values)
             .build();
@@ -719,7 +718,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        ContainerNode payload = Builders.containerBuilder()
+        ContainerNode payload = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(QName.create(barInputQname, "input")))
             .withChild(ImmutableNodes.leafNode(barInputQname, barInput))
             .build();
@@ -1179,14 +1178,14 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     }
 
     private static ContainerNode initInputAction(final QName qname, final String value) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(QName.create(qname, "input")))
             .withChild(ImmutableNodes.leafNode(qname, value))
             .build();
     }
 
     private static ContainerNode initEmptyInputAction(final QName qname) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(QName.create(qname, "input")))
             .build();
     }

@@ -67,7 +67,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
@@ -189,7 +188,7 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         // Perhaps add a default schema context to support create-subscription if the model was not provided
         // (same as what we do for base netconf operations in transformer)
         final var rpcResultListenableFuture = deviceRpc.domRpcService()
-            .invokeRpc(CreateSubscription.QNAME, Builders.containerBuilder()
+            .invokeRpc(CreateSubscription.QNAME, ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(NodeIdentifier.create(CreateSubscriptionInput.QNAME))
                 // Note: default 'stream' is 'NETCONF', we do not need to create an explicit leaf
                 .build());

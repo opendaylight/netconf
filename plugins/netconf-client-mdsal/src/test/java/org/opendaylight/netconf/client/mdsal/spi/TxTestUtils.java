@@ -9,9 +9,10 @@ package org.opendaylight.netconf.client.mdsal.spi;
 
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 public final class TxTestUtils {
     private static final QName Q_NAME_1 = QName.create("test:namespace", "2013-07-22", "c");
@@ -30,7 +31,7 @@ public final class TxTestUtils {
     }
 
     static ContainerNode getContainerNode() {
-        return ImmutableNodes.containerNode(Q_NAME_1);
+        return ImmutableNodes.newContainerBuilder().withNodeIdentifier(new NodeIdentifier(Q_NAME_1)).build();
     }
 
     public static LeafNode<String> getLeafNode() {

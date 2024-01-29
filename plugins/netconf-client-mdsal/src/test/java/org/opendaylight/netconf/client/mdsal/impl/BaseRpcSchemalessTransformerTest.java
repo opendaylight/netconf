@@ -25,8 +25,7 @@ import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.Element;
 import org.xmlunit.builder.DiffBuilder;
 
@@ -37,11 +36,11 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void toRpcRequest() throws Exception {
         final var msg = transformer.toRpcRequest(EditConfig.QNAME,
-            Builders.containerBuilder()
+            ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_NODEID)
-                .withChild(Builders.choiceBuilder()
+                .withChild(ImmutableNodes.newChoiceBuilder()
                     .withNodeIdentifier(new NodeIdentifier(EditContent.QNAME))
-                    .withChild(Builders.anyXmlBuilder()
+                    .withChild(ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
                         .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_CONFIG_NODEID)
                         .withValue(new DOMSource(XmlUtil.readXmlToDocument(
                             BaseRpcSchemalessTransformerTest.class.getResourceAsStream(
@@ -49,9 +48,9 @@ public class BaseRpcSchemalessTransformerTest extends AbstractBaseSchemasTest {
                             .getDocumentElement()))
                         .build())
                     .build())
-                .withChild(Builders.containerBuilder()
+                .withChild(ImmutableNodes.newContainerBuilder()
                     .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_TARGET_NODEID)
-                    .withChild(Builders.choiceBuilder()
+                    .withChild(ImmutableNodes.newChoiceBuilder()
                         .withNodeIdentifier(new NodeIdentifier(ConfigTarget.QNAME))
                         .withChild(ImmutableNodes.leafNode(Candidate.QNAME, Empty.value()))
                         .build())

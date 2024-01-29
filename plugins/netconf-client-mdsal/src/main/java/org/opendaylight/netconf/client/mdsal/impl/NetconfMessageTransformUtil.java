@@ -70,11 +70,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.YangInstanceIdentifierWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedMetadata;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
@@ -139,15 +139,15 @@ public final class NetconfMessageTransformUtil {
     public static final @NonNull NodeIdentifier EDIT_CONTENT_NODEID = NodeIdentifier.create(EditContent.QNAME);
 
     // Discard changes message
-    public static final @NonNull ContainerNode DISCARD_CHANGES_RPC_CONTENT = Builders.containerBuilder()
+    public static final @NonNull ContainerNode DISCARD_CHANGES_RPC_CONTENT = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(DiscardChangesInput.QNAME)).build();
 
     // Commit changes message
-    public static final @NonNull ContainerNode COMMIT_RPC_CONTENT = Builders.containerBuilder()
+    public static final @NonNull ContainerNode COMMIT_RPC_CONTENT = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(CommitInput.QNAME)).build();
 
     // Get message
-    public static final @NonNull ContainerNode GET_RPC_CONTENT = Builders.containerBuilder()
+    public static final @NonNull ContainerNode GET_RPC_CONTENT = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID).build();
 
     public static final @NonNull AnyxmlNode<?> EMPTY_FILTER = buildFilterStructure(newFilterElement());
@@ -206,7 +206,7 @@ public final class NetconfMessageTransformUtil {
     }
 
     private static AnyxmlNode<?> buildFilterStructure(final Element element) {
-        return Builders.anyXmlBuilder()
+        return ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
             .withNodeIdentifier(new NodeIdentifier(Filter.QNAME))
             .withValue(new DOMSource(element))
             .build();
@@ -236,7 +236,10 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static @NonNull ContainerNode wrap(final NodeIdentifier name, final DataContainerChild... node) {
-        return Builders.containerBuilder().withNodeIdentifier(name).withValue(ImmutableList.copyOf(node)).build();
+        return ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(name)
+            .withValue(ImmutableList.copyOf(node))
+            .build();
     }
 
     /**
@@ -283,8 +286,10 @@ public final class NetconfMessageTransformUtil {
             throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
         }
 
-        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_CONFIG_NODEID).withValue(new DOMSource(element))
-                .build();
+        return ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
+            .withNodeIdentifier(NETCONF_CONFIG_NODEID)
+            .withValue(new DOMSource(element))
+            .build();
     }
 
     private static NormalizedMetadata leafMetadata(final YangInstanceIdentifier path, final EffectiveOperation oper) {
@@ -322,8 +327,10 @@ public final class NetconfMessageTransformUtil {
     public static DataContainerChild createEditConfigStructure(final EffectiveModelContext ctx,
             final YangInstanceIdentifier dataPath, final Optional<EffectiveOperation> operation,
             final Optional<NormalizedNode> lastChildOverride) {
-        return Builders.choiceBuilder().withNodeIdentifier(EDIT_CONTENT_NODEID)
-                .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride)).build();
+        return ImmutableNodes.newChoiceBuilder()
+            .withNodeIdentifier(EDIT_CONTENT_NODEID)
+            .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride))
+            .build();
     }
 
     public static @NonNull Absolute toPath(final QName rpc) {

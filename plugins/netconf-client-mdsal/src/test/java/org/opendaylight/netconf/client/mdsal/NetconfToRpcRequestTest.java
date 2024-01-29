@@ -24,8 +24,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -66,7 +65,7 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testUserDefinedRpcCall() throws Exception {
-        final ContainerNode root = Builders.containerBuilder()
+        final ContainerNode root = ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(toId(SUBSCRIBE_RPC_NAME))
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME, "NETCONF"))
                 .build();

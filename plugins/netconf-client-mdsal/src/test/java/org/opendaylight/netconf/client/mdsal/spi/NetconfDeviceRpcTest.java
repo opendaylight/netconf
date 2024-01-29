@@ -48,7 +48,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.w3c.dom.Node;
@@ -143,7 +143,8 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     }
 
     private static ContainerNode createNode(final String namespace, final String date, final String localName) {
-        return Builders.containerBuilder().withNodeIdentifier(
-                new NodeIdentifier(QName.create(namespace, date, localName))).build();
+        return ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(QName.create(namespace, date, localName)))
+            .build();
     }
 }

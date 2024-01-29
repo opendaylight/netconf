@@ -17,7 +17,7 @@ import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -49,9 +49,9 @@ public class SchemalessMessageTransformer implements NotificationTransformer, Rp
                     + message + ", cannot find namespace", e);
         }
 
-        return new NetconfMessageTransformer.NetconfDeviceNotification(Builders.containerBuilder()
+        return new NetconfMessageTransformer.NetconfDeviceNotification(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(SCHEMALESS_NOTIFICATION_PAYLOAD)
-            .withChild(Builders.anyXmlBuilder()
+            .withChild(ImmutableNodes.newAnyxmlBuilder(DOMSource.class)
                 .withNodeIdentifier(new NodeIdentifier(notificationNoRev))
                 .withValue(new DOMSource(stripped.getValue().getDomElement()))
                 .build())
