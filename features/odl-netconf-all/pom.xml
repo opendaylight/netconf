@@ -29,7 +29,13 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-util</artifactId>
+            <artifactId>odl-netconf-client</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-netconf-common</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -41,13 +47,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-netty-util</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-netconf-client</artifactId>
+            <artifactId>odl-netconf-util</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

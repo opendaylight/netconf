@@ -16,9 +16,10 @@
         <relativePath>../parent</relativePath>
     </parent>
 
-    <artifactId>odl-netconf-netty-util</artifactId>
+    <artifactId>odl-netconf-common</artifactId>
     <packaging>feature</packaging>
-    <name>OpenDaylight :: Netconf :: Netty Util</name>
+    <name>OpenDaylight :: Netconf :: Netconf Common</name>
+    <description>Shared NETCONF components</description>
 
     <dependencies>
         <dependency>
@@ -47,6 +48,10 @@
             <artifactId>odl-netconf-util</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>netconf-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
