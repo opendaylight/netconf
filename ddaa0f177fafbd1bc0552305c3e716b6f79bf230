@@ -34,6 +34,41 @@
       "parentUuid": "006f657a_676d714c",
       "revId": "ddaa0f177fafbd1bc0552305c3e716b6f79bf230",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d09953c_ab75c2fa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-29T14:00:20Z",
+      "side": 1,
+      "message": "Please separate that change into independent commit to evaluate more preciselly.",
+      "parentUuid": "99b90324_70c6e186",
+      "revId": "ddaa0f177fafbd1bc0552305c3e716b6f79bf230",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a656de88_ed17404d",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-29T14:00:20Z",
+      "side": 1,
+      "message": "Probably this will be conflicting part - see NIO patch.",
+      "revId": "ddaa0f177fafbd1bc0552305c3e716b6f79bf230",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
