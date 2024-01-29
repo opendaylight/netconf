@@ -48,6 +48,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1704444_e41f6fc1",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/InfoStream.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-29T14:51:26Z",
+      "side": 1,
+      "message": "https://git.opendaylight.org/gerrit/c/netconf/+/109803",
+      "parentUuid": "dbfa0246_6cc605f0",
+      "range": {
+        "startLine": 32,
+        "startChar": 15,
+        "endLine": 32,
+        "endChar": 19
+      },
+      "revId": "950e8e67b490ac5d953c96d39ad069842e7dcc67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "37977cb7_463189a1",
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "1. In some cases new parameter into class will be added\n2. In most situations we will use SchemaNode to construct the value we are interested in, like in SchemaEntity.java\n\n    private @Nullable String description() {\n        return value.getDescription().orElse(null);\n    }\n    \nFor other cases/classes the logic in methods will be more complicated but IMO this way we can rework current implementation to the new one.\n\nIn general, we are using SchemaNode to determine most of the fields. The logic for it will be in methods like this.",
       "parentUuid": "37977cb7_463189a1",
+      "range": {
+        "startLine": 55,
+        "startChar": 21,
+        "endLine": 55,
+        "endChar": 24
+      },
+      "revId": "950e8e67b490ac5d953c96d39ad069842e7dcc67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "941a703f_f665ea91",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PathEntity.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-29T14:51:26Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2fe7d403_6f1c05cb",
       "range": {
         "startLine": 55,
         "startChar": 21,
