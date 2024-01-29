@@ -15,13 +15,19 @@ import org.junit.Test;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.DefaultNodeMatcher;
@@ -52,6 +58,37 @@ public class NormalizedDataUtilTest {
                         <username>admin</username>
                     </session>
                 </sessions>
+                """)
+            .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+            .ignoreWhitespace()
+            .checkForSimilar()
+            .build();
+
+        assertFalse(diff.toString(), diff.hasDifferences());
+    }
+
+    @Test
+    public void writeListFieldsFilter() throws Exception {
+        final var context = BindingRuntimeHelpers.createEffectiveModel(List.of(YangModuleInfoImpl.getInstance()));
+        final var result = new DOMResult(XmlUtil.newDocument());
+        final var listPath = YangInstanceIdentifier.of(NetconfState.QNAME, Schemas.QNAME, Schema.QNAME);
+        final var listSchemaNode = (ListSchemaNode) DataSchemaContextTree.from(context).findChild(listPath)
+            .map(DataSchemaContext::dataSchemaNode).orElseThrow();
+        final var keyFields = listSchemaNode.getKeyDefinition().stream().map(YangInstanceIdentifier::of).toList();
+
+        NormalizedDataUtil.writeFilter(listPath, result, context, null, keyFields);
+
+        final var diff = DiffBuilder.compare(result.getNode())
+            .withTest("""
+                <netconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
+                    <schemas>
+                        <schema>
+                            <identifier/>
+                            <version/>
+                            <format/>
+                        </schema>
+                    </schemas>
+                </netconf-state>
                 """)
             .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
             .ignoreWhitespace()
