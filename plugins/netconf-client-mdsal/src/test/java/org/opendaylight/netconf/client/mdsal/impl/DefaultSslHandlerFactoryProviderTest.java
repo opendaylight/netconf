@@ -12,20 +12,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
@@ -38,11 +38,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.
 import org.opendaylight.yangtools.concepts.Registration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class DefaultSslHandlerFactoryProviderTest {
+@ExtendWith(MockitoExtension.class)
+class DefaultSslHandlerFactoryProviderTest {
     private static final String XML_ELEMENT_PRIVATE_KEY = "private-key";
     private static final String XML_ELEMENT_NAME = "name";
     private static final String XML_ELEMENT_DATA = "data";
@@ -54,144 +52,139 @@ public class DefaultSslHandlerFactoryProviderTest {
     private DataBroker dataBroker;
     @Mock
     private Registration listenerRegistration;
+    @Mock
+    private DataTreeModification<Keystore> dataTreeModification1;
+    @Mock
+    private DataTreeModification<Keystore> dataTreeModification2;
+    @Mock
+    private DataObjectModification<Keystore> keystoreObjectModification1;
+    @Mock
+    private DataObjectModification<Keystore> keystoreObjectModification2;
+    @Mock
+    private DataObjectModification<PrivateKey> privateKeyModification;
+    @Mock
+    private DataObjectModification<TrustedCertificate> trustedCertificateModification;
 
-    @Before
-    public void setUp() {
-        doReturn(listenerRegistration).when(dataBroker)
-            .registerTreeChangeListener(any(DataTreeIdentifier.class), any(DefaultSslHandlerFactoryProvider.class));
+    private DataTreeChangeListener<Keystore> listener;
+
+    @BeforeEach
+    void setUp() {
+        doAnswer(inv -> {
+            listener = inv.getArgument(1);
+            return listenerRegistration;
+        }).when(dataBroker).registerTreeChangeListener(any(), any());
     }
 
     @Test
-    public void testKeystoreAdapterInit() throws Exception {
-        final DefaultSslHandlerFactoryProvider keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
-        final var ex = assertThrows(KeyStoreException.class, keystoreAdapter::getJavaKeyStore);
-        assertThat(ex.getMessage(), startsWith("No keystore private key found"));
+    void testKeystoreAdapterInit() throws Exception {
+        try (var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker)) {
+            final var ex = assertThrows(KeyStoreException.class, keystoreAdapter::getJavaKeyStore);
+            assertThat(ex.getMessage(), startsWith("No keystore private key found"));
+        }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    public void testWritePrivateKey() throws Exception {
-        DataTreeModification<Keystore> dataTreeModification = mock(DataTreeModification.class);
-        DataObjectModification<Keystore> keystoreObjectModification = mock(DataObjectModification.class);
-        doReturn(keystoreObjectModification).when(dataTreeModification).getRootNode();
-
-        DataObjectModification<?> childObjectModification = mock(DataObjectModification.class);
-        doReturn(List.of(childObjectModification)).when(keystoreObjectModification).modifiedChildren();
-        doReturn(PrivateKey.class).when(childObjectModification).dataType();
-
-        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification).modificationType();
+    void testWritePrivateKey() throws Exception {
+        doReturn(keystoreObjectModification1).when(dataTreeModification1).getRootNode();
+        doReturn(List.of(privateKeyModification)).when(keystoreObjectModification1)
+            .getModifiedChildren(PrivateKey.class);
+        doReturn(DataObjectModification.ModificationType.WRITE).when(privateKeyModification).modificationType();
 
         final var privateKey = getPrivateKey();
-        doReturn(privateKey).when(childObjectModification).dataAfter();
+        doReturn(privateKey).when(privateKeyModification).dataAfter();
 
-        final var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
-        keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification));
+        try (var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker)) {
+            listener.onDataTreeChanged(List.of(dataTreeModification1));
 
-        final var keyStore = keystoreAdapter.getJavaKeyStore();
-        assertTrue(keyStore.containsAlias(privateKey.getName()));
+            final var keyStore = keystoreAdapter.getJavaKeyStore();
+            assertTrue(keyStore.containsAlias(privateKey.getName()));
+        }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    public void testWritePrivateKeyAndTrustedCertificate() throws Exception {
+    void testWritePrivateKeyAndTrustedCertificate() throws Exception {
         // Prepare PrivateKey configuration
-        DataTreeModification<Keystore> dataTreeModification1 = mock(DataTreeModification.class);
-        DataObjectModification<Keystore> keystoreObjectModification1 = mock(DataObjectModification.class);
         doReturn(keystoreObjectModification1).when(dataTreeModification1).getRootNode();
 
-        DataObjectModification<?> childObjectModification1 = mock(DataObjectModification.class);
-        doReturn(List.of(childObjectModification1)).when(keystoreObjectModification1).modifiedChildren();
-        doReturn(PrivateKey.class).when(childObjectModification1).dataType();
-
-        doReturn(DataObjectModification.ModificationType.WRITE).when(childObjectModification1).modificationType();
+        doReturn(List.of(privateKeyModification)).when(keystoreObjectModification1)
+            .getModifiedChildren(PrivateKey.class);
+        doReturn(DataObjectModification.ModificationType.WRITE).when(privateKeyModification).modificationType();
 
         final var privateKey = getPrivateKey();
-        doReturn(privateKey).when(childObjectModification1).dataAfter();
+        doReturn(privateKey).when(privateKeyModification).dataAfter();
 
         // Prepare TrustedCertificate configuration
-        DataTreeModification<Keystore> dataTreeModification2 = mock(DataTreeModification.class);
-        DataObjectModification<Keystore> keystoreObjectModification2 = mock(DataObjectModification.class);
         doReturn(keystoreObjectModification2).when(dataTreeModification2).getRootNode();
 
-        DataObjectModification<?> childObjectModification2 = mock(DataObjectModification.class);
-        doReturn(List.of(childObjectModification2)).when(keystoreObjectModification2).modifiedChildren();
-        doReturn(TrustedCertificate.class).when(childObjectModification2).dataType();
+        doReturn(List.of()).when(keystoreObjectModification2).getModifiedChildren(PrivateKey.class);
+        doReturn(List.of(trustedCertificateModification)).when(keystoreObjectModification2)
+            .getModifiedChildren(TrustedCertificate.class);
+        doReturn(DataObjectModification.ModificationType.WRITE).when(trustedCertificateModification).modificationType();
 
-        doReturn(DataObjectModification.ModificationType.WRITE)
-            .when(childObjectModification2).modificationType();
+        final var trustedCertificate = getTrustedCertificate();
+        doReturn(trustedCertificate).when(trustedCertificateModification).dataAfter();
 
-        final var trustedCertificate = geTrustedCertificate();
-        doReturn(trustedCertificate).when(childObjectModification2).dataAfter();
+        try (var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker)) {
+            // Apply configurations
+            listener.onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
 
-        // Apply configurations
-        final var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker);
-        keystoreAdapter.onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
-
-        // Check result
-        final var keyStore = keystoreAdapter.getJavaKeyStore();
-        assertTrue(keyStore.containsAlias(privateKey.getName()));
-        assertTrue(keyStore.containsAlias(trustedCertificate.getName()));
+            // Check result
+            final var keyStore = keystoreAdapter.getJavaKeyStore();
+            assertTrue(keyStore.containsAlias(privateKey.getName()));
+            assertTrue(keyStore.containsAlias(trustedCertificate.getName()));
+        }
     }
 
-    private PrivateKey getPrivateKey() throws Exception {
-        final List<PrivateKey> privateKeys = new ArrayList<>();
-        final Document document = readKeystoreXML();
-        final NodeList nodeList = document.getElementsByTagName(XML_ELEMENT_PRIVATE_KEY);
+    private static PrivateKey getPrivateKey() throws Exception {
+        final var privateKeys = new ArrayList<PrivateKey>();
+        final var document = readKeystoreXML();
+        final var nodeList = document.getElementsByTagName(XML_ELEMENT_PRIVATE_KEY);
         for (int i = 0; i < nodeList.getLength(); i++) {
-            final Node node = nodeList.item(i);
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final Element element = (Element)node;
-            final String keyName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
-            final String keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent();
-            final NodeList certNodes = element.getElementsByTagName(XML_ELEMENT_CERT_CHAIN);
-            final List<String> certChain = new ArrayList<>();
-            for (int j = 0; j < certNodes.getLength(); j++) {
-                final Node certNode = certNodes.item(j);
-                if (certNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
+            if (nodeList.item(i) instanceof Element element) {
+                final var keyName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
+                final var keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent();
+                final var certNodes = element.getElementsByTagName(XML_ELEMENT_CERT_CHAIN);
+                final var certChain = new ArrayList<String>();
+                for (int j = 0; j < certNodes.getLength(); j++) {
+                    if (certNodes.item(j) instanceof Element certNode) {
+                        certChain.add(certNode.getTextContent());
+                    }
                 }
-                certChain.add(certNode.getTextContent());
-            }
 
-            final PrivateKey privateKey = new PrivateKeyBuilder()
+                privateKeys.add(new PrivateKeyBuilder()
                     .withKey(new PrivateKeyKey(keyName))
                     .setName(keyName)
                     .setData(keyData)
                     .setCertificateChain(certChain)
-                    .build();
-            privateKeys.add(privateKey);
+                    .build());
+            }
         }
 
         return privateKeys.get(0);
     }
 
-    private TrustedCertificate geTrustedCertificate() throws Exception {
-        final List<TrustedCertificate> trustedCertificates = new ArrayList<>();
-        final Document document = readKeystoreXML();
-        final NodeList nodeList = document.getElementsByTagName(XML_ELEMENT_TRUSTED_CERT);
+    private static TrustedCertificate getTrustedCertificate() throws Exception {
+        final var trustedCertificates = new ArrayList<TrustedCertificate>();
+        final var document = readKeystoreXML();
+        final var nodeList = document.getElementsByTagName(XML_ELEMENT_TRUSTED_CERT);
         for (int i = 0; i < nodeList.getLength(); i++) {
-            final Node node = nodeList.item(i);
-            if (node.getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-            final Element element = (Element)node;
-            final String certName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
-            final String certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent();
+            if (nodeList.item(i) instanceof Element element) {
+                final var certName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
+                final var certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent();
 
-            final TrustedCertificate certificate = new TrustedCertificateBuilder()
+                trustedCertificates.add(new TrustedCertificateBuilder()
                     .withKey(new TrustedCertificateKey(certName))
                     .setName(certName)
                     .setCertificate(certData)
-                    .build();
-            trustedCertificates.add(certificate);
+                    .build());
+            }
         }
 
         return trustedCertificates.get(0);
     }
 
-    private Document readKeystoreXML() throws Exception {
-        return XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/netconf-keystore.xml"));
+    private static Document readKeystoreXML() throws Exception {
+        return XmlUtil.readXmlToDocument(
+            DefaultSslHandlerFactoryProviderTest.class.getResourceAsStream("/netconf-keystore.xml"));
     }
 }
