@@ -12,6 +12,10 @@ module odl-netconf-callhome-server {
   description
    "This module defines the northbound interface for OpenDaylight NETCONF Callhome.";
 
+  revision 2024-01-29 {
+    description "This revision removes the deprecated host-key";
+  }
+
   revision 2023-04-28 {
     description "This revision integrates device-status leaf, formerly hosted in callhome-device.yang";
   }
@@ -73,13 +77,6 @@ module odl-netconf-callhome-server {
           description "Identifier of device, which will be used to identify device.";
           type string;
         }
-        leaf ssh-host-key {
-          description "BASE-64 encoded public key which device will use during connection.
-                       Deprecated, a 'host-key' from the  'ssh-client-params' containers should be used instead.";
-          status deprecated;
-          type string;
-        }
-        unique ssh-host-key;
         uses credentials;
 
         choice transport {
