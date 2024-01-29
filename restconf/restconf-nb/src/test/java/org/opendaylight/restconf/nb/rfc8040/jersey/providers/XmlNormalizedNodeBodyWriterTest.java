@@ -21,7 +21,7 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
@@ -33,7 +33,7 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
 
         final NormalizedNodePayload nodePayload = new NormalizedNodePayload(Inference.ofDataTreePath(schemaContext),
-            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build());
+            ImmutableNodes.newContainerBuilder().withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build());
 
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final XmlNormalizedNodeBodyWriter xmlWriter = new XmlNormalizedNodeBodyWriter();
@@ -48,13 +48,13 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
     public void testRootContainerWrite() throws IOException {
         final NormalizedNodePayload nodePayload = new NormalizedNodePayload(
             Inference.ofDataTreePath(IID_SCHEMA),
-            Builders.containerBuilder()
+            ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME))
-                .withChild(Builders.containerBuilder()
+                .withChild(ImmutableNodes.newContainerBuilder()
                     .withNodeIdentifier(new NodeIdentifier(
                         QName.create("foo:module", "2016-09-29", "foo-bar-container")))
                     .build())
-                .withChild(Builders.containerBuilder()
+                .withChild(ImmutableNodes.newContainerBuilder()
                     .withNodeIdentifier(new NodeIdentifier(
                         QName.create("bar:module", "2016-09-29", "foo-bar-container")))
                     .build())
@@ -64,9 +64,10 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
         final XmlNormalizedNodeBodyWriter xmlWriter = new XmlNormalizedNodeBodyWriter();
         xmlWriter.writeTo(nodePayload, null, null, null, MediaType.APPLICATION_XML_TYPE, null, output);
 
-        assertEquals("<data xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-            + "<foo-bar-container xmlns=\"bar:module\"></foo-bar-container>"
-            + "<foo-bar-container xmlns=\"foo:module\"></foo-bar-container>"
-            + "</data>", output.toString(StandardCharsets.UTF_8));
+        assertEquals("""
+            <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\
+            <foo-bar-container xmlns="bar:module"></foo-bar-container>\
+            <foo-bar-container xmlns="foo:module"></foo-bar-container>\
+            </data>""", output.toString(StandardCharsets.UTF_8));
     }
 }

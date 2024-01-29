@@ -35,7 +35,7 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,7 +60,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
     @Test
     void testInvokeAction() throws Exception {
         doReturn(Futures.immediateFuture(new SimpleDOMActionResult(
-            Builders.containerBuilder().withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME)).build())))
+            ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME)).build())))
             .when(actionService).invokeAction(eq(Absolute.of(CONT_QNAME, CONT1_QNAME, RESET_QNAME)), any(), any());
 
         final var restconf = new JaxRsRestconf(new MdsalRestconfServer(new FixedDOMSchemaService(IID_SCHEMA),

@@ -53,41 +53,40 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.w3c.dom.DOMException;
 
 abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
-    static final ContainerNode JUKEBOX_WITH_BANDS = Builders.containerBuilder()
+    static final ContainerNode JUKEBOX_WITH_BANDS = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-        .withChild(Builders.mapBuilder()
+        .withChild(ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
             .withChild(BAND_ENTRY)
-            .withChild(Builders.mapEntryBuilder()
+            .withChild(ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band 2"))
                 .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band 2"))
                 .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description 2"))
                 .build())
             .build())
         .build();
-    static final ContainerNode JUKEBOX_WITH_PLAYLIST = Builders.containerBuilder()
+    static final ContainerNode JUKEBOX_WITH_PLAYLIST = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-        .withChild(Builders.mapBuilder()
+        .withChild(ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
-            .withChild(Builders.mapEntryBuilder()
+            .withChild(ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "MyFavoriteBand-A"))
                 .withChild(ImmutableNodes.leafNode(NAME_QNAME, "MyFavoriteBand-A"))
                 .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description A"))
                 .build())
-            .withChild(Builders.mapEntryBuilder()
+            .withChild(ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "MyFavoriteBand-B"))
                 .withChild(ImmutableNodes.leafNode(NAME_QNAME, "MyFavoriteBand-B"))
                 .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description B"))
                 .build())
             .build())
         .build();
-    static final MapNode PLAYLIST = Builders.mapBuilder()
+    static final MapNode PLAYLIST = ImmutableNodes.newSystemMapBuilder()
         .withNodeIdentifier(new NodeIdentifier(PLAYLIST_QNAME))
         .withChild(BAND_ENTRY)
         .build();
@@ -128,62 +127,62 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         .node(NODE_WITH_KEY_2)
         .build();
     static final YangInstanceIdentifier PATH_3 = YangInstanceIdentifier.of(CONT_QNAME, LIST_QNAME);
-    private static final MapEntryNode DATA = Builders.mapEntryBuilder()
+    private static final MapEntryNode DATA = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(NODE_WITH_KEY)
         .withChild(CONTENT)
         .build();
-    static final MapEntryNode DATA_2 = Builders.mapEntryBuilder()
+    static final MapEntryNode DATA_2 = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(NODE_WITH_KEY)
         .withChild(CONTENT_2)
         .build();
     private static final LeafNode<?> CONTENT_LEAF = ImmutableNodes.leafNode(QName.create(BASE, "content"), "test");
     private static final LeafNode<?> CONTENT_LEAF_2 = ImmutableNodes.leafNode(QName.create(BASE, "content2"), "test2");
-    static final ContainerNode DATA_3 = Builders.containerBuilder()
+    static final ContainerNode DATA_3 = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create(BASE, "container")))
         .withChild(CONTENT_LEAF)
         .build();
-    static final ContainerNode DATA_4 = Builders.containerBuilder()
+    static final ContainerNode DATA_4 = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(BASE, "container2")))
         .withChild(CONTENT_LEAF_2)
         .build();
-    static final MapNode LIST_DATA = Builders.mapBuilder()
+    static final MapNode LIST_DATA = ImmutableNodes.newSystemMapBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create(LIST_QNAME, "list")))
         .withChild(DATA)
         .build();
-    static final MapNode LIST_DATA_2 = Builders.mapBuilder()
+    static final MapNode LIST_DATA_2 = ImmutableNodes.newSystemMapBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create(LIST_QNAME, "list")))
         .withChild(DATA)
         .withChild(DATA_2)
         .build();
-    static final UserMapNode ORDERED_MAP_NODE_1 = Builders.orderedMapBuilder()
+    static final UserMapNode ORDERED_MAP_NODE_1 = ImmutableNodes.newUserMapBuilder()
         .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
         .withChild(DATA)
         .build();
-    static final UserMapNode ORDERED_MAP_NODE_2 = Builders.orderedMapBuilder()
+    static final UserMapNode ORDERED_MAP_NODE_2 = ImmutableNodes.newUserMapBuilder()
         .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
         .withChild(DATA)
         .withChild(DATA_2)
         .build();
-    private static final MapEntryNode CHECK_DATA = Builders.mapEntryBuilder()
+    private static final MapEntryNode CHECK_DATA = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(NODE_WITH_KEY)
         .withChild(CONTENT_2)
         .withChild(CONTENT)
         .build();
-    static final LeafSetNode<String> LEAF_SET_NODE_1 = Builders.<String>leafSetBuilder()
+    static final LeafSetNode<String> LEAF_SET_NODE_1 = ImmutableNodes.<String>newSystemLeafSetBuilder()
         .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
         .withChildValue("one")
         .withChildValue("two")
         .build();
-    static final LeafSetNode<String> LEAF_SET_NODE_2 = Builders.<String>leafSetBuilder()
+    static final LeafSetNode<String> LEAF_SET_NODE_2 = ImmutableNodes.<String>newSystemLeafSetBuilder()
         .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
         .withChildValue("three")
         .build();
-    static final LeafSetNode<String> ORDERED_LEAF_SET_NODE_1 = Builders.<String>orderedLeafSetBuilder()
+    static final LeafSetNode<String> ORDERED_LEAF_SET_NODE_1 = ImmutableNodes.<String>newUserLeafSetBuilder()
         .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
         .withChildValue("one")
         .withChildValue("two")
         .build();
-    static final LeafSetNode<String> ORDERED_LEAF_SET_NODE_2 = Builders.<String>orderedLeafSetBuilder()
+    static final LeafSetNode<String> ORDERED_LEAF_SET_NODE_2 = ImmutableNodes.<String>newUserLeafSetBuilder()
         .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
         .withChildValue("three")
         .withChildValue("four")
@@ -192,19 +191,19 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         .node(CONT_QNAME)
         .node(LEAF_LIST_QNAME)
         .build();
-    private static final UnkeyedListEntryNode UNKEYED_LIST_ENTRY_NODE_1 = Builders.unkeyedListEntryBuilder()
+    private static final UnkeyedListEntryNode UNKEYED_LIST_ENTRY_NODE_1 = ImmutableNodes.newUnkeyedListEntryBuilder()
         .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
         .withChild(CONTENT)
         .build();
-    private static final UnkeyedListEntryNode UNKEYED_LIST_ENTRY_NODE_2 = Builders.unkeyedListEntryBuilder()
+    private static final UnkeyedListEntryNode UNKEYED_LIST_ENTRY_NODE_2 = ImmutableNodes.newUnkeyedListEntryBuilder()
         .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
         .withChild(CONTENT_2)
         .build();
-    static final UnkeyedListNode UNKEYED_LIST_NODE_1 = Builders.unkeyedListBuilder()
+    static final UnkeyedListNode UNKEYED_LIST_NODE_1 = ImmutableNodes.newUnkeyedListBuilder()
         .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
         .withChild(UNKEYED_LIST_ENTRY_NODE_1)
         .build();
-    static final UnkeyedListNode UNKEYED_LIST_NODE_2 = Builders.unkeyedListBuilder()
+    static final UnkeyedListNode UNKEYED_LIST_NODE_2 = ImmutableNodes.newUnkeyedListBuilder()
         .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(LIST_QNAME))
         .withChild(UNKEYED_LIST_ENTRY_NODE_2)
         .build();
@@ -312,9 +311,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testPatchDataReplaceMergeAndRemove() {
-        final var buildArtistList = Builders.mapBuilder()
+        final var buildArtistList = ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(ARTIST_QNAME))
-            .withChild(Builders.mapEntryBuilder()
+            .withChild(ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "name of artist"))
                 .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of artist"))
                 .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "description of artist"))
@@ -396,7 +395,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void readContainerDataAllTest() {
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NODE_IDENTIFIER)
             .withChild(CONTENT_LEAF)
             .withChild(CONTENT_LEAF_2)
@@ -407,7 +406,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void readContainerDataConfigNoValueOfContentTest() {
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NODE_IDENTIFIER)
             .withChild(CONTENT_LEAF)
             .withChild(CONTENT_LEAF_2)
@@ -418,7 +417,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void readListDataAllTest() {
-        assertEquals(Builders.mapBuilder()
+        assertEquals(ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
             .withChild(CHECK_DATA)
             .build(), readData(ContentParam.ALL, PATH_3, readListDataAllTestStrategy()));
@@ -428,7 +427,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void readOrderedListDataAllTest() {
-        assertEquals(Builders.orderedMapBuilder()
+        assertEquals(ImmutableNodes.newUserMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
             .withChild(CHECK_DATA)
             .build(), readData(ContentParam.ALL, PATH_3, readOrderedListDataAllTestStrategy()));
@@ -438,9 +437,9 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public void readUnkeyedListDataAllTest() {
-        assertEquals(Builders.unkeyedListBuilder()
+        assertEquals(ImmutableNodes.newUnkeyedListBuilder()
             .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
-            .withChild(Builders.unkeyedListEntryBuilder()
+            .withChild(ImmutableNodes.newUnkeyedListEntryBuilder()
                 .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
                 .withChild(UNKEYED_LIST_ENTRY_NODE_1.body().iterator().next())
                 .withChild(UNKEYED_LIST_ENTRY_NODE_2.body().iterator().next())
@@ -452,7 +451,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void readLeafListDataAllTest() {
-        assertEquals(Builders.<String>leafSetBuilder()
+        assertEquals(ImmutableNodes.<String>newSystemLeafSetBuilder()
             .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
             .withValue(ImmutableList.<LeafSetEntryNode<String>>builder()
                 .addAll(LEAF_SET_NODE_1.body())
@@ -465,7 +464,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void readOrderedLeafListDataAllTest() {
-        assertEquals(Builders.<String>orderedLeafSetBuilder()
+        assertEquals(ImmutableNodes.<String>newUserLeafSetBuilder()
             .withNodeIdentifier(new NodeIdentifier(LEAF_LIST_QNAME))
             .withValue(ImmutableList.<LeafSetEntryNode<String>>builder()
                 .addAll(ORDERED_LEAF_SET_NODE_1.body())

@@ -24,8 +24,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.xmlunit.assertj.XmlAssert;
 
@@ -73,7 +72,7 @@ class XMLNotificationFormatterTest extends AbstractNotificationListenerTest {
 
         final var leaf = mockLeaf(QName.create(MODULE, "lf"));
         final var entry = mockMapEntry(QName.create(MODULE, "lst"), leaf);
-        final var notifiBody = mockCont(schemaPathNotifi, Builders.mapBuilder()
+        final var notifiBody = mockCont(schemaPathNotifi, ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(NodeIdentifier.create(QName.create(MODULE, "lst")))
             .withChild(entry)
             .build());
@@ -128,14 +127,14 @@ class XMLNotificationFormatterTest extends AbstractNotificationListenerTest {
     }
 
     private static MapEntryNode mockMapEntry(final QName entryQName, final LeafNode<String> leaf) {
-        return Builders.mapEntryBuilder()
+        return ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(entryQName, leaf.name().getNodeType(), leaf.body()))
             .withChild(leaf)
             .build();
     }
 
     private static ContainerNode mockCont(final QName contQName, final DataContainerChild child) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(contQName))
             .withChild(child)
             .build();

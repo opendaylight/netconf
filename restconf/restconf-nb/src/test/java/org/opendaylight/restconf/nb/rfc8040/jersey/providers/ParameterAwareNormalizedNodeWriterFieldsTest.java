@@ -29,8 +29,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 /**
  * Unit test for {@link ParameterAwareNormalizedNodeWriter} used with fields parameter.
@@ -49,24 +48,24 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     private final NodeIdentifierWithPredicates mapEntryNodeIdentifier = NodeIdentifierWithPredicates.of(
         QName.create("namespace", "list-entry"), keyLeafNodeIdentifier.getNodeType(), keyLeafNodeValue);
 
-    private final LeafSetEntryNode<String> leafSetEntryNodeData = Builders.<String>leafSetEntryBuilder()
+    private final LeafSetEntryNode<String> leafSetEntryNodeData = ImmutableNodes.<String>newLeafSetEntryBuilder()
         .withNodeIdentifier(leafSetEntryNodeIdentifier)
         .withValue(leafSetEntryNodeValue)
         .build();
-    private final SystemLeafSetNode<String> leafSetNodeData = Builders.<String>leafSetBuilder()
+    private final SystemLeafSetNode<String> leafSetNodeData = ImmutableNodes.<String>newSystemLeafSetBuilder()
         .withNodeIdentifier(leafSetNodeIdentifier)
         .withChild(leafSetEntryNodeData)
         .build();
-    private final ContainerNode containerNodeData = Builders.containerBuilder()
+    private final ContainerNode containerNodeData = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(containerNodeIdentifier)
         .withChild(leafSetNodeData)
         .build();
     private final LeafNode<String> keyLeafNodeData = ImmutableNodes.leafNode(keyLeafNodeIdentifier, keyLeafNodeValue);
-    private final MapEntryNode mapEntryNodeData = Builders.mapEntryBuilder()
+    private final MapEntryNode mapEntryNodeData = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(mapEntryNodeIdentifier)
         .withChild(keyLeafNodeData)
         .build();
-    private final SystemMapNode mapNodeData = Builders.mapBuilder()
+    private final SystemMapNode mapNodeData = ImmutableNodes.newSystemMapBuilder()
         .withNodeIdentifier(mapNodeIdentifier)
         .withChild(mapEntryNodeData)
         .build();

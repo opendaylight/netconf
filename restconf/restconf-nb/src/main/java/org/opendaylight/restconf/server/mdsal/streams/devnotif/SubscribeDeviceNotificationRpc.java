@@ -29,8 +29,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -84,7 +83,7 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
         return streamRegistry.createStream(restconfURI, new DeviceNotificationSource(mountPointService, path),
             "All YANG notifications occuring on mount point /"
                 + new YangInstanceIdentifierSerializer(input.databind()).serializePath(path))
-            .transform(stream -> input.newOperationOutput(Builders.containerBuilder()
+            .transform(stream -> input.newOperationOutput(ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
                 .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH_NODEID, stream.name()))
                 .build()));

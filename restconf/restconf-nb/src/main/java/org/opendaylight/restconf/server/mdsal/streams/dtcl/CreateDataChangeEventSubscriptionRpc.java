@@ -33,8 +33,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -113,7 +112,7 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
             new DataTreeChangeSource(databindProvider, changeService, datastore, path),
             "Events occuring in " + datastore + " datastore under /"
                 + new YangInstanceIdentifierSerializer(input.databind()).serializePath(path))
-            .transform(stream -> input.newOperationOutput(Builders.containerBuilder()
+            .transform(stream -> input.newOperationOutput(ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
                 .build()));

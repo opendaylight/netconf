@@ -15,9 +15,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 public class XmlPatchBodyTest extends AbstractPatchBodyTest {
     public XmlPatchBodyTest() {
@@ -314,11 +312,11 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
                 </edit>
             </yang-patch>""");
         checkPatchContext(returnValue);
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(PATCH_CONT_QNAME))
-            .withChild(Builders.mapBuilder()
+            .withChild(ImmutableNodes.newSystemMapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(MY_LIST1_QNAME))
-                .withChild(Builders.mapEntryBuilder()
+                .withChild(ImmutableNodes.newMapEntryBuilder()
                     .withNodeIdentifier(NodeIdentifierWithPredicates.of(MY_LIST1_QNAME, LEAF_NAME_QNAME, "my-leaf-set"))
                     .withChild(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf-set"))
                     .withChild(ImmutableNodes.leafNode(MY_LEAF11_QNAME, "leaf-a"))
@@ -352,9 +350,9 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
                     </edit>
                 </yang-patch>""");
         checkPatchContext(returnValue);
-        assertEquals(Builders.mapBuilder()
+        assertEquals(ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(MY_LIST1_QNAME))
-            .withChild(Builders.mapEntryBuilder()
+            .withChild(ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(MY_LIST1_QNAME, LEAF_NAME_QNAME, "my-leaf-set"))
                 .withChild(ImmutableNodes.leafNode(LEAF_NAME_QNAME, "my-leaf-set"))
                 .withChild(ImmutableNodes.leafNode(MY_LEAF11_QNAME, "leaf-a"))
@@ -384,7 +382,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
                 </edit>
             </yang-patch>""");
         checkPatchContext(returnValue);
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_AUG_QNAME))
             .withChild(ImmutableNodes.leafNode(LEAF_AUG_QNAME, "data"))
             .build(), returnValue.entities().get(0).getNode());
@@ -412,9 +410,9 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
                 </edit>
             </yang-patch>""");
         checkPatchContext(returnValue);
-        assertEquals(Builders.mapBuilder()
+        assertEquals(ImmutableNodes.newSystemMapBuilder()
             .withNodeIdentifier(new NodeIdentifier(MAP_CONT_QNAME))
-            .withChild(Builders.mapEntryBuilder()
+            .withChild(ImmutableNodes.newMapEntryBuilder()
                 .withNodeIdentifier(NodeIdentifierWithPredicates.of(MAP_CONT_QNAME, KEY_LEAF_QNAME, "key"))
                 .withChild(ImmutableNodes.leafNode(KEY_LEAF_QNAME, "key"))
                 .withChild(ImmutableNodes.leafNode(DATA_LEAF_QNAME, "data"))
@@ -441,12 +439,9 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
                 </edit>
             </yang-patch>""");
         checkPatchContext(returnValue);
-        assertEquals(Builders.leafSetBuilder()
+        assertEquals(ImmutableNodes.newSystemLeafSetBuilder()
             .withNodeIdentifier(new NodeIdentifier(LEAF_SET_QNAME))
-            .withChild(Builders.leafSetEntryBuilder()
-                .withNodeIdentifier(new NodeWithValue<>(LEAF_SET_QNAME, "data1"))
-                .withValue("data1")
-                .build())
+            .withChildValue("data1")
             .build(), returnValue.entities().get(0).getNode());
     }
 
@@ -472,9 +467,9 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
                 </edit>
             </yang-patch>""");
         checkPatchContext(returnValue);
-        assertEquals(Builders.unkeyedListBuilder()
+        assertEquals(ImmutableNodes.newUnkeyedListBuilder()
             .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
-            .withChild(Builders.unkeyedListEntryBuilder()
+            .withChild(ImmutableNodes.newUnkeyedListEntryBuilder()
                 .withNodeIdentifier(new NodeIdentifier(LIST_QNAME))
                 .withChild(ImmutableNodes.leafNode(LIST_LEAF1_QNAME, "data1"))
                 .withChild(ImmutableNodes.leafNode(LIST_LEAF2_QNAME, "data2"))
@@ -503,7 +498,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
                 </edit>
             </yang-patch>""");
         checkPatchContext(returnValue);
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CHOICE_CONT_QNAME))
             .withChild(ImmutableNodes.leafNode(CASE_LEAF1_QNAME, "data"))
             .build(), returnValue.entities().get(0).getNode());

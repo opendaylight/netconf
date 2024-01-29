@@ -54,8 +54,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
@@ -349,7 +348,7 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
 
     @Test
     public void readLeafWithDefaultParameters() {
-        final var data = Builders.containerBuilder()
+        final var data = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
             .withChild(ImmutableNodes.leafNode(QName.create(BASE, "exampleLeaf"), "i am leaf"))
             .build();
@@ -366,17 +365,17 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     @Test
     public void readContainerWithDefaultParameters() {
         final var exampleList = new NodeIdentifier(QName.create(BASE, "exampleList"));
-        final var data = Builders.containerBuilder()
+        final var data = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
-            .withChild(Builders.unkeyedListBuilder()
+            .withChild(ImmutableNodes.newUnkeyedListBuilder()
                 .withNodeIdentifier(exampleList)
-                .withChild(Builders.unkeyedListEntryBuilder()
+                .withChild(ImmutableNodes.newUnkeyedListEntryBuilder()
                     .withNodeIdentifier(exampleList)
-                    .withChild(Builders.containerBuilder()
+                    .withChild(ImmutableNodes.newContainerBuilder()
                         .withNodeIdentifier(new NodeIdentifier(QName.create(BASE, "containerBool")))
                         .withChild(ImmutableNodes.leafNode(QName.create(BASE, "leafBool"), true))
                         .build())
-                    .addChild(Builders.containerBuilder()
+                    .addChild(ImmutableNodes.newContainerBuilder()
                         .withNodeIdentifier(new NodeIdentifier(QName.create(BASE, "containerInt")))
                         .withChild(ImmutableNodes.leafNode(QName.create(BASE, "leafInt"), 12))
                         .build())
@@ -396,11 +395,11 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     @Test
     public void readLeafInListWithDefaultParameters() {
         final var exampleList = new NodeIdentifier(QName.create(BASE, "exampleList"));
-        final var content = Builders.containerBuilder()
+        final var content = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
-            .withChild(Builders.unkeyedListBuilder()
+            .withChild(ImmutableNodes.newUnkeyedListBuilder()
                 .withNodeIdentifier(exampleList)
-                .withChild(Builders.unkeyedListEntryBuilder()
+                .withChild(ImmutableNodes.newUnkeyedListEntryBuilder()
                     .withNodeIdentifier(exampleList)
                     .addChild(ImmutableNodes.leafNode(QName.create(BASE, "leafInList"), "I am leaf in list"))
                     .build())

@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
@@ -20,7 +21,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,6 +153,6 @@ abstract class RestconfTransaction {
         }
 
         merge(rootNormalizedPath,
-            ImmutableNodes.fromInstanceId(modelContext, YangInstanceIdentifier.of(normalizedPathWithoutChildArgs)));
+            fromInstanceId(modelContext, YangInstanceIdentifier.of(normalizedPathWithoutChildArgs)));
     }
 }
