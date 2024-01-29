@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.security.PublicKey;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.PreDestroy;
@@ -61,7 +60,7 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
     public CallHomeMountStatusReporter(final @Reference DataBroker broker) {
         dataBroker = broker;
         syncReg = dataBroker.registerDataTreeChangeListener(
-            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES_II.child(Device.class)),
+            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES_II.child(Device.class)),
             this::onConfigurationDataTreeChanged);
     }
 
@@ -178,18 +177,18 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
 
     // DataTreeChangeListener dedicated to call-home device data synchronization
     // from CONFIGURATION to OPERATIONAL datastore (excluding device status)
-    private void onConfigurationDataTreeChanged(final Collection<DataTreeModification<Device>> changes) {
+    private void onConfigurationDataTreeChanged(final List<DataTreeModification<Device>> changes) {
         final var deleted = ImmutableList.<InstanceIdentifier<Device>>builder();
         final var modified = ImmutableList.<Device>builder();
         for (var change : changes) {
             var changeRootNode = change.getRootNode();
-            switch (changeRootNode.getModificationType()) {
+            switch (changeRootNode.modificationType()) {
                 case SUBTREE_MODIFIED:
                 case WRITE:
-                    modified.add(changeRootNode.getDataAfter());
+                    modified.add(changeRootNode.dataAfter());
                     break;
                 case DELETE:
-                    deleted.add(change.getRootPath().getRootIdentifier());
+                    deleted.add(change.getRootPath().path());
                     break;
                 default:
                     break;
