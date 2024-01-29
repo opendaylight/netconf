@@ -12,11 +12,12 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.api.OperationsPostPath;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 /**
  * Access to an {code rpc}'s or an {@code action}'s input.
@@ -38,7 +39,9 @@ public abstract sealed class OperationInputBody extends AbstractBody
         try (var is = new PushbackInputStream(acquireStream())) {
             final var firstByte = is.read();
             if (firstByte == -1) {
-                return ImmutableNodes.containerNode(path.inputQName());
+                return ImmutableNodes.newContainerBuilder()
+                    .withNodeIdentifier(new NodeIdentifier(path.inputQName()))
+                    .build();
             }
             is.unread(firstByte);
 

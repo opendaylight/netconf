@@ -18,8 +18,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -49,7 +48,7 @@ class JsonChildBodyTest extends AbstractBodyTest {
 
         final var lflst11 = QName.create("augment:module:leaf:list", "2014-01-27", "lflst11");
         assertEquals(List.of(new NodeIdentifier(CONT1_QNAME)), payload.prefix());
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT1_QNAME))
             .withChild(ImmutableNodes.leafNode(QName.create("augment:module:leaf:list", "2014-01-27", "lf11"),
                 YangInstanceIdentifier.of(
@@ -68,7 +67,7 @@ class JsonChildBodyTest extends AbstractBodyTest {
 
         final var contAugment = QName.create("augment:module", "2014-01-17", "cont-augment");
         assertEquals(List.of(new NodeIdentifier(contAugment)), payload.prefix());
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(contAugment))
             .withChild(ImmutableNodes.leafNode(QName.create(contAugment, "leaf1"), "stryng"))
             .build(), payload.body());
@@ -85,7 +84,7 @@ class JsonChildBodyTest extends AbstractBodyTest {
             new NodeIdentifier(QName.create(container1, "augment-choice1")),
             new NodeIdentifier(QName.create(container1, "augment-choice2")),
             new NodeIdentifier(container1)), payload.prefix());
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(container1))
             .withChild(ImmutableNodes.leafNode(QName.create(container1, "case-choice-case-leaf1"), "stryng"))
             .build(), payload.body());

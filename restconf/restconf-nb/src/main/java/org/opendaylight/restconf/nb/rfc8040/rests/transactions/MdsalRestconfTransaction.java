@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static com.google.common.base.Verify.verifyNotNull;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
+import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fromInstanceId;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
@@ -26,7 +27,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     @Override
     void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = ImmutableNodes.fromInstanceId(modelContext, path);
+            final var emptySubTree = fromInstanceId(modelContext, path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
             ensureParentsByMerge(path);
 
@@ -103,7 +103,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     @Override
     void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubtree = ImmutableNodes.fromInstanceId(modelContext, path);
+            final var emptySubtree = fromInstanceId(modelContext, path);
             merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
             ensureParentsByMerge(path);
 

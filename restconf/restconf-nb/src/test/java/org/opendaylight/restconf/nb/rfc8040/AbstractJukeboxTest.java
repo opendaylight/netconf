@@ -21,8 +21,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -62,35 +61,35 @@ public abstract class AbstractJukeboxTest {
         YangInstanceIdentifier.of(JUKEBOX_QNAME, PLAYER_QNAME, GAP_QNAME);
 
     protected static final LeafNode<?> GAP_LEAF = ImmutableNodes.leafNode(GAP_QNAME, Decimal64.valueOf("0.2"));
-    protected static final ContainerNode CONT_PLAYER = Builders.containerBuilder()
+    protected static final ContainerNode CONT_PLAYER = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(PLAYER_QNAME))
         .withChild(GAP_LEAF)
         .build();
-    protected static final ContainerNode EMPTY_JUKEBOX = Builders.containerBuilder()
+    protected static final ContainerNode EMPTY_JUKEBOX = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
         .withChild(CONT_PLAYER)
         .build();
-    protected static final MapEntryNode BAND_ENTRY = Builders.mapEntryBuilder()
+    protected static final MapEntryNode BAND_ENTRY = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "name of band"))
         .withChild(ImmutableNodes.leafNode(NAME_QNAME, "name of band"))
         .withChild(ImmutableNodes.leafNode(DESCRIPTION_QNAME, "band description"))
         .build();
-    protected static final MapEntryNode SONG1 = Builders.mapEntryBuilder()
+    protected static final MapEntryNode SONG1 = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
             "1"))
         .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "A"))
         .build();
-    protected static final MapEntryNode SONG2 = Builders.mapEntryBuilder()
+    protected static final MapEntryNode SONG2 = ImmutableNodes.newMapEntryBuilder()
         .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(SONG_QNAME, SONG_INDEX_QNAME,
             "2"))
         .withChild(ImmutableNodes.leafNode(SONG_ID_QNAME, "B"))
         .build();
-    protected static final SystemMapNode PLAYLIST_WITH_SONGS = Builders.mapBuilder()
+    protected static final SystemMapNode PLAYLIST_WITH_SONGS = ImmutableNodes.newSystemMapBuilder()
         .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
-        .withChild(Builders.mapEntryBuilder()
+        .withChild(ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME,
                 "0"))
-                .withChild(Builders.orderedMapBuilder()
+                .withChild(ImmutableNodes.newUserMapBuilder()
                     .withNodeIdentifier(new NodeIdentifier(SONG_QNAME))
                     .withChild(SONG1)
                     .withChild(SONG2)

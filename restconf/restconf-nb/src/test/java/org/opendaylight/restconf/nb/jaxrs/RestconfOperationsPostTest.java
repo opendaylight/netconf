@@ -39,22 +39,21 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class RestconfOperationsPostTest extends AbstractRestconfTest {
     private static final QName RPC = QName.create("invoke:rpc:module", "2013-12-03", "rpc-test");
-    private static final ContainerNode INPUT = Builders.containerBuilder()
+    private static final ContainerNode INPUT = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create(RPC, "input")))
-        .withChild(Builders.containerBuilder()
+        .withChild(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(QName.create(RPC, "cont")))
             .withChild(ImmutableNodes.leafNode(QName.create(RPC, "lf"), "test"))
             .build())
         .build();
-    private static final ContainerNode OUTPUT = Builders.containerBuilder()
+    private static final ContainerNode OUTPUT = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create(RPC, "output")))
         .withChild(ImmutableNodes.leafNode(QName.create(RPC, "content"), "operation result"))
         .build();

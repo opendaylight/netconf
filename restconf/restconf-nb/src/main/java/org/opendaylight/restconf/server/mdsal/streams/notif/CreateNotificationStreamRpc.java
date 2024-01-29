@@ -30,8 +30,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.stmt.NotificationEffectiveStatement;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -106,7 +105,7 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
 
         return streamRegistry.createStream(restconfURI,
             new NotificationSource(databindProvider, notificationService, qnames), description.toString())
-            .transform(stream -> input.newOperationOutput(Builders.containerBuilder()
+            .transform(stream -> input.newOperationOutput(ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
                 .build()));

@@ -30,8 +30,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 class XmlResourceBodyTest extends AbstractResourceBodyTest {
     private static final QName TOP_LEVEL_LIST = QName.create("foo", "2017-08-09", "top-level-list");
@@ -93,7 +92,7 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
     @Test
     void putXmlTest() throws Exception {
         final var keyName = QName.create(TOP_LEVEL_LIST, "key-leaf");
-        assertEquals(Builders.mapEntryBuilder()
+        assertEquals(ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(TOP_LEVEL_LIST, keyName, "key-value"))
             .withChild(ImmutableNodes.leafNode(keyName, "key-value"))
             .withChild(ImmutableNodes.leafNode(QName.create(keyName, "ordinary-leaf"), "leaf-value"))
@@ -120,13 +119,13 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
         final var entryId = NodeIdentifierWithPredicates.of(LST11,
             Map.of(KEYVALUE111, "value1", KEYVALUE112, "value2"));
 
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(CONT_NID)
-            .withChild(Builders.containerBuilder()
+            .withChild(ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(CONT1_NID)
-                .withChild(Builders.mapBuilder()
+                .withChild(ImmutableNodes.newSystemMapBuilder()
                     .withNodeIdentifier(new NodeIdentifier(LST11))
-                    .withChild(Builders.mapEntryBuilder()
+                    .withChild(ImmutableNodes.newMapEntryBuilder()
                         .withNodeIdentifier(entryId)
                         .withChild(ImmutableNodes.leafNode(KEYVALUE111, "value1"))
                         .withChild(ImmutableNodes.leafNode(KEYVALUE112, "value2"))
@@ -165,19 +164,19 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
     }
 
     private void testModuleSubContainerDataPut(final String uriPath) throws Exception {
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(CONT1_NID)
-            .withChild(Builders.leafSetBuilder()
+            .withChild(ImmutableNodes.newSystemLeafSetBuilder()
                 .withNodeIdentifier(new NodeIdentifier(LFLST11))
-                .withChild(Builders.leafSetEntryBuilder()
+                .withChild(ImmutableNodes.newLeafSetEntryBuilder()
                     .withNodeIdentifier(new NodeWithValue<>(LFLST11, "lflst11_3"))
                     .withValue("lflst11_3")
                     .build())
-                .withChild(Builders.leafSetEntryBuilder()
+                .withChild(ImmutableNodes.newLeafSetEntryBuilder()
                     .withNodeIdentifier(new NodeWithValue<>(LFLST11, "lflst11_1"))
                     .withValue("lflst11_1")
                     .build())
-                .withChild(Builders.leafSetEntryBuilder()
+                .withChild(ImmutableNodes.newLeafSetEntryBuilder()
                     .withNodeIdentifier(new NodeWithValue<>(LFLST11, "lflst11_2"))
                     .withValue("lflst11_2")
                     .build())

@@ -16,8 +16,8 @@ import java.time.Instant;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.ClusteredDOMDataTreeChangeListener;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker.DataTreeChangeExtension;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeListener;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -53,8 +53,8 @@ public final class DataTreeChangeSource extends Source<List<DataTreeCandidate>> 
 
     @Override
     protected Registration start(final Sink<List<DataTreeCandidate>> sink) {
-        return changeService.registerDataTreeChangeListener(new DOMDataTreeIdentifier(datastore, path),
-            new ClusteredDOMDataTreeChangeListener() {
+        return changeService.registerTreeChangeListener(DOMDataTreeIdentifier.of(datastore, path),
+            new DOMDataTreeChangeListener() {
                 @Override
                 public void onDataTreeChanged(final List<DataTreeCandidate> changes) {
                     // FIXME: format one change at a time?

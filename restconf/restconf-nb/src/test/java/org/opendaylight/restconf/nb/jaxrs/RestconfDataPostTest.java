@@ -32,7 +32,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @ExtendWith(MockitoExtension.class)
 class RestconfDataPostTest extends AbstractRestconfTest {
@@ -50,7 +50,7 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doNothing().when(tx).put(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID,
-            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME)).build());
+            ImmutableNodes.newContainerBuilder().withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME)).build());
         doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
 
         assertEquals(URI.create("http://localhost:8181/rests/data/example-jukebox:jukebox"),

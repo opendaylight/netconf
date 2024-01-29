@@ -18,8 +18,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 class JsonResourceBodyTest extends AbstractResourceBodyTest {
     JsonResourceBodyTest() {
@@ -31,13 +30,13 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
         final var entryId = NodeIdentifierWithPredicates.of(LST11,
             Map.of(KEYVALUE111, "value1", KEYVALUE112, "value2"));
 
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(CONT_NID)
-            .withChild(Builders.containerBuilder()
+            .withChild(ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(CONT1_NID)
-                .withChild(Builders.mapBuilder()
+                .withChild(ImmutableNodes.newSystemMapBuilder()
                     .withNodeIdentifier(new NodeIdentifier(LST11))
-                    .withChild(Builders.mapEntryBuilder()
+                    .withChild(ImmutableNodes.newMapEntryBuilder()
                         .withNodeIdentifier(entryId)
                         .withChild(ImmutableNodes.leafNode(KEYVALUE111, "value1"))
                         .withChild(ImmutableNodes.leafNode(KEYVALUE112, "value2"))
@@ -68,7 +67,7 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
 
     @Test
     void moduleSubContainerDataPutTest() throws Exception {
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(CONT1_NID)
             .withChild(ImmutableNodes.leafNode(LF11, YangInstanceIdentifier.of(CONT_NID, CONT1_NID,
                 new NodeIdentifier(LFLST11), new NodeWithValue<>(LFLST11, "lflst11_1"))))
@@ -125,7 +124,7 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
         final var one = QName.create("urn:nested:module", "2014-06-03", "depth3-lf1-key");
         final var two = QName.create("urn:nested:module", "2014-06-03", "depth3-lf2-key");
 
-        assertEquals(Builders.mapEntryBuilder()
+        assertEquals(ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(NodeIdentifierWithPredicates.of(
                 QName.create("urn:nested:module", "2014-06-03", "depth2-list2"), Map.of(one, "one", two, "two")))
             .withChild(ImmutableNodes.leafNode(one, "one"))

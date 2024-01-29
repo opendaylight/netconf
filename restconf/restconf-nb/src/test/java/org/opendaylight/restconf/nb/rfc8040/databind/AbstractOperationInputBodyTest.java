@@ -17,8 +17,7 @@ import org.opendaylight.restconf.server.api.OperationsPostPath;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -38,7 +37,7 @@ abstract class AbstractOperationInputBodyTest extends AbstractInstanceIdentifier
     public final void moduleSubContainerDataPostActionTest() throws Exception {
         final var body = moduleSubContainerDataPostActionBody();
 
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(INPUT_NID)
             .withChild(ImmutableNodes.leafNode(DELAY_QNAME, Uint32.valueOf(600)))
             .build(), body.toContainerNode(RESET_PATH));
@@ -49,7 +48,7 @@ abstract class AbstractOperationInputBodyTest extends AbstractInstanceIdentifier
     @Test
     public final void testEmpty() throws Exception {
         final var body = testEmptyBody();
-        assertEquals(Builders.containerBuilder().withNodeIdentifier(INPUT_NID).build(),
+        assertEquals(ImmutableNodes.newContainerBuilder().withNodeIdentifier(INPUT_NID).build(),
             body.toContainerNode(RESET_PATH));
     }
 
@@ -64,9 +63,9 @@ abstract class AbstractOperationInputBodyTest extends AbstractInstanceIdentifier
 
         final var body = testRpcModuleInputBody();
 
-        assertEquals(Builders.containerBuilder()
+        assertEquals(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(QName.create(rpcTest, "input")))
-            .withChild(Builders.containerBuilder()
+            .withChild(ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create(rpcTest, "cont")))
                 .withChild(ImmutableNodes.leafNode(QName.create(rpcTest, "lf"), "lf-test"))
                 .build())

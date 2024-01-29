@@ -25,11 +25,12 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -70,7 +71,10 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
         if (data instanceof MapEntryNode mapEntry) {
             // Restconf allows returning one list item. We need to wrap it
             // in map node in order to serialize it properly
-            nnWriter.write(ImmutableNodes.mapNodeBuilder(data.name().getNodeType()).addChild(mapEntry).build());
+            nnWriter.write(ImmutableNodes.newSystemMapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
+                .addChild(mapEntry)
+                .build());
         } else if (isRoot) {
             if (data instanceof ContainerNode container && container.isEmpty()) {
                 writeEmptyDataNode(xmlWriter, container);

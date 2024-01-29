@@ -66,7 +66,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangNames;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
@@ -77,8 +77,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A RESTCONF server implemented on top of MD-SAL.
@@ -86,7 +84,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Component(service = { RestconfServer.class, DatabindProvider.class })
 public final class MdsalRestconfServer implements RestconfServer, DatabindProvider, AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(MdsalRestconfServer.class);
     private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
     private static final VarHandle LOCAL_STRATEGY;
 

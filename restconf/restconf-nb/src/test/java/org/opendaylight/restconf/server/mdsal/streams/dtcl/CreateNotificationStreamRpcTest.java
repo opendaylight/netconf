@@ -52,8 +52,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -123,19 +122,19 @@ class CreateNotificationStreamRpcTest {
             new NodeIdentifier(QName.create(rcStream, "streams")),
             new NodeIdentifier(rcStream),
             streamId), pathCaptor.getValue());
-        assertEquals(Builders.mapEntryBuilder()
+        assertEquals(ImmutableNodes.newMapEntryBuilder()
             .withNodeIdentifier(streamId)
             .withChild(ImmutableNodes.leafNode(rcName, name))
             .withChild(ImmutableNodes.leafNode(QName.create(rcStream, "description"),
                 "Events occuring in CONFIGURATION datastore under /toaster:toaster"))
-            .withChild(Builders.mapBuilder()
+            .withChild(ImmutableNodes.newSystemMapBuilder()
                 .withNodeIdentifier(new NodeIdentifier(Access.QNAME))
-                .withChild(Builders.mapEntryBuilder()
+                .withChild(ImmutableNodes.newMapEntryBuilder()
                     .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, rcEncoding, "json"))
                     .withChild(ImmutableNodes.leafNode(rcEncoding, "json"))
                     .withChild(ImmutableNodes.leafNode(rcLocation, "/rests/streams/json/" + name))
                     .build())
-                .withChild(Builders.mapEntryBuilder()
+                .withChild(ImmutableNodes.newMapEntryBuilder()
                     .withNodeIdentifier(NodeIdentifierWithPredicates.of(Access.QNAME, rcEncoding, "xml"))
                     .withChild(ImmutableNodes.leafNode(rcEncoding, "xml"))
                     .withChild(ImmutableNodes.leafNode(rcLocation, "/rests/streams/xml/" + name))
@@ -171,7 +170,7 @@ class CreateNotificationStreamRpcTest {
             stack.enterSchemaTree(CreateDataChangeEventSubscription.QNAME));
         final var inference = stack.toInference();
 
-        final var builder = Builders.containerBuilder()
+        final var builder = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(rpcStmt.input().argument()));
         if (leafName != null) {
             final var lfQName = QName.create(rpcStmt.argument(), leafName);

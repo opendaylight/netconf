@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,16 +46,16 @@ class RestconfDataGetTest extends AbstractRestconfTest {
     private static final NodeIdentifier LIBRARY_NID = new NodeIdentifier(LIBRARY_QNAME);
 
     // config contains one child the same as in operational and one additional
-    private static final ContainerNode CONFIG_JUKEBOX = Builders.containerBuilder()
+    private static final ContainerNode CONFIG_JUKEBOX = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
             .withChild(CONT_PLAYER)
-            .withChild(Builders.containerBuilder().withNodeIdentifier(LIBRARY_NID).build())
+            .withChild(ImmutableNodes.newContainerBuilder().withNodeIdentifier(LIBRARY_NID).build())
             .build();
     // operational contains one child the same as in config and one additional
-    private static final ContainerNode OPER_JUKEBOX = Builders.containerBuilder()
+    private static final ContainerNode OPER_JUKEBOX = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(JUKEBOX_QNAME))
             .withChild(CONT_PLAYER)
-            .withChild(Builders.mapBuilder().withNodeIdentifier(PLAYLIST_NID).build())
+            .withChild(ImmutableNodes.newSystemMapBuilder().withNodeIdentifier(PLAYLIST_NID).build())
             .build();
 
     @Mock
@@ -96,7 +96,7 @@ class RestconfDataGetTest extends AbstractRestconfTest {
     }
 
     private static ContainerNode wrapNodeByDataRootContainer(final DataContainerChild data) {
-        return Builders.containerBuilder()
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(SchemaContext.NAME))
             .withChild(data)
             .build();
