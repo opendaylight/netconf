@@ -25,12 +25,13 @@ import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Arrays;
-import java.util.Base64;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.ECPointUtil;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.SshPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,15 +76,8 @@ public class AuthorizedKeysDecoder {
     private byte[] bytes = new byte[0];
     private int pos = 0;
 
-    public PublicKey decodePublicKey(final String keyLine) throws GeneralSecurityException {
-
-        // look for the Base64 encoded part of the line to decode
-        // both ssh-rsa and ssh-dss begin with "AAAA" due to the length bytes
-        bytes = Base64.getDecoder().decode(keyLine.getBytes(StandardCharsets.UTF_8));
-        if (bytes.length == 0) {
-            throw new IllegalArgumentException("No Base64 part to decode in " + keyLine);
-        }
-
+    public PublicKey decodePublicKey(final SshPublicKey keyLine) throws GeneralSecurityException {
+        bytes = keyLine.getValue();
         pos = 0;
 
         final var type = decodeType();
@@ -156,7 +150,7 @@ public class AuthorizedKeysDecoder {
         out.write(bytes);
     }
 
-    public static String encodePublicKey(final PublicKey publicKey) throws IOException {
+    public static @NonNull SshPublicKey encodePublicKey(final PublicKey publicKey) throws IOException {
         final var baos = new ByteArrayOutputStream();
 
         try (var dout = new DataOutputStream(baos)) {
@@ -187,9 +181,9 @@ public class AuthorizedKeysDecoder {
                 dout.write(coordX);
                 dout.write(coordY);
             } else {
-                throw new IllegalArgumentException("Unknown public key encoding: " + publicKey);
+                throw new IOException("Unknown public key encoding: " + publicKey);
             }
         }
-        return Base64.getEncoder().encodeToString(baos.toByteArray());
+        return new SshPublicKey(baos.toByteArray());
     }
 }

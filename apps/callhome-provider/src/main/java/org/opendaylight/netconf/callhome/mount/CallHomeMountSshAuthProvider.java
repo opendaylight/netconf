@@ -27,6 +27,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshAuthProvider;
 import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshAuthSettings;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.NetconfCallhomeServer;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.SshPublicKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.AllowedDevices;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.Global;
@@ -156,10 +157,9 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
 
         private void deleteDevice(final Device dataBefore) {
             if (dataBefore != null) {
-                final String publicKey = getHostPublicKey(dataBefore);
-                if (publicKey != null) {
+                if (dataBefore.getTransport() instanceof Ssh ssh) {
                     LOG.debug("Removing device {}", dataBefore.getUniqueId());
-                    removeDevice(publicKey, dataBefore);
+                    removeDevice(ssh.nonnullSshClientParams().requireHostKey(), dataBefore);
                 } else {
                     LOG.debug("Ignoring removal of device {}, no host key present", dataBefore.getUniqueId());
                 }
@@ -167,22 +167,17 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         }
 
         private void writeDevice(final Device dataAfter) {
-            final String publicKey = getHostPublicKey(dataAfter);
-            if (publicKey != null) {
+            if (dataAfter.getTransport() instanceof Ssh ssh) {
                 LOG.debug("Adding device {}", dataAfter.getUniqueId());
-                addDevice(publicKey, dataAfter);
+                addDevice(ssh.nonnullSshClientParams().requireHostKey(), dataAfter);
             } else {
                 LOG.debug("Ignoring addition of device {}, no host key present", dataAfter.getUniqueId());
             }
         }
 
-        private static String getHostPublicKey(final Device device) {
-            return device.getTransport() instanceof Ssh ssh ? ssh.nonnullSshClientParams().getHostKey() : null;
-        }
+        abstract void addDevice(SshPublicKey publicKey, Device device);
 
-        abstract void addDevice(String publicKey, Device device);
-
-        abstract void removeDevice(String publicKey, Device device);
+        abstract void removeDevice(SshPublicKey publicKey, Device device);
     }
 
     private static final class DeviceConfig extends AbstractDeviceListener {
@@ -194,7 +189,7 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         }
 
         @Override
-        void addDevice(final String publicKey, final Device device) {
+        void addDevice(final SshPublicKey publicKey, final Device device) {
             final PublicKey key = publicKey(publicKey, device);
             if (key != null) {
                 byPublicKey.put(key, device);
@@ -202,14 +197,14 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         }
 
         @Override
-        void removeDevice(final String publicKey, final Device device) {
+        void removeDevice(final SshPublicKey publicKey, final Device device) {
             final PublicKey key = publicKey(publicKey, device);
             if (key != null) {
                 byPublicKey.remove(key);
             }
         }
 
-        private PublicKey publicKey(final String hostKey, final Device device) {
+        private PublicKey publicKey(final SshPublicKey hostKey, final Device device) {
             try {
                 return keyDecoder.decodePublicKey(hostKey);
             } catch (GeneralSecurityException e) {
@@ -220,13 +215,13 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
     }
 
     private static final class DeviceOp extends AbstractDeviceListener {
-        private final ConcurrentMap<String, Device> byPublicKey = new ConcurrentHashMap<>();
+        private final ConcurrentMap<SshPublicKey, Device> byPublicKey = new ConcurrentHashMap<>();
 
         Device get(final PublicKey serverKey) {
-            final String skey;
+            final SshPublicKey skey;
             try {
                 skey = AuthorizedKeysDecoder.encodePublicKey(serverKey);
-            } catch (IOException | IllegalArgumentException e) {
+            } catch (IOException e) {
                 LOG.error("Unable to encode server key: {}", serverKey, e);
                 return null;
             }
@@ -235,12 +230,12 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
         }
 
         @Override
-        void removeDevice(final String publicKey, final Device device) {
+        void removeDevice(final SshPublicKey publicKey, final Device device) {
             byPublicKey.remove(publicKey);
         }
 
         @Override
-        void addDevice(final String publicKey, final Device device) {
+        void addDevice(final SshPublicKey publicKey, final Device device) {
             byPublicKey.put(publicKey, device);
         }
     }
