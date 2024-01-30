@@ -25,7 +25,6 @@ import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Arrays;
-import java.util.Base64;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.ECPointUtil;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
@@ -75,15 +74,11 @@ public class AuthorizedKeysDecoder {
     private byte[] bytes = new byte[0];
     private int pos = 0;
 
-    public PublicKey decodePublicKey(final String keyLine) throws GeneralSecurityException {
-
-        // look for the Base64 encoded part of the line to decode
-        // both ssh-rsa and ssh-dss begin with "AAAA" due to the length bytes
-        bytes = Base64.getDecoder().decode(keyLine.getBytes(StandardCharsets.UTF_8));
-        if (bytes.length == 0) {
+    public PublicKey decodePublicKey(final byte[] keyLine) throws GeneralSecurityException {
+        if (keyLine.length == 0) {
             throw new IllegalArgumentException("No Base64 part to decode in " + keyLine);
         }
-
+        bytes = keyLine;
         pos = 0;
 
         final var type = decodeType();
@@ -156,7 +151,7 @@ public class AuthorizedKeysDecoder {
         out.write(bytes);
     }
 
-    public static String encodePublicKey(final PublicKey publicKey) throws IOException {
+    public static byte[] encodePublicKey(final PublicKey publicKey) throws IOException {
         final var baos = new ByteArrayOutputStream();
 
         try (var dout = new DataOutputStream(baos)) {
@@ -190,6 +185,6 @@ public class AuthorizedKeysDecoder {
                 throw new IllegalArgumentException("Unknown public key encoding: " + publicKey);
             }
         }
-        return Base64.getEncoder().encodeToString(baos.toByteArray());
+        return baos.toByteArray();
     }
 }

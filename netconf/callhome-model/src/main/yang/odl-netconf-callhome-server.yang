@@ -18,7 +18,8 @@ module odl-netconf-callhome-server {
        - every device now has to have a transport
        - there is now a TCP transport
        - previously-deprecated 'ssh-host-key' is now obsolete
-       - 'credentials; is obsoleted as well";
+       - 'credentials; is obsoleted as well
+       - 'ssh-host-key' is switch to being a 'type binary'";
   }
 
   revision 2023-04-28 {
@@ -91,8 +92,8 @@ module odl-netconf-callhome-server {
             container ssh-client-params {
               leaf host-key {
                 mandatory true;
-                description "BASE-64 encoded public key which device will use during connection.";
-                type string;
+                description "Public key which device will use during connection.";
+                type binary;
               }
               uses credentials;
             }
