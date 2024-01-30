@@ -19,7 +19,10 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.keystore.legacy.AbstractNetconfKeystore;
@@ -43,8 +46,11 @@ public final class DefaultSslHandlerFactoryProvider extends AbstractNetconfKeyst
 
     @Inject
     @Activate
-    public DefaultSslHandlerFactoryProvider(@Reference final DataBroker dataBroker) {
-        start(dataBroker);
+    public DefaultSslHandlerFactoryProvider(@Reference final DataBroker dataBroker,
+            @Reference final RpcProviderService rpcProvider,
+            @Reference final ClusterSingletonServiceProvider cssProvider,
+            final AAAEncryptionService encryptionService) {
+        start(dataBroker, rpcProvider, cssProvider, encryptionService);
     }
 
     @Deactivate
