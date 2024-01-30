@@ -23,9 +23,12 @@ import java.util.function.Consumer;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
@@ -93,16 +96,30 @@ public abstract class AbstractNetconfKeystore {
     private final SecurityHelper securityHelper = new SecurityHelper();
 
     private @Nullable Registration configListener;
+    private @Nullable Registration rpcSingleton;
 
-    protected final void start(final DataBroker dataBroker) {
+    protected final void start(final DataBroker dataBroker, final RpcProviderService rpcProvider,
+            final ClusterSingletonServiceProvider cssProvider, final AAAEncryptionService encryptionService) {
         if (configListener == null) {
             configListener = dataBroker.registerTreeChangeListener(
                 DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
                 new ConfigListener(this));
+            LOG.debug("NETCONF keystore configuration listener started");
         }
+        if (rpcSingleton == null) {
+            rpcSingleton = cssProvider.registerClusterSingletonService(
+                new RpcSingleton(dataBroker, rpcProvider, encryptionService));
+            LOG.debug("NETCONF keystore configuration singleton registered");
+        }
+        LOG.info("NETCONF keystore service started");
     }
 
     protected final void stop() {
+        final var singleton = rpcSingleton;
+        if (singleton != null) {
+            rpcSingleton = null;
+            singleton.close();
+        }
         final var listener = configListener;
         if (listener != null) {
             configListener = null;
