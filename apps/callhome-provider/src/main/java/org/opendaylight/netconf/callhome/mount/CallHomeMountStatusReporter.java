@@ -127,17 +127,22 @@ public final class CallHomeMountStatusReporter implements CallHomeStatusRecorder
      * @param status initial device status
      */
     public void reportNewSshDevice(final String id, final PublicKey serverKey, final DeviceStatus status) {
-        writeDevice(buildInstanceIdentifier(id), newSshDevice(id, serverKey, status));
+        final var device = newSshDevice(id, serverKey, status);
+        if (device != null) {
+            writeDevice(buildInstanceIdentifier(id), device);
+        }
     }
 
     private static Device newSshDevice(final String id, final PublicKey serverKey, final DeviceStatus status) {
         // used only for netconf devices that are connected via SSH transport and global credentials
-        String sshEncodedKey = serverKey.toString();
+        final byte[] sshEncodedKey;
         try {
             sshEncodedKey = AuthorizedKeysDecoder.encodePublicKey(serverKey);
         } catch (IOException e) {
-            LOG.warn("Unable to encode public key to ssh format.", e);
+            LOG.warn("Unable to encode public key to ssh format, skipping update", e);
+            return null;
         }
+
         return new DeviceBuilder()
             .setUniqueId(id)
             .withKey(new DeviceKey(id))
