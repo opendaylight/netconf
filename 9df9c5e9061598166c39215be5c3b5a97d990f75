@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f26af27_c1db83af",
+        "filename": "protocol/netconf-common/pom.xml",
+        "patchSetId": 27
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-01-30T12:43:21Z",
+      "side": 1,
+      "message": "remove junit * dependencies, these are inherited via odlparent,\nalso non-test scope causes build failure (missing dependency on junit in sft)",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 21
+      },
+      "revId": "9df9c5e9061598166c39215be5c3b5a97d990f75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "326913ee_0bceb18f",
+        "filename": "protocol/netconf-common/pom.xml",
+        "patchSetId": 27
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-01-30T12:43:21Z",
+      "side": 1,
+      "message": "add scope:test",
+      "revId": "9df9c5e9061598166c39215be5c3b5a97d990f75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
