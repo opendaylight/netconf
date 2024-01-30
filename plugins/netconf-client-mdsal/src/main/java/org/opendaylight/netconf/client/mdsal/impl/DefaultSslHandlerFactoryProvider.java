@@ -77,19 +77,6 @@ public final class DefaultSslHandlerFactoryProvider extends AbstractNetconfKeyst
      * will be used by TLS clients to create <code>SSLEngine</code>. The private keys are essential
      * to create JDK <code>KeyStore</code> while the trusted certificates are optional.
      *
-     * @return A JDK KeyStore object
-     * @throws GeneralSecurityException If any security exception occurred
-     * @throws IOException If there is an I/O problem with the keystore data
-     */
-    KeyStore getJavaKeyStore() throws GeneralSecurityException, IOException {
-        return getJavaKeyStore(Set.of());
-    }
-
-    /**
-     * Using private keys and trusted certificates to create a new JDK <code>KeyStore</code> which
-     * will be used by TLS clients to create <code>SSLEngine</code>. The private keys are essential
-     * to create JDK <code>KeyStore</code> while the trusted certificates are optional.
-     *
      * @param allowedKeys Set of keys to include during KeyStore generation, empty set will create
      *                   a KeyStore with all possible keys.
      * @return A JDK KeyStore object

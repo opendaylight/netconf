@@ -18,6 +18,7 @@ import static org.mockito.Mockito.doReturn;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,7 +79,7 @@ class DefaultSslHandlerFactoryProviderTest {
     @Test
     void testKeystoreAdapterInit() throws Exception {
         try (var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker)) {
-            final var ex = assertThrows(KeyStoreException.class, keystoreAdapter::getJavaKeyStore);
+            final var ex = assertThrows(KeyStoreException.class, () -> keystoreAdapter.getJavaKeyStore(Set.of()));
             assertThat(ex.getMessage(), startsWith("No keystore private key found"));
         }
     }
@@ -96,7 +97,7 @@ class DefaultSslHandlerFactoryProviderTest {
         try (var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker)) {
             listener.onDataTreeChanged(List.of(dataTreeModification1));
 
-            final var keyStore = keystoreAdapter.getJavaKeyStore();
+            final var keyStore = keystoreAdapter.getJavaKeyStore(Set.of());
             assertTrue(keyStore.containsAlias(privateKey.getName()));
         }
     }
@@ -129,7 +130,7 @@ class DefaultSslHandlerFactoryProviderTest {
             listener.onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
 
             // Check result
-            final var keyStore = keystoreAdapter.getJavaKeyStore();
+            final var keyStore = keystoreAdapter.getJavaKeyStore(Set.of());
             assertTrue(keyStore.containsAlias(privateKey.getName()));
             assertTrue(keyStore.containsAlias(trustedCertificate.getName()));
         }
