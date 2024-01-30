@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "484fac12_f3e16a35",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/NodeSchemaEntity.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-01-30T08:07:13Z",
+      "side": 1,
+      "message": "let\u0027s make it static",
+      "revId": "0b18f840cbbd5da6cc61f4d1f905304ca3333ead",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
