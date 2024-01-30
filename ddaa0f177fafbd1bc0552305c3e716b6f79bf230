@@ -54,6 +54,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dff8ad6b_55ae72f9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-30T13:11:51Z",
+      "side": 1,
+      "message": "We want to stay with iterator as it is a design decision made in https://git.opendaylight.org/gerrit/c/netconf/+/108258. See https://jira.opendaylight.org/browse/NETCONF-1241 and https://jira.opendaylight.org/browse/NETCONF-1242.",
+      "parentUuid": "4d09953c_ab75c2fa",
+      "revId": "ddaa0f177fafbd1bc0552305c3e716b6f79bf230",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a656de88_ed17404d",
@@ -67,6 +85,24 @@
       "writtenOn": "2024-01-29T14:00:20Z",
       "side": 1,
       "message": "Probably this will be conflicting part - see NIO patch.",
+      "revId": "ddaa0f177fafbd1bc0552305c3e716b6f79bf230",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0d21732_425fbb24",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-01-30T13:11:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a656de88_ed17404d",
       "revId": "ddaa0f177fafbd1bc0552305c3e716b6f79bf230",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
