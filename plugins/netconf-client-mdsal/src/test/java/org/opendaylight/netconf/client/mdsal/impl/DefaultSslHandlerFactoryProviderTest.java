@@ -24,10 +24,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
+import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
@@ -51,6 +54,12 @@ class DefaultSslHandlerFactoryProviderTest {
 
     @Mock
     private DataBroker dataBroker;
+    @Mock
+    private RpcProviderService rpcProvider;
+    @Mock
+    private ClusterSingletonServiceProvider cssProvider;
+    @Mock
+    private AAAEncryptionService encryptionService;
     @Mock
     private Registration listenerRegistration;
     @Mock
@@ -76,9 +85,13 @@ class DefaultSslHandlerFactoryProviderTest {
         }).when(dataBroker).registerTreeChangeListener(any(), any());
     }
 
+    private DefaultSslHandlerFactoryProvider newProvider() {
+        return new DefaultSslHandlerFactoryProvider(dataBroker, rpcProvider, cssProvider, encryptionService);
+    }
+
     @Test
     void testKeystoreAdapterInit() throws Exception {
-        try (var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker)) {
+        try (var keystoreAdapter = newProvider()) {
             final var ex = assertThrows(KeyStoreException.class, () -> keystoreAdapter.getJavaKeyStore(Set.of()));
             assertThat(ex.getMessage(), startsWith("No keystore private key found"));
         }
@@ -94,7 +107,7 @@ class DefaultSslHandlerFactoryProviderTest {
         final var privateKey = getPrivateKey();
         doReturn(privateKey).when(privateKeyModification).dataAfter();
 
-        try (var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker)) {
+        try (var keystoreAdapter = newProvider()) {
             listener.onDataTreeChanged(List.of(dataTreeModification1));
 
             final var keyStore = keystoreAdapter.getJavaKeyStore(Set.of());
@@ -125,7 +138,7 @@ class DefaultSslHandlerFactoryProviderTest {
         final var trustedCertificate = getTrustedCertificate();
         doReturn(trustedCertificate).when(trustedCertificateModification).dataAfter();
 
-        try (var keystoreAdapter = new DefaultSslHandlerFactoryProvider(dataBroker)) {
+        try (var keystoreAdapter = newProvider()) {
             // Apply configurations
             listener.onDataTreeChanged(List.of(dataTreeModification1, dataTreeModification2));
 
