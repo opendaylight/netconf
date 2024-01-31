@@ -91,9 +91,9 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             builder.withProtocol(NetconfClientProtocol.SSH);
             setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
-            builder.withProtocol(NetconfClientProtocol.TLS).withSslHandlerFactory(
-                channel -> sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification())
-                    .createSslHandler());
+            final var handlerFactory = sslHandlerFactoryProvider.getSslHandlerFactory(protocol.getSpecification());
+            builder.withProtocol(NetconfClientProtocol.TLS)
+                .withSslHandlerFactory(channel -> handlerFactory.createSslHandler());
         } else {
             throw new IllegalArgumentException("Unsupported protocol type: " + protocol.getName());
         }

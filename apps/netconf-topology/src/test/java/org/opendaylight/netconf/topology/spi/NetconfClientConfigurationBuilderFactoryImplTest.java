@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
@@ -53,6 +56,8 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     private CredentialProvider credentialProvider;
     @Mock
     private SslHandlerFactoryProvider sslHandlerFactoryProvider;
+    @Mock
+    private SslHandlerFactory sslHandlerFactory;
 
     private NetconfNodeBuilder nodeBuilder;
     private NetconfClientConfigurationBuilderFactoryImpl factory;
@@ -78,7 +83,7 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
             sslHandlerFactoryProvider);
     }
 
-    private void assertConfig(NetconfClientConfiguration config) {
+    private void assertConfig(final NetconfClientConfiguration config) {
         assertNotNull(config);
         assertNotNull(config.getTcpParameters());
         assertEquals(HOST, config.getTcpParameters().getRemoteAddress());
@@ -112,6 +117,7 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
 
     @Test
     void testTls() {
+        doReturn(sslHandlerFactory).when(sslHandlerFactoryProvider).getSslHandlerFactory(any());
         final var config = createConfig(
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build());
         assertConfig(config);
