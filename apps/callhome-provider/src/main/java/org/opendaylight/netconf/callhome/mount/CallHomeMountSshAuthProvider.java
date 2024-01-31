@@ -182,7 +182,6 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
 
     private static final class DeviceConfig extends AbstractDeviceListener {
         private final ConcurrentMap<PublicKey, Device> byPublicKey = new ConcurrentHashMap<>();
-        private final AuthorizedKeysDecoder keyDecoder = new AuthorizedKeysDecoder();
 
         Device get(final PublicKey key) {
             return byPublicKey.get(key);
@@ -190,7 +189,7 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
 
         @Override
         void addDevice(final SshPublicKey publicKey, final Device device) {
-            final PublicKey key = publicKey(publicKey, device);
+            final var key = publicKey(publicKey, device);
             if (key != null) {
                 byPublicKey.put(key, device);
             }
@@ -198,15 +197,15 @@ public final class CallHomeMountSshAuthProvider implements CallHomeSshAuthProvid
 
         @Override
         void removeDevice(final SshPublicKey publicKey, final Device device) {
-            final PublicKey key = publicKey(publicKey, device);
+            final var key = publicKey(publicKey, device);
             if (key != null) {
                 byPublicKey.remove(key);
             }
         }
 
-        private PublicKey publicKey(final SshPublicKey hostKey, final Device device) {
+        private static PublicKey publicKey(final SshPublicKey hostKey, final Device device) {
             try {
-                return keyDecoder.decodePublicKey(hostKey);
+                return AuthorizedKeysDecoder.decodePublicKey(hostKey);
             } catch (GeneralSecurityException e) {
                 LOG.error("Unable to decode SSH key for {}. Ignoring update for this device", device.getUniqueId(), e);
                 return null;

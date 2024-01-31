@@ -35,10 +35,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * FIXME: This should be probably located at AAA library.
- */
-public class AuthorizedKeysDecoder {
+final class AuthorizedKeysDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(AuthorizedKeysDecoder.class);
 
     private static final ImmutableMap<String, String> ECDSA_CURVES = ImmutableMap.<String, String>builder()
@@ -73,84 +70,25 @@ public class AuthorizedKeysDecoder {
         }
     }
 
-    private byte[] bytes = new byte[0];
-    private int pos = 0;
+    private final byte[] bytes;
+    private int pos;
 
-    public PublicKey decodePublicKey(final SshPublicKey keyLine) throws GeneralSecurityException {
+    private AuthorizedKeysDecoder(final SshPublicKey keyLine) {
         bytes = keyLine.getValue();
-        pos = 0;
+    }
 
-        final var type = decodeType();
+    static @NonNull PublicKey decodePublicKey(final @NonNull SshPublicKey keyLine) throws GeneralSecurityException {
+        final var instance = new AuthorizedKeysDecoder(keyLine);
+        final var type = instance.decodeType();
         return switch (type) {
-            case KEY_TYPE_RSA -> decodeAsRSA();
-            case KEY_TYPE_DSA -> decodeAsDSA();
-            case KEY_TYPE_ECDSA -> decodeAsEcDSA();
-            default -> throw new IllegalArgumentException("Unknown decode key type " + type + " in " + keyLine);
+            case KEY_TYPE_RSA -> instance.decodeAsRSA();
+            case KEY_TYPE_DSA -> instance.decodeAsDSA();
+            case KEY_TYPE_ECDSA -> instance.decodeAsEcDSA();
+            default -> throw new NoSuchAlgorithmException("Unknown decode key type " + type + " in " + keyLine);
         };
     }
 
-    private PublicKey decodeAsEcDSA() throws GeneralSecurityException {
-        if (EC_FACTORY == null) {
-            throw new NoSuchAlgorithmException("ECDSA keys are not supported");
-        }
-
-        ECNamedCurveParameterSpec spec256r1 = ECNamedCurveTable.getParameterSpec(ECDSA_SUPPORTED_CURVE_NAME_SPEC);
-        ECNamedCurveSpec params256r1 = new ECNamedCurveSpec(
-            ECDSA_SUPPORTED_CURVE_NAME_SPEC, spec256r1.getCurve(), spec256r1.getG(), spec256r1.getN());
-        // copy last 65 bytes from ssh key.
-        ECPoint point = ECPointUtil.decodePoint(params256r1.getCurve(), Arrays.copyOfRange(bytes, 39, bytes.length));
-        return EC_FACTORY.generatePublic(new ECPublicKeySpec(point, params256r1));
-    }
-
-    private PublicKey decodeAsDSA() throws GeneralSecurityException {
-        if (DSA_FACTORY == null) {
-            throw new NoSuchAlgorithmException("RSA keys are not supported");
-        }
-
-        final var p = decodeBigInt();
-        final var q = decodeBigInt();
-        final var g = decodeBigInt();
-        final var y = decodeBigInt();
-        return DSA_FACTORY.generatePublic(new DSAPublicKeySpec(y, p, q, g));
-    }
-
-    private PublicKey decodeAsRSA() throws GeneralSecurityException {
-        if (RSA_FACTORY == null) {
-            throw new NoSuchAlgorithmException("RSA keys are not supported");
-        }
-
-        final var exponent = decodeBigInt();
-        final var modulus = decodeBigInt();
-        return RSA_FACTORY.generatePublic(new RSAPublicKeySpec(modulus, exponent));
-    }
-
-    private String decodeType() {
-        int len = decodeInt();
-        String type = new String(bytes, pos, len, StandardCharsets.UTF_8);
-        pos += len;
-        return type;
-    }
-
-    private int decodeInt() {
-        return (bytes[pos++] & 0xFF) << 24 | (bytes[pos++] & 0xFF) << 16
-                | (bytes[pos++] & 0xFF) << 8 | bytes[pos++] & 0xFF;
-    }
-
-    private BigInteger decodeBigInt() {
-        int len = decodeInt();
-        byte[] bigIntBytes = new byte[len];
-        System.arraycopy(bytes, pos, bigIntBytes, 0, len);
-        pos += len;
-        return new BigInteger(bigIntBytes);
-    }
-
-    private static void encodeBigInt(final DataOutput out, final BigInteger value) throws IOException {
-        final var bytes = value.toByteArray();
-        out.writeInt(bytes.length);
-        out.write(bytes);
-    }
-
-    public static @NonNull SshPublicKey encodePublicKey(final PublicKey publicKey) throws IOException {
+    static @NonNull SshPublicKey encodePublicKey(final PublicKey publicKey) throws IOException {
         final var baos = new ByteArrayOutputStream();
 
         try (var dout = new DataOutputStream(baos)) {
@@ -185,5 +123,66 @@ public class AuthorizedKeysDecoder {
             }
         }
         return new SshPublicKey(baos.toByteArray());
+    }
+
+    private @NonNull PublicKey decodeAsEcDSA() throws GeneralSecurityException {
+        if (EC_FACTORY == null) {
+            throw new NoSuchAlgorithmException("ECDSA keys are not supported");
+        }
+
+        ECNamedCurveParameterSpec spec256r1 = ECNamedCurveTable.getParameterSpec(ECDSA_SUPPORTED_CURVE_NAME_SPEC);
+        ECNamedCurveSpec params256r1 = new ECNamedCurveSpec(
+            ECDSA_SUPPORTED_CURVE_NAME_SPEC, spec256r1.getCurve(), spec256r1.getG(), spec256r1.getN());
+        // copy last 65 bytes from ssh key.
+        ECPoint point = ECPointUtil.decodePoint(params256r1.getCurve(), Arrays.copyOfRange(bytes, 39, bytes.length));
+        return EC_FACTORY.generatePublic(new ECPublicKeySpec(point, params256r1));
+    }
+
+    private @NonNull PublicKey decodeAsDSA() throws GeneralSecurityException {
+        if (DSA_FACTORY == null) {
+            throw new NoSuchAlgorithmException("RSA keys are not supported");
+        }
+
+        final var p = decodeBigInt();
+        final var q = decodeBigInt();
+        final var g = decodeBigInt();
+        final var y = decodeBigInt();
+        return DSA_FACTORY.generatePublic(new DSAPublicKeySpec(y, p, q, g));
+    }
+
+    private @NonNull PublicKey decodeAsRSA() throws GeneralSecurityException {
+        if (RSA_FACTORY == null) {
+            throw new NoSuchAlgorithmException("RSA keys are not supported");
+        }
+
+        final var exponent = decodeBigInt();
+        final var modulus = decodeBigInt();
+        return RSA_FACTORY.generatePublic(new RSAPublicKeySpec(modulus, exponent));
+    }
+
+    private String decodeType() {
+        int len = decodeInt();
+        String type = new String(bytes, pos, len, StandardCharsets.UTF_8);
+        pos += len;
+        return type;
+    }
+
+    private int decodeInt() {
+        return (bytes[pos++] & 0xFF) << 24 | (bytes[pos++] & 0xFF) << 16
+                | (bytes[pos++] & 0xFF) << 8 | bytes[pos++] & 0xFF;
+    }
+
+    private BigInteger decodeBigInt() {
+        int len = decodeInt();
+        byte[] bigIntBytes = new byte[len];
+        System.arraycopy(bytes, pos, bigIntBytes, 0, len);
+        pos += len;
+        return new BigInteger(bigIntBytes);
+    }
+
+    private static void encodeBigInt(final DataOutput out, final BigInteger value) throws IOException {
+        final var bytes = value.toByteArray();
+        out.writeInt(bytes.length);
+        out.write(bytes);
     }
 }
