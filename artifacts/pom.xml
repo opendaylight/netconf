@@ -290,17 +290,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>callhome-server</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>callhome-provider</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-client</artifactId>
                 <version>${project.version}</version>
@@ -309,6 +298,11 @@
             </dependency>
 
             <!-- Applications -->
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>callhome-provider</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-console</artifactId>
