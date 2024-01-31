@@ -34,8 +34,6 @@
     <module>yanglib</module>
     <module>tools</module>
 
-    <module>callhome-server</module>
-
     <module>netconf-test-models</module>
   </modules>
 </project>
