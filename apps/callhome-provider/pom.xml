@@ -79,10 +79,6 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>callhome-model</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>netconf-client-mdsal</artifactId>
         </dependency>
         <dependency>
