@@ -19,6 +19,7 @@ import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +33,7 @@ import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.keystore.legacy.impl.DefaultNetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyBuilder;
@@ -61,7 +63,7 @@ class DefaultSslHandlerFactoryProviderTest {
     @Mock
     private AAAEncryptionService encryptionService;
     @Mock
-    private Registration listenerRegistration;
+    private Registration registration;
     @Mock
     private DataTreeModification<Keystore> dataTreeModification1;
     @Mock
@@ -76,17 +78,25 @@ class DefaultSslHandlerFactoryProviderTest {
     private DataObjectModification<TrustedCertificate> trustedCertificateModification;
 
     private DataTreeChangeListener<Keystore> listener;
+    private DefaultNetconfKeystoreService keystore;
 
     @BeforeEach
     void beforeEach() {
         doAnswer(inv -> {
             listener = inv.getArgument(1);
-            return listenerRegistration;
+            return registration;
         }).when(dataBroker).registerTreeChangeListener(any(), any());
+        doReturn(registration).when(cssProvider).registerClusterSingletonService(any());
+        keystore = new DefaultNetconfKeystoreService(dataBroker, rpcProvider, cssProvider, encryptionService);
+    }
+
+    @AfterEach
+    void afterEach() {
+        keystore.close();
     }
 
     private DefaultSslHandlerFactoryProvider newProvider() {
-        return new DefaultSslHandlerFactoryProvider(dataBroker, rpcProvider, cssProvider, encryptionService);
+        return new DefaultSslHandlerFactoryProvider(keystore);
     }
 
     @Test

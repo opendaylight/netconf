@@ -19,15 +19,13 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.RpcProviderService;
-import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
-import org.opendaylight.netconf.keystore.legacy.AbstractNetconfKeystore;
+import org.opendaylight.netconf.keystore.legacy.NetconfKeystore;
+import org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.protocol.Specification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.protocol.specification.TlsCase;
+import org.opendaylight.yangtools.concepts.Registration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -35,34 +33,30 @@ import org.osgi.service.component.annotations.Reference;
 
 @Singleton
 @Component(service = SslHandlerFactoryProvider.class)
-public final class DefaultSslHandlerFactoryProvider extends AbstractNetconfKeystore
-        implements SslHandlerFactoryProvider, AutoCloseable {
+public final class DefaultSslHandlerFactoryProvider implements SslHandlerFactoryProvider, AutoCloseable {
     private static final X509Certificate[] EMPTY_CERTS = { };
     private static final char[] EMPTY_CHARS = { };
 
     private final @NonNull SslHandlerFactory nospecFactory = new SslHandlerFactoryImpl(this, Set.of());
+    private final Registration reg;
 
-    private volatile @NonNull State state = State.EMPTY;
+    private volatile @NonNull NetconfKeystore keystore = NetconfKeystore.EMPTY;
 
     @Inject
     @Activate
-    public DefaultSslHandlerFactoryProvider(@Reference final DataBroker dataBroker,
-            @Reference final RpcProviderService rpcProvider,
-            @Reference final ClusterSingletonServiceProvider cssProvider,
-            @Reference final AAAEncryptionService encryptionService) {
-        start(dataBroker, rpcProvider, cssProvider, encryptionService);
+    public DefaultSslHandlerFactoryProvider(@Reference final NetconfKeystoreService keystoreService) {
+        reg = keystoreService.registerKeystoreConsumer(this::onKeystoreUpdated);
     }
 
-    @Deactivate
+    @Override
     @PreDestroy
-    @Override
+    @Deactivate
     public void close() {
-        stop();
+        reg.close();
     }
 
-    @Override
-    protected void onStateUpdated(final State newState) {
-        state = newState;
+    private void onKeystoreUpdated(final @NonNull NetconfKeystore newKeystore) {
+        keystore = newKeystore;
     }
 
     @Override
@@ -91,7 +85,7 @@ public final class DefaultSslHandlerFactoryProvider extends AbstractNetconfKeyst
      */
     KeyStore getJavaKeyStore(final Set<String> allowedKeys) throws GeneralSecurityException, IOException {
         requireNonNull(allowedKeys);
-        final var current = state;
+        final var current = keystore;
         if (current.privateKeys().isEmpty()) {
             throw new KeyStoreException("No keystore private key found");
         }
