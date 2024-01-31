@@ -15,10 +15,14 @@ import java.net.SocketAddress;
 import java.util.Map;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.callhome.server.AbstractCallHomeSessionContextManager;
+import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 
 public class CallHomeSshSessionContextManager extends AbstractCallHomeSessionContextManager<CallHomeSshSessionContext> {
+    public CallHomeSshSessionContextManager(final CallHomeStatusRecorder statusRecorder) {
+        super(statusRecorder);
+    }
 
     @Override
     public CallHomeSshSessionContext findByChannel(final Channel channel) {
