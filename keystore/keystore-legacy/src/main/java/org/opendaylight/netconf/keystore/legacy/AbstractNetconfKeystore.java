@@ -10,11 +10,9 @@ package org.opendaylight.netconf.keystore.legacy;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Maps;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +27,9 @@ import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.Mutable;
 import org.opendaylight.yangtools.concepts.Registration;
@@ -149,18 +147,9 @@ public abstract class AbstractNetconfKeystore {
         for (var key : newState.privateKeys.values()) {
             final var keyName = key.requireName();
 
-            final byte[] keyBytes;
-            try {
-                keyBytes = base64Decode(key.requireData());
-            } catch (IllegalArgumentException e) {
-                LOG.debug("Failed to decode private key {}", keyName, e);
-                failure = updateFailure(failure, e);
-                continue;
-            }
-
             final java.security.PrivateKey privateKey;
             try {
-                privateKey = securityHelper.generatePrivateKey(keyBytes);
+                privateKey = securityHelper.generatePrivateKey(key.requireData());
             } catch (GeneralSecurityException e) {
                 LOG.debug("Failed to generate key for {}", keyName, e);
                 failure = updateFailure(failure, e);
@@ -177,18 +166,9 @@ public abstract class AbstractNetconfKeystore {
 
             final var certs = new ArrayList<X509Certificate>(certChain.size());
             for (int i = 0, size = certChain.size(); i < size; i++) {
-                final byte[] bytes;
-                try {
-                    bytes = base64Decode(certChain.get(i));
-                } catch (IllegalArgumentException e) {
-                    LOG.debug("Failed to decode certificate chain item {} for private key {}", i, keyName, e);
-                    failure = updateFailure(failure, e);
-                    continue;
-                }
-
                 final X509Certificate x509cert;
                 try {
-                    x509cert = securityHelper.generateCertificate(bytes);
+                    x509cert = securityHelper.generateCertificate(certChain.get(i));
                 } catch (GeneralSecurityException e) {
                     LOG.debug("Failed to generate certificate chain item {} for private key {}", i, keyName, e);
                     failure = updateFailure(failure, e);
@@ -204,19 +184,9 @@ public abstract class AbstractNetconfKeystore {
         final var certs = Maps.<String, X509Certificate>newHashMapWithExpectedSize(newState.trustedCertificates.size());
         for (var cert : newState.trustedCertificates.values()) {
             final var certName = cert.requireName();
-
-            final byte[] bytes;
-            try {
-                bytes = base64Decode(cert.requireCertificate());
-            } catch (IllegalArgumentException e) {
-                LOG.debug("Failed to decode trusted certificate {}", certName, e);
-                failure = updateFailure(failure, e);
-                continue;
-            }
-
             final X509Certificate x509cert;
             try {
-                x509cert = securityHelper.generateCertificate(bytes);
+                x509cert = securityHelper.generateCertificate(cert.requireCertificate());
             } catch (GeneralSecurityException e) {
                 LOG.debug("Failed to generate certificate for {}", certName, e);
                 failure = updateFailure(failure, e);
@@ -234,10 +204,6 @@ public abstract class AbstractNetconfKeystore {
         onStateUpdated(new State(keys, certs));
 
         // FIXME: tickle operational updater (which does not exist yet)
-    }
-
-    private static byte[] base64Decode(final String base64) {
-        return Base64.getMimeDecoder().decode(base64.getBytes(StandardCharsets.US_ASCII));
     }
 
     private static @NonNull Throwable updateFailure(final @Nullable Throwable failure, final @NonNull Exception ex) {

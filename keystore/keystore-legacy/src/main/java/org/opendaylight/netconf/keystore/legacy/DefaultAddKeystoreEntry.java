@@ -18,13 +18,13 @@ import java.util.Base64;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntry;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryOutput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryOutputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredentialBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.AddKeystoreEntry;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.AddKeystoreEntryInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.AddKeystoreEntryOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.AddKeystoreEntryOutputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.keystore.entry.KeyCredential;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.keystore.entry.KeyCredentialBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -55,7 +55,7 @@ final class DefaultAddKeystoreEntry extends AbstractRpc implements AddKeystoreEn
             final var keyId = credential.getKeyId();
             try {
                 encrypted.add(new KeyCredentialBuilder(credential)
-                    .setPrivateKey(encryptString(credential.getPrivateKey()))
+                    .setPrivateKey(encryptionService.encrypt(credential.getPrivateKey()))
                     .setPassphrase(encryptString(credential.getPassphrase()))
                     .build());
             } catch (GeneralSecurityException e) {

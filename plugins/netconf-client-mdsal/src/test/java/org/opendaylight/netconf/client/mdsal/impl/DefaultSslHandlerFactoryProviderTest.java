@@ -17,6 +17,7 @@ import static org.mockito.Mockito.doReturn;
 
 import java.security.KeyStoreException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,13 +33,13 @@ import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.Keystore;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131._private.keys.PrivateKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131._private.keys.PrivateKeyKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.trusted.certificates.TrustedCertificateBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.trusted.certificates.TrustedCertificateKey;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -158,17 +159,17 @@ class DefaultSslHandlerFactoryProviderTest {
                 final var keyName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
                 final var keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent();
                 final var certNodes = element.getElementsByTagName(XML_ELEMENT_CERT_CHAIN);
-                final var certChain = new ArrayList<String>();
+                final var certChain = new ArrayList<byte[]>();
                 for (int j = 0; j < certNodes.getLength(); j++) {
                     if (certNodes.item(j) instanceof Element certNode) {
-                        certChain.add(certNode.getTextContent());
+                        certChain.add(Base64.getDecoder().decode(certNode.getTextContent()));
                     }
                 }
 
                 privateKeys.add(new PrivateKeyBuilder()
                     .withKey(new PrivateKeyKey(keyName))
                     .setName(keyName)
-                    .setData(keyData)
+                    .setData(Base64.getDecoder().decode(keyData))
                     .setCertificateChain(certChain)
                     .build());
             }
@@ -189,7 +190,7 @@ class DefaultSslHandlerFactoryProviderTest {
                 trustedCertificates.add(new TrustedCertificateBuilder()
                     .withKey(new TrustedCertificateKey(certName))
                     .setName(certName)
-                    .setCertificate(certData)
+                    .setCertificate(Base64.getDecoder().decode(certData))
                     .build());
             }
         }

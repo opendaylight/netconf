@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,16 +28,16 @@ import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInputBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.AddPrivateKeyInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.AddPrivateKeyInputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.AddTrustedCertificateInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.AddTrustedCertificateInputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131._private.keys.PrivateKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131._private.keys.PrivateKeyKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.trusted.certificates.TrustedCertificate;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.trusted.certificates.TrustedCertificateBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240131.trusted.certificates.TrustedCertificateKey;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -96,17 +97,17 @@ class NetconfKeystoreRpcsTest {
                 final var keyName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
                 final var keyData = element.getElementsByTagName(XML_ELEMENT_DATA).item(0).getTextContent();
                 final var certNodes = element.getElementsByTagName(XML_ELEMENT_CERT_CHAIN);
-                final var certChain = new ArrayList<String>();
+                final var certChain = new ArrayList<byte[]>();
                 for (int j = 0; j < certNodes.getLength(); j++) {
                     if (certNodes.item(j) instanceof Element certElement) {
-                        certChain.add(certElement.getTextContent());
+                        certChain.add(Base64.getDecoder().decode(certElement.getTextContent()));
                     }
                 }
 
                 final var key = new PrivateKeyKey(keyName);
                 privateKeys.put(key, new PrivateKeyBuilder()
                     .withKey(key)
-                    .setData(keyData)
+                    .setData(Base64.getDecoder().decode(keyData))
                     .setCertificateChain(certChain)
                     .build());
             }
@@ -139,7 +140,7 @@ class NetconfKeystoreRpcsTest {
                 trustedCertificates.put(key, new TrustedCertificateBuilder()
                     .withKey(key)
                     .setName(certName)
-                    .setCertificate(certData)
+                    .setCertificate(Base64.getDecoder().decode(certData))
                     .build());
             }
         }
