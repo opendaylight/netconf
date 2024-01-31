@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f6eb3da_df946114",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-31T09:18:05Z",
+      "side": 1,
+      "message": "into NetconfCallHomeTlsService and IetfZeroTouchCallHomeServerProvider",
+      "parentUuid": "6bdf05a0_71606024",
+      "range": {
+        "startLine": 116,
+        "startChar": 21,
+        "endLine": 116,
+        "endChar": 41
+      },
+      "revId": "63bc4e4c01cd557eb04061d19a0c0fcc828b076e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce38b871_07262b7d",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "feb5dc5b_a0e6cebc",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-31T09:18:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce38b871_07262b7d",
+      "range": {
+        "startLine": 117,
+        "startChar": 49,
+        "endLine": 117,
+        "endChar": 63
+      },
+      "revId": "63bc4e4c01cd557eb04061d19a0c0fcc828b076e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b91e4757_cc40a9c5",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-01-29T12:11:34Z",
       "side": 1,
       "message": "let\u0027s use property names that look good in configuration files, so this is\nssh$_$port",
+      "range": {
+        "startLine": 128,
+        "startChar": 12,
+        "endLine": 128,
+        "endChar": 19
+      },
+      "revId": "63bc4e4c01cd557eb04061d19a0c0fcc828b076e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2ba870a_c610a499",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-01-31T09:18:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b91e4757_cc40a9c5",
       "range": {
         "startLine": 128,
         "startChar": 12,
