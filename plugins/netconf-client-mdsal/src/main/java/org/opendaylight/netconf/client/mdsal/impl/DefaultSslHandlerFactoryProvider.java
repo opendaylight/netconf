@@ -15,54 +15,35 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.Set;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.RpcProviderService;
-import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
-import org.opendaylight.netconf.keystore.legacy.AbstractNetconfKeystore;
+import org.opendaylight.netconf.keystore.api.KeystoreContent;
+import org.opendaylight.netconf.truststore.api.TruststoreContent;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.protocol.Specification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.parameters.protocol.specification.TlsCase;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 @Singleton
 @Component(service = SslHandlerFactoryProvider.class)
-public final class DefaultSslHandlerFactoryProvider extends AbstractNetconfKeystore
-        implements SslHandlerFactoryProvider, AutoCloseable {
+public final class DefaultSslHandlerFactoryProvider implements SslHandlerFactoryProvider {
     private static final X509Certificate[] EMPTY_CERTS = { };
     private static final char[] EMPTY_CHARS = { };
 
     private final @NonNull SslHandlerFactory nospecFactory = new SslHandlerFactoryImpl(this, Set.of());
-
-    private volatile @NonNull State state = State.EMPTY;
+    private final @NonNull TruststoreContent trustStore;
+    private final @NonNull KeystoreContent keyStore;
 
     @Inject
     @Activate
-    public DefaultSslHandlerFactoryProvider(@Reference final DataBroker dataBroker,
-            @Reference final RpcProviderService rpcProvider,
-            @Reference final ClusterSingletonServiceProvider cssProvider,
-            @Reference final AAAEncryptionService encryptionService) {
-        start(dataBroker, rpcProvider, cssProvider, encryptionService);
-    }
-
-    @Deactivate
-    @PreDestroy
-    @Override
-    public void close() {
-        stop();
-    }
-
-    @Override
-    protected void onStateUpdated(final State newState) {
-        state = newState;
+    public DefaultSslHandlerFactoryProvider(@Reference final KeystoreContent keyStore,
+            @Reference final TruststoreContent trustStore) {
+        this.keyStore = requireNonNull(keyStore);
+        this.trustStore = requireNonNull(trustStore);
     }
 
     @Override
@@ -91,8 +72,9 @@ public final class DefaultSslHandlerFactoryProvider extends AbstractNetconfKeyst
      */
     KeyStore getJavaKeyStore(final Set<String> allowedKeys) throws GeneralSecurityException, IOException {
         requireNonNull(allowedKeys);
-        final var current = state;
-        if (current.privateKeys().isEmpty()) {
+        final var privateKeys = keyStore.privateKeys();
+        final var trustedCertificates = trustStore.certificates();
+        if (privateKeys.isEmpty()) {
             throw new KeyStoreException("No keystore private key found");
         }
 
@@ -100,7 +82,7 @@ public final class DefaultSslHandlerFactoryProvider extends AbstractNetconfKeyst
         keyStore.load(null, null);
 
         // Private keys first
-        for (var entry : current.privateKeys().entrySet()) {
+        for (var entry : privateKeys.entrySet()) {
             final var alias = entry.getKey();
             if (allowedKeys.isEmpty() || allowedKeys.contains(alias)) {
                 final var privateKey = entry.getValue();
@@ -109,7 +91,7 @@ public final class DefaultSslHandlerFactoryProvider extends AbstractNetconfKeyst
             }
         }
 
-        for (var entry : current.trustedCertificates().entrySet()) {
+        for (var entry : trustedCertificates.entrySet()) {
             keyStore.setCertificateEntry(entry.getKey(), entry.getValue());
         }
 

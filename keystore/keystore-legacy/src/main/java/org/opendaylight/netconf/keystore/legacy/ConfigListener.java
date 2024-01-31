@@ -14,7 +14,7 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
-import org.opendaylight.netconf.keystore.legacy.AbstractNetconfKeystore.ConfigStateBuilder;
+import org.opendaylight.netconf.keystore.legacy.NetconfKeystore.ConfigStateBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @NonNullByDefault
-record ConfigListener(AbstractNetconfKeystore keystore) implements DataTreeChangeListener<Keystore> {
+record ConfigListener(NetconfKeystore keystore) implements DataTreeChangeListener<Keystore> {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigListener.class);
 
     ConfigListener {

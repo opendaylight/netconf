@@ -16,10 +16,12 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -29,6 +31,9 @@ import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
+import org.opendaylight.netconf.keystore.api.CertifiedPrivateKey;
+import org.opendaylight.netconf.keystore.api.KeystoreContent;
+import org.opendaylight.netconf.truststore.api.TruststoreContent;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
@@ -36,33 +41,26 @@ import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.concepts.Mutable;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Abstract substrate for implementing security services based on the contents of {@link Keystore}.
  */
-public abstract class AbstractNetconfKeystore {
+@Singleton
+@Component(service = KeystoreContent.class)
+public final class NetconfKeystore implements KeystoreContent, TruststoreContent, AutoCloseable {
     @NonNullByDefault
-    protected record CertifiedPrivateKey(
-            java.security.PrivateKey key,
-            List<X509Certificate> certificateChain) implements Immutable {
-        public CertifiedPrivateKey {
-            requireNonNull(key);
-            certificateChain = List.copyOf(certificateChain);
-            if (certificateChain.isEmpty()) {
-                throw new IllegalArgumentException("Certificate chain must not be empty");
-            }
-        }
-    }
-
-    @NonNullByDefault
-    protected record State(
+    private record State(
             Map<String, CertifiedPrivateKey> privateKeys,
             Map<String, X509Certificate> trustedCertificates) implements Immutable {
-        public static final State EMPTY = new State(Map.of(), Map.of());
+        static final State EMPTY = new State(Map.of(), Map.of());
 
-        public State {
+        State {
             privateKeys = Map.copyOf(privateKeys);
             trustedCertificates = Map.copyOf(trustedCertificates);
         }
@@ -90,31 +88,32 @@ public abstract class AbstractNetconfKeystore {
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfKeystore.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfKeystore.class);
 
-    private final AtomicReference<@NonNull ConfigState> state = new AtomicReference<>(ConfigState.EMPTY);
+    private final AtomicReference<@NonNull ConfigState> configState = new AtomicReference<>(ConfigState.EMPTY);
+    private final AtomicReference<@NonNull State> state = new AtomicReference<>(State.EMPTY);
     private final SecurityHelper securityHelper = new SecurityHelper();
 
     private @Nullable Registration configListener;
     private @Nullable Registration rpcSingleton;
 
-    protected final void start(final DataBroker dataBroker, final RpcProviderService rpcProvider,
-            final ClusterSingletonServiceProvider cssProvider, final AAAEncryptionService encryptionService) {
-        if (configListener == null) {
-            configListener = dataBroker.registerTreeChangeListener(
-                DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
-                new ConfigListener(this));
-            LOG.debug("NETCONF keystore configuration listener started");
-        }
-        if (rpcSingleton == null) {
-            rpcSingleton = cssProvider.registerClusterSingletonService(
-                new RpcSingleton(dataBroker, rpcProvider, encryptionService));
-            LOG.debug("NETCONF keystore configuration singleton registered");
-        }
+    @Inject
+    @Activate
+    public NetconfKeystore(@Reference final DataBroker dataBroker, final @Reference RpcProviderService rpcProvider,
+            final @Reference ClusterSingletonServiceProvider cssProvider,
+            final @Reference AAAEncryptionService encryptionService) {
+        configListener = dataBroker.registerTreeChangeListener(
+            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
+            new ConfigListener(this));
+        rpcSingleton = cssProvider.registerClusterSingletonService(
+            new RpcSingleton(dataBroker, rpcProvider, encryptionService));
         LOG.info("NETCONF keystore service started");
     }
 
-    protected final void stop() {
+    @PreDestroy
+    @Deactivate
+    @Override
+    public void close() {
         final var singleton = rpcSingleton;
         if (singleton != null) {
             rpcSingleton = null;
@@ -124,14 +123,23 @@ public abstract class AbstractNetconfKeystore {
         if (listener != null) {
             configListener = null;
             listener.close();
-            state.set(ConfigState.EMPTY);
+            configState.set(ConfigState.EMPTY);
         }
+        LOG.info("NETCONF keystore service stopped");
     }
 
-    protected abstract void onStateUpdated(@NonNull State newState);
+    @Override
+    public Map<String, X509Certificate> certificates() {
+        return state.getAcquire().trustedCertificates;
+    }
 
-    final void runUpdate(final Consumer<@NonNull ConfigStateBuilder> task) {
-        final var prevState = state.getAcquire();
+    @Override
+    public Map<String, CertifiedPrivateKey> privateKeys() {
+        return state.getAcquire().privateKeys;
+    }
+
+    void runUpdate(final Consumer<@NonNull ConfigStateBuilder> task) {
+        final var prevState = configState.getAcquire();
 
         final var builder = new ConfigStateBuilder(new HashMap<>(prevState.privateKeys),
             new HashMap<>(prevState.trustedCertificates));
@@ -139,7 +147,7 @@ public abstract class AbstractNetconfKeystore {
         final var newState = new ConfigState(builder.privateKeys, builder.trustedCertificates);
 
         // Careful application -- check if listener is still up and whether the state was not updated.
-        if (configListener == null || state.compareAndExchangeRelease(prevState, newState) != prevState) {
+        if (configListener == null || configState.compareAndExchangeRelease(prevState, newState) != prevState) {
             return;
         }
 
@@ -231,7 +239,7 @@ public abstract class AbstractNetconfKeystore {
             return;
         }
 
-        onStateUpdated(new State(keys, certs));
+        state.set(new State(keys, certs));
 
         // FIXME: tickle operational updater (which does not exist yet)
     }
