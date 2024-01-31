@@ -207,8 +207,9 @@ public final class CallHomeMountService implements AutoCloseable {
             .build();
     }
 
-    public CallHomeSshSessionContextManager createSshSessionContextManager() {
-        return new CallHomeSshSessionContextManager() {
+    public CallHomeSshSessionContextManager createSshSessionContextManager(
+            final CallHomeStatusRecorder statusRecorder) {
+        return new CallHomeSshSessionContextManager(statusRecorder) {
             @Override
             public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {
                 final var remoteAddr = clientSession.getRemoteAddress();

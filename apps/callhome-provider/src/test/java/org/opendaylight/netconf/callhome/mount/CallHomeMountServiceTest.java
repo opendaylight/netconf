@@ -93,7 +93,7 @@ public class CallHomeMountServiceTest {
     @Test
     void sshSessionContextManager() throws Exception {
         doReturn(SOCKET_ADDRESS).when(sshSession).getRemoteAddress();
-        final var sshSessionContextManager = service.createSshSessionContextManager();
+        final var sshSessionContextManager = service.createSshSessionContextManager(statusRecorder);
 
         // id 1 -- netconf layer created
         final var context = sshSessionContextManager.createContext(ID1, sshSession);

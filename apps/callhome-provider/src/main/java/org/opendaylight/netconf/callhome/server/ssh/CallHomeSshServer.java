@@ -162,7 +162,7 @@ public final class CallHomeSshServer implements AutoCloseable {
                 toServerParams(address, port),
                 transportStackFactory == null ? defaultTransportStackFactory() : transportStackFactory,
                 negotiationFactory,
-                contextManager == null ? new CallHomeSshSessionContextManager() : contextManager,
+                contextManager == null ? new CallHomeSshSessionContextManager(statusRecorder) : contextManager,
                 authProvider, statusRecorder);
         }
 

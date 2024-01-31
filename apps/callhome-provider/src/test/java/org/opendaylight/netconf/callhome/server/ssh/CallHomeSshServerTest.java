@@ -134,7 +134,7 @@ public class CallHomeSshServerTest {
             .setRemotePort(new PortNumber(Uint16.valueOf(serverPort))).build();
 
         // Session context manager
-        final var contextManager = new CallHomeSshSessionContextManager() {
+        final var contextManager = new CallHomeSshSessionContextManager(statusRecorder) {
             // inject netconf session listener
             @Override
             public CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {

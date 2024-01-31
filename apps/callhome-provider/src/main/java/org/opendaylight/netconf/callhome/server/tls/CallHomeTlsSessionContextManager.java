@@ -27,8 +27,8 @@ public class CallHomeTlsSessionContextManager extends AbstractCallHomeSessionCon
     private final CallHomeStatusRecorder statusRecorder;
 
     public CallHomeTlsSessionContextManager(final CallHomeTlsAuthProvider authProvider,
-        final CallHomeStatusRecorder statusRecorder) {
-        super();
+            final CallHomeStatusRecorder statusRecorder) {
+        super(statusRecorder);
         this.authProvider = requireNonNull(authProvider);
         this.statusRecorder = requireNonNull(statusRecorder);
     }

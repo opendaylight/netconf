@@ -61,7 +61,7 @@ public final class IetfZeroTouchCallHomeServerProvider implements AutoCloseable 
                 .withPort(configuration.port())
                 .withAuthProvider(authProvider)
                 .withStatusRecorder(statusRecorder)
-                .withSessionContextManager(mountService.createSshSessionContextManager())
+                .withSessionContextManager(mountService.createSshSessionContextManager(statusRecorder))
                 .withNegotiationFactory(new NetconfClientSessionNegotiatorFactory(timer, Optional.empty(), 10000L,
                     NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES))
                 .build();

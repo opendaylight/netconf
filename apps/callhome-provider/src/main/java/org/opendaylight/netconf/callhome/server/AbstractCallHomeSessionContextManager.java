@@ -7,13 +7,19 @@
  */
 package org.opendaylight.netconf.callhome.server;
 
-import java.util.Map;
+import static java.util.Objects.requireNonNull;
+
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public abstract class AbstractCallHomeSessionContextManager<T extends CallHomeSessionContext>
         implements CallHomeSessionContextManager<T> {
+    protected final ConcurrentMap<String, T> contexts = new ConcurrentHashMap<>();
+    private final CallHomeStatusRecorder statusRecorder;
 
-    protected final Map<String, T> contexts = new ConcurrentHashMap<>();
+    protected AbstractCallHomeSessionContextManager(final CallHomeStatusRecorder statusRecorder) {
+        this.statusRecorder = requireNonNull(statusRecorder);
+    }
 
     @Override
     public void register(final T context) {
