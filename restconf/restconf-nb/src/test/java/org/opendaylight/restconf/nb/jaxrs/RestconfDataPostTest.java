@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
@@ -31,6 +30,8 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
@@ -38,6 +39,8 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 class RestconfDataPostTest extends AbstractRestconfTest {
     @Mock
     private DOMDataTreeReadWriteTransaction tx;
+    @Mock
+    private AsyncResponse asyncResponse;
 
     @BeforeEach
     void beforeEach() {
@@ -84,7 +87,6 @@ class RestconfDataPostTest extends AbstractRestconfTest {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(immediateTrueFluentFuture())
             .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
-        final var mockAsyncResponse = mock(AsyncResponse.class);
 
         final var ex = assertThrows(RestconfDocumentedException.class, () -> restconf
             .postDataJSON(stringInputStream("""
@@ -92,10 +94,33 @@ class RestconfDataPostTest extends AbstractRestconfTest {
                   "example-jukebox:jukebox" : {
                   }
                 }"""),
-            uriInfo, mockAsyncResponse));
+            uriInfo, asyncResponse));
 
         final var error = ex.getErrors().get(0);
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.DATA_EXISTS, error.getErrorTag());
+    }
+
+    @Test
+    public void testPostExistingListsDataErrorPath() {
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
+        final var node = PLAYLIST_IID.node(BAND_ENTRY.name());
+        doReturn(immediateTrueFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doNothing().when(tx).put(LogicalDatastoreType.CONFIGURATION, node, BAND_ENTRY);
+
+        final var ex = assertThrows(RestconfDocumentedException.class, () -> restconf.postDataJSON(JUKEBOX_API_PATH,
+            stringInputStream("""
+                {
+                  "example-jukebox:playlist" : {
+                    "name" : "name of band",
+                    "description" : "band description"
+                  }
+                }"""),
+                uriInfo, asyncResponse));
+        final var actualPath = ex.getErrors().get(0).getErrorPath();
+        final var expectedPath = YangInstanceIdentifier.builder(PLAYLIST_IID)
+            .nodeWithKey(PLAYLIST_QNAME, QName.create(JUKEBOX_QNAME, "name"), "name of band")
+            .build();
+        assertEquals(expectedPath, actualPath);
     }
 }

@@ -89,9 +89,9 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
             }
 
             // ... finally collect existence checks and abort the transaction if any of them failed.
-            if (check.getOrThrow() instanceof Conflict) {
+            if (check.getOrThrow() instanceof Conflict conflict) {
                 throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
-                    path);
+                    conflict.path());
             }
         } else {
             RestconfStrategy.checkItemDoesNotExists(verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
