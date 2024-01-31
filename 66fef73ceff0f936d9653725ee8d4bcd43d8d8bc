@@ -33,6 +33,24 @@
       "message": "doesn\u0027t sound correct to me, seem like copy paste \n\nsame for RPCschema",
       "revId": "66fef73ceff0f936d9653725ee8d4bcd43d8d8bc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6974e3a_ae1e78ac",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/NodeSchemaEntity.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-01-31T14:06:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b97ca987_297ee5e2",
+      "revId": "66fef73ceff0f936d9653725ee8d4bcd43d8d8bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
