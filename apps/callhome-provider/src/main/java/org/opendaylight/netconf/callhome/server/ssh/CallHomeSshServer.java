@@ -71,8 +71,29 @@ public final class CallHomeSshServer implements AutoCloseable {
         final var sshClientParams = new SshClientParametersBuilder().setClientIdentity(
             new ClientIdentityBuilder().setUsername("ignored").build()).build();
         final ClientFactoryManagerConfigurator configurator = factoryMgr -> {
+
+
+
             factoryMgr.setServerKeyVerifier(this::verifyServerKey);
-            factoryMgr.addSessionListener(createSessionListener());
+            factoryMgr.addSessionListener(new SessionListener() {
+                @Override
+                public void sessionClosed(final Session session) {
+                    if (session instanceof ClientSession clientSession) {
+                        final var context = contextManager.findBySshSession(clientSession);
+                        if (context != null) {
+                            contextManager.remove(context.id());
+                            if (!clientSession.isAuthenticated()) {
+                                // threat unauthenticated session closure as authentication failure
+                                // in case there was context object created for the session
+                                statusRecorder.reportFailedAuth(context.id());
+                            } else if (context.settableFuture().isDone()) {
+                                // disconnected after netconf session established
+                                statusRecorder.reportDisconnected(context.id());
+                            }
+                        }
+                    }
+                }
+            });
             // supported auth factories
             factoryMgr.setUserAuthFactories(List.of(new UserAuthPasswordFactory(), new UserAuthPublicKeyFactory()));
         };
@@ -84,37 +105,9 @@ public final class CallHomeSshServer implements AutoCloseable {
         }
     }
 
-    private SessionListener createSessionListener() {
-        return new SessionListener() {
-            @Override
-            public void sessionClosed(final Session session) {
-                if (session instanceof ClientSession clientSession) {
-                    final var context = contextManager.findBySshSession(clientSession);
-                    if (context != null) {
-                        contextManager.remove(context.id());
-                        if (!clientSession.isAuthenticated()) {
-                            // threat unauthenticated session closure as authentication failure
-                            // in case there was context object created for the session
-                            statusRecorder.reportFailedAuth(context.id());
-                        } else if (context.settableFuture().isDone()) {
-                            // disconnected after netconf session established
-                            statusRecorder.reportDisconnected(context.id());
-                        }
-                    }
-                }
-            }
-        };
-    }
-
     private boolean verifyServerKey(final ClientSession clientSession, final SocketAddress remoteAddress,
             final PublicKey serverKey) {
         final CallHomeSshAuthSettings authSettings = authProvider.provideAuth(remoteAddress, serverKey);
-        if (authSettings == null) {
-            // no auth for server key
-            statusRecorder.reportUnknown(remoteAddress, serverKey);
-            LOG.info("No auth settings found. Connection from {} rejected.", remoteAddress);
-            return false;
-        }
         if (contextManager.exists(authSettings.id())) {
             LOG.info("Session context with same id {} already exists. Connection from {} rejected.",
                 authSettings.id(), remoteAddress);

@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
 import java.net.SocketAddress;
 import java.util.Map;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.callhome.server.AbstractCallHomeSessionContextManager;
 import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
@@ -55,7 +54,8 @@ public class CallHomeSshSessionContextManager extends AbstractCallHomeSessionCon
      * @param clientSession SSH session instance
      * @return created object or {@code null} if it cannot be created for some reason
      */
-    public @Nullable CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {
+    @Override
+    protected CallHomeSshSessionContext createContext(final String id, final ClientSession clientSession) {
         return new CallHomeSshSessionContext(id, clientSession.getRemoteAddress(), clientSession,
             new SimpleNetconfClientSessionListener(), SettableFuture.create());
     }
