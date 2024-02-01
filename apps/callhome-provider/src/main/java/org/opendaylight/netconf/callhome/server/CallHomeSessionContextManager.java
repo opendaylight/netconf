@@ -8,8 +8,12 @@
 package org.opendaylight.netconf.callhome.server;
 
 import io.netty.channel.Channel;
+import java.net.SocketAddress;
+import java.security.PublicKey;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.yangtools.concepts.Registration;
 
 /**
  * Manager service for active Call-Home connections. Serves session context per id mapping (registry).
@@ -18,20 +22,23 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 public interface CallHomeSessionContextManager<T extends CallHomeSessionContext> extends AutoCloseable {
 
-    /**
-     * Checks if contexts with same id already defined.
-     *
-     * @param id unique session context identifier
-     * @return {@code true} if context with same id exists in registry, {@code false} otherwise
-     */
-    boolean exists(@NonNull String id);
-
-    /**
-     * Registers (maps) new context object.
-     *
-     * @param context context object associated with new incoming connection
-     */
-    void register(T context);
+    @Nullable Registration createSession(ClientSession clientSession, SocketAddress remoteAddress, PublicKey serverKey);
+//
+//
+//    /**
+//     * Checks if contexts with same id already defined.
+//     *
+//     * @param id unique session context identifier
+//     * @return {@code true} if context with same id exists in registry, {@code false} otherwise
+//     */
+//    boolean exists(@NonNull String id);
+//
+//    /**
+//     * Registers (maps) new context object.
+//     *
+//     * @param context context object associated with new incoming connection
+//     */
+//    void register(T context);
 
     /**
      * Searches for session context associated with requested {@link Channel}.
@@ -41,10 +48,10 @@ public interface CallHomeSessionContextManager<T extends CallHomeSessionContext>
      */
     @Nullable T findByChannel(@NonNull Channel channel);
 
-    /**
-     * Removes session context by id from registry. Connection associated with removed context will be closed if open.
-     *
-     * @param id unique session context identifier
-     */
-    void remove(@NonNull String id);
+//    /**
+//     * Removes session context by id from registry. Connection associated with removed context will be closed if open.
+//     *
+//     * @param id unique session context identifier
+//     */
+//    void remove(@NonNull String id);
 }
