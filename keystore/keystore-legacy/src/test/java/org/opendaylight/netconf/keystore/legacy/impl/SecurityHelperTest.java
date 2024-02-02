@@ -6,7 +6,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.topology.spi;
+package org.opendaylight.netconf.keystore.legacy.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,7 +17,9 @@ import java.security.KeyPair;
 import org.bouncycastle.openssl.EncryptionException;
 import org.junit.jupiter.api.Test;
 
-class PKIUtilTest {
+class SecurityHelperTest {
+    private final SecurityHelper helper = new SecurityHelper();
+
     @Test
     void testRSAKey() throws Exception {
         assertNotNull(decodePrivateKey("rsa", ""));
@@ -69,9 +71,9 @@ class PKIUtilTest {
         assertEquals("exception using cipher - please check password and data.", ex.getMessage());
     }
 
-    private static KeyPair decodePrivateKey(final String resourceName, final String password) throws Exception {
-        return NetconfClientConfigurationBuilderFactoryImpl.decodePrivateKey(
-            new String(PKIUtilTest.class.getResourceAsStream("/pki/" + resourceName).readAllBytes(),
+    private KeyPair decodePrivateKey(final String resourceName, final String password) throws Exception {
+        return helper.decodePrivateKey(
+            new String(SecurityHelperTest.class.getResourceAsStream("/pki/" + resourceName).readAllBytes(),
                 StandardCharsets.UTF_8),
             password);
     }

@@ -7,42 +7,35 @@
  */
 package org.opendaylight.netconf.client.mdsal.impl;
 
+import static java.util.Objects.requireNonNull;
+
+import java.security.KeyPair;
 import java.util.Map;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataListener;
-import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredentialKey;
+import org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 @Component(service = CredentialProvider.class)
-public final class DefaultCredentialProvider implements CredentialProvider, DataListener<Keystore>, AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultCredentialProvider.class);
-
+public final class DefaultCredentialProvider implements CredentialProvider, AutoCloseable {
     private final @NonNull Registration reg;
 
-    private volatile @NonNull Map<KeyCredentialKey, KeyCredential> credentials = Map.of();
+    private volatile @NonNull Map<String, KeyPair> credentials = Map.of();
 
     @Inject
     @Activate
-    public DefaultCredentialProvider(@Reference final DataBroker dataBroker) {
-        reg = dataBroker.registerDataListener(
-            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)), this);
+    public DefaultCredentialProvider(@Reference final NetconfKeystoreService keystoreService) {
+        reg = keystoreService.registerKeystoreConsumer(keystore -> {
+            credentials = keystore.credentials();
+        });
     }
 
     @Deactivate
@@ -53,15 +46,7 @@ public final class DefaultCredentialProvider implements CredentialProvider, Data
     }
 
     @Override
-    public KeyCredential credentialForId(final String id) {
-        return credentials.get(new KeyCredentialKey(id));
-    }
-
-    @Override
-    public void dataChangedTo(final Keystore data) {
-        final var newCredentials = data != null ? data.nonnullKeyCredential()
-            : Map.<KeyCredentialKey, KeyCredential>of();
-        LOG.debug("Updating to {} credentials", newCredentials.size());
-        credentials = newCredentials;
+    public KeyPair credentialForId(final String id) {
+        return credentials.get(requireNonNull(id));
     }
 }
