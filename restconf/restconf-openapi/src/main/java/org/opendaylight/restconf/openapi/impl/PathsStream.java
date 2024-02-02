@@ -10,8 +10,10 @@ package org.opendaylight.restconf.openapi.impl;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolveFullNameFromNode;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +26,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
@@ -59,7 +62,7 @@ import org.opendaylight.yangtools.yang.model.api.type.Uint64TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.Uint8TypeDefinition;
 
 public final class PathsStream extends InputStream {
-    private final Collection<? extends Module> modules;
+    private final Iterator<? extends Module> iterator;
     private final OpenApiBodyWriter writer;
     private final EffectiveModelContext schemaContext;
     private final String deviceName;
@@ -67,6 +70,8 @@ public final class PathsStream extends InputStream {
     private final String basePath;
     private final boolean isForSingleModule;
     private final boolean includeDataStore;
+    private final ByteArrayOutputStream stream;
+    private final JsonGenerator generator;
 
     private static final String OPERATIONS = "operations";
     private static final String DATA = "data";
@@ -74,11 +79,13 @@ public final class PathsStream extends InputStream {
     private boolean hasAddedDataStore;
     private Reader reader;
     private ReadableByteChannel channel;
+    private boolean eof;
 
     public PathsStream(final EffectiveModelContext schemaContext, final OpenApiBodyWriter writer,
             final String deviceName, final String urlPrefix, final boolean isForSingleModule,
-            final boolean includeDataStore, final Collection<? extends Module> modules, final String basePath) {
-        this.modules = modules;
+            final boolean includeDataStore, final Iterator<? extends Module> iterator, final String basePath,
+            final ByteArrayOutputStream stream, final JsonGenerator generator) {
+        this.iterator = iterator;
         this.writer = writer;
         this.schemaContext = schemaContext;
         this.isForSingleModule = isForSingleModule;
@@ -86,26 +93,71 @@ public final class PathsStream extends InputStream {
         this.urlPrefix = urlPrefix;
         this.includeDataStore = includeDataStore;
         this.basePath = basePath;
+        this.stream = stream;
+        this.generator = generator;
         hasRootPostLink = false;
         hasAddedDataStore = false;
     }
 
     @Override
     public int read() throws IOException {
-        if (reader == null) {
-            reader = new BufferedReader(
-                new InputStreamReader(new ByteArrayInputStream(writeNextEntity(new PathsEntity(toPaths()))),
-                    StandardCharsets.UTF_8));
+        if (eof) {
+            return -1;
         }
-        return reader.read();
+        if (reader == null) {
+            generator.writeObjectFieldStart("paths");
+            generator.flush();
+            reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
+            stream.reset();
+        }
+        var read = reader.read();
+        while (read == -1) {
+            if (iterator.hasNext()) {
+                reader = new BufferedReader(
+                    new InputStreamReader(new ByteArrayInputStream(writeNextEntity(
+                        new PathsEntity(toPaths(iterator.next())))), StandardCharsets.UTF_8));
+                read = reader.read();
+                continue;
+            }
+            generator.writeEndObject();
+            generator.flush();
+            reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
+            stream.reset();
+            eof = true;
+            return reader.read();
+        }
+        return read;
     }
 
     @Override
     public int read(final byte[] array, final int off, final int len) throws IOException {
-        if (channel == null) {
-            channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(new PathsEntity(toPaths()))));
+        if (eof) {
+            return -1;
         }
-        return channel.read(ByteBuffer.wrap(array, off, len));
+        if (channel == null) {
+            generator.writeObjectFieldStart("paths");
+            generator.flush();
+            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
+            stream.reset();
+        }
+        var read = channel.read(ByteBuffer.wrap(array, off, len));
+        while (read == -1) {
+            if (iterator.hasNext()) {
+                channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(
+                    new PathsEntity(toPaths(iterator.next())))));
+                read = channel.read(ByteBuffer.wrap(array, off, len));
+                continue;
+            }
+            generator.writeEndObject();
+            generator.flush();
+            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
+            stream.reset();
+            eof = true;
+            return channel.read(ByteBuffer.wrap(array, off, len));
+        }
+        return read;
     }
 
     private byte[] writeNextEntity(final OpenApiEntity next) throws IOException {
@@ -113,9 +165,8 @@ public final class PathsStream extends InputStream {
         return writer.readFrom();
     }
 
-    private Deque<PathEntity> toPaths() {
+    private Deque<PathEntity> toPaths(final Module module) {
         final var result = new ArrayDeque<PathEntity>();
-        for (final var module : modules) {
             if (includeDataStore && !hasAddedDataStore) {
                 final var dataPath = basePath + DATA + urlPrefix;
                 result.add(new PathEntity(dataPath, null, null, null,
@@ -155,7 +206,6 @@ public final class PathsStream extends InputStream {
                         deviceName, basePath, null);
                 }
             }
-        }
         return result;
     }
 
