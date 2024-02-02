@@ -17,6 +17,7 @@ import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.keystore.legacy.impl.DefaultNetconfKeystoreService.ConfigStateBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +71,18 @@ record ConfigListener(DefaultNetconfKeystoreService keystore) implements DataTre
                         builder.trustedCertificates().put(trustedCertificate.requireName(), trustedCertificate);
                     }
                     case DELETE -> builder.trustedCertificates().remove(mod.dataBefore().requireName());
+                    default -> {
+                        // no-op
+                    }
+                }
+            }
+            for (var mod : rootNode.getModifiedChildren(KeyCredential.class)) {
+                switch (mod.modificationType()) {
+                    case SUBTREE_MODIFIED, WRITE -> {
+                        final var keyCredential = mod.dataAfter();
+                        builder.credentials().put(keyCredential.requireKeyId(), keyCredential);
+                    }
+                    case DELETE -> builder.credentials().remove(mod.dataBefore().requireKeyId());
                     default -> {
                         // no-op
                     }

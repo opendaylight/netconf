@@ -9,25 +9,11 @@ package org.opendaylight.netconf.topology.spi;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
-import java.io.IOException;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.security.KeyPair;
-import java.security.Provider;
-import java.security.Security;
-import java.util.Base64;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMEncryptedKeyPair;
-import org.bouncycastle.openssl.PEMKeyPair;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
@@ -58,13 +44,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component
 @Singleton
 public final class NetconfClientConfigurationBuilderFactoryImpl implements NetconfClientConfigurationBuilderFactory {
-    private static final Provider BCPROV;
-
-    static {
-        final var prov = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
-        BCPROV = prov != null ? prov : new BouncyCastleProvider();
-    }
-
     private final SslHandlerFactoryProvider sslHandlerFactoryProvider;
     private final AAAEncryptionService encryptionService;
     private final CredentialProvider credentialProvider;
@@ -82,7 +61,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
 
     @Override
     public NetconfClientConfigurationBuilder createClientConfigurationBuilder(final NodeId nodeId,
-        final NetconfNode node) {
+            final NetconfNode node) {
         final var builder = NetconfClientConfigurationBuilder.create();
         final var protocol = node.getProtocol();
         if (node.requireTcpOnly()) {
@@ -135,7 +114,11 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             final var keyBased = keyAuth.getKeyBased();
             sshParamsBuilder.setClientIdentity(new ClientIdentityBuilder().setUsername(keyBased.getUsername()).build());
             confBuilder.withSshConfigurator(factoryMgr -> {
-                final var keyPair = getKeyPair(keyBased.getKeyId());
+                final var keyId = keyBased.getKeyId();
+                final var keyPair = credentialProvider.credentialForId(keyId);
+                if (keyPair == null) {
+                    throw new IllegalArgumentException("No keypair found with keyId=" + keyId);
+                }
                 factoryMgr.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
                 final var factory = new UserAuthPublicKeyFactory();
                 factory.setSignatureFactories(factoryMgr.getSignatureFactories());
@@ -156,51 +139,5 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
                     .build())
                 .build())
             .build();
-    }
-
-    private KeyPair getKeyPair(final String keyId) {
-        // public key retrieval logic taken from DatastoreBackedPublicKeyAuth
-        final var dsKeypair = credentialProvider.credentialForId(keyId);
-        if (dsKeypair == null) {
-            throw new IllegalArgumentException("No keypair found with keyId=" + keyId);
-        }
-        final var passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
-        try {
-            return decodePrivateKey(decryptString(dsKeypair.getPrivateKey()), decryptString(passPhrase));
-        } catch (IOException e) {
-            throw new IllegalStateException("Could not decode private key with keyId=" + keyId, e);
-        }
-    }
-
-    private String decryptString(final String encrypted) {
-        final byte[] cryptobytes = Base64.getDecoder().decode(encrypted);
-        final byte[] clearbytes;
-        try {
-            clearbytes = encryptionService.decrypt(cryptobytes);
-        } catch (GeneralSecurityException e) {
-            throw new IllegalStateException("Failed to decrypt", e);
-        }
-        return new String(clearbytes, StandardCharsets.UTF_8);
-    }
-
-
-    @VisibleForTesting
-    static KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {
-        try (var keyReader = new PEMParser(new StringReader(privateKey.replace("\\n", "\n")))) {
-            final var obj = keyReader.readObject();
-
-            final PEMKeyPair keyPair;
-            if (obj instanceof PEMEncryptedKeyPair encrypted) {
-                keyPair = encrypted.decryptKeyPair(new JcePEMDecryptorProviderBuilder()
-                    .setProvider(BCPROV)
-                    .build(passphrase.toCharArray()));
-            } else if (obj instanceof PEMKeyPair plain) {
-                keyPair = plain;
-            } else {
-                throw new IllegalArgumentException("Unhandled private key " + obj.getClass());
-            }
-
-            return new JcaPEMKeyConverter().getKeyPair(keyPair);
-        }
     }
 }
