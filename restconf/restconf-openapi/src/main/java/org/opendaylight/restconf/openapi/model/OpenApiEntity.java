@@ -15,8 +15,7 @@ import org.eclipse.jdt.annotation.NonNull;
  * A response entity for complex generated type.
  */
 public abstract sealed class OpenApiEntity permits ComponentsEntity, InfoEntity, OpenApiVersionEntity, OperationEntity,
-        PathEntity, PathsEntity, SchemaEntity, SchemasEntity, SecurityEntity, SecuritySchemesEntity, ServerEntity,
-        ServersEntity {
+        PathEntity, SchemaEntity, SchemasEntity, SecurityEntity, SecuritySchemesEntity, ServerEntity, ServersEntity {
     /**
      * Generate JSON events into specified generator.
      *
