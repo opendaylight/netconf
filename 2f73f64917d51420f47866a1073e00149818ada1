@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57738a05_e80cf800",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-02T15:52:58Z",
+      "side": 1,
+      "message": "Why? How?",
+      "revId": "2f73f64917d51420f47866a1073e00149818ada1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94d60649_32025e8f",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfDataPutTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-02T15:52:58Z",
+      "side": 1,
+      "message": "This is not testing the issue of inserting multiple elements and checking all are written. This is just copy of previous test.",
+      "revId": "2f73f64917d51420f47866a1073e00149818ada1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
