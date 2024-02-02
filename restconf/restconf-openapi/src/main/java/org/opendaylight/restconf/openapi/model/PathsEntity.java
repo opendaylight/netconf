@@ -23,10 +23,8 @@ public final class PathsEntity extends OpenApiEntity {
 
     @Override
     public void generate(final @NonNull JsonGenerator generator) throws IOException {
-        generator.writeObjectFieldStart("paths");
         for (final var path : paths) {
             path.generate(generator);
         }
-        generator.writeEndObject();
     }
 }
