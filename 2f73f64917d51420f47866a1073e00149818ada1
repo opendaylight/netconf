@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e1d90644_3d26b775",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-02T16:10:26Z",
+      "side": 1,
+      "message": "Why I fixed it that way? I had a conversation with Ruslan since he had related tasks and I came to conclusion that simplest fix like that will suffice.",
+      "parentUuid": "57738a05_e80cf800",
+      "revId": "2f73f64917d51420f47866a1073e00149818ada1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94d60649_32025e8f",
         "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfDataPutTest.java",
         "patchSetId": 4
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-02T15:52:58Z",
       "side": 1,
       "message": "This is not testing the issue of inserting multiple elements and checking all are written. This is just copy of previous test.",
+      "revId": "2f73f64917d51420f47866a1073e00149818ada1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c523bc7_0bf01428",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfDataPutTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-02T16:10:26Z",
+      "side": 1,
+      "message": "Previous test had 2 elements in list and insert after 1st. This is copy - yes, but in inserting after 2nd(i.e. last one). If we don\u0027t need both - I can delete one where we inserting aster 1st element(i.e. previous test) since this one covers both - previous test and fixed bug",
+      "parentUuid": "94d60649_32025e8f",
       "revId": "2f73f64917d51420f47866a1073e00149818ada1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
