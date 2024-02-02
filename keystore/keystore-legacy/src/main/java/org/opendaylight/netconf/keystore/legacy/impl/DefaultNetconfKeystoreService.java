@@ -8,10 +8,17 @@
 package org.opendaylight.netconf.keystore.legacy.impl;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.Provider;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -24,6 +31,12 @@ import java.util.function.Consumer;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -38,6 +51,7 @@ import org.opendaylight.netconf.keystore.legacy.NetconfKeystore;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yangtools.concepts.AbstractObjectRegistration;
 import org.opendaylight.yangtools.concepts.Immutable;
@@ -61,31 +75,43 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
     @NonNullByDefault
     private record ConfigState(
             Map<String, PrivateKey> privateKeys,
-            Map<String, TrustedCertificate> trustedCertificates) implements Immutable {
-        static final ConfigState EMPTY = new ConfigState(Map.of(), Map.of());
+            Map<String, TrustedCertificate> trustedCertificates,
+            Map<String, KeyCredential> credentials) implements Immutable {
+        static final ConfigState EMPTY = new ConfigState(Map.of(), Map.of(), Map.of());
 
         ConfigState {
             privateKeys = Map.copyOf(privateKeys);
             trustedCertificates = Map.copyOf(trustedCertificates);
+            credentials = Map.copyOf(credentials);
         }
     }
 
     @NonNullByDefault
     record ConfigStateBuilder(
             HashMap<String, PrivateKey> privateKeys,
-            HashMap<String, TrustedCertificate> trustedCertificates) implements Mutable {
+            HashMap<String, TrustedCertificate> trustedCertificates,
+            HashMap<String, KeyCredential> credentials) implements Mutable {
         ConfigStateBuilder {
             requireNonNull(privateKeys);
             requireNonNull(trustedCertificates);
+            requireNonNull(credentials);
         }
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultNetconfKeystoreService.class);
+    private static final Provider BCPROV;
+
+    static {
+        final var prov = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
+        BCPROV = prov != null ? prov : new BouncyCastleProvider();
+    }
+
 
     private final Set<ObjectRegistration<Consumer<NetconfKeystore>>> consumers = ConcurrentHashMap.newKeySet();
     private final AtomicReference<NetconfKeystore> keystore = new AtomicReference<>(null);
     private final AtomicReference<ConfigState> config = new AtomicReference<>(ConfigState.EMPTY);
     private final SecurityHelper securityHelper = new SecurityHelper();
+    private final AAAEncryptionService encryptionService;
     private final Registration configListener;
     private final Registration rpcSingleton;
 
@@ -95,6 +121,7 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             @Reference final RpcProviderService rpcProvider,
             @Reference final ClusterSingletonServiceProvider cssProvider,
             @Reference final AAAEncryptionService encryptionService) {
+        this.encryptionService = requireNonNull(encryptionService);
         configListener = dataBroker.registerTreeChangeListener(
             DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
             new ConfigListener(this));
@@ -136,9 +163,9 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
         final var prevState = config.getAcquire();
 
         final var builder = new ConfigStateBuilder(new HashMap<>(prevState.privateKeys),
-            new HashMap<>(prevState.trustedCertificates));
+            new HashMap<>(prevState.trustedCertificates), new HashMap<>(prevState.credentials));
         task.accept(builder);
-        final var newState = new ConfigState(builder.privateKeys, builder.trustedCertificates);
+        final var newState = new ConfigState(builder.privateKeys, builder.trustedCertificates, builder.credentials);
 
         // Careful application -- check if listener is still up and whether the state was not updated.
         if (configListener == null || config.compareAndExchangeRelease(prevState, newState) != prevState) {
@@ -228,12 +255,45 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             certs.put(certName, x509cert);
         }
 
+        final var creds = Maps.<String, KeyPair>newHashMapWithExpectedSize(newState.credentials.size());
+        for (var cred : newState.credentials.values()) {
+            final var keyId = cred.requireKeyId();
+            final String passPhrase;
+            try {
+                passPhrase = decryptString(requireNonNullElse(cred.getPassphrase(), ""));
+            } catch (GeneralSecurityException e) {
+                LOG.debug("Failed to decrypt pass phrase for {}", keyId, e);
+                failure = updateFailure(failure, e);
+                continue;
+            }
+
+            final String privateKey;
+            try {
+                privateKey = decryptString(cred.getPrivateKey());
+            } catch (GeneralSecurityException e) {
+                LOG.debug("Failed to decrypt private key for {}", keyId, e);
+                failure = updateFailure(failure, e);
+                continue;
+            }
+
+            final KeyPair keyPair;
+            try {
+                keyPair = decodePrivateKey(privateKey, passPhrase);
+            } catch (IOException e) {
+                LOG.debug("Failed to decode key pair for {}", keyId, e);
+                failure = updateFailure(failure, e);
+                continue;
+            }
+
+            creds.put(keyId, keyPair);
+        }
+
         if (failure != null) {
             LOG.warn("New configuration is invalid, not applying it", failure);
             return;
         }
 
-        final var newKeystore = new NetconfKeystore(keys, certs);
+        final var newKeystore = new NetconfKeystore(keys, certs, creds);
         keystore.setRelease(newKeystore);
         consumers.forEach(consumer -> consumer.getInstance().accept(newKeystore));
     }
@@ -242,11 +302,35 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
         return Base64.getMimeDecoder().decode(base64.getBytes(StandardCharsets.US_ASCII));
     }
 
+    private String decryptString(final String encrypted) throws GeneralSecurityException {
+        return new String(encryptionService.decrypt(Base64.getDecoder().decode(encrypted)), StandardCharsets.UTF_8);
+    }
+
     private static @NonNull Throwable updateFailure(final @Nullable Throwable failure, final @NonNull Exception ex) {
         if (failure != null) {
             failure.addSuppressed(ex);
             return failure;
         }
         return ex;
+    }
+
+    @VisibleForTesting
+    static KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {
+        try (var keyReader = new PEMParser(new StringReader(privateKey.replace("\\n", "\n")))) {
+            final var obj = keyReader.readObject();
+
+            final PEMKeyPair keyPair;
+            if (obj instanceof PEMEncryptedKeyPair encrypted) {
+                keyPair = encrypted.decryptKeyPair(new JcePEMDecryptorProviderBuilder()
+                    .setProvider(BCPROV)
+                    .build(passphrase.toCharArray()));
+            } else if (obj instanceof PEMKeyPair plain) {
+                keyPair = plain;
+            } else {
+                throw new IOException("Unhandled private key " + obj.getClass());
+            }
+
+            return new JcaPEMKeyConverter().getKeyPair(keyPair);
+        }
     }
 }
