@@ -7,28 +7,19 @@
  */
 package org.opendaylight.netconf.callhome.mount.tls;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
-
+import com.google.common.collect.ImmutableMultimap;
 import io.netty.channel.Channel;
 import io.netty.handler.ssl.SslHandler;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.PublicKey;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
-import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -36,8 +27,8 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsAuthProvider;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
+import org.opendaylight.netconf.keystore.legacy.NetconfKeystore;
+import org.opendaylight.netconf.keystore.legacy.NetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.NetconfCallhomeServer;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.AllowedDevices;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev240129.netconf.callhome.server.allowed.devices.Device;
@@ -59,24 +50,22 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
 
     private final ConcurrentMap<String, String> deviceToPrivateKey = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, String> deviceToCertificate = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, PublicKey> certificateToPublicKey = new ConcurrentHashMap<>();
     private final Registration allowedDevicesReg;
     private final Registration certificatesReg;
     private final SslHandlerFactory sslHandlerFactory;
 
+    private volatile ImmutableMultimap<PublicKey, String> publicKeyToName = ImmutableMultimap.of();
+
     @Inject
     @Activate
-    public CallHomeMountTlsAuthProvider(
-            final @Reference SslHandlerFactoryProvider sslHandlerFactoryProvider,
-            final @Reference DataBroker dataBroker) {
+    public CallHomeMountTlsAuthProvider(final @Reference SslHandlerFactoryProvider sslHandlerFactoryProvider,
+            final @Reference DataBroker dataBroker, final @Reference NetconfKeystoreService keystoreService) {
         sslHandlerFactory = sslHandlerFactoryProvider.getSslHandlerFactory(null);
         allowedDevicesReg = dataBroker.registerTreeChangeListener(
             DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION,
                 InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class)),
             new AllowedDevicesMonitor());
-        certificatesReg = dataBroker.registerTreeChangeListener(
-            DataTreeIdentifier.of(LogicalDatastoreType.CONFIGURATION, InstanceIdentifier.create(Keystore.class)),
-            new CertificatesMonitor());
+        certificatesReg = keystoreService.registerKeystoreConsumer(this::updateCertificates);
     }
 
     @PreDestroy
@@ -87,17 +76,20 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
         certificatesReg.close();
     }
 
+    private void updateCertificates(final NetconfKeystore keystore) {
+        final var builder = ImmutableMultimap.<PublicKey, String>builder();
+        keystore.trustedCertificates().forEach((name, cert) -> builder.put(cert.getPublicKey(), name));
+        publicKeyToName = builder.build();
+    }
+
     @Override
     public String idFor(final PublicKey key) {
         // Find certificate names by the public key
-        final var certificates = certificateToPublicKey.entrySet().stream()
-            .filter(v -> key.equals(v.getValue()))
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toSet());
+        final var certificateNames = publicKeyToName.get(key);
 
         // Find devices names associated with a certificate name
         final var deviceNames = deviceToCertificate.entrySet().stream()
-            .filter(v -> certificates.contains(v.getValue()))
+            .filter(v -> certificateNames.contains(v.getValue()))
             .map(Map.Entry::getKey)
             .toList();
 
@@ -118,58 +110,6 @@ public final class CallHomeMountTlsAuthProvider implements CallHomeTlsAuthProvid
     @Override
     public SslHandler createSslHandler(final Channel channel) {
         return sslHandlerFactory.createSslHandler(Set.copyOf(deviceToPrivateKey.values()));
-    }
-
-    private final class CertificatesMonitor implements DataTreeChangeListener<Keystore> {
-        @Override
-        public void onDataTreeChanged(final List<DataTreeModification<Keystore>> changes) {
-            changes.stream()
-                .map(DataTreeModification::getRootNode)
-                .flatMap(v -> v.modifiedChildren().stream())
-                .filter(v -> v.dataType().equals(TrustedCertificate.class))
-                .map(v -> (DataObjectModification<TrustedCertificate>) v)
-                .forEach(this::updateCertificate);
-        }
-
-        private void updateCertificate(final DataObjectModification<TrustedCertificate> change) {
-            switch (change.modificationType()) {
-                case DELETE -> deleteCertificate(change.dataBefore());
-                case SUBTREE_MODIFIED, WRITE -> {
-                    deleteCertificate(change.dataBefore());
-                    writeCertificate(change.dataAfter());
-                }
-                default -> {
-                    // Should never happen
-                }
-            }
-        }
-
-        private void deleteCertificate(final TrustedCertificate dataBefore) {
-            if (dataBefore != null) {
-                LOG.debug("Removing public key mapping for certificate {}", dataBefore.getName());
-                certificateToPublicKey.remove(dataBefore.getName());
-            }
-        }
-
-        private void writeCertificate(final TrustedCertificate dataAfter) {
-            if (dataAfter != null) {
-                LOG.debug("Adding public key mapping for certificate {}", dataAfter.getName());
-                certificateToPublicKey.putIfAbsent(dataAfter.getName(), buildPublicKey(dataAfter.getCertificate()));
-            }
-        }
-
-        private PublicKey buildPublicKey(final String encoded) {
-            final byte[] decoded = Base64.getMimeDecoder().decode(encoded.getBytes(US_ASCII));
-            try {
-                final CertificateFactory factory = CertificateFactory.getInstance("X.509");
-                try (InputStream in = new ByteArrayInputStream(decoded)) {
-                    return factory.generateCertificate(in).getPublicKey();
-                }
-            } catch (final CertificateException | IOException e) {
-                LOG.error("Unable to build X.509 certificate from encoded value: {}", e.getLocalizedMessage());
-            }
-            return null;
-        }
     }
 
     private final class AllowedDevicesMonitor implements DataTreeChangeListener<Device> {
