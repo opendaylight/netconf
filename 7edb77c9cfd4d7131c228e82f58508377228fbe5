@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3a50d60_0b5a185d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-02T15:38:54Z",
+      "side": 1,
+      "message": "In fact, we would like to have simplification made in https://git.opendaylight.org/gerrit/c/netconf/+/109796 but with iterator 😊",
+      "revId": "7edb77c9cfd4d7131c228e82f58508377228fbe5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
