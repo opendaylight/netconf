@@ -7,8 +7,10 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,36 +47,83 @@ public final class SchemasStream extends InputStream {
     private final OpenApiBodyWriter writer;
     private final EffectiveModelContext context;
     private final boolean isForSingleModule;
+    private final ByteArrayOutputStream stream;
+    private final JsonGenerator generator;
 
     private Reader reader;
     private ReadableByteChannel channel;
+    private boolean eof;
 
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
-            final Iterator<? extends Module> iterator, final boolean isForSingleModule) {
+            final Iterator<? extends Module> iterator, final boolean isForSingleModule,
+            final ByteArrayOutputStream stream, final JsonGenerator generator) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
         this.isForSingleModule = isForSingleModule;
+        this.stream = stream;
+        this.generator = generator;
     }
 
     @Override
     public int read() throws IOException {
-        if (reader == null) {
-            reader = new BufferedReader(
-                new InputStreamReader(new ByteArrayInputStream(writeNextEntity(
-                    new SchemasEntity(toComponents(iterator, context, isForSingleModule)))),
-                    StandardCharsets.UTF_8));
+        if (eof) {
+            return -1;
         }
-        return reader.read();
+        if (reader == null) {
+            generator.writeObjectFieldStart("schemas");
+            generator.flush();
+            reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
+            stream.reset();
+        }
+        var read = reader.read();
+        while (read == -1) {
+            if (iterator.hasNext()) {
+                reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(writeNextEntity(
+                        new SchemasEntity(toComponents(iterator.next(), context, isForSingleModule)))),
+                        StandardCharsets.UTF_8));
+                read = reader.read();
+                continue;
+            }
+            generator.writeEndObject();
+            generator.flush();
+            reader = new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
+            stream.reset();
+            eof = true;
+            return reader.read();
+        }
+        return read;
     }
 
     @Override
     public int read(final byte[] array, final int off, final int len) throws IOException {
-        if (channel == null) {
-            channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(
-                new SchemasEntity(toComponents(iterator, context, isForSingleModule)))));
+        if (eof) {
+            return -1;
         }
-        return channel.read(ByteBuffer.wrap(array, off, len));
+        if (channel == null) {
+            generator.writeObjectFieldStart("schemas");
+            generator.flush();
+            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
+            stream.reset();
+        }
+        var read = channel.read(ByteBuffer.wrap(array, off, len));
+        while (read == -1) {
+            if (iterator.hasNext()) {
+                channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(
+                        new SchemasEntity(toComponents(iterator.next(), context, isForSingleModule)))));
+                read = channel.read(ByteBuffer.wrap(array, off, len));
+                continue;
+            }
+            generator.writeEndObject();
+            generator.flush();
+            channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
+            stream.reset();
+            eof = true;
+            return channel.read(ByteBuffer.wrap(array, off, len));
+        }
+        return read;
     }
 
     private byte[] writeNextEntity(final OpenApiEntity next) throws IOException {
@@ -82,58 +131,55 @@ public final class SchemasStream extends InputStream {
         return writer.readFrom();
     }
 
-    private static Deque<SchemaEntity> toComponents(final Iterator<? extends Module> iterator,
-            final EffectiveModelContext context, final boolean isForSingleModule) {
+    private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context,
+            final boolean isForSingleModule) {
         final var result = new ArrayDeque<SchemaEntity>();
-        while (iterator.hasNext()) {
-            final var module = iterator.next();
-            final var definitionNames = new DefinitionNames();
-            final var stack = SchemaInferenceStack.of(context);
-            final var moduleName = module.getName();
-            if (isForSingleModule) {
-                definitionNames.addUnlinkedName(moduleName + "_module");
-            }
-            final var children = new ArrayList<DataSchemaNode>();
-            for (final var rpc : module.getRpcs()) {
-                stack.enterSchemaTree(rpc.getQName());
-                final var rpcName = rpc.getQName().getLocalName();
-                final var rpcInput = rpc.getInput();
-                if (!rpcInput.getChildNodes().isEmpty()) {
-                    final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, null,
-                        OBJECT_TYPE, stack, moduleName, false, definitionNames, EntityType.RPC);
-                    result.add(input);
-                    stack.enterSchemaTree(rpcInput.getQName());
-                    for (final var child : rpcInput.getChildNodes()) {
-                        if (!children.contains(child)) {
-                            children.add(child);
-                            processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName,
-                                false);
-                        }
+        final var definitionNames = new DefinitionNames();
+        final var stack = SchemaInferenceStack.of(context);
+        final var moduleName = module.getName();
+        if (isForSingleModule) {
+            definitionNames.addUnlinkedName(moduleName + "_module");
+        }
+        final var children = new ArrayList<DataSchemaNode>();
+        for (final var rpc : module.getRpcs()) {
+            stack.enterSchemaTree(rpc.getQName());
+            final var rpcName = rpc.getQName().getLocalName();
+            final var rpcInput = rpc.getInput();
+            if (!rpcInput.getChildNodes().isEmpty()) {
+                final var input = new SchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, null,
+                    OBJECT_TYPE, stack, moduleName, false, definitionNames, EntityType.RPC);
+                result.add(input);
+                stack.enterSchemaTree(rpcInput.getQName());
+                for (final var child : rpcInput.getChildNodes()) {
+                    if (!children.contains(child)) {
+                        children.add(child);
+                        processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName,
+                            false);
                     }
-                    stack.exit();
-                }
-                final var rpcOutput = rpc.getOutput();
-                if (!rpcOutput.getChildNodes().isEmpty()) {
-                    final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, null,
-                        OBJECT_TYPE, stack, moduleName, false, definitionNames, EntityType.RPC);
-                    result.add(output);
-                    stack.enterSchemaTree(rpcOutput.getQName());
-                    for (final var child : rpcOutput.getChildNodes()) {
-                        if (!children.contains(child)) {
-                            children.add(child);
-                            processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName,
-                                false);
-                        }
-                    }
-                    stack.exit();
                 }
                 stack.exit();
             }
-
-            for (final var childNode : module.getChildNodes()) {
-                processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
-                    true);
+            final var rpcOutput = rpc.getOutput();
+            if (!rpcOutput.getChildNodes().isEmpty()) {
+                final var output = new SchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, null,
+                    OBJECT_TYPE, stack, moduleName, false, definitionNames, EntityType.RPC);
+                result.add(output);
+                stack.enterSchemaTree(rpcOutput.getQName());
+                for (final var child : rpcOutput.getChildNodes()) {
+                    if (!children.contains(child)) {
+                        children.add(child);
+                        processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName,
+                            false);
+                    }
+                }
+                stack.exit();
             }
+            stack.exit();
+        }
+
+        for (final var childNode : module.getChildNodes()) {
+            processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
+                true);
         }
         return result;
     }
