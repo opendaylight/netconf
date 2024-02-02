@@ -7,16 +7,16 @@
  */
 package org.opendaylight.netconf.client.mdsal.api;
 
+import java.security.KeyPair;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
 
 public interface CredentialProvider {
     /**
-     * Get the a {@link KeyCredential} for a particular id.
+     * Get the a {@link KeyPair} for a particular id.
      *
      * @param id Credential id
-     * @return A {@link KeyCredential} object, {@code null} if not found
+     * @return A {@link KeyPair} object, {@code null} if not found
      * @throws NullPointerException if {@code id} is {@code null}
      */
-    @Nullable KeyCredential credentialForId(String id);
+    @Nullable KeyPair credentialForId(String id);
 }

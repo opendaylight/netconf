@@ -7,20 +7,33 @@
  */
 package org.opendaylight.netconf.keystore.legacy.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
+import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.eclipse.jdt.annotation.NonNull;
 
 final class SecurityHelper {
     private CertificateFactory certFactory;
     private KeyFactory dsaFactory;
     private KeyFactory rsaFactory;
+    private Provider bcProv;
 
     @NonNull PrivateKey generatePrivateKey(final byte[] privateKey) throws GeneralSecurityException {
         final var keySpec = new PKCS8EncodedKeySpec(privateKey);
@@ -47,5 +60,30 @@ final class SecurityHelper {
             certFactory = CertificateFactory.getInstance("X.509");
         }
         return (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(certificate));
+    }
+
+    @VisibleForTesting
+    KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {
+        if (bcProv == null) {
+            final var prov = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
+            bcProv = prov != null ? prov : new BouncyCastleProvider();
+        }
+
+        try (var keyReader = new PEMParser(new StringReader(privateKey.replace("\\n", "\n")))) {
+            final var obj = keyReader.readObject();
+
+            final PEMKeyPair keyPair;
+            if (obj instanceof PEMEncryptedKeyPair encrypted) {
+                keyPair = encrypted.decryptKeyPair(new JcePEMDecryptorProviderBuilder()
+                    .setProvider(bcProv)
+                    .build(passphrase.toCharArray()));
+            } else if (obj instanceof PEMKeyPair plain) {
+                keyPair = plain;
+            } else {
+                throw new IOException("Unhandled private key " + obj.getClass());
+            }
+
+            return new JcaPEMKeyConverter().getKeyPair(keyPair);
+        }
     }
 }
