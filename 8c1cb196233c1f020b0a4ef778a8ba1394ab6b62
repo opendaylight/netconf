@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9734879e_87af0078",
+        "filename": "keystore/keystore-legacy/src/main/java/org/opendaylight/netconf/keystore/legacy/impl/ConfigListener.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-04T00:30:18Z",
+      "side": 1,
+      "message": "credentials",
+      "range": {
+        "startLine": 85,
+        "startChar": 43,
+        "endLine": 85,
+        "endChar": 62
+      },
+      "revId": "8c1cb196233c1f020b0a4ef778a8ba1394ab6b62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2ff5f49_bb9802eb",
+        "filename": "keystore/keystore-legacy/src/main/java/org/opendaylight/netconf/keystore/legacy/impl/SecurityHelper.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-04T00:30:18Z",
+      "side": 1,
+      "message": "remove this",
+      "range": {
+        "startLine": 65,
+        "startChar": 5,
+        "endLine": 65,
+        "endChar": 22
+      },
+      "revId": "8c1cb196233c1f020b0a4ef778a8ba1394ab6b62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
