@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.callhome.mount;
+package org.opendaylight.netconf.callhome;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -20,12 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
-import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshSessionContext;
-import org.opendaylight.netconf.callhome.server.ssh.CallHomeSshSessionContextManager;
-import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsAuthProvider;
-import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsSessionContext;
-import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsSessionContextManager;
 import org.opendaylight.netconf.client.NetconfClientFactory;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -93,7 +87,7 @@ import org.osgi.service.component.annotations.Reference;
  * <ul>
  *     <li>When incoming connection is identified the {@link CallHomeSshSessionContext} instance expected to be created.
  *     The createContext() method is invoked within protocol associated
- *     {@link org.opendaylight.netconf.callhome.server.CallHomeSessionContextManager CallHomeSessionContextManager} --
+ *     {@link org.opendaylight.netconf.callhome.CallHomeSessionContextManager CallHomeSessionContextManager} --
  *     see {@link #createSshSessionContextManager()} and
  *     {@link #createTlsSessionContextManager(CallHomeTlsAuthProvider, CallHomeStatusRecorder)}</li>
  *     <li>Due to both {@link NetconfClientSessionListener} and {@link SettableFuture} are required to build session
@@ -101,7 +95,7 @@ import org.osgi.service.component.annotations.Reference;
  *     composed via {@link #asNode(String, SocketAddress, Protocol)}. This triggers Netconf client construct/connect
  *     logic (as explained above) resulting captured object placed into {@link #netconfLayerMapping}.</li>
  *     <li>Accepted instance of {@link NetconfClientSessionListener} is used to establish Netconf layer --
- *     see {@link org.opendaylight.netconf.callhome.server.CallHomeTransportChannelListener
+ *     see {@link org.opendaylight.netconf.callhome.CallHomeTransportChannelListener
  *     CallHomeTransportChannelListener} </li>
  *     <li>Accepted instance of {@link SettableFuture} (representing connection to remote device) is used to
  *     signal connection state to topology component</li>

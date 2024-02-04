@@ -5,14 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.callhome.server.tls;
+package org.opendaylight.netconf.callhome;
 
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
-import org.opendaylight.netconf.callhome.server.CallHomeSessionContext;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 

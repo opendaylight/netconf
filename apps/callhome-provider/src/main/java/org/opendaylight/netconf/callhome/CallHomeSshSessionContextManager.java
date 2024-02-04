@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.callhome.server.ssh;
+package org.opendaylight.netconf.callhome;
 
 import static java.util.Objects.requireNonNull;
 
@@ -14,7 +14,6 @@ import io.netty.channel.Channel;
 import java.net.SocketAddress;
 import java.util.Map;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.netconf.callhome.server.AbstractCallHomeSessionContextManager;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 

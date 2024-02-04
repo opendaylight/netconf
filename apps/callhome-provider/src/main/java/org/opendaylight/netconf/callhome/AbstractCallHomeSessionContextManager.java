@@ -5,15 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.callhome.server;
+package org.opendaylight.netconf.callhome;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public abstract class AbstractCallHomeSessionContextManager<T extends CallHomeSessionContext>
         implements CallHomeSessionContextManager<T> {
-
-    protected final Map<String, T> contexts = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<String, T> contexts = new ConcurrentHashMap<>();
 
     @Override
     public void register(final T context) {

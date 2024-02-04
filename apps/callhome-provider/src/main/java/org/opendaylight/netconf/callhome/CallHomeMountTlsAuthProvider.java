@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.callhome.mount.tls;
+package org.opendaylight.netconf.callhome;
 
 import com.google.common.collect.ImmutableMultimap;
 import io.netty.handler.ssl.SslContext;
@@ -24,7 +24,6 @@ import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.callhome.server.tls.CallHomeTlsAuthProvider;
 import org.opendaylight.netconf.client.SslContextFactory;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.keystore.legacy.NetconfKeystore;

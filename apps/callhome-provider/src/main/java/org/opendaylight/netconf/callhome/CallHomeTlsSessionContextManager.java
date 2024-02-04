@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.callhome.server.tls;
+package org.opendaylight.netconf.callhome;
 
 import static java.util.Objects.requireNonNull;
 
@@ -14,8 +14,6 @@ import io.netty.channel.Channel;
 import io.netty.handler.ssl.SslHandler;
 import java.security.PublicKey;
 import javax.net.ssl.SSLPeerUnverifiedException;
-import org.opendaylight.netconf.callhome.server.AbstractCallHomeSessionContextManager;
-import org.opendaylight.netconf.callhome.server.CallHomeStatusRecorder;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
