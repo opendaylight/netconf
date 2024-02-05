@@ -43,9 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(MountPointOpenApi.class);
-
     private static final String DATASTORES_REVISION = "-";
     private static final String DATASTORES_LABEL = "Datastores";
 
@@ -55,7 +53,6 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     private final Map<YangInstanceIdentifier, Long> instanceIdToLongId =
             new ConcurrentSkipListMap<>((o1, o2) -> o1.toString().compareToIgnoreCase(o2.toString()));
     private final Map<Long, YangInstanceIdentifier> longIdToInstanceId = new ConcurrentHashMap<>();
-
     private final AtomicLong idKey = new AtomicLong(0);
 
     private Registration registration;

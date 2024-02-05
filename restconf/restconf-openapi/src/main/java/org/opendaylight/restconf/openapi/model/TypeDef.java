@@ -31,7 +31,6 @@ public class TypeDef {
         return defaultValue != null;
     }
 
-
     public Object getExample() {
         return example;
     }
@@ -43,7 +42,6 @@ public class TypeDef {
     public boolean hasExample() {
         return example != null;
     }
-
 
     public String getFormat() {
         return format;
@@ -57,7 +55,6 @@ public class TypeDef {
         return format != null;
     }
 
-
     public Integer getMinItems() {
         return minItems;
     }
@@ -69,7 +66,6 @@ public class TypeDef {
     public boolean hasMinItems() {
         return minItems != null;
     }
-
 
     public Boolean getUniqueItems() {
         return uniqueItems;
@@ -83,7 +79,6 @@ public class TypeDef {
         return uniqueItems != null;
     }
 
-
     public List<String> getEnums() {
         return enums;
     }
@@ -96,7 +91,6 @@ public class TypeDef {
         return enums != null;
     }
 
-
     public Integer getMinLength() {
         return minLength;
     }
@@ -108,7 +102,6 @@ public class TypeDef {
     public boolean hasMinLength() {
         return minLength != null;
     }
-
 
     public Integer getMaxLength() {
         return maxLength;
