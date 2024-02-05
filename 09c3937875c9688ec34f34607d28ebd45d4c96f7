@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6e7edd0_2aafed41",
+        "filename": "keystore/keystore-legacy/src/main/yang/netconf-keystore.yang",
+        "patchSetId": 19
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-05T09:54:16Z",
+      "side": 1,
+      "message": "This is also supposed to be binary.",
+      "revId": "09c3937875c9688ec34f34607d28ebd45d4c96f7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
