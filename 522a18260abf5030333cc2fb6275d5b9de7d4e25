@@ -16,6 +16,24 @@
       "message": "What is the format for the key? IMHO the meaning of changes we do is that in RPC we are using plain string and in datastore we are using base 64.",
       "revId": "522a18260abf5030333cc2fb6275d5b9de7d4e25",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4750914_0292f5cd",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-05T11:16:24Z",
+      "side": 1,
+      "message": "This needs to be addressed.",
+      "parentUuid": "07e066fd_0ae12788",
+      "revId": "522a18260abf5030333cc2fb6275d5b9de7d4e25",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
