@@ -1196,7 +1196,6 @@
           "name": "mandatory-list",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-container_mandatory-list",
         "type": "object"
       },
@@ -1264,7 +1263,6 @@
           "name": "root-container",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-container",
         "type": "object"
       },
@@ -1286,7 +1284,6 @@
           "name": "optional-list",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-container_optional-list",
         "type": "object"
       },
@@ -1302,7 +1299,6 @@
           "name": "optional-presence-container",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-container_optional-presence-container",
         "type": "object"
       },
@@ -1324,7 +1320,6 @@
           "name": "root-optional-list",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-optional-list",
         "type": "object"
       },
@@ -1346,7 +1341,6 @@
           "name": "root-mandatory-list",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-mandatory-list",
         "type": "object"
       },
@@ -1379,7 +1373,6 @@
           "name": "mandatory-container",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-container_mandatory-container",
         "type": "object"
       }

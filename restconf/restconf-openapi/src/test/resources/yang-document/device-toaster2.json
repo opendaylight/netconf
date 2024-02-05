@@ -1678,7 +1678,6 @@
           "name": "cont1",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_lst_cont1",
         "type": "object"
       },
@@ -1736,7 +1735,6 @@
           "name": "lst",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_lst",
         "type": "object"
       },
@@ -1790,7 +1788,6 @@
           "name": "lst1",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_lst_lst1",
         "type": "object"
       },
@@ -1812,7 +1809,6 @@
           "name": "cont11",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_lst_cont1_cont11",
         "type": "object"
       },
@@ -1829,7 +1825,6 @@
           "name": "slotInfo",
           "namespace": "http://netconfcentral.org/ns/toaster/augmented"
         },
-        "description": "",
         "title": "toaster2_toaster_toasterSlot_slotInfo",
         "type": "object"
       },
@@ -1848,7 +1843,6 @@
           "name": "toasterSlot",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_toaster_toasterSlot",
         "type": "object"
       },
@@ -1864,7 +1858,6 @@
           "name": "lst11",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_lst_cont1_lst11",
         "type": "object"
       },

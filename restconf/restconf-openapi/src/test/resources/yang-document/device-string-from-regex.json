@@ -208,7 +208,6 @@
           "name": "test",
           "namespace": "urn:ietf:params:xml:ns:yang:strings:regex"
         },
-        "description": "",
         "title": "strings-from-regex_test",
         "type": "object"
       }

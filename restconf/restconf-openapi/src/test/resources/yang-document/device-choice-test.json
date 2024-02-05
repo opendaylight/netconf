@@ -324,7 +324,6 @@
           "name": "first-container",
           "namespace": "urn:opendaylight:choice-test"
         },
-        "description": "",
         "title": "choice-test_first-container",
         "type": "object"
       },
@@ -340,7 +339,6 @@
           "name": "second-container",
           "namespace": "urn:opendaylight:choice-test"
         },
-        "description": "",
         "title": "choice-test_second-container",
         "type": "object"
       }

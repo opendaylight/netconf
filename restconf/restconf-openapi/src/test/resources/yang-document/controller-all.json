@@ -11802,7 +11802,6 @@
           "name": "cont1",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_lst_cont1",
         "type": "object"
       },
@@ -11855,7 +11854,6 @@
           "name": "boolean",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_boolean",
         "type": "object"
       },
@@ -11876,7 +11874,6 @@
           "name": "instance-identifier",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_instance-identifier",
         "type": "object"
       },
@@ -11890,7 +11887,6 @@
           "name": "root-container",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container",
         "type": "object"
       },
@@ -11916,7 +11912,6 @@
           "name": "bits",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_bits",
         "type": "object"
       },
@@ -11934,7 +11929,6 @@
           "name": "container-root",
           "namespace": "urn:opendaylight:test:recursive"
         },
-        "description": "",
         "title": "recursive_container-root",
         "type": "object"
       },
@@ -12064,7 +12058,6 @@
           "name": "typed",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed",
         "type": "object"
       },
@@ -12104,7 +12097,6 @@
           "name": "uint32",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_uint32",
         "type": "object"
       },
@@ -12120,7 +12112,6 @@
           "name": "super-nested-list",
           "namespace": "urn:opendaylight:test:recursive"
         },
-        "description": "",
         "title": "recursive_container-root_root-list_nested-list_super-nested-list",
         "type": "object"
       },
@@ -12142,7 +12133,6 @@
           "name": "int16",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_int16",
         "type": "object"
       },
@@ -12179,7 +12169,6 @@
           "name": "decimal64",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_decimal64",
         "type": "object"
       },
@@ -12196,7 +12185,6 @@
           "name": "binary-container",
           "namespace": "urn:definition-test"
         },
-        "description": "",
         "title": "definition-test_binary-container",
         "type": "object"
       },
@@ -12260,7 +12248,6 @@
           "name": "string",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_string",
         "type": "object"
       },
@@ -12297,7 +12284,6 @@
           "name": "union-container",
           "namespace": "urn:definition-test"
         },
-        "description": "",
         "title": "definition-test_union-container",
         "type": "object"
       },
@@ -12323,7 +12309,6 @@
           "name": "lst",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_lst",
         "type": "object"
       },
@@ -12337,7 +12322,6 @@
           "name": "multi-container",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "description": "",
         "title": "action-types_multi-container",
         "type": "object"
       },
@@ -12358,7 +12342,6 @@
           "name": "binary",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_binary",
         "type": "object"
       },
@@ -12380,7 +12363,6 @@
           "name": "root-mandatory-list",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-mandatory-list",
         "type": "object"
       },
@@ -12390,7 +12372,6 @@
           "name": "inner-container",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "description": "",
         "title": "action-types_multi-container_inner-container",
         "type": "object"
       },
@@ -12422,7 +12403,6 @@
           "name": "test",
           "namespace": "urn:ietf:params:xml:ns:yang:strings:regex"
         },
-        "description": "",
         "title": "strings-from-regex_test",
         "type": "object"
       },
@@ -12455,7 +12435,6 @@
           "name": "mandatory-container",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-container_mandatory-container",
         "type": "object"
       },
@@ -12465,7 +12444,6 @@
           "name": "container",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "description": "",
         "title": "action-types_container",
         "type": "object"
       },
@@ -12487,7 +12465,6 @@
           "name": "int64",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_int64",
         "type": "object"
       },
@@ -12508,7 +12485,6 @@
           "name": "uint64",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_uint64",
         "type": "object"
       },
@@ -12530,7 +12506,6 @@
           "name": "optional-list",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-container_optional-list",
         "type": "object"
       },
@@ -12582,7 +12557,6 @@
           "name": "mandatory-list",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container_nested-container_mandatory-list",
         "type": "object"
       },
@@ -12607,7 +12581,6 @@
           "name": "cont",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont",
         "type": "object"
       },
@@ -12626,7 +12599,6 @@
           "name": "toasterSlot",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_toaster_toasterSlot",
         "type": "object"
       },
@@ -12642,7 +12614,6 @@
           "name": "list2",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont_list1_list2",
         "type": "object"
       },
@@ -12668,7 +12639,6 @@
           "name": "enumeration",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_enumeration",
         "type": "object"
       },
@@ -12690,7 +12660,6 @@
           "name": "union",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_union",
         "type": "object"
       },
@@ -12706,7 +12675,6 @@
           "name": "list",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "description": "",
         "title": "action-types_list",
         "type": "object"
       },
@@ -12722,7 +12690,6 @@
           "name": "list4",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont_list1_list4",
         "type": "object"
       },
@@ -12772,7 +12739,6 @@
           "name": "number-container",
           "namespace": "urn:definition-test"
         },
-        "description": "",
         "title": "definition-test_number-container",
         "type": "object"
       },
@@ -12788,7 +12754,6 @@
           "name": "list-nested-container",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container",
         "type": "object"
       },
@@ -12811,7 +12776,6 @@
           "name": "nested-list",
           "namespace": "urn:opendaylight:test:recursive"
         },
-        "description": "",
         "title": "recursive_container-root_root-list_nested-list",
         "type": "object"
       },
@@ -12851,7 +12815,6 @@
           "name": "nested-container",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container_nested-container",
         "type": "object"
       },
@@ -12867,7 +12830,6 @@
           "name": "optional-presence-container",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-container_optional-presence-container",
         "type": "object"
       },
@@ -12889,7 +12851,6 @@
           "name": "root-optional-list",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-optional-list",
         "type": "object"
       },
@@ -12910,7 +12871,6 @@
           "name": "enum-container",
           "namespace": "urn:definition-test"
         },
-        "description": "",
         "title": "definition-test_enum-container",
         "type": "object"
       },
@@ -12920,7 +12880,6 @@
           "name": "cont2",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont_list1_cont2",
         "type": "object"
       },
@@ -12945,7 +12904,6 @@
           "name": "mandatory-list",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-container_mandatory-list",
         "type": "object"
       },
@@ -12959,7 +12917,6 @@
           "name": "root-container-two-keys",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-two-keys",
         "type": "object"
       },
@@ -13002,7 +12959,6 @@
           "name": "nested-container-unique",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-unique_nested-container-unique",
         "type": "object"
       },
@@ -13070,7 +13026,6 @@
           "name": "root-container",
           "namespace": "http://example.com/test"
         },
-        "description": "",
         "title": "mandatory-test_root-container",
         "type": "object"
       },
@@ -13092,7 +13047,6 @@
           "name": "int32",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_int32",
         "type": "object"
       },
@@ -13132,7 +13086,6 @@
           "name": "nested-container-two-keys",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-two-keys_nested-container-two-keys",
         "type": "object"
       },
@@ -13152,7 +13105,6 @@
           "name": "empty",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_empty",
         "type": "object"
       },
@@ -13169,7 +13121,6 @@
           "name": "slotInfo",
           "namespace": "http://netconfcentral.org/ns/toaster/augmented"
         },
-        "description": "",
         "title": "toaster2_toaster_toasterSlot_slotInfo",
         "type": "object"
       },
@@ -13191,7 +13142,6 @@
           "name": "uint16",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_uint16",
         "type": "object"
       },
@@ -13207,7 +13157,6 @@
           "name": "second-container",
           "namespace": "urn:opendaylight:choice-test"
         },
-        "description": "",
         "title": "choice-test_second-container",
         "type": "object"
       },
@@ -13328,7 +13277,6 @@
           "name": "uint8",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_uint8",
         "type": "object"
       },
@@ -13375,7 +13323,6 @@
           "name": "lst1",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_lst_lst1",
         "type": "object"
       },
@@ -13397,7 +13344,6 @@
           "name": "cont11",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_lst_cont1_cont11",
         "type": "object"
       },
@@ -13429,7 +13375,6 @@
           "name": "mandatory-list-unique",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique",
         "type": "object"
       },
@@ -13445,7 +13390,6 @@
           "name": "lst11",
           "namespace": "http://netconfcentral.org/ns/toaster2"
         },
-        "description": "",
         "title": "toaster2_lst_cont1_lst11",
         "type": "object"
       },
@@ -13461,7 +13405,6 @@
           "name": "data",
           "namespace": "urn:opendaylight:params:xml:ns:yang:my-yang"
         },
-        "description": "",
         "title": "my-yang_data",
         "type": "object"
       },
@@ -13483,7 +13426,6 @@
           "name": "int8",
           "namespace": "urn:typed-params"
         },
-        "description": "",
         "title": "typed-params_typed_int8",
         "type": "object"
       },
@@ -13524,7 +13466,6 @@
           "name": "root-list",
           "namespace": "urn:opendaylight:test:recursive"
         },
-        "description": "",
         "title": "recursive_container-root_root-list",
         "type": "object"
       },
@@ -13538,7 +13479,6 @@
           "name": "root-container-unique",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-unique",
         "type": "object"
       },
@@ -13555,7 +13495,6 @@
           "name": "first-container",
           "namespace": "urn:opendaylight:choice-test"
         },
-        "description": "",
         "title": "choice-test_first-container",
         "type": "object"
       },
@@ -13590,7 +13529,6 @@
           "name": "network-container",
           "namespace": "urn:definition-test"
         },
-        "description": "",
         "title": "definition-test_network-container",
         "type": "object"
       },
@@ -13623,7 +13561,6 @@
           "name": "list1",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont_list1",
         "type": "object"
       },
@@ -13639,7 +13576,6 @@
           "name": "list3",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont_list3",
         "type": "object"
       },
@@ -13669,7 +13605,6 @@
           "name": "mandatory-list-two-keys",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys",
         "type": "object"
       }

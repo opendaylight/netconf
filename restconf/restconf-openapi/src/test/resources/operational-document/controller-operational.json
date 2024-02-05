@@ -590,7 +590,6 @@
           "name": "config-container",
           "namespace": "urn:opendaylight:oper"
         },
-        "description": "",
         "title": "operational_root_config-container",
         "type": "object"
       },
@@ -609,7 +608,6 @@
           "name": "root",
           "namespace": "urn:opendaylight:oper"
         },
-        "description": "",
         "title": "operational_root",
         "type": "object"
       },
@@ -625,7 +623,6 @@
           "name": "oper-container-list",
           "namespace": "urn:opendaylight:oper"
         },
-        "description": "",
         "title": "operational_root_oper-container_oper-container-list",
         "type": "object"
       },
@@ -649,7 +646,6 @@
           "name": "config-container",
           "namespace": "urn:opendaylight:oper"
         },
-        "description": "",
         "title": "operational_root_oper-container_config-container",
         "type": "object"
       },
@@ -691,7 +687,6 @@
           "name": "oper-container",
           "namespace": "urn:opendaylight:oper"
         },
-        "description": "",
         "title": "operational_root_oper-container",
         "type": "object"
       },
@@ -707,7 +702,6 @@
           "name": "config-container-oper-list",
           "namespace": "urn:opendaylight:oper"
         },
-        "description": "",
         "title": "operational_root_config-container_config-container-oper-list",
         "type": "object"
       }

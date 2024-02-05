@@ -192,7 +192,6 @@
           "name": "data",
           "namespace": "urn:opendaylight:params:xml:ns:yang:my-yang"
         },
-        "description": "",
         "title": "my-yang_data",
         "type": "object"
       }
