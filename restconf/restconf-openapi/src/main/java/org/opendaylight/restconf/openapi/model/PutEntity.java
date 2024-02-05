@@ -21,7 +21,6 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public final class PutEntity extends OperationEntity {
-
     private final @NonNull String fullName;
 
     public PutEntity(final @NonNull SchemaNode schema, final @NonNull String deviceName,

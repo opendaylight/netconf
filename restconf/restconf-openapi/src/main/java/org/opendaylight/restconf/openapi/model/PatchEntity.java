@@ -20,7 +20,6 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public final class PatchEntity extends OperationEntity {
-
     private final @NonNull String fullName;
 
     public PatchEntity(final @NonNull SchemaNode schema, final @NonNull String deviceName,
