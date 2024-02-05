@@ -30,8 +30,6 @@ import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public final class PostEntity extends OperationEntity {
-
-    private final @Nullable DocumentedNode parentNode;
     private static final String INPUT_SUFFIX = "_input";
     private static final String INPUT_KEY = "input";
     private static final String POST_DESCRIPTION = """
@@ -40,6 +38,8 @@ public final class PostEntity extends OperationEntity {
         In example payload, you can see only the first data node child of the resource to be created, following the
         guidelines of RFC 8040, which allows us to create only one resource in POST request.
         """;
+
+    private final @Nullable DocumentedNode parentNode;
 
     public PostEntity(final @NonNull SchemaNode schema, final @NonNull String deviceName,
             final @NonNull String moduleName, final @NonNull List<ParameterEntity> parameters,
@@ -187,7 +187,6 @@ public final class PostEntity extends OperationEntity {
         }
         generator.writeEndObject();
     }
-
 
     @Override
     public void generateBasics(@NonNull JsonGenerator generator) throws IOException {

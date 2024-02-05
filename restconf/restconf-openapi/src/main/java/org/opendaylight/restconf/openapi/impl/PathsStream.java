@@ -59,6 +59,9 @@ import org.opendaylight.yangtools.yang.model.api.type.Uint64TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.Uint8TypeDefinition;
 
 public final class PathsStream extends InputStream {
+    private static final String OPERATIONS = "operations";
+    private static final String DATA = "data";
+
     private final Collection<? extends Module> modules;
     private final OpenApiBodyWriter writer;
     private final EffectiveModelContext schemaContext;
@@ -67,11 +70,9 @@ public final class PathsStream extends InputStream {
     private final String basePath;
     private final boolean isForSingleModule;
     private final boolean includeDataStore;
-
-    private static final String OPERATIONS = "operations";
-    private static final String DATA = "data";
     private boolean hasRootPostLink;
     private boolean hasAddedDataStore;
+
     private Reader reader;
     private ReadableByteChannel channel;
 
@@ -309,11 +310,9 @@ public final class PathsStream extends InputStream {
         if (keyType instanceof Uint64TypeDefinition) {
             return "integer";
         }
-
         if (keyType instanceof DecimalTypeDefinition) {
             return "number";
         }
-
         if (keyType instanceof BooleanTypeDefinition) {
             return "boolean";
         }

@@ -14,7 +14,6 @@ import java.util.Set;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public class DefinitionNames {
-
     private final HashMap<SchemaNode, String> discriminators;
     private final Set<String> names;
 
@@ -62,5 +61,4 @@ public class DefinitionNames {
     public String getDiscriminator(final SchemaNode node) {
         return discriminators.get(node);
     }
-
 }
