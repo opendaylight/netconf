@@ -89,9 +89,7 @@ public final class SchemaEntity extends OpenApiEntity {
     }
 
     private @Nullable String description() {
-        // FIXME: Ensure the method returns null if the description is not available.
-        return value.getDescription()
-            .orElse(value instanceof InputSchemaNode || value instanceof OutputSchemaNode ? null : "");
+        return value.getDescription().orElse(null);
     }
 
     private @Nullable String reference() {
