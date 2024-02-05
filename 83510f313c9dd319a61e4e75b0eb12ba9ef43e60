@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "622c96f1_67101f40",
+        "filename": "keystore/keystore-legacy/src/main/yang/netconf-keystore.yang",
+        "patchSetId": 20
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-05T13:10:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8bb2e632_ebedb15e",
+      "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45afabbf_6f04c420",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-05T11:31:11Z",
       "side": 1,
       "message": "Here we expect already encrypted data. The nature of our fix allows to write directly on user\u0027s risk.",
+      "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbe809b4_adf8d67b",
+        "filename": "keystore/keystore-legacy/src/main/yang/netconf-keystore.yang",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-05T13:10:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45afabbf_6f04c420",
       "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b25a3fd_690078ff",
+        "filename": "keystore/keystore-legacy/src/main/yang/netconf-keystore.yang",
+        "patchSetId": 20
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-05T13:10:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c9485ed_7bab787b",
+      "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66ac01d3_07b0e5d2",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-02-05T11:31:11Z",
       "side": 1,
       "message": "IMHO this is not used outside of RPC - thus we cannot write it directly.",
+      "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68c4e513_93fd37d8",
+        "filename": "keystore/keystore-legacy/src/main/yang/netconf-keystore.yang",
+        "patchSetId": 20
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-05T13:10:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66ac01d3_07b0e5d2",
       "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -88,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "999845a6_d73b32a5",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslContextFactoryProviderTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-05T13:10:11Z",
+      "side": 1,
+      "message": "IMO just getBytes is enough. Base64 encoder does not accept Strings as parameter so it will just complicate test.",
+      "parentUuid": "0b9e20aa_22b66a41",
+      "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "de416979_59233bf3",
         "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslContextFactoryProviderTest.java",
         "patchSetId": 20
@@ -99,6 +189,24 @@
       "writtenOn": "2024-02-05T11:31:11Z",
       "side": 1,
       "message": "IMO would be better to use java.util.Base64?",
+      "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48787c2b_6892b9ea",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslContextFactoryProviderTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-05T13:10:11Z",
+      "side": 1,
+      "message": "IMO just getBytes is enough. Base64 encoder does not accept Strings as parameter so it will just complicate test.",
+      "parentUuid": "de416979_59233bf3",
       "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
