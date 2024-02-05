@@ -19,13 +19,12 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public final class RestDocgenUtil {
+    private static final Map<XMLNamespace, Map<Optional<Revision>, Module>> NAMESPACE_AND_REVISION_TO_MODULE =
+        new HashMap<>();
 
     private RestDocgenUtil() {
         // Hidden on purpose
     }
-
-    private static final Map<XMLNamespace, Map<Optional<Revision>, Module>> NAMESPACE_AND_REVISION_TO_MODULE =
-        new HashMap<>();
 
     /**
      * Resolve path argument name for {@code node}.
