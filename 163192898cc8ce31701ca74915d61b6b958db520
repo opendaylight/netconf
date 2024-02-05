@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "728585e7_2f8008db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-05T14:12:19Z",
+      "side": 1,
+      "message": "IMO it is fine if we use link on GitHub configuration instead.",
+      "parentUuid": "121320fc_b9c90217",
+      "revId": "163192898cc8ce31701ca74915d61b6b958db520",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c0e4668_c49a0378",
@@ -35,6 +53,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "655ddd38_50522f19",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1239,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-05T14:12:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c0e4668_c49a0378",
+      "revId": "163192898cc8ce31701ca74915d61b6b958db520",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2252eca3_174ffed5",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-02-05T13:26:31Z",
       "side": 1,
       "message": "ID what if this change? Instead we can linkhttps://github.com/CESNET/netopeer2/tree/master/example_configuration.",
+      "revId": "163192898cc8ce31701ca74915d61b6b958db520",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "410bd602_52371522",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1279,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-05T14:12:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2252eca3_174ffed5",
       "revId": "163192898cc8ce31701ca74915d61b6b958db520",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }

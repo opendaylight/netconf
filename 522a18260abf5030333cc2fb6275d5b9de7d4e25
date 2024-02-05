@@ -70,6 +70,24 @@
       "parentUuid": "92c51cc2_639e63ad",
       "revId": "522a18260abf5030333cc2fb6275d5b9de7d4e25",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd57a11e_7d709311",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-05T14:12:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac84113a_2e23cf39",
+      "revId": "522a18260abf5030333cc2fb6275d5b9de7d4e25",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
