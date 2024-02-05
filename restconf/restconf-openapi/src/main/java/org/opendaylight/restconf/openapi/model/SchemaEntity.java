@@ -90,6 +90,7 @@ public final class SchemaEntity extends OpenApiEntity {
 
     private @Nullable String description() {
         // FIXME: Ensure the method returns null if the description is not available.
+        //  Logic to handle InputSchemaNode and OutputSchemaNode instances should be moved to the generate() method.
         return value.getDescription()
             .orElse(value instanceof InputSchemaNode || value instanceof OutputSchemaNode ? null : "");
     }
