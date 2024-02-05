@@ -86,7 +86,6 @@ public class PropertyEntity {
     private static final String OBJECT_TYPE = "object";
     private static final String NUMBER_TYPE = "number";
     private static final String TYPE = "type";
-
     private static final Pattern AUTOMATON_SPECIAL_CHARACTERS = Pattern.compile("[@&\"<>#~]");
     // Adaptation from YANG regex to Automaton regex
     // See https://github.com/mifmif/Generex/blob/master/src/main/java/com/mifmif/common/regex/Generex.java
@@ -110,7 +109,6 @@ public class PropertyEntity {
         this.parentName = requireNonNull(parentName);
         this.definitionNames = requireNonNull(definitionNames);
         generate(stack, isParentConfig);
-
     }
 
     private void generate(final SchemaInferenceStack stack, final boolean isParentConfig) throws IOException {
@@ -180,7 +178,6 @@ public class PropertyEntity {
         final var schemaNode = (SchemaNode) dataNode;
         final var localName = schemaNode.getQName().getLocalName();
         final var nodeName = parentName + "_" + localName;
-
 
         final String discriminator;
         if (!definitionNames.isListedNode(schemaNode)) {

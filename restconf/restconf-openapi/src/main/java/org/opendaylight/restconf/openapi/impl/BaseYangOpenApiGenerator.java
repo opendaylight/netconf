@@ -22,7 +22,6 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public abstract class BaseYangOpenApiGenerator {
-
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
     public static final List<Map<String, List<String>>> SECURITY = List.of(Map.of("basicAuth", List.of()));
 

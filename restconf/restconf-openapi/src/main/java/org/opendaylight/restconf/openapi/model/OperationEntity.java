@@ -151,7 +151,6 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
         generator.writeEndArray(); //end of params
     }
 
-
     protected static void generateMediaTypeSchemaRef(final @NonNull JsonGenerator generator,
             final @NonNull String mediaType, final @NonNull String ref) throws IOException {
         generator.writeObjectFieldStart(mediaType);
