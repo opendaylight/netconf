@@ -1807,7 +1807,6 @@
           "name": "root-container-unique",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-unique",
         "type": "object"
       },
@@ -1821,7 +1820,6 @@
           "name": "root-container-two-keys",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-two-keys",
         "type": "object"
       },
@@ -1864,7 +1862,6 @@
           "name": "nested-container-unique",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-unique_nested-container-unique",
         "type": "object"
       },
@@ -1880,7 +1877,6 @@
           "name": "list-nested-container",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys_list-nested-container",
         "type": "object"
       },
@@ -1920,7 +1916,6 @@
           "name": "nested-container-two-keys",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-two-keys_nested-container-two-keys",
         "type": "object"
       },
@@ -1934,7 +1929,6 @@
           "name": "root-container",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container",
         "type": "object"
       },
@@ -1961,7 +1955,6 @@
           "name": "mandatory-list",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container_nested-container_mandatory-list",
         "type": "object"
       },
@@ -2001,7 +1994,6 @@
           "name": "nested-container",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container_nested-container",
         "type": "object"
       },
@@ -2031,7 +2023,6 @@
           "name": "mandatory-list-two-keys",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys",
         "type": "object"
       },
@@ -2063,7 +2054,6 @@
           "name": "mandatory-list-unique",
           "namespace": "http://example.com/test/container/child"
         },
-        "description": "",
         "title": "test-container-childs_root-container-unique_nested-container-unique_mandatory-list-unique",
         "type": "object"
       }

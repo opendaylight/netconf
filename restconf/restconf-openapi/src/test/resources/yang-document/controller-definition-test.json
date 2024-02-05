@@ -737,7 +737,6 @@
           "name": "union-container",
           "namespace": "urn:definition-test"
         },
-        "description": "",
         "title": "definition-test_union-container",
         "type": "object"
       },
@@ -787,7 +786,6 @@
           "name": "number-container",
           "namespace": "urn:definition-test"
         },
-        "description": "",
         "title": "definition-test_number-container",
         "type": "object"
       },
@@ -804,7 +802,6 @@
           "name": "network-container",
           "namespace": "urn:definition-test"
         },
-        "description": "",
         "title": "definition-test_network-container",
         "type": "object"
       },
@@ -825,7 +822,6 @@
           "name": "enum-container",
           "namespace": "urn:definition-test"
         },
-        "description": "",
         "title": "definition-test_enum-container",
         "type": "object"
       },
@@ -842,7 +838,6 @@
           "name": "binary-container",
           "namespace": "urn:definition-test"
         },
-        "description": "",
         "title": "definition-test_binary-container",
         "type": "object"
       }

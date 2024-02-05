@@ -24,8 +24,6 @@ import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.InputSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.OutputSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
@@ -81,9 +79,7 @@ public final class SchemaEntity extends OpenApiEntity {
     }
 
     private @Nullable String description() {
-        // FIXME: Ensure the method returns null if the description is not available.
-        return value.getDescription()
-            .orElse(value instanceof InputSchemaNode || value instanceof OutputSchemaNode ? null : "");
+        return value.getDescription().orElse(null);
     }
 
     private void generateRequired(final @NonNull JsonGenerator generator, final List<String> required)

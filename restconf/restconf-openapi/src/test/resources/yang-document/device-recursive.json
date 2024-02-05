@@ -856,7 +856,6 @@
           "name": "root-list",
           "namespace": "urn:opendaylight:test:recursive"
         },
-        "description": "",
         "title": "recursive_container-root_root-list",
         "type": "object"
       },
@@ -879,7 +878,6 @@
           "name": "nested-list",
           "namespace": "urn:opendaylight:test:recursive"
         },
-        "description": "",
         "title": "recursive_container-root_root-list_nested-list",
         "type": "object"
       },
@@ -895,7 +893,6 @@
           "name": "super-nested-list",
           "namespace": "urn:opendaylight:test:recursive"
         },
-        "description": "",
         "title": "recursive_container-root_root-list_nested-list_super-nested-list",
         "type": "object"
       },
@@ -913,7 +910,6 @@
           "name": "container-root",
           "namespace": "urn:opendaylight:test:recursive"
         },
-        "description": "",
         "title": "recursive_container-root",
         "type": "object"
       }

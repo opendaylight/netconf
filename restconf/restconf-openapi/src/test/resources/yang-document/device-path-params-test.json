@@ -1175,7 +1175,6 @@
           "name": "list1",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont_list1",
         "type": "object"
       },
@@ -1191,7 +1190,6 @@
           "name": "list3",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont_list3",
         "type": "object"
       },
@@ -1216,7 +1214,6 @@
           "name": "cont",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont",
         "type": "object"
       },
@@ -1232,7 +1229,6 @@
           "name": "list2",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont_list1_list2",
         "type": "object"
       },
@@ -1242,7 +1238,6 @@
           "name": "cont2",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont_list1_cont2",
         "type": "object"
       },
@@ -1258,7 +1253,6 @@
           "name": "list4",
           "namespace": "urn:ietf:params:xml:ns:yang:test:params"
         },
-        "description": "",
         "title": "path-params-test_cont_list1_list4",
         "type": "object"
       }
