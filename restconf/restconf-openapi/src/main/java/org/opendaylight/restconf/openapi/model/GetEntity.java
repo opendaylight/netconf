@@ -21,7 +21,6 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public final class GetEntity extends OperationEntity {
-
     private final boolean isConfig;
 
     public GetEntity(final @Nullable SchemaNode schema, final @NonNull String deviceName,
