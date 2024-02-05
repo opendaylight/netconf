@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "121320fc_b9c90217",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-05T13:26:31Z",
+      "side": 1,
+      "message": "If TLS really needs so much configuration then it would be better to split this patch.",
+      "revId": "163192898cc8ce31701ca74915d61b6b958db520",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c0e4668_c49a0378",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1239,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-05T13:26:31Z",
+      "side": 1,
+      "message": "Usual users do not need `sudo` when docker group is correctly configured.",
+      "revId": "163192898cc8ce31701ca74915d61b6b958db520",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2252eca3_174ffed5",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1279,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-05T13:26:31Z",
+      "side": 1,
+      "message": "ID what if this change? Instead we can linkhttps://github.com/CESNET/netopeer2/tree/master/example_configuration.",
+      "revId": "163192898cc8ce31701ca74915d61b6b958db520",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
