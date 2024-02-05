@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5b242b9_d6260e55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-05T12:19:16Z",
+      "side": 1,
+      "message": "There is no checking for value null-ability nor validity.",
+      "revId": "1a029a9b8e57c01e50b0007eabd650ec2a0f5011",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
