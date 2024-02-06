@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "105f1ee0_e18bf60d",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/StreamsConfiguration.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-06T06:58:50Z",
+      "side": 1,
+      "message": "IMO it can.",
+      "revId": "ce9c9dcf3ef0e1252550de7906e5c4ff0cd352e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
