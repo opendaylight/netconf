@@ -7,9 +7,10 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
-import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -21,14 +22,41 @@ public final class PathEntity extends OpenApiEntity {
     private final @Nullable PutEntity put;
     private final @Nullable DeleteEntity delete;
 
-    public PathEntity(final String path, final PostEntity post, final PatchEntity patch,
-            final PutEntity put, final GetEntity get, final DeleteEntity delete) {
-        this.path = Objects.requireNonNull(path);
+    /**
+     * Create a new config path.
+     */
+    public PathEntity(final @NonNull String path, final @Nullable PostEntity post, final @NonNull PatchEntity patch,
+            final @NonNull PutEntity put, final @NonNull GetEntity get, final @NonNull DeleteEntity delete) {
+        this.path = requireNonNull(path);
         this.post = post;
-        this.patch = patch;
-        this.put = put;
-        this.delete = delete;
-        this.get = get;
+        this.patch = requireNonNull(patch);
+        this.put = requireNonNull(put);
+        this.delete = requireNonNull(delete);
+        this.get = requireNonNull(get);
+    }
+
+    /**
+     * Possibility to create a new non config or datastore path.
+     */
+    public PathEntity(final @NonNull String path, final @NonNull GetEntity get) {
+        this.path = requireNonNull(path);
+        this.get = requireNonNull(get);
+        this.post = null;
+        this.patch = null;
+        this.put = null;
+        this.delete = null;
+    }
+
+    /**
+     * Possibility to create a new root post path or path for operation (RPC/action).
+     */
+    public PathEntity(final @NonNull String path, final @NonNull PostEntity post) {
+        this.path = requireNonNull(path);
+        this.post = requireNonNull(post);
+        this.patch = null;
+        this.put = null;
+        this.delete = null;
+        this.get = null;
     }
 
     @Override
