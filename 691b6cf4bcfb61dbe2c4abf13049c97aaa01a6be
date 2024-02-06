@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3d3157a_ebee8ef0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-06T13:37:00Z",
+      "side": 1,
+      "message": "Test revision requirement in schema service",
+      "revId": "691b6cf4bcfb61dbe2c4abf13049c97aaa01a6be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cdcb40d_c43583d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-06T13:37:00Z",
+      "side": 1,
+      "message": "We can write something that old tests had to be adapted because they were using not existing module.",
+      "revId": "691b6cf4bcfb61dbe2c4abf13049c97aaa01a6be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b8bc445_b5b87359",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfSchemaServiceTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-06T13:37:00Z",
+      "side": 1,
+      "message": "We can reuse this test with new module without revision.",
+      "revId": "691b6cf4bcfb61dbe2c4abf13049c97aaa01a6be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
