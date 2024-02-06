@@ -40,7 +40,6 @@ public final class OpenApiBodyWriter implements MessageBodyWriter<OpenApiEntity>
         return OpenApiEntity.class.isAssignableFrom(type);
     }
 
-    // TODO IMO we can get rid of implementing MessageBodyWriter
     @Override
     public void writeTo(final OpenApiEntity entity, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,

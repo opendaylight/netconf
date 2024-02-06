@@ -70,7 +70,6 @@ public final class PostEntity extends OperationEntity {
             final var output = rpc.getOutput();
             final var operationName = rpc.getQName().getLocalName();
             if (!output.getChildNodes().isEmpty()) {
-                // TODO: add proper discriminator from DefinitionNames when schemas re-implementation is done
                 final var ref = processOperationsRef(rpc, operationName, "_output");
                 generator.writeObjectFieldStart(String.valueOf(OK.getStatusCode()));
                 generator.writeStringField(DESCRIPTION, String.format("RPC %s success", operationName));
@@ -105,7 +104,6 @@ public final class PostEntity extends OperationEntity {
             generator.writeStringField(DESCRIPTION, operationName + INPUT_SUFFIX);
             generator.writeObjectFieldStart(CONTENT);
             if (!input.getChildNodes().isEmpty()) {
-                // TODO: add proper discriminator from DefinitionNames when schemas re-implementation is done
                 final var ref = processOperationsRef(rpc, operationName, INPUT_SUFFIX);
                 generator.writeObjectFieldStart(MediaType.APPLICATION_JSON);
                 generator.writeObjectFieldStart(SCHEMA);
@@ -149,7 +147,6 @@ public final class PostEntity extends OperationEntity {
             generator.writeStringField(DESCRIPTION, nodeName());
             generator.writeObjectFieldStart(CONTENT);
             final var ref = COMPONENTS_PREFIX + moduleName() + "_" + refPath();
-            //TODO: Remove if and fix this weird logic of top level nodes
             var childConfig = true;
             if (schema() instanceof DataNodeContainer dataSchema) {
                 final var child = dataSchema.getChildNodes().stream()
