@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c93c204e_c83ecef2",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/StreamsConfiguration.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-06T09:43:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "105f1ee0_e18bf60d",
+      "revId": "ce9c9dcf3ef0e1252550de7906e5c4ff0cd352e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2102a868_c6d97d58",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-06T07:00:25Z",
       "side": 1,
       "message": "`Must` with M?",
+      "revId": "ce9c9dcf3ef0e1252550de7906e5c4ff0cd352e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23c3c8a8_4500d12c",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/StreamsConfiguration.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-06T09:43:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2102a868_c6d97d58",
       "revId": "ce9c9dcf3ef0e1252550de7906e5c4ff0cd352e4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
