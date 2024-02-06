@@ -178,6 +178,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4921919f_75b1578f",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslContextFactoryProviderTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-06T13:52:06Z",
+      "side": 1,
+      "message": "IDK",
+      "parentUuid": "999845a6_d73b32a5",
+      "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "de416979_59233bf3",
         "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslContextFactoryProviderTest.java",
         "patchSetId": 20
@@ -207,6 +225,24 @@
       "side": 1,
       "message": "IMO just getBytes is enough. Base64 encoder does not accept Strings as parameter so it will just complicate test.",
       "parentUuid": "de416979_59233bf3",
+      "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adea53a9_4196192a",
+        "filename": "plugins/netconf-client-mdsal/src/test/java/org/opendaylight/netconf/client/mdsal/impl/DefaultSslContextFactoryProviderTest.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-06T13:52:06Z",
+      "side": 1,
+      "message": "IDK",
+      "parentUuid": "48787c2b_6892b9ea",
       "revId": "83510f313c9dd319a61e4e75b0eb12ba9ef43e60",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
