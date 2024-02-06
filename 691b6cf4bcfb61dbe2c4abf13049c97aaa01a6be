@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd7ce00b_690276ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-06T15:50:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3d3157a_ebee8ef0",
+      "revId": "691b6cf4bcfb61dbe2c4abf13049c97aaa01a6be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9cdcb40d_c43583d8",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-06T13:37:00Z",
       "side": 1,
       "message": "We can write something that old tests had to be adapted because they were using not existing module.",
+      "revId": "691b6cf4bcfb61dbe2c4abf13049c97aaa01a6be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcf9f6a1_464cba91",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-06T15:50:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9cdcb40d_c43583d8",
       "revId": "691b6cf4bcfb61dbe2c4abf13049c97aaa01a6be",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
