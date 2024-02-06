@@ -7,9 +7,10 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
-import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -17,18 +18,70 @@ public final class PathEntity extends OpenApiEntity {
     private final @NonNull String path;
     private final @Nullable PostEntity post;
     private final @Nullable PatchEntity patch;
-    private final @Nullable GetEntity get;
     private final @Nullable PutEntity put;
+    private final @Nullable GetEntity get;
     private final @Nullable DeleteEntity delete;
 
-    public PathEntity(final String path, final PostEntity post, final PatchEntity patch,
-            final PutEntity put, final GetEntity get, final DeleteEntity delete) {
-        this.path = Objects.requireNonNull(path);
-        this.post = post;
-        this.patch = patch;
-        this.put = put;
-        this.delete = delete;
-        this.get = get;
+    /**
+     * Construct new path instance pointing to top level config data.
+     *
+     * <p>
+     * Paths to top level configuration data allows full CRUD operations (including POST).
+     */
+    public PathEntity(final @NonNull String path, final @NonNull PostEntity post, final @NonNull PatchEntity patch,
+            final @NonNull PutEntity put, final @NonNull GetEntity get, final @NonNull DeleteEntity delete) {
+        this.path = requireNonNull(path);
+        this.post = requireNonNull(post);
+        this.patch = requireNonNull(patch);
+        this.put = requireNonNull(put);
+        this.get = requireNonNull(get);
+        this.delete = requireNonNull(delete);
+    }
+
+    /**
+     * Construct new path instance pointing child level config data.
+     *
+     * <p>
+     * Paths to child level configuration data allows full CRUD operations (except of POST).
+     */
+    public PathEntity(final @NonNull String path, final @NonNull PatchEntity patch,
+            final @NonNull PutEntity put, final @NonNull GetEntity get, final @NonNull DeleteEntity delete) {
+        this.path = requireNonNull(path);
+        this.post = null;
+        this.patch = requireNonNull(patch);
+        this.put = requireNonNull(put);
+        this.get = requireNonNull(get);
+        this.delete = requireNonNull(delete);
+    }
+
+    /**
+     * Construct new path instance pointing to non-config data.
+     *
+     * <p>
+     * Paths to non-configuration data are allowed to be read only.
+     */
+    public PathEntity(final @NonNull String path, final @NonNull GetEntity get) {
+        this.path = requireNonNull(path);
+        this.post = null;
+        this.patch = null;
+        this.put = null;
+        this.get = requireNonNull(get);
+        this.delete = null;
+    }
+
+    /**
+     * Construct new path instance pointing to operation (RPC/action).
+     *
+     * <p>
+     * Operations are allowed to be invoked only.
+     */
+    public PathEntity(final @NonNull String path, final @NonNull PostEntity post) {
+        this.path = requireNonNull(path);
+        this.get = null;
+        this.post = requireNonNull(post);
+        this.put = null;
+        this.patch = null;
+        this.delete = null;
     }
 
     @Override
