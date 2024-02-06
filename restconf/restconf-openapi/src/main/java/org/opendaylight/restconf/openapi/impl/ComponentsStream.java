@@ -64,8 +64,8 @@ public final class ComponentsStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (!schemasWritten) {
-                reader = new InputStreamReader(new SchemasStream(context, writer, iterator, isForSingleModule),
-                    StandardCharsets.UTF_8);
+                reader = new InputStreamReader(new SchemasStream(context, writer, iterator, isForSingleModule, stream,
+                    generator), StandardCharsets.UTF_8);
                 read = reader.read();
                 schemasWritten = true;
                 continue;
@@ -98,7 +98,8 @@ public final class ComponentsStream extends InputStream {
         var read = channel.read(ByteBuffer.wrap(array, off, len));
         while (read == -1) {
             if (!schemasWritten) {
-                channel = Channels.newChannel(new SchemasStream(context, writer, iterator, isForSingleModule));
+                channel = Channels.newChannel(new SchemasStream(context, writer, iterator, isForSingleModule, stream,
+                    generator));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 schemasWritten = true;
                 continue;
