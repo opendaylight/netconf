@@ -157,15 +157,14 @@ public final class PathsStream extends InputStream {
 
     private Deque<PathEntity> toPaths(final Module module) {
         final var result = new ArrayDeque<PathEntity>();
-        if (includeDataStore && !hasAddedDataStore) {
-            final var dataPath = basePath + DATA + urlPrefix;
-            result.add(new PathEntity(dataPath, null, null, null,
-                new GetEntity(null, deviceName, "data", null, null, false),
-                null));
-            final var operationsPath = basePath + OPERATIONS + urlPrefix;
-            result.add(new PathEntity(operationsPath, null, null, null,
-                new GetEntity(null, deviceName, "operations", null, null, false),
-                null));
+
+            if (includeDataStore && !hasAddedDataStore) {
+                final var dataPath = basePath + DATA + urlPrefix;
+                result.add(new PathEntity(dataPath,
+                new GetEntity(null, deviceName, "data", null, null, false)));
+                final var operationsPath = basePath + OPERATIONS + urlPrefix;
+                result.add(new PathEntity(operationsPath,
+                new GetEntity(null, deviceName, "operations", null, null, false)));
             hasAddedDataStore = true;
         }
         // RPC operations (via post) - RPCs have their own path
@@ -173,7 +172,7 @@ public final class PathsStream extends InputStream {
             final var localName = rpc.getQName().getLocalName();
             final var post = new PostEntity(rpc, deviceName, module.getName(), new ArrayList<>(), localName, null);
             final var resolvedPath = basePath + OPERATIONS + urlPrefix + "/" + module.getName() + ":" + localName;
-            final var entity = new PathEntity(resolvedPath, post, null, null, null, null);
+            final var entity = new PathEntity(resolvedPath, post);
             result.add(entity);
         }
         for (final var node : module.getChildNodes()) {
@@ -181,11 +180,11 @@ public final class PathsStream extends InputStream {
             final boolean isConfig = node.isConfiguration();
             final var nodeLocalName = node.getQName().getLocalName();
 
-            if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                if (isConfig && !hasRootPostLink && isForSingleModule) {
-                    final var resolvedPath = basePath + DATA + urlPrefix;
-                    result.add(new PathEntity(resolvedPath, new PostEntity(node, deviceName, moduleName,
-                        new ArrayList<>(), nodeLocalName, module), null, null, null, null));
+                if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
+                    if (isConfig && !hasRootPostLink && isForSingleModule) {
+                        final var resolvedPath = basePath + DATA + urlPrefix;
+                        result.add(new PathEntity(resolvedPath,
+                            new PostEntity(node, deviceName, moduleName, new ArrayList<>(), nodeLocalName, module)));
                     hasRootPostLink = true;
                 }
                 //process first node
@@ -220,7 +219,7 @@ public final class PathsStream extends InputStream {
                 final var resourceActionPath = path + "/" + resolvePathArgumentsName(actionDef.getQName(),
                     node.getQName(), schemaContext);
                 final var childPath = basePath + OPERATIONS + resourceActionPath;
-                result.add(processRootAndActionPathEntity(actionDef, childPath, actionParams, moduleName,
+                result.add(processActionPathEntity(actionDef, childPath, actionParams, moduleName,
                     refPath, deviceName, parentNode));
             });
         }
@@ -253,8 +252,8 @@ public final class PathsStream extends InputStream {
                 new GetEntity(node, deviceName, moduleName, pathParams, refPath, true),
                 new DeleteEntity(node, deviceName, moduleName, pathParams, refPath));
         } else {
-            return new PathEntity(resourcePath, null, null, null,
-                new GetEntity(node, deviceName, moduleName, pathParams, refPath, false), null);
+            return new PathEntity(resourcePath,
+                new GetEntity(node, deviceName, moduleName, pathParams, refPath, false));
         }
     }
 
@@ -273,17 +272,16 @@ public final class PathsStream extends InputStream {
                 new GetEntity(node, deviceName, moduleName, pathParams, refPath, true),
                 new DeleteEntity(node, deviceName, moduleName, pathParams, refPath));
         } else {
-            return new PathEntity(resourcePath, null, null, null,
-                new GetEntity(node, deviceName, moduleName, pathParams, refPath, false), null);
+            return new PathEntity(resourcePath,
+                new GetEntity(node, deviceName, moduleName, pathParams, refPath, false));
         }
     }
 
-    private static PathEntity processRootAndActionPathEntity(final SchemaNode node, final String resourcePath,
+    private static PathEntity processActionPathEntity(final SchemaNode node, final String resourcePath,
             final List<ParameterEntity> pathParams, final String moduleName, final String refPath,
             final String deviceName, final SchemaNode parentNode) {
         return new PathEntity(resourcePath,
-            new PostEntity(node, deviceName, moduleName, pathParams, refPath, parentNode),
-            null, null, null, null);
+            new PostEntity(node, deviceName, moduleName, pathParams, refPath, parentNode));
     }
 
     private static String processPath(final DataSchemaNode node, final List<ParameterEntity> pathParams,
