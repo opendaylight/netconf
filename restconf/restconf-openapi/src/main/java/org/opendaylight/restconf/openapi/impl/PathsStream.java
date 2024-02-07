@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.DeleteEntity;
+import org.opendaylight.restconf.openapi.model.GetRootEntity;
 import org.opendaylight.restconf.openapi.model.GetEntity;
 import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 import org.opendaylight.restconf.openapi.model.ParameterEntity;
@@ -118,11 +119,9 @@ public final class PathsStream extends InputStream {
         for (final var module : modules) {
             if (includeDataStore && !hasAddedDataStore) {
                 final var dataPath = basePath + DATA + urlPrefix;
-                result.add(new PathEntity(dataPath,
-                    new GetEntity(null, deviceName, "data", null, null, false)));
+                result.add(new PathEntity(dataPath, new GetRootEntity(deviceName, "data")));
                 final var operationsPath = basePath + OPERATIONS + urlPrefix;
-                result.add(new PathEntity(operationsPath,
-                    new GetEntity(null, deviceName, "operations", null, null, false)));
+                result.add(new PathEntity(operationsPath, new GetRootEntity(deviceName, "operations")));
                 hasAddedDataStore = true;
             }
             // RPC operations (via post) - RPCs have their own path

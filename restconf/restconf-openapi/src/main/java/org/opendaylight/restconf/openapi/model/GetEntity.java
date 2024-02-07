@@ -20,7 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
-public final class GetEntity extends OperationEntity {
+public sealed class GetEntity extends OperationEntity permits GetRootEntity {
 
     private final boolean isConfig;
 
