@@ -56,7 +56,7 @@ public final class ApiDocGeneratorRFC8040Test extends AbstractApiDocTest {
     private static final String CONTAINER = "container";
     private static final String LIST = "list";
 
-    private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
+    private final ApiDocGeneratorRFC8040 generator = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE, "rests");
 
     /**
      * Test that paths are generated according to the model.

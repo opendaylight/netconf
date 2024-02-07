@@ -113,7 +113,7 @@ public class PostPayloadTest {
         final var context = YangParserTestUtils.parseYang(CONTAINER_TEST, LIST_TEST);
         final var schemaService = mock(DOMSchemaService.class);
         when(schemaService.getGlobalContext()).thenReturn(context);
-        final var generator = new ApiDocGeneratorRFC8040(schemaService);
+        final var generator = new ApiDocGeneratorRFC8040(schemaService, "rests");
         final var uriInfo = DocGenTestHelper.createMockUriInfo("http://localhost/path");
         containerDoc = (OpenApiObject) generator.getApiDeclaration("container-test", "2023-07-31", uriInfo,
             OAversion.V3_0);

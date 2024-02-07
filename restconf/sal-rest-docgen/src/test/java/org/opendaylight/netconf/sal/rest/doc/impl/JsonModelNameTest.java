@@ -47,7 +47,7 @@ public class JsonModelNameTest {
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
-        final MountPointSwagger swagger = new MountPointSwaggerGeneratorRFC8040(schemaService, service)
+        final MountPointSwagger swagger = new MountPointSwaggerGeneratorRFC8040(schemaService, service, "rests")
             .getMountPointSwagger();
         swagger.onMountPointCreated(INSTANCE_ID);
 
