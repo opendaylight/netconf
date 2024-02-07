@@ -20,10 +20,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 public abstract class BaseYangOpenApiGeneratorRFC8040 extends BaseYangOpenApiGenerator {
     private final String basePath;
 
-    protected BaseYangOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService) {
-        this(schemaService, "rests");
-    }
-
     protected BaseYangOpenApiGeneratorRFC8040(final @NonNull DOMSchemaService schemaService,
             final @NonNull String basePath) {
         super(schemaService);

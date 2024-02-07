@@ -83,7 +83,7 @@ public final class MountPointOpenApiTest {
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
 
-        openApi = new MountPointOpenApiGeneratorRFC8040(schemaService, service).getMountPointOpenApi();
+        openApi = new MountPointOpenApiGeneratorRFC8040(schemaService, service, "rests").getMountPointOpenApi();
 
         uriDeviceAll = DocGenTestHelper.createMockUriInfo(GET_ALL);
         when(uriDeviceAll.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());

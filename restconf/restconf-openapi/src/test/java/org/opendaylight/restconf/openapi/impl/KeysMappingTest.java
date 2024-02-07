@@ -67,7 +67,7 @@ public class KeysMappingTest {
               }""");
         final var schemaService = mock(DOMSchemaService.class);
         when(schemaService.getGlobalContext()).thenReturn(context);
-        final var generator = new OpenApiGeneratorRFC8040(schemaService);
+        final var generator = new OpenApiGeneratorRFC8040(schemaService, "rests");
         final var uriInfo = DocGenTestHelper.createMockUriInfo("http://localhost/path");
         doc = generator.getApiDeclaration("keys-mapping", null, uriInfo);
         assertNotNull(doc);

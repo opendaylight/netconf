@@ -46,7 +46,8 @@ public class JsonModelNameTest {
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         when(mountPoint.getService(DOMSchemaService.class)).thenReturn(Optional.of(schemaService));
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
-        final var openApi = new MountPointOpenApiGeneratorRFC8040(schemaService, service).getMountPointOpenApi();
+        final var openApi = new MountPointOpenApiGeneratorRFC8040(schemaService, service, "rests")
+            .getMountPointOpenApi();
         openApi.onMountPointCreated(INSTANCE_ID);
 
         mountPointApi = openApi.getMountPointApi(mockInfo, 1L, Optional.of(1));
