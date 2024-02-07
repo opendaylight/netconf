@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.JaxRsNorthbound;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.restconf.openapi.model.MountPointInstance;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
@@ -49,16 +50,10 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Inject
     @Activate
     public OpenApiServiceImpl(final @Reference DOMSchemaService schemaService,
-                             final @Reference DOMMountPointService mountPointService) {
-        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService),
-            new OpenApiGeneratorRFC8040(schemaService));
-    }
-
-    public OpenApiServiceImpl(final DOMSchemaService schemaService,
-                             final DOMMountPointService mountPointService,
-                             final String basePath) {
-        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, basePath),
-            new OpenApiGeneratorRFC8040(schemaService, basePath));
+            final @Reference DOMMountPointService mountPointService,
+            final @Reference JaxRsNorthbound.Configuration context) {
+        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, context.restconf()),
+            new OpenApiGeneratorRFC8040(schemaService, context.restconf()));
     }
 
     @VisibleForTesting
