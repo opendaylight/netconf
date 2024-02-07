@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "68b633eb_7f4b2893",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-07T22:25:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e1d90644_3d26b775",
+      "revId": "2f73f64917d51420f47866a1073e00149818ada1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94d60649_32025e8f",
@@ -85,6 +103,24 @@
       "side": 1,
       "message": "But you right, I\u0027ll make different test",
       "parentUuid": "7c523bc7_0bf01428",
+      "revId": "2f73f64917d51420f47866a1073e00149818ada1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c04d059_a66801b9",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfDataPutTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-07T22:25:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1bb344b0_07692735",
       "revId": "2f73f64917d51420f47866a1073e00149818ada1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
