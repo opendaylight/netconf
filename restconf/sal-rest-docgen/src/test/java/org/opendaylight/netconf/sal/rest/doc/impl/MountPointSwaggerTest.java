@@ -70,7 +70,7 @@ public final class MountPointSwaggerTest extends AbstractApiDocTest {
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
 
-        swagger = new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service).getMountPointSwagger();
+        swagger = new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service, "rests").getMountPointSwagger();
 
         uriDeviceAll = DocGenTestHelper.createMockUriInfo(GET_ALL);
         when(uriDeviceAll.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());

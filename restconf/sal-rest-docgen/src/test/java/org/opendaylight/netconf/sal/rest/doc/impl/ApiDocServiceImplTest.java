@@ -41,8 +41,8 @@ public final class ApiDocServiceImplTest extends AbstractApiDocTest {
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
         final MountPointSwaggerGeneratorRFC8040 mountPointRFC8040 =
-                new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service);
-        final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040 = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE);
+                new MountPointSwaggerGeneratorRFC8040(SCHEMA_SERVICE, service, "rests");
+        final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040 = new ApiDocGeneratorRFC8040(SCHEMA_SERVICE, "rests");
         mountPointRFC8040.getMountPointSwagger().onMountPointCreated(INSTANCE_ID);
         apiDocService = new ApiDocServiceImpl(mountPointRFC8040, apiDocGeneratorRFC8040);
     }
