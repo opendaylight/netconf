@@ -1,0 +1,4 @@
+module module-without-revision-behind-mount-point {
+    namespace "module:without:revision:behind:mount:point";
+    prefix "mwrbmp";
+}
