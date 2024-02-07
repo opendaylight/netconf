@@ -34,18 +34,6 @@ public final class PathEntity extends OpenApiEntity {
     @Override
     public void generate(@NonNull JsonGenerator generator) throws IOException {
         generator.writeObjectFieldStart(path);
-        final var ref = ref();
-        if (ref != null) {
-            generator.writeStringField("$ref", ref);
-        }
-        final var summary = summary();
-        if (summary != null) {
-            generator.writeStringField("summary", summary);
-        }
-        final var description = description();
-        if (ref != null) {
-            generator.writeStringField("description", description);
-        }
         final var postOperation = post();
         if (postOperation != null) {
             postOperation.generate(generator);
@@ -67,18 +55,6 @@ public final class PathEntity extends OpenApiEntity {
             getOperation.generate(generator);
         }
         generator.writeEndObject();
-    }
-
-    @Nullable String ref() {
-        return null;
-    }
-
-    @Nullable String summary() {
-        return null;
-    }
-
-    @Nullable String description() {
-        return null;
     }
 
     @Nullable OperationEntity post() {

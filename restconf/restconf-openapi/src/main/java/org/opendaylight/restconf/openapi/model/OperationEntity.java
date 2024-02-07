@@ -100,10 +100,6 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
 
     protected @NonNull abstract String operation();
 
-    @Nullable Boolean deprecated() {
-        return Boolean.FALSE;
-    }
-
     @NonNull String description() {
         return schema == null ? "" : schema.getDescription().orElse("");
     }
