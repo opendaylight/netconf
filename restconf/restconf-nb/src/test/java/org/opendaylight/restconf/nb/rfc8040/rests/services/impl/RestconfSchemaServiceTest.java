@@ -337,9 +337,7 @@ public class RestconfSchemaServiceTest {
     }
 
     /**
-     * Try to get schema with identifier which does not contain revision catching
-     * <code>RestconfDocumentedException</code>. Error type, error tag and error status code are compared to expected
-     * values.
+     * Try to get schema with identifier which does not contain revision and check if correct module was found.
      */
     @Test
     public void getSchemaWithoutRevisionTest() {
@@ -347,16 +345,20 @@ public class RestconfSchemaServiceTest {
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT);
 
         // make test and verify
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> schemaService.getSchema("module"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        final var context = schemaService.getSchema("module-without-revision");
+
+        // verify
+        final var module = context.getModule();
+        assertNotNull("Existing module should be found", module);
+
+        assertEquals("Not expected module name", "module-without-revision", module.getName());
+        assertEquals("Not expected module revision", Revision.ofNullable(null), module.getRevision());
+        assertEquals("Not expected module namespace", "module:without:revision", module.getNamespace().toString());
     }
 
     /**
-     * Try to get schema behind mount point with identifier when does not contain revision catching
-     * <code>RestconfDocumentedException</code>. Error type, error tag and error status code are compared to expected
-     * values.
+     * Try to get schema behind mount point with identifier when does not contain revision and check if correct module
+     * was found.
      */
     @Test
     public void getSchemaWithoutRevisionMountPointTest() {
@@ -364,10 +366,18 @@ public class RestconfSchemaServiceTest {
         when(mockSchemaService.getGlobalContext()).thenReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS);
 
         // make test and verify
-        final RestconfDocumentedException ex = assertThrows(RestconfDocumentedException.class,
-            () -> schemaService.getSchema(MOUNT_POINT + "module"));
-        assertEquals(ErrorType.PROTOCOL, ex.getErrors().get(0).getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, ex.getErrors().get(0).getErrorTag());
+        final var context = schemaService.getSchema(MOUNT_POINT + "module-without-revision-behind-mount-point");
+
+        // verify
+        assertNotNull("Export context should not be null", context);
+
+        final Module module = context.getModule();
+        assertNotNull("Existing module should be found", module);
+
+        assertEquals("Not expected module name", "module-without-revision-behind-mount-point", module.getName());
+        assertEquals("Not expected module revision", Revision.ofNullable(null), module.getRevision());
+        assertEquals("Not expected module namespace",
+            "module:without:revision:behind:mount:point", module.getNamespace().toString());
     }
 
     /**
