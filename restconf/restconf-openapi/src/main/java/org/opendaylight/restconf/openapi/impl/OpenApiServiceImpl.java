@@ -26,6 +26,9 @@ import org.opendaylight.restconf.openapi.mountpoints.MountPointOpenApi;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 
 /**
@@ -34,9 +37,17 @@ import org.osgi.service.component.annotations.Reference;
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  */
-@Component
+@Component(service = OpenApiService.class, configurationPid = "org.opendaylight.restconf.nb.rfc8040")
+@Designate(ocd = OpenApiServiceImpl.Configuration.class)
 @Singleton
 public final class OpenApiServiceImpl implements OpenApiService {
+    @ObjectClassDefinition
+    public @interface Configuration {
+        @AttributeDefinition(name = "{+restconf}", description = """
+            The value of RFC8040 {+restconf} URI template, poiting to the root resource. Must not end with '/'.""")
+        String restconf() default "rests";
+    }
+
     // FIXME: make this configurable
     public static final int DEFAULT_PAGESIZE = 20;
 
@@ -49,16 +60,9 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Inject
     @Activate
     public OpenApiServiceImpl(final @Reference DOMSchemaService schemaService,
-                             final @Reference DOMMountPointService mountPointService) {
-        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService),
-            new OpenApiGeneratorRFC8040(schemaService));
-    }
-
-    public OpenApiServiceImpl(final DOMSchemaService schemaService,
-                             final DOMMountPointService mountPointService,
-                             final String basePath) {
-        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, basePath),
-            new OpenApiGeneratorRFC8040(schemaService, basePath));
+            final @Reference DOMMountPointService mountPointService, final Configuration configuration) {
+        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, configuration.restconf()),
+            new OpenApiGeneratorRFC8040(schemaService, configuration.restconf()));
     }
 
     @VisibleForTesting

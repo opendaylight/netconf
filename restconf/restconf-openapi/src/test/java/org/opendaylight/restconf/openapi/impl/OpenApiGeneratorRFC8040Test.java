@@ -56,7 +56,7 @@ public final class OpenApiGeneratorRFC8040Test {
     private static DOMSchemaService schemaService;
     private static UriInfo uriInfo;
 
-    private final OpenApiGeneratorRFC8040 generator = new OpenApiGeneratorRFC8040(schemaService);
+    private final OpenApiGeneratorRFC8040 generator = new OpenApiGeneratorRFC8040(schemaService, "rests");
 
     @BeforeClass
     public static void beforeClass() throws Exception {

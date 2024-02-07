@@ -54,8 +54,8 @@ public final class OpenApiServiceImplTest {
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
         final MountPointOpenApiGeneratorRFC8040 mountPointRFC8040 =
-                new MountPointOpenApiGeneratorRFC8040(schemaService, service);
-        final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(schemaService);
+                new MountPointOpenApiGeneratorRFC8040(schemaService, service, "rests");
+        final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040 = new OpenApiGeneratorRFC8040(schemaService, "rests");
         mountPointRFC8040.getMountPointOpenApi().onMountPointCreated(INSTANCE_ID);
         openApiService = new OpenApiServiceImpl(mountPointRFC8040, openApiGeneratorRFC8040);
     }
