@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.JaxRsNorthbound;
 import org.opendaylight.restconf.openapi.api.OpenApiService;
 import org.opendaylight.restconf.openapi.model.MountPointInstance;
 import org.opendaylight.restconf.openapi.model.OpenApiObject;
@@ -34,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  */
-@Component
+@Component(configurationPid = "org.opendaylight.restconf.nb.rfc8040")
 @Singleton
 public final class OpenApiServiceImpl implements OpenApiService {
     // FIXME: make this configurable
@@ -49,16 +50,10 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Inject
     @Activate
     public OpenApiServiceImpl(final @Reference DOMSchemaService schemaService,
-                             final @Reference DOMMountPointService mountPointService) {
-        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService),
-            new OpenApiGeneratorRFC8040(schemaService));
-    }
-
-    public OpenApiServiceImpl(final DOMSchemaService schemaService,
-                             final DOMMountPointService mountPointService,
-                             final String basePath) {
-        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, basePath),
-            new OpenApiGeneratorRFC8040(schemaService, basePath));
+            final @Reference DOMMountPointService mountPointService,
+            final JaxRsNorthbound.Configuration configuration) {
+        this(new MountPointOpenApiGeneratorRFC8040(schemaService, mountPointService, configuration.restconf()),
+            new OpenApiGeneratorRFC8040(schemaService, configuration.restconf()));
     }
 
     @VisibleForTesting

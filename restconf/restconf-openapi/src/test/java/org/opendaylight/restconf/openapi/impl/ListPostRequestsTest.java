@@ -42,7 +42,7 @@ public class ListPostRequestsTest {
               }""");
         final var schemaService = mock(DOMSchemaService.class);
         when(schemaService.getGlobalContext()).thenReturn(context);
-        final var generator = new OpenApiGeneratorRFC8040(schemaService);
+        final var generator = new OpenApiGeneratorRFC8040(schemaService, "rests");
         final var uriInfo = DocGenTestHelper.createMockUriInfo("http://localhost/path");
         doc = generator.getApiDeclaration("list-post", null, uriInfo);
         assertNotNull(doc);
