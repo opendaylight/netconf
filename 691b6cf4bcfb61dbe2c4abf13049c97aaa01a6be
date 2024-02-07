@@ -86,6 +86,24 @@
       "message": "We can reuse this test with new module without revision.",
       "revId": "691b6cf4bcfb61dbe2c4abf13049c97aaa01a6be",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55731b1a_a3d3e662",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/jaxrs/RestconfSchemaServiceTest.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-07T08:42:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b8bc445_b5b87359",
+      "revId": "691b6cf4bcfb61dbe2c4abf13049c97aaa01a6be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
