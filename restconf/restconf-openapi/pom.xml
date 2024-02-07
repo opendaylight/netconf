@@ -111,6 +111,10 @@
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-test-util</artifactId>
     </dependency>
+      <dependency>
+          <groupId>org.opendaylight.netconf</groupId>
+          <artifactId>restconf-nb</artifactId>
+      </dependency>
   </dependencies>
 
   <build>
