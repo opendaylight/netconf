@@ -20,10 +20,6 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGenerator {
     private final String basePath;
 
-    protected BaseYangSwaggerGeneratorRFC8040(final Optional<DOMSchemaService> schemaService) {
-        this(schemaService, "rests");
-    }
-
     protected BaseYangSwaggerGeneratorRFC8040(final Optional<DOMSchemaService> schemaService, final String basePath) {
         super(schemaService);
         this.basePath = requireNonNull(basePath);

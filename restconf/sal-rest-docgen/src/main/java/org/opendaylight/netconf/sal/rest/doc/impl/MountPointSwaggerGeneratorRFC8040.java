@@ -21,13 +21,6 @@ public class MountPointSwaggerGeneratorRFC8040 extends BaseYangSwaggerGeneratorR
     private final MountPointSwagger mountPointSwagger;
 
     public MountPointSwaggerGeneratorRFC8040(final DOMSchemaService schemaService,
-            final DOMMountPointService mountService) {
-        super(Optional.of(schemaService));
-        mountPointSwagger = new MountPointSwagger(schemaService, mountService, this);
-        mountPointSwagger.init();
-    }
-
-    public MountPointSwaggerGeneratorRFC8040(final DOMSchemaService schemaService,
             final DOMMountPointService mountService, final String basePath) {
         super(Optional.of(schemaService), basePath);
         mountPointSwagger = new MountPointSwagger(schemaService, mountService, this);
