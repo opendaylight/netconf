@@ -24,6 +24,7 @@ import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.MountPointInstance;
 import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+import org.opendaylight.restconf.nb.rfc8040.JaxRsNorthbound;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  * >https://helloreverb.com/developers/swagger</a>) compliant documentation for
  * RESTCONF APIs. The output of this is used by embedded Swagger UI.
  */
-@Component
+@Component(configurationPid = "org.opendaylight.restconf.nb.rfc8040")
 @Singleton
 public final class ApiDocServiceImpl implements ApiDocService {
     // FIXME: make this configurable
@@ -52,16 +53,10 @@ public final class ApiDocServiceImpl implements ApiDocService {
     @Inject
     @Activate
     public ApiDocServiceImpl(final @Reference DOMSchemaService schemaService,
-                             final @Reference DOMMountPointService mountPointService) {
-        this(new MountPointSwaggerGeneratorRFC8040(schemaService, mountPointService),
-            new ApiDocGeneratorRFC8040(schemaService));
-    }
-
-    public ApiDocServiceImpl(final DOMSchemaService schemaService,
-                             final DOMMountPointService mountPointService,
-                             final String basePath) {
-        this(new MountPointSwaggerGeneratorRFC8040(schemaService, mountPointService, basePath),
-            new ApiDocGeneratorRFC8040(schemaService, basePath));
+            final @Reference DOMMountPointService mountPointService,
+            final JaxRsNorthbound.Configuration configuration) {
+        this(new MountPointSwaggerGeneratorRFC8040(schemaService, mountPointService, configuration.restconf()),
+            new ApiDocGeneratorRFC8040(schemaService, configuration.restconf()));
     }
 
     @VisibleForTesting
