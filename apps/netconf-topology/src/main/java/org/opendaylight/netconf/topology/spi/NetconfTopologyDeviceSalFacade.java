@@ -16,6 +16,7 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceSalFacade;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 
 /**
  * {@link NetconfDeviceSalFacade} specialization for netconf topology.
@@ -23,10 +24,12 @@ import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceSalFacade;
 public class NetconfTopologyDeviceSalFacade extends NetconfDeviceSalFacade {
     private final NetconfDeviceTopologyAdapter datastoreAdapter;
 
-    public NetconfTopologyDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
+    public NetconfTopologyDeviceSalFacade(final NetconfNode netconfNode, final RemoteDeviceId id,
+            final DOMMountPointService mountPointService,
             final boolean lockDatastore, final DataBroker dataBroker) {
         super(id, mountPointService, NetconfNodeUtils.defaultTopologyMountPath(id), lockDatastore);
-        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, NetconfNodeUtils.DEFAULT_TOPOLOGY_IID, id);
+        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, NetconfNodeUtils.DEFAULT_TOPOLOGY_IID, id,
+            netconfNode);
     }
 
     @Override

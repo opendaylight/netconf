@@ -7,16 +7,17 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.InetSocketAddress;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.ConcurrentDataBrokerTestCustomizer;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeContext;
@@ -28,7 +29,10 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.ConnectionOper.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.augment.test.rev160808.Node1;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -39,9 +43,11 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 
 // FIXME: base on AbstractDataBrokerTest test?
@@ -58,17 +64,17 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
 
     private NetconfDeviceTopologyAdapter adapter;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() {
         RUNTIME_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(NetconfNode.class, Node1.class);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() {
         RUNTIME_CONTEXT = null;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final var customizer = new ConcurrentDataBrokerTestCustomizer(true);
         domDataBroker = customizer.getDOMDataBroker();
@@ -81,7 +87,13 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
             .build());
         tx.commit().get(2, TimeUnit.SECONDS);
 
-        adapter = new NetconfDeviceTopologyAdapter(dataBroker, TEST_TOPOLOGY_ID, ID);
+        adapter = new NetconfDeviceTopologyAdapter(dataBroker, TEST_TOPOLOGY_ID, ID,
+            new NetconfNodeBuilder().setCredentials(new LoginPwUnencryptedBuilder()
+                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                    .setUsername("netconf")
+                    .setPassword("netconf")
+                    .build())
+                .build()).build());
     }
 
     @Test
@@ -99,35 +111,85 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
 
     @Test
     public void testDeviceAugmentedNodePresence() throws Exception {
-        QName netconfTestLeafQname = QName.create(
-                "urn:TBD:params:xml:ns:yang:network-topology-augment-test", "2016-08-08", "test-id").intern();
-
-        YangInstanceIdentifier pathToAugmentedLeaf = YangInstanceIdentifier.builder().node(NetworkTopology.QNAME)
-                .node(Topology.QNAME)
-                .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), "topology-netconf")
-                .node(Node.QNAME)
-                .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
-                .node(netconfTestLeafQname).build();
+        final var netconfTestLeafQname = QName.create("urn:TBD:params:xml:ns:yang:network-topology-augment-test",
+            "2016-08-08", "test-id").intern();
+        final var loginPwUnencryptedQName = QName.create("urn:opendaylight:netconf-node-topology",
+            "2023-11-21", "login-password-unencrypted").intern();
+        final var credentialsQname = QName.create("urn:opendaylight:netconf-node-topology",
+            "2023-11-21", "credentials").intern();
+        final var usernameQName = QName.create(loginPwUnencryptedQName, "username");
+        final var passwordQName = QName.create(loginPwUnencryptedQName, "password");
 
         final Integer dataTestId = 474747;
         final var augmentNode = ImmutableNodes.leafNode(netconfTestLeafQname, dataTestId);
+        final var usernameNode = ImmutableNodes.leafNode(usernameQName, "netconf");
+        final var passwordNode = ImmutableNodes.leafNode(passwordQName, "netconf");
+
+        final var loginPasswordUnencryptedNode = Builders.containerBuilder()
+            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(loginPwUnencryptedQName))
+            .withChild(usernameNode)
+            .withChild(passwordNode)
+            .build();
+        final var choiceNode = Builders.choiceBuilder()
+            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(credentialsQname))
+            .withChild(loginPasswordUnencryptedNode)
+            .build();
+
+        final var nodeList = ImmutableNodes.mapEntryBuilder(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
+            .withChild(choiceNode)
+            .withChild(augmentNode)
+            .build();
+
+        YangInstanceIdentifier pathToNodeList = YangInstanceIdentifier.builder().node(NetworkTopology.QNAME)
+            .node(Topology.QNAME)
+            .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), "topology-netconf")
+            .node(Node.QNAME)
+            .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
+            .build();
 
         DOMDataTreeWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
-        wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
+        wtx.put(LogicalDatastoreType.OPERATIONAL, pathToNodeList, nodeList);
         wtx.commit().get(5, TimeUnit.SECONDS);
 
         adapter.updateDeviceData(true, NetconfDeviceCapabilities.empty(), new SessionIdType(Uint32.ONE));
 
-        assertEquals(Optional.of(dataTestId), domDataBroker.newReadOnlyTransaction()
-            .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf)
+        //preparing expected list of nodes
+        final var nodeIdLeaf = ImmutableNodes.leafNode(QName.create(Node.QNAME, "node-id"), "test");
+        final var nodeStatusLeaf = ImmutableNodes.leafNode(QName.create("urn:opendaylight:netconf-node-topology",
+            "2023-11-21", "connection-status"), "connected");
+        final var nodeHostLeaf = ImmutableNodes.leafNode(QName.create("urn:opendaylight:netconf-node-topology",
+            "2023-11-21", "host"), "127.0.0.1");
+        final var nodePortLeaf = ImmutableNodes.leafNode(QName.create("urn:opendaylight:netconf-node-topology",
+            "2023-11-21", "port"), Uint16.valueOf(22));
+        final var nodeSessionIdLeaf = ImmutableNodes.leafNode(QName.create("urn:opendaylight:netconf-node-topology",
+            "2023-11-21", "session-id"), Uint32.ONE);
+
+        final var expectedData = new ArrayList<NormalizedNode>();
+        expectedData.add(nodeIdLeaf);
+        expectedData.add(choiceNode);
+        expectedData.add(augmentNode);
+        expectedData.add(nodeSessionIdLeaf);
+        expectedData.add(nodeStatusLeaf);
+        expectedData.add(nodeHostLeaf);
+        expectedData.add(nodePortLeaf);
+
+        final var readDataOptional = domDataBroker.newReadOnlyTransaction()
+            .read(LogicalDatastoreType.OPERATIONAL, pathToNodeList)
             .get(2, TimeUnit.SECONDS)
-            .map(NormalizedNode::body));
+            .map(NormalizedNode::body);
+
+        final var actualData = new ArrayList<>((Collection) readDataOptional.orElseThrow());
+        assertEquals(expectedData, actualData);
 
         adapter.setDeviceAsFailed(null);
 
-        assertEquals(Optional.of(dataTestId), domDataBroker.newReadOnlyTransaction()
-            .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf)
+        final var readDataOptionalFailedDevice = domDataBroker.newReadOnlyTransaction()
+            .read(LogicalDatastoreType.OPERATIONAL, pathToNodeList)
             .get(2, TimeUnit.SECONDS)
-            .map(NormalizedNode::body));
+            .map(NormalizedNode::body);
+        final var actualDataFailedDevice = new ArrayList<>((Collection) readDataOptionalFailedDevice
+            .orElseThrow());
+
+        assertEquals(expectedData, actualDataFailedDevice);
     }
 }
