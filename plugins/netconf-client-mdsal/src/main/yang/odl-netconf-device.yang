@@ -1,6 +1,7 @@
 module odl-netconf-device {
   namespace "urn:opendaylight:netconf:device";
   prefix "ond";
+  yang-version 1.1;
 
   description
     "Common groupings for describing configuration and operational status
@@ -74,6 +75,7 @@ module odl-netconf-device {
 
   grouping credentials {
     choice credentials {
+      mandatory true;
       config true;
       case login-pw {
         description "login-password credentials, encrypted.";
