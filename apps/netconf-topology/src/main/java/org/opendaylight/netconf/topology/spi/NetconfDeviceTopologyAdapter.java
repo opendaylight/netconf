@@ -52,6 +52,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     private final @NonNull KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath;
     private final DataBroker dataBroker;
     private final RemoteDeviceId id;
+    private final NetconfNode netconfNode;
 
     @GuardedBy("this")
     private SettableFuture<Empty> closeFuture;
@@ -59,10 +60,12 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     private TransactionChain txChain;
 
     public NetconfDeviceTopologyAdapter(final DataBroker dataBroker,
-            final KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath, final RemoteDeviceId id) {
+            final KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath, final RemoteDeviceId id,
+            final NetconfNode netconfNode) {
         this.dataBroker = requireNonNull(dataBroker);
         this.topologyPath = requireNonNull(topologyPath);
         this.id = requireNonNull(id);
+        this.netconfNode = netconfNode;
         txChain = dataBroker.createMergingTransactionChain();
         txChain.addCallback(this);
 
@@ -75,6 +78,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
             .addAugmentation(new NetconfNodeBuilder()
                 .setConnectionStatus(ConnectionStatus.Connecting)
                 .setHost(id.host())
+                .setCredentials(netconfNode.getCredentials())
                 .setPort(new PortNumber(Uint16.valueOf(id.address().getPort()))).build())
             .build());
         LOG.trace("{}: Init device state transaction {} putting operational data ended.", id, tx.getIdentifier());
@@ -108,6 +112,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
         final var data = new NetconfNodeBuilder()
                 .setHost(id.host())
                 .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))
+                .setCredentials(netconfNode.getCredentials())
                 .setConnectionStatus(ConnectionStatus.UnableToConnect)
                 .setConnectedMessage(extractReason(throwable))
                 .build();
@@ -149,6 +154,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
         return new NetconfNodeBuilder()
             .setHost(id.host())
             .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))
+            .setCredentials(netconfNode.getCredentials())
             .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
             .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
                 .setAvailableCapability(ImmutableList.<AvailableCapability>builder()

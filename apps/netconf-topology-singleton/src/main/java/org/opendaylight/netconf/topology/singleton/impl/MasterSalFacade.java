@@ -34,6 +34,8 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.spi.NetconfDeviceTopologyAdapter;
 import org.opendaylight.netconf.topology.spi.NetconfNodeUtils;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
@@ -64,7 +66,8 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
                     final Timeout actorResponseWaitTime,
                     final DOMMountPointService mountService,
                     final DataBroker dataBroker,
-                    final boolean lockDatastore) {
+                    final boolean lockDatastore,
+                    final Node node) {
         this.id = id;
         mount = new NetconfDeviceMount(id, mountService, NetconfNodeUtils.defaultTopologyMountPath(id));
         this.actorSystem = actorSystem;
@@ -72,7 +75,8 @@ class MasterSalFacade implements RemoteDeviceHandler, AutoCloseable {
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.lockDatastore = lockDatastore;
 
-        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, NetconfNodeUtils.DEFAULT_TOPOLOGY_IID, id);
+        datastoreAdapter = new NetconfDeviceTopologyAdapter(dataBroker, NetconfNodeUtils.DEFAULT_TOPOLOGY_IID, id,
+            (NetconfNode) node);
     }
 
     @Override
