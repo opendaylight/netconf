@@ -25,14 +25,15 @@ import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.ConnectionOper.ConnectionStatus;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.AvailableCapabilitiesBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.ClusteredConnectionStatusBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.UnavailableCapabilitiesBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.unavailable.capabilities.UnavailableCapabilityBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240208.ConnectionOper.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240208.connection.oper.AvailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240208.connection.oper.ClusteredConnectionStatusBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240208.connection.oper.UnavailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240208.connection.oper.available.capabilities.AvailableCapability;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240208.connection.oper.unavailable.capabilities.UnavailableCapabilityBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240208.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240208.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240208.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
@@ -52,6 +53,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     private final @NonNull KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath;
     private final DataBroker dataBroker;
     private final RemoteDeviceId id;
+    private final Credentials credentials;
 
     @GuardedBy("this")
     private SettableFuture<Empty> closeFuture;
@@ -59,10 +61,12 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
     private TransactionChain txChain;
 
     public NetconfDeviceTopologyAdapter(final DataBroker dataBroker,
-            final KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath, final RemoteDeviceId id) {
+            final KeyedInstanceIdentifier<Topology, TopologyKey> topologyPath, final RemoteDeviceId id,
+            final Credentials credentials) {
         this.dataBroker = requireNonNull(dataBroker);
         this.topologyPath = requireNonNull(topologyPath);
         this.id = requireNonNull(id);
+        this.credentials = requireNonNull(credentials);
         txChain = dataBroker.createMergingTransactionChain();
         txChain.addCallback(this);
 
@@ -75,6 +79,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
             .addAugmentation(new NetconfNodeBuilder()
                 .setConnectionStatus(ConnectionStatus.Connecting)
                 .setHost(id.host())
+                .setCredentials(credentials)
                 .setPort(new PortNumber(Uint16.valueOf(id.address().getPort()))).build())
             .build());
         LOG.trace("{}: Init device state transaction {} putting operational data ended.", id, tx.getIdentifier());
@@ -108,6 +113,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
         final var data = new NetconfNodeBuilder()
                 .setHost(id.host())
                 .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))
+                .setCredentials(credentials)
                 .setConnectionStatus(ConnectionStatus.UnableToConnect)
                 .setConnectedMessage(extractReason(throwable))
                 .build();
@@ -149,6 +155,7 @@ public final class NetconfDeviceTopologyAdapter implements FutureCallback<Empty>
         return new NetconfNodeBuilder()
             .setHost(id.host())
             .setPort(new PortNumber(Uint16.valueOf(id.address().getPort())))
+            .setCredentials(credentials)
             .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
             .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
                 .setAvailableCapability(ImmutableList.<AvailableCapability>builder()
