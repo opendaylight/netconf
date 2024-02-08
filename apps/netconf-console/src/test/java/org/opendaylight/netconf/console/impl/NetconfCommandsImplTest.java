@@ -33,6 +33,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.Co
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.AvailableCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapabilityBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.network.topology.topology.topology.types.TopologyNetconf;
@@ -105,6 +107,12 @@ class NetconfCommandsImplTest {
         final var netconfNode = new NetconfNodeBuilder()
             .setPort(new PortNumber(Uint16.valueOf(7777)))
             .setHost(new Host(new IpAddress(new Ipv4Address("10.10.1.1"))))
+            .setCredentials(new LoginPwUnencryptedBuilder()
+                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                    .setUsername("testuser")
+                    .setPassword("testpassword")
+                    .build())
+                .build())
             .build();
 
         createTopology(LogicalDatastoreType.CONFIGURATION);
