@@ -8,12 +8,10 @@
 package org.opendaylight.restconf.openapi.model;
 
 import static java.util.Objects.requireNonNull;
-import static javax.ws.rs.core.Response.Status.OK;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.List;
-import javax.ws.rs.HttpMethod;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -80,17 +78,13 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
 
     @Override
     public void generate(@NonNull JsonGenerator generator) throws IOException {
-        if (schema() == null) {
-            generateGetRoot(generator, moduleName());
-        } else {
-            generator.writeObjectFieldStart(operation());
-            generateBasics(generator);
-            generateRequestBody(generator);
-            generateResponses(generator);
-            generateTags(generator);
-            generateParams(generator);
-            generator.writeEndObject();
-        }
+        generator.writeObjectFieldStart(operation());
+        generateBasics(generator);
+        generateRequestBody(generator);
+        generateResponses(generator);
+        generateTags(generator);
+        generateParams(generator);
+        generator.writeEndObject();
     }
 
     public void generateBasics(@NonNull JsonGenerator generator) throws IOException {
@@ -159,27 +153,5 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
         generator.writeStringField(REF, ref);
         generator.writeEndObject();
         generator.writeEndObject();
-    }
-
-    void generateGetRoot(final @NonNull JsonGenerator generator, final @NonNull String resourceType)
-            throws IOException {
-        generator.writeObjectFieldStart("get");
-        if (resourceType.equals("data")) {
-            generator.writeStringField(DESCRIPTION, "Queries the config (startup) datastore on the mounted hosted.");
-        } else if (resourceType.equals("operations")) {
-            generator.writeStringField(DESCRIPTION,
-                "Queries the available operations (RPC calls) on the mounted hosted.");
-        }
-        generator.writeObjectFieldStart(RESPONSES);
-        generator.writeObjectFieldStart(String.valueOf(OK.getStatusCode()));
-        generator.writeStringField(DESCRIPTION, "OK");
-        generator.writeEndObject(); //end of 200
-        generator.writeEndObject(); // end of responses
-        final var summary = HttpMethod.GET + " - " + deviceName() + " - datastore - " + resourceType;
-        generator.writeStringField(SUMMARY, summary);
-        generator.writeArrayFieldStart("tags");
-        generator.writeString(deviceName + " GET root");
-        generator.writeEndArray(); //end of tags
-        generator.writeEndObject(); //end of get
     }
 }
