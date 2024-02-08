@@ -9,7 +9,7 @@ package org.opendaylight.netconf.topology.spi;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,15 +28,16 @@ import io.netty.util.TimerTask;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientFactory;
@@ -74,7 +75,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class NetconfNodeHandlerTest {
     private static final RemoteDeviceId DEVICE_ID = new RemoteDeviceId("netconf-topology",
         new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
@@ -123,17 +124,17 @@ public class NetconfNodeHandlerTest {
     private NetconfTopologySchemaAssembler schemaAssembler;
     private NetconfNodeHandler handler;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         BASE_SCHEMAS = new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory());
     }
 
-    @BeforeClass
+    @AfterAll
     public static void afterClass() throws Exception {
         BASE_SCHEMAS = null;
     }
 
-    @Before
+    @BeforeEach
     public void before() {
         schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
 
@@ -166,7 +167,7 @@ public class NetconfNodeHandlerTest {
                 .build(), null);
     }
 
-    @After
+    @AfterEach
     public void after() {
         schemaAssembler.close();
     }
