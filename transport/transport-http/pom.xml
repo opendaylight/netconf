@@ -24,6 +24,33 @@
 
     <dependencies>
         <dependency>
+            <!-- serves iana-crypt-hash incl `rounds` property for SHA algorithms -->
+            <!-- excluded from odl-parent via ODLPARENT-285 -->
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.kohsuke.metainf-services</groupId>
             <artifactId>metainf-services</artifactId>
         </dependency>
@@ -41,11 +68,23 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>keystore-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>transport-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-tcp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>transport-tls</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>truststore-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
@@ -54,6 +93,17 @@
         <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
             <artifactId>rfc8341</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
