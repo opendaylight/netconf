@@ -16,7 +16,10 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.ConcurrentDataBrokerTestCustomizer;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeContext;
@@ -27,7 +30,9 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.ConnectionOper.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240208.ConnectionOper.ConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240208.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240208.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.augment.test.rev160808.Node1;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -81,7 +86,12 @@ class NetconfDeficeTopologyAdapterIntegrationTest {
             .build());
         tx.commit().get(2, TimeUnit.SECONDS);
 
-        adapter = new NetconfDeviceTopologyAdapter(dataBroker, TEST_TOPOLOGY_ID, ID);
+        adapter = new NetconfDeviceTopologyAdapter(dataBroker, TEST_TOPOLOGY_ID, ID, new LoginPwUnencryptedBuilder()
+                .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
+                    .setUsername("netconf")
+                    .setPassword("netconf")
+                    .build())
+                .build());
     }
 
     @Test
@@ -99,15 +109,15 @@ class NetconfDeficeTopologyAdapterIntegrationTest {
 
     @Test
     void testDeviceAugmentedNodePresence() throws Exception {
-        QName netconfTestLeafQname = QName.create(
-                "urn:TBD:params:xml:ns:yang:network-topology-augment-test", "2016-08-08", "test-id").intern();
+        final var netconfTestLeafQname = QName.create("urn:TBD:params:xml:ns:yang:network-topology-augment-test",
+            "2016-08-08", "test-id").intern();
 
-        YangInstanceIdentifier pathToAugmentedLeaf = YangInstanceIdentifier.builder().node(NetworkTopology.QNAME)
-                .node(Topology.QNAME)
-                .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), "topology-netconf")
-                .node(Node.QNAME)
-                .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
-                .node(netconfTestLeafQname).build();
+        final var pathToAugmentedLeaf = YangInstanceIdentifier.builder().node(NetworkTopology.QNAME)
+            .node(Topology.QNAME)
+            .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), "topology-netconf")
+            .node(Node.QNAME)
+            .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
+            .node(netconfTestLeafQname).build();
 
         final Integer dataTestId = 474747;
         final var augmentNode = ImmutableNodes.leafNode(netconfTestLeafQname, dataTestId);
