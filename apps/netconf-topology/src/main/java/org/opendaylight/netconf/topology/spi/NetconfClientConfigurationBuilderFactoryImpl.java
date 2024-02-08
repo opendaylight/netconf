@@ -95,6 +95,9 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
     private void setSshParametersFromCredentials(final NetconfClientConfigurationBuilder confBuilder,
             final Credentials credentials) {
         final var sshParamsBuilder = new SshClientParametersBuilder();
+        if (credentials == null) {
+            throw new IllegalArgumentException("Credentials were not provided");
+        }
         if (credentials instanceof LoginPwUnencrypted unencrypted) {
             final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
             sshParamsBuilder.setClientIdentity(loginPasswordIdentity(

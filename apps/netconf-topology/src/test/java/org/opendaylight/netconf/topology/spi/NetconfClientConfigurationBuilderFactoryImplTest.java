@@ -130,6 +130,13 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
     }
 
     @Test
+    void testEmptyCredentials() {
+        nodeBuilder.setCredentials(null).setTcpOnly(false);
+        assertThrows(IllegalArgumentException.class, () -> createConfig(nodeBuilder.build()),
+            "Credentials were not provided");
+    }
+
+    @Test
     void noPort() {
         assertThrows(NoSuchElementException.class, () -> createConfig(nodeBuilder.setPort(null).build()));
     }
