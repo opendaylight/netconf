@@ -62,13 +62,13 @@ public class NetconfTopologyRPCProviderTest {
 
     @Before
     public void setUp() throws Exception {
-        doReturn(ENC_PWD.getBytes()).when(encryptionService).encrypt(TEST_PWD.getBytes());
         doReturn(rpcReg).when(rpcProviderService).registerRpcImplementations(any(Rpc[].class));
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, TOPOLOGY_ID);
     }
 
     @Test
-    public void testEncryptPassword() {
+    public void testEncryptPassword() throws Exception {
+        doReturn(ENC_PWD.getBytes()).when(encryptionService).encrypt(TEST_PWD.getBytes());
         final var encryptedPwNode = rpcProvider.encryptPassword(getInput(true));
         final var loginPw = assertInstanceOf(LoginPw.class, encryptedPwNode.getCredentials());
 
