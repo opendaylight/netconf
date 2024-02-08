@@ -69,6 +69,9 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             builder.withProtocol(NetconfClientProtocol.TCP);
         } else if (protocol == null || protocol.getName() == Name.SSH) {
             builder.withProtocol(NetconfClientProtocol.SSH);
+            if (node.getCredentials() == null) {
+                throw new IllegalArgumentException("Credentials were not provided");
+            }
             setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
             final var handlerFactory = sslContextFactoryProvider.getSslContextFactory(protocol.getSpecification());
