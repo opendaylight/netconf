@@ -69,6 +69,9 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             builder.withProtocol(NetconfClientProtocol.TCP);
         } else if (protocol == null || protocol.getName() == Name.SSH) {
             builder.withProtocol(NetconfClientProtocol.SSH);
+            if (node.getCredentials() == null) {
+                throw new IllegalArgumentException("Credentials were not provided");
+            }
             setSshParametersFromCredentials(builder, node.getCredentials());
         } else if (protocol.getName() == Name.TLS) {
             final var handlerFactory = sslContextFactoryProvider.getSslContextFactory(protocol.getSpecification());
@@ -95,6 +98,9 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
     private void setSshParametersFromCredentials(final NetconfClientConfigurationBuilder confBuilder,
             final Credentials credentials) {
         final var sshParamsBuilder = new SshClientParametersBuilder();
+        if (credentials == null) {
+            throw new IllegalArgumentException("Credentials were not provided");
+        }
         if (credentials instanceof LoginPwUnencrypted unencrypted) {
             final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
             sshParamsBuilder.setClientIdentity(loginPasswordIdentity(
