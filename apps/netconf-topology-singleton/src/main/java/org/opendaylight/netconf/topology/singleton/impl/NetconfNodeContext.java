@@ -156,7 +156,8 @@ final class NetconfNodeContext implements AutoCloseable {
 
     @VisibleForTesting
     MasterSalFacade createSalFacade(final boolean lockDatastore) {
-        return new MasterSalFacade(remoteDeviceId, setup.getActorSystem(), masterActorRef, actorResponseWaitTime,
+        return new MasterSalFacade(remoteDeviceId, requireNonNull(setup.getNode()).augmentation(NetconfNode.class)
+            .getCredentials(), setup.getActorSystem(), masterActorRef, actorResponseWaitTime,
             mountPointService, setup.getDataBroker(), lockDatastore);
     }
 }
