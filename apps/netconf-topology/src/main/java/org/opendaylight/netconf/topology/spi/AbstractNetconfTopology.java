@@ -116,7 +116,7 @@ public abstract class AbstractNetconfTopology {
 
         // Instantiate the handler ...
         final var nodeOptional = node.augmentation(NetconfNodeAugmentedOptional.class);
-        final var deviceSalFacade = createSalFacade(deviceId, netconfNode.requireLockDatastore());
+        final var deviceSalFacade = createSalFacade(netconfNode, deviceId, netconfNode.requireLockDatastore());
 
         final NetconfNodeHandler nodeHandler;
         try {
@@ -158,8 +158,9 @@ public abstract class AbstractNetconfTopology {
         activeConnectors.clear();
     }
 
-    protected RemoteDeviceHandler createSalFacade(final RemoteDeviceId deviceId, final boolean lockDatastore) {
-        return new NetconfTopologyDeviceSalFacade(deviceId, mountPointService, lockDatastore, dataBroker);
+    protected RemoteDeviceHandler createSalFacade(final NetconfNode netconfNode, final RemoteDeviceId deviceId,
+            final boolean lockDatastore) {
+        return new NetconfTopologyDeviceSalFacade(netconfNode, deviceId, mountPointService, lockDatastore, dataBroker);
     }
 
     /**
