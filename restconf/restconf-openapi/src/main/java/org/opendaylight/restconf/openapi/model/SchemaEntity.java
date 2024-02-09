@@ -67,14 +67,6 @@ public final class SchemaEntity extends OpenApiEntity {
         if (description != null) {
             generator.writeStringField("description", description);
         }
-        final var reference = reference();
-        if (reference != null) {
-            generator.writeStringField("$ref", reference);
-        }
-        generateEnum(generator);
-        generateDiscriminator(generator);
-        generateExamples(generator);
-        generateExternalDocs(generator);
         generateProperties(generator);
         generateXml(generator);
         generator.writeEndObject();
@@ -94,14 +86,6 @@ public final class SchemaEntity extends OpenApiEntity {
             .orElse(value instanceof InputSchemaNode || value instanceof OutputSchemaNode ? null : "");
     }
 
-    private @Nullable String reference() {
-        return null;
-    }
-
-    private void generateEnum(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
-    }
-
     private void generateRequired(final @NonNull JsonGenerator generator, final List<String> required)
             throws IOException {
         if (!required.isEmpty()) {
@@ -111,18 +95,6 @@ public final class SchemaEntity extends OpenApiEntity {
             }
             generator.writeEndArray();
         }
-    }
-
-    private void generateDiscriminator(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
-    }
-
-    private void generateExamples(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
-    }
-
-    private void generateExternalDocs(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
     }
 
     private void generateProperties(final @NonNull JsonGenerator generator) throws IOException {
