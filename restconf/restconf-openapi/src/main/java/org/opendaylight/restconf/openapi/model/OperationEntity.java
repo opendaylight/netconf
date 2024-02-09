@@ -110,13 +110,9 @@ public abstract sealed class OperationEntity extends OpenApiEntity permits Delet
 
     @NonNull abstract String summary();
 
-    void generateRequestBody(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
-    }
+    abstract void generateRequestBody(@NonNull JsonGenerator generator) throws IOException;
 
-    void generateResponses(final @NonNull JsonGenerator generator) throws IOException {
-        // No-op
-    }
+    abstract void generateResponses(@NonNull JsonGenerator generator) throws IOException;
 
     void generateTags(final @NonNull JsonGenerator generator) throws IOException {
         generator.writeArrayFieldStart("tags");

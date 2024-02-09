@@ -37,6 +37,11 @@ public final class DeleteEntity extends OperationEntity {
     }
 
     @Override
+    void generateRequestBody(@NonNull JsonGenerator generator) throws IOException {
+        // no-op
+    }
+
+    @Override
     void generateResponses(final @NonNull JsonGenerator generator) throws IOException {
         generator.writeObjectFieldStart(RESPONSES);
         generator.writeObjectFieldStart(String.valueOf(NO_CONTENT.getStatusCode()));

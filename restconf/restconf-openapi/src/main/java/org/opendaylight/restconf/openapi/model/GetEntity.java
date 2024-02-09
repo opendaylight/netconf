@@ -41,6 +41,11 @@ public final class GetEntity extends OperationEntity {
     }
 
     @Override
+    void generateRequestBody(@NonNull JsonGenerator generator) throws IOException {
+        // no-op
+    }
+
+    @Override
     void generateResponses(final @NonNull JsonGenerator generator) throws IOException {
         final var ref = COMPONENTS_PREFIX + moduleName() + "_" + refPath();
         generator.writeObjectFieldStart(RESPONSES);
