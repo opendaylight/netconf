@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "ad944a7a8a2a5e1db87a0a239966c40910d03922",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "320dcb46_8a4b3a7d",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-12T12:31:13Z",
+      "side": 1,
+      "message": "move this check to caller",
+      "range": {
+        "startLine": 98,
+        "startChar": 7,
+        "endLine": 98,
+        "endChar": 34
+      },
+      "revId": "ad944a7a8a2a5e1db87a0a239966c40910d03922",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
