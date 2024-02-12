@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import java.io.InputStream;
+import org.opendaylight.restconf.server.api.JsonOperationInputBody;
+import org.opendaylight.restconf.server.api.OperationInputBody;
 
 public class JsonOperationInputBodyTest extends AbstractOperationInputBodyTest {
     @Override
