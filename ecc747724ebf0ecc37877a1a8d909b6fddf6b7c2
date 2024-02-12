@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91f4a990_75919d66",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T09:14:02Z",
+      "side": 1,
+      "message": "Method reference can be used.",
+      "revId": "ecc747724ebf0ecc37877a1a8d909b6fddf6b7c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9123ddbe_cf6ce68a",
+        "filename": "protocol/netconf-common/src/test/java/org/opendaylight/netconf/common/util/CapabilityUtilTest.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T09:14:02Z",
+      "side": 1,
+      "message": "We are using JUnit 5.",
+      "revId": "ecc747724ebf0ecc37877a1a8d909b6fddf6b7c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
