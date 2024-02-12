@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "361ee17b_2ccf34b9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 25
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "Reformat.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb9434c7_61c3d8e4",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "IMO this can be a record.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e7c9a5d_d06e1bec",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "This is used here and from parent, too. What is the purpose?",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe178dee_02ecb1cf",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ParameterizedCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "IMO can be a record.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a04e5b63_fdd67916",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ParameterizedCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "No implementation, no usages.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa531faf_248198e3",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/SimpleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "Those here?\n\nhttps://www.iana.org/assignments/netconf-capability-urns/netconf-capability-urns.xhtml#netconf-capability-urns-1",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f22f9095_d61c2e95",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/SimpleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "IMO we can create this in toURI method.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07598f4e_303b2dee",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/SimpleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "throw IAE if ...",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f7051f0_4c08b52b",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/SimpleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "Not needed empty line.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc6436a4_3c4e4ffe",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "IMO This can be a record.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cff2de6_c1a31c8c",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "I would prefer to use @Nonnull for nonnull parameters and omit annotation for nullable. Not opposite as its now.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62e8b93c_ceee5c1b",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-12T08:55:24Z",
+      "side": 1,
+      "message": "No more Java code style for getters.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
