@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "608cc3db_65ce756d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-12T08:43:17Z",
+      "side": 1,
+      "message": "This is a bit confusing - you removed these null in constructor but meaning of this message is misleading. Rephrase it to something like \"This was done to avoid using null for PathEntity creation\"",
+      "range": {
+        "startLine": 9,
+        "startChar": 47,
+        "endLine": 10,
+        "endChar": 53
+      },
+      "revId": "cc41496d77d73e410bbf97b5d3bb3bb009815090",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
