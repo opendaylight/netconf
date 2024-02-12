@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.databind;
+package org.opendaylight.restconf.server.api;
 
 import java.io.InputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.server.api.DataPostPath;
 
 /**
  * Body of a {@code POST} request as defined in
