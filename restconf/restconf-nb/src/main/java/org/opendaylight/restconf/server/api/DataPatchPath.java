@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.nb.rfc8040.databind.PatchBody;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
