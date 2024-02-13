@@ -25,16 +25,16 @@ import org.bouncycastle.crypto.util.OpenSSHPublicKeyUtil;
 import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev231228.EndEntityCertCms;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev231228.PrivateKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev231228.PublicKeyFormat;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev231228.TrustAnchorCertCms;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev231228._private.key.grouping._private.key.type.CleartextPrivateKeyBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev231228.InlineOrKeystoreAsymmetricKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev231228.InlineOrKeystoreEndEntityCertWithKeyGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev231228.tls.server.grouping.server.identity.auth.type.raw._private.key.RawPrivateKeyBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev231228.inline.or.truststore.certs.grouping.InlineOrTruststore;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev231228.inline.or.truststore.certs.grouping.inline.or.truststore.inline.inline.definition.CertificateBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev240208.EndEntityCertCms;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev240208.PrivateKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev240208.PublicKeyFormat;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev240208.TrustAnchorCertCms;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev240208._private.key.grouping._private.key.type.CleartextPrivateKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208.InlineOrKeystoreAsymmetricKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208.InlineOrKeystoreEndEntityCertWithKeyGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208.tls.server.grouping.server.identity.auth.type.raw._private.key.RawPrivateKeyBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208.inline.or.truststore.certs.grouping.InlineOrTruststore;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208.inline.or.truststore.certs.grouping.inline.or.truststore.inline.inline.definition.CertificateBuilder;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 
 public final class TestUtils {
@@ -45,9 +45,9 @@ public final class TestUtils {
     }
 
     public static InlineOrTruststore buildInlineOrTruststore(final Map<String, byte[]> certNameToBytesMap) {
-        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev231228
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
             .inline.or.truststore.certs.grouping.inline.or.truststore.InlineBuilder()
-            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev231228
+            .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.truststore.rev240208
                 .inline.or.truststore.certs.grouping.inline.or.truststore.inline.InlineDefinitionBuilder()
                 .setCertificate(certNameToBytesMap.entrySet().stream()
                     .map(entry -> new CertificateBuilder()
@@ -63,7 +63,7 @@ public final class TestUtils {
             final PublicKeyFormat publicKeyFormat, final byte[] publicKeyBytes,
             final PrivateKeyFormat privateKeyFormat, final byte[] privateKeyBytes) {
         return new RawPrivateKeyBuilder()
-            .setInlineOrKeystore(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev231228
+            .setInlineOrKeystore(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
                 .inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.InlineBuilder()
                 .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore
                     .rev231228.inline.or.keystore.asymmetric.key.grouping.inline.or.keystore.inline
@@ -82,9 +82,9 @@ public final class TestUtils {
     public static InlineOrKeystoreEndEntityCertWithKeyGrouping buildEndEntityCertWithKeyGrouping(
             final PublicKeyFormat publicKeyFormat, final byte[] publicKeyBytes,
             final PrivateKeyFormat privateKeyFormat, final byte[] privateKeyBytes, final byte[] certificateBytes) {
-        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev231228
+        return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.server.rev240208
             .tls.server.grouping.server.identity.auth.type.certificate.CertificateBuilder()
-            .setInlineOrKeystore(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev231228
+            .setInlineOrKeystore(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore.rev240208
                 .inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.InlineBuilder()
                 .setInlineDefinition(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.keystore
                     .rev231228.inline.or.keystore.end.entity.cert.with.key.grouping.inline.or.keystore.inline

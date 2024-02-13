@@ -43,7 +43,7 @@ module ietf-tcp-common {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2023-12-28 {
+  revision 2024-02-08 {
     description
       "Initial version";
     reference
@@ -66,6 +66,10 @@ module ietf-tcp-common {
        whole.";
     container keepalives {
       if-feature "keepalives-supported";
+      presence
+        "Indicates that keepalives are enabled, aligning to
+         the requirement in Section 3.8.4 RFC 9293 that
+         keepalives are off by default.";
       description
         "Configures the keep-alive policy, to proactively test the
          aliveness of the TCP peer.  An unresponsive TCP peer is
@@ -73,8 +77,7 @@ module ietf-tcp-common {
          probe-interval) seconds.  Further guidance can be found
          in Section 2.1.5 of RFC DDDD.";
       reference
-        "RFC 9293:
-          Transmission Control Protocol (TCP), Section 3.8.4..";
+        "RFC 9293: Transmission Control Protocol (TCP)";
       leaf idle-time {
         type uint16 {
           range "1..max";
@@ -85,10 +88,11 @@ module ietf-tcp-common {
           "Sets the amount of time after which if no data has been
            received from the TCP peer, a TCP-level probe message
            will be sent to test the aliveness of the TCP peer.
-           Two hours (7200 seconds) is safe value, per RFC 1122.";
+           Two hours (7200 seconds) is safe value, per RFC 9293
+           Section 3.8.4.";
         reference
-          "RFC 1122:
-            Requirements for Internet Hosts -- Communication Layers";
+          "RFC 9293: Transmission Control Protocol (TCP)";
+
       }
       leaf max-probes {
         type uint16 {

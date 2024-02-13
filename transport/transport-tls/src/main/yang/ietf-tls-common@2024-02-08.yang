@@ -28,14 +28,14 @@ module ietf-tls-common {
     "WG List:  NETCONF WG list <mailto:netconf@ietf.org>
      WG Web:   https://datatracker.ietf.org/wg/netconf
      Author:   Kent Watsen <mailto:kent+ietf@watsen.net>
-     Author:   Jeff Hartley <mailto:jeff.hartley@commscope.com>
+     Author:   Jeff Hartley <mailto:intensifysecurity@gmail.com>
      Author:   Gary Wu <mailto:garywu@cisco.com>";
 
    description
     "This module defines a common features and groupings for
      Transport Layer Security (TLS).
 
-     Copyright (c) 2023 IETF Trust and the persons identified
+     Copyright (c) 2024 IETF Trust and the persons identified
      as authors of the code. All rights reserved.
 
      Redistribution and use in source and binary forms, with
@@ -56,7 +56,7 @@ module ietf-tls-common {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2023-12-28 {
+  revision 2024-02-08 {
     description
       "Initial version";
     reference
@@ -64,25 +64,6 @@ module ietf-tls-common {
   }
 
   // Features
-
-  feature tls10 {
-    status "obsolete";
-    description
-      "TLS Protocol Version 1.0 is supported.  TLS 1.0 is obsolete
-       and thus it is NOT RECOMMENDED to enable this feature.";
-    reference
-      "RFC 2246: The TLS Protocol Version 1.0";
-  }
-
-  feature tls11 {
-    status "obsolete";
-    description
-      "TLS Protocol Version 1.1 is supported.  TLS 1.1 is obsolete
-       and thus it is NOT RECOMMENDED to enable this feature.";
-    reference
-      "RFC 4346: The Transport Layer Security (TLS) Protocol
-                 Version 1.1";
-  }
 
   feature tls12 {
     status "deprecated";
@@ -107,10 +88,16 @@ module ietf-tls-common {
       "TLS hello message parameters are configurable.";
   }
 
-  feature public-key-generation {
+  feature algorithm-discovery {
     description
       "Indicates that the server implements the
-       'generate-public-key' RPC.";
+       'supported-algorithms' container.";
+  }
+
+  feature asymmetric-key-pair-generation {
+    description
+      "Indicates that the server implements the
+       'generate-asymmetric-key-pair' RPC.";
   }
 
   // Identities
@@ -118,27 +105,6 @@ module ietf-tls-common {
   identity tls-version-base {
     description
       "Base identity used to identify TLS protocol versions.";
-  }
-
-  identity tls10 {
-    if-feature "tls10";
-    base tls-version-base;
-    status "obsolete";
-    description
-      "TLS Protocol Version 1.0.";
-    reference
-      "RFC 2246: The TLS Protocol Version 1.0";
-  }
-
-  identity tls11 {
-    if-feature "tls11";
-    base tls-version-base;
-    status "obsolete";
-    description
-      "TLS Protocol Version 1.1.";
-    reference
-      "RFC 4346: The Transport Layer Security (TLS) Protocol
-                 Version 1.1";
   }
 
   identity tls12 {
@@ -235,11 +201,27 @@ module ietf-tls-common {
     }
   } // hello-params-grouping
 
-  rpc generate-public-key {
-    if-feature "public-key-generation";
+
+  // Protocol-accessible Nodes
+
+  container supported-algorithms {
+    if-feature "algorithm-discovery";
+    config false;
     description
-      "Requests the device to generate an public key using
-       the specified key algorithm.";
+      "A container for a list of cipher suite algorithms supported
+       by the server.";
+    leaf-list supported-algorithm {
+      type tlscsa:cipher-suite-algorithm-ref;
+      description
+        "A cipher suite algorithm supported by the server.";
+    }
+  }
+
+  rpc generate-asymmetric-key-pair {
+    if-feature "asymmetric-key-pair-generation";
+    description
+      "Requests the device to generate an asymmetric-key-pair
+       key using the specified key algorithm.";
     input {
       leaf algorithm {
         type tlscsa:cipher-suite-algorithm-ref;
@@ -311,6 +293,6 @@ module ietf-tls-common {
     output {
       uses ct:asymmetric-key-pair-grouping;
     }
-  } // end generate-public-key
+  } // end generate-asymmetric-key-pair
 
 }

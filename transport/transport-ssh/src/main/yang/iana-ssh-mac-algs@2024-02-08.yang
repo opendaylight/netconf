@@ -20,7 +20,7 @@ module iana-ssh-mac-algs {
      'Secure Shell (SSH) Protocol Parameters' registry maintained
      by IANA.
 
-     Copyright (c) 2022 IETF Trust and the persons identified as
+     Copyright (c) 2024 IETF Trust and the persons identified as
      authors of the code. All rights reserved.
 
      Redistribution and use in source and binary forms, with
@@ -34,10 +34,9 @@ module iana-ssh-mac-algs {
      (https://www.rfc-editor.org/info/rfcEEEE); see the RFC
      itself for full legal notices.";
 
-  revision 2022-06-16 {
+  revision 2024-02-08 {
     description
-      "Reflects contents of the MAC algorithms registry on
-       June 16, 2022.";
+      "Reflects contents of the mac algorithms registry.";
     reference
       "RFC EEEE: YANG Groupings for SSH Clients and SSH Servers";
   }
@@ -49,7 +48,7 @@ module iana-ssh-mac-algs {
       base "mac-alg-base";
     }
     description
-      "A reference to a SSH mac algorithm identifier.";
+      "A reference to an SSH mac algorithm identifier.";
   }
 
 
@@ -57,14 +56,13 @@ module iana-ssh-mac-algs {
 
   identity mac-alg-base {
     description
-      "Base identity used to identify message authentication
-       code (MAC) algorithms.";
+      "Base identity for SSH mac algorithms.";
   }
 
   identity hmac-sha1 {
     base mac-alg-base;
     description
-      "HMAC-SHA1";
+      "Identity for the 'hmac-sha1' algorithm.  Section 6.4";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
@@ -73,7 +71,7 @@ module iana-ssh-mac-algs {
   identity hmac-sha1-96 {
     base mac-alg-base;
     description
-      "HMAC-SHA1-96";
+      "Identity for the 'hmac-sha1-96' algorithm.  Section 6.4";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
@@ -82,7 +80,7 @@ module iana-ssh-mac-algs {
   identity hmac-md5 {
     base mac-alg-base;
     description
-      "HMAC-MD5";
+      "Identity for the 'hmac-md5' algorithm.  Section 6.4";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
@@ -91,7 +89,7 @@ module iana-ssh-mac-algs {
   identity hmac-md5-96 {
     base mac-alg-base;
     description
-      "HMAC-MD5-96";
+      "Identity for the 'hmac-md5-96' algorithm.  Section 6.4";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
@@ -100,64 +98,50 @@ module iana-ssh-mac-algs {
   identity none {
     base mac-alg-base;
     description
-      "NONE";
+      "Identity for the 'none' algorithm.  Section 6.4";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
   }
 
-  identity aead-aes-128-gcm {
+  identity AEAD_AES_128_GCM {
     base mac-alg-base;
     description
-      "AEAD_AES_128_GCM";
+      "Identity for the 'AEAD_AES_128_GCM' algorithm.  Section 6.1";
     reference
       "RFC 5647:
-         AES Galois Counter Mode for the
-         Secure Shell Transport Layer Protocol";
+         AES Galois Counter Mode for the Secure Shell Transport Layer
+         Protocol";
   }
 
-  identity aead-aes-256-gcm {
+  identity AEAD_AES_256_GCM {
     base mac-alg-base;
     description
-      "AEAD_AES_256_GCM";
+      "Identity for the 'AEAD_AES_256_GCM' algorithm.  Section 6.2";
     reference
       "RFC 5647:
-         AES Galois Counter Mode for the
-         Secure Shell Transport Layer Protocol";
+         AES Galois Counter Mode for the Secure Shell Transport Layer
+         Protocol";
   }
 
   identity hmac-sha2-256 {
     base mac-alg-base;
     description
-      "HMAC-SHA2-256";
+      "Identity for the 'hmac-sha2-256' algorithm.  Section 2";
     reference
       "RFC 6668:
-         SHA-2 Data Integrity Verification for the
-         Secure Shell (SSH) Transport Layer Protocol";
+         SHA-2 Data Integrity Verification for the Secure Shell (SSH)
+         Transport Layer Protocol";
   }
 
   identity hmac-sha2-512 {
     base mac-alg-base;
     description
-      "HMAC-SHA2-512";
+      "Identity for the 'hmac-sha2-512' algorithm.  Section 2";
     reference
       "RFC 6668:
-         SHA-2 Data Integrity Verification for the
-         Secure Shell (SSH) Transport Layer Protocol";
-  }
-
-  // Protocol-accessible Nodes
-
-  container supported-algorithms {
-    config false;
-    description
-      "A container for a list of MAC algorithms
-       supported by the server.";
-    leaf-list supported-algorithm {
-      type mac-algorithm-ref;
-      description
-        "A MAC algorithm supported by the server.";
-    }
+         SHA-2 Data Integrity Verification for the Secure Shell (SSH)
+         Transport Layer Protocol";
   }
 
 }
