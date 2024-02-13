@@ -88,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cf573b1_88af01cc",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:47:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e7c9a5d_d06e1bec",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe178dee_02ecb1cf",
@@ -206,6 +224,24 @@
       "writtenOn": "2024-02-12T08:55:24Z",
       "side": 1,
       "message": "IMO we can create this in toURI method.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd196538_e5474a8a",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/SimpleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:47:10Z",
+      "side": 1,
+      "message": "We use URI.create(urn) in the constructor to conserve resources and ensure that it is called only once when creating an object.",
+      "parentUuid": "f22f9095_d61c2e95",
       "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
