@@ -20,7 +20,7 @@ module iana-ssh-public-key-algs {
      'Secure Shell (SSH) Protocol Parameters' registry maintained
      by IANA.
 
-     Copyright (c) 2022 IETF Trust and the persons identified as
+     Copyright (c) 2024 IETF Trust and the persons identified as
      authors of the code. All rights reserved.
 
      Redistribution and use in source and binary forms, with
@@ -34,10 +34,9 @@ module iana-ssh-public-key-algs {
      (https://www.rfc-editor.org/info/rfcEEEE); see the RFC
      itself for full legal notices.";
 
-  revision 2022-06-16 {
+  revision 2024-02-08 {
     description
-      "Reflects contents of the public key algorithms registry
-       on June 16, 2022.";
+      "Reflects contents of the public key algorithms registry.";
     reference
       "RFC EEEE: YANG Groupings for SSH Clients and SSH Servers";
   }
@@ -49,7 +48,7 @@ module iana-ssh-public-key-algs {
       base "public-key-alg-base";
     }
     description
-      "A reference to a SSH public key algorithm identifier.";
+      "A reference to an SSH public key algorithm identifier.";
   }
 
 
@@ -57,13 +56,13 @@ module iana-ssh-public-key-algs {
 
   identity public-key-alg-base {
     description
-      "Base identity used to identify public key algorithms.";
+      "Base identity for SSH public key algorithms.";
   }
 
   identity ssh-dss {
     base public-key-alg-base;
     description
-      "SSH-DSS";
+      "Identity for the 'ssh-dss' algorithm.  Section 6.6";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
@@ -72,7 +71,7 @@ module iana-ssh-public-key-algs {
   identity ssh-rsa {
     base public-key-alg-base;
     description
-      "SSH-RSA";
+      "Identity for the 'ssh-rsa' algorithm.  Section 6.6";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
@@ -81,27 +80,27 @@ module iana-ssh-public-key-algs {
   identity rsa-sha2-256 {
     base public-key-alg-base;
     description
-      "RSA-SHA2-256";
+      "Identity for the 'rsa-sha2-256' algorithm.  Section 3";
     reference
       "RFC 8332:
-         Use of RSA Keys with SHA-256 and SHA-512
-         in the Secure Shell (SSH) Protocol";
+         Use of RSA Keys with SHA-256 and SHA-512 in the Secure Shell
+         (SSH) Protocol";
   }
 
   identity rsa-sha2-512 {
     base public-key-alg-base;
     description
-      "RSA-SHA2-512";
+      "Identity for the 'rsa-sha2-512' algorithm.  Section 3";
     reference
       "RFC 8332:
-         Use of RSA Keys with SHA-256 and SHA-512
-         in the Secure Shell (SSH) Protocol";
+         Use of RSA Keys with SHA-256 and SHA-512 in the Secure Shell
+         (SSH) Protocol";
   }
 
   identity spki-sign-rsa {
     base public-key-alg-base;
     description
-      "SPKI-SIGN-RSA";
+      "Identity for the 'spki-sign-rsa' algorithm.  Section 6.6";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
@@ -110,7 +109,7 @@ module iana-ssh-public-key-algs {
   identity spki-sign-dss {
     base public-key-alg-base;
     description
-      "SPKI-SIGN-DSS";
+      "Identity for the 'spki-sign-dss' algorithm.  Section 6.6";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
@@ -119,7 +118,7 @@ module iana-ssh-public-key-algs {
   identity pgp-sign-rsa {
     base public-key-alg-base;
     description
-      "PGP-SIGN-RSA";
+      "Identity for the 'pgp-sign-rsa' algorithm.  Section 6.6";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
@@ -128,7 +127,7 @@ module iana-ssh-public-key-algs {
   identity pgp-sign-dss {
     base public-key-alg-base;
     description
-      "PGP-SIGN-DSS";
+      "Identity for the 'pgp-sign-dss' algorithm.  Section 6.6";
     reference
       "RFC 4253:
          The Secure Shell (SSH) Transport Layer Protocol";
@@ -137,139 +136,138 @@ module iana-ssh-public-key-algs {
   identity null {
     base public-key-alg-base;
     description
-      "NULL";
+      "Identity for the 'null' algorithm.  Section 5";
     reference
       "RFC 4462:
-         Generic Security Service Application Program Interface
-         (GSS-API) Authentication and Key Exchange for the
-         Secure Shell (SSH) Protocol";
+         Generic Security Service Application Program Interface (GSS-
+         API) Authentication and Key Exchange for the Secure Shell
+         (SSH) Protocol";
   }
 
   identity ecdsa-sha2-nistp256 {
     base public-key-alg-base;
-    status deprecated;
     description
-      "ECDSA-SHA2-NISTP256 (secp256r1)";
+      "Identity for the 'ecdsa-sha2-nistp256' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-nistp384 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-NISTP384 (secp384r1)";
+      "Identity for the 'ecdsa-sha2-nistp384' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-nistp521 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-NISTP521 (secp521r1)";
+      "Identity for the 'ecdsa-sha2-nistp521' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-1.3.132.0.1 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-1.3.132.0.1 (nistk163, sect163k1)";
+      "Identity for the 'ecdsa-sha2-1.3.132.0.1' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-1.2.840.10045.3.1.1 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-1.2.840.10045.3.1.1 (nistp192, secp192r1)";
+      "Identity for the 'ecdsa-sha2-1.2.840.10045.3.1.1' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-1.3.132.0.33 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-1.3.132.0.33 (nistp224, secp224r1)";
+      "Identity for the 'ecdsa-sha2-1.3.132.0.33' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-1.3.132.0.26 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-1.3.132.0.26 (nistk233, sect233k1)";
+      "Identity for the 'ecdsa-sha2-1.3.132.0.26' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-1.3.132.0.27 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-1.3.132.0.27 (nistb233, sect233r1)";
+      "Identity for the 'ecdsa-sha2-1.3.132.0.27' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-1.3.132.0.16 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-1.3.132.0.16 (nistk283, sect283k1)";
+      "Identity for the 'ecdsa-sha2-1.3.132.0.16' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-1.3.132.0.36 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-1.3.132.0.36 (nistk409, sect409k1)";
+      "Identity for the 'ecdsa-sha2-1.3.132.0.36' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-1.3.132.0.37 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-1.3.132.0.37 (nistb409, sect409r1)";
+      "Identity for the 'ecdsa-sha2-1.3.132.0.37' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity ecdsa-sha2-1.3.132.0.38 {
     base public-key-alg-base;
     description
-      "ECDSA-SHA2-1.3.132.0.38 (nistt571, sect571k1)";
+      "Identity for the 'ecdsa-sha2-1.3.132.0.38' algorithm.";
     reference
       "RFC 5656:
-         Elliptic Curve Algorithm Integration in the
-         Secure Shell Transport Layer";
+         Elliptic Curve Algorithm Integration in the Secure Shell
+         Transport Layer";
   }
 
   identity x509v3-ssh-dss {
     base public-key-alg-base;
     description
-      "X509V3-SSH-DSS";
+      "Identity for the 'x509v3-ssh-dss' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -278,7 +276,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ssh-rsa {
     base public-key-alg-base;
     description
-      "X509V3-SSH-RSA";
+      "Identity for the 'x509v3-ssh-rsa' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -286,9 +284,8 @@ module iana-ssh-public-key-algs {
 
   identity x509v3-rsa2048-sha256 {
     base public-key-alg-base;
-    status deprecated;
     description
-      "X509V3-RSA2048-SHA256";
+      "Identity for the 'x509v3-rsa2048-sha256' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -297,7 +294,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-nistp256 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-NISTP256 (secp256r1)";
+      "Identity for the 'x509v3-ecdsa-sha2-nistp256' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -306,7 +303,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-nistp384 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-NISTP384 (secp384r1)";
+      "Identity for the 'x509v3-ecdsa-sha2-nistp384' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -315,7 +312,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-nistp521 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-NISTP521 (secp521r1)";
+      "Identity for the 'x509v3-ecdsa-sha2-nistp521' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -324,7 +321,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-1.3.132.0.1 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-1.3.132.0.1 (nistk163, sect163k1)";
+      "Identity for the 'x509v3-ecdsa-sha2-1.3.132.0.1' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -333,7 +330,8 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-1.2.840.10045.3.1.1 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-1.2.840.10045.3.1.1 (nistp192, secp192r1)";
+      "Identity for the 'x509v3-ecdsa-sha2-1.2.840.10045.3.1.1'
+       algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -342,7 +340,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-1.3.132.0.33 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-1.3.132.0.33 (nistp224, secp224r1)";
+      "Identity for the 'x509v3-ecdsa-sha2-1.3.132.0.33' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -351,7 +349,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-1.3.132.0.26 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-1.3.132.0.26 (nistk233, sect233k1)";
+      "Identity for the 'x509v3-ecdsa-sha2-1.3.132.0.26' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -360,7 +358,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-1.3.132.0.27 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-1.3.132.0.27 (nistb233, sect233r1)";
+      "Identity for the 'x509v3-ecdsa-sha2-1.3.132.0.27' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -369,7 +367,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-1.3.132.0.16 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-1.3.132.0.16 (nistk283, sect283k1)";
+      "Identity for the 'x509v3-ecdsa-sha2-1.3.132.0.16' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -378,7 +376,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-1.3.132.0.36 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-1.3.132.0.36 (nistk409, sect409k1)";
+      "Identity for the 'x509v3-ecdsa-sha2-1.3.132.0.36' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -387,7 +385,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-1.3.132.0.37 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-1.3.132.0.37 (nistb409, sect409r1)";
+      "Identity for the 'x509v3-ecdsa-sha2-1.3.132.0.37' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -396,7 +394,7 @@ module iana-ssh-public-key-algs {
   identity x509v3-ecdsa-sha2-1.3.132.0.38 {
     base public-key-alg-base;
     description
-      "X509V3-ECDSA-SHA2-1.3.132.0.38 (nistt571, sect571k1)";
+      "Identity for the 'x509v3-ecdsa-sha2-1.3.132.0.38' algorithm.";
     reference
       "RFC 6187:
          X.509v3 Certificates for Secure Shell Authentication";
@@ -405,35 +403,21 @@ module iana-ssh-public-key-algs {
   identity ssh-ed25519 {
     base public-key-alg-base;
     description
-      "SSH-ED25519";
+      "Identity for the 'ssh-ed25519' algorithm.";
     reference
       "RFC 8709:
-         Ed25519 and Ed448 Public Key Algorithms for the
-         Secure Shell (SSH) Protocol";
+         Ed25519 and Ed448 Public Key Algorithms for the Secure Shell
+         (SSH) Protocol";
   }
 
   identity ssh-ed448 {
     base public-key-alg-base;
     description
-      "SSH-ED448";
+      "Identity for the 'ssh-ed448' algorithm.";
     reference
       "RFC 8709:
-         Ed25519 and Ed448 Public Key Algorithms for the
-         Secure Shell (SSH) Protocol";
-  }
-
-  // Protocol-accessible Nodes
-
-  container supported-algorithms {
-    config false;
-    description
-      "A container for a list of public key algorithms
-       supported by the server.";
-    leaf-list supported-algorithm {
-      type public-key-algorithm-ref;
-      description
-        "A public key algorithm supported by the server.";
-    }
+         Ed25519 and Ed448 Public Key Algorithms for the Secure Shell
+         (SSH) Protocol";
   }
 
 }
