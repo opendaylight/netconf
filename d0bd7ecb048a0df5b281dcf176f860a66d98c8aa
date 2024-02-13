@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca0a0a74_9b4023da",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-13T14:09:14Z",
+      "side": 1,
+      "message": "Missing what is the intent of this patch. Please check netconf RFC to see if credentials are required for all netconf devices.",
+      "revId": "d0bd7ecb048a0df5b281dcf176f860a66d98c8aa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
