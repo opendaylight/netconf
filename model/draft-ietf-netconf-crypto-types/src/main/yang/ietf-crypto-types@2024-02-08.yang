@@ -27,7 +27,7 @@ module ietf-crypto-types {
     "This module defines common YANG types for cryptographic
      applications.
 
-     Copyright (c) 2023 IETF Trust and the persons identified
+     Copyright (c) 2024 IETF Trust and the persons identified
      as authors of the code. All rights reserved.
 
      Redistribution and use in source and binary forms, with
@@ -48,7 +48,7 @@ module ietf-crypto-types {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2023-12-28 {
+  revision 2024-02-08 {
     description
       "Initial version";
     reference
@@ -190,11 +190,11 @@ module ietf-crypto-types {
     base private-key-format;
     description
       "Indicates that the private key value is encoded as
-       an RSAPrivateKey (from RFC 3447), encoded using ASN.1
+       an RSAPrivateKey (from RFC 8017), encoded using ASN.1
        distinguished encoding rules (DER), as specified in
        ITU-T X.690.";
     reference
-      "RFC 3447:
+      "RFC 8017:
          PKCS #1: RSA Cryptography Specifications Version 2.2
        ITU-T X.690:
          Information technology - ASN.1 encoding rules:
@@ -718,11 +718,11 @@ module ietf-crypto-types {
 
          If 'encrypted-by' points to a symmetric key, then a
          'symmetrically-encrypted-value-format' based identity
-         MUST by set (e.g., cms-encrypted-data-format).
+         MUST be set (e.g., cms-encrypted-data-format).
 
          If 'encrypted-by' points to an asymmetric key, then an
          'asymmetrically-encrypted-value-format' based identity
-         MUST by set (e.g., cms-enveloped-data-format).";
+         MUST be set (e.g., cms-enveloped-data-format).";
     }
     leaf encrypted-value {
       nacm:default-deny-write;
@@ -739,7 +739,11 @@ module ietf-crypto-types {
 
   grouping password-grouping {
     description
-      "A password that may be encrypted.";
+      "A password used for authenticating to a remote system.
+       
+       The 'ianach:crypt-hash' typedef from RFC 7317 should be
+       used instead when needing a password to authencate a
+       local account.";
     choice password-type {
       nacm:default-deny-write;
       mandatory true;
@@ -787,8 +791,8 @@ module ietf-crypto-types {
       mandatory true;
       description
         "Choice between key types.";
-      case cleartext-key {
-        leaf cleartext-key {
+      case cleartext-symmetric-key {
+        leaf cleartext-symmetric-key {
           if-feature "cleartext-symmetric-keys";
           nacm:default-deny-all;
           type binary;
@@ -798,19 +802,25 @@ module ietf-crypto-types {
              the value is defined by the 'key-format' field.";
         }
       }
-      case hidden-key {
+      case hidden-symmetric-key {
         if-feature "hidden-symmetric-keys";
-        leaf hidden-key {
+        leaf hidden-symmetric-key {
           type empty;
           must 'not(../key-format)';
           description
-            "A hidden key.  How such keys are created is outside
-             the scope of this module.";
+            "A hidden key is not exportable, and not extractable,
+             and therefore, it is of type 'empty' as its value is
+             inaccessible via management interfaces. Though hidden
+             to users, such keys are not hidden to the server and
+             may be referenced by configuration to indicate which
+             key a server should use for a cryptographic operation.
+             How such keys are created is outside the scope of this
+             module.";
         }
       }
-      case encrypted-key {
+      case encrypted-symmetric-key {
         if-feature "encrypted-symmetric-keys";
-        container encrypted-key {
+        container encrypted-symmetric-key {
           must '../key-format';
           description
             "A container for the encrypted symmetric key value.
@@ -885,8 +895,13 @@ module ietf-crypto-types {
           type empty;
           must 'not(../private-key-format)';
           description
-            "A hidden key.  How such keys are created is
-             outside the scope of this module.";
+            "A hidden key.  It is of type 'empty' as its value is
+             inaccessible via management interfaces.  Though hidden
+             to users, such keys are not hidden to the server and
+             and may be referenced by configuration to indicate which
+             key a server should use for a cryptographic operation.
+             How such keys are created is outside the scope of this
+             module.";
         }
       }
       case encrypted-private-key {
@@ -906,7 +921,7 @@ module ietf-crypto-types {
   grouping asymmetric-key-pair-grouping {
     description
       "A private key and, optionally, its associated public key.
-       Implementations SHOULD ensure that the two keys, when both
+       Implementations MUST ensure that the two keys, when both
        are specified, are a matching pair.";
     uses public-key-grouping {
       refine public-key-format {
@@ -946,7 +961,7 @@ module ietf-crypto-types {
       "A trust anchor certificate, and a notification for when
        it is about to (or already has) expire.";
     leaf cert-data {
-      nacm:default-deny-write;
+      nacm:default-deny-all;
       type trust-anchor-cert-cms;
       description
         "The binary certificate data for this certificate.";
@@ -961,7 +976,7 @@ module ietf-crypto-types {
        SHOULD assert that, where used, the end entity certificate
        contains the expected public key.";
     leaf cert-data {
-      nacm:default-deny-write;
+      nacm:default-deny-all;
       type end-entity-cert-cms;
       description
         "The binary certificate data for this certificate.";
@@ -985,12 +1000,6 @@ module ietf-crypto-types {
          This action statement is only available when the
          associated 'public-key-format' node's value is
          'subject-public-key-info-format'.";
-      reference
-        "RFC 6125:
-          Representation and Verification of Domain-Based
-          Application Service Identity within Internet Public Key
-          Infrastructure Using X.509 (PKIX) Certificates in the
-          Context of Transport Layer Security (TLS)";
       input {
         leaf csr-format {
           type identityref {
@@ -1052,7 +1061,7 @@ module ietf-crypto-types {
   grouping asymmetric-key-pair-with-cert-grouping {
     description
       "A private/public key pair and an associated certificate.
-       Implementations SHOULD assert that the certificate contains
+       Implementations MUST assert that the certificate contains
        the matching public key.";
     uses asymmetric-key-pair-grouping;
     uses end-entity-cert-grouping;
@@ -1062,7 +1071,7 @@ module ietf-crypto-types {
   grouping asymmetric-key-pair-with-certs-grouping {
     description
       "A private/public key pair and a list of associated
-       certificates.  Implementations SHOULD assert that
+       certificates.  Implementations MUST assert that
        certificates contain the matching public key.";
     uses asymmetric-key-pair-grouping;
     container certificates {

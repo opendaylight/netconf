@@ -57,7 +57,7 @@ module ietf-restconf-server {
     "This module contains a collection of YANG definitions
      for configuring RESTCONF servers.
 
-     Copyright (c) 2023 IETF Trust and the persons identified
+     Copyright (c) 2024 IETF Trust and the persons identified
      as authors of the code. All rights reserved.
 
      Redistribution and use in source and binary forms, with
@@ -78,7 +78,7 @@ module ietf-restconf-server {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2023-04-17 {
+  revision 2024-02-08 {
     description
       "Initial version";
     reference
@@ -171,19 +171,22 @@ module ietf-restconf-server {
   grouping restconf-server-listen-stack-grouping {
     description
       "A reusable grouping for configuring a RESTCONF server
-       'listen' protocol stack for a single connection.";
+       'listen' protocol stack for listening on a single port.";
     choice transport {
       mandatory true;
       description
-        "Selects between available transports. This is a
-         'choice' statement so as to support additional
-         transport options to be augmented in.";
+        "Selects between available transports.";
       case http {
         if-feature "http-listen";
         container http {
           description
             "Configures RESTCONF server stack assuming that
-             TLS-termination is handled externally.";
+             TLS-termination is handled externally.
+
+             How a RESTCONF-server identifies RESTCONF-clients
+             authenticating using a TLS-level client-certificate
+             with external TLS termination is out of scope of
+             this document.";
           container external-endpoint {
             presence
               "Identifies that an external endpoint has been
@@ -193,7 +196,7 @@ module ietf-restconf-server {
             description
               "Identifies contact information for the external
                system that terminates connections before passing
-               them thru to this server (e.g., a network address
+               them through to this server (e.g., a network address
                translator or a load balancer).  These values have
                no effect on the local operation of this server,
                but may be used by the application when needing to
@@ -202,10 +205,10 @@ module ietf-restconf-server {
               type inet:host;
               mandatory true;
               description
-                "The IP address or hostname of the external system
-                 that terminates incoming RESTCONF client
-                 connections before forwarding them to this
-                 server.";
+                "The IP address or hostname of the external
+                 system that terminates incoming RESTCONF
+                 client connections before forwarding them
+                 to this server.";
             }
             leaf port {
               type inet:port-number;
@@ -220,8 +223,8 @@ module ietf-restconf-server {
           }
           container tcp-server-parameters {
             description
-              "A wrapper around the TCP server parameters
-               to avoid name collisions.";
+              "TCP-level server parameters to listen for
+               RESTCONF over HTTP connections.";
             uses tcps:tcp-server-grouping {
               refine "local-port" {
                 default "80";
@@ -234,14 +237,14 @@ module ietf-restconf-server {
           }
           container http-server-parameters {
             description
-              "A wrapper around the HTTP server parameters
-               to avoid name collisions.";
+              "HTTP-level server parameters to listen
+               for RESTCONF over HTTP connections.";
             uses https:http-server-grouping;
           }
           container restconf-server-parameters {
             description
-              "A wrapper around the RESTCONF server parameters
-               to avoid name collisions.";
+              "RESTCONF-level server parameters to listen
+               for RESTCONF over HTTP connections.";
             uses rcs:restconf-server-grouping;
           }
         }
@@ -256,8 +259,8 @@ module ietf-restconf-server {
              server).";
           container tcp-server-parameters {
             description
-              "A wrapper around the TCP server parameters
-               to avoid name collisions.";
+              "TCP-level server parameters to listen for
+               RESTCONF over HTTPS connections.";
             uses tcps:tcp-server-grouping {
               refine "local-port" {
                 default "443";
@@ -270,20 +273,20 @@ module ietf-restconf-server {
           }
           container tls-server-parameters {
             description
-              "A wrapper around the TLS server parameters
-               to avoid name collisions.";
+              "TLS-level server parameters to listen
+               for RESTCONF over HTTPS connections.";
             uses tlss:tls-server-grouping;
           }
           container http-server-parameters {
             description
-              "A wrapper around the HTTP server parameters
-               to avoid name collisions.";
+              "HTTP-level server parameters to listen
+               for RESTCONF over HTTPS connections.";
             uses https:http-server-grouping;
           }
           container restconf-server-parameters {
             description
-              "A wrapper around the RESTCONF server parameters
-               to avoid name collisions.";
+              "RESTCONF-level server parameters to listen
+               for RESTCONF over HTTPS connections.";
             uses rcs:restconf-server-grouping;
           }
         }
@@ -294,23 +297,22 @@ module ietf-restconf-server {
   grouping restconf-server-callhome-stack-grouping {
     description
       "A reusable grouping for configuring a RESTCONF server
-       'call-home' protocol stack, for a single connection.";
+       'call-home' protocol stack, for a single outbound
+       connection.";
     choice transport {
       mandatory true;
       description
-        "Selects between available transports. This is a
-         'choice' statement so as to support additional
-         transport options to be augmented in.";
+        "Selects between available transports.";
       case https {
-        if-feature "https-listen";
+        if-feature "https-call-home";
         container https {
           description
             "Configures RESTCONF server stack assuming that
              TLS-termination is handled internally.";
           container tcp-client-parameters {
             description
-              "A wrapper around the TCP client parameters
-               to avoid name collisions.";
+              "TCP-level client parameters to initiate a
+               RESTCONF over HTTPS Call Home connection.";
             uses tcpc:tcp-client-grouping {
               refine "remote-port" {
                 default "4336";
@@ -324,20 +326,20 @@ module ietf-restconf-server {
           }
           container tls-server-parameters {
             description
-              "A wrapper around the TLS server parameters
-               to avoid name collisions.";
+              "TLS-level server parameters to initiate a
+               RESTCONF over HTTPS Call Home connection.";
             uses tlss:tls-server-grouping;
           }
           container http-server-parameters {
             description
-              "A wrapper around the HTTP server parameters
-               to avoid name collisions.";
+              "HTTP-level server parameters to initiate a
+               RESTCONF over HTTPS Call Home connection.";
             uses https:http-server-grouping;
           }
           container restconf-server-parameters {
             description
-              "A wrapper around the RESTCONF server parameters
-               to avoid name collisions.";
+              "RESTCONF-level server parameters to initiate
+               a RESTCONF over HTTPS Call Home connection.";
             uses rcs:restconf-server-grouping;
           }
         }
@@ -360,17 +362,21 @@ module ietf-restconf-server {
       description
         "Configures the RESTCONF server to listen for RESTCONF
          client connections.";
-      list endpoint {
-        key "name";
-        min-elements 1;
+      container endpoints {
         description
-          "List of endpoints to listen for RESTCONF connections.";
-        leaf name {
-          type string;
+          "Container for a list of endpoints.";
+        list endpoint {
+          key "name";
+          min-elements 1;
           description
-            "An arbitrary name for the RESTCONF listen endpoint.";
+            "List of endpoints to listen for RESTCONF connections.";
+          leaf name {
+            type string;
+            description
+              "An arbitrary name for the RESTCONF listen endpoint.";
+          }
+          uses restconf-server-listen-stack-grouping;
         }
-        uses restconf-server-listen-stack-grouping;
       }
     }
     container call-home {
