@@ -3,6 +3,12 @@ module ietf-http-server {
   namespace "urn:ietf:params:xml:ns:yang:ietf-http-server";
   prefix https;
 
+  import ietf-yang-types {
+    prefix yang;
+    reference
+      "RFC 6991: Common YANG Data Types";
+  }
+
   import iana-crypt-hash {
     prefix ianach;
     reference
@@ -39,7 +45,7 @@ module ietf-http-server {
     "This module defines reusable groupings for HTTP servers that
      can be used as a basis for specific HTTP server instances.
 
-     Copyright (c) 2023 IETF Trust and the persons identified
+     Copyright (c) 2024 IETF Trust and the persons identified
      as authors of the code. All rights reserved.
 
      Redistribution and use in source and binary forms, with
@@ -60,7 +66,7 @@ module ietf-http-server {
      (RFC 8174) when, and only when, they appear in all
      capitals, as shown here.";
 
-  revision 2023-04-17 {
+  revision 2024-02-08 {
     description
       "Initial version";
     reference
@@ -167,16 +173,29 @@ module ietf-http-server {
             case basic {
               container basic {
                 if-feature "basic-auth";
-                leaf user-id {
+                leaf username {
                   type string;
                   description
-                    "The user-id for the authenticating client.";
+                    "The username for the authenticating HTTP
+                     client.";
                 }
-                leaf password {
-                  nacm:default-deny-write;
-                  type ianach:crypt-hash;
+                container password {
                   description
-                    "The password for the authenticating client.";
+                    "The hashed password the HTTP server uses to
+                     authenticate this user.  A user is authenticated
+                     if the hash of the supplied password matches
+                     this value.";
+                  leaf hashed-password {
+                    type ianach:crypt-hash;
+                    description
+                      "The password for the authenticating client.";
+                  }
+                  leaf last-modified {
+                    type yang:date-and-time;
+                    config false;
+                    description
+                      "Identifies when the password was last set.";
+                  }
                 }
                 description
                   "The 'basic' HTTP scheme credentials.";
@@ -208,14 +227,14 @@ module ietf-http-server {
             "Container for TCP-based HTTP protocols.";
           container tcp-server-parameters {
             description
-              "A wrapper around the TCP parameters to avoid
-               name collisions.";
+              "TCP-level server parameters to
+               listen for HTTP connections.";
             uses tcps:tcp-server-grouping;
           }
           container http-server-parameters {
             description
-              "A wrapper around the HTTP parameters to avoid
-               name collisions.";
+              "HTTP-level server parameters to
+               listen for HTTP connections.";
             uses http-server-grouping;
           }
         }
@@ -227,20 +246,20 @@ module ietf-http-server {
             "Container for TLS-based HTTP protocols.";
           container tcp-server-parameters {
             description
-              "A wrapper around the TCP parameters to avoid
-               name collisions.";
+              "TCP-level server parameters to
+               listen for HTTPS connections.";
             uses tcps:tcp-server-grouping;
           }
           container tls-server-parameters {
             description
-              "A wrapper around the TLS parameters to avoid
-               name collisions.";
+              "TLS-level server parameters to
+               listen for HTTPS connections.";
             uses tlss:tls-server-grouping;
           }
           container http-server-parameters {
             description
-              "A wrapper around the HTTP parameters to avoid
-               name collisions.";
+              "HTTP-level server parameters to
+               listen for HTTPS connections.";
             uses http-server-grouping;
           }
         }

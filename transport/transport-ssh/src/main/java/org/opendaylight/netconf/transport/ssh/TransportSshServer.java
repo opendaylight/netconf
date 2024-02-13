@@ -26,10 +26,10 @@ import org.opendaylight.netconf.shaded.sshd.server.auth.password.UserAuthPasswor
 import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.UserAuthPublicKeyFactory;
 import org.opendaylight.netconf.shaded.sshd.server.forward.DirectTcpipFactory;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev231228.SshServerGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev231228.ssh.server.grouping.ClientAuthentication;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev231228.ssh.server.grouping.Keepalives;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev231228.ssh.server.grouping.ServerIdentity;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.SshServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.ClientAuthentication;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.Keepalives;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.server.rev240208.ssh.server.grouping.ServerIdentity;
 
 /**
  * Our internal-use {@link SshServer}. We reuse all the properties and logic of an {@link SshServer}, but we never allow
@@ -196,7 +196,7 @@ final class TransportSshServer extends SshServer {
                 for (var entry : userMap.entrySet()) {
                     final var username = entry.getKey().getName();
                     final var value = entry.getValue();
-                    final var password = value.getPassword();
+                    final var password = value.nonnullPassword().getHashedPassword();
                     if (password != null) {
                         passwordMapBuilder.put(username, password.getValue());
                     }
