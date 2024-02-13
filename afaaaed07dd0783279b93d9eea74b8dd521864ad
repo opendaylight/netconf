@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "244dbf10_918b1863",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 25
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "361ee17b_2ccf34b9",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb9434c7_61c3d8e4",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-12T08:55:24Z",
       "side": 1,
       "message": "IMO this can be a record.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db548148_756859c5",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb9434c7_61c3d8e4",
       "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b13342f_01fcb677",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ParameterizedCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe178dee_02ecb1cf",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a04e5b63_fdd67916",
@@ -86,6 +140,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b55f0f1_53a516f3",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ParameterizedCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:08:45Z",
+      "side": 1,
+      "message": "has implementation https://git.opendaylight.org/gerrit/c/netconf/+/105846/26/protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java#74",
+      "parentUuid": "a04e5b63_fdd67916",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fa531faf_248198e3",
@@ -99,6 +171,24 @@
       "writtenOn": "2024-02-12T08:55:24Z",
       "side": 1,
       "message": "Those here?\n\nhttps://www.iana.org/assignments/netconf-capability-urns/netconf-capability-urns.xhtml#netconf-capability-urns-1",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "920a1d71_acdd680a",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/SimpleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa531faf_248198e3",
       "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -137,6 +227,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e21c3cff_9af5f2fd",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/SimpleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07598f4e_303b2dee",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f7051f0_4c08b52b",
@@ -150,6 +258,24 @@
       "writtenOn": "2024-02-12T08:55:24Z",
       "side": 1,
       "message": "Not needed empty line.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6994c807_3859734b",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/SimpleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f7051f0_4c08b52b",
       "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -171,6 +297,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8906ef40_2e359f08",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc6436a4_3c4e4ffe",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2cff2de6_c1a31c8c",
@@ -188,6 +332,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "849d86dd_d7a8df4a",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2cff2de6_c1a31c8c",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "62e8b93c_ceee5c1b",
@@ -201,6 +363,24 @@
       "writtenOn": "2024-02-12T08:55:24Z",
       "side": 1,
       "message": "No more Java code style for getters.",
+      "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be9c9284_ad3f0e04",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-13T11:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62e8b93c_ceee5c1b",
       "revId": "afaaaed07dd0783279b93d9eea74b8dd521864ad",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
