@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0173c0ac_8aa76b69",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-14T09:51:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91f4a990_75919d66",
+      "revId": "ecc747724ebf0ecc37877a1a8d909b6fddf6b7c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9123ddbe_cf6ce68a",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-12T09:14:02Z",
       "side": 1,
       "message": "We are using JUnit 5.",
+      "revId": "ecc747724ebf0ecc37877a1a8d909b6fddf6b7c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74c16b03_a96e7f53",
+        "filename": "protocol/netconf-common/src/test/java/org/opendaylight/netconf/common/util/CapabilityUtilTest.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-14T09:51:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9123ddbe_cf6ce68a",
       "revId": "ecc747724ebf0ecc37877a1a8d909b6fddf6b7c2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
