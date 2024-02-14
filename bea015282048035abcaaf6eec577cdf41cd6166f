@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "862379e4_cc50416e",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-14T09:51:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a5afe05_9ace3b94",
+      "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b294b4d8_ab288d00",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-14T09:19:41Z",
       "side": 1,
       "message": "final params",
+      "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "641d81bb_2c3813a9",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-14T09:51:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b294b4d8_ab288d00",
       "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fe8e2ba_49bea9e8",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ParameterizedCapabilityTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-14T09:51:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03a70711_d73422aa",
+      "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "05cf7aa6_cd504928",
@@ -69,6 +123,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33684186_ee9b0823",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ParameterizedCapabilityTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-14T09:51:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05cf7aa6_cd504928",
+      "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3578ed32_9d132e09",
@@ -82,6 +154,24 @@
       "writtenOn": "2024-02-14T09:19:41Z",
       "side": 1,
       "message": "final params",
+      "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee8d0956_f5e12001",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ParameterizedCapabilityTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-02-14T09:51:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3578ed32_9d132e09",
       "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
