@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a5afe05_9ace3b94",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/ExiCapability.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-02-14T09:19:41Z",
+      "side": 1,
+      "message": "final",
+      "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b294b4d8_ab288d00",
+        "filename": "protocol/netconf-api/src/main/java/org/opendaylight/netconf/api/capability/YangModuleCapability.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-02-14T09:19:41Z",
+      "side": 1,
+      "message": "final params",
+      "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03a70711_d73422aa",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ParameterizedCapabilityTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-02-14T09:19:41Z",
+      "side": 1,
+      "message": "final params",
+      "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05cf7aa6_cd504928",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ParameterizedCapabilityTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-02-14T09:19:41Z",
+      "side": 1,
+      "message": "final params",
+      "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3578ed32_9d132e09",
+        "filename": "protocol/netconf-api/src/test/java/org/opendaylight/netconf/api/capability/ParameterizedCapabilityTest.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-02-14T09:19:41Z",
+      "side": 1,
+      "message": "final params",
+      "revId": "bea015282048035abcaaf6eec577cdf41cd6166f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
