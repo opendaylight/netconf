@@ -88,6 +88,24 @@
       "parentUuid": "92bb5d8f_399d71da",
       "revId": "8828d4667400f45db0651691ad41c9222fbeb7d1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5733479_e5191c13",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-14T08:57:08Z",
+      "side": 1,
+      "message": "RPC should use plain as it was.",
+      "parentUuid": "96ee4cce_eb895edb",
+      "revId": "8828d4667400f45db0651691ad41c9222fbeb7d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
