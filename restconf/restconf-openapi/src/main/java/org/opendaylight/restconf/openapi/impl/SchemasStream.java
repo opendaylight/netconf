@@ -25,7 +25,9 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
+import org.opendaylight.restconf.openapi.model.OpenApiEntity;
 import org.opendaylight.restconf.openapi.model.SchemaEntity;
+import org.opendaylight.restconf.openapi.model.SchemasEntity;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -78,8 +80,8 @@ public final class SchemasStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (iterator.hasNext()) {
-                reader = new BufferedReader(new InputStreamReader(
-                    new SchemaStream(toComponents(iterator.next(), context, isForSingleModule), writer),
+                reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(
+                    writeNextEntity(new SchemasEntity(toComponents(iterator.next(), context, isForSingleModule)))),
                         StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
@@ -109,8 +111,8 @@ public final class SchemasStream extends InputStream {
         var read = channel.read(ByteBuffer.wrap(array, off, len));
         while (read == -1) {
             if (iterator.hasNext()) {
-                channel = Channels.newChannel(
-                    new SchemaStream(toComponents(iterator.next(), context, isForSingleModule), writer));
+                channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(
+                    new SchemasEntity(toComponents(iterator.next(), context, isForSingleModule)))));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 continue;
             }
@@ -122,6 +124,11 @@ public final class SchemasStream extends InputStream {
             return channel.read(ByteBuffer.wrap(array, off, len));
         }
         return read;
+    }
+
+    private byte[] writeNextEntity(final OpenApiEntity entity) throws IOException {
+        writer.writeTo(entity, null, null, null, null, null, null);
+        return writer.readFrom();
     }
 
     private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context,
