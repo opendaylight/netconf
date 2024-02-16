@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d43d095f_67eff145",
+        "filename": "restconf/restconf-openapi/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-02-16T14:10:13Z",
+      "side": 1,
+      "message": "This import is unnecessary in the current implementation.",
+      "revId": "79cf0867af8458f29318a7f08eb1dd1c74e8d50a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}

@@ -16,6 +16,23 @@
       "message": "Does not work.",
       "revId": "e935d7dae04c1c2c5b43fb919c9d397bb0724934",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f4e2467_d7e5905c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/OpenApiServiceImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-02-16T14:10:13Z",
+      "side": 1,
+      "message": "Is there an option to use it this way, with a @Reference to JaxRsNorthbound.Configuration?\n\nFor example:\n```@Reference(target \u003d \"(service.pid\u003dorg.opendaylight.restconf.nb.rfc8040)\")```\n\nThe current implementation, with Configuration referencing the same file as it used JaxRsNorthbound, prevents the creation of custom configurations for OpenApiService. For example:\n```\n    // FIXME: make this configurable\n    public static final int DEFAULT_PAGESIZE \u003d 2\n```\n\nAdding it to the `org.opendaylight.restconf.nb.rfc8040.cfg` file may not be correct.",
+      "revId": "e935d7dae04c1c2c5b43fb919c9d397bb0724934",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
