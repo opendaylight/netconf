@@ -20,6 +20,10 @@ module odl-device-notification {
      accompanies this distribution, and is available at
      http://www.eclipse.org/legal/epl-v10.html";
 
+  revision "2024-02-18" {
+    description "Corrected output to result in a stream name";
+  }
+
   revision "2022-11-06" {
     description
       "Initial revision";
@@ -30,16 +34,16 @@ module odl-device-notification {
       "Subscribe to notifications on specified device.";
 
     input {
-        leaf path {
-          type instance-identifier;
-          description "Device mount point path";
-        }
-     }
-     output {
-        leaf stream-path {
-          type inet:uri;
-          description "Device Notification stream URL";
-        }
-     }
+      leaf path {
+        type instance-identifier;
+        description "Device mount point path";
+      }
+    }
+    output {
+      leaf stream-name {
+        type string;
+        description "Notification stream name.";
+      }
+    }
   }
 }

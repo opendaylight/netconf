@@ -20,9 +20,9 @@ import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotification;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev221106.SubscribeDeviceNotificationOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev240218.SubscribeDeviceNotification;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev240218.SubscribeDeviceNotificationInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.device.notification.rev240218.SubscribeDeviceNotificationOutput;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -42,9 +42,8 @@ import org.osgi.service.component.annotations.Reference;
 public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
         NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "path").intern());
-    // FIXME: NETCONF-1102: this should be 'stream-name'
-    private static final NodeIdentifier DEVICE_NOTIFICATION_STREAM_PATH_NODEID =
-        NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "stream-path").intern());
+    private static final NodeIdentifier DEVICE_NOTIFICATION_STREAM_NAME_NODEID =
+        NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "stream-name").intern());
 
     private final DOMMountPointService mountPointService;
     private final RestconfStream.Registry streamRegistry;
@@ -85,7 +84,7 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
                 + new YangInstanceIdentifierSerializer(input.databind()).serializePath(path))
             .transform(stream -> input.newOperationOutput(ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
-                .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_PATH_NODEID, stream.name()))
+                .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_NAME_NODEID, stream.name()))
                 .build()));
     }
 }
