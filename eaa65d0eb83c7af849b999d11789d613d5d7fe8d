@@ -124,6 +124,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b79d591_b15e6c7f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-19T13:09:36Z",
+      "side": 1,
+      "message": "sorry for that",
+      "parentUuid": "eedf7116_81f06214",
+      "revId": "eaa65d0eb83c7af849b999d11789d613d5d7fe8d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66224cb2_c363479b",

@@ -16,6 +16,24 @@
       "message": "Please add here `private void generateProperties` as it was before.",
       "revId": "b1f48c60eea6e192115037981f31f52a4029bd32",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "604944e5_cc5b2ec5",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-19T13:09:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72a2f5e7_188da6a4",
+      "revId": "b1f48c60eea6e192115037981f31f52a4029bd32",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
