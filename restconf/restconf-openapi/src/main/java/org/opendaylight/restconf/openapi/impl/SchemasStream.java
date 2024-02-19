@@ -192,16 +192,18 @@ public final class SchemasStream extends InputStream {
             } else {
                 discriminator = definitionNames.getDiscriminator(node);
             }
-            final var child = new NodeSchemaEntity(node, newTitle, discriminator, OBJECT_TYPE, stack, parentName,
-                isParentConfig, definitionNames);
-            final var isConfig = node.isConfiguration() && isParentConfig;
-            result.add(child);
-            stack.enterSchemaTree(node.getQName());
-            processActions(node, title, stack, definitionNames, result, parentName);
-            for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
-                processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
+            if (!isSchemaAdded(newTitle, discriminator, result)) {
+                final var child = new NodeSchemaEntity(node, newTitle, discriminator, OBJECT_TYPE, stack, parentName,
+                    isParentConfig, definitionNames);
+                final var isConfig = node.isConfiguration() && isParentConfig;
+                result.add(child);
+                stack.enterSchemaTree(node.getQName());
+                processActions(node, title, stack, definitionNames, result, parentName);
+                for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
+                    processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
+                }
+                stack.exit();
             }
-            stack.exit();
         } else if (node instanceof ChoiceSchemaNode choiceNode && !choiceNode.getCases().isEmpty()) {
             // Process default case or first case
             final var caseNode = choiceNode.getDefaultCase()
@@ -236,5 +238,15 @@ public final class SchemasStream extends InputStream {
             }
             stack.exit();
         }
+    }
+
+    private static boolean isSchemaAdded(final String title, final String discriminator,
+            final ArrayDeque<SchemaEntity> result) {
+        for (final var schemaEntity : result) {
+            if (schemaEntity.getSchemaTitle().equals(title + discriminator)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

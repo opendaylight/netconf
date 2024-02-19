@@ -123,4 +123,8 @@ public abstract sealed class SchemaEntity extends OpenApiEntity permits NodeSche
         generator.writeStringField("namespace", value.getQName().getNamespace().toString());
         generator.writeEndObject();
     }
+
+    public @NonNull String getSchemaTitle() {
+        return title + discriminator;
+    }
 }
