@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d52fa39_6d80d5fa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/NodeSchemaEntity.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-19T08:26:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da748b4a_63aa5586",
+      "revId": "eaa65d0eb83c7af849b999d11789d613d5d7fe8d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0357ba7b_e5b12933",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-16T14:55:29Z",
       "side": 1,
       "message": "final @NonNull OR @NonNull final? Please keep it consistent.",
+      "revId": "eaa65d0eb83c7af849b999d11789d613d5d7fe8d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5d3a868_55006db8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/RpcSchemaEntity.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-19T08:26:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0357ba7b_e5b12933",
       "revId": "eaa65d0eb83c7af849b999d11789d613d5d7fe8d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -52,6 +88,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2567f930_8a478492",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-19T08:26:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfca6909_ce798bf3",
+      "revId": "eaa65d0eb83c7af849b999d11789d613d5d7fe8d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66224cb2_c363479b",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-02-16T14:55:29Z",
       "side": 1,
       "message": "Can we implement something similar here to eliminate duplicate code from NodeSchemaEntity and RpcSchemaEntity?\n\n```\n    void generateProperties(@NonNull JsonGenerator generator) throws IOException {\n        final var required \u003d new ArrayList\u003cString\u003e();\n        generator.writeObjectFieldStart(\"properties\");\n        stack().enterSchemaTree(value().getQName());\n        generateProperties(generator, required);\n        stack().exit();\n        generator.writeEndObject();\n        generateRequired(generator, required);\n    }\n\n    abstract void generateProperties(@NonNull JsonGenerator generator, @NonNull List\u003cString\u003e required)\n        throws IOException;\n\n```",
+      "revId": "eaa65d0eb83c7af849b999d11789d613d5d7fe8d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d7f827a_5e8556a9",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemaEntity.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-19T08:26:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66224cb2_c363479b",
       "revId": "eaa65d0eb83c7af849b999d11789d613d5d7fe8d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
