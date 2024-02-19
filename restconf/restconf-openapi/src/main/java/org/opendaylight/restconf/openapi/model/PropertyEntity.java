@@ -153,7 +153,7 @@ public class PropertyEntity {
         final var name = schemaNode.getQName().getLocalName();
         final var shouldBeAddedAsChild = !isParentConfig || schemaNode.isConfiguration();
         if (schemaNode instanceof ListSchemaNode || schemaNode instanceof ContainerSchemaNode) {
-            processDataNodeContainer((DataNodeContainer) schemaNode);
+            processDataNodeContainer((DataNodeContainer) schemaNode, stack);
             if (shouldBeAddedAsChild && isSchemaNodeMandatory(schemaNode)) {
                 required.add(name);
             }
@@ -174,7 +174,8 @@ public class PropertyEntity {
         stack.exit();
     }
 
-    private void processDataNodeContainer(final DataNodeContainer dataNode) throws IOException {
+    private void processDataNodeContainer(final DataNodeContainer dataNode, final SchemaInferenceStack stack)
+            throws IOException {
         final var schemaNode = (SchemaNode) dataNode;
         final var localName = schemaNode.getQName().getLocalName();
         final var nodeName = parentName + "_" + localName;
@@ -188,10 +189,11 @@ public class PropertyEntity {
             discriminator = definitionNames.getDiscriminator(schemaNode);
         }
 
-        processRef(nodeName, schemaNode, discriminator);
+        processRef(nodeName, schemaNode, discriminator, stack);
     }
 
-    private void processRef(final String name, final SchemaNode schemaNode, String discriminator) throws IOException {
+    private void processRef(final String name, final SchemaNode schemaNode, String discriminator,
+            final SchemaInferenceStack stack) throws IOException {
         final var ref = COMPONENTS_PREFIX + name + discriminator;
         if (schemaNode instanceof ListSchemaNode listNode) {
             generator.writeStringField(TYPE, ARRAY_TYPE);
@@ -204,7 +206,7 @@ public class PropertyEntity {
                 final var minElements = listNode.getElementCountConstraint().orElseThrow().getMinElements();
                 final var maxElements = listNode.getElementCountConstraint().orElseThrow().getMaxElements();
                 if (minElements != null) {
-                    createExamples(listNode, minElements);
+                    createExamples(listNode, minElements, stack);
                     generator.writeNumberField("minItems", minElements);
                 }
                 if (maxElements != null) {
@@ -221,8 +223,8 @@ public class PropertyEntity {
     }
 
     private void createExamples(final ListSchemaNode schemaNode,
-        @NonNull final Integer minElements) throws IOException {
-        final var firstExampleMap = prepareFirstListExample(schemaNode);
+            @NonNull final Integer minElements, final SchemaInferenceStack stack) throws IOException {
+        final var firstExampleMap = prepareFirstListExample(schemaNode, stack);
         final var examples = new ArrayList<Map<String, Object>>();
         examples.add(firstExampleMap);
 
@@ -258,14 +260,15 @@ public class PropertyEntity {
         generator.writeEndArray();
     }
 
-    private HashMap<String, Object> prepareFirstListExample(final ListSchemaNode schemaNode) {
+    private HashMap<String, Object> prepareFirstListExample(final ListSchemaNode schemaNode,
+            final SchemaInferenceStack stack) {
         final var childNodes = schemaNode.getChildNodes();
         final var firstExampleMap = new HashMap<String, Object>();
         // Cycle for each child node
         for (final var childNode : childNodes) {
             if (childNode instanceof TypedDataSchemaNode leafSchemaNode) {
                 final var def = new TypeDef();
-                processTypeDef(leafSchemaNode.getType(), leafSchemaNode, null, def);
+                processTypeDef(leafSchemaNode.getType(), leafSchemaNode, stack, def);
                 if (def.hasExample()) {
                     firstExampleMap.put(leafSchemaNode.getQName().getLocalName(), def.getExample());
                 }
