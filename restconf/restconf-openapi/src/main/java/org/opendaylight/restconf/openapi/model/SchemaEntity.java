@@ -136,4 +136,8 @@ public final class SchemaEntity extends OpenApiEntity {
         generator.writeStringField("namespace", value.getQName().getNamespace().toString());
         generator.writeEndObject();
     }
+
+    public @NonNull String getSchemaTitle() {
+        return title + discriminator;
+    }
 }
