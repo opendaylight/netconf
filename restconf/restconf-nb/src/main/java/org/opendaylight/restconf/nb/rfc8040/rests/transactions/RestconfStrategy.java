@@ -846,7 +846,8 @@ public abstract class RestconfStrategy {
      * @return {@link NormalizedNode}
      */
     // FIXME: NETCONF-1155: this method should asynchronous
-    public final @Nullable NormalizedNode readData(final @NonNull ContentParam content,
+    @VisibleForTesting
+    final @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final WithDefaultsParam defaultsMode) {
         return switch (content) {
             case ALL -> {
