@@ -184,14 +184,9 @@ public final class SchemasStream extends InputStream {
             final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
             final var newTitle = title + "_" + node.getQName().getLocalName();
-            final String discriminator;
-            if (!definitionNames.isListedNode(node)) {
-                final var parentNameConfigLocalName = parentName + "_" + node.getQName().getLocalName();
-                final var names = List.of(parentNameConfigLocalName);
-                discriminator = definitionNames.pickDiscriminator(node, names);
-            } else {
-                discriminator = definitionNames.getDiscriminator(node);
-            }
+            final var parentNameConfigLocalName = parentName + "_" + node.getQName().getLocalName();
+            final var names = List.of(parentNameConfigLocalName);
+            final var discriminator = definitionNames.pickDiscriminator(node, names);
             final var child = new NodeSchemaEntity(node, newTitle, discriminator, OBJECT_TYPE, stack, parentName,
                 isParentConfig, definitionNames);
             final var isConfig = node.isConfiguration() && isParentConfig;
