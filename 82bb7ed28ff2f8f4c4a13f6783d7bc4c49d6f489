@@ -16,6 +16,24 @@
       "message": "Care for formatting. Please.",
       "revId": "82bb7ed28ff2f8f4c4a13f6783d7bc4c49d6f489",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86bd82f9_c2567076",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-02-20T08:15:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7e6967f_45eefe64",
+      "revId": "82bb7ed28ff2f8f4c4a13f6783d7bc4c49d6f489",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
