@@ -16,6 +16,24 @@
       "message": "final @NonNull JsonGenerator.",
       "revId": "ad1bf6522dce4ed43367bda079560f2e158db81b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "196c06cd_f083a86e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemasEntity.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-20T16:02:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82491283_3131fc55",
+      "revId": "ad1bf6522dce4ed43367bda079560f2e158db81b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
