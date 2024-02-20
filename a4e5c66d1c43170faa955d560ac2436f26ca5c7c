@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc2574a6_54a93725",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-02-20T16:17:10Z",
+      "side": 1,
+      "message": "What about using predefined size if you know it?\n```final var list \u003d new ArrayList\u003cYangModuleCapability\u003e(modules.size());```\n\nIMHO, inline comments should clarify the code rather than explain Java.",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 116
+      },
+      "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70a441f8_1246d425",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-02-20T16:17:10Z",
+      "side": 1,
+      "message": "Why is \u0027var\u0027 not used here?",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 5
+      },
+      "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f09bb18_e15a3ab5",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-02-20T16:17:10Z",
+      "side": 1,
+      "message": "This urn:\n```urn:ietf:params:netconf:capability:exi:1.0?compression\u003d1000\u0026schemas\u003ddynamic```\n\nshould be null or ExiSchemas.DYNAMIC?",
+      "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d324bd99_f4a3829f",
+        "filename": "protocol/netconf-common/src/test/java/org/opendaylight/netconf/common/util/CapabilityUtilTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-02-20T16:17:10Z",
+      "side": 1,
+      "message": "Missing ExiCapability with schemas\u003dnull use-case.\n```\n            arguments(\"urn:ietf:params:netconf:capability:exi:1.0?compression\u003d1000\u0026schemas\u003dnull\",\n                new ExiCapability(1000, null)),\n```",
+      "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
