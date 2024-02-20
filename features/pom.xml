@@ -56,6 +56,7 @@
         <module>odl-netconf-console</module>
         <module>odl-netconf-impl</module>
         <module>odl-netconf-keystore</module>
+        <module>odl-netconf-keystore-plaintext</module>
         <module>odl-netconf-mdsal</module>
         <module>odl-netconf-ssh</module>
         <module>odl-netconf-test-tools</module>
