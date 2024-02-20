@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82491283_3131fc55",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/SchemasEntity.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-02-20T12:11:23Z",
+      "side": 1,
+      "message": "final @NonNull JsonGenerator.",
+      "revId": "ad1bf6522dce4ed43367bda079560f2e158db81b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
