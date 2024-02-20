@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d0e3816_19cac8f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-02-20T12:30:53Z",
+      "side": 1,
+      "message": "when I connect netopeer2 and try to verify generated JSON with swagger editor i get following errror:\n\nSemantic error at paths./rests/operations/network-topology:network-topology/topology\u003dtopology-netconf/node\u003dnew-netconf-devic1/yang-ext:mount/ietf-keystore:keystore/asymmetric-keys/asymmetric-key\u003d{name}/generate-certificate-signing-request.post.requestBody.content.application/json.schema.properties.input.$ref\n$refs must reference a valid location in the document\nJump to line 453\n\nand more.",
+      "revId": "8cac7f09976c8b13cd5d09cc87b7183d8450d552",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
