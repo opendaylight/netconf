@@ -79,6 +79,24 @@
       "message": "Missing ExiCapability with schemas\u003dnull use-case.\n```\n            arguments(\"urn:ietf:params:netconf:capability:exi:1.0?compression\u003d1000\u0026schemas\u003dnull\",\n                new ExiCapability(1000, null)),\n```",
       "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6962303_3aeac406",
+        "filename": "protocol/netconf-common/src/test/java/org/opendaylight/netconf/common/util/CapabilityUtilTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2024-02-20T16:28:35Z",
+      "side": 1,
+      "message": "This will increase coverage for the \u0027default -\u003e null\u0027 use-case.\n```\n        return switch (value) {\n            case \"builtin\" -\u003e ExiSchemas.BUILTIN;\n            case \"base:1.1\" -\u003e ExiSchemas.BASE_1_1;\n            default -\u003e null;\n        };\n```",
+      "parentUuid": "d324bd99_f4a3829f",
+      "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
