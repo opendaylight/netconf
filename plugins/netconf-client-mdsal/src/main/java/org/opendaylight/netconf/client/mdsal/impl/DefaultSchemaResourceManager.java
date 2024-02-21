@@ -18,11 +18,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
-import org.opendaylight.netconf.client.mdsal.NetconfStateSchemasResolverImpl;
+import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
 import org.opendaylight.yangtools.yang.model.repo.fs.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.repo.spi.SoftSchemaSourceCache;
 import org.opendaylight.yangtools.yang.model.spi.source.YangIRSource;
@@ -49,8 +47,8 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSchemaResourceManager.class);
 
     @GuardedBy("this")
-    private final Map<String, SchemaResourcesDTO> resources = new HashMap<>();
-    private final @NonNull SchemaResourcesDTO defaultResources;
+    private final Map<String, NetconfDeviceSchemaProvider> resources = new HashMap<>();
+    private final @NonNull NetconfDeviceSchemaProvider defaultResources;
     private final YangParserFactory parserFactory;
     private final String defaultSubdirectory;
     private final String rootDirectory;
@@ -71,7 +69,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
     }
 
     @Override
-    public SchemaResourcesDTO getSchemaResources(final String subdir, final Object nodeId) {
+    public NetconfDeviceSchemaProvider getSchemaResources(final String subdir, final Object nodeId) {
         if (defaultSubdirectory.equals(subdir)) {
             // Fast path for default devices
             return defaultResources;
@@ -90,21 +88,21 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         return getSchemaResources(subdir);
     }
 
-    private synchronized @NonNull SchemaResourcesDTO getSchemaResources(final String subdir) {
+    private synchronized @NonNull NetconfDeviceSchemaProvider getSchemaResources(final String subdir) {
         // Fast path for unusual devices
-        final SchemaResourcesDTO existing = resources.get(subdir);
+        final var existing = resources.get(subdir);
         if (existing != null) {
             return existing;
         }
 
-        final SchemaResourcesDTO created = createResources(subdir);
+        final var created = createResources(subdir);
         resources.put(subdir, created);
         return created;
     }
 
-    private @NonNull SchemaResourcesDTO createResources(final String subdir) {
+    private @NonNull NetconfDeviceSchemaProvider createResources(final String subdir) {
         // Setup the baseline empty registry
-        final SharedSchemaRepository repository = new SharedSchemaRepository(subdir, parserFactory);
+        final var repository = new SharedSchemaRepository(subdir, parserFactory);
 
         // Teach the registry how to transform YANG text to IRSchemaSource internally
         repository.registerSchemaSourceListener(TextToIRTransformer.create(repository, repository));
@@ -112,17 +110,14 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         // Attach a soft cache of IRSchemaSource instances. This is important during convergence when we are fishing
         // for a consistent set of modules, as it skips the need to re-parse the text sources multiple times. It also
         // helps establishing different sets of contexts, as they can share this pre-made cache.
-        repository.registerSchemaSourceListener(
-            new SoftSchemaSourceCache<>(repository, YangIRSource.class));
+        repository.registerSchemaSourceListener(new SoftSchemaSourceCache<>(repository, YangIRSource.class));
 
         // Attach the filesystem cache, providing persistence capability, so that restarts do not require us to
         // re-populate the cache. This also acts as a side-load capability, as anything pre-populated into that
         // directory will not be fetched from the device.
-        repository.registerSchemaSourceListener(new FilesystemSchemaSourceCache<>(repository,
-                YangTextSource.class, new File(rootDirectory + File.separator + subdir)));
+        repository.registerSchemaSourceListener(new FilesystemSchemaSourceCache<>(repository, YangTextSource.class,
+            new File(rootDirectory + File.separator + subdir)));
 
-        return new SchemaResourcesDTO(repository, repository,
-            repository.createEffectiveModelContextFactory(SchemaContextFactoryConfiguration.getDefault()),
-            new NetconfStateSchemasResolverImpl());
+        return new DefaultDeviceNetconfSchemaProvider(repository);
     }
 }
