@@ -1506,6 +1506,7 @@ set:
 * ``ping-executor-name-prefix``, which defaults to ``ping-executor``
 * ``max-thread-count``, which defaults to ``1``
 * ``use-sse``, which defaults to ``true``
+* ``restconf``, which defaults to ``rests``
 
 *maximum-fragment-length* — Maximum web-socket fragment length in number of Unicode code units (characters)
 (exceeded message length leads to fragmentation of messages)
@@ -1521,6 +1522,8 @@ set:
 *use-sse* — In case of ``true`` access to notification streams will be via Server-Sent Events.
 Otherwise web-socket servlet will be initialized.
 
+*restconf* — The value of RFC8040 restconf URI template, pointing to the root resource. Must not end with '/'.
+
 In order to change these settings, you can either modify the corresponding configuration
 file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
 
@@ -1529,9 +1532,10 @@ file, ``org.opendaylight.restconf.nb.rfc8040.cfg``, for example:
     maximum-fragment-length=0
     heartbeat-interval=10000
     idle-timeout=30000
-    ping-executor-name-prefix="ping-executor"
+    ping-executor-name-prefix=ping-executor
     max-thread-count=1
     use-sse=true
+    restconf=rests
 
 Or use Karaf CLI:
 
@@ -1544,6 +1548,7 @@ Or use Karaf CLI:
     opendaylight-user@root>config:property-set ping-executor-name-prefix "ping-executor"
     opendaylight-user@root>config:property-set max-thread-count 1
     opendaylight-user@root>config:property-set use-sse true
+    opendaylight-user@root>config:property-set restconf "rests"
     opendaylight-user@root>config:update
 
 NETCONF Call Home
