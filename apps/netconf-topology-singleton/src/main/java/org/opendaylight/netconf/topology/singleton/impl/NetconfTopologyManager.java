@@ -326,7 +326,8 @@ public class NetconfTopologyManager implements DataTreeChangeListener<Node>, Aut
             .setSchemaAssembler(schemaAssembler)
             .setTopologyId(topologyId)
             .setNetconfClientFactory(clientFactory)
-            .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode.getSchemaCacheDirectory(), deviceId))
+            .setDeviceSchemaProvider(resourceManager.getSchemaResources(netconfNode.getSchemaCacheDirectory(),
+                deviceId))
             .setIdleTimeout(writeTxIdleTimeout)
             .build();
     }

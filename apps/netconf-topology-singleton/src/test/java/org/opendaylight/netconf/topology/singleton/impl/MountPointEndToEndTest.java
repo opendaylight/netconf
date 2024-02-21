@@ -296,7 +296,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             new SimpleDOMEntityOwnershipService());
 
         final var resources =  resourceManager.getSchemaResources(TEST_DEFAULT_SUBDIR, "test");
-        resources.getSchemaRegistry().registerSchemaSource(
+        resources.registerSchemaSource(
             id -> Futures.immediateFuture(new DelegatedYangTextSource(id, topModuleInfo.getYangTextCharSource())),
             PotentialSchemaSource.create(new SourceIdentifier(TOP_MODULE_NAME,
                     topModuleInfo.getName().getRevision().map(Revision::toString).orElse(null)),
