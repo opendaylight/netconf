@@ -52,7 +52,7 @@ public final class OSGiNorthbound {
         @AttributeDefinition
         boolean use$_$sse() default true;
         @AttributeDefinition(name = "{+restconf}", description = """
-            The value of RFC8040 {+restconf} URI template, poiting to the root resource. Must not end with '/'.""")
+            The value of RFC8040 {+restconf} URI template, pointing to the root resource. Must not end with '/'.""")
         String restconf() default "rests";
     }
 
