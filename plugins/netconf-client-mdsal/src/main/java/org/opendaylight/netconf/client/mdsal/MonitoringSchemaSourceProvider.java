@@ -16,7 +16,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.GetSchema;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
@@ -53,10 +53,10 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
     private static final LeafNode<?> FORMAT_LEAF = ImmutableNodes.leafNode(FORMAT_PATHARG, Yang.QNAME);
     private static final NodeIdentifier NETCONF_DATA_PATHARG = NodeIdentifier.create(Data.QNAME);
 
-    private final DOMRpcService rpc;
+    private final NetconfRpcService rpc;
     private final RemoteDeviceId id;
 
-    public MonitoringSchemaSourceProvider(final RemoteDeviceId id, final DOMRpcService rpc) {
+    public MonitoringSchemaSourceProvider(final RemoteDeviceId id, final NetconfRpcService rpc) {
         this.id = requireNonNull(id);
         this.rpc = requireNonNull(rpc);
     }
@@ -90,12 +90,13 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
     @Override
     public ListenableFuture<YangTextSource> getSource(final SourceIdentifier sourceIdentifier) {
         final String moduleName = sourceIdentifier.name().getLocalName();
+        final Revision revision = sourceIdentifier.revision();
+        final ContainerNode getSchemaRequest = createGetSchemaRequest(moduleName,
+            revision == null ? Optional.empty() : Optional.of(revision.toString()));
 
-        final Optional<String> revision = Optional.ofNullable(sourceIdentifier.revision()).map(Revision::toString);
-        final ContainerNode getSchemaRequest = createGetSchemaRequest(moduleName, revision);
         LOG.trace("{}: Loading YANG schema source for {}:{}", id, moduleName, revision);
-        return Futures.transform(
-            rpc.invokeRpc(GetSchema.QNAME, getSchemaRequest), result -> {
+        return Futures.transform(rpc.invokeNetconf(GetSchema.QNAME, getSchemaRequest),
+            result -> {
                 // Transform composite node to string schema representation and then to ASTSchemaSource.
                 if (result.errors().isEmpty()) {
                     final String schemaString = getSchemaFromRpc(id, result.value())

@@ -15,8 +15,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientFactory;
-import org.opendaylight.netconf.client.mdsal.NetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
+import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
 import org.opendaylight.netconf.topology.spi.NetconfTopologySchemaAssembler;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -32,7 +32,7 @@ public final class NetconfTopologySetup {
     private final ActorSystem actorSystem;
     private final NetconfClientFactory netconfClientFactory;
     private final String topologyId;
-    private final NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
+    private final DeviceNetconfSchemaProvider deviceSchemaProvider;
     private final Duration idleTimeout;
     private final BaseNetconfSchemaProvider baseSchemaProvider;
 
@@ -46,7 +46,7 @@ public final class NetconfTopologySetup {
         actorSystem = builder.getActorSystem();
         netconfClientFactory = builder.getNetconfClientFactory();
         topologyId = builder.getTopologyId();
-        schemaResourceDTO = builder.getSchemaResourceDTO();
+        deviceSchemaProvider = builder.getDeviceSchemaProvider();
         idleTimeout = builder.getIdleTimeout();
         baseSchemaProvider = builder.getBaseSchemaProvider();
     }
@@ -87,8 +87,8 @@ public final class NetconfTopologySetup {
         return netconfClientFactory;
     }
 
-    public NetconfDevice.SchemaResourcesDTO getSchemaResourcesDTO() {
-        return schemaResourceDTO;
+    public DeviceNetconfSchemaProvider getDeviceSchemaProvider() {
+        return deviceSchemaProvider;
     }
 
     public Duration getIdleTimeout() {
@@ -113,7 +113,7 @@ public final class NetconfTopologySetup {
         private ActorSystem actorSystem;
         private String topologyId;
         private NetconfClientFactory netconfClientFactory;
-        private NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
+        private DeviceNetconfSchemaProvider deviceSchemaProvider;
         private Duration idleTimeout;
         private BaseNetconfSchemaProvider baseSchemaProvider;
 
@@ -217,14 +217,13 @@ public final class NetconfTopologySetup {
             return this;
         }
 
-        public Builder setSchemaResourceDTO(
-                final NetconfDevice.SchemaResourcesDTO schemaResourceDTO) {
-            this.schemaResourceDTO = schemaResourceDTO;
+        public Builder setDeviceSchemaProvider(final DeviceNetconfSchemaProvider deviceSchemaProvider) {
+            this.deviceSchemaProvider = deviceSchemaProvider;
             return this;
         }
 
-        NetconfDevice.SchemaResourcesDTO getSchemaResourceDTO() {
-            return schemaResourceDTO;
+        DeviceNetconfSchemaProvider getDeviceSchemaProvider() {
+            return deviceSchemaProvider;
         }
 
         public Builder setIdleTimeout(final Duration idleTimeout) {
