@@ -35,7 +35,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
+import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
@@ -81,7 +81,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
 
-    private SchemaResourcesDTO schemaResources;
+    private DeviceNetconfSchemaProvider schemaProvider;
     private Timeout actorResponseWaitTime;
     private RemoteDeviceId id;
     private List<SourceIdentifier> sourceIdentifiers = null;
@@ -97,7 +97,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     protected NetconfNodeActor(final NetconfTopologySetup setup, final RemoteDeviceId id,
             final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
         this.id = id;
-        schemaResources = setup.getSchemaResourcesDTO();
+        schemaProvider = setup.getDeviceSchemaProvider();
         this.actorResponseWaitTime = actorResponseWaitTime;
         writeTxIdleTimeout = setup.getIdleTimeout();
         this.mountPointService = mountPointService;
@@ -129,7 +129,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             LOG.debug("{}: Master is ready.", id);
         } else if (message instanceof RefreshSetupMasterActorData masterActorData) {
             id = masterActorData.getRemoteDeviceId();
-            schemaResources = masterActorData.getNetconfTopologyDeviceSetup().getSchemaResourcesDTO();
+            schemaProvider = masterActorData.getNetconfTopologyDeviceSetup().getDeviceSchemaProvider();
             sender().tell(new MasterActorDataInitialized(), self());
         } else if (message instanceof AskForMasterMountPoint askForMasterMountPoint) { // master
             // only master contains reference to deviceDataBroker
@@ -177,7 +177,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         } else if (message instanceof RefreshSlaveActor refreshSlave) { //slave
             actorResponseWaitTime = refreshSlave.getActorResponseWaitTime();
             id = refreshSlave.getId();
-            schemaResources = refreshSlave.getSetup().getSchemaResourcesDTO();
+            schemaProvider = refreshSlave.getSetup().getDeviceSchemaProvider();
         } else if (message instanceof NetconfDataTreeServiceRequest) {
             final var netconfActor = context().actorOf(NetconfDataTreeServiceActor.props(netconfService,
                 writeTxIdleTimeout));
@@ -204,8 +204,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     }
 
     private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
-        Futures.addCallback(
-            schemaResources.getSchemaRepository().getSchemaSource(sourceIdentifier, YangTextSource.class),
+        Futures.addCallback(schemaProvider.getSchemaSource(sourceIdentifier, YangTextSource.class),
             new FutureCallback<>() {
                 @Override
                 public void onSuccess(final YangTextSource yangTextSchemaSource) {
@@ -308,10 +307,9 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         final var remoteYangTextSourceProvider = new ProxyYangTextSourceProvider(masterReference, dispatcher,
             actorResponseWaitTime);
         final var remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider, dispatcher);
-        final var schemaRegistry = schemaResources.getSchemaRegistry();
 
         registeredSchemas = sourceIdentifiers.stream()
-            .map(sourceId -> schemaRegistry.registerSchemaSource(remoteProvider, PotentialSchemaSource.create(sourceId,
+            .map(sourceId -> schemaProvider.registerSchemaSource(remoteProvider, PotentialSchemaSource.create(sourceId,
                 YangTextSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())))
             .collect(Collectors.toList());
 
