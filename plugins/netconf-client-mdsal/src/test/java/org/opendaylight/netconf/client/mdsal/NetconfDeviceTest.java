@@ -10,8 +10,6 @@ package org.opendaylight.netconf.client.mdsal;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
@@ -52,8 +50,8 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -402,10 +400,16 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
             any(RemoteDeviceServices.class));
-        argument.getValue().capabilities().resolvedCapabilities()
-                .forEach(entry -> assertEquals("Builded 'AvailableCapability' schemas should match input capabilities.",
-                        moduleBasedCaps.get(
-                                QName.create(entry.getCapability())).getName(), entry.getCapabilityOrigin().getName()));
+
+        assertEquals(Set.of(
+            new AvailableCapabilityBuilder()
+                .setCapability("(test:namespace?revision=2013-07-22)test-module")
+                .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
+                .build(),
+            new AvailableCapabilityBuilder()
+                .setCapability("(test:qname:side:loading)test")
+                .setCapabilityOrigin(CapabilityOrigin.UserDefined)
+                .build()), argument.getValue().capabilities().resolvedCapabilities());
     }
 
     @Test
@@ -425,25 +429,19 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .build();
         final NetconfDevice netconfSpy = spy(device);
 
-        final NetconfSessionPreferences sessionCaps = getSessionCaps(false, List.of(CapabilityURN.NOTIFICATION));
-
-        netconfSpy.onRemoteSessionUp(sessionCaps, listener);
+        netconfSpy.onRemoteSessionUp(getSessionCaps(false, List.of(CapabilityURN.NOTIFICATION)), listener);
 
         final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
                 any(RemoteDeviceServices.class));
 
-        List<String> notificationModulesName = List.of(
-                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                        .YangModuleInfoImpl.getInstance().getName().toString(),
-                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                        .YangModuleInfoImpl.getInstance().getName().toString());
-
-        final Set<AvailableCapability> resolvedCapabilities = argument.getValue().capabilities().resolvedCapabilities();
-
-        assertEquals(2, resolvedCapabilities.size());
-        assertTrue(resolvedCapabilities.stream().anyMatch(entry -> notificationModulesName
-                .contains(entry.getCapability())));
+        assertEquals(Set.of(
+            new AvailableCapabilityBuilder()
+                .setCapability("(urn:ietf:params:xml:ns:yang:ietf-yang-types?revision=2013-07-15)ietf-yang-types")
+                .build(),
+            new AvailableCapabilityBuilder()
+                .setCapability("(urn:ietf:params:xml:ns:netconf:notification:1.0?revision=2008-07-14)notifications")
+                .build()), argument.getValue().capabilities().resolvedCapabilities());
     }
 
     @Test
@@ -471,16 +469,11 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
                 any(RemoteDeviceServices.class));
-        final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().capabilities();
 
-        List<String> notificationModulesName = List.of(
-                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                        .YangModuleInfoImpl.getInstance().getName().toString(),
-                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                        .YangModuleInfoImpl.getInstance().getName().toString());
-
-        assertFalse(netconfDeviceCaps.resolvedCapabilities().stream()
-            .anyMatch(entry -> notificationModulesName.contains(entry.getCapability())));
+        assertEquals(Set.of(new AvailableCapabilityBuilder()
+            .setCapability("(test:namespace?revision=2013-07-22)test-module")
+            .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
+            .build()), argument.getValue().capabilities().resolvedCapabilities());
     }
 
     @Test
@@ -500,33 +493,26 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .build();
         final NetconfDevice netconfSpy = spy(device);
 
-        final NetconfSessionPreferences sessionCaps = getSessionCaps(false, List.of());
-
-        final var moduleBasedCaps = new HashMap<QName, CapabilityOrigin>();
-        moduleBasedCaps.put(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                        .YangModuleInfoImpl.getInstance().getName(),
-                CapabilityOrigin.DeviceAdvertised);
-        moduleBasedCaps.put(org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                        .YangModuleInfoImpl.getInstance().getName(),
-                CapabilityOrigin.DeviceAdvertised);
-
-
-        netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
+        netconfSpy.onRemoteSessionUp(getSessionCaps(false, List.of()).replaceModuleCaps(Map.of(
+            org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                .YangModuleInfoImpl.getInstance().getName(), CapabilityOrigin.DeviceAdvertised,
+            org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                .YangModuleInfoImpl.getInstance().getName(), CapabilityOrigin.DeviceAdvertised
+            )), listener);
 
         final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
                 any(RemoteDeviceServices.class));
-        final Set<AvailableCapability> resolvedCapabilities = argument.getValue().capabilities().resolvedCapabilities();
 
-        final var notificationModulesName = List.of(
-                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                        .YangModuleInfoImpl.getInstance().getName().toString(),
-                org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                        .YangModuleInfoImpl.getInstance().getName().toString());
-
-        assertEquals(2, resolvedCapabilities.size());
-        assertTrue(resolvedCapabilities.stream().anyMatch(entry -> notificationModulesName
-                .contains(entry.getCapability())));
+        assertEquals(Set.of(
+            new AvailableCapabilityBuilder()
+                .setCapability("(urn:ietf:params:xml:ns:yang:ietf-yang-types?revision=2013-07-15)ietf-yang-types")
+                .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
+                .build(),
+            new AvailableCapabilityBuilder()
+                .setCapability("(urn:ietf:params:xml:ns:netconf:notification:1.0?revision=2008-07-14)notifications")
+                .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
+                .build()), argument.getValue().capabilities().resolvedCapabilities());
     }
 
     private static EffectiveModelContextFactory getSchemaFactory() throws Exception {
