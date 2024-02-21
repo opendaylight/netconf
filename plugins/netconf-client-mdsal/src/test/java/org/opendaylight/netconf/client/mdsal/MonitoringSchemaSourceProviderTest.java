@@ -12,7 +12,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.FluentFuture;
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.Set;
@@ -23,9 +22,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.GetSchema;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
@@ -42,18 +40,17 @@ import org.w3c.dom.Element;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class MonitoringSchemaSourceProviderTest {
     @Mock
-    private DOMRpcService service;
+    private NetconfRpcService service;
 
     private MonitoringSchemaSourceProvider provider;
 
     @Before
     public void setUp() throws Exception {
-        final DOMRpcResult value = new DefaultDOMRpcResult(getNode(), Set.of());
-        final FluentFuture<DOMRpcResult> response = FluentFutures.immediateFluentFuture(value);
-        doReturn(response).when(service).invokeRpc(any(QName.class), any(ContainerNode.class));
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(getNode(), Set.of()))).when(service)
+            .invokeNetconf(any(), any());
 
         provider = new MonitoringSchemaSourceProvider(
-                new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("localhost", 17830)), service);
+            new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("localhost", 17830)), service);
     }
 
     @Test
@@ -61,7 +58,7 @@ public class MonitoringSchemaSourceProviderTest {
         final SourceIdentifier identifier = new SourceIdentifier("test", "2016-02-08");
         final YangTextSource source = provider.getSource(identifier).get();
         assertEquals(identifier, source.sourceId());
-        verify(service).invokeRpc(GetSchema.QNAME,
+        verify(service).invokeNetconf(GetSchema.QNAME,
                 MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Optional.of("2016-02-08")));
     }
 
