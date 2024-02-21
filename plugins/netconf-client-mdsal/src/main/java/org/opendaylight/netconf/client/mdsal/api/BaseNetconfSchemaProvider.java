@@ -23,5 +23,6 @@ public interface BaseNetconfSchemaProvider {
      * @return A {@link BaseNetconfSchema}
      * @throws NullPointerException if {@code capabilityURNs} is {@code null}
      */
+    // FIXME: return ListenableFuture
     BaseNetconfSchema baseSchemaForCapabilities(NetconfSessionPreferences sessionPreferences);
 }

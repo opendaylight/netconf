@@ -30,8 +30,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
@@ -64,7 +64,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     private static ContainerNode SCHEMAS_PAYLOAD;
 
     @Mock
-    private DOMRpcService rpc;
+    private NetconfRpcService rpc;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -104,7 +104,8 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
                         .build())
                     .build())
                 .build();
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcReply))).when(rpc).invokeRpc(eq(Get.QNAME), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcReply))).when(rpc)
+            .invokeNetconf(eq(Get.QNAME), any());
         final var stateSchemas = assertSchemas(CAPS);
         final var availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         assertEquals(69, availableYangSchemasQNames.size());
@@ -122,14 +123,15 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     @Test
     public void testCreateFail() throws Exception {
         final var domEx = new DOMRpcImplementationNotAvailableException("not available");
-        doReturn(Futures.immediateFailedFuture(domEx)).when(rpc).invokeRpc(eq(Get.QNAME), any());
+        doReturn(Futures.immediateFailedFuture(domEx)).when(rpc).invokeNetconf(eq(Get.QNAME), any());
         assertSame(domEx, assertSchemasFailure());
     }
 
     @Test
     public void testCreateRpcError() throws Exception {
         final var rpcError = RpcResultBuilder.newError(ErrorType.RPC, new ErrorTag("fail"), "fail");
-        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(rpc).invokeRpc(eq(Get.QNAME), any());
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(rpc)
+            .invokeNetconf(eq(Get.QNAME), any());
 
         final var ex = assertInstanceOf(OperationFailedException.class, assertSchemasFailure());
         assertEquals(List.of(rpcError), ex.getErrorList());
