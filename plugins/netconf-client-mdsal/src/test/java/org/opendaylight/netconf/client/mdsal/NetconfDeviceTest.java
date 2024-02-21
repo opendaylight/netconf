@@ -103,7 +103,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final SchemaResolutionException schemaResolutionException =
                 new SchemaResolutionException("fail first", TEST_SID, new Throwable("YangTools parser fail"));
         doAnswer(invocation -> {
-            if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
+            if (invocation.getArgument(0, Collection.class).size() == 2) {
                 return Futures.immediateFailedFuture(schemaResolutionException);
             } else {
                 return Futures.immediateFuture(SCHEMA_CONTEXT);
@@ -399,7 +399,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
 
-        final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
             any(RemoteDeviceServices.class));
         argument.getValue().capabilities().resolvedCapabilities()
@@ -429,7 +429,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         netconfSpy.onRemoteSessionUp(sessionCaps, listener);
 
-        final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
                 any(RemoteDeviceServices.class));
 
@@ -468,7 +468,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         netconfSpy.onRemoteSessionUp(sessionCaps, listener);
 
-        final ArgumentCaptor<NetconfDeviceSchema> argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
                 any(RemoteDeviceServices.class));
         final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().capabilities();
