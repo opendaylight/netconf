@@ -103,7 +103,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final SchemaResolutionException schemaResolutionException =
                 new SchemaResolutionException("fail first", TEST_SID, new Throwable("YangTools parser fail"));
         doAnswer(invocation -> {
-            if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
+            if (invocation.getArgument(0, Collection.class).size() == 2) {
                 return Futures.immediateFailedFuture(schemaResolutionException);
             } else {
                 return Futures.immediateFuture(SCHEMA_CONTEXT);
