@@ -28,13 +28,13 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
 import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
-import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceBuilder;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
 import org.opendaylight.netconf.client.mdsal.SchemalessNetconfDevice;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
@@ -173,12 +173,12 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
             final var resources = schemaManager.getSchemaResources(node.getSchemaCacheDirectory(), nodeId.getValue());
             device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(node.requireReconnectOnChangedSchema())
-                .setSchemaResourcesDTO(resources)
-                .setGlobalProcessingExecutor(schemaAssembler.executor())
+                .setBaseSchemaProvider(baseSchemaProvider)
+                .setDeviceSchemaProvider(resources)
+                .setProcessingExecutor(schemaAssembler.executor())
                 .setId(deviceId)
                 .setSalFacade(salFacade)
                 .setDeviceActionFactory(deviceActionFactory)
-                .setBaseSchemas(baseSchemaProvider)
                 .build();
             yanglibRegistrations = registerDeviceSchemaSources(deviceId, node, resources);
         }
@@ -338,14 +338,13 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
     }
 
     private static List<Registration> registerDeviceSchemaSources(final RemoteDeviceId remoteDeviceId,
-            final NetconfNode node, final SchemaResourcesDTO resources) {
+            final NetconfNode node, final DeviceNetconfSchemaProvider resources) {
         final var yangLibrary = node.getYangLibrary();
         if (yangLibrary != null) {
             final Uri uri = yangLibrary.getYangLibraryUrl();
             if (uri != null) {
                 final var registrations = new ArrayList<Registration>();
                 final var yangLibURL = uri.getValue();
-                final var schemaRegistry = resources.getSchemaRegistry();
 
                 // pre register yang library sources as fallback schemas to schema registry
                 final var yangLibUsername = yangLibrary.getUsername();
@@ -355,7 +354,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                         : LibraryModulesSchemas.create(yangLibURL);
 
                 for (var entry : schemas.getAvailableModels().entrySet()) {
-                    registrations.add(schemaRegistry.registerSchemaSource(new LibrarySchemaSourceProvider(
+                    registrations.add(resources.registerSchemaSource(new LibrarySchemaSourceProvider(
                         remoteDeviceId, schemas.getAvailableModels()),
                         PotentialSchemaSource.create(entry.getKey(), YangTextSource.class,
                             PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
