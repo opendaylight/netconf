@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a77adbd_63d3e686",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-21T15:58:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc2574a6_54a93725",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 98,
+        "endChar": 116
+      },
+      "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70a441f8_1246d425",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "26277559_fab1bde2",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-21T15:58:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70a441f8_1246d425",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 5
+      },
+      "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f09bb18_e15a3ab5",
@@ -60,6 +108,24 @@
       "writtenOn": "2024-02-20T16:17:10Z",
       "side": 1,
       "message": "This urn:\n```urn:ietf:params:netconf:capability:exi:1.0?compression\u003d1000\u0026schemas\u003ddynamic```\n\nshould be null or ExiSchemas.DYNAMIC?",
+      "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00187410_d4b8d77c",
+        "filename": "protocol/netconf-common/src/main/java/org/opendaylight/netconf/common/util/CapabilityUtil.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-21T15:58:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f09bb18_e15a3ab5",
       "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -95,6 +161,24 @@
       "side": 1,
       "message": "This will increase coverage for the \u0027default -\u003e null\u0027 use-case.\n```\n        return switch (value) {\n            case \"builtin\" -\u003e ExiSchemas.BUILTIN;\n            case \"base:1.1\" -\u003e ExiSchemas.BASE_1_1;\n            default -\u003e null;\n        };\n```",
       "parentUuid": "d324bd99_f4a3829f",
+      "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfcd2ee3_ab5a8118",
+        "filename": "protocol/netconf-common/src/test/java/org/opendaylight/netconf/common/util/CapabilityUtilTest.java",
+        "patchSetId": 31
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-02-21T15:58:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6962303_3aeac406",
       "revId": "a4e5c66d1c43170faa955d560ac2436f26ca5c7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
