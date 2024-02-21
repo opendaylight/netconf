@@ -10,15 +10,15 @@ package org.opendaylight.netconf.client.mdsal;
 import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.Executor;
-import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
+import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 
 public class NetconfDeviceBuilder {
     private boolean reconnectOnSchemasChange;
-    private SchemaResourcesDTO schemaResourcesDTO;
+    private DeviceNetconfSchemaProvider schemaResourcesDTO;
     private RemoteDeviceId id;
     private RemoteDeviceHandler salFacade;
     private Executor globalProcessingExecutor;
@@ -35,18 +35,18 @@ public class NetconfDeviceBuilder {
         return this;
     }
 
-    public NetconfDeviceBuilder setSchemaResourcesDTO(final SchemaResourcesDTO schemaResourcesDTO) {
-        this.schemaResourcesDTO = schemaResourcesDTO;
+    public NetconfDeviceBuilder setSchemaResourcesDTO(final DeviceNetconfSchemaProvider schemaResourcesDTO) {
+        this.schemaResourcesDTO = requireNonNull(schemaResourcesDTO);
         return this;
     }
 
     public NetconfDeviceBuilder setSalFacade(final RemoteDeviceHandler salFacade) {
-        this.salFacade = salFacade;
+        this.salFacade = requireNonNull(salFacade);
         return this;
     }
 
     public NetconfDeviceBuilder setGlobalProcessingExecutor(final Executor globalProcessingExecutor) {
-        this.globalProcessingExecutor = globalProcessingExecutor;
+        this.globalProcessingExecutor = requireNonNull(globalProcessingExecutor);
         return this;
     }
 
@@ -62,8 +62,8 @@ public class NetconfDeviceBuilder {
 
     public NetconfDevice build() {
         validation();
-        return new NetconfDevice(schemaResourcesDTO, baseSchemas, id, salFacade,
-            globalProcessingExecutor, reconnectOnSchemasChange, deviceActionFactory);
+        return new NetconfDevice(id, baseSchemas, schemaResourcesDTO, salFacade, globalProcessingExecutor,
+            reconnectOnSchemasChange, deviceActionFactory);
     }
 
     private void validation() {
