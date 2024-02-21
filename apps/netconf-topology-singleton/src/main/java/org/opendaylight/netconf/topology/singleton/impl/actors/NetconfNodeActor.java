@@ -97,7 +97,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     protected NetconfNodeActor(final NetconfTopologySetup setup, final RemoteDeviceId id,
             final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
         this.id = id;
-        schemaResources = setup.getSchemaResourcesDTO();
+        schemaResources = setup.getDeviceSchemaProvider();
         this.actorResponseWaitTime = actorResponseWaitTime;
         writeTxIdleTimeout = setup.getIdleTimeout();
         this.mountPointService = mountPointService;
@@ -129,7 +129,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             LOG.debug("{}: Master is ready.", id);
         } else if (message instanceof RefreshSetupMasterActorData masterActorData) {
             id = masterActorData.getRemoteDeviceId();
-            schemaResources = masterActorData.getNetconfTopologyDeviceSetup().getSchemaResourcesDTO();
+            schemaResources = masterActorData.getNetconfTopologyDeviceSetup().getDeviceSchemaProvider();
             sender().tell(new MasterActorDataInitialized(), self());
         } else if (message instanceof AskForMasterMountPoint askForMasterMountPoint) { // master
             // only master contains reference to deviceDataBroker
