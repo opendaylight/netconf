@@ -9,15 +9,13 @@ package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.annotations.Beta;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
 
 @Beta
 @NonNullByDefault
 public interface SchemaResourceManager {
-
     // FIXME: document this, nodeId is not quite appropriate name here: it should be a @NonNull id with .toString()
     //        being interesting
-    // FIXME: subDirectory should have be really String..., placing the onus of splitting the directory to callers,
-    //        so we do not get separator ambiguity
-    SchemaResourcesDTO getSchemaResources(String subDirectory, Object nodeId);
+    // FIXME: subDirectory should have be really 'String...' or a 'java.nio.file.Path', placing the onus of splitting
+    //        the directory to callers, so we do not get separator ambiguity
+    DeviceNetconfSchemaProvider getSchemaResources(String subDirectory, Object nodeId);
 }

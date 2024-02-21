@@ -46,9 +46,9 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
+import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.client.mdsal.spi.NetconfDeviceRpc;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
@@ -126,7 +126,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     // FIXME: this should work on NetconfRpcService
-    public static ListenableFuture<LibraryModulesSchemas> forDevice(final NetconfDeviceRpc deviceRpc,
+    public static ListenableFuture<LibraryModulesSchemas> forDevice(final NetconfRpcService deviceRpc,
             final RemoteDeviceId deviceId) {
         final var future = SettableFuture.<LibraryModulesSchemas>create();
         Futures.addCallback(deviceRpc.invokeNetconf(Get.QNAME, GET_MODULES_STATE_MODULE_LIST_RPC),
