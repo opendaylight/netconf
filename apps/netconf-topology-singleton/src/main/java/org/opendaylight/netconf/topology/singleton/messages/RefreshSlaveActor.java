@@ -24,8 +24,8 @@ public class RefreshSlaveActor {
                              final Timeout actorResponseWaitTime) {
         this.setup = setup;
         this.id = id;
-        schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
-        schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
+        schemaRegistry = setup.getDeviceSchemaProvider().getSchemaRegistry();
+        schemaRepository = setup.getDeviceSchemaProvider().getSchemaRepository();
         this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
