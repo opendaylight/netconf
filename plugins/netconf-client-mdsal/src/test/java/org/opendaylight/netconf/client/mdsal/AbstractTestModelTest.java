@@ -7,21 +7,11 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractTestModelTest extends AbstractBaseSchemasTest {
-    protected static EffectiveModelContext SCHEMA_CONTEXT;
-
-    @BeforeClass
-    public static final void setupSchemaContext() {
-        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
-    }
-
-    @AfterClass
-    public static final void tearDownSchemaContext() {
-        SCHEMA_CONTEXT = null;
-    }
+    protected static final @NonNull EffectiveModelContext SCHEMA_CONTEXT =
+        YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
 }

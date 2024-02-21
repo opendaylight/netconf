@@ -11,10 +11,9 @@ import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
- * {@link NetconfDeviceCapabilities} and {@link EffectiveModelContext} pertaining to a {@link NetconfDevice}.
+ * {@link NetconfDeviceCapabilities} and {@link MountPointContext} pertaining to a {@link NetconfDevice}.
  */
 public record NetconfDeviceSchema(
     @NonNull NetconfDeviceCapabilities capabilities,
