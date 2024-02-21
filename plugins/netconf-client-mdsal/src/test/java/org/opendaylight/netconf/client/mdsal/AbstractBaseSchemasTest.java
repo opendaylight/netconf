@@ -7,23 +7,11 @@
  */
 package org.opendaylight.netconf.client.mdsal;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
-import org.opendaylight.yangtools.yang.parser.api.YangParserException;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
 public abstract class AbstractBaseSchemasTest {
-    protected static BaseNetconfSchemaProvider BASE_SCHEMAS;
-
-    @BeforeClass
-    public static void initBaseSchemas() throws YangParserException {
-        BASE_SCHEMAS = new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory());
-    }
-
-    @AfterClass
-    public static void freeBaseSchemas() {
-        BASE_SCHEMAS = null;
-    }
+    protected static final BaseNetconfSchemaProvider BASE_SCHEMAS =
+        new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory());
 }

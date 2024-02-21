@@ -27,10 +27,10 @@ import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
+import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.common.mdsal.NormalizedDataUtil;
@@ -118,7 +118,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     /**
      * Issue get request to remote device and parse response to find all schemas under netconf-state/schemas.
      */
-    static ListenableFuture<NetconfStateSchemas> forDevice(final DOMRpcService deviceRpc,
+    static ListenableFuture<NetconfStateSchemas> forDevice(final NetconfRpcService deviceRpc,
             final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id,
             final EffectiveModelContext modelContext) {
         if (!remoteSessionCapabilities.isMonitoringSupported()) {
@@ -129,7 +129,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         }
 
         final var future = SettableFuture.<NetconfStateSchemas>create();
-        Futures.addCallback(deviceRpc.invokeRpc(Get.QNAME, GET_SCHEMAS_RPC),
+        Futures.addCallback(deviceRpc.invokeNetconf(Get.QNAME, GET_SCHEMAS_RPC),
             new FutureCallback<DOMRpcResult>() {
                 @Override
                 public void onSuccess(final DOMRpcResult result) {
