@@ -56,7 +56,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.netconf.client.mdsal.NetconfDevice;
+import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
@@ -162,9 +162,8 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         NetconfTopologySetup masterSetup = NetconfTopologySetup.builder()
                 .setActorSystem(masterSystem)
                 .setDataBroker(mockDataBroker)
-                .setSchemaResourceDTO(new NetconfDevice.SchemaResourcesDTO(
-                    masterSchemaRepository, masterSchemaRepository, mockSchemaContextFactory, mockSchemasResolver))
                 .setBaseSchemaProvider(BASE_SCHEMAS)
+                .setDeviceSchemaProvider(createDeviceSchemaProvider(masterSchemaRepository))
                 .build();
 
         testMasterActorRef = TestActorRef.create(masterSystem, Props.create(TestMasterActor.class, masterSetup,
@@ -178,15 +177,21 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         NetconfTopologySetup slaveSetup = NetconfTopologySetup.builder()
                 .setActorSystem(slaveSystem)
                 .setDataBroker(mockDataBroker)
-                .setSchemaResourceDTO(new NetconfDevice.SchemaResourcesDTO(
-                    slaveSchemaRepository, slaveSchemaRepository, mockSchemaContextFactory, mockSchemasResolver))
                 .setBaseSchemaProvider(BASE_SCHEMAS)
+                .setDeviceSchemaProvider(createDeviceSchemaProvider(slaveSchemaRepository))
                 .build();
 
         netconfNodeManager = new NetconfNodeManager(slaveSetup, DEVICE_ID, responseTimeout,
                 mockMountPointService);
 
         setupMountPointMocks();
+    }
+
+    private static DeviceNetconfSchemaProvider createDeviceSchemaProvider(final SharedSchemaRepository repository) {
+        final var provider = mock(DeviceNetconfSchemaProvider.class);
+        doReturn(repository).when(provider).registry();
+        doReturn(repository).when(provider).repository();
+        return provider;
     }
 
     @After

@@ -81,7 +81,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
-import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
+import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
@@ -169,7 +169,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     @Mock
     private EffectiveModelContext mockSchemaContext;
     @Mock
-    private SchemaResourcesDTO schemaResourceDTO;
+    private DeviceNetconfSchemaProvider deviceSchemaProvider;
 
     @Before
     public void setup() {
@@ -182,7 +182,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final NetconfTopologySetup setup = NetconfTopologySetup.builder()
             .setActorSystem(system)
             .setIdleTimeout(Duration.ofSeconds(1))
-            .setSchemaResourceDTO(schemaResourceDTO)
+            .setDeviceSchemaProvider(deviceSchemaProvider)
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
 
@@ -223,7 +223,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         final NetconfTopologySetup newSetup = NetconfTopologySetup.builder()
             .setBaseSchemaProvider(BASE_SCHEMAS)
-            .setSchemaResourceDTO(schemaResourceDTO)
+            .setDeviceSchemaProvider(deviceSchemaProvider)
             .setActorSystem(system)
             .build();
 
@@ -325,14 +325,14 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(newMockSchemaSourceReg).close();
     }
 
-    @SuppressWarnings("unchecked")
+//    @SuppressWarnings("unchecked")
     @Test
     public void testRegisterMountPointWithSchemaFailures() throws Exception {
-        SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
-        doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
-        doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
+        var deviceSchemaProvider2 = mock(DeviceNetconfSchemaProvider.class);
+        doReturn(mockRegistry).when(deviceSchemaProvider2).registry();
+        doReturn(mockSchemaRepository).when(deviceSchemaProvider2).repository();
         final NetconfTopologySetup setup = NetconfTopologySetup.builder()
-                .setSchemaResourceDTO(schemaResourceDTO2)
+                .setDeviceSchemaProvider(deviceSchemaProvider2)
                 .setBaseSchemaProvider(BASE_SCHEMAS)
                 .setActorSystem(system)
                 .build();
@@ -413,11 +413,11 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     public void testMissingSchemaSourceOnMissingProvider() throws Exception {
         final var repository = new SharedSchemaRepository("test");
 
-        final var schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
-        doReturn(repository).when(schemaResourceDTO2).getSchemaRepository();
+        final var deviceSchemaProvider2 = mock(DeviceNetconfSchemaProvider.class);
+        doReturn(repository).when(deviceSchemaProvider2).repository();
         final var setup = NetconfTopologySetup.builder()
             .setActorSystem(system)
-            .setSchemaResourceDTO(schemaResourceDTO2)
+            .setDeviceSchemaProvider(deviceSchemaProvider2)
             .setIdleTimeout(Duration.ofSeconds(1))
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
@@ -436,7 +436,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testYangTextSchemaSourceRequest() throws Exception {
-        doReturn(masterSchemaRepository).when(schemaResourceDTO).getSchemaRepository();
+        doReturn(masterSchemaRepository).when(deviceSchemaProvider).repository();
 
         final var sourceIdentifier = new SourceIdentifier("testID");
 
@@ -655,11 +655,11 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     }
 
     private ActorRef registerSlaveMountPoint() {
-        SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
-        doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
-        doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
+        var deviceSchemaProvider2 = mock(DeviceNetconfSchemaProvider.class);
+        doReturn(mockRegistry).when(deviceSchemaProvider2).registry();
+        doReturn(mockSchemaRepository).when(deviceSchemaProvider2).repository();
         final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(NetconfTopologySetup.builder()
-                .setSchemaResourceDTO(schemaResourceDTO2)
+                .setDeviceSchemaProvider(deviceSchemaProvider2)
                 .setActorSystem(system)
                 .setBaseSchemaProvider(BASE_SCHEMAS)
                 .build(), remoteDeviceId, TIMEOUT, mockMountPointService));
