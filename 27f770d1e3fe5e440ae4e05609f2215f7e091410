@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "27f770d1e3fe5e440ae4e05609f2215f7e091410",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff9cb2a3_43e25190",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1538,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-22T19:25:38Z",
+      "side": 1,
+      "message": "When i load openapi, paths seems like /\"restconf\"/data/aaa:authentication, are there \"\" necessary ?",
+      "revId": "27f770d1e3fe5e440ae4e05609f2215f7e091410",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
