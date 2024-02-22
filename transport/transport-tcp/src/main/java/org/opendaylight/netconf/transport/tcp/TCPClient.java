@@ -70,6 +70,7 @@ public final class TCPClient extends TCPTransportStack {
                     stack.addTransportChannel(new TCPTransportChannel(future.channel()));
                 } else {
                     ret.setException(future.cause());
+                    listener.onTransportChannelFailed(future.cause());
                 }
             });
         return ret;
