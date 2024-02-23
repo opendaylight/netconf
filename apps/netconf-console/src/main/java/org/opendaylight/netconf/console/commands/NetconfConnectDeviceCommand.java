@@ -22,13 +22,13 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.Protocol.Name;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.ProtocolBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.protocol.specification.TlsCase;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.protocol.specification.TlsCaseBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.protocol.specification.tls._case.TlsBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.LoginPasswordBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.connection.parameters.ProtocolBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.connection.parameters.protocol.specification.TlsCase;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.connection.parameters.protocol.specification.TlsCaseBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.connection.parameters.protocol.specification.tls._case.TlsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240223.NetconfNodeBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @Service
