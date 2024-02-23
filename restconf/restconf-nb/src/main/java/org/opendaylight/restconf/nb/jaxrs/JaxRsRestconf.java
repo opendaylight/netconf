@@ -29,7 +29,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.CacheControl;
@@ -805,7 +804,20 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     //          wild destinations
 
     /**
-     * Get schema of specific module.
+     * Get yang schema of specific module without revision.
+     *
+     * @param fileName source file name
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
+    public void modulesYangGET(@PathParam("fileName") final String fileName, @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYangGET(fileName, null), ar);
+    }
+
+    /**
+     * Get yang schema of specific module.
      *
      * @param fileName source file name
      * @param revision source revision
@@ -813,14 +825,29 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}/{revision : [^/]+}")
     public void modulesYangGET(@PathParam("fileName") final String fileName,
-            @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
+            @PathParam("revision") final String revision, @Suspended final AsyncResponse ar) {
         completeModulesGET(server.modulesYangGET(fileName, revision), ar);
     }
 
     /**
-     * Get schema of specific module.
+     * Get yang schema of specific module without revision behind mount point.
+     *
+     * @param mountPath mount point path
+     * @param fileName source file name
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath: .*/yang-ext:mount}/{fileName : [^/]+}")
+    public void modulesYangGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
+        @PathParam("fileName") final String fileName, @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYangGET(mountPath, fileName, null), ar);
+    }
+
+    /**
+     * Get yang schema of specific module behind mount point.
      *
      * @param mountPath mount point path
      * @param fileName source file name
@@ -829,30 +856,59 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.*/yang-ext:mount}/{fileName : [^/]+}/{revision : [^/]+}")
     public void modulesYangGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
-            @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
+            @PathParam("fileName") final String fileName, @PathParam("revision") final String revision,
             @Suspended final AsyncResponse ar) {
         completeModulesGET(server.modulesYangGET(mountPath, fileName, revision), ar);
     }
 
     /**
-     * Get schema of specific module.
+     * Get Yin schema of specific module without revision.
      *
      * @param fileName source file name
-     * @param revision source revision
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
     @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
     public void modulesYinGET(@PathParam("fileName") final String fileName,
-            @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
+            @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYinGET(fileName, null), ar);
+    }
+
+    /**
+     * Get Yin schema of specific module.
+     *
+     * @param fileName source file name
+     * @param revision source revision
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}/{revision : [^/]+}")
+    public void modulesYinGET(@PathParam("fileName") final String fileName,
+            @PathParam("revision") final String revision, @Suspended final AsyncResponse ar) {
         completeModulesGET(server.modulesYinGET(fileName, revision), ar);
     }
 
     /**
-     * Get schema of specific module.
+     * Get Yin schema of specific module without revision behind mount point.
+     *
+     * @param mountPath mount point path
+     * @param fileName source file name
+     * @param ar {@link AsyncResponse} which needs to be completed
+     */
+    @GET
+    @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.*/yang-ext:mount}/{fileName : [^/]+}")
+    public void modulesYinGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
+        @PathParam("fileName") final String fileName, @Suspended final AsyncResponse ar) {
+        completeModulesGET(server.modulesYinGET(mountPath, fileName, null), ar);
+    }
+
+    /**
+     * Get Yin schema of specific module behind mount point.
      *
      * @param mountPath mount point path
      * @param fileName source file name
@@ -861,9 +917,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.*/yang-ext:mount}/{fileName : [^/]+}/{revision : [^/]+}")
     public void modulesYinGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
-            @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
+            @PathParam("fileName") final String fileName, @PathParam("revision") final String revision,
             @Suspended final AsyncResponse ar) {
         completeModulesGET(server.modulesYinGET(mountPath, fileName, revision), ar);
     }
