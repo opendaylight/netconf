@@ -18,9 +18,10 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.ProtocolBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.LoginPasswordBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.connection.parameters.ProtocolBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240223.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
@@ -97,10 +98,12 @@ class CallHomeMountSessionContext {
                         .setConcurrentRpcLimit(Uint16.ZERO)
                         .setActorResponseWaitTime(Uint16.valueOf(5))
                         // the real call-home device credentials are applied in CallHomeAuthProviderImpl
-                        .setCredentials(new LoginPasswordBuilder()
+                        .setCredentials(new LoginPwUnencryptedBuilder()
+                            .setLoginPasswordUnencrypted(new LoginPasswordUnencryptedBuilder()
                                 .setUsername("omitted")
                                 .setPassword("omitted")
                                 .build())
+                            .build())
                         .setLockDatastore(true)
                     .build())
                 .build();

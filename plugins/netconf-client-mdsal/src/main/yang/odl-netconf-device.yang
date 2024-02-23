@@ -9,6 +9,10 @@ module odl-netconf-device {
   import ietf-inet-types { prefix inet; }
   import ietf-netconf { prefix nc; }
 
+  revision 2024-02-23 {
+    description "Store encrypted login-pw case password as binary";
+  }
+
   revision 2024-01-18 {
     description "Mark between-attempts-timeout-millis, max-timeout-between-attempts-millis and sleep-factor
     as deprecated. They will be renamed to min-backoff-millis, max-backoff-millis and backoff-multiplier
@@ -39,6 +43,16 @@ module odl-netconf-device {
     }
 
     leaf password {
+      type binary;
+    }
+  }
+
+  grouping username-password-unencrypted {
+    leaf username {
+      type string;
+    }
+
+    leaf password {
       type string;
     }
   }
@@ -50,7 +64,7 @@ module odl-netconf-device {
         description "Obsolete way of storing credentials, unencrypted.";
 
         status obsolete;
-        uses username-password;
+        uses username-password-unencrypted;
       }
       case login-pw {
         description "login-password credentials, encrypted.";
@@ -63,7 +77,7 @@ module odl-netconf-device {
         description "login-password credentials, not encrypted.";
 
         container login-password-unencrypted {
-          uses username-password;
+          uses username-password-unencrypted;
         }
       }
       case key-auth {
