@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "78ea9c79_4fa38a30",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1509,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-23T08:00:16Z",
+      "side": 1,
+      "message": "Its not a boolean 😊",
+      "revId": "27f770d1e3fe5e440ae4e05609f2215f7e091410",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ff9cb2a3_43e25190",
         "filename": "docs/user-guide.rst",
         "patchSetId": 3
