@@ -16,6 +16,24 @@
       "message": "This import is unnecessary in the current implementation.",
       "revId": "79cf0867af8458f29318a7f08eb1dd1c74e8d50a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1529edb_26e4887f",
+        "filename": "restconf/restconf-openapi/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-23T09:52:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d43d095f_67eff145",
+      "revId": "79cf0867af8458f29318a7f08eb1dd1c74e8d50a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
