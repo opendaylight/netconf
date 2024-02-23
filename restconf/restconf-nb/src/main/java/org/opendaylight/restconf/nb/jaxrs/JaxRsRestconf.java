@@ -29,7 +29,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.CacheControl;
@@ -813,9 +812,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}/{revision : [^/]+}")
     public void modulesYangGET(@PathParam("fileName") final String fileName,
-            @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
+            @PathParam("revision") final String revision, @Suspended final AsyncResponse ar) {
         completeModulesGET(server.modulesYangGET(fileName, revision), ar);
     }
 
@@ -829,9 +828,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YANG_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}/{revision : [^/]+}")
     public void modulesYangGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
-            @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
+            @PathParam("fileName") final String fileName, @PathParam("revision") final String revision,
             @Suspended final AsyncResponse ar) {
         completeModulesGET(server.modulesYangGET(mountPath, fileName, revision), ar);
     }
@@ -845,9 +844,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}/{revision : [^/]+}")
     public void modulesYinGET(@PathParam("fileName") final String fileName,
-            @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
+            @PathParam("revision") final String revision, @Suspended final AsyncResponse ar) {
         completeModulesGET(server.modulesYinGET(fileName, revision), ar);
     }
 
@@ -861,9 +860,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      */
     @GET
     @Produces(YangConstants.RFC6020_YIN_MEDIA_TYPE)
-    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}")
+    @Path("/" + URLConstants.MODULES_SUBPATH + "/{mountPath:.+}/{fileName : [^/]+}/{revision : [^/]+}")
     public void modulesYinGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
-            @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
+            @PathParam("fileName") final String fileName, @PathParam("revision") final String revision,
             @Suspended final AsyncResponse ar) {
         completeModulesGET(server.modulesYinGET(mountPath, fileName, revision), ar);
     }
