@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2935ac42_57b40ba3",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1509,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-02-23T09:38:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78ea9c79_4fa38a30",
+      "revId": "27f770d1e3fe5e440ae4e05609f2215f7e091410",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff9cb2a3_43e25190",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-02-22T19:25:38Z",
       "side": 1,
       "message": "When i load openapi, paths seems like /\"restconf\"/data/aaa:authentication, are there \"\" necessary ?",
+      "revId": "27f770d1e3fe5e440ae4e05609f2215f7e091410",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec76774b_bf77085b",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1538,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-02-23T09:38:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff9cb2a3_43e25190",
       "revId": "27f770d1e3fe5e440ae4e05609f2215f7e091410",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
