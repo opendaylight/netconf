@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Base64;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -21,13 +22,12 @@ import org.opendaylight.netconf.client.mdsal.api.CredentialProvider;
 import org.opendaylight.netconf.client.mdsal.api.SslHandlerFactoryProvider;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.connection.parameters.Protocol.Name;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.KeyAuth;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.LoginPassword;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.LoginPw;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240118.credentials.credentials.LoginPwUnencrypted;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev221225.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.credentials.credentials.KeyAuth;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev240223.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -84,15 +84,14 @@ public final class DefaultNetconfClientConfigurationBuilderFactory implements Ne
     }
 
     private @NonNull AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
-        if (credentials instanceof LoginPassword loginPassword) {
-            return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
-        } else if (credentials instanceof LoginPwUnencrypted unencrypted) {
+        if (credentials instanceof LoginPwUnencrypted unencrypted) {
             final var loginPassword = unencrypted.getLoginPasswordUnencrypted();
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         } else if (credentials instanceof LoginPw loginPw) {
             final var loginPassword = loginPw.getLoginPassword();
+            final var password = Base64.getEncoder().encodeToString(loginPassword.getPassword());
             return new LoginPasswordHandler(loginPassword.getUsername(),
-                    encryptionService.decrypt(loginPassword.getPassword()));
+                    encryptionService.decrypt(password));
         } else if (credentials instanceof KeyAuth keyAuth) {
             final var keyPair = keyAuth.getKeyBased();
             return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getKeyId(), credentialProvider,
