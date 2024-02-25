@@ -44,7 +44,6 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.EmptySchemaContextException;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
-import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -75,9 +74,6 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     public static final String TEST_CAPABILITY2 =
             TEST_NAMESPACE + "?module=" + TEST_MODULE + "2" + "&amp;revision=" + TEST_REVISION;
 
-    private static final NetconfDeviceSchemasResolver STATE_SCHEMAS_RESOLVER =
-        (deviceRpc, remoteSessionCapabilities, id, schemaContext) -> Futures.immediateFuture(NetconfStateSchemas.EMPTY);
-
     private static NetconfMessage NOTIFICATION;
 
     @Mock
@@ -106,8 +102,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
-            .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider(getSchemaRepository(), schemaFactory,
-                STATE_SCHEMAS_RESOLVER))
+            .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider(getSchemaRepository(), schemaFactory))
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
@@ -234,7 +229,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider(getSchemaRepository(),
-                schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER))
+                schemaContextProviderFactory))
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
@@ -382,13 +377,13 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     }
 
     private DeviceNetconfSchemaProvider mockDeviceNetconfSchemaProvider() {
-        return mockDeviceNetconfSchemaProvider(getSchemaRepository(), getSchemaFactory(), STATE_SCHEMAS_RESOLVER);
+        return mockDeviceNetconfSchemaProvider(getSchemaRepository(), getSchemaFactory());
     }
 
     private DeviceNetconfSchemaProvider mockDeviceNetconfSchemaProvider(final SchemaRepository schemaRepository,
-            final EffectiveModelContextFactory schemaFactory, final NetconfDeviceSchemasResolver stateSchemasResolver) {
+            final EffectiveModelContextFactory schemaFactory) {
         return new DefaultDeviceNetconfSchemaProvider(schemaRegistry, schemaRepository, schemaFactory,
-            stateSchemasResolver);
+            (unused1, unused2, unused3, unused4) -> Futures.immediateFuture(NetconfStateSchemas.EMPTY));
     }
 
     public RemoteDeviceId getId() {
