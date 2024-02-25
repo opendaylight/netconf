@@ -31,7 +31,6 @@ import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeGenerator;
 import org.opendaylight.netconf.api.messages.NotificationMessage;
 import org.opendaylight.netconf.server.api.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector;
-import org.opendaylight.netconf.server.api.notifications.NetconfNotificationCollector.NetconfNotificationStreamListener;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationListener;
 import org.opendaylight.netconf.server.api.notifications.NetconfNotificationRegistry;
 import org.opendaylight.netconf.server.api.notifications.NotificationPublisherRegistration;
