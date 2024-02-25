@@ -63,13 +63,14 @@ public final class TCPClient extends TCPTransportStack {
                 socketAddressOf(connectParams.requireRemoteAddress(), connectParams.requireRemotePort()),
                 socketAddressOf(connectParams.getLocalAddress(), connectParams.getLocalPort()))
             .addListener((ChannelFutureListener) future -> {
-                if (future.isSuccess()) {
+                final var cause = future.cause();
+                if (cause == null) {
                     // Order of operations is important here: the stack should be visible before the underlying channel
                     final var stack = new TCPClient(listener);
                     ret.set(stack);
                     stack.addTransportChannel(new TCPTransportChannel(future.channel()));
                 } else {
-                    ret.setException(future.cause());
+                    ret.setException(cause);
                 }
             });
         return ret;
