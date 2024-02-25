@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -195,7 +194,7 @@ public class NetconfDeviceCommunicatorTest {
         verify(mockDevice, never()).onRemoteSessionDown();
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings("unchecked")
     @Test
     public void testSendRequest() throws Exception {
         setupSession();
@@ -203,8 +202,7 @@ public class NetconfDeviceCommunicatorTest {
         NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create("", "mockRpc");
 
-        ArgumentCaptor<GenericFutureListener> futureListener =
-                ArgumentCaptor.forClass(GenericFutureListener.class);
+        final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
 
         ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
@@ -218,14 +216,11 @@ public class NetconfDeviceCommunicatorTest {
 
         verify(mockChannelFuture).addListener(futureListener.capture());
         Future<Void> operationFuture = mock(Future.class);
-        doReturn(true).when(operationFuture).isSuccess();
+        doReturn(null).when(operationFuture).cause();
         futureListener.getValue().operationComplete(operationFuture);
 
-        try {
-            resultFuture.get(1, TimeUnit.MILLISECONDS); // verify it's not cancelled or has an error set
-        } catch (TimeoutException e) {
-            LOG.info("Operation failed due timeout.");
-        } // expected
+        // verify it's not cancelled or has an error set
+        assertFalse(resultFuture.isDone());
     }
 
     @Test
@@ -256,7 +251,7 @@ public class NetconfDeviceCommunicatorTest {
         return new NetconfMessage(doc);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings("unchecked")
     @Test
     public void testSendRequestWithWithSendFailure() throws Exception {
         setupSession();
@@ -264,8 +259,7 @@ public class NetconfDeviceCommunicatorTest {
         NetconfMessage message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
         QName rpc = QName.create("", "mockRpc");
 
-        ArgumentCaptor<GenericFutureListener> futureListener =
-                ArgumentCaptor.forClass(GenericFutureListener.class);
+        final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
 
         ChannelFuture mockChannelFuture = mock(ChannelFuture.class);
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
@@ -278,7 +272,6 @@ public class NetconfDeviceCommunicatorTest {
         verify(mockChannelFuture).addListener(futureListener.capture());
 
         Future<Void> operationFuture = mock(Future.class);
-        doReturn(false).when(operationFuture).isSuccess();
         doReturn(new Exception("mock error")).when(operationFuture).cause();
         futureListener.getValue().operationComplete(operationFuture);
 
