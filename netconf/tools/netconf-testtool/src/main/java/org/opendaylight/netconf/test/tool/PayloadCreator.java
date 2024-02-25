@@ -23,16 +23,14 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.slf4j.Logger;
@@ -84,7 +82,7 @@ final class PayloadCreator {
         return normalizedNodeToString(createNormalizedNodePayload(devices, parameters));
     }
 
-    private static String normalizedNodeToString(final NormalizedNode node) {
+    private static String normalizedNodeToString(final SystemMapNode node) {
         final StringWriter writer = new StringWriter();
         final JsonWriter jsonWriter = JsonWriterFactory.createJsonWriter(writer, DEFAULT_REQUEST_PAYLOAD_INDENTATION);
         final NormalizedNodeStreamWriter jsonStream = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
@@ -98,82 +96,36 @@ final class PayloadCreator {
         return writer.toString();
     }
 
-    private static NormalizedNode createNormalizedNodePayload(final List<Integer> devices,
+    private static SystemMapNode createNormalizedNodePayload(final List<Integer> devices,
             final TesttoolParameters parameters) {
-        final var nodeBuilder = Builders.mapBuilder().withNodeIdentifier(NodeIdentifier.create(Node.QNAME));
+        final var nodeBuilder = ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(Node.QNAME));
         for (final Integer device : devices) {
-            nodeBuilder.withChild(Builders.mapEntryBuilder()
-                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME,
-                            createNodeID(device)))
-                    .withChild(leafPort(device))
-                    .withChild(leafHost(parameters.generateConfigsAddress))
-                    .withChild(containerCredentials(DEFAULT_NODE_USERNAME, DEFAULT_NODE_PASSWORD))
-                    .withChild(leafTcpOnly(!parameters.ssh))
-                    .withChild(leafKeepaliveDelay(DEFAULT_NODE_KEEPALIVE_DELAY))
-                    .withChild(leafSchemaless(DEFAULT_NODE_SCHEMALESS))
-                    .build());
+            nodeBuilder.withChild(ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, device + "-sim-device"))
+                .withChild(ImmutableNodes.leafNode(PORT_NODE_IDENTIFIER, Uint16.valueOf(device)))
+                .withChild(ImmutableNodes.leafNode(HOST_NODE_IDENTIFIER, parameters.generateConfigsAddress))
+                .withChild(ImmutableNodes.newChoiceBuilder()
+                    .withNodeIdentifier(CREDENTIALS_NODE_IDENTIFIER)
+                    .withChild(ImmutableNodes.newContainerBuilder()
+                        .withNodeIdentifier(LOGIN_PASSWORD_UNENCRYPTED_NODE_IDENTIFIER)
+                        .withChild(ImmutableNodes.leafNode(USERNAME_NODE_IDENTIFIER, DEFAULT_NODE_USERNAME))
+                        .withChild(ImmutableNodes.leafNode(PASSWORD_NODE_IDENTIFIER, DEFAULT_NODE_PASSWORD))
+                        .build())
+                    .build())
+                .withChild(ImmutableNodes.leafNode(TCP_ONLY_NODE_IDENTIFIER, !parameters.ssh))
+                .withChild(ImmutableNodes.leafNode(KEEPALIVE_DELAY_NODE_IDENTIFIER, DEFAULT_NODE_KEEPALIVE_DELAY))
+                .withChild(ImmutableNodes.leafNode(SCHEMALESS_NODE_IDENTIFIER, DEFAULT_NODE_SCHEMALESS))
+                .build());
         }
 
-        return Builders.mapBuilder()
-                .withNodeIdentifier(NodeIdentifier.create(Topology.QNAME))
-                .withChild(Builders.mapEntryBuilder().withNodeIdentifier(NodeIdentifierWithPredicates
-                        .of(Topology.QNAME, TOPOLOGY_ID_QNAME, DEFAULT_TOPOLOGY_ID))
-                        .withChild(nodeBuilder.build())
-                        .build())
-                .build();
-    }
-
-    private static String createNodeID(final Integer port) {
-        return String.format("%d-sim-device", port);
-    }
-
-    private static LeafNode<Uint16> leafPort(final int port) {
-        return Builders.<Uint16>leafBuilder()
-                .withNodeIdentifier(PORT_NODE_IDENTIFIER)
-                .withValue(Uint16.valueOf(port))
-                .build();
-    }
-
-    private static LeafNode<String> leafHost(final String host) {
-        return Builders.<String>leafBuilder()
-                .withNodeIdentifier(HOST_NODE_IDENTIFIER)
-                .withValue(host)
-                .build();
-    }
-
-    private static ChoiceNode containerCredentials(final String username, final String password) {
-        return Builders.choiceBuilder().withNodeIdentifier(CREDENTIALS_NODE_IDENTIFIER)
-                .withChild(Builders.containerBuilder().withNodeIdentifier(LOGIN_PASSWORD_UNENCRYPTED_NODE_IDENTIFIER)
-                        .withChild(Builders.<String>leafBuilder()
-                                .withNodeIdentifier(USERNAME_NODE_IDENTIFIER)
-                                .withValue(username)
-                                .build())
-                        .withChild(Builders.<String>leafBuilder()
-                                .withNodeIdentifier(PASSWORD_NODE_IDENTIFIER)
-                                .withValue(password)
-                                .build())
-                        .build())
-                .build();
-    }
-
-    private static LeafNode<Boolean> leafTcpOnly(final Boolean tcpOnly) {
-        return Builders.<Boolean>leafBuilder()
-                .withNodeIdentifier(TCP_ONLY_NODE_IDENTIFIER)
-                .withValue(tcpOnly)
-                .build();
-    }
-
-    private static LeafNode<Integer> leafKeepaliveDelay(final Integer keepaliveDelay) {
-        return Builders.<Integer>leafBuilder()
-                .withNodeIdentifier(KEEPALIVE_DELAY_NODE_IDENTIFIER)
-                .withValue(keepaliveDelay)
-                .build();
-    }
-
-    private static LeafNode<Boolean> leafSchemaless(final Boolean schemaless) {
-        return Builders.<Boolean>leafBuilder()
-                .withNodeIdentifier(SCHEMALESS_NODE_IDENTIFIER)
-                .withValue(schemaless)
-                .build();
+        return ImmutableNodes.newSystemMapBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(Topology.QNAME))
+            .withChild(ImmutableNodes.newMapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(Topology.QNAME,
+                    TOPOLOGY_ID_QNAME, DEFAULT_TOPOLOGY_ID))
+                .withChild(nodeBuilder.build())
+                .build())
+            .build();
     }
 }

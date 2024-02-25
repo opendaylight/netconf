@@ -9,10 +9,8 @@ package org.opendaylight.netconf.test.tool;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.util.concurrent.MoreExecutors;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -51,14 +49,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.builder.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,23 +147,20 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             final QName location = QName.create(Schema.QNAME, "location");
             final QName namespace = QName.create(Schema.QNAME, "namespace");
 
-            CollectionNodeBuilder<MapEntryNode, SystemMapNode> schemaMapEntryNodeMapNodeCollectionNodeBuilder =
-                Builders.mapBuilder().withNodeIdentifier(new NodeIdentifier(Schema.QNAME));
-            LeafSetNode<String> locationLeafSet = Builders.<String>leafSetBuilder()
+            final var schemaMapEntryNodeMapNodeCollectionNodeBuilder = ImmutableNodes.newSystemMapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(Schema.QNAME));
+            final var locationLeafSet = ImmutableNodes.<String>newSystemLeafSetBuilder()
                 .withNodeIdentifier(new NodeIdentifier(location))
-                .withChild(Builders.<String>leafSetEntryBuilder()
-                    .withNodeIdentifier(new NodeWithValue<>(location, "NETCONF"))
-                    .withValue("NETCONF")
-                    .build())
+                .withChildValue("NETCONF")
                 .build();
 
-            Map<QName, Object> keyValues = new HashMap<>();
+            final var keyValues = new HashMap<QName, Object>();
             for (final Schema schema : monitor.getSchemas().nonnullSchema().values()) {
                 keyValues.put(identifier, schema.getIdentifier());
                 keyValues.put(version, schema.getVersion());
                 keyValues.put(format, Yang.QNAME);
 
-                schemaMapEntryNodeMapNodeCollectionNodeBuilder.withChild(Builders.mapEntryBuilder()
+                schemaMapEntryNodeMapNodeCollectionNodeBuilder.withChild(ImmutableNodes.newMapEntryBuilder()
                     .withNodeIdentifier(NodeIdentifierWithPredicates.of(Schema.QNAME, keyValues))
                     .withChild(ImmutableNodes.leafNode(identifier, schema.getIdentifier()))
                     .withChild(ImmutableNodes.leafNode(version, schema.getVersion()))
@@ -181,9 +170,9 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                     .build());
             }
 
-            return Builders.containerBuilder()
+            return ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(NetconfState.QNAME))
-                .withChild(Builders.containerBuilder()
+                .withChild(ImmutableNodes.newContainerBuilder()
                     .withNodeIdentifier(new NodeIdentifier(Schemas.QNAME))
                     .withChild(schemaMapEntryNodeMapNodeCollectionNodeBuilder.build())
                     .build())
@@ -203,7 +192,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
             datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
 
-            return new SerializedDOMDataBroker(datastores, MoreExecutors.listeningDecorator(listenableFutureExecutor));
+            return new SerializedDOMDataBroker(datastores, listenableFutureExecutor);
         }
 
         private DOMSchemaService createSchemaService() {
