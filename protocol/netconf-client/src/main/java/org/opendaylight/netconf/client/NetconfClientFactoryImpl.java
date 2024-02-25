@@ -8,9 +8,6 @@
 package org.opendaylight.netconf.client;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol.SSH;
-import static org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol.TCP;
-import static org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol.TLS;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -33,10 +30,14 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 @Component(service = NetconfClientFactory.class)
 public final class NetconfClientFactoryImpl implements NetconfClientFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfClientFactoryImpl.class);
+
     private final SSHTransportStackFactory factory;
     private final NetconfTimer timer;
 
@@ -62,28 +63,28 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
     @Override
     public ListenableFuture<NetconfClientSession> createClient(final NetconfClientConfiguration configuration)
             throws UnsupportedConfigurationException {
-        final var protocol = configuration.getProtocol();
         final var future = SettableFuture.<NetconfClientSession>create();
         final var channelInitializer = new ClientChannelInitializer(createNegotiatorFactory(configuration),
             () -> configuration.getSessionListener());
-        final var bootstrap = factory.newBootstrap();
 
-        if (TCP.equals(protocol)) {
-            TCPClient.connect(new ClientTransportChannelListener(future, channelInitializer), bootstrap,
-                configuration.getTcpParameters());
-        } else if (TLS.equals(protocol)) {
-            if (configuration.getTlsParameters() != null) {
-                TLSClient.connect(new ClientTransportChannelListener(future, channelInitializer), bootstrap,
-                    configuration.getTcpParameters(), new FixedSslHandlerFactory(configuration.getTlsParameters()));
-            } else {
-                TLSClient.connect(new ClientTransportChannelListener(future, channelInitializer), bootstrap,
-                    configuration.getTcpParameters(), configuration.getSslHandlerFactory());
-            }
-        } else if (SSH.equals(protocol)) {
-            factory.connectClient(TransportConstants.SSH_SUBSYSTEM,
+        // FIXME: do not ignore this future
+        final var stackFuture = switch (configuration.getProtocol()) {
+            case SSH -> factory.connectClient(TransportConstants.SSH_SUBSYSTEM,
                 new ClientTransportChannelListener(future, channelInitializer), configuration.getTcpParameters(),
                 configuration.getSshParameters(), configuration.getSshConfigurator());
-        }
+            case TCP -> TCPClient.connect(new ClientTransportChannelListener(future, channelInitializer),
+                factory.newBootstrap(), configuration.getTcpParameters());
+            case TLS -> {
+                var handlerFactory = configuration.getSslHandlerFactory();
+                if (handlerFactory == null) {
+                    handlerFactory = new FixedSslHandlerFactory(configuration.getTlsParameters());
+                }
+                yield TLSClient.connect(new ClientTransportChannelListener(future, channelInitializer),
+                    factory.newBootstrap(), configuration.getTcpParameters(), handlerFactory);
+            }
+        };
+        LOG.trace("Future stack is {}", stackFuture);
+
         return future;
     }
 
