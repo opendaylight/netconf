@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -69,7 +70,8 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
     }
 
     @Override
-    public DeviceNetconfSchemaProvider getSchemaResources(final String subdir, final Object nodeId) {
+    public DeviceNetconfSchemaProvider getSchemaResources(final String subdir, final Object nodeId,
+            final Executor executor) {
         if (defaultSubdirectory.equals(subdir)) {
             // Fast path for default devices
             return defaultResources;

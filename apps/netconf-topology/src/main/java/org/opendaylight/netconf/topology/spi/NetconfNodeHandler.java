@@ -175,7 +175,6 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                 .setReconnectOnSchemasChange(node.requireReconnectOnChangedSchema())
                 .setBaseSchemaProvider(baseSchemaProvider)
                 .setDeviceSchemaProvider(resources)
-                .setProcessingExecutor(schemaAssembler.executor())
                 .setId(deviceId)
                 .setSalFacade(salFacade)
                 .setDeviceActionFactory(deviceActionFactory)
