@@ -33,6 +33,42 @@
       "message": "And also, isn\u0027t the real problem that NetconfClientFactoryImpl is ignoring the future we are returning?",
       "revId": "5b97b38579cc5ab845e167d043758a7b3337ff7c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eddfd535_6d36004d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-25T14:05:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45ffc9eb_46392d3a",
+      "revId": "5b97b38579cc5ab845e167d043758a7b3337ff7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6b734e5_4b308dd5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-25T14:05:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bfddd3ff_291accde",
+      "revId": "5b97b38579cc5ab845e167d043758a7b3337ff7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
