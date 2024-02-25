@@ -18,8 +18,6 @@ import javax.inject.Singleton;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.common.NetconfTimer;
-import org.opendaylight.netconf.transport.api.TransportChannel;
-import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
@@ -99,34 +97,5 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
             .collect(ImmutableSet.toImmutableSet());
         return new NetconfClientSessionNegotiatorFactory(timer, configuration.getAdditionalHeader(),
             configuration.getConnectionTimeoutMillis(), stringCapabilities);
-    }
-
-    private record ClientTransportChannelListener(
-            SettableFuture<NetconfClientSession> future,
-            ClientChannelInitializer initializer) implements TransportChannelListener {
-        ClientTransportChannelListener {
-            requireNonNull(future);
-            requireNonNull(initializer);
-        }
-
-        @Override
-        public void onTransportChannelEstablished(final TransportChannel channel) {
-            final var nettyChannel = channel.channel();
-            final var promise = nettyChannel.eventLoop().<NetconfClientSession>newPromise();
-            initializer.initialize(nettyChannel, promise);
-            promise.addListener(ignored -> {
-                final var cause = promise.cause();
-                if (cause != null) {
-                    future.setException(cause);
-                } else {
-                    future.set(promise.getNow());
-                }
-            });
-        }
-
-        @Override
-        public void onTransportChannelFailed(final Throwable cause) {
-            future.setException(cause);
-        }
     }
 }
