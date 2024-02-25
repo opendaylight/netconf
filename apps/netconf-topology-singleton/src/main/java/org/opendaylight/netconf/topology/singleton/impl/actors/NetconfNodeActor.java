@@ -23,7 +23,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opendaylight.controller.cluster.common.actor.AbstractUntypedActor;
-import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
@@ -36,6 +35,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.client.mdsal.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
@@ -75,19 +75,15 @@ import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 
 public class NetconfNodeActor extends AbstractUntypedActor {
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
 
-    private SchemaSourceRegistry schemaRegistry;
-    private SchemaRepository schemaRepository;
+    private SchemaResourcesDTO schemaResources;
     private Timeout actorResponseWaitTime;
     private RemoteDeviceId id;
-    private NetconfTopologySetup setup;
     private List<SourceIdentifier> sourceIdentifiers = null;
     private DOMRpcService deviceRpc = null;
     private DOMActionService deviceAction = null;
@@ -98,22 +94,19 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private ActorRef readTxActor;
     private List<Registration> registeredSchemas;
 
+    protected NetconfNodeActor(final NetconfTopologySetup setup, final RemoteDeviceId id,
+            final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
+        this.id = id;
+        schemaResources = setup.getSchemaResourcesDTO();
+        this.actorResponseWaitTime = actorResponseWaitTime;
+        writeTxIdleTimeout = setup.getIdleTimeout();
+        this.mountPointService = mountPointService;
+    }
+
     public static Props props(final NetconfTopologySetup setup, final RemoteDeviceId id,
             final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
         return Props.create(NetconfNodeActor.class, () ->
                 new NetconfNodeActor(setup, id, actorResponseWaitTime, mountPointService));
-    }
-
-    protected NetconfNodeActor(final NetconfTopologySetup setup,
-                               final RemoteDeviceId id, final Timeout actorResponseWaitTime,
-                               final DOMMountPointService mountPointService) {
-        this.setup = setup;
-        this.id = id;
-        schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
-        schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
-        this.actorResponseWaitTime = actorResponseWaitTime;
-        writeTxIdleTimeout = setup.getIdleTimeout();
-        this.mountPointService = mountPointService;
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -134,9 +127,9 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
             sender().tell(new MasterActorDataInitialized(), self());
             LOG.debug("{}: Master is ready.", id);
-        } else if (message instanceof RefreshSetupMasterActorData) {
-            setup = ((RefreshSetupMasterActorData) message).getNetconfTopologyDeviceSetup();
-            id = ((RefreshSetupMasterActorData) message).getRemoteDeviceId();
+        } else if (message instanceof RefreshSetupMasterActorData masterActorData) {
+            id = masterActorData.getRemoteDeviceId();
+            schemaResources = masterActorData.getNetconfTopologyDeviceSetup().getSchemaResourcesDTO();
             sender().tell(new MasterActorDataInitialized(), self());
         } else if (message instanceof AskForMasterMountPoint askForMasterMountPoint) { // master
             // only master contains reference to deviceDataBroker
@@ -184,12 +177,10 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         } else if (message instanceof RefreshSlaveActor refreshSlave) { //slave
             actorResponseWaitTime = refreshSlave.getActorResponseWaitTime();
             id = refreshSlave.getId();
-            schemaRegistry = refreshSlave.getSchemaRegistry();
-            setup = refreshSlave.getSetup();
-            schemaRepository = refreshSlave.getSchemaRepository();
+            schemaResources = refreshSlave.getSetup().getSchemaResourcesDTO();
         } else if (message instanceof NetconfDataTreeServiceRequest) {
-            ActorRef netconfActor = context()
-                .actorOf(NetconfDataTreeServiceActor.props(netconfService, writeTxIdleTimeout));
+            final var netconfActor = context().actorOf(NetconfDataTreeServiceActor.props(netconfService,
+                writeTxIdleTimeout));
             sender().tell(new Success(netconfActor), self());
         }
     }
@@ -213,7 +204,8 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     }
 
     private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
-        Futures.addCallback(schemaRepository.getSchemaSource(sourceIdentifier, YangTextSource.class),
+        Futures.addCallback(
+            schemaResources.getSchemaRepository().getSchemaSource(sourceIdentifier, YangTextSource.class),
             new FutureCallback<>() {
                 @Override
                 public void onSuccess(final YangTextSource yangTextSchemaSource) {
@@ -306,24 +298,24 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private void registerSlaveMountPoint(final ActorRef masterReference) {
         unregisterSlaveMountPoint();
 
-        slaveSalManager = new SlaveSalFacade(id, setup.getActorSystem(), actorResponseWaitTime, mountPointService);
+        slaveSalManager = new SlaveSalFacade(id, context().system(), actorResponseWaitTime, mountPointService);
 
         resolveSchemaContext(createSchemaContextFactory(masterReference), slaveSalManager, masterReference, 1);
     }
 
     private EffectiveModelContextFactory createSchemaContextFactory(final ActorRef masterReference) {
-        final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
-                new ProxyYangTextSourceProvider(masterReference, getContext().dispatcher(), actorResponseWaitTime);
-        final RemoteSchemaProvider remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider,
-                getContext().dispatcher());
+        final var dispatcher = getContext().dispatcher();
+        final var remoteYangTextSourceProvider = new ProxyYangTextSourceProvider(masterReference, dispatcher,
+            actorResponseWaitTime);
+        final var remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider, dispatcher);
+        final var schemaRegistry = schemaResources.getSchemaRegistry();
 
         registeredSchemas = sourceIdentifiers.stream()
-                .map(sourceId ->
-                        schemaRegistry.registerSchemaSource(remoteProvider, PotentialSchemaSource.create(sourceId,
-                                YangTextSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())))
-                .collect(Collectors.toList());
+            .map(sourceId -> schemaRegistry.registerSchemaSource(remoteProvider, PotentialSchemaSource.create(sourceId,
+                YangTextSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())))
+            .collect(Collectors.toList());
 
-        return schemaRepository.createEffectiveModelContextFactory();
+        return schemaResources.getSchemaRepository().createEffectiveModelContextFactory();
     }
 
     private void resolveSchemaContext(final EffectiveModelContextFactory schemaContextFactory,
@@ -338,7 +330,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                     if (slaveSalManager == localSlaveSalManager) {
                         LOG.info("{}: Schema context resolved: {} - registering slave mount point", id,
                             result.getModules());
-                        final var actorSystem = setup.getActorSystem();
+                        final var actorSystem = context().system();
                         final var rpcProxy = new ProxyDOMRpcService(actorSystem, masterReference, id,
                             actorResponseWaitTime);
                         slaveSalManager.registerSlaveMountPoint(result, masterReference, new RemoteDeviceServices(

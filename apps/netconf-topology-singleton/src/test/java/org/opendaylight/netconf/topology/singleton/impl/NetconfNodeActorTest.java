@@ -63,7 +63,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
@@ -109,8 +108,7 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
@@ -181,8 +179,6 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         masterSchemaRepository.registerSchemaSourceListener(
                 TextToIRTransformer.create(masterSchemaRepository, masterSchemaRepository));
 
-        doReturn(masterSchemaRepository).when(schemaResourceDTO).getSchemaRepository();
-        doReturn(mockRegistry).when(schemaResourceDTO).getSchemaRegistry();
         final NetconfTopologySetup setup = NetconfTopologySetup.builder()
             .setActorSystem(system)
             .setIdleTimeout(Duration.ofSeconds(1))
@@ -413,66 +409,58 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(mockSchemaRepository, times(2)).createEffectiveModelContextFactory();
     }
 
-    @Test(expected = MissingSchemaSourceException.class)
+    @Test
     public void testMissingSchemaSourceOnMissingProvider() throws Exception {
-        final SharedSchemaRepository repository = new SharedSchemaRepository("test");
+        final var repository = new SharedSchemaRepository("test");
 
-        SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
-        doReturn(repository).when(schemaResourceDTO2).getSchemaRegistry();
+        final var schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(repository).when(schemaResourceDTO2).getSchemaRepository();
-        final NetconfTopologySetup setup = NetconfTopologySetup.builder()
+        final var setup = NetconfTopologySetup.builder()
             .setActorSystem(system)
             .setSchemaResourceDTO(schemaResourceDTO2)
             .setIdleTimeout(Duration.ofSeconds(1))
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build();
-        final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
-        ActorRef actor = TestActorRef.create(system, props, "master_messages_2");
+        final var props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
+        final var actor = TestActorRef.create(system, props, "master_messages_2");
 
-        final SourceIdentifier sourceIdentifier = new SourceIdentifier("testID");
+        final var sourceIdentifier = new SourceIdentifier("testID");
 
-        final ProxyYangTextSourceProvider proxyYangProvider =
-                new ProxyYangTextSourceProvider(actor, system.dispatcher(), TIMEOUT);
+        final var proxyYangProvider = new ProxyYangTextSourceProvider(actor, system.dispatcher(), TIMEOUT);
 
-        final Future<YangTextSchemaSourceSerializationProxy> resolvedSchemaFuture =
-                proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
-        Await.result(resolvedSchemaFuture, TIMEOUT.duration());
+        final var resolvedSchemaFuture = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
+        final var ex = assertThrows(MissingSchemaSourceException.class,
+            () -> Await.result(resolvedSchemaFuture, TIMEOUT.duration()));
+        assertEquals("No providers registered for source SourceIdentifier [testID]", ex.getMessage());
     }
 
     @Test
     public void testYangTextSchemaSourceRequest() throws Exception {
-        final SourceIdentifier sourceIdentifier = new SourceIdentifier("testID");
+        doReturn(masterSchemaRepository).when(schemaResourceDTO).getSchemaRepository();
 
-        final ProxyYangTextSourceProvider proxyYangProvider =
-                new ProxyYangTextSourceProvider(masterRef, system.dispatcher(), TIMEOUT);
+        final var sourceIdentifier = new SourceIdentifier("testID");
 
-        final YangTextSource yangTextSchemaSource = new DelegatedYangTextSource(sourceIdentifier,
-            CharSource.wrap("YANG"));
+        final var proxyYangProvider = new ProxyYangTextSourceProvider(masterRef, system.dispatcher(), TIMEOUT);
+
+        final var yangTextSchemaSource = new DelegatedYangTextSource(sourceIdentifier, CharSource.wrap("YANG"));
 
         // Test success.
 
-        final var schemaSourceReg = masterSchemaRepository.registerSchemaSource(
-            id -> Futures.immediateFuture(yangTextSchemaSource),
-            PotentialSchemaSource.create(sourceIdentifier, YangTextSource.class, 1));
+        try (var schemaSourceReg = masterSchemaRepository.registerSchemaSource(
+                id -> Futures.immediateFuture(yangTextSchemaSource),
+                PotentialSchemaSource.create(sourceIdentifier, YangTextSource.class, 1))) {
+            final var resolvedSchemaFuture = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
+            final var success = Await.result(resolvedSchemaFuture, TIMEOUT.duration());
 
-        final Future<YangTextSchemaSourceSerializationProxy> resolvedSchemaFuture =
-                proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
-
-        final YangTextSchemaSourceSerializationProxy success = Await.result(resolvedSchemaFuture, TIMEOUT.duration());
-
-        assertEquals(sourceIdentifier, success.getRepresentation().sourceId());
-        assertEquals("YANG", success.getRepresentation().read());
+            assertEquals(sourceIdentifier, success.getRepresentation().sourceId());
+            assertEquals("YANG", success.getRepresentation().read());
+        }
 
         // Test missing source failure.
 
-        schemaSourceReg.close();
-
-        final MissingSchemaSourceException ex = assertThrows(MissingSchemaSourceException.class,
-            () -> {
-                final Future<YangTextSchemaSourceSerializationProxy> failedSchemaFuture =
-                        proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
-                Await.result(failedSchemaFuture, TIMEOUT.duration());
-            });
+        final var failedSchemaFuture = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
+        final var ex = assertThrows(MissingSchemaSourceException.class,
+            () -> Await.result(failedSchemaFuture, TIMEOUT.duration()));
         assertThat(ex.getMessage(), startsWith("No providers registered for source"));
         assertThat(ex.getMessage(), containsString(sourceIdentifier.toString()));
     }
@@ -490,7 +478,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         assertTrue(slaveDomRPCService instanceof ProxyDOMRpcService);
 
         final QName testQName = QName.create("", "TestQname");
-        final ContainerNode outputNode = Builders.containerBuilder()
+        final ContainerNode outputNode = ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(testQName))
                 .withChild(ImmutableNodes.leafNode(testQName, "foo")).build();
         final RpcError rpcError = RpcResultBuilder.newError(ErrorType.RPC, null, "Rpc invocation failed.");
@@ -564,7 +552,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final DOMDataTreeIdentifier domDataTreeIdentifier = new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL,
             yangIIdPath);
 
-        final ContainerNode outputNode = Builders.containerBuilder()
+        final ContainerNode outputNode = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(testQName))
             .withChild(ImmutableNodes.leafNode(testQName, "foo")).build();
 
@@ -634,7 +622,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
         final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
-        final ContainerNode NODE = Builders.containerBuilder()
+        final ContainerNode NODE = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
             .build();
 
