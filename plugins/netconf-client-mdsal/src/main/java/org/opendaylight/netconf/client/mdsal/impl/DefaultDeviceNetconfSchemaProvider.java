@@ -41,16 +41,17 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
     private final @NonNull EffectiveModelContextFactory contextFactory;
     private final @NonNull SchemaSourceRegistry registry;
     private final @NonNull SchemaRepository repository;
-    // FIXME: private final Executor processingExecutor;
+    private final Executor processingExecutor;
 
-    DefaultDeviceNetconfSchemaProvider(final SharedSchemaRepository repository) {
-        this(repository, repository,
+    DefaultDeviceNetconfSchemaProvider(final SharedSchemaRepository repository, final Executor processingExecutor) {
+        this(processingExecutor, repository, repository,
             repository.createEffectiveModelContextFactory(SchemaContextFactoryConfiguration.getDefault()));
     }
 
     @VisibleForTesting
-    public DefaultDeviceNetconfSchemaProvider(final SchemaSourceRegistry registry, final SchemaRepository repository,
-            final EffectiveModelContextFactory contextFactory) {
+    public DefaultDeviceNetconfSchemaProvider(final Executor processingExecutor, final SchemaSourceRegistry registry,
+            final SchemaRepository repository, final EffectiveModelContextFactory contextFactory) {
+        this.processingExecutor = requireNonNull(processingExecutor);
         this.registry = requireNonNull(registry);
         this.repository = requireNonNull(repository);
         this.contextFactory = requireNonNull(contextFactory);
@@ -59,7 +60,7 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
     @Override
     public ListenableFuture<DeviceNetconfSchema> deviceNetconfSchemaFor(final RemoteDeviceId deviceId,
             final NetconfSessionPreferences sessionPreferences, final NetconfRpcService deviceRpc,
-            final BaseNetconfSchema baseSchema, final Executor processingExecutor) {
+            final BaseNetconfSchema baseSchema) {
         // Acquire sources
         final var sourceResolverFuture = resolver.resolve(deviceId, sessionPreferences, deviceRpc,
             baseSchema.modelContext());

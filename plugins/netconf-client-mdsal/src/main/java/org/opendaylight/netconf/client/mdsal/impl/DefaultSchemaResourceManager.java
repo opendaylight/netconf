@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
@@ -69,7 +70,8 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
     }
 
     @Override
-    public DeviceNetconfSchemaProvider getSchemaResources(final String subdir, final Object nodeId) {
+    public DeviceNetconfSchemaProvider getSchemaResources(final String subdir, final Object nodeId,
+            final Executor executor) {
         if (defaultSubdirectory.equals(subdir)) {
             // Fast path for default devices
             return defaultResources;
@@ -85,22 +87,23 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
 
         LOG.info("Netconf connector for device {} will use schema cache directory {} instead of {}", nodeId, subdir,
             defaultSubdirectory);
-        return getSchemaResources(subdir);
+        return getSchemaResources(subdir, executor);
     }
 
-    private synchronized @NonNull DeviceNetconfSchemaProvider getSchemaResources(final String subdir) {
+    private synchronized @NonNull DeviceNetconfSchemaProvider getSchemaResources(final String subdir,
+            final Executor executor) {
         // Fast path for unusual devices
         final var existing = resources.get(subdir);
         if (existing != null) {
             return existing;
         }
 
-        final var created = createResources(subdir);
+        final var created = createResources(subdir, executor);
         resources.put(subdir, created);
         return created;
     }
 
-    private @NonNull DeviceNetconfSchemaProvider createResources(final String subdir) {
+    private @NonNull DeviceNetconfSchemaProvider createResources(final String subdir, final Executor executor) {
         // Setup the baseline empty registry
         final var repository = new SharedSchemaRepository(subdir, parserFactory);
 
@@ -118,6 +121,6 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
         repository.registerSchemaSourceListener(new FilesystemSchemaSourceCache<>(repository, YangTextSource.class,
             new File(rootDirectory + File.separator + subdir)));
 
-        return new DefaultDeviceNetconfSchemaProvider(repository);
+        return new DefaultDeviceNetconfSchemaProvider(repository, executor);
     }
 }

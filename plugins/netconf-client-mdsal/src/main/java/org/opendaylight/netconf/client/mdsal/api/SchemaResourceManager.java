@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.annotations.Beta;
+import java.util.concurrent.Executor;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 @Beta
@@ -17,5 +18,5 @@ public interface SchemaResourceManager {
     //        being interesting
     // FIXME: subDirectory should have be really 'String...' or a 'java.nio.file.Path', placing the onus of splitting
     //        the directory to callers, so we do not get separator ambiguity
-    DeviceNetconfSchemaProvider getSchemaResources(String subDirectory, Object nodeId);
+    DeviceNetconfSchemaProvider getSchemaResources(String subDirectory, Object nodeId, Executor executor);
 }

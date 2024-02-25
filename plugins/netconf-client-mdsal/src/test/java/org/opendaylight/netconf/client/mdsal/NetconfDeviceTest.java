@@ -102,7 +102,6 @@ class NetconfDeviceTest extends AbstractTestModelTest {
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider(getSchemaRepository(), schemaFactory))
-            .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
             .setBaseSchemaProvider(BASE_SCHEMAS)
@@ -132,12 +131,11 @@ class NetconfDeviceTest extends AbstractTestModelTest {
         final var remoteDeviceHandler = mockRemoteDeviceHandler();
         doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
         final var schemaFuture = SettableFuture.<DeviceNetconfSchema>create();
-        doReturn(schemaFuture).when(deviceSchemaProvider).deviceNetconfSchemaFor(any(), any(), any(), any(), any());
+        doReturn(schemaFuture).when(deviceSchemaProvider).deviceNetconfSchemaFor(any(), any(), any(), any());
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
             .setDeviceSchemaProvider(deviceSchemaProvider)
-            .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(remoteDeviceHandler)
             .setBaseSchemaProvider(BASE_SCHEMAS)
@@ -174,7 +172,6 @@ class NetconfDeviceTest extends AbstractTestModelTest {
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
-            .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
             .setBaseSchemaProvider(BASE_SCHEMAS)
@@ -199,12 +196,11 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     void testNetconfDeviceDisconnectListenerCallCancellation() {
         doNothing().when(facade).onDeviceDisconnected();
         final var schemaFuture = SettableFuture.<DeviceNetconfSchema>create();
-        doReturn(schemaFuture).when(schemaProvider).deviceNetconfSchemaFor(any(), any(), any(), any(), any());
+        doReturn(schemaFuture).when(schemaProvider).deviceNetconfSchemaFor(any(), any(), any(), any());
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
             .setDeviceSchemaProvider(schemaProvider)
-            .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
             .setBaseSchemaProvider(BASE_SCHEMAS)
@@ -231,9 +227,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
-            .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider(getSchemaRepository(),
-                schemaFactory))
-            .setProcessingExecutor(MoreExecutors.directExecutor())
+            .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider(getSchemaRepository(), schemaFactory))
             .setId(getId())
             .setSalFacade(facade)
             .setBaseSchemaProvider(BASE_SCHEMAS)
@@ -264,7 +258,6 @@ class NetconfDeviceTest extends AbstractTestModelTest {
         final var netconfSpy = spy(new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
-            .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
             .setBaseSchemaProvider(BASE_SCHEMAS)
@@ -297,7 +290,6 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     void testNetconfDeviceNotificationsModelNotPresentWithCapability() {
         final var netconfSpy = spy(new NetconfDeviceBuilder()
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
-            .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
             .setBaseSchemaProvider(BASE_SCHEMAS)
@@ -323,7 +315,6 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     void testNetconfDeviceNotificationsModelNotPresentWithoutInterleaveCapability() {
         final var netconfSpy = spy(new NetconfDeviceBuilder()
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
-            .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
             .setBaseSchemaProvider(BASE_SCHEMAS)
@@ -350,7 +341,6 @@ class NetconfDeviceTest extends AbstractTestModelTest {
     void testNetconfDeviceNotificationsModelIsPresent() {
         final var netconfSpy = spy(new NetconfDeviceBuilder()
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
-            .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
             .setBaseSchemaProvider(BASE_SCHEMAS)
@@ -390,7 +380,8 @@ class NetconfDeviceTest extends AbstractTestModelTest {
 
     private DeviceNetconfSchemaProvider mockDeviceNetconfSchemaProvider(final SchemaRepository schemaRepository,
             final EffectiveModelContextFactory modelContextFactory) {
-        return new DefaultDeviceNetconfSchemaProvider(schemaRegistry, schemaRepository, modelContextFactory);
+        return new DefaultDeviceNetconfSchemaProvider(MoreExecutors.directExecutor(), schemaRegistry, schemaRepository,
+            modelContextFactory);
     }
 
     private static RemoteDeviceId getId() {

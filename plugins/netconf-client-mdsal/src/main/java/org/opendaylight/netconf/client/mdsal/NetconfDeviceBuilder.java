@@ -9,7 +9,6 @@ package org.opendaylight.netconf.client.mdsal;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.concurrent.Executor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchemaProvider;
 import org.opendaylight.netconf.client.mdsal.api.DeviceActionFactory;
@@ -23,8 +22,6 @@ public final class NetconfDeviceBuilder {
     private DeviceNetconfSchemaProvider deviceSchemaProvider;
     private RemoteDeviceId id;
     private RemoteDeviceHandler salFacade;
-    // FIXME: this should not be here
-    private Executor processingExecutor;
     private DeviceActionFactory deviceActionFactory;
     private BaseNetconfSchemaProvider baseSchemaProvider;
 
@@ -40,11 +37,6 @@ public final class NetconfDeviceBuilder {
 
     public @NonNull NetconfDeviceBuilder setSalFacade(final RemoteDeviceHandler salFacade) {
         this.salFacade = requireNonNull(salFacade);
-        return this;
-    }
-
-    public @NonNull NetconfDeviceBuilder setProcessingExecutor(final Executor processingExecutor) {
-        this.processingExecutor = requireNonNull(processingExecutor);
         return this;
     }
 
@@ -70,7 +62,6 @@ public final class NetconfDeviceBuilder {
             requireNonNull(baseSchemaProvider, "BaseNetconfSchemaProvider is not initialized"),
             requireNonNull(deviceSchemaProvider, "DeviceNetconfSchemaProvider is not initialized"),
             requireNonNull(salFacade, "RemoteDeviceHandler is not initialized"),
-            requireNonNull(processingExecutor, "Executor is not initialized"),
             reconnectOnSchemasChange, deviceActionFactory);
     }
 }

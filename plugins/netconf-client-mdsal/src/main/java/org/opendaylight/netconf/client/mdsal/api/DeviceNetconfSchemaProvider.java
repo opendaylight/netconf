@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import java.util.concurrent.Executor;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
@@ -21,9 +20,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 public interface DeviceNetconfSchemaProvider {
 
     ListenableFuture<DeviceNetconfSchema> deviceNetconfSchemaFor(RemoteDeviceId deviceId,
-        NetconfSessionPreferences sessionPreferences, NetconfRpcService deviceRpc, BaseNetconfSchema baseSchema,
-        // FIXME: this parameter should not be here
-        Executor processingExecutor);
+        NetconfSessionPreferences sessionPreferences, NetconfRpcService deviceRpc, BaseNetconfSchema baseSchema);
 
     // FIXME: These support:
     //        - external URL-based pre-registration of schema sources from topology, which should really be catered

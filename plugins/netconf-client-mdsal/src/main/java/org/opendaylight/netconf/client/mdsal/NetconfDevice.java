@@ -15,7 +15,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.Executor;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -62,7 +61,6 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     protected final RemoteDeviceId id;
     private final BaseNetconfSchemaProvider baseSchemaProvider;
     private final DeviceNetconfSchemaProvider deviceSchemaProvider;
-    private final Executor processingExecutor;
 
     private final RemoteDeviceHandler salFacade;
     private final DeviceActionFactory deviceActionFactory;
@@ -76,22 +74,19 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
 
     public NetconfDevice(final RemoteDeviceId id,final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,
-            final Executor globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
-        this(id, baseSchemaProvider, deviceSchemaProvider, salFacade, globalProcessingExecutor,
-            reconnectOnSchemasChange, null);
+            final boolean reconnectOnSchemasChange) {
+        this(id, baseSchemaProvider, deviceSchemaProvider, salFacade, reconnectOnSchemasChange, null);
     }
 
     public NetconfDevice(final RemoteDeviceId id, final BaseNetconfSchemaProvider baseSchemaProvider,
             final DeviceNetconfSchemaProvider deviceSchemaProvider, final RemoteDeviceHandler salFacade,
-            final Executor globalProcessingExecutor, final boolean reconnectOnSchemasChange,
-            final DeviceActionFactory deviceActionFactory) {
+            final boolean reconnectOnSchemasChange, final DeviceActionFactory deviceActionFactory) {
         this.id = requireNonNull(id);
         this.baseSchemaProvider = requireNonNull(baseSchemaProvider);
         this.deviceSchemaProvider = requireNonNull(deviceSchemaProvider);
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
         this.deviceActionFactory = deviceActionFactory;
         this.salFacade = salFacade;
-        processingExecutor = requireNonNull(globalProcessingExecutor);
         notificationHandler = new NotificationHandler(salFacade, id);
     }
 
@@ -110,13 +105,13 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             new NetconfMessageTransformer(baseSchema.mountPointContext(), false, baseSchema));
 
         final var deviceSchema = deviceSchemaProvider.deviceNetconfSchemaFor(id, remoteSessionCapabilities, initRpc,
-            baseSchema, processingExecutor);
+            baseSchema);
 
         // Potentially acquire mount point list and interpret it
         final var netconfDeviceSchemaFuture = Futures.transformAsync(deviceSchema,
             result -> Futures.transform(createMountPointContext(result.modelContext(), baseSchema, listener),
-                mount -> new NetconfDeviceSchema(result.capabilities(), mount), processingExecutor),
-            processingExecutor);
+                mount -> new NetconfDeviceSchema(result.capabilities(), mount), MoreExecutors.directExecutor()),
+            MoreExecutors.directExecutor());
         schemaFuture = netconfDeviceSchemaFuture;
 
         Futures.addCallback(netconfDeviceSchemaFuture, new FutureCallback<>() {
