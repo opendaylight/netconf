@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45ffc9eb_46392d3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-25T10:05:15Z",
+      "side": 1,
+      "message": "Every bugfix needs to have a test, so we do not regress, right?",
+      "revId": "5b97b38579cc5ab845e167d043758a7b3337ff7c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
