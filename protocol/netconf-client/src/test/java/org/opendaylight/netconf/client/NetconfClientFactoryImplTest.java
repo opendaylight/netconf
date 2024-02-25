@@ -126,14 +126,19 @@ class NetconfClientFactoryImplTest {
         doNothing().when(serverTransportListener).onTransportChannelEstablished(any());
 
         // create temp socket to get available port for test
-        final var socket = new ServerSocket(0);
+        final int localPort;
+        try (var socket = new ServerSocket(0)) {
+            localPort = socket.getLocalPort();
+        }
+
         final var address = IetfInetUtil.ipAddressFor(InetAddress.getLoopbackAddress());
-        final var port = new PortNumber(Uint16.valueOf(socket.getLocalPort()));
-        socket.close();
+        final var port = new PortNumber(Uint16.valueOf(localPort));
 
         tcpServerParams = new TcpServerParametersBuilder().setLocalAddress(address).setLocalPort(port).build();
-        tcpClientParams =
-            new TcpClientParametersBuilder().setRemoteAddress(new Host(address)).setRemotePort(port).build();
+        tcpClientParams = new TcpClientParametersBuilder()
+            .setRemoteAddress(new Host(address))
+            .setRemotePort(port)
+            .build();
     }
 
     @AfterEach
