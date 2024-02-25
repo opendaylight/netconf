@@ -71,11 +71,12 @@ public final class TCPServer extends TCPTransportStack {
             .childHandler(initializer)
             .bind(socketAddressOf(listenParams.requireLocalAddress(), listenParams.requireLocalPort()))
             .addListener((ChannelFutureListener) future -> {
-                if (future.isSuccess()) {
+                final var cause = future.cause();
+                if (cause == null) {
                     stack.setListenChannel(future.channel());
                     ret.set(stack);
                 } else {
-                    ret.setException(future.cause());
+                    ret.setException(cause);
                 }
             });
         return ret;

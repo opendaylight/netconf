@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 // Non-final for mocking
 class NetconfClientSessionNegotiator
@@ -103,9 +102,9 @@ class NetconfClientSessionNegotiator
                 new ExiConfirmationInboundHandler(session, startExiMessage));
 
         session.sendMessage(startExiMessage).addListener(channelFuture -> {
-            if (!channelFuture.isSuccess()) {
-                LOG.warn("Failed to send start-exi message {} on session {}", startExiMessage, session,
-                        channelFuture.cause());
+            final var cause = channelFuture.cause();
+            if (cause != null) {
+                LOG.warn("Failed to send start-exi message {} on session {}", startExiMessage, session, cause);
                 channel.pipeline().remove(ExiConfirmationInboundHandler.EXI_CONFIRMED_HANDLER);
             } else {
                 LOG.trace("Start-exi message {} sent to socket on session {}", startExiMessage, session);
@@ -118,9 +117,9 @@ class NetconfClientSessionNegotiator
     }
 
     private static boolean containsExi10Capability(final Document doc) {
-        final NodeList nList = doc.getElementsByTagName(XmlNetconfConstants.CAPABILITY);
-        for (int i = 0; i < nList.getLength(); i++) {
-            if (nList.item(i).getTextContent().contains(EXI_1_0_CAPABILITY_MARKER)) {
+        final var nodeList = doc.getElementsByTagName(XmlNetconfConstants.CAPABILITY);
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            if (nodeList.item(i).getTextContent().contains(EXI_1_0_CAPABILITY_MARKER)) {
                 return true;
             }
         }

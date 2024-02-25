@@ -103,8 +103,10 @@ final class SendErrorExceptionUtil {
 
         @Override
         public void operationComplete(final ChannelFuture channelFuture) {
-            checkState(channelFuture.isSuccess(), "Unable to send exception %s", sendErrorException,
-                channelFuture.cause());
+            final var cause = channelFuture.cause();
+            if (cause != null) {
+                throw new IllegalStateException("Unable to send exception " + sendErrorException, cause);
+            }
         }
     }
 }
