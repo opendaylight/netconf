@@ -11,15 +11,13 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.TransportConstants;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.common.NetconfTimer;
-import org.opendaylight.netconf.transport.api.TransportChannel;
-import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.ssh.SSHTransportStackFactory;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
@@ -63,32 +61,29 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
     @Override
     public ListenableFuture<NetconfClientSession> createClient(final NetconfClientConfiguration configuration)
             throws UnsupportedConfigurationException {
-        final var future = SettableFuture.<NetconfClientSession>create();
-        final var channelInitializer = new ClientChannelInitializer(createNegotiatorFactory(configuration),
-            () -> configuration.getSessionListener());
+        final var sessionListener = configuration.getSessionListener();
+        final var transportListener = new ClientTransportChannelListener(new ClientChannelInitializer(
+            createNegotiatorFactory(configuration), () -> sessionListener));
 
-        // FIXME: do not ignore this future
         final var stackFuture = switch (configuration.getProtocol()) {
-            case SSH -> factory.connectClient(TransportConstants.SSH_SUBSYSTEM,
-                new ClientTransportChannelListener(future, channelInitializer), configuration.getTcpParameters(),
-                configuration.getSshParameters(), configuration.getSshConfigurator());
-            case TCP -> TCPClient.connect(new ClientTransportChannelListener(future, channelInitializer),
-                factory.newBootstrap(), configuration.getTcpParameters());
+            case SSH -> factory.connectClient(TransportConstants.SSH_SUBSYSTEM, transportListener,
+                configuration.getTcpParameters(), configuration.getSshParameters(), configuration.getSshConfigurator());
+            case TCP -> TCPClient.connect(transportListener, factory.newBootstrap(), configuration.getTcpParameters());
             case TLS -> {
                 var handlerFactory = configuration.getSslHandlerFactory();
                 if (handlerFactory == null) {
                     handlerFactory = new FixedSslHandlerFactory(configuration.getTlsParameters());
                 }
-                yield TLSClient.connect(new ClientTransportChannelListener(future, channelInitializer),
-                    factory.newBootstrap(), configuration.getTcpParameters(), handlerFactory);
+                yield TLSClient.connect(transportListener, factory.newBootstrap(), configuration.getTcpParameters(),
+                    handlerFactory);
             }
         };
         LOG.trace("Future stack is {}", stackFuture);
 
-        return future;
+        return transportListener.sessionFuture();
     }
 
-    private NetconfClientSessionNegotiatorFactory createNegotiatorFactory(
+    private @NonNull NetconfClientSessionNegotiatorFactory createNegotiatorFactory(
             final NetconfClientConfiguration configuration) {
         final var capabilities = configuration.getOdlHelloCapabilities();
         if (capabilities == null || capabilities.isEmpty()) {
@@ -99,34 +94,5 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
             .collect(ImmutableSet.toImmutableSet());
         return new NetconfClientSessionNegotiatorFactory(timer, configuration.getAdditionalHeader(),
             configuration.getConnectionTimeoutMillis(), stringCapabilities);
-    }
-
-    private record ClientTransportChannelListener(
-            SettableFuture<NetconfClientSession> future,
-            ClientChannelInitializer initializer) implements TransportChannelListener {
-        ClientTransportChannelListener {
-            requireNonNull(future);
-            requireNonNull(initializer);
-        }
-
-        @Override
-        public void onTransportChannelEstablished(final TransportChannel channel) {
-            final var nettyChannel = channel.channel();
-            final var promise = nettyChannel.eventLoop().<NetconfClientSession>newPromise();
-            initializer.initialize(nettyChannel, promise);
-            promise.addListener(ignored -> {
-                final var cause = promise.cause();
-                if (cause != null) {
-                    future.setException(cause);
-                } else {
-                    future.set(promise.getNow());
-                }
-            });
-        }
-
-        @Override
-        public void onTransportChannelFailed(final Throwable cause) {
-            future.setException(cause);
-        }
     }
 }
