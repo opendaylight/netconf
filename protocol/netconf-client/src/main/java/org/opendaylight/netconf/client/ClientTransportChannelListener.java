@@ -9,6 +9,7 @@ package org.opendaylight.netconf.client;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
@@ -16,10 +17,12 @@ import io.netty.util.concurrent.FutureListener;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
+import org.opendaylight.netconf.transport.api.TransportStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class ClientTransportChannelListener implements TransportChannelListener, FutureListener<NetconfClientSession> {
+final class ClientTransportChannelListener implements TransportChannelListener, FutureListener<NetconfClientSession>,
+        FutureCallback<TransportStack> {
     private static final Logger LOG = LoggerFactory.getLogger(ClientTransportChannelListener.class);
 
     private final @NonNull SettableFuture<NetconfClientSession> sessionFuture = SettableFuture.create();
@@ -55,5 +58,15 @@ final class ClientTransportChannelListener implements TransportChannelListener, 
         } else {
             sessionFuture.set(future.getNow());
         }
+    }
+
+    @Override
+    public void onSuccess(final TransportStack result) {
+        // No-op
+    }
+
+    @Override
+    public void onFailure(final Throwable cause) {
+        onTransportChannelFailed(cause);
     }
 }

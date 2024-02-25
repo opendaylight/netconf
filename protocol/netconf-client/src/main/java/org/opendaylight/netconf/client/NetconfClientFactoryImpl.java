@@ -10,7 +10,9 @@ package org.opendaylight.netconf.client;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,14 +30,10 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 @Component(service = NetconfClientFactory.class)
 public final class NetconfClientFactoryImpl implements NetconfClientFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfClientFactoryImpl.class);
-
     private final SSHTransportStackFactory factory;
     private final NetconfTimer timer;
 
@@ -78,7 +76,7 @@ public final class NetconfClientFactoryImpl implements NetconfClientFactory {
                     handlerFactory);
             }
         };
-        LOG.trace("Future stack is {}", stackFuture);
+        Futures.addCallback(stackFuture, transportListener, MoreExecutors.directExecutor());
 
         return transportListener.sessionFuture();
     }
