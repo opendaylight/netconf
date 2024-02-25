@@ -384,21 +384,14 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
         requests.add(req);
 
         currentSession.sendMessage(req.request).addListener(future -> {
-            if (!future.isSuccess()) {
+            final var cause = future.cause();
+            if (cause != null) {
                 // We expect that a session down will occur at this point
-                final var cause = future.cause();
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("{}: Failed to send request {}", id, XmlUtil.toString(req.request.getDocument()), cause);
                 }
 
-                final RpcResult<NetconfMessage> result;
-                if (cause == null) {
-                    // assume session is down
-                    result = createSessionDownRpcResult();
-                } else {
-                    result = createErrorRpcResult(ErrorType.TRANSPORT, cause.getLocalizedMessage());
-                }
-                req.future.set(result);
+                req.future.set(createErrorRpcResult(ErrorType.TRANSPORT, cause.getLocalizedMessage()));
             } else {
                 LOG.trace("Finished sending request {}", req.request);
             }
