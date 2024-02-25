@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.slf4j.Logger;
@@ -145,9 +145,10 @@ public final class EditConfig extends AbstractEdit {
             }
 
             // merge empty ordered or unordered map
+            final var builder = listSchemaNode.isUserOrdered() ? ImmutableNodes.newUserMapBuilder()
+                : ImmutableNodes.newSystemMapBuilder();
             rwtx.merge(LogicalDatastoreType.CONFIGURATION, parentNodeYid,
-                (listSchemaNode.isUserOrdered() ? Builders.orderedMapBuilder() : Builders.mapBuilder())
-                    .withNodeIdentifier(new NodeIdentifier(parentNodeYid.getLastPathArgument().getNodeType()))
+                builder.withNodeIdentifier(new NodeIdentifier(parentNodeYid.getLastPathArgument().getNodeType()))
                     .build());
         }
     }

@@ -60,7 +60,7 @@ import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -122,7 +122,7 @@ public class RuntimeRpcTest {
                 .findFirst().orElse(null);
             final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(module, module.getNamespace(),
                 type.getLocalName());
-            final ContainerNode node = Builders.containerBuilder()
+            final ContainerNode node = ImmutableNodes.newContainerBuilder()
                     .withNodeIdentifier(new NodeIdentifier(rpcDefinition.getOutput().getQName()))
                     .withValue(children)
                     .build();
