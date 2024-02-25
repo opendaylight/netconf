@@ -14,6 +14,7 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.transport.ssh.ClientFactoryManagerConfigurator;
@@ -24,8 +25,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tcp.client.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.rev240208.TlsClientGrouping;
 
 public final class NetconfClientConfiguration {
+    public enum NetconfClientProtocol {
+        TCP, SSH, TLS
+    }
 
-    private final NetconfClientProtocol clientProtocol;
+    private final @NonNull NetconfClientProtocol clientProtocol;
     private final Long connectionTimeoutMillis;
     private final NetconfHelloMessageAdditionalHeader additionalHeader;
     private final NetconfClientSessionListener sessionListener;
@@ -88,7 +92,7 @@ public final class NetconfClientConfiguration {
         return sessionListener;
     }
 
-    public NetconfClientProtocol getProtocol() {
+    public @NonNull NetconfClientProtocol getProtocol() {
         return clientProtocol;
     }
 
@@ -133,9 +137,5 @@ public final class NetconfClientConfiguration {
             .add("sslHandlerFactory (defined)", sslHandlerFactory != null)
             .add("sslHandlerFactory (defined)", sshConfigurator != null)
             .toString();
-    }
-
-    public enum NetconfClientProtocol {
-        TCP, SSH, TLS
     }
 }
