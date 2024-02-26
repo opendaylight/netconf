@@ -17,11 +17,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
+import org.opendaylight.yangtools.yang.model.spi.source.StringYangTextSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +33,8 @@ public final class LibrarySchemaSourceProvider implements SchemaSourceProvider<Y
     private static final Logger LOG = LoggerFactory.getLogger(LibrarySchemaSourceProvider.class);
 
     private final ImmutableMap<SourceIdentifier, URL> availableSources;
-    private final RemoteDeviceId id;
 
-    public LibrarySchemaSourceProvider(final RemoteDeviceId id, final Map<SourceIdentifier, URL> availableSources) {
-        this.id = requireNonNull(id);
+    public LibrarySchemaSourceProvider(final Map<SourceIdentifier, URL> availableSources) {
         this.availableSources = ImmutableMap.copyOf(availableSources);
     }
 
@@ -54,7 +52,7 @@ public final class LibrarySchemaSourceProvider implements SchemaSourceProvider<Y
                 "Unable to download remote schema for " + sourceIdentifier + " from " + url, e));
         }
 
-        final var yangSource = new CachedYangTextSource(id, sourceIdentifier,
+        final var yangSource = new StringYangTextSource(sourceIdentifier,
             new String(schemaContent, StandardCharsets.UTF_8), url.toString());
         LOG.debug("Source {} downloaded from a yang library's url {}", sourceIdentifier, url);
         return Futures.immediateFuture(yangSource);

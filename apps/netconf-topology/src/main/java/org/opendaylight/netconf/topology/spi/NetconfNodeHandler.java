@@ -356,7 +356,7 @@ public final class NetconfNodeHandler extends AbstractRegistration implements Re
                 final var registry = resources.registry();
                 for (var entry : schemas.getAvailableModels().entrySet()) {
                     registrations.add(registry.registerSchemaSource(new LibrarySchemaSourceProvider(
-                        remoteDeviceId, schemas.getAvailableModels()),
+                        schemas.getAvailableModels()),
                         PotentialSchemaSource.create(entry.getKey(), YangTextSource.class,
                             PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }

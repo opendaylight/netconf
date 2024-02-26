@@ -32,6 +32,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
+import org.opendaylight.yangtools.yang.model.spi.source.StringYangTextSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -104,7 +105,7 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
                             id + ": Unexpected response to get-schema, schema not present in message for: "
                                 + sourceIdentifier));
                     LOG.debug("{}: YANG Schema successfully retrieved for {}:{}", id, moduleName, revision);
-                    return new CachedYangTextSource(id, sourceIdentifier, schemaString, null);
+                    return new StringYangTextSource(sourceIdentifier, schemaString);
                 }
 
                 LOG.warn("{}: YANG schema was not successfully retrieved for {}. Errors: {}", id, sourceIdentifier,

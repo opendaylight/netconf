@@ -100,7 +100,7 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
 
             // FIXME: this instanceof check is quite bad
             final var sourceProvider = availableSchemas instanceof LibraryModulesSchemas libraryModule
-                ? new LibrarySchemaSourceProvider(deviceId, libraryModule.getAvailableModels())
+                ? new LibrarySchemaSourceProvider(libraryModule.getAvailableModels())
                     : new MonitoringSchemaSourceProvider(deviceId, deviceRpc);
             return new DeviceSources(requiredSources, providedSources, sourceProvider);
         }, MoreExecutors.directExecutor());
