@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d49f9ac_cb0b31ea",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/BasicAuthHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-26T17:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86a82441_fc1ff7a5",
+      "revId": "a4bfab682483c990a71e665ca70ed853acc79376",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbdab412_86adcabf",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-02-21T08:54:09Z",
       "side": 1,
       "message": "ctx can be final",
+      "revId": "a4bfab682483c990a71e665ca70ed853acc79376",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5aadce69_f10fa539",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientRequestDispatcher.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-26T17:46:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bcca5bc_dd75d033",
       "revId": "a4bfab682483c990a71e665ca70ed853acc79376",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
