@@ -29,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.mdsal.AbstractTestModelTest;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.ProvidedSources;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapabilityBuilder;
@@ -72,7 +73,8 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .getSchemaSource(any(), eq(YangTextSource.class));
 
         final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
-            new DeviceSources(Set.of(TEST_QNAME, TEST_QNAME2), Set.of(TEST_QNAME, TEST_QNAME2), sourceProvider),
+            new DeviceSources(Set.of(TEST_QNAME, TEST_QNAME2),
+                List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider, Set.of(TEST_SID, TEST_SID2)))),
             NetconfSessionPreferences.fromStrings(Set.of()));
 
         final var result = Futures.getDone(setup.startResolution());
@@ -92,7 +94,8 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .createEffectiveModelContext(anyCollection());
 
         final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
-            new DeviceSources(Set.of(TEST_QNAME, TEST_QNAME2), Set.of(TEST_QNAME, TEST_QNAME2), sourceProvider),
+            new DeviceSources(Set.of(TEST_QNAME, TEST_QNAME2),
+                List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider, Set.of(TEST_SID, TEST_SID2)))),
             NetconfSessionPreferences.fromStrings(Set.of()));
 
         final var result = Futures.getDone(setup.startResolution());
@@ -110,7 +113,8 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .createEffectiveModelContext(anyCollection());
 
         final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
-            new DeviceSources(Set.of(TEST_QNAME), Set.of(TEST_QNAME), sourceProvider),
+            new DeviceSources(Set.of(TEST_QNAME),
+                List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider, Set.of(TEST_SID)))),
             NetconfSessionPreferences.fromStrings(
                 Set.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION)));
 

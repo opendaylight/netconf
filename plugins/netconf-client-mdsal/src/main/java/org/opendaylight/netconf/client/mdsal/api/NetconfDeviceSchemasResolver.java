@@ -11,10 +11,12 @@ import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
- * Factory for netconf device schemas.
+ * A component capable of determining the {@link NetconfDeviceSchemas} for a particular device.
  */
 public interface NetconfDeviceSchemasResolver {
     // FIXME: document this method
-    ListenableFuture<? extends NetconfDeviceSchemas> resolve(NetconfRpcService deviceRpc,
-        NetconfSessionPreferences remoteSessionCapabilities, RemoteDeviceId id, EffectiveModelContext schemaContext);
+    ListenableFuture<NetconfDeviceSchemas> resolve(RemoteDeviceId deviceId,
+        NetconfSessionPreferences sessionPreferences, NetconfRpcService deviceRpc,
+        // FIXME: this should not be needed
+        EffectiveModelContext baseModelContext);
 }
