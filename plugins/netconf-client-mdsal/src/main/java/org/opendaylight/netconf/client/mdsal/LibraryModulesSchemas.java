@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.XMLStreamException;
@@ -45,7 +44,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
-import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
@@ -91,7 +89,7 @@ import org.xml.sax.SAXException;
  * Holds URLs with YANG schema resources for all yang modules reported in
  * ietf-netconf-yang-library/modules-state/modules node.
  */
-public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
+public final class LibraryModulesSchemas {
     private static final Logger LOG = LoggerFactory.getLogger(LibraryModulesSchemas.class);
     private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
     private static final EffectiveModelContext LIBRARY_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(
@@ -382,10 +380,5 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static Optional<String> getValueOfSimpleNode(final NormalizedNode node) {
         final String valueStr = node.body().toString();
         return Strings.isNullOrEmpty(valueStr) ? Optional.empty() : Optional.of(valueStr.trim());
-    }
-
-    @Override
-    public Set<QName> getAvailableYangSchemasQNames() {
-        return null;
     }
 }
