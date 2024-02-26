@@ -63,7 +63,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private final Set<AvailableCapability> resolvedCapabilities = new HashSet<>();
 
     private final RemoteDeviceId deviceId;
-    private final DeviceSources deviceSources;
+    private final DeviceNetconfSchema deviceSchemas;
     private final NetconfSessionPreferences remoteSessionCapabilities;
     private final SchemaRepository repository;
     private final EffectiveModelContextFactory contextFactory;
@@ -71,18 +71,18 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private Collection<SourceIdentifier> requiredSources;
 
     SchemaSetup(final SchemaRepository repository, final EffectiveModelContextFactory contextFactory,
-            final RemoteDeviceId deviceId, final DeviceSources deviceSources,
+            final RemoteDeviceId deviceId, final DeviceNetconfSchema deviceSchemas,
             final NetconfSessionPreferences remoteSessionCapabilities) {
         this.repository = requireNonNull(repository);
         this.contextFactory = requireNonNull(contextFactory);
         this.deviceId = requireNonNull(deviceId);
-        this.deviceSources = requireNonNull(deviceSources);
+        this.deviceSchemas = requireNonNull(deviceSchemas);
         this.remoteSessionCapabilities = requireNonNull(remoteSessionCapabilities);
 
         // If device supports notifications and does not contain necessary modules, add them automatically
         if (remoteSessionCapabilities.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
             // FIXME: mutable collection modification!
-            deviceSources.getRequiredSourcesQName().addAll(List.of(
+            deviceSchemas.getRequiredSourcesQName().addAll(List.of(
                 org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
                     .YangModuleInfoImpl.getInstance().getName(),
                 org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
@@ -90,7 +90,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
             );
         }
 
-        requiredSources = deviceSources.getRequiredSources();
+        requiredSources = deviceSchemas.getRequiredSources();
         final var missingSources = filterMissingSources(requiredSources);
 
         addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
@@ -107,7 +107,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     public void onSuccess(final EffectiveModelContext result) {
         LOG.debug("{}: Schema context built successfully from {}", deviceId, requiredSources);
 
-        final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(),
+        final Collection<QName> filteredQNames = Sets.difference(deviceSchemas.getRequiredSourcesQName(),
                 unresolvedCapabilites.keySet());
         resolvedCapabilities.addAll(filteredQNames.stream()
             .map(capability -> new AvailableCapabilityBuilder()
@@ -242,7 +242,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
 
     private QName getQNameFromSourceIdentifier(final SourceIdentifier identifier) {
         // Required sources are all required and provided merged in DeviceSourcesResolver
-        for (final QName qname : deviceSources.getRequiredSourcesQName()) {
+        for (final QName qname : deviceSchemas.getRequiredSourcesQName()) {
             if (!qname.getLocalName().equals(identifier.name().getLocalName())) {
                 continue;
             }
@@ -252,7 +252,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
             }
         }
         LOG.warn("Unable to map identifier to a devices reported capability: {} Available: {}",identifier,
-                deviceSources.getRequiredSourcesQName());
+                deviceSchemas.getRequiredSourcesQName());
         // return null since we cannot find the QName,
         // this capability will be removed from required sources and not reported as unresolved-capability
         return null;

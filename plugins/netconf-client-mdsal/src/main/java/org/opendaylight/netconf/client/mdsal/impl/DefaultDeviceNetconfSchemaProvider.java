@@ -10,16 +10,10 @@ package org.opendaylight.netconf.client.mdsal.impl;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
-import java.util.HashSet;
 import java.util.concurrent.Executor;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
-import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
-import org.opendaylight.netconf.client.mdsal.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchemaProvider;
@@ -66,43 +60,9 @@ public final class DefaultDeviceNetconfSchemaProvider implements DeviceNetconfSc
     public ListenableFuture<DeviceNetconfSchema> deviceNetconfSchemaFor(final RemoteDeviceId deviceId,
             final NetconfSessionPreferences sessionPreferences, final NetconfRpcService deviceRpc,
             final BaseNetconfSchema baseSchema, final Executor processingExecutor) {
-
-        // Acquire schemas
-        final var futureSchemas = resolver.resolve(deviceRpc, sessionPreferences, deviceId, baseSchema.modelContext());
-
-        // Convert to sources
-        final var sourceResolverFuture = Futures.transform(futureSchemas, availableSchemas -> {
-            final var providedSources = availableSchemas.getAvailableYangSchemasQNames();
-            LOG.debug("{}: Schemas exposed by ietf-netconf-monitoring: {}", deviceId, providedSources);
-
-            final var requiredSources = new HashSet<>(sessionPreferences.moduleBasedCaps().keySet());
-            final var requiredSourcesNotProvided = Sets.difference(requiredSources, providedSources);
-            if (!requiredSourcesNotProvided.isEmpty()) {
-                LOG.warn("{}: Netconf device does not provide all yang models reported in hello message capabilities,"
-                        + " required but not provided: {}", deviceId, requiredSourcesNotProvided);
-                LOG.warn("{}: Attempting to build schema context from required sources", deviceId);
-            }
-
-            // Here all the sources reported in netconf monitoring are merged with those reported in hello.
-            // It is necessary to perform this since submodules are not mentioned in hello but still required.
-            // This clashes with the option of a user to specify supported yang models manually in configuration
-            // for netconf-connector and as a result one is not able to fully override yang models of a device.
-            // It is only possible to add additional models.
-            final var providedSourcesNotRequired = Sets.difference(providedSources, requiredSources);
-            if (!providedSourcesNotRequired.isEmpty()) {
-                LOG.warn("{}: Netconf device provides additional yang models not reported in "
-                        + "hello message capabilities: {}", deviceId, providedSourcesNotRequired);
-                LOG.warn("{}: Adding provided but not required sources as required to prevent failures", deviceId);
-                LOG.debug("{}: Netconf device reported in hello: {}", deviceId, requiredSources);
-                requiredSources.addAll(providedSourcesNotRequired);
-            }
-
-            // FIXME: this instanceof check is quite bad
-            final var sourceProvider = availableSchemas instanceof LibraryModulesSchemas libraryModule
-                ? new LibrarySchemaSourceProvider(libraryModule.getAvailableModels())
-                    : new MonitoringSchemaSourceProvider(deviceId, deviceRpc);
-            return new DeviceSources(requiredSources, providedSources, sourceProvider);
-        }, MoreExecutors.directExecutor());
+        // Acquire sources
+        final var sourceResolverFuture = resolver.resolve(deviceId, sessionPreferences, deviceRpc,
+            baseSchema.modelContext());
 
         // Set up the EffectiveModelContext for the device
         return Futures.transformAsync(sourceResolverFuture, deviceSources -> {
