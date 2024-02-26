@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
+//import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -101,16 +101,16 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
         final var ok = new NetconfMessage(XmlUtil.readXmlToDocument(okStream));
         final var data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
-        when(listener.sendRequest(any(), eq(GetConfig.QNAME))).thenReturn(RpcResultBuilder.success(data).buildFuture());
-        when(listener.sendRequest(any(), eq(Get.QNAME))).thenReturn(RpcResultBuilder.success(data).buildFuture());
-        when(listener.sendRequest(any(), eq(EditConfig.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(CopyConfig.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(DiscardChanges.QNAME)))
-                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(Validate.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(Lock.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(Unlock.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
-        when(listener.sendRequest(any(), eq(Commit.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
+      //when(listener.sendRequest(any(), eq(GetConfig.QNAME))).thenReturn(RpcResultBuilder.success(data).buildFuture());
+      //when(listener.sendRequest(any(), eq(Get.QNAME))).thenReturn(RpcResultBuilder.success(data).buildFuture());
+        when(listener.sendRequest(any())).thenReturn(RpcResultBuilder.success(ok).buildFuture());
+      //when(listener.sendRequest(any(), eq(CopyConfig.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
+      //  when(listener.sendRequest(any(), eq(DiscardChanges.QNAME)))
+        //        .thenReturn(RpcResultBuilder.success(ok).buildFuture());
+        //when(listener.sendRequest(any(), eq(Validate.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
+        //when(listener.sendRequest(any(), eq(Lock.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
+        //when(listener.sendRequest(any(), eq(Unlock.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
+        //when(listener.sendRequest(any(), eq(Commit.QNAME))).thenReturn(RpcResultBuilder.success(ok).buildFuture());
         final var rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, new NetconfMessageTransformer(
             MountPointContext.of(SCHEMA_CONTEXT), true,
             BASE_SCHEMAS.baseSchemaForCapabilities(NetconfSessionPreferences.fromStrings(Set.of()))));
@@ -195,6 +195,10 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testGetConfigRunningData() throws Exception {
+        final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
+        final var data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
+        when(listener.sendRequest(any())).thenReturn(RpcResultBuilder.success(data).buildFuture());
+
         final var dataOpt = baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.of())).get();
         assertTrue(dataOpt.isPresent());
         assertEquals(Data.QNAME, dataOpt.orElseThrow().name().getNodeType());
@@ -202,6 +206,10 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
 
     @Test
     public void testGetData() throws Exception {
+        final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
+        final var data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
+        when(listener.sendRequest(any())).thenReturn(RpcResultBuilder.success(data).buildFuture());
+
         final var dataOpt = baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of())).get();
         assertTrue(dataOpt.isPresent());
         assertEquals(Data.QNAME, dataOpt.orElseThrow().name().getNodeType());
@@ -268,23 +276,31 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testGetWithFields() throws ExecutionException, InterruptedException {
+    public void testGetWithFields() throws Exception {
         final YangInstanceIdentifier path = YangInstanceIdentifier.of(CONTAINER_C_NID);
         final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(LEAF_A_NID);
         final YangInstanceIdentifier leafBField = YangInstanceIdentifier.of(LEAF_B_NID);
 
+        final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
+        final var data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
+        when(listener.sendRequest(any())).thenReturn(RpcResultBuilder.success(data).buildFuture());
+
         baseOps.getData(callback, Optional.of(path), List.of(leafAField, leafBField)).get();
-        verify(listener).sendRequest(msg("/netconfMessages/get-fields-request.xml"), eq(Get.QNAME));
+        verify(listener).sendRequest(msg("/netconfMessages/get-fields-request.xml"));
     }
 
     @Test
-    public void testGetConfigWithFields() throws ExecutionException, InterruptedException {
+    public void testGetConfigWithFields() throws Exception {
         final YangInstanceIdentifier path = YangInstanceIdentifier.of(CONTAINER_C_NID);
         final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(LEAF_A_NID);
         final YangInstanceIdentifier leafBField = YangInstanceIdentifier.of(LEAF_B_NID);
 
+        final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
+        final var data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
+        when(listener.sendRequest(any())).thenReturn(RpcResultBuilder.success(data).buildFuture());
+
         baseOps.getConfigRunningData(callback, Optional.of(path), List.of(leafAField, leafBField)).get();
-        verify(listener).sendRequest(msg("/netconfMessages/get-config-fields-request.xml"), eq(GetConfig.QNAME));
+        verify(listener).sendRequest(msg("/netconfMessages/get-config-fields-request.xml"));
     }
 
     @Test
@@ -300,42 +316,53 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
     }
 
     @Test
-    public void testGetWithFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
+    public void testGetWithFieldsAndEmptyParentPath() throws Exception {
         final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(CONTAINER_C_NID, LEAF_A_NID);
         final YangInstanceIdentifier leafXField = YangInstanceIdentifier.of(
                 CONTAINER_C_NID, CONTAINER_D_NID, LEAF_X_NID);
         final YangInstanceIdentifier leafZField = YangInstanceIdentifier.of(CONTAINER_E_NID, LEAF_Z_NID);
+
+        final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
+        final var data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
+        when(listener.sendRequest(any())).thenReturn(RpcResultBuilder.success(data).buildFuture());
 
         baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of()),
                 List.of(leafAField, leafXField, leafZField)).get();
-        verify(listener).sendRequest(msg("/netconfMessages/get-with-multiple-subtrees.xml"), eq(Get.QNAME));
+        verify(listener).sendRequest(msg("/netconfMessages/get-with-multiple-subtrees.xml"));
     }
 
     @Test
-    public void testGetConfigWithFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
+    public void testGetConfigWithFieldsAndEmptyParentPath() throws Exception {
         final YangInstanceIdentifier leafAField = YangInstanceIdentifier.of(CONTAINER_C_NID, LEAF_A_NID);
         final YangInstanceIdentifier leafXField = YangInstanceIdentifier.of(
                 CONTAINER_C_NID, CONTAINER_D_NID, LEAF_X_NID);
         final YangInstanceIdentifier leafZField = YangInstanceIdentifier.of(CONTAINER_E_NID, LEAF_Z_NID);
 
+        final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
+        final var data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
+        when(listener.sendRequest(any())).thenReturn(RpcResultBuilder.success(data).buildFuture());
+
         baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.of()),
                 List.of(leafAField, leafXField, leafZField)).get();
-        verify(listener).sendRequest(msg("/netconfMessages/get-config-with-multiple-subtrees.xml"),
-                eq(GetConfig.QNAME));
+        verify(listener).sendRequest(msg("/netconfMessages/get-config-with-multiple-subtrees.xml"));
     }
 
     @Test
-    public void testGetWithRootFieldsAndEmptyParentPath() throws ExecutionException, InterruptedException {
+    public void testGetWithRootFieldsAndEmptyParentPath() throws Exception {
         final YangInstanceIdentifier contCField = YangInstanceIdentifier.of(CONTAINER_C_NID);
         final YangInstanceIdentifier contDField = YangInstanceIdentifier.of(CONTAINER_E_NID);
 
+        final var dataStream = NetconfBaseOpsTest.class.getResourceAsStream("/netconfMessages/rpc-reply_get.xml");
+        final var data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
+        when(listener.sendRequest(any())).thenReturn(RpcResultBuilder.success(data).buildFuture());
+
         baseOps.getData(callback, Optional.of(YangInstanceIdentifier.of()), List.of(contCField, contDField)).get();
-        verify(listener).sendRequest(msg("/netconfMessages/get-with-multiple-root-subtrees.xml"), eq(Get.QNAME));
+        verify(listener).sendRequest(msg("/netconfMessages/get-with-multiple-root-subtrees.xml"));
     }
 
     private void verifyMessageSent(final String fileName, final QName name) {
         final String path = "/netconfMessages/" + fileName + ".xml";
-        verify(listener).sendRequest(msg(path), eq(name));
+        verify(listener).sendRequest(msg(path));
     }
 
     private static NetconfMessage msg(final String name) {
