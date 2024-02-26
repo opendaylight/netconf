@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.client.mdsal;
+package org.opendaylight.netconf.client.mdsal.impl;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
@@ -42,7 +42,7 @@ import org.w3c.dom.Element;
  * {@code ietf-netconf-monitoring} interface. The set of available sources is not pre-determined and each request is
  * dispatched to the device, i.e. this provider reflects real-time updates to available schemas.
  */
-public final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangTextSource> {
+final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangTextSource> {
     private static final Logger LOG = LoggerFactory.getLogger(MonitoringSchemaSourceProvider.class);
     private static final NodeIdentifier FORMAT_PATHARG =
             NodeIdentifier.create(QName.create(GetSchema.QNAME, "format").intern());
@@ -57,35 +57,9 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
     private final NetconfRpcService rpc;
     private final RemoteDeviceId id;
 
-    public MonitoringSchemaSourceProvider(final RemoteDeviceId id, final NetconfRpcService rpc) {
+    MonitoringSchemaSourceProvider(final RemoteDeviceId id, final NetconfRpcService rpc) {
         this.id = requireNonNull(id);
         this.rpc = requireNonNull(rpc);
-    }
-
-    public static @NonNull ContainerNode createGetSchemaRequest(final String moduleName,
-            final Optional<String> revision) {
-        final var builder = ImmutableNodes.newContainerBuilder()
-            .withNodeIdentifier(GET_SCHEMA_PATHARG)
-            .withChild(ImmutableNodes.leafNode(IDENTIFIER_PATHARG, moduleName))
-            .withChild(FORMAT_LEAF);
-        revision.ifPresent(rev -> builder.withChild(ImmutableNodes.leafNode(VERSION_PATHARG, rev)));
-        return builder.build();
-    }
-
-    private static Optional<String> getSchemaFromRpc(final RemoteDeviceId id, final ContainerNode result) {
-        if (result == null) {
-            return Optional.empty();
-        }
-
-        final DataContainerChild child = result.childByArg(NETCONF_DATA_PATHARG);
-        checkState(child instanceof DOMSourceAnyxmlNode,
-                "%s Unexpected response to get-schema, expected response with one child %s, but was %s", id,
-                Data.QNAME, result);
-
-        final DOMSource wrappedNode = ((DOMSourceAnyxmlNode) child).body();
-        final Element dataNode = (Element) requireNonNull(wrappedNode.getNode());
-
-        return Optional.of(dataNode.getTextContent().trim());
     }
 
     @Override
@@ -114,5 +88,30 @@ public final class MonitoringSchemaSourceProvider implements SchemaSourceProvide
                     "%s: YANG schema was not successfully retrieved for %s. Errors: %s", id, sourceIdentifier,
                     result.errors()));
             }, MoreExecutors.directExecutor());
+    }
+
+    static @NonNull ContainerNode createGetSchemaRequest(final String moduleName, final Optional<String> revision) {
+        final var builder = ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(GET_SCHEMA_PATHARG)
+            .withChild(ImmutableNodes.leafNode(IDENTIFIER_PATHARG, moduleName))
+            .withChild(FORMAT_LEAF);
+        revision.ifPresent(rev -> builder.withChild(ImmutableNodes.leafNode(VERSION_PATHARG, rev)));
+        return builder.build();
+    }
+
+    private static Optional<String> getSchemaFromRpc(final RemoteDeviceId id, final ContainerNode result) {
+        if (result == null) {
+            return Optional.empty();
+        }
+
+        final DataContainerChild child = result.childByArg(NETCONF_DATA_PATHARG);
+        checkState(child instanceof DOMSourceAnyxmlNode,
+                "%s Unexpected response to get-schema, expected response with one child %s, but was %s", id,
+                Data.QNAME, result);
+
+        final DOMSource wrappedNode = ((DOMSourceAnyxmlNode) child).body();
+        final Element dataNode = (Element) requireNonNull(wrappedNode.getNode());
+
+        return Optional.of(dataNode.getTextContent().trim());
     }
 }

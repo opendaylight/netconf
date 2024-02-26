@@ -19,7 +19,6 @@ import java.util.concurrent.Executor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.mdsal.LibraryModulesSchemas;
 import org.opendaylight.netconf.client.mdsal.LibrarySchemaSourceProvider;
-import org.opendaylight.netconf.client.mdsal.MonitoringSchemaSourceProvider;
 import org.opendaylight.netconf.client.mdsal.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.client.mdsal.api.BaseNetconfSchema;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
