@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.client.mdsal;
+package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -21,7 +21,8 @@ class NC881Test {
         final var expected = XmlUtil.readXmlToDocument(
             NC881Test.class.getResourceAsStream("/nc881/netconf-state-filtered.xml"));
 
-        final var filteredDom = NetconfStateSchemas.ietfMonitoringCopy(new DOMSource(source.getDocumentElement()));
+        final var filteredDom = NetconfStateSchemasResolverImpl.ietfMonitoringCopy(
+            new DOMSource(source.getDocumentElement()));
         final var filtered = XmlUtil.newDocument();
         filtered.appendChild(filtered.importNode(filteredDom.getNode(), true));
 

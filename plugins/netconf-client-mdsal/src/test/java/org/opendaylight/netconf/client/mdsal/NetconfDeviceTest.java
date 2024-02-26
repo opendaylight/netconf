@@ -49,10 +49,12 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultDeviceNetconfSchemaProvider;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
@@ -166,11 +168,11 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final var facade = getFacade();
         final var listener = getListener();
 
-        final var deviceSchemaProvider = mockDeviceNetconfSchemaProvider();
+        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
-            .setDeviceSchemaProvider(deviceSchemaProvider)
+            .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
             .setProcessingExecutor(MoreExecutors.directExecutor())
             .setId(getId())
             .setSalFacade(facade)
@@ -226,6 +228,9 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final var schemaFuture = SettableFuture.<EffectiveModelContext>create();
         doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(anyCollection());
 
+        final var listener = getListener();
+        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
+
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
             .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider(getSchemaRepository(),
@@ -238,7 +243,6 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final var sessionCaps = getSessionCaps(true,
             TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION);
 
-        final NetconfDeviceCommunicator listener = getListener();
         // session up, start schema resolution
         device.onRemoteSessionUp(sessionCaps, listener);
         // session down
@@ -259,6 +263,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     public void testNetconfDeviceAvailableCapabilitiesBuilding() throws Exception {
         final var facade = getFacade();
         final var listener = getListener();
+        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
 
         final var netconfSpy = spy(new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
@@ -382,8 +387,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     private DeviceNetconfSchemaProvider mockDeviceNetconfSchemaProvider(final SchemaRepository schemaRepository,
             final EffectiveModelContextFactory schemaFactory) {
-        return new DefaultDeviceNetconfSchemaProvider(schemaRegistry, schemaRepository, schemaFactory,
-            (unused1, unused2, unused3, unused4) -> Futures.immediateFuture(NetconfStateSchemas.EMPTY));
+        return new DefaultDeviceNetconfSchemaProvider(schemaRegistry, schemaRepository, schemaFactory);
     }
 
     public RemoteDeviceId getId() {

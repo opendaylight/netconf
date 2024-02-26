@@ -5,24 +5,23 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.client.mdsal;
+package org.opendaylight.netconf.client.mdsal.impl;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.SettableFuture;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,17 +30,18 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.client.mdsal.AbstractBaseSchemasTest;
+import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.ProvidedSources;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
-import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -79,12 +79,12 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testCreate() throws Exception {
-        final var future = SettableFuture.<NetconfStateSchemas>create();
-        NetconfStateSchemas.create(future, DEVICE_ID, SCHEMAS_PAYLOAD);
-        final var schemas = Futures.getDone(future);
+    public void testTesolveMonitoringSources() throws Exception {
+        final var providedSchemas = NetconfStateSchemasResolverImpl.resolveMonitoringSources(DEVICE_ID, rpc,
+            SCHEMAS_PAYLOAD);
 
-        final var availableYangSchemasQNames = schemas.getAvailableYangSchemasQNames();
+        final var availableYangSchemasQNames = availableYangSchemasQNames(providedSchemas);
+
         assertEquals(69, availableYangSchemasQNames.size());
 
         assertThat(availableYangSchemasQNames,
@@ -107,7 +107,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcReply))).when(rpc)
             .invokeNetconf(eq(Get.QNAME), any());
         final var stateSchemas = assertSchemas(CAPS);
-        final var availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
+        final var availableYangSchemasQNames = availableYangSchemasQNames(stateSchemas.providedSources());
         assertEquals(69, availableYangSchemasQNames.size());
 
         assertThat(availableYangSchemasQNames,
@@ -117,7 +117,7 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
     @Test
     public void testCreateMonitoringNotSupported() throws Exception {
         final var stateSchemas = assertSchemas(NetconfSessionPreferences.fromStrings(Set.of()));
-        assertEquals(Set.of(), stateSchemas.getAvailableYangSchemasQNames());
+        assertEquals(Set.of(), availableYangSchemasQNames(stateSchemas.providedSources()));
     }
 
     @Test
@@ -133,20 +133,26 @@ public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(rpcError))).when(rpc)
             .invokeNetconf(eq(Get.QNAME), any());
 
-        final var ex = assertInstanceOf(OperationFailedException.class, assertSchemasFailure());
-        assertEquals(List.of(rpcError), ex.getErrorList());
+        final var stateSchemas = assertSchemas(CAPS);
+        assertEquals(List.of(), stateSchemas.providedSources());
     }
 
-    private NetconfStateSchemas assertSchemas(final NetconfSessionPreferences prefs) {
+    private NetconfDeviceSchemas assertSchemas(final NetconfSessionPreferences prefs) {
         try {
-            return Futures.getDone(NetconfStateSchemas.forDevice(rpc, prefs, DEVICE_ID, MODEL_CONTEXT));
+            return Futures.getDone(new NetconfStateSchemasResolverImpl().resolve(DEVICE_ID, prefs, rpc, MODEL_CONTEXT));
         } catch (ExecutionException e) {
             throw new AssertionError(e);
         }
     }
 
     private Throwable assertSchemasFailure() {
-        final var future = NetconfStateSchemas.forDevice(rpc, CAPS, DEVICE_ID, MODEL_CONTEXT);
+        final var future = new NetconfStateSchemasResolverImpl().resolve(DEVICE_ID, CAPS, rpc, MODEL_CONTEXT);
         return assertThrows(ExecutionException.class, () -> Futures.getDone(future)).getCause();
+    }
+
+    private static Set<QName> availableYangSchemasQNames(final List<ProvidedSources<?>> providedSources) {
+        return providedSources.stream()
+            .flatMap(sources -> sources.sources().stream())
+            .collect(Collectors.toSet());
     }
 }
