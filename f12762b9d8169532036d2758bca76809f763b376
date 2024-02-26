@@ -3,6 +3,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5fc067f8_817929b8",
+        "filename": "transport/transport-http/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-26T18:02:32Z",
+      "side": 1,
+      "message": "this is flagged as unused, are we missing the equivalent of https://github.com/netty/netty/blob/4.1/example/src/main/java/io/netty/example/http2/helloworld/multiplex/server/Http2OrHttpHandler.java ?",
+      "range": {
+        "startLine": 47,
+        "startChar": 24,
+        "endLine": 47,
+        "endChar": 41
+      },
+      "revId": "f12762b9d8169532036d2758bca76809f763b376",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f6e5d084_91d233b3",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientRequestDispatcher.java",
         "patchSetId": 5
