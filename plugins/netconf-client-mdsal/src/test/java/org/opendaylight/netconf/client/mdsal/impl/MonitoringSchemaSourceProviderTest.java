@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
-import java.util.Optional;
 import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
@@ -29,6 +28,7 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.GetSchema;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -56,7 +56,7 @@ class MonitoringSchemaSourceProviderTest {
         final var source = provider.getSource(identifier).get();
         assertEquals(identifier, source.sourceId());
         verify(service).invokeNetconf(GetSchema.QNAME,
-                MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Optional.of("2016-02-08")));
+            MonitoringSchemaSourceProvider.createGetSchemaRequest("test", Revision.of("2016-02-08")));
     }
 
     private static ContainerNode getNode() throws ParserConfigurationException {

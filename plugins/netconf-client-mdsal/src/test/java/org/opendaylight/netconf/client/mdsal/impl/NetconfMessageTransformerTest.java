@@ -67,6 +67,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfConfigChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.netconf.config.change.Edit;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -264,7 +265,7 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
     @Test
     public void testGetSchemaRequest() throws Exception {
         final var netconfMessage = netconfMessageTransformer.toRpcRequest(GetSchema.QNAME,
-                MonitoringSchemaSourceProvider.createGetSchemaRequest("module", Optional.of("2012-12-12")));
+                MonitoringSchemaSourceProvider.createGetSchemaRequest("module", Revision.of("2012-12-12")));
         assertSimilarXml(netconfMessage, """
             <rpc message-id="m-0" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
               <get-schema xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring">
@@ -320,8 +321,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
         assertTrue(compositeNodeRpcResult.errors().isEmpty());
         assertNotNull(compositeNodeRpcResult.value());
 
-        final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest(
-            "module", Optional.of("2012-12-12")).body();
+        final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest("module", Revision.of("2012-12-12"))
+            .body();
 
         final var keys = new HashMap<QName, Object>();
         for (var value : values) {
@@ -405,8 +406,8 @@ public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     @Test
     public void testEditConfigRequest() throws Exception {
-        final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest(
-            "module", Optional.of("2012-12-12")).body();
+        final var values = MonitoringSchemaSourceProvider.createGetSchemaRequest("module", Revision.of("2012-12-12"))
+            .body();
 
         final var keys = new HashMap<QName, Object>();
         for (var value : values) {

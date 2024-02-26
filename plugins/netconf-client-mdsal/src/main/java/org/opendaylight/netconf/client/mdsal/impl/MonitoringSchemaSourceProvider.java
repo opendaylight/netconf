@@ -14,8 +14,8 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Optional;
-import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.GetSchema;
@@ -26,7 +26,6 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
-import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
@@ -64,10 +63,9 @@ final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangT
 
     @Override
     public ListenableFuture<YangTextSource> getSource(final SourceIdentifier sourceIdentifier) {
-        final String moduleName = sourceIdentifier.name().getLocalName();
-        final Revision revision = sourceIdentifier.revision();
-        final ContainerNode getSchemaRequest = createGetSchemaRequest(moduleName,
-            revision == null ? Optional.empty() : Optional.of(revision.toString()));
+        final var moduleName = sourceIdentifier.name().getLocalName();
+        final var revision = sourceIdentifier.revision();
+        final var getSchemaRequest = createGetSchemaRequest(moduleName, revision);
 
         LOG.trace("{}: Loading YANG schema source for {}:{}", id, moduleName, revision);
         return Futures.transform(rpc.invokeNetconf(GetSchema.QNAME, getSchemaRequest),
@@ -90,13 +88,13 @@ final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangT
             }, MoreExecutors.directExecutor());
     }
 
-    static @NonNull ContainerNode createGetSchemaRequest(final String moduleName, final Optional<String> revision) {
-        final var builder = ImmutableNodes.newContainerBuilder()
+    static @NonNull ContainerNode createGetSchemaRequest(final String moduleName, final @Nullable Revision revision) {
+        return ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(GET_SCHEMA_PATHARG)
             .withChild(ImmutableNodes.leafNode(IDENTIFIER_PATHARG, moduleName))
-            .withChild(FORMAT_LEAF);
-        revision.ifPresent(rev -> builder.withChild(ImmutableNodes.leafNode(VERSION_PATHARG, rev)));
-        return builder.build();
+            .withChild(ImmutableNodes.leafNode(VERSION_PATHARG, revision == null ? "" : revision.toString()))
+            .withChild(FORMAT_LEAF)
+            .build();
     }
 
     private static Optional<String> getSchemaFromRpc(final RemoteDeviceId id, final ContainerNode result) {
@@ -104,13 +102,13 @@ final class MonitoringSchemaSourceProvider implements SchemaSourceProvider<YangT
             return Optional.empty();
         }
 
-        final DataContainerChild child = result.childByArg(NETCONF_DATA_PATHARG);
+        final var child = result.childByArg(NETCONF_DATA_PATHARG);
         checkState(child instanceof DOMSourceAnyxmlNode,
                 "%s Unexpected response to get-schema, expected response with one child %s, but was %s", id,
                 Data.QNAME, result);
 
-        final DOMSource wrappedNode = ((DOMSourceAnyxmlNode) child).body();
-        final Element dataNode = (Element) requireNonNull(wrappedNode.getNode());
+        final var wrappedNode = ((DOMSourceAnyxmlNode) child).body();
+        final var dataNode = (Element) requireNonNull(wrappedNode.getNode());
 
         return Optional.of(dataNode.getTextContent().trim());
     }
