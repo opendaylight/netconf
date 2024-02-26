@@ -28,13 +28,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.client.mdsal.AbstractTestModelTest;
+import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
+import org.opendaylight.netconf.client.mdsal.api.ProvidedSources;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
+import org.opendaylight.yangtools.yang.model.api.stmt.FeatureSet;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
@@ -72,7 +75,8 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .getSchemaSource(any(), eq(YangTextSource.class));
 
         final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
-            new DeviceSources(Set.of(TEST_QNAME, TEST_QNAME2), Set.of(TEST_QNAME, TEST_QNAME2), sourceProvider),
+            new NetconfDeviceSchemas(Set.of(TEST_QNAME, TEST_QNAME2), FeatureSet.builder().build(), Set.of(),
+                List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider, Set.of(TEST_QNAME, TEST_QNAME2)))),
             NetconfSessionPreferences.fromStrings(Set.of()));
 
         final var result = Futures.getDone(setup.startResolution());
@@ -92,7 +96,8 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .createEffectiveModelContext(anyCollection());
 
         final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
-            new DeviceSources(Set.of(TEST_QNAME, TEST_QNAME2), Set.of(TEST_QNAME, TEST_QNAME2), sourceProvider),
+            new NetconfDeviceSchemas(Set.of(TEST_QNAME, TEST_QNAME2), FeatureSet.builder().build(), Set.of(),
+                List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider, Set.of(TEST_QNAME, TEST_QNAME2)))),
             NetconfSessionPreferences.fromStrings(Set.of()));
 
         final var result = Futures.getDone(setup.startResolution());
@@ -110,7 +115,8 @@ class SchemaSetupTest extends AbstractTestModelTest {
             .createEffectiveModelContext(anyCollection());
 
         final var setup = new SchemaSetup(schemaRepository, contextFactory, DEVICE_ID,
-            new DeviceSources(Set.of(TEST_QNAME), Set.of(TEST_QNAME), sourceProvider),
+            new NetconfDeviceSchemas(Set.of(TEST_QNAME), FeatureSet.builder().build(), Set.of(),
+                List.of(new ProvidedSources<>(YangTextSource.class, sourceProvider, Set.of(TEST_QNAME)))),
             NetconfSessionPreferences.fromStrings(
                 Set.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION)));
 

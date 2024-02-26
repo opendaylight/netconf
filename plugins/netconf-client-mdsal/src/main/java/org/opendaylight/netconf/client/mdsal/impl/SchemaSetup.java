@@ -34,6 +34,7 @@ import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.mdsal.NetconfDevice.EmptySchemaContextException;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.api.DeviceNetconfSchema;
+import org.opendaylight.netconf.client.mdsal.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability;
@@ -61,38 +62,40 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     private final Set<AvailableCapability> nonModuleBasedCapabilities = new HashSet<>();
     private final Map<QName, FailureReason> unresolvedCapabilites = new HashMap<>();
     private final Set<AvailableCapability> resolvedCapabilities = new HashSet<>();
-
     private final RemoteDeviceId deviceId;
-    private final DeviceSources deviceSources;
-    private final NetconfSessionPreferences remoteSessionCapabilities;
+    private final NetconfDeviceSchemas deviceSchemas;
+    private final Set<QName> deviceRequiredSources;
+    private final NetconfSessionPreferences sessionPreferences;
     private final SchemaRepository repository;
     private final EffectiveModelContextFactory contextFactory;
 
     private Collection<SourceIdentifier> requiredSources;
 
     SchemaSetup(final SchemaRepository repository, final EffectiveModelContextFactory contextFactory,
-            final RemoteDeviceId deviceId, final DeviceSources deviceSources,
-            final NetconfSessionPreferences remoteSessionCapabilities) {
+            final RemoteDeviceId deviceId, final NetconfDeviceSchemas deviceSchemas,
+            final NetconfSessionPreferences sessionPreferences) {
         this.repository = requireNonNull(repository);
         this.contextFactory = requireNonNull(contextFactory);
         this.deviceId = requireNonNull(deviceId);
-        this.deviceSources = requireNonNull(deviceSources);
-        this.remoteSessionCapabilities = requireNonNull(remoteSessionCapabilities);
+        this.deviceSchemas = requireNonNull(deviceSchemas);
+        this.sessionPreferences = requireNonNull(sessionPreferences);
 
         // If device supports notifications and does not contain necessary modules, add them automatically
-        if (remoteSessionCapabilities.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
-            // FIXME: mutable collection modification!
-            deviceSources.getRequiredSourcesQName().addAll(List.of(
+        deviceRequiredSources = new HashSet<>(deviceSchemas.requiredSources());
+        if (sessionPreferences.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
+            deviceRequiredSources.add(
                 org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
-                    .YangModuleInfoImpl.getInstance().getName(),
+                    .YangModuleInfoImpl.getInstance().getName());
+            deviceRequiredSources.add(
                 org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
-                    .YangModuleInfoImpl.getInstance().getName())
-            );
+                    .YangModuleInfoImpl.getInstance().getName());
         }
 
-        requiredSources = deviceSources.getRequiredSources();
-        final var missingSources = filterMissingSources(requiredSources);
+        requiredSources = deviceRequiredSources.stream()
+            .map(qname -> new SourceIdentifier(qname.getLocalName(), qname.getRevision().orElse(null)))
+            .collect(Collectors.toList());
 
+        final var missingSources = filterMissingSources(requiredSources);
         addUnresolvedCapabilities(getQNameFromSourceIdentifiers(missingSources),
             UnavailableCapability.FailureReason.MissingSource);
         requiredSources.removeAll(missingSources);
@@ -107,22 +110,20 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
     public void onSuccess(final EffectiveModelContext result) {
         LOG.debug("{}: Schema context built successfully from {}", deviceId, requiredSources);
 
-        final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(),
-                unresolvedCapabilites.keySet());
+        final var filteredQNames = Sets.difference(deviceRequiredSources, unresolvedCapabilites.keySet());
         resolvedCapabilities.addAll(filteredQNames.stream()
             .map(capability -> new AvailableCapabilityBuilder()
                 .setCapability(capability.toString())
-                .setCapabilityOrigin(remoteSessionCapabilities.capabilityOrigin(capability))
+                .setCapabilityOrigin(sessionPreferences.capabilityOrigin(capability))
                 .build())
             .collect(Collectors.toList()));
 
-        nonModuleBasedCapabilities.addAll(remoteSessionCapabilities.nonModuleCaps().keySet().stream()
+        nonModuleBasedCapabilities.addAll(sessionPreferences.nonModuleCaps().keySet().stream()
             .map(capability -> new AvailableCapabilityBuilder()
                 .setCapability(capability)
-                .setCapabilityOrigin(remoteSessionCapabilities.capabilityOrigin(capability))
+                .setCapabilityOrigin(sessionPreferences.capabilityOrigin(capability))
                 .build())
             .collect(Collectors.toList()));
-
 
         resultFuture.set(new DeviceNetconfSchema(new NetconfDeviceCapabilities(
             ImmutableMap.copyOf(unresolvedCapabilites), ImmutableSet.copyOf(resolvedCapabilities),
@@ -242,7 +243,7 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
 
     private QName getQNameFromSourceIdentifier(final SourceIdentifier identifier) {
         // Required sources are all required and provided merged in DeviceSourcesResolver
-        for (final QName qname : deviceSources.getRequiredSourcesQName()) {
+        for (final QName qname : deviceRequiredSources) {
             if (!qname.getLocalName().equals(identifier.name().getLocalName())) {
                 continue;
             }
@@ -251,8 +252,8 @@ final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
                 return qname;
             }
         }
-        LOG.warn("Unable to map identifier to a devices reported capability: {} Available: {}",identifier,
-                deviceSources.getRequiredSourcesQName());
+        LOG.warn("Unable to map identifier to a devices reported capability: {} Available: {}", identifier,
+            deviceRequiredSources);
         // return null since we cannot find the QName,
         // this capability will be removed from required sources and not reported as unresolved-capability
         return null;
