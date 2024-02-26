@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6e5d084_91d233b3",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientRequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-26T17:50:35Z",
+      "side": 1,
+      "message": "just use sent.cause() to examine failure and use setException() if it\u0027s set\nthat also handles cancellation (via CancellationException)",
+      "range": {
+        "startLine": 49,
+        "startChar": 12,
+        "endLine": 49,
+        "endChar": 35
+      },
+      "revId": "f12762b9d8169532036d2758bca76809f763b376",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67677630_4ff672b4",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientRequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-02-26T17:50:35Z",
+      "side": 1,
+      "message": "use retain() instead and make sure receivers perform a .realese() once they are done with it",
+      "range": {
+        "startLine": 72,
+        "startChar": 32,
+        "endLine": 72,
+        "endChar": 38
+      },
+      "revId": "f12762b9d8169532036d2758bca76809f763b376",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
