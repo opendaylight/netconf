@@ -49,7 +49,6 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultDeviceNetconfSchemaProvider;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.connection.oper.available.capabilities.AvailableCapabilityBuilder;
@@ -168,7 +167,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final var facade = getFacade();
         final var listener = getListener();
 
-        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
+        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any());
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
@@ -229,7 +228,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         doReturn(schemaFuture).when(schemaContextProviderFactory).createEffectiveModelContext(anyCollection());
 
         final var listener = getListener();
-        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
+        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any());
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
@@ -263,7 +262,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
     public void testNetconfDeviceAvailableCapabilitiesBuilding() throws Exception {
         final var facade = getFacade();
         final var listener = getListener();
-        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
+        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any());
 
         final var netconfSpy = spy(new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)

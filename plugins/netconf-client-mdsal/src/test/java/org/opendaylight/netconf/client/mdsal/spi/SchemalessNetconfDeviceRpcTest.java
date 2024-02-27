@@ -46,7 +46,7 @@ public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     public void setUp() throws Exception {
         RpcResult<NetconfMessage> msg = null;
         ListenableFuture<RpcResult<NetconfMessage>> future = Futures.immediateFuture(msg);
-        doReturn(future).when(listener).sendRequest(any(), any());
+        doReturn(future).when(listener).sendRequest(any());
         final MessageCounter counter = new MessageCounter();
         deviceRpc = new SchemalessNetconfDeviceRpc(
                 new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830)), listener,
@@ -71,8 +71,7 @@ public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
                 + "  </get-config>"));
         deviceRpc.schemalessRpcService().invokeRpc(qName, src);
         final var msgCaptor = ArgumentCaptor.forClass(NetconfMessage.class);
-        final var qnameCaptor = ArgumentCaptor.forClass(QName.class);
-        verify(listener).sendRequest(msgCaptor.capture(), qnameCaptor.capture());
+        verify(listener).sendRequest(msgCaptor.capture());
         assertEquals("""
             <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="m-0">
                 <get-config xmlns="dd">
