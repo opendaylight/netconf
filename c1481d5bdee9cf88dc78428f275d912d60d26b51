@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6fdc9c2_58fbe45b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-27T12:40:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff4f5cec_65b1346c",
+      "revId": "c1481d5bdee9cf88dc78428f275d912d60d26b51",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d824ecd_522f72c5",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-27T12:16:46Z",
       "side": 1,
       "message": "is this dependency needed?",
+      "revId": "c1481d5bdee9cf88dc78428f275d912d60d26b51",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b47db2fd_1c3d5be4",
+        "filename": "restconf/restconf-openapi/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-02-27T12:40:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d824ecd_522f72c5",
       "revId": "c1481d5bdee9cf88dc78428f275d912d60d26b51",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
