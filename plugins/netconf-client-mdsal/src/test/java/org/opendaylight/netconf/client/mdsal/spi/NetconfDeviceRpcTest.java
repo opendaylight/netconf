@@ -90,7 +90,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
                         + "</rpc-reply>"));
         final var result = RpcResultBuilder.success(reply).build();
         doReturn(Futures.immediateFuture(result))
-                .when(communicator).sendRequest(any(NetconfMessage.class), any(QName.class));
+                .when(communicator).sendRequest(any(NetconfMessage.class));
         rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicator, transformer);
 
         type = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get-config");
@@ -104,7 +104,7 @@ public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
         final RemoteDeviceCommunicator communicatorMock = mock(RemoteDeviceCommunicator.class);
         final NetconfMessage msg = null;
         final RpcResult<NetconfMessage> result = RpcResultBuilder.success(msg).build();
-        when(communicatorMock.sendRequest(any(), any())).thenReturn(Futures.immediateFuture(result));
+        when(communicatorMock.sendRequest(any())).thenReturn(Futures.immediateFuture(result));
         when(failingTransformer.toRpcResult(any(), any())).thenThrow(new RuntimeException("FAIL"));
         final var failingRpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicatorMock, failingTransformer)
             .domRpcService();
