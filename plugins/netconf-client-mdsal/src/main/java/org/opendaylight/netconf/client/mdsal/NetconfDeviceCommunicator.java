@@ -42,7 +42,6 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -352,7 +351,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     @Override
-    public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
+    public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message) {
         sessionLock.lock();
         try {
             if (semaphore != null && !semaphore.tryAcquire()) {
@@ -363,14 +362,13 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                         + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
             }
 
-            return sendRequestWithLock(message, rpc);
+            return sendRequestWithLock(message);
         } finally {
             sessionLock.unlock();
         }
     }
 
-    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message,
-            final QName rpc) {
+    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Sending message {}", id, msgToS(message));
         }

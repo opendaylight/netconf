@@ -45,13 +45,13 @@ class AsyncExecutionStrategy extends AbstractExecutionStrategy {
                     LOG.debug("Sending message {}", XmlUtil.toString(msg.getDocument()));
                 }
                 final ListenableFuture<RpcResult<NetconfMessage>> netconfMessageFuture =
-                        getSessionListener().sendRequest(msg, StressClient.EDIT_QNAME);
+                        getSessionListener().sendRequest(msg);
                 futures.add(netconfMessageFuture);
             }
             batchI++;
             LOG.info("Batch {} with size {} sent. Committing", batchI, editBatch);
             if (getParams().candidateDatastore) {
-                futures.add(getSessionListener().sendRequest(StressClient.COMMIT_MSG, StressClient.COMMIT_QNAME));
+                futures.add(getSessionListener().sendRequest(StressClient.COMMIT_MSG));
             }
         }
 
