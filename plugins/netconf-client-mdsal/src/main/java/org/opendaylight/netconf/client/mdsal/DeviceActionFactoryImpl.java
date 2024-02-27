@@ -41,7 +41,7 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
             requireNonNull(input);
 
             final var actionResultFuture = listener.sendRequest(
-                messageTransformer.toActionRequest(schemaPath, dataTreeIdentifier, input), input.name().getNodeType());
+                messageTransformer.toActionRequest(schemaPath, dataTreeIdentifier, input));
 
             return Futures.transform(actionResultFuture, netconfMessageRpcResult -> {
                 if (netconfMessageRpcResult != null) {
