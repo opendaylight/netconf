@@ -110,7 +110,7 @@ class NetconfDeviceCommunicatorTest {
                 .addListener(any(GenericFutureListener.class));
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
-        final var resultFuture = communicator.sendRequest(message, QName.create("", "mockRpc"));
+        final var resultFuture = communicator.sendRequest(message);
         if (doLastTest) {
             assertNotNull(resultFuture, "ListenableFuture is null");
         }
@@ -127,7 +127,7 @@ class NetconfDeviceCommunicatorTest {
         final var message = new NetconfMessage(doc);
 
         final var resultFuture =
-            communicator.sendRequest(message, QName.create("", "mockRpc"));
+            communicator.sendRequest(message);
         if (doLastTest) {
             assertNotNull(resultFuture, "ListenableFuture is null");
         }
@@ -218,14 +218,13 @@ class NetconfDeviceCommunicatorTest {
         setupSession();
 
         final var message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
-        final var rpc = QName.create("", "mockRpc");
 
         final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
 
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
-        final var resultFuture = communicator.sendRequest(message, rpc);
+        final var resultFuture = communicator.sendRequest(message);
 
         verify(spySession).sendMessage(same(message));
 
@@ -242,9 +241,8 @@ class NetconfDeviceCommunicatorTest {
     @Test
     void testSendRequestWithNoSession() throws Exception {
         final var message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
-        final var rpc = QName.create("", "mockRpc");
 
-        final var resultFuture = communicator.sendRequest(message, rpc);
+        final var resultFuture = communicator.sendRequest(message);
 
         assertNotNull(resultFuture, "ListenableFuture is null");
 
@@ -272,14 +270,13 @@ class NetconfDeviceCommunicatorTest {
         setupSession();
 
         final var message = new NetconfMessage(UntrustedXML.newDocumentBuilder().newDocument());
-        final var rpc = QName.create("", "mockRpc");
 
         final var futureListener = ArgumentCaptor.forClass(GenericFutureListener.class);
 
         doReturn(mockChannelFuture).when(mockChannelFuture).addListener(futureListener.capture());
         doReturn(mockChannelFuture).when(spySession).sendMessage(same(message));
 
-        final var resultFuture = communicator.sendRequest(message, rpc);
+        final var resultFuture = communicator.sendRequest(message);
 
         assertNotNull(resultFuture, "ListenableFuture is null");
 

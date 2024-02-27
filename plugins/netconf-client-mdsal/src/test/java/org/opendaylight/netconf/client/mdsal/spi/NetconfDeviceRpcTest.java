@@ -102,7 +102,7 @@ class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
         final RemoteDeviceCommunicator communicatorMock = mock(RemoteDeviceCommunicator.class);
         final NetconfMessage msg = null;
         final RpcResult<NetconfMessage> result = RpcResultBuilder.success(msg).build();
-        when(communicatorMock.sendRequest(any(), any())).thenReturn(Futures.immediateFuture(result));
+        when(communicatorMock.sendRequest(any())).thenReturn(Futures.immediateFuture(result));
         when(failingTransformer.toRpcResult(any(), any())).thenThrow(new RuntimeException("FAIL"));
         final var failingRpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicatorMock, failingTransformer)
             .domRpcService();
@@ -113,8 +113,7 @@ class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     @Test
     void testInvokeRpc() throws Exception {
         final var rpcResult = RpcResultBuilder.success(reply).build();
-        doReturn(Futures.immediateFuture(rpcResult)).when(communicator).sendRequest(any(NetconfMessage.class),
-            any(QName.class));
+        doReturn(Futures.immediateFuture(rpcResult)).when(communicator).sendRequest(any(NetconfMessage.class));
         ContainerNode input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
         final DOMRpcResult result = rpc.domRpcService().invokeRpc(type, input).get();
         assertEquals(expectedReply.value().name(), result.value().name());

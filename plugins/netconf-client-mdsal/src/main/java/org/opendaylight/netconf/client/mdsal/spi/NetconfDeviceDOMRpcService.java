@@ -41,7 +41,7 @@ record NetconfDeviceDOMRpcService(
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
     public ListenableFuture<DOMRpcResult> invokeRpc(final QName type, final ContainerNode input) {
-        final var delegateFuture = communicator.sendRequest(transformer.toRpcRequest(type, input), type);
+        final var delegateFuture = communicator.sendRequest(transformer.toRpcRequest(type, input));
 
         final var ret = SettableFuture.<DOMRpcResult>create();
         Futures.addCallback(delegateFuture, new FutureCallback<>() {
