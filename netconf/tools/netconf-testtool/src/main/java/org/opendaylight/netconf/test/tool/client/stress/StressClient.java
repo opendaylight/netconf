@@ -32,8 +32,6 @@ import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDevice;
 import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.netconf.test.tool.TestToolUtils;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.CommitInput;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev240208.password.grouping.password.type.CleartextPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
@@ -43,7 +41,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.cli
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.client.rev240208.netconf.client.initiate.stack.grouping.transport.ssh.ssh.TcpClientParametersBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.ssh.client.grouping.ClientIdentityBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.ssh.client.rev240208.ssh.client.grouping.client.identity.PasswordBuilder;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,13 +69,10 @@ public final class StressClient {
         }
     };
 
-    static final QName COMMIT_QNAME = QName.create(CommitInput.QNAME, "commit");
     public static final NetconfMessage COMMIT_MSG = new NetconfMessage(readString("""
         <rpc message-id="commit-batch" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
             <commit/>
         </rpc>"""));
-
-    static final QName EDIT_QNAME = QName.create(EditConfigInput.QNAME, "edit-config");
     static final Document EDIT_CANDIDATE_BLUEPRINT = readString("""
         <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
             <edit-config>
