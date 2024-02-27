@@ -72,13 +72,10 @@ public final class StressClient {
         }
     };
 
-    static final QName COMMIT_QNAME = QName.create(CommitInput.QNAME, "commit");
     public static final NetconfMessage COMMIT_MSG = new NetconfMessage(readString("""
         <rpc message-id="commit-batch" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
             <commit/>
         </rpc>"""));
-
-    static final QName EDIT_QNAME = QName.create(EditConfigInput.QNAME, "edit-config");
     static final Document EDIT_CANDIDATE_BLUEPRINT = readString("""
         <rpc xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
             <edit-config>
