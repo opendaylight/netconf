@@ -44,7 +44,7 @@ class SyncExecutionStrategy extends AbstractExecutionStrategy {
                     LOG.debug("Sending message {}", XmlUtil.toString(msg.getDocument()));
                 }
                 final ListenableFuture<RpcResult<NetconfMessage>> netconfMessageFuture =
-                        getSessionListener().sendRequest(msg, StressClient.EDIT_QNAME);
+                        getSessionListener().sendRequest(msg);
                 // Wait for response
                 waitForResponse(responseCounter, netconfMessageFuture);
 
@@ -55,7 +55,7 @@ class SyncExecutionStrategy extends AbstractExecutionStrategy {
             // Commit batch sync
             if (getParams().candidateDatastore) {
                 waitForResponse(responseCounter,
-                        getSessionListener().sendRequest(StressClient.COMMIT_MSG, StressClient.COMMIT_QNAME));
+                        getSessionListener().sendRequest(StressClient.COMMIT_MSG));
             }
         }
 

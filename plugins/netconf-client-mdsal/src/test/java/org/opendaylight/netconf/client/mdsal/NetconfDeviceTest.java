@@ -48,7 +48,6 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultDeviceNetconfSchemaProvider;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.Get;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240319.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240319.connection.oper.available.capabilities.AvailableCapabilityBuilder;
@@ -170,7 +169,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     void testNetconfDeviceReconnect() {
-        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
+        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any());
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
@@ -228,7 +227,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
         final var schemaFuture = SettableFuture.<EffectiveModelContext>create();
         doReturn(schemaFuture).when(schemaFactory).createEffectiveModelContext(anyCollection());
 
-        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
+        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any());
 
         final var device = new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)
@@ -260,7 +259,7 @@ class NetconfDeviceTest extends AbstractTestModelTest {
 
     @Test
     void testNetconfDeviceAvailableCapabilitiesBuilding() {
-        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any(), eq(Get.QNAME));
+        doReturn(RpcResultBuilder.failed().buildFuture()).when(listener).sendRequest(any());
 
         final var netconfSpy = spy(new NetconfDeviceBuilder()
             .setReconnectOnSchemasChange(true)

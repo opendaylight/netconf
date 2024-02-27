@@ -9,19 +9,9 @@ package org.opendaylight.netconf.client.mdsal.api;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 
 public interface RemoteDeviceCommunicator extends AutoCloseable {
-    /**
-     * Send request message to current client session.
-     *
-     * @deprecated The parameter rpc is never used.
-     *             Use {@link RemoteDeviceCommunicator#sendRequest(NetconfMessage)}.
-     */
-    @Deprecated(forRemoval = true)
-    ListenableFuture<RpcResult<NetconfMessage>> sendRequest(NetconfMessage message, QName rpc);
-
     /**
      * Send request message to current client session.
      *
