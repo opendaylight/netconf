@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1ae3960_6e5e9fc8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-02-28T08:55:20Z",
+      "side": 1,
+      "message": "Wait for a while for NETCONF-1230.",
+      "revId": "4ae7ee365e037b9a0ea85d420b63c19626cd31c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
