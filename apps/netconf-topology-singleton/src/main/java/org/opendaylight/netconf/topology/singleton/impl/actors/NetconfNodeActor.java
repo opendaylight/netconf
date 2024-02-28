@@ -333,7 +333,18 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                         final var rpcProxy = new ProxyDOMRpcService(actorSystem, masterReference, id,
                             actorResponseWaitTime);
                         slaveSalManager.registerSlaveMountPoint(result, masterReference, new RemoteDeviceServices(
-                            (Rpcs.Normalized) () -> rpcProxy,
+                            new Rpcs.Normalized() {
+                                @Override
+                                public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type,
+                                        final ContainerNode input) {
+                                    return rpcProxy.invokeRpc(type, input);
+                                }
+
+                                @Override
+                                public DOMRpcService domRpcService() {
+                                    return rpcProxy;
+                                }
+                            },
                             new ProxyDOMActionService(actorSystem, masterReference, id, actorResponseWaitTime)));
                     }
                 });

@@ -255,7 +255,17 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
                 DOMRpcIdentifier.create(putTopRpcSchemaPath), DOMRpcIdentifier.create(getTopRpcSchemaPath));
 
         final var rpcService = router.rpcService();
-        deviceRpcService = () -> rpcService;
+        deviceRpcService = new Rpcs.Normalized() {
+            @Override
+            public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
+                return rpcService.invokeRpc(type, input);
+            }
+
+            @Override
+            public DOMRpcService domRpcService() {
+                return rpcService;
+            }
+        };
 
         builderFactory = new NetconfClientConfigurationBuilderFactoryImpl(mockEncryptionService, credentialProvider,
             sslHandlerFactoryProvider);
