@@ -7,12 +7,14 @@
  */
 package org.opendaylight.netconf.client.mdsal.spi;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Rpcs;
 import org.opendaylight.netconf.client.mdsal.api.RpcTransformer;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -26,6 +28,11 @@ public final class NetconfDeviceRpc implements Rpcs.Normalized {
     public NetconfDeviceRpc(final EffectiveModelContext modelContext, final RemoteDeviceCommunicator communicator,
             final RpcTransformer<ContainerNode, DOMRpcResult> transformer) {
         domRpcService = new NetconfDeviceDOMRpcService(modelContext, communicator, transformer);
+    }
+
+    @Override
+    public ListenableFuture<? extends DOMRpcResult> invokeNetconf(final QName type, final ContainerNode input) {
+        return domRpcService().invokeRpc(type, input);
     }
 
     @Override
