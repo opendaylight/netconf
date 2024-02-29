@@ -47,4 +47,23 @@ module action-types {
       }
     }
   }
+
+  container first-container {
+    container second-container {
+      container third-container {
+        action nested-action {
+          input {
+            leaf input-leaf {
+              type string;
+            }
+          }
+          output {
+            leaf output-leaf {
+              type string;
+            }
+          }
+        }
+      }
+    }
+  }
 }
