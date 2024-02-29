@@ -1,0 +1,21 @@
+module duplication-test {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:test:duplication:test";
+  prefix "dt";
+
+  rpc test-rpc {
+    input {
+      leaf input-leaf {
+        type string;
+      }
+    }
+  }
+
+  rpc test-rpc2 {
+    input {
+      leaf input-leaf {
+        type string;
+      }
+    }
+  }
+}

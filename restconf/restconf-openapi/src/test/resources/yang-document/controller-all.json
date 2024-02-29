@@ -11781,6 +11781,76 @@
         "description": "",
         "summary": "PATCH - typed-params - Controller - enumeration"
       }
+    },
+    "/rests/operations/duplication-test:test-rpc": {
+      "post": {
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc_input"
+              }
+            }
+          },
+          "description": "test-rpc_input"
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc success"
+          }
+        },
+        "summary": "POST - Controller - duplication-test - test-rpc",
+        "tags": [
+          "Controller duplication-test"
+        ]
+      }
+    },
+    "/rests/operations/duplication-test:test-rpc2": {
+      "post": {
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc2_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc2_input"
+              }
+            }
+          },
+          "description": "test-rpc2_input"
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc2 success"
+          }
+        },
+        "summary": "POST - Controller - duplication-test - test-rpc2",
+        "tags": [
+          "Controller duplication-test"
+        ]
+      }
     }
   },
   "components": {
@@ -13607,6 +13677,51 @@
         },
         "title": "test-container-childs_root-container-two-keys_nested-container-two-keys_mandatory-list-two-keys",
         "type": "object"
+      },
+      "duplication-test_first": {
+        "properties": {},
+        "title": "duplication-test_first",
+        "type": "object",
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      },
+      "duplication-test_test-rpc2_input": {
+        "properties": {
+          "first": {
+            "$ref": "#/components/schemas/duplication-test_first"
+          },
+          "input-leaf": {
+            "description": "",
+            "example": "Some input-leaf",
+            "type": "string"
+          }
+        },
+        "title": "duplication-test_test-rpc2_input",
+        "type": "object",
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_test-rpc_input": {
+        "properties": {
+          "first": {
+            "$ref": "#/components/schemas/duplication-test_first"
+          },
+          "input-leaf": {
+            "description": "",
+            "example": "Some input-leaf",
+            "type": "string"
+          }
+        },
+        "title": "duplication-test_test-rpc_input",
+        "type": "object",
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
       }
     },
     "securitySchemes": {
