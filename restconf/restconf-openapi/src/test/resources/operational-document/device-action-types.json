@@ -31,14 +31,14 @@
           "content": {
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/action-types_list-action_input"
+                "$ref": "#/components/schemas/action-types_list_list-action_input"
               }
             },
             "application/json": {
               "schema": {
                 "properties": {
                   "input": {
-                    "$ref": "#/components/schemas/action-types_list-action_input",
+                    "$ref": "#/components/schemas/action-types_list_list-action_input",
                     "type": "object"
                   }
                 }
@@ -52,12 +52,12 @@
             "content": {
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/action-types_list-action_output"
+                  "$ref": "#/components/schemas/action-types_list_list-action_output"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/action-types_list-action_output"
+                  "$ref": "#/components/schemas/action-types_list_list-action_output"
                 }
               }
             }
@@ -78,14 +78,14 @@
           "content": {
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/action-types_container-action_input"
+                "$ref": "#/components/schemas/action-types_container_container-action_input"
               }
             },
             "application/json": {
               "schema": {
                 "properties": {
                   "input": {
-                    "$ref": "#/components/schemas/action-types_container-action_input",
+                    "$ref": "#/components/schemas/action-types_container_container-action_input",
                     "type": "object"
                   }
                 }
@@ -99,12 +99,12 @@
             "content": {
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/action-types_container-action_output"
+                  "$ref": "#/components/schemas/action-types_container_container-action_output"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/action-types_container-action_output"
+                  "$ref": "#/components/schemas/action-types_container_container-action_output"
                 }
               }
             }
@@ -795,7 +795,7 @@
   },
   "components": {
     "schemas": {
-      "action-types_list-action_input": {
+      "action-types_list_list-action_input": {
         "required": [
           "la-input"
         ],
@@ -810,7 +810,7 @@
           "name": "input",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "title": "action-types_list-action_input",
+        "title": "action-types_list_list-action_input",
         "type": "object"
       },
       "action-types_container": {
@@ -835,7 +835,7 @@
         "title": "action-types_multi-container",
         "type": "object"
       },
-      "action-types_list-action_output": {
+      "action-types_list_list-action_output": {
         "required": [
           "la-output"
         ],
@@ -850,10 +850,10 @@
           "name": "output",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "title": "action-types_list-action_output",
+        "title": "action-types_list_list-action_output",
         "type": "object"
       },
-      "action-types_container-action_input": {
+      "action-types_container_container-action_input": {
         "required": [
           "ca-input"
         ],
@@ -868,7 +868,7 @@
           "name": "input",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "title": "action-types_container-action_input",
+        "title": "action-types_container_container-action_input",
         "type": "object"
       },
       "action-types_multi-container_inner-container": {
@@ -895,7 +895,7 @@
         "title": "action-types_list",
         "type": "object"
       },
-      "action-types_container-action_output": {
+      "action-types_container_container-action_output": {
         "required": [
           "ca-output"
         ],
@@ -910,7 +910,7 @@
           "name": "output",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "title": "action-types_container-action_output",
+        "title": "action-types_container_container-action_output",
         "type": "object"
       }
     },
