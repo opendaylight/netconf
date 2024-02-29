@@ -791,6 +791,512 @@
         "description": "",
         "summary": "POST - Controller - action-types - action"
       }
+    },
+    "/rests/data/action-types:first-container": {
+      "delete": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "summary": "DELETE - Controller - action-types - first-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "first-container": {
+                      "$ref": "#/components/schemas/action-types_first-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_first-container"
+                }
+              }
+            },
+            "description": "200"
+          }
+        },
+        "summary": "GET - Controller - action-types - first-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "patch": {
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "action-types:first-container": {
+                    "$ref": "#/components/schemas/action-types_first-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_first-container"
+              }
+            }
+          },
+          "description": "first-container"
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "summary": "PATCH - action-types - Controller - first-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "second-container": {
+                    "$ref": "#/components/schemas/action-types_first-container_second-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_first-container_second-container"
+              }
+            }
+          },
+          "description": "second-container"
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "POST - Controller - action-types - first-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "put": {
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action-types:first-container": {
+                    "$ref": "#/components/schemas/action-types_first-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_first-container"
+              }
+            }
+          },
+          "description": "first-container"
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "summary": "PUT - action-types - Controller - first-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      }
+    },
+    "/rests/data/action-types:first-container/second-container": {
+      "delete": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "summary": "DELETE - Controller - action-types - second-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "second-container": {
+                      "$ref": "#/components/schemas/action-types_first-container_second-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_first-container_second-container"
+                }
+              }
+            },
+            "description": "200"
+          }
+        },
+        "summary": "GET - Controller - action-types - second-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "patch": {
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "action-types:second-container": {
+                    "$ref": "#/components/schemas/action-types_first-container_second-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_first-container_second-container"
+              }
+            }
+          },
+          "description": "second-container"
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "summary": "PATCH - action-types - Controller - second-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "third-container": {
+                    "$ref": "#/components/schemas/action-types_first-container_second-container_third-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_first-container_second-container_third-container"
+              }
+            }
+          },
+          "description": "third-container"
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "summary": "POST - Controller - action-types - second-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "put": {
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action-types:second-container": {
+                    "$ref": "#/components/schemas/action-types_first-container_second-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_first-container_second-container"
+              }
+            }
+          },
+          "description": "second-container"
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "summary": "PUT - action-types - Controller - second-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      }
+    },
+    "/rests/data/action-types:first-container/second-container/third-container": {
+      "delete": {
+        "description": "",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "summary": "DELETE - Controller - action-types - third-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "third-container": {
+                      "$ref": "#/components/schemas/action-types_first-container_second-container_third-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_first-container_second-container_third-container"
+                }
+              }
+            },
+            "description": "200"
+          }
+        },
+        "summary": "GET - Controller - action-types - third-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "patch": {
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "action-types:third-container": {
+                    "$ref": "#/components/schemas/action-types_first-container_second-container_third-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_first-container_second-container_third-container"
+              }
+            }
+          },
+          "description": "third-container"
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "summary": "PATCH - action-types - Controller - third-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      },
+      "put": {
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action-types:third-container": {
+                    "$ref": "#/components/schemas/action-types_first-container_second-container_third-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_first-container_second-container_third-container"
+              }
+            }
+          },
+          "description": "third-container"
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "summary": "PUT - action-types - Controller - third-container",
+        "tags": [
+          "Controller action-types"
+        ]
+      }
+    },
+    "/rests/operations/action-types:first-container/second-container/third-container/nested-action": {
+      "post": {
+        "description": "",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/action-types_first-container_second-container_nested-action_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_first-container_second-container_nested-action_input"
+              }
+            }
+          },
+          "description": "nested-action_input"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_first-container_second-container_nested-action_output"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_first-container_second-container_nested-action_output"
+                }
+              }
+            },
+            "description": "RPC nested-action success"
+          }
+        },
+        "summary": "POST - Controller - action-types - nested-action",
+        "tags": [
+          "Controller action-types"
+        ]
+      }
     }
   },
   "components": {
@@ -912,6 +1418,71 @@
         },
         "title": "action-types_container-action_output",
         "type": "object"
+      },
+      "action-types_first-container": {
+        "properties": {
+          "second-container": {
+            "$ref": "#/components/schemas/action-types_first-container_second-container"
+          }
+        },
+        "title": "action-types_first-container",
+        "type": "object",
+        "xml": {
+          "name": "first-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_first-container_second-container": {
+        "properties": {
+          "third-container": {
+            "$ref": "#/components/schemas/action-types_first-container_second-container_third-container"
+          }
+        },
+        "title": "action-types_first-container_second-container",
+        "type": "object",
+        "xml": {
+          "name": "second-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_first-container_second-container_nested-action_input": {
+        "properties": {
+          "input-leaf": {
+            "description": "",
+            "example": "Some input-leaf",
+            "type": "string"
+          }
+        },
+        "title": "action-types_first-container_second-container_nested-action_input",
+        "type": "object",
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_first-container_second-container_nested-action_output": {
+        "properties": {
+          "output-leaf": {
+            "description": "",
+            "example": "Some output-leaf",
+            "type": "string"
+          }
+        },
+        "title": "action-types_first-container_second-container_nested-action_output",
+        "type": "object",
+        "xml": {
+          "name": "output",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_first-container_second-container_third-container": {
+        "properties": {},
+        "title": "action-types_first-container_second-container_third-container",
+        "type": "object",
+        "xml": {
+          "name": "third-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
       }
     },
     "securitySchemes": {
