@@ -1,0 +1,33 @@
+module duplication-service {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:test:duplication:service";
+  prefix "ds";
+  import duplication-test {
+    prefix "dt";
+  }
+
+  grouping test-grouping {
+    choice test-choice {
+      case first {
+        container first {
+        }
+      }
+      case second {
+        container second {
+        }
+      }
+    }
+  }
+
+  grouping test-grouping2 {
+    uses test-grouping;
+  }
+
+  augment "/dt:test-rpc/dt:input" {
+    uses test-grouping2;
+  }
+
+  augment "/dt:test-rpc2/dt:input" {
+    uses test-grouping;
+  }
+}
