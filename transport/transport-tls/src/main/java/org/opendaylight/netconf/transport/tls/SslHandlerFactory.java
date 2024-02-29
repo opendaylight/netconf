@@ -17,6 +17,7 @@ import static org.opendaylight.netconf.transport.tls.KeyStoreUtils.newKeyStore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.netty.channel.Channel;
+import io.netty.handler.ssl.ApplicationProtocolConfig;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -115,7 +116,12 @@ public abstract class SslHandlerFactory {
 
     protected static final @NonNull SslContext createSslContext(final @NonNull TlsClientGrouping clientParams)
             throws UnsupportedConfigurationException {
-        final var builder = SslContextBuilder.forClient();
+        return createSslContext(clientParams, null);
+    }
+
+    protected static final @NonNull SslContext createSslContext(final @NonNull TlsClientGrouping clientParams,
+            final @Nullable ApplicationProtocolConfig apn) throws UnsupportedConfigurationException {
+        final var builder = SslContextBuilder.forClient().applicationProtocolConfig(apn);
 
         final var clientIdentity = clientParams.getClientIdentity();
         if (clientIdentity != null) {
@@ -156,6 +162,11 @@ public abstract class SslHandlerFactory {
 
     protected static final @NonNull SslContext createSslContext(final @NonNull TlsServerGrouping serverParams)
             throws UnsupportedConfigurationException {
+        return createSslContext(serverParams, null);
+    }
+
+    protected static final @NonNull SslContext createSslContext(final @NonNull TlsServerGrouping serverParams,
+            final @Nullable ApplicationProtocolConfig apn) throws UnsupportedConfigurationException {
         final var serverIdentity = serverParams.getServerIdentity();
         if (serverIdentity == null) {
             throw new UnsupportedConfigurationException("Missing server identity");
@@ -198,7 +209,7 @@ public abstract class SslHandlerFactory {
             builder.clientAuth(ClientAuth.NONE);
         }
 
-        return buildSslContext(builder, serverParams.getHelloParams());
+        return buildSslContext(builder.applicationProtocolConfig(apn), serverParams.getHelloParams());
     }
 
     // FIXME: should be TrustManagerBuilder
