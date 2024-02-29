@@ -29,6 +29,14 @@ public class YangDocumentTest extends AbstractDocumentTest {
      */
     private static final String DEFINITION_TEST = "definition-test";
     /**
+     * Model duplication-service is used for augmentation of duplication-service model.
+     */
+    private static final String DUPLICATION_SERVICE = "duplication-service";
+    /**
+     * Model duplication-test is used for test if the same schema is not duplicated in openapi.
+     */
+    private static final String DUPLICATION_TEST = "duplication-test";
+    /**
      * Model mandatory-test is used for test correct generating of mandatory nodes for openapi.
      */
     private static final String MANDATORY_TEST = "mandatory-test";
@@ -119,6 +127,8 @@ public class YangDocumentTest extends AbstractDocumentTest {
             Arguments.of(ACTION_TYPES, null, "controller-action-types.json"),
             Arguments.of(CHOICE_TEST, null, "controller-choice-test.json"),
             Arguments.of(DEFINITION_TEST, null, "controller-definition-test.json"),
+            Arguments.of(DUPLICATION_SERVICE, null, "controller-duplication-service.json"),
+            Arguments.of(DUPLICATION_TEST, null, "controller-duplication-test.json"),
             Arguments.of(MANDATORY_TEST, null, "controller-mandatory-test.json"),
             Arguments.of(MY_YANG, MY_YANG_REV, "controller-my-yang.json"),
             Arguments.of(OPFLEX, OPFLEX_REV, "controller-opflex.json"),
@@ -162,6 +172,8 @@ public class YangDocumentTest extends AbstractDocumentTest {
             Arguments.of(ACTION_TYPES, null, "device-action-types.json"),
             Arguments.of(CHOICE_TEST, null, "device-choice-test.json"),
             Arguments.of(DEFINITION_TEST, null, "device-definition-test.json"),
+            Arguments.of(DUPLICATION_SERVICE, null, "device-duplication-service.json"),
+            Arguments.of(DUPLICATION_TEST, null, "device-duplication-test.json"),
             Arguments.of(MANDATORY_TEST, null, "device-mandatory-test.json"),
             Arguments.of(MY_YANG, MY_YANG_REV, "device-my-yang.json"),
             Arguments.of(OPFLEX, OPFLEX_REV, "device-opflex.json"),
