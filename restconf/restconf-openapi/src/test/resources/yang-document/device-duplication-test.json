@@ -1,0 +1,154 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "duplication-test",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That's because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/operations/nodes/node=123/yang-ext:mount/duplication-test:test-rpc": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - duplication-test - test-rpc",
+        "requestBody": {
+          "description": "test-rpc_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc success"
+          }
+        },
+        "tags": [
+          "123 duplication-test"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/duplication-test:test-rpc2": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - duplication-test - test-rpc2",
+        "requestBody": {
+          "description": "test-rpc2_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc2_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc2_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc2 success"
+          }
+        },
+        "tags": [
+          "123 duplication-test"
+        ],
+        "parameters": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "duplication-test_test-rpc_input": {
+        "title": "duplication-test_test-rpc_input",
+        "type": "object",
+        "properties": {
+          "input-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf"
+          },
+          "first": {
+            "$ref": "#/components/schemas/duplication-test_first1"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_first": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      },
+      "duplication-test_test-rpc2_input": {
+        "title": "duplication-test_test-rpc2_input",
+        "type": "object",
+        "properties": {
+          "input-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf"
+          },
+          "first": {
+            "$ref": "#/components/schemas/duplication-test_first1"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_first1": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
