@@ -2877,7 +2877,7 @@
               "schema": {
                 "properties": {
                   "input": {
-                    "$ref": "#/components/schemas/action-types_container-action_input",
+                    "$ref": "#/components/schemas/action-types_container_container-action_input",
                     "type": "object"
                   }
                 }
@@ -2885,7 +2885,7 @@
             },
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/action-types_container-action_input"
+                "$ref": "#/components/schemas/action-types_container_container-action_input"
               }
             }
           }
@@ -2896,12 +2896,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/action-types_container-action_output"
+                  "$ref": "#/components/schemas/action-types_container_container-action_output"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/action-types_container-action_output"
+                  "$ref": "#/components/schemas/action-types_container_container-action_output"
                 }
               }
             }
@@ -9627,7 +9627,7 @@
               "schema": {
                 "properties": {
                   "input": {
-                    "$ref": "#/components/schemas/action-types_list-action_input",
+                    "$ref": "#/components/schemas/action-types_list_list-action_input",
                     "type": "object"
                   }
                 }
@@ -9635,7 +9635,7 @@
             },
             "application/xml": {
               "schema": {
-                "$ref": "#/components/schemas/action-types_list-action_input"
+                "$ref": "#/components/schemas/action-types_list_list-action_input"
               }
             }
           }
@@ -9646,12 +9646,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/action-types_list-action_output"
+                  "$ref": "#/components/schemas/action-types_list_list-action_output"
                 }
               },
               "application/xml": {
                 "schema": {
-                  "$ref": "#/components/schemas/action-types_list-action_output"
+                  "$ref": "#/components/schemas/action-types_list_list-action_output"
                 }
               }
             }
@@ -12159,7 +12159,7 @@
         "title": "typed-params_typed",
         "type": "object"
       },
-      "action-types_container-action_output": {
+      "action-types_container_container-action_output": {
         "required": [
           "ca-output"
         ],
@@ -12174,7 +12174,7 @@
           "name": "output",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "title": "action-types_container-action_output",
+        "title": "action-types_container_container-action_output",
         "type": "object"
       },
       "typed-params_typed_uint32": {
@@ -13378,7 +13378,7 @@
         "title": "typed-params_typed_uint8",
         "type": "object"
       },
-      "action-types_container-action_input": {
+      "action-types_container_container-action_input": {
         "required": [
           "ca-input"
         ],
@@ -13393,7 +13393,7 @@
           "name": "input",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "title": "action-types_container-action_input",
+        "title": "action-types_container_container-action_input",
         "type": "object"
       },
       "toaster2_lst_lst1": {
@@ -13527,7 +13527,7 @@
         "title": "typed-params_typed_int8",
         "type": "object"
       },
-      "action-types_list-action_input": {
+      "action-types_list_list-action_input": {
         "required": [
           "la-input"
         ],
@@ -13542,7 +13542,7 @@
           "name": "input",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "title": "action-types_list-action_input",
+        "title": "action-types_list_list-action_input",
         "type": "object"
       },
       "recursive_container-root_root-list": {
@@ -13596,7 +13596,7 @@
         "title": "choice-test_first-container",
         "type": "object"
       },
-      "action-types_list-action_output": {
+      "action-types_list_list-action_output": {
         "required": [
           "la-output"
         ],
@@ -13611,7 +13611,7 @@
           "name": "output",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         },
-        "title": "action-types_list-action_output",
+        "title": "action-types_list_list-action_output",
         "type": "object"
       },
       "definition-test_network-container": {
