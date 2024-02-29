@@ -192,7 +192,7 @@ public final class SchemasStream extends InputStream {
             final var isConfig = node.isConfiguration() && isParentConfig;
             result.add(child);
             stack.enterSchemaTree(node.getQName());
-            processActions(node, title, stack, definitionNames, result, parentName);
+            processActions(node, newTitle, stack, definitionNames, result, parentName);
             for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
                 processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
             }

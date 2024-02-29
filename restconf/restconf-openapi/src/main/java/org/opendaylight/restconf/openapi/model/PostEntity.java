@@ -40,12 +40,15 @@ public final class PostEntity extends OperationEntity {
         """;
 
     private final @Nullable DocumentedNode parentNode;
+    private final @Nullable List<SchemaNode> parentNodes;
 
     public PostEntity(final @NonNull SchemaNode schema, final @NonNull String deviceName,
             final @NonNull String moduleName, final @NonNull List<ParameterEntity> parameters,
-            final @NonNull String refPath, final @Nullable DocumentedNode parentNode) {
+            final @NonNull String refPath, final @Nullable DocumentedNode parentNode,
+            final @Nullable List<SchemaNode> parentNodes) {
         super(requireNonNull(schema), deviceName, moduleName, requireNonNull(parameters), requireNonNull(refPath));
         this.parentNode = parentNode;
+        this.parentNodes = parentNodes;
     }
 
     protected @NonNull String operation() {
@@ -206,14 +209,16 @@ public final class PostEntity extends OperationEntity {
     }
 
     private String processOperationsRef(final OperationDefinition def, final String operationName, final String suf) {
-        if (def instanceof ActionDefinition && parentNode != null) {
-            final var parentName = ((DataSchemaNode) parentNode).getQName().getLocalName();
+        final var ref = new StringBuilder(COMPONENTS_PREFIX + moduleName() + "_");
+        if (def instanceof ActionDefinition && parentNodes != null) {
             final boolean hasChildNodes = suf.equals(INPUT_SUFFIX) ? !def.getInput().getChildNodes().isEmpty()
-                    : !def.getOutput().getChildNodes().isEmpty();
+                : !def.getOutput().getChildNodes().isEmpty();
             if (hasChildNodes) {
-                return COMPONENTS_PREFIX + moduleName() + "_" + parentName + "_" + operationName + suf;
+                for (final SchemaNode node : parentNodes) {
+                    ref.append(node.getQName().getLocalName()).append("_");
+                }
             }
         }
-        return COMPONENTS_PREFIX + moduleName() + "_" + operationName + suf;
+        return ref.append(operationName).append(suf).toString();
     }
 }
