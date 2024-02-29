@@ -26,6 +26,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
@@ -169,7 +170,8 @@ public final class PathsStream extends InputStream {
         // RPC operations (via post) - RPCs have their own path
         for (final var rpc : module.getRpcs()) {
             final var localName = rpc.getQName().getLocalName();
-            final var post = new PostEntity(rpc, deviceName, module.getName(), new ArrayList<>(), localName, null);
+            final var post = new PostEntity(rpc, deviceName, module.getName(), new ArrayList<>(), localName, null,
+                null);
             final var resolvedPath = basePath + OPERATIONS + urlPrefix + "/" + module.getName() + ":" + localName;
             final var entity = new PathEntity(resolvedPath, post);
             result.add(entity);
@@ -183,7 +185,7 @@ public final class PathsStream extends InputStream {
                 if (isConfig && !hasRootPostLink && isForSingleModule) {
                     final var resolvedPath = basePath + DATA + urlPrefix;
                     result.add(new PathEntity(resolvedPath,
-                        new PostEntity(node, deviceName, moduleName, new ArrayList<>(), nodeLocalName, module)));
+                        new PostEntity(node, deviceName, moduleName, new ArrayList<>(), nodeLocalName, module, null)));
                     hasRootPostLink = true;
                 }
                 //process first node
@@ -191,7 +193,7 @@ public final class PathsStream extends InputStream {
                 final var localName = moduleName + ":" + nodeLocalName;
                 final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
                 processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, schemaContext,
-                    deviceName, basePath, null);
+                    deviceName, basePath, null, new LinkedList<>());
             }
         }
         return result;
@@ -200,7 +202,7 @@ public final class PathsStream extends InputStream {
     private static void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
             final boolean isConfig, final EffectiveModelContext schemaContext, final String deviceName,
-            final String basePath, final SchemaNode parentNode) {
+            final String basePath, final SchemaNode parentNode, final LinkedList<SchemaNode> parentNodes) {
         final var resourcePath = basePath + DATA + path;
         final var fullName = resolveFullNameFromNode(node.getQName(), schemaContext);
         final var firstChild = getListOrContainerChildNode((DataNodeContainer) node);
@@ -212,6 +214,10 @@ public final class PathsStream extends InputStream {
                 isConfig, fullName, deviceName));
         }
         final var childNodes = ((DataNodeContainer) node).getChildNodes();
+        final var listOfParents = new LinkedList<>(parentNodes);
+        if (parentNode != null) {
+            listOfParents.add(parentNode);
+        }
         if (node instanceof ActionNodeContainer actionContainer) {
             final var actionParams = new ArrayList<>(pathParams);
             actionContainer.getActions().forEach(actionDef -> {
@@ -219,18 +225,18 @@ public final class PathsStream extends InputStream {
                     node.getQName(), schemaContext);
                 final var childPath = basePath + OPERATIONS + resourceActionPath;
                 result.add(processActionPathEntity(actionDef, childPath, actionParams, moduleName,
-                    refPath, deviceName, parentNode));
+                    refPath, deviceName, parentNode, listOfParents));
             });
         }
         for (final var childNode : childNodes) {
-            final var childParams = new ArrayList<>(pathParams);
-            final var newRefPath = refPath + "_" + childNode.getQName().getLocalName();
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
+                final var childParams = new ArrayList<>(pathParams);
+                final var newRefPath = refPath + "_" + childNode.getQName().getLocalName();
                 final var localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
                 processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
-                    schemaContext, deviceName, basePath, node);
+                    schemaContext, deviceName, basePath, node, listOfParents);
             }
         }
     }
@@ -261,9 +267,9 @@ public final class PathsStream extends InputStream {
             final boolean isConfig, final String fullName, final SchemaNode childNode, final String deviceName) {
         if (isConfig) {
             final var childNodeRefPath = refPath + "_" + childNode.getQName().getLocalName();
-            var post = new PostEntity(childNode, deviceName, moduleName, pathParams, childNodeRefPath, node);
+            var post = new PostEntity(childNode, deviceName, moduleName, pathParams, childNodeRefPath, node, null);
             if (!((DataSchemaNode) childNode).isConfiguration()) {
-                post = new PostEntity(node, deviceName, moduleName, pathParams, refPath, null);
+                post = new PostEntity(node, deviceName, moduleName, pathParams, refPath, null, null);
             }
             return new PathEntity(resourcePath, post,
                 new PatchEntity(node, deviceName, moduleName, pathParams, refPath, fullName),
@@ -278,9 +284,9 @@ public final class PathsStream extends InputStream {
 
     private static PathEntity processActionPathEntity(final SchemaNode node, final String resourcePath,
             final List<ParameterEntity> pathParams, final String moduleName, final String refPath,
-            final String deviceName, final SchemaNode parentNode) {
+            final String deviceName, final SchemaNode parentNode, final LinkedList<SchemaNode> parentNodes) {
         return new PathEntity(resourcePath,
-            new PostEntity(node, deviceName, moduleName, pathParams, refPath, parentNode));
+            new PostEntity(node, deviceName, moduleName, pathParams, refPath, parentNode, parentNodes));
     }
 
     private static String processPath(final DataSchemaNode node, final List<ParameterEntity> pathParams,
