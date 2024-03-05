@@ -86,8 +86,7 @@ public final class NetconfNotification extends NetconfMessage {
                 while (reminderBuilder.charAt(reminderBuilder.length() - 1) == '0') {
                     reminderBuilder.deleteCharAt(reminderBuilder.length() - 1);
                 }
-                LOG.warn("Fraction of second is cut to three digits. Value that was cut {}",
-                        reminderBuilder.toString());
+                LOG.debug("Fraction of second is cut to three digits. Value that was cut {}", reminderBuilder);
             }
 
             return Date.from(Instant.from(localDateTime));
