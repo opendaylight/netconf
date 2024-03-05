@@ -49,4 +49,10 @@ public class NotificationMessageTest {
         assertEquals(eventTime, NotificationMessage.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()));
         assertEquals(eventTime, netconfNotification.getEventTime());
     }
+
+    @Test
+    public void testEventTimeNanos() throws Exception {
+        assertEquals(Instant.ofEpochSecond(42, 123456789),
+            NotificationMessage.RFC3339_DATE_PARSER.apply("1970-01-01T00:00:42.123456789Z"));
+    }
 }

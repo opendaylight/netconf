@@ -69,31 +69,7 @@ public final class NotificationMessage extends NetconfMessage {
      */
     public static final Function<String, Instant> RFC3339_DATE_PARSER = time -> {
         try {
-            final ZonedDateTime localDateTime = ZonedDateTime.parse(time, DATE_TIME_FORMATTER);
-            final int startAt = 0;
-            final TemporalAccessor parsed = DATE_TIME_FORMATTER.parse(time, new ParsePosition(startAt));
-            final int nanoOfSecond = getFieldFromTemporalAccessor(parsed, ChronoField.NANO_OF_SECOND);
-            final long reminder = nanoOfSecond % 1000000;
-
-            // Log warn in case we rounded the fraction of a second. We need to create a string from the
-            // value that was cut. Example -> 1.123750 -> Value that was cut 75
-            if (reminder != 0) {
-                final StringBuilder reminderBuilder = new StringBuilder(String.valueOf(reminder));
-
-                //add zeros in case we have number like 123056 to make sure 056 is displayed
-                while (reminderBuilder.length() < 6) {
-                    reminderBuilder.insert(0, '0');
-                }
-
-                //delete zeros from end to make sure that number like 1.123750 will show value cut 75.
-                while (reminderBuilder.charAt(reminderBuilder.length() - 1) == '0') {
-                    reminderBuilder.deleteCharAt(reminderBuilder.length() - 1);
-                }
-                LOG.warn("Fraction of second is cut to three digits. Value that was cut {}",
-                        reminderBuilder.toString());
-            }
-
-            return Instant.from(localDateTime);
+            return ZonedDateTime.parse(time, DATE_TIME_FORMATTER).toInstant();
         } catch (DateTimeParseException exception) {
             final var res = handlePotentialLeapSecond(time);
             if (res != null) {
