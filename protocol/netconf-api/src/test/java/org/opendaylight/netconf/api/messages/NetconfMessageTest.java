@@ -50,6 +50,20 @@ class NetconfMessageTest {
     }
 
     @Test
+    void testOfNotificationNanos() throws Exception {
+        final var eventTime = Instant.ofEpochSecond(42, 123456789);
+        final var expected = NotificationMessage.ofNotificationContent(getTestElement(), eventTime);
+        final var msg = assertInstanceOf(NotificationMessage.class, NetconfMessage.of(expected.getDocument()));
+        assertEquals("""
+            <notification xmlns="urn:ietf:params:xml:ns:netconf:notification:1.0">
+                <test-root/>
+                <eventTime>1970-01-01T00:00:42.123456789Z</eventTime>
+            </notification>
+            """, msg.toString());
+        assertEquals(eventTime, msg.getEventTime());
+    }
+
+    @Test
     void testOfRpc() throws Exception {
         final var expected = RpcMessage.ofOperation(MESSAGE_ID, getTestElement());
         final var msg = assertInstanceOf(RpcMessage.class, NetconfMessage.of(expected.getDocument()));
