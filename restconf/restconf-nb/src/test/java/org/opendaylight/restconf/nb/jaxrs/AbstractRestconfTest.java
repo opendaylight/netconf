@@ -15,12 +15,17 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyWriter;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +42,8 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -71,8 +78,32 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return JUKEBOX_SCHEMA;
     }
 
+    static final void assertJson(final String expectedJson, final NormalizedNodePayload payload) {
+        assertPayload(expectedJson, payload, new JsonNormalizedNodeBodyWriter(), MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    static final void assertXml(final String expectedXml, final NormalizedNodePayload payload) {
+        assertPayload(expectedXml, payload, new XmlNormalizedNodeBodyWriter(), MediaType.APPLICATION_XML_TYPE);
+    }
+
+    private static void assertPayload(final String expected, final NormalizedNodePayload payload,
+            final MessageBodyWriter<NormalizedNodePayload> writer, final MediaType mediaType) {
+        final var baos = new ByteArrayOutputStream();
+        try {
+            writer.writeTo(payload, null, null, null, mediaType, null, baos);
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(expected, baos.toString(StandardCharsets.UTF_8));
+    }
+
     static final NormalizedNode assertNormalizedNode(final int status, final Consumer<AsyncResponse> invocation) {
-        return assertEntity(NormalizedNodePayload.class, status, invocation).data();
+        return assertNormalizedNodePayload(status, invocation).data();
+    }
+
+    static final NormalizedNodePayload assertNormalizedNodePayload(final int status,
+            final Consumer<AsyncResponse> invocation) {
+        return assertEntity(NormalizedNodePayload.class, status, invocation);
     }
 
     static final <T> T assertEntity(final Class<T> expectedType, final int expectedStatus,
