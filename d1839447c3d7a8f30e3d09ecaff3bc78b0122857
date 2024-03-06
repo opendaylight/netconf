@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d672f153_f2d8da98",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-03-06T12:12:14Z",
+      "side": 1,
+      "message": "We should iterate discriminator in case the same name is used?",
+      "revId": "d1839447c3d7a8f30e3d09ecaff3bc78b0122857",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
