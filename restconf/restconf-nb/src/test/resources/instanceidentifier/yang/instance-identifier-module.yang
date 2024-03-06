@@ -14,6 +14,11 @@ module instance-identifier-module {
             default 0;
           }
         }
+        output {
+          leaf timestamp {
+            type string;
+          }
+        }
       }
     }
   }

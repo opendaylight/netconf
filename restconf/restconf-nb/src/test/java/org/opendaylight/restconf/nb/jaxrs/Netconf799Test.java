@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,6 +33,7 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -41,6 +43,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absol
 @ExtendWith(MockitoExtension.class)
 class Netconf799Test extends AbstractInstanceIdentifierTest {
     private static final QName OUTPUT_QNAME = QName.create(CONT_QNAME, "output");
+    private static final Absolute RESET_PATH = Absolute.of(CONT_QNAME, CONT1_QNAME, RESET_QNAME);
 
     @Mock
     private UriInfo uriInfo;
@@ -59,9 +62,10 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
 
     @Test
     void testInvokeAction() throws Exception {
-        doReturn(Futures.immediateFuture(new SimpleDOMActionResult(
-            ImmutableNodes.newContainerBuilder().withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME)).build())))
-            .when(actionService).invokeAction(eq(Absolute.of(CONT_QNAME, CONT1_QNAME, RESET_QNAME)), any(), any());
+        doReturn(Futures.immediateFuture(new SimpleDOMActionResult(ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME))
+            .build())))
+            .when(actionService).invokeAction(eq(RESET_PATH), any(), any());
 
         final var restconf = new JaxRsRestconf(new MdsalRestconfServer(new FixedDOMSchemaService(IID_SCHEMA),
             dataBroker, rpcService, actionService, mountPointService));
@@ -77,5 +81,34 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
         final var response = captor.getValue();
         assertEquals(204, response.getStatus());
         assertNull(response.getEntity());
+    }
+
+    @Test
+    void testInvokeActionOutput() throws Exception {
+        doReturn(Futures.immediateFuture(new SimpleDOMActionResult(ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME))
+            .withChild(ImmutableNodes.leafNode(QName.create(OUTPUT_QNAME, "timestamp"), "somevalue"))
+            .build())))
+            .when(actionService).invokeAction(eq(RESET_PATH), any(), any());
+
+        final var restconf = new JaxRsRestconf(new MdsalRestconfServer(new FixedDOMSchemaService(IID_SCHEMA),
+            dataBroker, rpcService, actionService, mountPointService));
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
+        doReturn(true).when(asyncResponse).resume(captor.capture());
+        restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
+            stringInputStream("""
+            {
+              "instance-identifier-module:input": {
+                "delay": 600
+              }
+            }"""), uriInfo, asyncResponse);
+        final var response = captor.getValue();
+        assertEquals(200, response.getStatus());
+
+        final var payload = assertInstanceOf(NormalizedNodePayload.class, response.getEntity());
+        AbstractRestconfTest.assertJson("""
+            {"instance-identifier-module:output":{"timestamp":"somevalue"}}""", payload);
+        AbstractRestconfTest.assertXml("""
+            <output xmlns="instance:identifier:module"><timestamp>somevalue</timestamp></output>""", payload);
     }
 }
