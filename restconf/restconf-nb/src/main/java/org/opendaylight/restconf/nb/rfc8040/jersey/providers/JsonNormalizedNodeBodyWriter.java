@@ -58,10 +58,13 @@ public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBo
     @Override
     void writeData(final SchemaInferenceStack stack, final QueryParameters writerParameters, final NormalizedNode data,
             final OutputStream entityStream) throws IOException {
-        if (!stack.isEmpty()) {
-            stack.exit();
-        }
+        stack.exit();
+        writeRoot(stack, writerParameters, data, entityStream);
+    }
 
+    @Override
+    void writeRoot(final SchemaInferenceStack stack, final QueryParameters writerParameters, final NormalizedNode data,
+            final OutputStream entityStream) throws IOException {
         // RESTCONF allows returning one list item. We need to wrap it in map node in order to serialize it properly
         final var toSerialize = data instanceof MapEntryNode mapEntry
             ? ImmutableNodes.newSystemMapBuilder()

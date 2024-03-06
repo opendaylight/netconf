@@ -45,19 +45,23 @@ abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<Nor
             if (stmt instanceof RpcEffectiveStatement rpc) {
                 stack.enterSchemaTree(rpc.output().argument());
                 writeOperationOutput(stack, context.writerParameters(), (ContainerNode) context.data(), output);
-                return;
             } else if (stmt instanceof ActionEffectiveStatement action) {
                 stack.enterSchemaTree(action.output().argument());
                 writeOperationOutput(stack, context.writerParameters(), (ContainerNode) context.data(), output);
-                return;
+            } else {
+                writeData(stack, context.writerParameters(), context.data(), output);
             }
+        } else {
+            writeRoot(stack, context.writerParameters(), context.data(), output);
         }
-        writeData(stack, context.writerParameters(), context.data(), output);
     }
 
     abstract void writeOperationOutput(@NonNull SchemaInferenceStack stack, @NonNull QueryParameters writerParameters,
         @NonNull ContainerNode output, @NonNull OutputStream entityStream) throws IOException;
 
     abstract void writeData(@NonNull SchemaInferenceStack stack, @NonNull QueryParameters writerParameters,
+        @NonNull NormalizedNode data, @NonNull OutputStream entityStream) throws IOException;
+
+    abstract void writeRoot(@NonNull SchemaInferenceStack stack, @NonNull QueryParameters writerParameters,
         @NonNull NormalizedNode data, @NonNull OutputStream entityStream) throws IOException;
 }

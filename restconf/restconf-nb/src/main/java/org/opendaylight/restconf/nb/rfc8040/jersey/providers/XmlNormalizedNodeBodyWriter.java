@@ -58,13 +58,7 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
     @Override
     void writeData(final SchemaInferenceStack stack, final QueryParameters writerParameters, final NormalizedNode data,
             final OutputStream entityStream) throws IOException {
-        final boolean isRoot;
-        if (!stack.isEmpty()) {
-            stack.exit();
-            isRoot = false;
-        } else {
-            isRoot = true;
-        }
+        stack.exit();
 
         final var xmlWriter = createXmlWriter(entityStream, writerParameters.prettyPrint());
         final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), writerParameters);
@@ -75,14 +69,21 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
                 .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
                 .addChild(mapEntry)
                 .build());
-        } else if (isRoot) {
-            if (data instanceof ContainerNode container && container.isEmpty()) {
-                writeEmptyDataNode(xmlWriter, container);
-            } else {
-                writeAndWrapInDataNode(xmlWriter, nnWriter, data);
-            }
         } else {
             nnWriter.write(data);
+        }
+        nnWriter.flush();
+    }
+
+    @Override
+    void writeRoot(final SchemaInferenceStack stack, final QueryParameters writerParameters, final NormalizedNode data,
+            final OutputStream entityStream) throws IOException {
+        final var xmlWriter = createXmlWriter(entityStream, writerParameters.prettyPrint());
+        final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), writerParameters);
+        if (data instanceof ContainerNode container && container.isEmpty()) {
+            writeEmptyDataNode(xmlWriter, container);
+        } else {
+            writeAndWrapInDataNode(xmlWriter, nnWriter, data);
         }
         nnWriter.flush();
     }
