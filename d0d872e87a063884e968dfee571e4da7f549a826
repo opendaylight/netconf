@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35663bf1_d272a2da",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PathsStream.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-03-06T12:21:27Z",
+      "side": 1,
+      "message": "We do not need to use `ImmutableList` and then use its Builder in method parameters.",
+      "revId": "d0d872e87a063884e968dfee571e4da7f549a826",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
