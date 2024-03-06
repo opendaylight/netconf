@@ -55,7 +55,10 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         .build();
     private static final ContainerNode OUTPUT = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create(RPC, "output")))
-        .withChild(ImmutableNodes.leafNode(QName.create(RPC, "content"), "operation result"))
+        .withChild(ImmutableNodes.newContainerBuilder()
+            .withNodeIdentifier(new NodeIdentifier(QName.create(RPC, "cont-out")))
+            .withChild(ImmutableNodes.leafNode(QName.create(RPC, "lf-out"), "operation result"))
+            .build())
         .build();
     private static final EffectiveModelContext MODEL_CONTEXT =
         YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc");
@@ -185,7 +188,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of())))
             .when(rpcService).invokeRpc(RPC, INPUT);
 
-        assertEquals(OUTPUT, assertNormalizedNode(200, ar -> restconf.operationsJsonPOST(
+        final var payload = assertNormalizedNodePayload(200, ar -> restconf.operationsJsonPOST(
             apiPath("invoke-rpc-module:rpc-test"),
             stringInputStream("""
                 {
@@ -194,7 +197,13 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                       "lf" : "test"
                     }
                   }
-                }"""), uriInfo, ar)));
+                }"""), uriInfo, ar));
+        assertEquals(OUTPUT, payload.data());
+        assertJson("""
+            {"invoke-rpc-module:output":{"cont-out":{"lf-out":"operation result"}}}""", payload);
+        assertXml("""
+            <output xmlns="invoke:rpc:module"><cont-out><lf-out>operation result</lf-out></cont-out></output>""",
+            payload);
     }
 
     private void prepNNC(final ContainerNode result) {

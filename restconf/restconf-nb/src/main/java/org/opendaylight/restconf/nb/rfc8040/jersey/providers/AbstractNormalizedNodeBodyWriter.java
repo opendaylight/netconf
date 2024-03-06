@@ -45,9 +45,11 @@ abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<Nor
             if (stmt instanceof RpcEffectiveStatement rpc) {
                 stack.enterSchemaTree(rpc.output().argument());
                 writeOperationOutput(stack, context.writerParameters(), (ContainerNode) context.data(), output);
+                return;
             } else if (stmt instanceof ActionEffectiveStatement action) {
                 stack.enterSchemaTree(action.output().argument());
                 writeOperationOutput(stack, context.writerParameters(), (ContainerNode) context.data(), output);
+                return;
             }
         }
         writeData(stack, context.writerParameters(), context.data(), output);
