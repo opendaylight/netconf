@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1597155b_342a1db1",
+        "filename": "transport/transport-http/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-06T09:02:34Z",
+      "side": 1,
+      "message": "provided HTTP/2 support",
+      "parentUuid": "5fc067f8_817929b8",
+      "range": {
+        "startLine": 47,
+        "startChar": 24,
+        "endLine": 47,
+        "endChar": 41
+      },
+      "revId": "f12762b9d8169532036d2758bca76809f763b376",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6e5d084_91d233b3",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f310001_fd528d5e",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientRequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-06T09:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6e5d084_91d233b3",
+      "range": {
+        "startLine": 49,
+        "startChar": 12,
+        "endLine": 49,
+        "endChar": 35
+      },
+      "revId": "f12762b9d8169532036d2758bca76809f763b376",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "67677630_4ff672b4",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-02-26T17:50:35Z",
       "side": 1,
       "message": "use retain() instead and make sure receivers perform a .realese() once they are done with it",
+      "range": {
+        "startLine": 72,
+        "startChar": 32,
+        "endLine": 72,
+        "endChar": 38
+      },
+      "revId": "f12762b9d8169532036d2758bca76809f763b376",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e20c99df_a2b902c5",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientRequestDispatcher.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-06T09:02:34Z",
+      "side": 1,
+      "message": "while this is a client side dispatcher it has no control on how the message will be used subsequently, using copy is a safe option for a message which is out and forgotten\n \nupdated server side dispatcher to retain + release -- see ServerChannelInitializer#serverHandler()",
+      "parentUuid": "67677630_4ff672b4",
       "range": {
         "startLine": 72,
         "startChar": 32,
