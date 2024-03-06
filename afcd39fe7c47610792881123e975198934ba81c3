@@ -16,6 +16,24 @@
       "message": "This needs a rather bigger refactor to deal with https://github.com/apache/mina-sshd/pull/424",
       "revId": "afcd39fe7c47610792881123e975198934ba81c3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e22145d0_2c40acea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-03-06T11:05:35Z",
+      "side": 1,
+      "message": "Tracked in https://jira.opendaylight.org/browse/NETCONF-1267.",
+      "parentUuid": "6c3a4dc8_b555a950",
+      "revId": "afcd39fe7c47610792881123e975198934ba81c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
