@@ -125,7 +125,7 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
                     final var keyId = keyBased.getKeyId();
                     final var keyPair = credentialProvider.credentialForId(keyId);
                     if (keyPair == null) {
-                        throw new IllegalArgumentException("No keypair found with keyId=" + keyId);
+                        throw new UnsupportedConfigurationException("No keypair found with keyId=" + keyId);
                     }
                     factoryManager.setKeyIdentityProvider(KeyIdentityProvider.wrapKeyPairs(keyPair));
                     final var factory = new UserAuthPublicKeyFactory();
