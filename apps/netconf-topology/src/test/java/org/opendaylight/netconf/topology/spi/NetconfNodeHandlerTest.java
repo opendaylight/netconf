@@ -40,6 +40,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientFactory;
+import org.opendaylight.netconf.client.NetconfClientFactoryImpl;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.client.mdsal.NetconfDeviceSchema;
@@ -55,11 +56,14 @@ import org.opendaylight.netconf.client.mdsal.api.SchemaResourceManager;
 import org.opendaylight.netconf.client.mdsal.api.SslContextFactoryProvider;
 import org.opendaylight.netconf.client.mdsal.impl.DefaultBaseNetconfSchemaProvider;
 import org.opendaylight.netconf.common.NetconfTimer;
+import org.opendaylight.netconf.common.impl.DefaultNetconfTimer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.KeyAuthBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.key.auth.KeyBasedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240120.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -259,5 +263,48 @@ public class NetconfNodeHandlerTest {
         handler.connect();
         verify(clientFactory).createClient(any());
         verifyNoInteractions(delegate);
+    }
+
+    @Test
+    public void failToConnectOnUnsupportedConfiguration() throws Exception {
+        var defaultTimer = new DefaultNetconfTimer();
+        var factory = new NetconfClientFactoryImpl(defaultTimer);
+
+        NetconfNodeHandler keyAuthHandler = new NetconfNodeHandler(factory, defaultTimer, BASE_SCHEMAS, schemaManager,
+            schemaAssembler, new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
+                sslContextFactoryProvider),
+            deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
+                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
+                .setReconnectOnChangedSchema(true)
+                .setSchemaless(true)
+                .setTcpOnly(false)
+                .setProtocol(null)
+                .setBackoffMultiplier(Decimal64.valueOf("1.5"))
+                .setConcurrentRpcLimit(Uint16.ONE)
+                // One reconnection attempt
+                .setMaxConnectionAttempts(Uint32.ONE)
+                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+                .setMinBackoffMillis(Uint16.valueOf(100))
+                .setKeepaliveDelay(Uint32.valueOf(1000))
+                .setConnectionTimeoutMillis(Uint32.valueOf(1000))
+                .setMaxBackoffMillis(Uint32.valueOf(1000))
+                .setBackoffJitter(Decimal64.valueOf("0.0"))
+                .setCredentials(new KeyAuthBuilder()
+                    .setKeyBased(new KeyBasedBuilder()
+                        .setUsername("testuser")
+                        .setKeyId("keyId")
+                        .build())
+                    .build())
+                .build(), null);
+
+        // return null when attempt to load credentials fot key id
+        doReturn(null).when(credentialProvider).credentialForId(any());
+        doNothing().when(delegate).onDeviceFailed(any());
+        keyAuthHandler.connect();
+        verify(credentialProvider).credentialForId(any());
+        // attempt to connect fails due to unsupported configuration, and there is attempt to reconnect
+        verify(delegate).onDeviceFailed(any());
+        assertEquals(1, keyAuthHandler.attempts());
     }
 }
