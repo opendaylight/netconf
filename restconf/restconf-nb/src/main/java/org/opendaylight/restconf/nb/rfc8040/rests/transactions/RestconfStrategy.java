@@ -1492,7 +1492,7 @@ public abstract class RestconfStrategy {
 
         Futures.addCallback(actionService.invokeAction(
             path.inference().toSchemaInferenceStack().toSchemaNodeIdentifier(),
-            new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL, path.instance()), input),
+            DOMDataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, path.instance()), input),
             new FutureCallback<DOMActionResult>() {
                 @Override
                 public void onSuccess(final DOMActionResult result) {
