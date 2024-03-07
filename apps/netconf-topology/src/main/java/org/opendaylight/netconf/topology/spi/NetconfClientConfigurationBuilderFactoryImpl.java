@@ -109,7 +109,8 @@ public final class NetconfClientConfigurationBuilderFactoryImpl implements Netco
             final byte[] plainBytes;
             try {
                 plainBytes = encryptionService.decrypt(loginPassword.getPassword());
-            } catch (GeneralSecurityException e) {
+                // TODO: after aaa 19.2 catching IllegalArgumentException should ne longer be needed.
+            } catch (GeneralSecurityException | IllegalArgumentException e) {
                 throw new IllegalStateException("Failed to decrypt password", e);
             }
 

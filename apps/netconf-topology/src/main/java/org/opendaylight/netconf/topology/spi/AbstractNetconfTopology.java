@@ -123,9 +123,8 @@ public abstract class AbstractNetconfTopology {
             nodeHandler = new NetconfNodeHandler(clientFactory, timer, baseSchemaProvider, schemaManager,
                 schemaAssembler, builderFactory, deviceActionFactory, deviceSalFacade, deviceId, nodeId, netconfNode,
                 nodeOptional);
-        } catch (IllegalArgumentException e) {
-            // This is a workaround for NETCONF-1114 where the encrypted password's lexical structure is not enforced
-            // in the datastore and it ends up surfacing when we decrypt the password.
+        } catch (IllegalStateException e) {
+            // This is a workaround for NETCONF-1114 when we fail to decrypt the password
             LOG.warn("RemoteDevice{{}} failed to connect, removing from operational datastore", nodeId, e);
             deviceSalFacade.close();
             return;
