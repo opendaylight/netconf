@@ -88,12 +88,12 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
     }
 
     private static XMLStreamWriter createXmlWriter(final OutputStream entityStream,
-            final @Nullable PrettyPrintParam prettyPrint) {
+            final @Nullable PrettyPrintParam prettyPrint) throws IOException {
         final XMLStreamWriter xmlWriter;
         try {
             xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
         } catch (XMLStreamException | FactoryConfigurationError e) {
-            throw new IllegalStateException(e);
+            throw new IOException(e);
         }
 
         return prettyPrint != null && prettyPrint.value() ? new IndentingXMLStreamWriter(xmlWriter) : xmlWriter;
