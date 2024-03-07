@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.spi;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -266,11 +267,12 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
-    public void failToConnectOnUnsupportedConfiguration() throws Exception {
-        var defaultTimer = new DefaultNetconfTimer();
-        var factory = new NetconfClientFactoryImpl(defaultTimer);
+    public void failToConnectOnUnsupportedConfiguration() {
+        final var defaultTimer = new DefaultNetconfTimer();
+        final var factory = new NetconfClientFactoryImpl(defaultTimer);
 
-        NetconfNodeHandler keyAuthHandler = new NetconfNodeHandler(factory, defaultTimer, BASE_SCHEMAS, schemaManager,
+        final var keyId = "keyId";
+        final var keyAuthHandler = new NetconfNodeHandler(factory, defaultTimer, BASE_SCHEMAS, schemaManager,
             schemaAssembler, new NetconfClientConfigurationBuilderFactoryImpl(encryptionService, credentialProvider,
                 sslContextFactoryProvider),
             deviceActionFactory, delegate, DEVICE_ID, NODE_ID, new NetconfNodeBuilder()
@@ -293,7 +295,7 @@ public class NetconfNodeHandlerTest {
                 .setCredentials(new KeyAuthBuilder()
                     .setKeyBased(new KeyBasedBuilder()
                         .setUsername("testuser")
-                        .setKeyId("keyId")
+                        .setKeyId(keyId)
                         .build())
                     .build())
                 .build(), null);
@@ -302,9 +304,11 @@ public class NetconfNodeHandlerTest {
         doReturn(null).when(credentialProvider).credentialForId(any());
         doNothing().when(delegate).onDeviceFailed(any());
         keyAuthHandler.connect();
-        verify(credentialProvider).credentialForId(any());
+        verify(credentialProvider).credentialForId(eq(keyId));
         // attempt to connect fails due to unsupported configuration, and there is attempt to reconnect
-        verify(delegate).onDeviceFailed(any());
+        final var captor = ArgumentCaptor.forClass(Throwable.class);
+        verify(delegate).onDeviceFailed(captor.capture());
+        assertTrue(captor.getValue() instanceof ConnectGivenUpException);
         assertEquals(1, keyAuthHandler.attempts());
     }
 }
