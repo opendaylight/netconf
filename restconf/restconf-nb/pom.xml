@@ -277,7 +277,7 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20230618</version>
+      <version>20240303</version>
       <scope>test</scope>
     </dependency>
     <dependency>
