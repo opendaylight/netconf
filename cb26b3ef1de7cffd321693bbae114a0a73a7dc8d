@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1fb4b1bb_c2b91603",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/BasicAuthHandler.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-03-07T15:44:16Z",
+      "side": 1,
+      "message": "/*\n * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others.  All rights reserved.\n *\n * This program and the accompanying materials are made available under the\n * terms of the Eclipse Public License v1.0 which accompanies this distribution,\n * and is available at http://www.eclipse.org/legal/epl-v10.html\n */",
+      "revId": "cb26b3ef1de7cffd321693bbae114a0a73a7dc8d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ca5c937b_9162bb11",
         "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/HttpSslHandlerFactory.java",
         "patchSetId": 9
