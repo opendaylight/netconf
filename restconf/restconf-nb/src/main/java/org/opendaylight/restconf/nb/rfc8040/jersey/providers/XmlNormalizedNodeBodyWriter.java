@@ -79,13 +79,21 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
     void writeRoot(final Inference inference, final QueryParameters writerParameters, final NormalizedNode data,
             final OutputStream entityStream) throws IOException {
         final var xmlWriter = createXmlWriter(entityStream, writerParameters.prettyPrint());
-        final var nnWriter = createNormalizedNodeWriter(xmlWriter, inference, writerParameters);
-        if (data instanceof ContainerNode container && container.isEmpty()) {
-            writeEmptyDataNode(xmlWriter, container);
-        } else {
-            writeAndWrapInDataNode(xmlWriter, nnWriter, data);
+        try {
+            final var nodeType = data.name().getNodeType();
+            final var namespace = nodeType.getNamespace().toString();
+            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);
+            xmlWriter.writeDefaultNamespace(namespace);
+            if (!(data instanceof ContainerNode container) || !container.isEmpty()) {
+                final var nnWriter = createNormalizedNodeWriter(xmlWriter, inference, writerParameters);
+                nnWriter.write(data);
+                nnWriter.flush();
+            }
+            xmlWriter.writeEndElement();
+            xmlWriter.flush();
+        } catch (XMLStreamException e) {
+            throw new IOException("Failed to write elements", e);
         }
-        nnWriter.flush();
     }
 
     private static XMLStreamWriter createXmlWriter(final OutputStream entityStream,
@@ -105,35 +113,6 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(
             XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, inference),
             writerParameters.depth(), writerParameters.fields());
-    }
-
-    private static void writeAndWrapInDataNode(final XMLStreamWriter xmlWriter,
-            final RestconfNormalizedNodeWriter nnWriter, final NormalizedNode data) throws IOException {
-        final QName nodeType = data.name().getNodeType();
-        final String namespace = nodeType.getNamespace().toString();
-        try {
-            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);
-            xmlWriter.writeDefaultNamespace(namespace);
-            nnWriter.write(data);
-            xmlWriter.writeEndElement();
-            xmlWriter.flush();
-        } catch (XMLStreamException e) {
-            throw new IOException("Failed to write elements", e);
-        }
-    }
-
-    private static void writeEmptyDataNode(final XMLStreamWriter xmlWriter, final ContainerNode data)
-            throws IOException {
-        final QName nodeType = data.name().getNodeType();
-        final String namespace = nodeType.getNamespace().toString();
-        try {
-            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);
-            xmlWriter.writeDefaultNamespace(namespace);
-            xmlWriter.writeEndElement();
-            xmlWriter.flush();
-        } catch (XMLStreamException e) {
-            throw new IOException("Failed to write elements", e);
-        }
     }
 
     private static void writeElements(final XMLStreamWriter xmlWriter, final RestconfNormalizedNodeWriter nnWriter,
