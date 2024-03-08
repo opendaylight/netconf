@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a2ee026_45ec2306",
+        "filename": "restconf/restconf-openapi/src/test/resources/yang-document/controller-action-types.json",
+        "patchSetId": 6
+      },
+      "lineNbr": 1264,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-03-08T13:30:32Z",
+      "side": 1,
+      "message": "I would expect:\n\ncomponents/schemas/action-types_first-container_second-container_THIRD-CONTAINER_nested-action_input",
+      "revId": "70c70dadbaba303c6eb4b22dfbf424530c24a124",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
