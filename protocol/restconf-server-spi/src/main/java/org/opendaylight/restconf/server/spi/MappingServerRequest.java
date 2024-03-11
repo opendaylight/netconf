@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
@@ -56,5 +57,5 @@ public abstract class MappingServerRequest<T> extends AbstractServerRequest<T> {
         onFailure(statusCodes.getFirst(), body);
     }
 
-    protected abstract void onFailure(HttpStatusCode status, FormattableBody body);
+    protected abstract void onFailure(@NonNull HttpStatusCode status, @NonNull FormattableBody body);
 }
