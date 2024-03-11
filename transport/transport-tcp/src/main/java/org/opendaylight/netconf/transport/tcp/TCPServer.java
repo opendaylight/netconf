@@ -50,7 +50,7 @@ public final class TCPServer extends TCPTransportStack {
     }
 
     /**
-     * Attempt to establish a {@link TCPClient} by connecting to a remote address.
+     * Attempt to establish a {@link TCPServer} by connecting to a remote address.
      *
      * @param listener {@link TransportChannelListener} to notify when the session is established
      * @param bootstrap {@link ServerBootstrap} to use for the underlying Netty server channel
