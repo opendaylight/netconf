@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2024 PANTHEON.tech s.r.o. and others. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -15,7 +15,7 @@ import org.opendaylight.yangtools.binding.YangFeature;
 import org.opendaylight.yangtools.binding.meta.YangFeatureProvider;
 
 /**
- * Baseline features supported from {@code ietf-restconf-client.yang}.
+ * Baseline features supported from {@code ietf-restconf-server.yang}.
  */
 @MetaInfServices
 @NonNullByDefault
