@@ -10,11 +10,16 @@ package org.opendaylight.restconf.nb.rfc8040;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+import org.opendaylight.netconf.transport.http.ConfigUtils;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.NettyEndpoint;
+import org.opendaylight.restconf.server.NettyEndpointConfiguration;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpoint;
 import org.opendaylight.restconf.server.jaxrs.JaxRsEndpointConfiguration;
 import org.opendaylight.restconf.server.spi.EndpointConfiguration;
 import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerStackGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.stack.grouping.Transport;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.osgi.framework.FrameworkUtil;
@@ -75,23 +80,50 @@ public final class OSGiNorthbound {
         //        Integer.MAX_VALUE, which is not what we want
         @AttributeDefinition(min = "0")
         int max$_$thread$_$count() default JaxRsEndpointConfiguration.DEFAULT_CORE_POOL_SIZE;
+
+        // Note: below (+restconf above) are used in NettyEndpointConfiguration
+
+        @AttributeDefinition
+        String bind$_$address() default "0.0.0.0";
+
+        @AttributeDefinition(min = "1", max = "65535")
+        int bind$_$port() default 8182;
+
+        @AttributeDefinition(description = "Thread name prefix to be used by Netty's thread executor")
+        String group$_$name() default "restconf-server";
+
+        @AttributeDefinition(min = "0", description = "Netty's thread limit. 0 means no limits.")
+        int group$_$threads() default 0;
+
+        @AttributeDefinition(description = """
+            Default encoding for outgoing messages. Only "xml" or "json" values are allowed.""")
+        String default$_$encoding() default "json";
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
 
     private final ComponentFactory<JaxRsEndpoint> jaxrsFactory;
+    private final ComponentFactory<NettyEndpoint> nettyEndpointFactory;
 
     private ComponentInstance<JaxRsEndpoint> jaxrs;
+    private ComponentInstance<NettyEndpoint> nettyEndpoint;
     private Map<String, ?> jaxrsProps;
+    private Map<String, ?> nettyEndpointProps;
 
     @Activate
     public OSGiNorthbound(
             @Reference(target = "(component.factory=" + JaxRsEndpoint.FACTORY_NAME + ")")
-            final ComponentFactory<JaxRsEndpoint> jaxrsFactory, final Configuration configuration) {
+            final ComponentFactory<JaxRsEndpoint> jaxrsFactory,
+            @Reference(target = "(component.factory=" + NettyEndpoint.FACTORY_NAME + ")")
+            final ComponentFactory<NettyEndpoint> nettyEndpointFactory,
+            final Configuration configuration) {
         this.jaxrsFactory = requireNonNull(jaxrsFactory);
-
         jaxrsProps = newJaxrsProps(configuration);
         jaxrs = jaxrsFactory.newInstance(FrameworkUtil.asDictionary(jaxrsProps));
+
+        this.nettyEndpointFactory = requireNonNull(nettyEndpointFactory);
+        nettyEndpointProps = newNettyEndpointProps(configuration);
+        nettyEndpoint = nettyEndpointFactory.newInstance(FrameworkUtil.asDictionary(nettyEndpointProps));
 
         LOG.info("Global RESTCONF northbound pools started");
     }
@@ -105,6 +137,13 @@ public final class OSGiNorthbound {
             jaxrs = jaxrsFactory.newInstance(FrameworkUtil.asDictionary(jaxrsProps));
             LOG.debug("JAX-RS northbound restarted with {}", jaxrsProps);
         }
+        final var newNettyEndpointProps = newNettyEndpointProps(configuration);
+        if (!newNettyEndpointProps.equals(nettyEndpointProps)) {
+            nettyEndpoint.dispose();
+            nettyEndpointProps = newNettyEndpointProps;
+            nettyEndpoint = nettyEndpointFactory.newInstance(FrameworkUtil.asDictionary(nettyEndpointProps));
+            LOG.debug("Netty northbound restarted with {}", nettyEndpointProps);
+        }
         LOG.debug("Applied {}", configuration);
     }
 
@@ -112,6 +151,8 @@ public final class OSGiNorthbound {
     void deactivate() {
         jaxrs.dispose();
         jaxrs = null;
+        nettyEndpoint.dispose();
+        nettyEndpoint = null;
         LOG.info("Global RESTCONF northbound pools stopped");
     }
 
@@ -122,5 +163,37 @@ public final class OSGiNorthbound {
             Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
             Uint32.valueOf(configuration.heartbeat$_$interval()), configuration.restconf(),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count()));
+    }
+
+    private static Map<String, ?> newNettyEndpointProps(final Configuration configuration) {
+        return NettyEndpoint.props(
+            new NettyEndpointConfiguration(
+                configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
+                PrettyPrintParam.of(configuration.pretty$_$print()),
+                Uint16.valueOf(configuration.maximum$_$fragment$_$length()),
+                Uint32.valueOf(configuration.heartbeat$_$interval()),
+                configuration.restconf(),
+                configuration.group$_$name(),
+                configuration.group$_$threads(),
+                configuration.default$_$encoding(),
+                newTransportConfiguration(configuration))
+        );
+    }
+
+    private static HttpServerStackGrouping newTransportConfiguration(final Configuration configuration) {
+        // TODO TLS support
+        final var transport =
+            ConfigUtils.serverTransportTcp(configuration.bind$_$address(), configuration.bind$_$port());
+        return new HttpServerStackGrouping() {
+            @Override
+            public Class<? extends HttpServerStackGrouping> implementedInterface() {
+                return HttpServerStackGrouping.class;
+            }
+
+            @Override
+            public Transport getTransport() {
+                return transport;
+            }
+        };
     }
 }
