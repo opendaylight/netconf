@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) 2024 PANTHEON.tech s.r.o. and others. All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.restconf.server;
+
+import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.server.ResponseUtils.simpleErrorResponse;
+import static org.opendaylight.restconf.server.ResponseUtils.unmappedRequestErrorResponse;
+
+import com.google.common.util.concurrent.FutureCallback;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.util.AsciiString;
+import java.net.URI;
+import org.opendaylight.netconf.transport.http.RequestDispatcher;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.spi.ErrorTagMapping;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public final class RestconfRequestDispatcher implements RequestDispatcher {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfRequestDispatcher.class);
+
+    private final URI baseURI;
+    private final RestconfServer restconfService;
+    private final PrincipalService principalService;
+    private final ErrorTagMapping errorTagMapping;
+    private final AsciiString defaultAcceptType;
+    private final PrettyPrintParam defaultPrettyPrint;
+
+    public RestconfRequestDispatcher(final RestconfServer restconfService, final PrincipalService principalService,
+            final URI baseUri, final ErrorTagMapping errorTagMapping,
+            final AsciiString defaultAcceptType, final PrettyPrintParam defaultPrettyPrint) {
+        this.restconfService = requireNonNull(restconfService);
+        this.principalService = requireNonNull(principalService);
+        this.baseURI = requireNonNull(baseUri);
+        this.errorTagMapping = requireNonNull(errorTagMapping);
+        this.defaultAcceptType = requireNonNull(defaultAcceptType);
+        this.defaultPrettyPrint = requireNonNull(defaultPrettyPrint);
+
+        LOG.info("{} initialized with service {}", getClass().getSimpleName(), restconfService.getClass());
+        LOG.info("Base path: {}, default accept: {}, default pretty print: {}",
+            this.baseURI, defaultAcceptType, defaultPrettyPrint.value());
+    }
+
+    @Override
+    @SuppressWarnings("IllegalCatch")
+    public void dispatch(final FullHttpRequest request, final FutureCallback<FullHttpResponse> callback) {
+        LOG.debug("Dispatching {} {}", request.method(), request.uri());
+
+        final var principal = principalService.acquirePrincipal(request);
+        final var params = new RequestParameters(baseURI, request, principal,
+            errorTagMapping, defaultAcceptType, defaultPrettyPrint);
+        try {
+            switch (params.pathParameters().apiResource()) {
+                case PathParameters.DATA -> DataRequestProcessor.processDataRequest(params, restconfService, callback);
+                case PathParameters.OPERATIONS ->
+                    OperationsRequestProcessor.processOperationsRequest(params, restconfService, callback);
+                case PathParameters.YANG_LIBRARY_VERSION ->
+                    ModulesRequestProcessor.processYangLibraryVersion(params, restconfService, callback);
+                case PathParameters.MODULES ->
+                    ModulesRequestProcessor.processModules(params, restconfService, callback);
+                case PathParameters.HOST_META -> HostMetaRequestProcessor.processHostMetaRequest(params, callback);
+                case PathParameters.HOST_META_JSON ->
+                    HostMetaRequestProcessor.processHostMetaJsonRequest(params, callback);
+                default -> callback.onSuccess(unmappedRequestErrorResponse(params));
+            }
+        } catch (RuntimeException e) {
+            LOG.error("Error processing request {} {}", request.method(), request.uri(), e);
+            final var errorTag = e instanceof ServerErrorException see ? see.errorTag() : ErrorTag.OPERATION_FAILED;
+            callback.onSuccess(simpleErrorResponse(params, errorTag, e.getMessage()));
+        }
+    }
+}
