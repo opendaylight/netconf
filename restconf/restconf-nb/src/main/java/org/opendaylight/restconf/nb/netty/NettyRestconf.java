@@ -19,6 +19,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
+import javax.inject.Singleton;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.databind.netty.QueryParams;
@@ -27,6 +28,7 @@ import org.opendaylight.restconf.server.api.RestconfServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class NettyRestconf extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger LOG = LoggerFactory.getLogger(NettyRestconf.class);
 
