@@ -63,8 +63,8 @@ final class AuthorizedKeysDecoder {
 
     private static KeyFactory loadOrWarn(final String algorithm) {
         try {
-            return KeyFactory.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
+            return KeyFactory.getInstance(algorithm, "BC");
+        } catch (GeneralSecurityException e) {
             LOG.warn("KeyFactory for {} not found", algorithm, e);
             return null;
         }
