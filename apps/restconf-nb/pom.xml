@@ -84,6 +84,10 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-server-api</artifactId>
         </dependency>
         <dependency>
@@ -234,6 +238,10 @@
         <dependency>
             <groupId>org.opendaylight.netconf.model</groupId>
             <artifactId>test-models</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>transport-http</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
