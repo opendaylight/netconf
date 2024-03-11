@@ -10,6 +10,8 @@ package org.opendaylight.restconf.nb.netty;
 import static java.util.Objects.requireNonNull;
 
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -19,6 +21,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
+import javax.inject.Singleton;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.databind.netty.QueryParams;
@@ -27,6 +30,7 @@ import org.opendaylight.restconf.server.api.RestconfServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class NettyRestconf extends SimpleChannelInboundHandler<FullHttpRequest> {
     private static final Logger LOG = LoggerFactory.getLogger(NettyRestconf.class);
 
@@ -66,6 +70,9 @@ public class NettyRestconf extends SimpleChannelInboundHandler<FullHttpRequest> 
                     Unpooled.copiedBuffer(result.payload().data().toString(), CharsetUtil.UTF_8));
                 response.headers().set("ETag", result.entityTag());
                 response.headers().set("Last-Modified", result.lastModified());
+
+                final var channelFuture = ctx.writeAndFlush(response);
+                channelFuture.addListener((ChannelFutureListener) future1 -> ctx.close());
                 return response;
             }
         });
