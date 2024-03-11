@@ -7,28 +7,32 @@
  */
 package org.opendaylight.restconf.nb.netty;
 
+import static io.netty.buffer.Unpooled.wrappedBuffer;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderValues.TEXT_PLAIN;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static java.util.Objects.requireNonNull;
 
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.util.CharsetUtil;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.databind.netty.QueryParams;
-import org.opendaylight.restconf.server.api.DataGetResult;
+import io.netty.handler.codec.http.FullHttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Singleton;
+import org.opendaylight.netconf.transport.http.RequestDispatcher;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NettyRestconf extends SimpleChannelInboundHandler<FullHttpRequest> {
+@Singleton
+public class NettyRestconf implements RequestDispatcher {
     private static final Logger LOG = LoggerFactory.getLogger(NettyRestconf.class);
+
+    private static final String RESPONSE_TEMPLATE = "Method: %s URI: %s Payload: %s";
 
     private final RestconfServer server;
 
@@ -37,37 +41,23 @@ public class NettyRestconf extends SimpleChannelInboundHandler<FullHttpRequest> 
     }
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest msg) throws Exception {
-        final var method = msg.method();
+    public ListenableFuture<FullHttpResponse> dispatch(final FullHttpRequest request) {
+        LOG.info("Sending repose to {}", request);
+        final var future = SettableFuture.<FullHttpResponse>create();
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            // return 200 response with a content built from request parameters
+            final var method = request.method().name();
+            final var uri = request.uri();
+            final var payload = request.content().readableBytes() > 0
+                ? request.content().toString(StandardCharsets.UTF_8) : "";
+            final var responseMessage = RESPONSE_TEMPLATE.formatted(method, uri, payload);
+            final var response = new DefaultFullHttpResponse(request.protocolVersion(), OK,
+                wrappedBuffer(responseMessage.getBytes(StandardCharsets.UTF_8)));
+            response.headers().set(CONTENT_TYPE, TEXT_PLAIN)
+                .setInt(CONTENT_LENGTH, response.content().readableBytes());
+            return future.set(response);
+        }, 100, TimeUnit.MILLISECONDS);
 
-        switch (method.name()) {
-            case "GET" -> {
-                LOG.debug("GET");
-                dataGET(ctx, msg);
-            }
-            case "POST" -> LOG.debug("POST");
-            case "PUT" -> LOG.debug("PUT");
-            case "PATCH" -> LOG.debug("PATCH");
-            case "DELETE" -> LOG.debug("DELETE");
-            default -> LOG.debug("Unsupported request method.");
-        }
-    }
-
-    public void dataGET(final ChannelHandlerContext ctx, final FullHttpRequest msg) {
-        final var decoder = new QueryStringDecoder(msg.uri());
-        completeDataGET(server.dataGET(QueryParams.newDataGetParams(decoder)), ctx);
-    }
-
-    private static void completeDataGET(final RestconfFuture<DataGetResult> future, final ChannelHandlerContext ctx) {
-        future.addCallback(new NettyRestconfCallback<>(ctx) {
-            @Override
-            HttpResponse transform(final DataGetResult result) throws RestconfDocumentedException {
-                final var response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, HttpResponseStatus.OK,
-                    Unpooled.copiedBuffer(result.payload().data().toString(), CharsetUtil.UTF_8));
-                response.headers().set("ETag", result.entityTag());
-                response.headers().set("Last-Modified", result.lastModified());
-                return response;
-            }
-        });
+        return future;
     }
 }

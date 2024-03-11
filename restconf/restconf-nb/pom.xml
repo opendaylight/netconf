@@ -316,6 +316,10 @@
       <artifactId>netconf-test-models</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>transport-http</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
