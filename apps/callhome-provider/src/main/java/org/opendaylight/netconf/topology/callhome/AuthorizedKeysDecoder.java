@@ -17,7 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
@@ -28,6 +30,7 @@ import java.util.Arrays;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.ECPointUtil;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 import org.eclipse.jdt.annotation.NonNull;
@@ -57,14 +60,25 @@ final class AuthorizedKeysDecoder {
     private static final String KEY_TYPE_ECDSA = "ecdsa-sha2-" + ECDSA_SUPPORTED_CURVE_NAME;
     private static final byte[] KEY_TYPE_ECDSA_BYTES = KEY_TYPE_ECDSA.getBytes(StandardCharsets.UTF_8);
 
-    private static final KeyFactory RSA_FACTORY = loadOrWarn("RSA");
-    private static final KeyFactory DSA_FACTORY = loadOrWarn("DSA");
-    private static final KeyFactory EC_FACTORY = loadOrWarn("EC");
+    private static final KeyFactory RSA_FACTORY;
+    private static final KeyFactory DSA_FACTORY;
+    private static final KeyFactory EC_FACTORY;
 
-    private static KeyFactory loadOrWarn(final String algorithm) {
+    static {
+        // Default provider fails to validate keys, see https://jira.opendaylight.org/browse/NETCONF-1249
+        var bcprov = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
+        if (bcprov == null) {
+            bcprov = new BouncyCastleProvider();
+        }
+        RSA_FACTORY = loadOrWarn("RSA", bcprov);
+        DSA_FACTORY = loadOrWarn("DSA", bcprov);
+        EC_FACTORY = loadOrWarn("EC", bcprov);
+    }
+
+    private static KeyFactory loadOrWarn(final String algorithm, final Provider provider) {
         try {
-            return KeyFactory.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
+            return KeyFactory.getInstance(algorithm, provider);
+        } catch (GeneralSecurityException e) {
             LOG.warn("KeyFactory for {} not found", algorithm, e);
             return null;
         }
