@@ -36,6 +36,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "be17f3ce_68956bb7",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-03-12T13:32:04Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6650330c_96e3d866",
+      "revId": "d32f894db85ce99e3cf68176a6117e6b6474f67a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bde36286_775f9814",
