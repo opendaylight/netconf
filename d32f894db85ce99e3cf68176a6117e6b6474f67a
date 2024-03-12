@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6650330c_96e3d866",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/SchemasStream.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-03-12T10:33:37Z",
+      "side": 1,
+      "message": "IMHO it is related, but naming is little confusing, but method processDataAndActionNodes should be refactored in new task.",
+      "parentUuid": "d12c8011_8acb1b93",
+      "revId": "d32f894db85ce99e3cf68176a6117e6b6474f67a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bde36286_775f9814",
         "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PostEntity.java",
         "patchSetId": 12
@@ -31,6 +49,24 @@
       "writtenOn": "2024-03-12T08:59:49Z",
       "side": 1,
       "message": "@NonNull collections are easier to maintain.",
+      "revId": "d32f894db85ce99e3cf68176a6117e6b6474f67a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52b1660f_56d70c08",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/model/PostEntity.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-03-12T10:33:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bde36286_775f9814",
       "revId": "d32f894db85ce99e3cf68176a6117e6b6474f67a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
