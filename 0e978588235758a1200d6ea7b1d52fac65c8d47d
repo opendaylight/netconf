@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "581ecb68_8530eeab",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-03-12T08:52:14Z",
+      "side": 1,
+      "message": "We have 4 methods here now with just \"Get schema of specific module without revision.\" in doc. Can we explain these methods a bit more?",
+      "range": {
+        "startLine": 807,
+        "startChar": 7,
+        "endLine": 807,
+        "endChar": 54
+      },
+      "revId": "0e978588235758a1200d6ea7b1d52fac65c8d47d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
