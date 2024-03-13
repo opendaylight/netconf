@@ -16,6 +16,24 @@
       "message": "IMHO there is not something new for this usage, I think this is in 19.0.1 https://git.opendaylight.org/gerrit/c/aaa/+/108651. Am I wrong ?",
       "revId": "29e287c1d8601a8344cbe89fe9e37e33c7dbaaa7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7970573_75d9b409",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-03-13T11:28:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4c87955_afbca955",
+      "revId": "29e287c1d8601a8344cbe89fe9e37e33c7dbaaa7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
