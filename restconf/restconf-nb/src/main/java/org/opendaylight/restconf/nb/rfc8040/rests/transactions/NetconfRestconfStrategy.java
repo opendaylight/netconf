@@ -93,7 +93,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             } catch (RestconfDocumentedException e) {
                 return RestconfFuture.failed(e);
             }
-            fieldPaths = tmp == null || tmp.isEmpty() ? null : tmp;
+            fieldPaths = tmp.isEmpty() ? null : tmp;
         } else {
             fieldPaths = null;
         }
@@ -131,7 +131,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      * @param content  type of data to read (config, state, all)
      * @param path     the parent path to read
      * @param withDefa value of with-defaults parameter
-     * @param fields   paths to selected subtrees which should be read, relative to to the parent path
+     * @param fields   paths to selected subtrees which should be read, relative to the parent path
      * @return {@link NormalizedNode}
      */
     // FIXME: NETCONF-1155: this method should asynchronous
@@ -162,9 +162,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      *
      * @param store                 datastore type
      * @param path                  parent path to selected fields
-     * @param closeTransactionChain if it is set to {@code true}, after transaction it will close transactionChain
-     *                              in {@link RestconfStrategy} if any
-     * @param fields                paths to selected subtrees which should be read, relative to to the parent path
+     * @param fields                paths to selected subtrees which should be read, relative to the parent path
      * @return {@link NormalizedNode}
      */
     private @Nullable NormalizedNode readDataViaTransaction(final @NonNull LogicalDatastoreType store,
@@ -181,7 +179,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     private static <T> ListenableFuture<T> remapException(final ListenableFuture<T> input) {
         final var ret = SettableFuture.<T>create();
-        Futures.addCallback(input, new FutureCallback<T>() {
+        Futures.addCallback(input, new FutureCallback<>() {
             @Override
             public void onSuccess(final T result) {
                 ret.set(result);
