@@ -42,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  * RESTCONF implementation of {@link CreateDataChangeEventSubscription}.
  */
 @Singleton
-@Component
+@Component(service = RpcImplementation.class)
 public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementation {
     private static final @NonNull NodeIdentifier DATASTORE_NODEID = NodeIdentifier.create(
         QName.create(CreateDataChangeEventSubscriptionInput1.QNAME, "datastore").intern());
