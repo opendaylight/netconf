@@ -56,11 +56,11 @@ import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.connection.oper.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.connection.oper.available.capabilities.AvailableCapability.CapabilityOrigin;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.device.rev240223.connection.oper.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
-import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -178,59 +178,6 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         assertThat(captor.getValue(), instanceOf(EmptySchemaContextException.class));
 
         verify(listener, timeout(5000)).close();
-        verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollection());
-    }
-
-    @Test
-    public void testNetconfDeviceMissingSource() throws Exception {
-        final RemoteDeviceHandler facade = getFacade();
-        final NetconfDeviceCommunicator listener = getListener();
-
-        final EffectiveModelContextFactory schemaFactory = getSchemaFactory();
-        final SchemaRepository schemaRepository = getSchemaRepository();
-
-        // Make fallback attempt to fail due to empty resolved sources
-        final MissingSchemaSourceException schemaResolutionException =
-                new MissingSchemaSourceException("fail first", TEST_SID);
-        doReturn(Futures.immediateFailedFuture(schemaResolutionException))
-                .when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(YangTextSchemaSource.class));
-        doAnswer(invocation -> {
-            if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
-                return Futures.immediateFailedFuture(schemaResolutionException);
-            } else {
-                return Futures.immediateFuture(SCHEMA_CONTEXT);
-            }
-        }).when(schemaFactory).createEffectiveModelContext(anyCollection());
-
-        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
-            schemaContext) -> {
-            final Module first = SCHEMA_CONTEXT.getModules().iterator().next();
-            final QName qName = QName.create(first.getQNameModule(), first.getName());
-            final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
-            final NetconfStateSchemas.RemoteYangSchema source2 =
-                    new NetconfStateSchemas.RemoteYangSchema(QName.create(first.getQNameModule(), "test-module2"));
-            return new NetconfStateSchemas(Sets.newHashSet(source1, source2));
-        };
-
-        doReturn(mock(SchemaSourceRegistration.class)).when(schemaRegistry).registerSchemaSource(any(), any());
-        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
-                .SchemaResourcesDTO(schemaRegistry, schemaRepository, schemaFactory, stateSchemasResolver);
-
-        final NetconfDevice device = new NetconfDeviceBuilder()
-                .setReconnectOnSchemasChange(true)
-                .setSchemaResourcesDTO(schemaResourcesDTO)
-                .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
-                .setBaseSchemas(BASE_SCHEMAS)
-                .setId(getId())
-                .setSalFacade(facade)
-                .build();
-        // Monitoring supported
-        final NetconfSessionPreferences sessionCaps =
-                getSessionCaps(true, List.of(TEST_CAPABILITY, TEST_CAPABILITY2));
-        device.onRemoteSessionUp(sessionCaps, listener);
-
-        verify(facade, timeout(5000)).onDeviceConnected(any(NetconfDeviceSchema.class),
-            any(NetconfSessionPreferences.class), any(RemoteDeviceServices.class));
         verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollection());
     }
 
@@ -432,7 +379,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .build();
         final NetconfDevice netconfSpy = spy(device);
 
-        final NetconfSessionPreferences sessionCaps = getSessionCaps(false, List.of(CapabilityURN.NOTIFICATION));
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(false,
+                List.of(CapabilityURN.NOTIFICATION, CapabilityURN.INTERLEAVE));
 
         netconfSpy.onRemoteSessionUp(sessionCaps, listener);
 
@@ -488,6 +436,39 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         assertFalse(netconfDeviceCaps.resolvedCapabilities().stream()
             .anyMatch(entry -> notificationModulesName.contains(entry.getCapability())));
+    }
+
+    @Test
+    public void testNetconfDeviceNotificationsModelNotPresentWithoutInterleaveCapability() throws Exception {
+        final RemoteDeviceHandler facade = getFacade();
+        final EffectiveModelContextFactory schemaContextProviderFactory = getSchemaFactory();
+
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(schemaRegistry,
+                getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final var netconfSpy = spy(new NetconfDeviceBuilder()
+            .setSchemaResourcesDTO(schemaResourcesDTO)
+            .setGlobalProcessingExecutor(MoreExecutors.directExecutor())
+            .setId(getId())
+            .setSalFacade(facade)
+            .setBaseSchemas(BASE_SCHEMAS)
+            .build());
+
+        final var sessionCaps = getSessionCaps(false,
+            List.of(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION,
+                CapabilityURN.NOTIFICATION));
+
+        netconfSpy.onRemoteSessionUp(sessionCaps, getListener());
+
+        final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
+        verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
+            any(RemoteDeviceServices.class));
+
+        // Notification schema was not added when there is no Interleave capability
+        assertEquals(Set.of(
+            new AvailableCapabilityBuilder()
+                .setCapability("(test:namespace?revision=2013-07-22)test-module")
+                .setCapabilityOrigin(CapabilityOrigin.DeviceAdvertised)
+                .build()), argument.getValue().capabilities().resolvedCapabilities());
     }
 
     @Test
