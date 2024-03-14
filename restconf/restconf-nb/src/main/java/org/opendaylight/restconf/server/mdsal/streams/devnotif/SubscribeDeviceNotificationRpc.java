@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  * RESTCONF implementation of {@link SubscribeDeviceNotification}.
  */
 @Singleton
-@Component
+@Component(service = RpcImplementation.class)
 public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
     private static final NodeIdentifier DEVICE_NOTIFICATION_PATH_NODEID =
         NodeIdentifier.create(QName.create(SubscribeDeviceNotificationInput.QNAME, "path").intern());
