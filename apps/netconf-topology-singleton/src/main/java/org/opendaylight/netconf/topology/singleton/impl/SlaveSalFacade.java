@@ -51,7 +51,7 @@ public class SlaveSalFacade {
         final var proxyNetconfService = new ProxyNetconfDataTreeService(id, masterActorRef,
             actorSystem.dispatcher(), actorResponseWaitTime);
 
-        mount.onDeviceConnected(remoteSchemaContext, services, netconfDeviceDataBroker, proxyNetconfService);
+        mount.onDeviceConnected(remoteSchemaContext, services, null, netconfDeviceDataBroker, proxyNetconfService);
         LOG.info("{}: Slave mount point registered.", id);
     }
 
