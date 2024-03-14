@@ -10,6 +10,7 @@ package org.opendaylight.netconf.client.mdsal;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
@@ -308,7 +309,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build());
 
-        netconfSpy.onRemoteSessionUp(getSessionCaps(false, CapabilityURN.NOTIFICATION), getListener());
+        netconfSpy.onRemoteSessionUp(getSessionCaps(false, CapabilityURN.NOTIFICATION,
+                CapabilityURN.INTERLEAVE), getListener());
 
         final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
@@ -321,6 +323,25 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             new AvailableCapabilityBuilder()
                 .setCapability("(urn:ietf:params:xml:ns:netconf:notification:1.0?revision=2008-07-14)notifications")
                 .build()), argument.getValue().capabilities().resolvedCapabilities());
+    }
+
+    @Test
+    public void testNetconfDeviceNotificationsModelNotPresentWithoutInterleaveCapability() throws Exception {
+        final var facade = getFacade();
+        final var netconfSpy = spy(new NetconfDeviceBuilder()
+                .setDeviceSchemaProvider(mockDeviceNetconfSchemaProvider())
+                .setProcessingExecutor(MoreExecutors.directExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .setBaseSchemaProvider(BASE_SCHEMAS)
+                .build());
+
+        netconfSpy.onRemoteSessionUp(getSessionCaps(false, CapabilityURN.NOTIFICATION), getListener());
+
+        // Schemas end up being empty as nothing was added when there is no Interleave capability
+        final var captor = ArgumentCaptor.forClass(Throwable.class);
+        verify(facade, timeout(5000)).onDeviceFailed(captor.capture());
+        assertTrue(captor.getValue() instanceof EmptySchemaContextException);
     }
 
     @Test
