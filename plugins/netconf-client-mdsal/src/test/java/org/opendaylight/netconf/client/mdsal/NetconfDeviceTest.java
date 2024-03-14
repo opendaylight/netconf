@@ -308,7 +308,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             .setBaseSchemaProvider(BASE_SCHEMAS)
             .build());
 
-        netconfSpy.onRemoteSessionUp(getSessionCaps(false, CapabilityURN.NOTIFICATION), getListener());
+        netconfSpy.onRemoteSessionUp(getSessionCaps(false, CapabilityURN.NOTIFICATION,
+                CapabilityURN.INTERLEAVE), getListener());
 
         final var argument = ArgumentCaptor.forClass(NetconfDeviceSchema.class);
         verify(facade, timeout(5000)).onDeviceConnected(argument.capture(), any(NetconfSessionPreferences.class),
