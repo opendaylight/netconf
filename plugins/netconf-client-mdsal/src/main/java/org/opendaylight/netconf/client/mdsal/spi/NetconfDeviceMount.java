@@ -21,6 +21,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.netconf.client.mdsal.api.NetconfRpcService;
+import org.opendaylight.netconf.client.mdsal.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceServices.Actions;
@@ -53,8 +54,12 @@ public class NetconfDeviceMount implements AutoCloseable {
 
     public void onDeviceConnected(final EffectiveModelContext initialCtx,
             final RemoteDeviceServices services, final DOMDataBroker broker,
-            final NetconfDataTreeService dataTreeService) {
-        onDeviceConnected(initialCtx, services, new NetconfDeviceNotificationService(), broker, dataTreeService);
+            final NetconfDataTreeService dataTreeService, final NetconfSessionPreferences sessionPreferences) {
+        if (sessionPreferences.isInterleaveSupported() && sessionPreferences.isNotificationsSupported()) {
+            onDeviceConnected(initialCtx, services, new NetconfDeviceNotificationService(), broker, dataTreeService);
+        } else {
+            onDeviceConnected(initialCtx, services, null, broker, dataTreeService);
+        }
     }
 
     public synchronized void onDeviceConnected(final EffectiveModelContext initialCtx,
@@ -83,7 +88,9 @@ public class NetconfDeviceMount implements AutoCloseable {
         if (dataTreeService != null) {
             mountBuilder.addService(NetconfDataTreeService.class, dataTreeService);
         }
-        mountBuilder.addService(DOMNotificationService.class, newNotificationService);
+        if (newNotificationService != null) {
+            mountBuilder.addService(DOMNotificationService.class, newNotificationService);
+        }
         notificationService = newNotificationService;
 
         topologyRegistration = mountBuilder.register();
