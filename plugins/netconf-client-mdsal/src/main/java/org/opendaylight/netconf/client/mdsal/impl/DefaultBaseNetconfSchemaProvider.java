@@ -139,7 +139,7 @@ public final class DefaultBaseNetconfSchemaProvider implements BaseNetconfSchema
             sessionPreferences.containsNonModuleCapability(CapabilityURN.STARTUP),
             sessionPreferences.containsNonModuleCapability(CapabilityURN.URL),
             sessionPreferences.containsNonModuleCapability(CapabilityURN.XPATH),
-            sessionPreferences.isNotificationsSupported(),
+            sessionPreferences.isNotificationsSupported() && sessionPreferences.isInterleaveSupported(),
             sessionPreferences.containsNonModuleCapability(CapabilityURN.YANG_LIBRARY)
                 || sessionPreferences.containsNonModuleCapability(CapabilityURN.YANG_LIBRARY_1_1),
             sessionPreferences.isMonitoringSupported()));
