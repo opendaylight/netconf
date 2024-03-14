@@ -174,7 +174,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     private boolean shouldListenOnSchemaChange(final NetconfSessionPreferences remoteSessionCapabilities) {
-        return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
+        return remoteSessionCapabilities.isNotificationsSupported() && remoteSessionCapabilities.isInterleaveSupported()
+            && reconnectOnSchemasChange;
     }
 
     private synchronized void handleSalInitializationSuccess(final NetconfDeviceCommunicator listener,
