@@ -138,7 +138,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         setConnected(true);
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
-        final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
+        final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()
+                && remoteSessionCapabilities.isInterleaveSupported());
         final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.getEffectiveModelContext(), listener,
             new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
         final var sourceResolverFuture = Futures.submit(new DeviceSourcesResolver(id, baseSchema, initRpc,
@@ -212,7 +213,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
     }
 
     private boolean shouldListenOnSchemaChange(final NetconfSessionPreferences remoteSessionCapabilities) {
-        return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
+        return remoteSessionCapabilities.isNotificationsSupported() && remoteSessionCapabilities.isInterleaveSupported()
+            && reconnectOnSchemasChange;
     }
 
     private synchronized void handleSalInitializationSuccess(final RemoteDeviceCommunicator listener,
@@ -226,7 +228,8 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
         }
 
         final var messageTransformer = new NetconfMessageTransformer(deviceSchema.mountContext(), true,
-            resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
+            resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()
+                && remoteSessionCapabilities.isInterleaveSupported()));
 
         // Order is important here: salFacade has to see the device come up and then the notificationHandler can deliver
         // whatever notifications have been held back
@@ -405,7 +408,9 @@ public class NetconfDevice implements RemoteDevice<NetconfDeviceCommunicator> {
             this.remoteSessionCapabilities = remoteSessionCapabilities;
 
             // If device supports notifications and does not contain necessary modules, add them automatically
-            if (remoteSessionCapabilities.containsNonModuleCapability(CapabilityURN.NOTIFICATION)) {
+            // also check if device supports interleave
+            if (remoteSessionCapabilities.containsNonModuleCapability(CapabilityURN.NOTIFICATION)
+                && remoteSessionCapabilities.containsNonModuleCapability(CapabilityURN.INTERLEAVE)) {
                 // FIXME: mutable collection modification!
                 deviceSources.getRequiredSourcesQName().addAll(List.of(
                     org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
