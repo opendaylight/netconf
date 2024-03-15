@@ -16,6 +16,24 @@
       "message": "Looks good, but also update other RpcImplementations",
       "revId": "da33ac11431ed398aacad7399bf02a70d7a5207d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72467f9e_41944fff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-03-15T19:43:28Z",
+      "side": 1,
+      "message": "Registration of another implementation is a bit challenging, when we use same logic as here we will have:\n```\norg.opendaylight.restconf.server.mdsal.streams.dtcl.CreateDataChangeEventSubscriptionRpc in bundle 250 (org.opendaylight.netconf.restconf-nb:7.0.2.SNAPSHOT) enabled, 1 instance.\n    Id: 77, State:FAILED ACTIVATION\norg.opendaylight.restconf.server.mdsal.streams.dtcl.CreateDataChangeEventSubscriptionRpc in bundle 250 (org.opendaylight.netconf.restconf-nb:7.0.2.SNAPSHOT) enabled, 1 instance.\n    Id: 77, State:FAILED ACTIVATION\n```\non `opendaylight-user@root\u003escr:list`\n\nProbably, we need to investigate what is going wrong, and fix it in a separate patch with new JIRA ticket",
+      "parentUuid": "df39576f_058749b9",
+      "revId": "da33ac11431ed398aacad7399bf02a70d7a5207d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
