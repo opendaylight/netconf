@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c16e731_6ec95041",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/AbstractNetconfTopology.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-03-15T15:57:47Z",
+      "side": 1,
+      "message": "netconfNode.getCredentials()",
+      "range": {
+        "startLine": 119,
+        "startChar": 52,
+        "endLine": 119,
+        "endChar": 63
+      },
+      "revId": "a607bc59fc38c7233ca9526c30153b4eab954fd6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe1d2f9c_15e8ed0f",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-03-15T15:57:47Z",
+      "side": 1,
+      "message": "If we need only credentials then why don\u0027t you send only credentials? Why pass whole node?",
+      "range": {
+        "startLine": 81,
+        "startChar": 32,
+        "endLine": 81,
+        "endChar": 60
+      },
+      "revId": "a607bc59fc38c7233ca9526c30153b4eab954fd6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
