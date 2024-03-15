@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13830ae8_c39d5c51",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/AbstractJukeboxTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-03-15T14:36:33Z",
+      "side": 1,
+      "message": "This is not necessary. Type for it is defined in the yang model so changing it here is redundant.",
+      "revId": "fe9c35bfa2e54385c688e289611d100a873013f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15c1ec6c_e6e84c04",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/AbstractJukeboxTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-03-15T14:36:33Z",
+      "side": 1,
+      "message": "Same here",
+      "revId": "fe9c35bfa2e54385c688e289611d100a873013f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
