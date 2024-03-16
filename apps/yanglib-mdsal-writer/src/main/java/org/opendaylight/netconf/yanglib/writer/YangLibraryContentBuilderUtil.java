@@ -158,17 +158,20 @@ final class YangLibraryContentBuilderUtil {
     }
 
     private static RevisionIdentifier buildRevision(final ModuleLike module) {
-        return module.getQNameModule().getRevision().map(rev -> new RevisionIdentifier(rev.toString())).orElse(null);
+        final var revision = module.getQNameModule().revision();
+        return revision != null ? new RevisionIdentifier(revision.toString()) : null;
     }
 
     private static CommonLeafs.Revision buildLegacyRevision(final ModuleLike module) {
-        return module.getQNameModule().getRevision()
-            .map(rev -> new CommonLeafs.Revision(new RevisionIdentifier(rev.toString()))).orElse(EMPTY_REVISION);
+        final var revision = module.getQNameModule().revision();
+        return revision != null ? new CommonLeafs.Revision(new RevisionIdentifier(revision.toString()))
+            : EMPTY_REVISION;
     }
 
     private static YangIdentifier buildModuleKeyName(final ModuleLike module) {
-        return new YangIdentifier(module.getName()
-            + module.getQNameModule().getRevision().map(revision -> "_" + revision).orElse(""));
+        final var revision = module.getQNameModule().revision();
+        return revision == null ? new YangIdentifier(module.getName()) :
+            new YangIdentifier(module.getName() + "_" + revision);
     }
 
     private static @NonNull Optional<Uri> buildSchemaSourceUrl(final @NonNull ModuleLike module,
