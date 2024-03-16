@@ -8,14 +8,11 @@
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractNotificationListenerTest {
-    protected static final QNameModule MODULE =
-        QNameModule.create(XMLNamespace.of("notifi:mod"), Revision.of("2016-11-23"));
+    protected static final QNameModule MODULE = QNameModule.ofRevision("notifi:mod", "2016-11-23");
     protected static final EffectiveModelContext MODEL_CONTEXT =
         YangParserTestUtils.parseYangResourceDirectory("/notifications");
 }
