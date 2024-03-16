@@ -13,14 +13,12 @@ import java.nio.charset.StandardCharsets;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractInstanceIdentifierTest {
-    protected static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
-        XMLNamespace.of("instance:identifier:module"), Revision.of("2014-01-17"));
+    protected static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME =
+        QNameModule.ofRevision("instance:identifier:module", "2014-01-17");
 
     protected static final QName CONT_QNAME = QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont");
     protected static final QName CONT1_QNAME = QName.create(CONT_QNAME, "cont1");
