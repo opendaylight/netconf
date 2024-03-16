@@ -25,6 +25,7 @@ import static org.opendaylight.mdsal.binding.api.DataObjectModification.Modifica
 
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
+import com.google.common.collect.ClassToInstanceMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,7 +134,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
         doNothing().when(mockListenerReg).close();
         doReturn(mockListenerReg).when(dataBroker).registerTreeChangeListener(any(), any());
-        doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any());
+        doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any(ClassToInstanceMap.class));
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
                 timer, schemaAssembler, actorSystem, clientFactory, mountPointService, encryptionService,

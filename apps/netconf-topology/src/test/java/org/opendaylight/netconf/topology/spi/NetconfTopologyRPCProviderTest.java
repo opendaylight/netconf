@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
+import com.google.common.collect.ClassToInstanceMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,7 +63,7 @@ public class NetconfTopologyRPCProviderTest {
     @Before
     public void setUp() throws Exception {
         doReturn(ENC_PWD.getBytes()).when(encryptionService).encrypt(TEST_PWD.getBytes());
-        doReturn(rpcReg).when(rpcProviderService).registerRpcImplementations(any());
+        doReturn(rpcReg).when(rpcProviderService).registerRpcImplementations(any(ClassToInstanceMap.class));
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, TOPOLOGY_ID);
     }
 

@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import akka.actor.ActorSystem;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
+import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FluentFuture;
@@ -270,7 +271,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         builderFactory = new NetconfClientConfigurationBuilderFactoryImpl(mockEncryptionService, credentialProvider,
             sslHandlerFactoryProvider);
 
-        doReturn(mockRpcReg).when(mockRpcProviderService).registerRpcImplementations(any());
+        doReturn(mockRpcReg).when(mockRpcProviderService).registerRpcImplementations(any(ClassToInstanceMap.class));
 
         setupMaster();
 
