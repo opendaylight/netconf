@@ -360,8 +360,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             return RestconfFuture.failed(new RestconfDocumentedException("RESTCONF is not available"));
         }
         return RestconfFuture.of(new NormalizedNodePayload(stack.toInference(),
-            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, stack.modelContext()
-                .findModuleStatements("ietf-yang-library").iterator().next().localQNameModule().getRevision()
-                .map(Revision::toString).orElse(""))));
+            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, stack.modelContext().findModuleStatements("ietf-yang-library")
+                .iterator().next().localQNameModule().revisionUnion().unionString())));
     }
 }

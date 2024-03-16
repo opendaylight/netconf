@@ -35,16 +35,14 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 @RunWith(Parameterized.class)
 public class RestconfDocumentedExceptionMapperTest {
-    private static final QNameModule MONITORING_MODULE_INFO = QNameModule.create(
-        XMLNamespace.of("instance:identifier:patch:module"), Revision.of("2015-11-21"));
+    private static final QNameModule MONITORING_MODULE_INFO =
+        QNameModule.ofRevision("instance:identifier:patch:module", "2015-11-21");
 
     private static RestconfDocumentedExceptionMapper exceptionMapper;
 

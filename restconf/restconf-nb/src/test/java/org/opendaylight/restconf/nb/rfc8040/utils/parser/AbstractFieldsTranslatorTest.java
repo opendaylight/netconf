@@ -23,20 +23,17 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractFieldsTranslatorTest<T> extends AbstractJukeboxTest {
-    private static final QNameModule Q_NAME_MODULE_TEST_SERVICES = QNameModule.create(
-        XMLNamespace.of("tests:test-services"), Revision.of("2019-03-25"));
-    private static final QNameModule Q_NAME_MODULE_AUGMENTED_JUKEBOX = QNameModule.create(
-        XMLNamespace.of("http://example.com/ns/augmented-jukebox"), Revision.of("2016-05-05"));
-    private static final QNameModule Q_NAME_MODULE_FOO = QNameModule.create(
-        XMLNamespace.of("urn:foo"), Revision.of("2023-03-27"));
+    private static final QNameModule Q_NAME_MODULE_TEST_SERVICES =
+        QNameModule.ofRevision("tests:test-services", "2019-03-25");
+    private static final QNameModule Q_NAME_MODULE_AUGMENTED_JUKEBOX =
+        QNameModule.ofRevision("http://example.com/ns/augmented-jukebox", "2016-05-05");
+    private static final QNameModule Q_NAME_MODULE_FOO = QNameModule.ofRevision("urn:foo", "2023-03-27");
 
     private static final EffectiveModelContext TEST_SERVICES_SCHEMA =
         YangParserTestUtils.parseYangResourceDirectory("/test-services");

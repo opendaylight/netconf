@@ -1250,8 +1250,8 @@ public abstract class RestconfStrategy {
                 .collect(ImmutableSet.toImmutableSet());
             if (!rpcNames.isEmpty()) {
                 final var namespace = entry.getKey();
-                table.computeIfAbsent(namespace.getNamespace(), ignored -> new HashMap<>())
-                    .put(namespace.getRevision().orElse(null), rpcNames);
+                table.computeIfAbsent(namespace.namespace(), ignored -> new HashMap<>())
+                    .put(namespace.revision(), rpcNames);
             }
         }
 
@@ -1261,7 +1261,7 @@ public abstract class RestconfStrategy {
             entry.getValue().entrySet().stream()
             .sorted(Comparator.comparing(Entry::getKey, (first, second) -> Revision.compare(second, first)))
             .findFirst()
-            .ifPresent(row -> rpcs.putAll(QNameModule.create(entry.getKey(), row.getKey()), row.getValue()));
+            .ifPresent(row -> rpcs.putAll(QNameModule.of(entry.getKey(), row.getKey()), row.getValue()));
         }
         return RestconfFuture.of(new OperationsGetResult.Container(modelContext, rpcs.build()));
     }
