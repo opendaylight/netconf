@@ -46,6 +46,7 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -71,8 +72,9 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
 
     @BeforeEach
     final void setupRestconf() {
-        restconf = new JaxRsRestconf(new MdsalRestconfServer(new FixedDOMSchemaService(modelContext()), dataBroker,
-            rpcService, actionService, mountPointService));
+        restconf = new JaxRsRestconf(new MdsalRestconfServer(
+            new MdsalDatabindProvider(new FixedDOMSchemaService(modelContext())), dataBroker, rpcService, actionService,
+            mountPointService));
     }
 
     EffectiveModelContext modelContext() {

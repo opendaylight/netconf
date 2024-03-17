@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
  * RESTCONF implementation of {@link CreateNotificationStream}.
  */
 @Singleton
-@Component
+@Component(service = RpcImplementation.class)
 public final class CreateNotificationStreamRpc extends RpcImplementation {
     private static final NodeIdentifier SAL_REMOTE_OUTPUT_NODEID =
         NodeIdentifier.create(CreateDataChangeEventSubscriptionOutput.QNAME);
