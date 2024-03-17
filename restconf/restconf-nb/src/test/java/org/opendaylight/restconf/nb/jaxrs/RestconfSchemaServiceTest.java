@@ -9,8 +9,6 @@ package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertEntity;
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertError;
@@ -18,7 +16,6 @@ import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertErro
 import com.google.common.util.concurrent.Futures;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,8 +25,9 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -45,11 +43,9 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfSchemaServiceTest {
     // schema context with modules
-    private static final EffectiveModelContext SCHEMA_CONTEXT =
+    private static final EffectiveModelContext MODEL_CONTEXT =
         YangParserTestUtils.parseYangResourceDirectory("/modules");
 
-    @Mock
-    private DOMSchemaService schemaService;
     @Mock
     private YangTextSourceExtension sourceProvider;
     @Mock
@@ -70,12 +66,9 @@ public class RestconfSchemaServiceTest {
 
     @Before
     public void setup() throws Exception {
-        doReturn(SCHEMA_CONTEXT).when(schemaService).getGlobalContext();
-        doCallRealMethod().when(schemaService).extension(any());
-        doReturn(List.of(sourceProvider)).when(schemaService).supportedExtensions();
-
-        restconf = new JaxRsRestconf(new MdsalRestconfServer(schemaService, dataBroker, rpcService, actionService,
-            mountPointService));
+        restconf = new JaxRsRestconf(new MdsalRestconfServer(
+            new MdsalDatabindProvider(new FixedDOMSchemaService(() -> MODEL_CONTEXT, sourceProvider)), dataBroker,
+            rpcService, actionService, mountPointService));
     }
 
     /**

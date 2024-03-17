@@ -29,8 +29,6 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
@@ -55,11 +53,9 @@ import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
-import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.Restconf;
-import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -67,7 +63,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangNames;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
@@ -77,13 +72,14 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * A RESTCONF server implemented on top of MD-SAL.
  */
 @Singleton
-@Component(service = { RestconfServer.class, DatabindProvider.class })
-public final class MdsalRestconfServer implements RestconfServer, DatabindProvider, AutoCloseable {
+@Component(service = RestconfServer.class)
+public final class MdsalRestconfServer implements RestconfServer, AutoCloseable {
     private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
     private static final VarHandle LOCAL_STRATEGY;
 
@@ -98,67 +94,58 @@ public final class MdsalRestconfServer implements RestconfServer, DatabindProvid
 
     private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
     private final @NonNull DOMMountPointService mountPointService;
+    private final @NonNull MdsalDatabindProvider databindProvider;
     private final @NonNull DOMDataBroker dataBroker;
     private final @Nullable DOMRpcService rpcService;
     private final @Nullable DOMActionService actionService;
-    private final @Nullable YangTextSourceExtension sourceProvider;
 
-    private final Registration reg;
-
-    @SuppressWarnings("unused")
     @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile MdsalRestconfStrategy localStrategy;
 
     @Inject
     @Activate
-    public MdsalRestconfServer(@Reference final DOMSchemaService schemaService,
+    public MdsalRestconfServer(@Reference final MdsalDatabindProvider databindProvider,
             @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
             @Reference final DOMActionService actionService,
             @Reference final DOMMountPointService mountPointService,
-            @Reference final List<RpcImplementation> localRpcs) {
+            @Reference(policyOption = ReferencePolicyOption.GREEDY) final List<RpcImplementation> localRpcs) {
+        this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcService = requireNonNull(rpcService);
         this.actionService = requireNonNull(actionService);
         this.mountPointService = requireNonNull(mountPointService);
-        this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
-        sourceProvider = schemaService.extension(YangTextSourceExtension.class);
 
-        localStrategy = createLocalStrategy(schemaService.getGlobalContext());
-        reg = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
+        this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
+        localStrategy = createLocalStrategy(databindProvider.currentDatabind());
     }
 
-    public MdsalRestconfServer(final DOMSchemaService schemaService, final DOMDataBroker dataBroker,
+    public MdsalRestconfServer(final MdsalDatabindProvider databindProvider, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMMountPointService mountPointService, final RpcImplementation... localRpcs) {
-        this(schemaService, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
+        this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
     }
 
-    @Override
-    public DatabindContext currentDatabind() {
-        return localStrategy().databind();
-    }
-
-    private void onModelContextUpdated(final EffectiveModelContext newModelContext) {
-        final var local = localStrategy();
-        if (!newModelContext.equals(local.modelContext())) {
-            LOCAL_STRATEGY.setRelease(this, createLocalStrategy(newModelContext));
-        }
-    }
-
-    private @NonNull MdsalRestconfStrategy createLocalStrategy(final EffectiveModelContext modelContext) {
-        return new MdsalRestconfStrategy(DatabindContext.ofModel(modelContext), dataBroker, rpcService, actionService,
-            sourceProvider, mountPointService, localRpcs);
+    private @NonNull MdsalRestconfStrategy createLocalStrategy(final DatabindContext databind) {
+        return new MdsalRestconfStrategy(databind, dataBroker, rpcService, actionService,
+            databindProvider.sourceProvider(), mountPointService, localRpcs);
     }
 
     private @NonNull MdsalRestconfStrategy localStrategy() {
-        return verifyNotNull((MdsalRestconfStrategy) LOCAL_STRATEGY.getAcquire(this));
+        final var strategy = verifyNotNull((@NonNull MdsalRestconfStrategy) LOCAL_STRATEGY.getAcquire(this));
+        final var databind = databindProvider.currentDatabind();
+        return databind.equals(strategy.databind()) ? strategy : updateLocalStrategy(databind);
+    }
+
+    private @NonNull MdsalRestconfStrategy updateLocalStrategy(final DatabindContext databind) {
+        final var strategy = createLocalStrategy(databind);
+        localStrategy = strategy;
+        return strategy;
     }
 
     @PreDestroy
     @Deactivate
     @Override
     public void close() {
-        reg.close();
         localStrategy = null;
     }
 

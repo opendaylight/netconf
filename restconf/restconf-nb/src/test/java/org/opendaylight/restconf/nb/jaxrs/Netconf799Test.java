@@ -34,6 +34,7 @@ import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -67,8 +68,9 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
             .build())))
             .when(actionService).invokeAction(eq(RESET_PATH), any(), any());
 
-        final var restconf = new JaxRsRestconf(new MdsalRestconfServer(new FixedDOMSchemaService(IID_SCHEMA),
-            dataBroker, rpcService, actionService, mountPointService));
+        final var restconf = new JaxRsRestconf(new MdsalRestconfServer(
+            new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)), dataBroker, rpcService, actionService,
+            mountPointService));
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
         restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
@@ -91,8 +93,9 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
             .build())))
             .when(actionService).invokeAction(eq(RESET_PATH), any(), any());
 
-        final var restconf = new JaxRsRestconf(new MdsalRestconfServer(new FixedDOMSchemaService(IID_SCHEMA),
-            dataBroker, rpcService, actionService, mountPointService));
+        final var restconf = new JaxRsRestconf(new MdsalRestconfServer(
+            new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)), dataBroker, rpcService, actionService,
+            mountPointService));
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
         restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),

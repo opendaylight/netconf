@@ -8,15 +8,11 @@
 package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertEntity;
 import static org.opendaylight.restconf.nb.jaxrs.AbstractRestconfTest.assertError;
 
 import com.google.common.io.CharStreams;
 import java.io.Reader;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,11 +22,11 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
+import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -59,10 +55,6 @@ public class RestconfSchemaServiceMountTest {
 
     // handlers
     @Mock
-    private DOMSchemaService schemaService;
-    @Mock
-    private YangTextSourceExtension sourceProvider;
-    @Mock
     private DOMDataBroker dataBroker;
     @Mock
     private DOMActionService actionService;
@@ -89,12 +81,9 @@ public class RestconfSchemaServiceMountTest {
                 .createMountPoint(YangInstanceIdentifier.of(QName.create("mount:point:2", "2016-01-01", "cont")))
                 .register();
 
-        doCallRealMethod().when(schemaService).extension(any());
-        doReturn(List.of(sourceProvider)).when(schemaService).supportedExtensions();
-        doReturn(SCHEMA_CONTEXT_WITH_MOUNT_POINTS).when(schemaService).getGlobalContext();
-
-        restconf = new JaxRsRestconf(new MdsalRestconfServer(schemaService, dataBroker, rpcService, actionService,
-            mountPointService));
+        restconf = new JaxRsRestconf(new MdsalRestconfServer(
+            new MdsalDatabindProvider(new FixedDOMSchemaService(SCHEMA_CONTEXT_WITH_MOUNT_POINTS)), dataBroker,
+            rpcService, actionService, mountPointService));
     }
 
     /**
