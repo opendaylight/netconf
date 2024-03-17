@@ -25,7 +25,6 @@ import static org.mockito.Mockito.verify;
 import akka.actor.ActorSystem;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
-import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FluentFuture;
@@ -132,6 +131,7 @@ import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.Rpc;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -271,7 +271,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         builderFactory = new NetconfClientConfigurationBuilderFactoryImpl(mockEncryptionService, credentialProvider,
             sslHandlerFactoryProvider);
 
-        doReturn(mockRpcReg).when(mockRpcProviderService).registerRpcImplementations(any(ClassToInstanceMap.class));
+        doReturn(mockRpcReg).when(mockRpcProviderService).registerRpcImplementations(any(Rpc[].class));
 
         setupMaster();
 
