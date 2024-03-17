@@ -15,8 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -58,8 +56,7 @@ class FieldsSchemalessRpcStructureTransformerTest {
      *     }
      * }
      */
-    private static final QNameModule TEST_MODULE = QNameModule.create(
-            XMLNamespace.of("test-namespace"), Revision.of("2020-10-25"));
+    private static final QNameModule TEST_MODULE = QNameModule.ofRevision("test-namespace", "2020-10-25");
 
     private static final NodeIdentifier C1_NID = new NodeIdentifier(QName.create(TEST_MODULE, "c-1"));
     private static final NodeIdentifier C2_NID = new NodeIdentifier(QName.create(TEST_MODULE, "c-2"));
