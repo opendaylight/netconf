@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d813f33_6b896ae5",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfClientConfigurationBuilderFactoryImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-17T14:38:44Z",
+      "side": 1,
+      "message": "let\u0027s not keep this FIXME, update the model instead",
+      "range": {
+        "startLine": 78,
+        "startChar": 15,
+        "endLine": 78,
+        "endChar": 20
+      },
+      "revId": "1cdc6eafcc72ddc6a60d59c4acb232827d31c510",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
