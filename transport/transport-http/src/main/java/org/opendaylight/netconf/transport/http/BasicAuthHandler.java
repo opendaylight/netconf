@@ -21,10 +21,12 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.ReferenceCountUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Map;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.Crypt;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.client.authentication.users.user.auth.type.Basic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,14 +44,11 @@ final class BasicAuthHandler extends SimpleChannelInboundHandler<HttpMessage> {
 
     private static final Logger LOG = LoggerFactory.getLogger(BasicAuthHandler.class);
     private static final Pattern CRYPT_HASH_PATTERN = Pattern.compile(
-        // clear text, or
-        "\\$0\\$.*"
-        // MD5, or
-        + "|\\$1\\$[a-zA-Z0-9./]{1,8}\\$[a-zA-Z0-9./]{22}"
-        // SHA-256, or
-        + "|\\$5\\$(rounds=\\d+\\$)?[a-zA-Z0-9./]{1,16}\\$[a-zA-Z0-9./]{43}"
-        // SHA-512
-        + "|\\$6\\$(rounds=\\d+\\$)?[a-zA-Z0-9./]{1,16}\\$[a-zA-Z0-9./]{86}");
+        """
+            \\$0\\$.*\
+            |\\$1\\$[a-zA-Z0-9./]{1,8}\\$[a-zA-Z0-9./]{22}\
+            |\\$5\\$(rounds=\\d+\\$)?[a-zA-Z0-9./]{1,16}\\$[a-zA-Z0-9./]{43}\
+            |\\$6\\$(rounds=\\d+\\$)?[a-zA-Z0-9./]{1,16}\\$[a-zA-Z0-9./]{86}""");
     private static final String DEFAULT_SALT = "$5$rounds=3500$default";
 
     public static final String BASIC_AUTH_PREFIX = "Basic ";
@@ -57,22 +56,38 @@ final class BasicAuthHandler extends SimpleChannelInboundHandler<HttpMessage> {
 
     private final ImmutableMap<String, CryptHash> knownHashes;
 
-    BasicAuthHandler(final Map<String, String> userHashes) {
-        if (userHashes.isEmpty()) {
-            throw new IllegalArgumentException("Hashes map should not be empty");
+    private BasicAuthHandler(final ImmutableMap<String, CryptHash> knownHashes) {
+        this.knownHashes = requireNonNull(knownHashes);
+    }
+
+    static @Nullable BasicAuthHandler ofNullable(final HttpServerGrouping httpParams) {
+        if (httpParams == null) {
+            return null;
+        }
+        final var clientAuth = httpParams.getClientAuthentication();
+        if (clientAuth == null) {
+            return null;
         }
 
-        final var mapBuilder = ImmutableMap.<String, CryptHash>builder();
-        for (var entry : userHashes.entrySet()) {
-            final var hash = entry.getValue();
-            if (!CRYPT_HASH_PATTERN.matcher(hash).matches()) {
-                throw new IllegalArgumentException("Invalid crypt hash string \"" + hash + '"');
+        // Basic authorization handler
+        final var builder = ImmutableMap.<String, CryptHash>builder();
+        clientAuth.nonnullUsers().nonnullUser().forEach(
+            (ignored, user) -> {
+                if (user.getAuthType() instanceof Basic basicAuth) {
+                    final var basic = basicAuth.nonnullBasic();
+                    final var hashedPassword = basic.nonnullPassword().requireHashedPassword().getValue();
+                    if (!CRYPT_HASH_PATTERN.matcher(hashedPassword).matches()) {
+                        throw new IllegalArgumentException("Invalid crypt hash string \"" + hashedPassword + '"');
+                    }
+
+                    builder.put(basic.requireUsername(), hashedPassword.startsWith("$0$")
+                      ? new CryptHash(DEFAULT_SALT, Crypt.crypt(hashedPassword.substring(3), DEFAULT_SALT))
+                      : new CryptHash(hashedPassword.substring(0, hashedPassword.lastIndexOf('$')), hashedPassword));
+                }
             }
-            mapBuilder.put(entry.getKey(), hash.startsWith("$0$")
-                ? new CryptHash(DEFAULT_SALT, Crypt.crypt(hash.substring(3), DEFAULT_SALT))
-                    : new CryptHash(hash.substring(0, hash.lastIndexOf('$')), hash));
-        }
-        knownHashes = mapBuilder.build();
+        );
+        final var knownHashes = builder.build();
+        return knownHashes.isEmpty() ? null : new BasicAuthHandler(knownHashes);
     }
 
     @Override

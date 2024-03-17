@@ -14,7 +14,6 @@ import static io.netty.handler.codec.http.HttpHeaderValues.TEXT_PLAIN;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 import static org.opendaylight.netconf.transport.http.Http2Utils.copyStreamId;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -46,7 +45,6 @@ import io.netty.util.AsciiString;
 import io.netty.util.ReferenceCountUtil;
 import java.nio.charset.StandardCharsets;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.client.authentication.users.user.auth.type.Basic;
 
 /**
  * Netty channel initializer for Http Server.
@@ -60,7 +58,7 @@ class ServerChannelInitializer extends ChannelInitializer<Channel> implements Ht
 
     ServerChannelInitializer(final HttpServerGrouping httpParams, final RequestDispatcher dispatcher) {
         super();
-        this.authHandler = authHandler(httpParams);
+        authHandler = BasicAuthHandler.ofNullable(httpParams);
         this.dispatcher = dispatcher;
     }
 
@@ -152,33 +150,13 @@ class ServerChannelInitializer extends ChannelInitializer<Channel> implements Ht
 
     private static HttpServerUpgradeHandler.UpgradeCodecFactory upgradeCodecFactory(
             final Http2ConnectionHandler connectionHandler) {
-        return new HttpServerUpgradeHandler.UpgradeCodecFactory() {
-            @Override
-            public HttpServerUpgradeHandler.UpgradeCodec newUpgradeCodec(CharSequence protocol) {
-                if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
-                    return new Http2ServerUpgradeCodec(connectionHandler);
-                } else {
-                    return null;
-                }
+        return protocol -> {
+            if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
+                return new Http2ServerUpgradeCodec(connectionHandler);
+            } else {
+                return null;
             }
         };
-    }
-
-    private static ChannelHandler authHandler(final HttpServerGrouping httpParams) {
-        if (httpParams == null || httpParams.getClientAuthentication() == null) {
-            return null;
-        }
-        // Basic authorization handler
-        final var userMap = ImmutableMap.<String, String>builder();
-        httpParams.getClientAuthentication().nonnullUsers().nonnullUser().forEach(
-            (ignored, user) -> {
-                if (user.getAuthType() instanceof Basic basicAuth) {
-                    userMap.put(basicAuth.getBasic().requireUsername(),
-                        basicAuth.getBasic().nonnullPassword().requireHashedPassword().getValue());
-                }
-            }
-        );
-        return new BasicAuthHandler(userMap.build());
     }
 
     private static ChannelHandler serverHandler(final RequestDispatcher dispatcher) {

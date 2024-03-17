@@ -11,7 +11,6 @@ import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.transport.http.BasicAuthHandler.BASIC_AUTH_PREFIX;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -20,40 +19,32 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpClientUpgradeHandler;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http2.Http2ClientUpgradeCodec;
 import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
 import io.netty.handler.ssl.SslHandler;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.crypto.types.rev240208.password.grouping.password.type.CleartextPassword;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.HttpClientGrouping;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.client.rev240208.http.client.identity.grouping.client.identity.auth.type.Basic;
 
 /**
  * Netty channel initializer for Http Client.
  */
-class ClientChannelInitializer extends ChannelInitializer<Channel> implements HttpChannelInitializer {
+final class ClientChannelInitializer extends ChannelInitializer<Channel> implements HttpChannelInitializer {
     private static final int MAX_HTTP_CONTENT_LENGTH = 16 * 1024;
 
     private final SettableFuture<Void> completeFuture = SettableFuture.create();
-    private final ChannelHandler authHandler;
     private final ChannelHandler dispatcherHandler;
+    private final ClientAuthProvider authProvider;
     private final boolean http2;
 
     ClientChannelInitializer(final HttpClientGrouping httpParams, final ChannelHandler dispatcherHandler,
             final boolean http2) {
-        authHandler = authHandler(httpParams);
         this.dispatcherHandler = requireNonNull(dispatcherHandler);
+        authProvider = ClientAuthProvider.ofNullable(httpParams);
         this.http2 = http2;
     }
 
@@ -92,8 +83,8 @@ class ClientChannelInitializer extends ChannelInitializer<Channel> implements Ht
         if (http2) {
             pipeline.addLast(Http2Utils.clientSettingsHandler());
         }
-        if (authHandler != null) {
-            pipeline.addLast(authHandler);
+        if (authProvider != null) {
+            pipeline.addLast(authProvider);
         }
         pipeline.addLast(dispatcherHandler);
 
@@ -106,7 +97,7 @@ class ClientChannelInitializer extends ChannelInitializer<Channel> implements Ht
     private ChannelHandler apnHandler(final ChannelHandler connectionHandler) {
         return new ApplicationProtocolNegotiationHandler("") {
             @Override
-            protected void configurePipeline(ChannelHandlerContext ctx, String protocol) {
+            protected void configurePipeline(final ChannelHandlerContext ctx, final String protocol) {
                 if (ApplicationProtocolNames.HTTP_2.equals(protocol)) {
                     final var pipeline = ctx.pipeline();
                     pipeline.addLast(connectionHandler);
@@ -122,16 +113,15 @@ class ClientChannelInitializer extends ChannelInitializer<Channel> implements Ht
     protected ChannelHandler upgradeRequestHandler() {
         return new ChannelInboundHandlerAdapter() {
             @Override
-            public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            public void channelActive(final ChannelHandlerContext ctx) throws Exception {
                 // trigger upgrade by simple GET request;
                 // required headers and flow will be handled by HttpClientUpgradeHandler
-                final var upgradeRequest = new DefaultFullHttpRequest(HTTP_1_1, GET, "/", EMPTY_BUFFER);
-                ctx.writeAndFlush(upgradeRequest);
+                ctx.writeAndFlush(new DefaultFullHttpRequest(HTTP_1_1, GET, "/", EMPTY_BUFFER));
                 ctx.fireChannelActive();
             }
 
             @Override
-            public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+            public void userEventTriggered(final ChannelHandlerContext ctx, final Object evt) throws Exception {
                 // process upgrade result
                 if (evt == HttpClientUpgradeHandler.UpgradeEvent.UPGRADE_SUCCESSFUL) {
                     configureEndOfPipeline(ctx.pipeline());
@@ -141,32 +131,5 @@ class ClientChannelInitializer extends ChannelInitializer<Channel> implements Ht
                 }
             }
         };
-    }
-
-    private static ChannelHandler authHandler(final HttpClientGrouping httpParams) {
-        if (httpParams == null || httpParams.getClientIdentity() == null) {
-            return null;
-        }
-        // Basic authorization handler, sets authorization header on outgoing requests
-        final var authType = httpParams.getClientIdentity().getAuthType();
-        if (authType instanceof Basic basicAuth) {
-            final var username = basicAuth.getBasic().getUserId();
-            final var password = basicAuth.getBasic().getPasswordType() instanceof CleartextPassword clearText
-                ? clearText.requireCleartextPassword() : "";
-            final var authHeader = BASIC_AUTH_PREFIX + Base64.getEncoder()
-                .encodeToString((username + ":" + password).getBytes(StandardCharsets.UTF_8));
-
-            return new ChannelOutboundHandlerAdapter() {
-                @Override
-                public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise)
-                        throws Exception {
-                    if (msg instanceof HttpRequest request) {
-                        request.headers().set(HttpHeaderNames.AUTHORIZATION, authHeader);
-                    }
-                    super.write(ctx, msg, promise);
-                }
-            };
-        }
-        return null;
     }
 }

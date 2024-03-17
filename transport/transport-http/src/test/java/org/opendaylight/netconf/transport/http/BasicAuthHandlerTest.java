@@ -23,28 +23,88 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.commons.codec.digest.Crypt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana.crypt.hash.rev140806.CryptHash;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.HttpServerGrouping;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.ClientAuthentication;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.ClientAuthenticationBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.client.authentication.users.UserBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.client.authentication.users.user.auth.type.basic.BasicBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208.http.server.grouping.client.authentication.users.user.auth.type.basic.basic.PasswordBuilder;
+import org.opendaylight.yangtools.yang.binding.util.BindingMap;
 
 public class BasicAuthHandlerTest {
     private static final String USERNAME1 = "username-1";
     private static final String USERNAME2 = "username-2";
     private static final String PASSWORD1 = "pa$$W0rd!1";
     private static final String PASSWORD2 = "pa$$W0rd#2";
-    private static final Map<String, String> USER_HASHES_MAP = Map.of(
-        USERNAME1, "$0$" + PASSWORD1,
-        USERNAME2, Crypt.crypt(PASSWORD2, "$6$rounds=4500$sha512salt"));
+    private static final String HASHED_PASSWORD2 = Crypt.crypt(PASSWORD2, "$6$rounds=4500$sha512salt");
 
     private EmbeddedChannel channel;
 
     @BeforeEach
     void beforeEach() {
-        channel = new EmbeddedChannel(new BasicAuthHandler(USER_HASHES_MAP));
+        final var authHandler = BasicAuthHandler.ofNullable(new HttpServerGrouping() {
+            @Override
+            public Class<? extends HttpServerGrouping> implementedInterface() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public String getServerName() {
+                return null;
+            }
+
+            @Override
+            public ClientAuthentication getClientAuthentication() {
+                final var user1 = new UserBuilder()
+                    .setUserId(USERNAME1)
+                    .setAuthType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208
+                            .http.server.grouping.client.authentication.users.user.auth.type.BasicBuilder()
+                        .setBasic(new BasicBuilder()
+                            .setUsername(USERNAME1)
+                            .setPassword(new PasswordBuilder()
+                                .setHashedPassword(new CryptHash("$0$" + PASSWORD1))
+                                .build())
+                            .build())
+                        .build())
+                    .build();
+                final var user2 = new UserBuilder()
+                    .setUserId(USERNAME2)
+                    .setAuthType(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208
+                            .http.server.grouping.client.authentication.users.user.auth.type.BasicBuilder()
+                        .setBasic(new BasicBuilder()
+                            .setPassword(new PasswordBuilder()
+                                .setHashedPassword(new CryptHash(HASHED_PASSWORD2))
+                                .build())
+                            .build())
+                        .build())
+                    .build();
+
+                return new ClientAuthenticationBuilder()
+                    .setUsers(new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.http.server.rev240208
+                            .http.server.grouping.client.authentication.UsersBuilder()
+                        .setUser(BindingMap.of(
+                            new UserBuilder()
+                                .setUserId(user1.requireUserId())
+                                .setAuthType(user1.getAuthType())
+                                .build(),
+                            new UserBuilder()
+                                .setUserId(user2.requireUserId())
+                                .setAuthType(user2.getAuthType())
+                                .build()))
+                        .build())
+                    .build();
+            }
+        });
+        assertNotNull(authHandler);
+
+        channel = new EmbeddedChannel(authHandler);
     }
 
     @ParameterizedTest(name = "BasicAuth success: {0} password configured")
