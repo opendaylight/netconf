@@ -9,7 +9,6 @@ package org.opendaylight.netconf.keystore.legacy.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.eclipse.jdt.annotation.NonNull;
@@ -18,14 +17,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.singleton.api.ClusterSingletonService;
 import org.opendaylight.mdsal.singleton.api.ServiceGroupIdentifier;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddKeystoreEntry;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddPrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddTrustedCertificate;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemoveKeystoreEntry;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemovePrivateKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.RemoveTrustedCertificate;
 import org.opendaylight.yangtools.concepts.Registration;
-import org.opendaylight.yangtools.yang.binding.Rpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,14 +51,13 @@ final class RpcSingleton implements ClusterSingletonService {
         }
 
         LOG.debug("Registering RPC implementations");
-        reg = rpcProvider.registerRpcImplementations(ImmutableClassToInstanceMap.<Rpc<?, ?>>builder()
-            .put(AddKeystoreEntry.class, new DefaultAddKeystoreEntry(dataBroker, encryptionService))
-            .put(RemoveKeystoreEntry.class, new DefaultRemoveKeystoreEntry(dataBroker))
-            .put(AddPrivateKey.class, new DefaultAddPrivateKey(dataBroker))
-            .put(RemovePrivateKey.class, new DefaultRemovePrivateKey(dataBroker))
-            .put(AddTrustedCertificate.class, new DefaultAddTrustedCertificate(dataBroker))
-            .put(RemoveTrustedCertificate.class, new DefaultRemoveTrustedCertificate(dataBroker))
-            .build());
+        reg = rpcProvider.registerRpcImplementations(
+            new DefaultAddKeystoreEntry(dataBroker, encryptionService),
+            new DefaultRemoveKeystoreEntry(dataBroker),
+            new DefaultAddPrivateKey(dataBroker),
+            new DefaultRemovePrivateKey(dataBroker),
+            new DefaultAddTrustedCertificate(dataBroker),
+            new DefaultRemoveTrustedCertificate(dataBroker));
         LOG.info("This node is now owning NETCONF keystore configuration");
     }
 
