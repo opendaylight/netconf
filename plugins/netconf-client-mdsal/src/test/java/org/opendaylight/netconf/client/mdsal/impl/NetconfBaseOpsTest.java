@@ -52,9 +52,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.output.Data;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
@@ -66,8 +64,7 @@ import org.xml.sax.SAXException;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfBaseOpsTest extends AbstractTestModelTest {
-    private static final QNameModule TEST_MODULE = QNameModule.create(
-            XMLNamespace.of("test:namespace"), Revision.of("2013-07-22"));
+    private static final QNameModule TEST_MODULE = QNameModule.ofRevision("test:namespace", "2013-07-22");
 
     private static final QName CONTAINER_C_QNAME = QName.create(TEST_MODULE, "c");
     private static final NodeIdentifier CONTAINER_C_NID = NodeIdentifier.create(CONTAINER_C_QNAME);
