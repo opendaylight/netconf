@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b6ee929_ae16458e",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 794,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-17T14:53:56Z",
+      "side": 1,
+      "message": "remove this",
+      "range": {
+        "startLine": 794,
+        "startChar": 16,
+        "endLine": 794,
+        "endChar": 52
+      },
+      "revId": "398a5c8708c9e5e3678de9a4d442e3e4b1b93d28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cd73981_24cafaaa",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 797,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-17T14:53:56Z",
+      "side": 1,
+      "message": "seems to be addressed by this patch",
+      "range": {
+        "startLine": 797,
+        "startChar": 16,
+        "endLine": 797,
+        "endChar": 78
+      },
+      "revId": "398a5c8708c9e5e3678de9a4d442e3e4b1b93d28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e348464_9cd9afa2",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 804,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-17T14:53:56Z",
+      "side": 1,
+      "message": "re-formulate this FIXME to say that \u0027if we are to support yang-ext:mount\u0027, we also need to implement the yang-library rewrite",
+      "range": {
+        "startLine": 802,
+        "startChar": 16,
+        "endLine": 804,
+        "endChar": 33
+      },
+      "revId": "398a5c8708c9e5e3678de9a4d442e3e4b1b93d28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08816e3f_a2060d42",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 904,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-17T14:53:56Z",
+      "side": 1,
+      "message": "yeah, let\u0027s just not not support these right now (addressing part of the above FIXME)",
+      "range": {
+        "startLine": 904,
+        "startChar": 63,
+        "endLine": 904,
+        "endChar": 77
+      },
+      "revId": "398a5c8708c9e5e3678de9a4d442e3e4b1b93d28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
