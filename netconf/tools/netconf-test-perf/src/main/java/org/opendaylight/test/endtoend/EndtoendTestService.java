@@ -12,7 +12,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.MountPointService;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ListNodes;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ListNodesOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ShowNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ncmount.rev150105.ShowNodeOutput;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -20,15 +26,21 @@ import org.osgi.service.component.annotations.Reference;
 
 @Singleton
 @Component(immediate = true)
-public class EndtoendTestService implements AutoCloseable {
+public final class EndtoendTestService implements AutoCloseable {
     private final Registration registration;
 
     @Inject
     @Activate
     public EndtoendTestService(final @Reference RpcProviderService rpcProviderService,
-                               final @Reference MountPointService mountPointService) {
-        final var ncmountRpcs = new NcmountRpcs(mountPointService);
-        registration = rpcProviderService.registerRpcImplementations(ncmountRpcs.getRpcClassToInstanceMap());
+            final @Reference MountPointService mountPointService) {
+        registration = rpcProviderService.registerRpcImplementations(
+            new WriteRoutesImpl(mountPointService),
+            (ShowNode) input -> RpcResultBuilder.<ShowNodeOutput>failed()
+                .withError(ErrorType.APPLICATION, "Not implemented")
+                .buildFuture(),
+            (ListNodes) input -> RpcResultBuilder.<ListNodesOutput>failed()
+                .withError(ErrorType.APPLICATION, "Not implemented")
+                .buildFuture());
     }
 
     @Override
@@ -37,4 +49,5 @@ public class EndtoendTestService implements AutoCloseable {
     public void close() {
         registration.close();
     }
+
 }
