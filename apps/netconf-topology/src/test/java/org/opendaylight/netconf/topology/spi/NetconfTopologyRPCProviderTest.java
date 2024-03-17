@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-import com.google.common.collect.ClassToInstanceMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +39,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev23
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev231121.rpc.credentials.rpc.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yangtools.concepts.Registration;
+import org.opendaylight.yangtools.yang.binding.Rpc;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -63,7 +63,7 @@ public class NetconfTopologyRPCProviderTest {
     @Before
     public void setUp() throws Exception {
         doReturn(ENC_PWD.getBytes()).when(encryptionService).encrypt(TEST_PWD.getBytes());
-        doReturn(rpcReg).when(rpcProviderService).registerRpcImplementations(any(ClassToInstanceMap.class));
+        doReturn(rpcReg).when(rpcProviderService).registerRpcImplementations(any(Rpc[].class));
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, TOPOLOGY_ID);
     }
 

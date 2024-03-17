@@ -25,7 +25,6 @@ import static org.opendaylight.mdsal.binding.api.DataObjectModification.Modifica
 
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
-import com.google.common.collect.ClassToInstanceMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +75,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyStep;
+import org.opendaylight.yangtools.yang.binding.Rpc;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
@@ -134,7 +134,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
         doNothing().when(mockListenerReg).close();
         doReturn(mockListenerReg).when(dataBroker).registerTreeChangeListener(any(), any());
-        doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any(ClassToInstanceMap.class));
+        doReturn(mockRpcReg).when(rpcProviderService).registerRpcImplementations(any(Rpc[].class));
 
         netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, clusterSingletonServiceProvider,
                 timer, schemaAssembler, actorSystem, clientFactory, mountPointService, encryptionService,
