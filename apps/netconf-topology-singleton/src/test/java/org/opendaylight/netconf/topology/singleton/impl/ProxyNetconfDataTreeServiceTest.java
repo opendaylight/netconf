@@ -46,7 +46,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
@@ -56,7 +56,7 @@ public class ProxyNetconfDataTreeServiceTest {
         new RemoteDeviceId("dev1", InetSocketAddress.createUnresolved("localhost", 17830));
     private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
     private static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
-    private static final ContainerNode NODE = Builders.containerBuilder()
+    private static final ContainerNode NODE = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
         .build();
 

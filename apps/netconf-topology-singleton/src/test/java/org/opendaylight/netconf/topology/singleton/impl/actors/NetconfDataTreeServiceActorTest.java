@@ -61,14 +61,14 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfDataTreeServiceActorTest {
     static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
     static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
-    static final ContainerNode NODE = Builders.containerBuilder()
+    static final ContainerNode NODE = ImmutableNodes.newContainerBuilder()
         .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
         .build();
 
@@ -82,9 +82,9 @@ public class NetconfDataTreeServiceActorTest {
 
     @Before
     public void setUp() {
-        this.actorRef = TestActorRef.create(system,
+        actorRef = TestActorRef.create(system,
             NetconfDataTreeServiceActor.props(netconfService, Duration.ofSeconds(2)));
-        this.probe = TestProbe.apply(system);
+        probe = TestProbe.apply(system);
     }
 
     @AfterClass

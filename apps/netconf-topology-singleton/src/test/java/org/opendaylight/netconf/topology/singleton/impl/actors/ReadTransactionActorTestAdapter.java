@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 /**
  * Adapter for read transaction tests.
@@ -44,7 +44,7 @@ public abstract class ReadTransactionActorTestAdapter {
     static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
     static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
-    static final ContainerNode NODE = Builders.containerBuilder()
+    static final ContainerNode NODE = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(QName.create("", "cont")))
             .build();
 
@@ -54,9 +54,9 @@ public abstract class ReadTransactionActorTestAdapter {
 
     public void init(final DOMDataTreeReadOperations inMockReadTx, final ActorSystem system,
             final ActorRef inActorRef) {
-        this.mockReadTx = inMockReadTx;
-        this.probe = TestProbe.apply(system);
-        this.actorRef = inActorRef;
+        mockReadTx = inMockReadTx;
+        probe = TestProbe.apply(system);
+        actorRef = inActorRef;
     }
 
     @Test
