@@ -284,12 +284,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>yanglib</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-client</artifactId>
                 <version>${project.version}</version>
@@ -681,13 +675,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>features-netconf-experimental</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>odl-yanglib</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>

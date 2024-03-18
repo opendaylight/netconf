@@ -31,7 +31,6 @@
   <modules>
     <module>netconf-netty-util</module>
     <module>netconf-auth</module>
-    <module>yanglib</module>
     <module>tools</module>
 
     <module>netconf-test-models</module>

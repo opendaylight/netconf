@@ -68,7 +68,6 @@
         <module>odl-restconf-common</module>
         <module>odl-restconf</module>
         <module>odl-restconf-nb</module>
-        <module>odl-yanglib</module>
         <module>odl-yanglib-mdsal-writer</module>
     </modules>
 </project>

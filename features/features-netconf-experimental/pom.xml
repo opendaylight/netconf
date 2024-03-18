@@ -42,11 +42,5 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-yanglib</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
     </dependencies>
 </project>
