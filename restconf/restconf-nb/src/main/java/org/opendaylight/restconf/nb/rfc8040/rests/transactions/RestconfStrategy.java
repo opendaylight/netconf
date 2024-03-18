@@ -1033,22 +1033,15 @@ public abstract class RestconfStrategy {
 
     static final NormalizedNode mergeConfigAndSTateDataIfNeeded(final NormalizedNode stateDataNode,
             final NormalizedNode configDataNode) {
-        // if no data exists
-        if (stateDataNode == null && configDataNode == null) {
-            return null;
-        }
-
-        // return config data
         if (stateDataNode == null) {
+            // No state, return config
             return configDataNode;
         }
-
-        // return state data
         if (configDataNode == null) {
+            // No config, return state
             return stateDataNode;
         }
-
-        // merge data from config and state
+        // merge config and state
         return mergeStateAndConfigData(stateDataNode, configDataNode);
     }
 
