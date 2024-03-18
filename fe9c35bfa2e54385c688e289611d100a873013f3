@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35bb96a4_0e62cc05",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/AbstractJukeboxTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-03-18T10:32:50Z",
+      "side": 1,
+      "message": "the .equals() do not match on this value if the value is just \"1\".",
+      "parentUuid": "13830ae8_c39d5c51",
+      "revId": "fe9c35bfa2e54385c688e289611d100a873013f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "15c1ec6c_e6e84c04",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-03-15T14:36:33Z",
       "side": 1,
       "message": "Same here",
+      "revId": "fe9c35bfa2e54385c688e289611d100a873013f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7146a3a_571a899c",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/AbstractJukeboxTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-03-18T10:32:50Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "15c1ec6c_e6e84c04",
       "revId": "fe9c35bfa2e54385c688e289611d100a873013f3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
