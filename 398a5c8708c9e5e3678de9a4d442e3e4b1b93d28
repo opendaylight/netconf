@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6b92477a_60734dbe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-18T22:35:39Z",
+      "side": 1,
+      "message": "The code is actually correct, see bug description.\nIf anything, any documentation having these URLs should be updated.",
+      "revId": "398a5c8708c9e5e3678de9a4d442e3e4b1b93d28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9b6ee929_ae16458e",
         "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/jaxrs/JaxRsRestconf.java",
         "patchSetId": 5
