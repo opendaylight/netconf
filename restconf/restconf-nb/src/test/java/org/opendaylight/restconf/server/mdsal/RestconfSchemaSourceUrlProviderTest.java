@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ class RestconfSchemaSourceUrlProviderTest {
     @MethodSource
     void getSchemaSourceUrl(final String moduleName, final Revision revision, final Uri expected) {
         final var result = urlProvider.getSchemaSourceUrl("ODL_modules", moduleName, revision);
-        assertEquals(Optional.of(expected), result);
+        assertEquals(Set.of(expected), result);
     }
 
     private static List<Arguments> getSchemaSourceUrl() {
