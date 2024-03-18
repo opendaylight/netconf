@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.server.mdsal;
 
-import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.netconf.yanglib.writer.YangLibrarySchemaSourceUrlProvider;
@@ -40,15 +40,15 @@ public final class RestconfSchemaSourceUrlProvider implements YangLibrarySchemaS
     }
 
     @Override
-    public Optional<Uri> getSchemaSourceUrl(final String moduleSetName, final String moduleName,
+    public Set<Uri> getSchemaSourceUrl(final String moduleSetName, final String moduleName,
             final Revision revision) {
         if ("ODL_modules".equals(moduleSetName)) {
             final var sb = new StringBuilder(modulesPath).append(moduleName);
             if (revision != null) {
                 sb.append("?" + URLConstants.MODULES_REVISION_QUERY + "=").append(revision);
             }
-            return Optional.of(new Uri(sb.toString()));
+            return Set.of(new Uri(sb.toString()));
         }
-        return Optional.empty();
+        return Set.of();
     }
 }

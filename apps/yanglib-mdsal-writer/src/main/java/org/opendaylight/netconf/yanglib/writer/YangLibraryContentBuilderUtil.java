@@ -15,10 +15,10 @@ import com.google.common.collect.ImmutableSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.datastores.rev180214.Operational;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -51,6 +51,7 @@ import org.opendaylight.yangtools.yang.model.api.ModuleLike;
 //  https://jira.opendaylight.org/browse/MDSAL-833
 //  https://jira.opendaylight.org/browse/MDSAL-835
 final class YangLibraryContentBuilderUtil {
+    @Deprecated
     private static final CommonLeafs.Revision EMPTY_REVISION = new CommonLeafs.Revision("");
 
     static final String DEFAULT_MODULE_SET_NAME = "ODL_modules";
@@ -64,11 +65,12 @@ final class YangLibraryContentBuilderUtil {
      * Builds ietf-yang-library content based on model context.
      *
      * @param context effective model context
-     * @param urlProvider optional schema source URL provider
+     * @param urlProvider schema source URL provider
      * @return content as YangLibrary object
      */
-    static YangLibrary buildYangLibrary(final @NonNull EffectiveModelContext context,
-            final @NonNull String contentId, final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider) {
+    @NonNullByDefault
+    static YangLibrary buildYangLibrary(final EffectiveModelContext context, final String contentId,
+            final YangLibrarySchemaSourceUrlProvider urlProvider) {
         final var deviationsMap = getDeviationsMap(context);
         return new YangLibraryBuilder()
             .setModuleSet(BindingMap.of(new ModuleSetBuilder()
@@ -93,20 +95,20 @@ final class YangLibraryContentBuilderUtil {
     private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104
         .module.set.parameters.@NonNull Module buildModule(final @NonNull Module module,
             final @NonNull  Map<QNameModule, Set<Module>> deviationsMap,
-            final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider) {
+            final @NonNull YangLibrarySchemaSourceUrlProvider urlProvider) {
         return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library
             .rev190104.module.set.parameters.ModuleBuilder()
             .setName(buildModuleKeyName(module))
             .setRevision(buildRevision(module))
             .setNamespace(new Uri(module.getNamespace().toString()))
-            .setFeature(buildFeatures(module).orElse(null))
-            .setDeviation(buildDeviations(module, deviationsMap).orElse(null))
-            .setLocation(buildSchemaSourceUrl(module, urlProvider).map(Set::of).orElse(null))
+            .setFeature(buildFeatures(module))
+            .setDeviation(buildDeviations(module, deviationsMap))
+            .setLocation(buildSchemaSourceUrls(module, urlProvider))
             .setSubmodule(module.getSubmodules().stream()
                 .map(subModule -> new SubmoduleBuilder()
                     .setName(buildModuleKeyName(subModule))
                     .setRevision(buildRevision(subModule))
-                    .setLocation(buildSchemaSourceUrl(subModule, urlProvider).map(Set::of).orElse(null))
+                    .setLocation(buildSchemaSourceUrls(subModule, urlProvider))
                     .build())
                 .collect(BindingMap.toMap()))
             .build();
@@ -116,13 +118,13 @@ final class YangLibraryContentBuilderUtil {
      * Builds ietf-yang-library legacy content based on model context.
      *
      * @param context effective model context
-     * @param urlProvider optional schema source URL provider
+     * @param urlProvider schema source URL provider
      * @return content as ModulesState object
      * @deprecated due to model update via RFC 8525, the functionality serves backward compatibility.
      */
     @Deprecated
     static ModulesState buildModuleState(final @NonNull EffectiveModelContext context,
-            final @NonNull String moduleSetId, final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider) {
+            final @NonNull String moduleSetId, final @NonNull YangLibrarySchemaSourceUrlProvider urlProvider) {
         final var deviationsMap = getDeviationsMap(context);
         return new ModulesStateBuilder()
             .setModule(context.getModules().stream()
@@ -132,26 +134,27 @@ final class YangLibraryContentBuilderUtil {
             .build();
     }
 
+    @Deprecated
     private static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library
         .rev190104.module.list.@NonNull Module buildLegacyModule(final @NonNull Module module,
             final @NonNull  Map<QNameModule, Set<Module>> deviationsMap,
-            final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider) {
+            final @NonNull YangLibrarySchemaSourceUrlProvider urlProvider) {
 
         return new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library
             .rev190104.module.list.ModuleBuilder()
             .setName(buildModuleKeyName(module))
             .setRevision(buildLegacyRevision(module))
             .setNamespace(new Uri(module.getNamespace().toString()))
-            .setFeature(buildFeatures(module).orElse(null))
-            .setSchema(buildSchemaSourceUrl(module, urlProvider).orElse(null))
+            .setFeature(buildFeatures(module))
+            .setSchema(buildSchemaSourceUrl(module, urlProvider))
             .setConformanceType(hasDeviations(module) ? Implement : Import)
-            .setDeviation(buildLegacyDeviations(module, deviationsMap).orElse(null))
+            .setDeviation(buildLegacyDeviations(module, deviationsMap))
             .setSubmodule(module.getSubmodules().stream()
                 .map(subModule -> new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library
                     .rev190104.module.list.module.SubmoduleBuilder()
                     .setName(buildModuleKeyName(subModule))
                     .setRevision(buildLegacyRevision(subModule))
-                    .setSchema(buildSchemaSourceUrl(subModule, urlProvider).orElse(null))
+                    .setSchema(buildSchemaSourceUrl(subModule, urlProvider))
                     .build())
                 .collect(BindingMap.toMap()))
             .build();
@@ -162,6 +165,7 @@ final class YangLibraryContentBuilderUtil {
         return revision != null ? new RevisionIdentifier(revision.toString()) : null;
     }
 
+    @Deprecated
     private static CommonLeafs.Revision buildLegacyRevision(final ModuleLike module) {
         final var revision = module.getQNameModule().revision();
         return revision != null ? new CommonLeafs.Revision(new RevisionIdentifier(revision.toString()))
@@ -174,16 +178,24 @@ final class YangLibraryContentBuilderUtil {
             new YangIdentifier(module.getName() + "_" + revision);
     }
 
-    private static @NonNull Optional<Uri> buildSchemaSourceUrl(final @NonNull ModuleLike module,
-            final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider) {
-        return urlProvider == null ? Optional.empty() :
-            urlProvider.getSchemaSourceUrl(DEFAULT_MODULE_SET_NAME, module.getName(),
-                module.getRevision().orElse(null));
+    @Deprecated
+    private static @Nullable Uri buildSchemaSourceUrl(final @NonNull ModuleLike module,
+            final @NonNull YangLibrarySchemaSourceUrlProvider urlProvider) {
+        final var uris = buildSchemaSourceUrls(module, urlProvider);
+        return uris == null ? null : uris.iterator().next();
     }
 
-    private static Optional<Set<YangIdentifier>> buildFeatures(final ModuleLike module) {
-        if (module.getFeatures() == null || module.getFeatures().isEmpty()) {
-            return Optional.empty();
+    private static @Nullable Set<Uri> buildSchemaSourceUrls(final @NonNull ModuleLike module,
+            final @NonNull YangLibrarySchemaSourceUrlProvider urlProvider) {
+        final var uris = urlProvider.getSchemaSourceUrl(DEFAULT_MODULE_SET_NAME, module.getName(),
+            module.getRevision().orElse(null));
+        return uris.isEmpty() ? null : uris;
+    }
+
+    private static @Nullable Set<YangIdentifier> buildFeatures(final ModuleLike module) {
+        final var moduleFeatures = module.getFeatures();
+        if (moduleFeatures == null || moduleFeatures.isEmpty()) {
+            return null;
         }
         final var namespace = module.getQNameModule();
         final var features = module.getFeatures().stream()
@@ -192,36 +204,31 @@ final class YangLibraryContentBuilderUtil {
             .filter(featureName -> namespace.equals(featureName.getModule()))
             .map(featureName -> new YangIdentifier(featureName.getLocalName()))
             .collect(Collectors.toUnmodifiableSet());
-        return features.isEmpty() ? Optional.empty() : Optional.of(features);
+        return features.isEmpty() ? null : features;
     }
 
     private static boolean hasDeviations(final Module module) {
         return module.getDeviations() != null && !module.getDeviations().isEmpty();
     }
 
-    private static Optional<Set<YangIdentifier>> buildDeviations(final Module module,
+    private static @Nullable Set<YangIdentifier> buildDeviations(final Module module,
             final Map<QNameModule, Set<Module>> deviationsMap) {
         final var deviationModules = deviationsMap.get(module.getQNameModule());
-        if (deviationModules == null) {
-            return Optional.empty();
-        }
-        return Optional.of(deviationModules.stream()
+        return deviationModules == null ? null : deviationModules.stream()
             .map(devModule -> new YangIdentifier(buildModuleKeyName(devModule)))
-            .collect(ImmutableSet.toImmutableSet()));
+            .collect(ImmutableSet.toImmutableSet());
     }
 
-    private static Optional<Map<DeviationKey, Deviation>> buildLegacyDeviations(final Module module,
+    @Deprecated
+    private static @Nullable Map<DeviationKey, Deviation> buildLegacyDeviations(final Module module,
             final Map<QNameModule, Set<Module>> deviationsMap) {
         final var deviationModules = deviationsMap.get(module.getQNameModule());
-        if (deviationModules == null) {
-            return Optional.empty();
-        }
-        return Optional.of(deviationModules.stream()
+        return deviationModules == null ? null : deviationModules.stream()
             .map(devModule -> new DeviationBuilder()
                 .setName(buildModuleKeyName(devModule))
                 .setRevision(buildLegacyRevision(devModule))
                 .build())
-            .collect(BindingMap.toMap()));
+            .collect(BindingMap.toMap());
     }
 
     private static @NonNull Map<QNameModule, Set<Module>> getDeviationsMap(final EffectiveModelContext context) {
