@@ -73,9 +73,7 @@ final class YangLibraryWriter implements FutureCallback<Empty> {
             future = chain.future();
             final var tx = chain.newWriteOnlyTransaction();
             tx.delete(LogicalDatastoreType.OPERATIONAL, YANG_LIBRARY_INSTANCE_IDENTIFIER);
-            if (writeLegacy) {
-                tx.delete(LogicalDatastoreType.OPERATIONAL, MODULES_STATE_INSTANCE_IDENTIFIER);
-            }
+            tx.delete(LogicalDatastoreType.OPERATIONAL, MODULES_STATE_INSTANCE_IDENTIFIER);
 
             tx.commit().addCallback(new FutureCallback<CommitInfo>() {
                 @Override
@@ -129,6 +127,8 @@ final class YangLibraryWriter implements FutureCallback<Empty> {
         if (writeLegacy) {
             tx.put(LogicalDatastoreType.OPERATIONAL, MODULES_STATE_INSTANCE_IDENTIFIER,
                 YangLibraryContentBuilderUtil.buildModuleState(context, nextId, urlProvider));
+        } else {
+            tx.delete(LogicalDatastoreType.OPERATIONAL, MODULES_STATE_INSTANCE_IDENTIFIER);
         }
 
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
