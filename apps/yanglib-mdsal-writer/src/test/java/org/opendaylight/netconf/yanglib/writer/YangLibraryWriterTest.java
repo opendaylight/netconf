@@ -14,7 +14,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 import static org.opendaylight.netconf.yanglib.writer.YangLibraryContentBuilderUtil.DEFAULT_MODULE_SET_NAME;
 import static org.opendaylight.netconf.yanglib.writer.YangLibraryContentBuilderUtil.DEFAULT_SCHEMA_NAME;
@@ -24,7 +23,6 @@ import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.pars
 
 import java.util.Set;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +35,9 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.datastores.rev180214.Operational;
@@ -60,6 +60,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.util.BindingMap;
+import org.opendaylight.yangtools.yang.common.Empty;
 
 @ExtendWith(MockitoExtension.class)
 class YangLibraryWriterTest {
@@ -80,6 +81,8 @@ class YangLibraryWriterTest {
     @Mock
     private DataBroker dataBroker;
     @Mock
+    private TransactionChain transactionChain;
+    @Mock
     private WriteTransaction writeTransaction;
     @Mock
     private Registration registration;
@@ -88,10 +91,6 @@ class YangLibraryWriterTest {
     @Captor
     private ArgumentCaptor<ModulesState> modulesStateCaptor;
     private YangLibraryWriter writer;
-
-    @BeforeEach
-    void beforeEach() {
-    }
 
     @Test
     @DisplayName("No update bc context has no ietf-yang-library")
@@ -105,8 +104,9 @@ class YangLibraryWriterTest {
     @MethodSource("writeContentArgs")
     void writeContent(final boolean withUrls, final boolean writeLegacy, final YangLibrary expectedData,
             final ModulesState expectedLegacyData) {
-        doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
-        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
+        doReturn(transactionChain).when(dataBroker).createMergingTransactionChain();
+        doReturn(writeTransaction).when(transactionChain).newWriteOnlyTransaction();
+        doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
 
         writer = new YangLibraryWriter(new FixedDOMSchemaService(parseYangResources(YangLibraryWriterTest.class,
             "/test-module.yang", "/test-submodule.yang", "/test-more.yang", "/ietf-yang-library@2019-01-04.yang",
@@ -135,8 +135,10 @@ class YangLibraryWriterTest {
     @ParameterizedTest(name = "Clear data on close -- include legacy: {0}")
     @ValueSource(booleans = {false, true})
     void clearOnClose(final boolean writeLegacy) throws Exception {
-        doReturn(writeTransaction).when(dataBroker).newWriteOnlyTransaction();
-        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
+        doReturn(transactionChain).when(dataBroker).createMergingTransactionChain();
+        doReturn(writeTransaction).when(transactionChain).newWriteOnlyTransaction();
+        doReturn(Empty.immediateFuture()).when(transactionChain).future();
+        doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
         doReturn(registration).when(schemaService).registerSchemaContextListener(any());
 
         new YangLibraryWriter(schemaService, dataBroker, writeLegacy).close();
