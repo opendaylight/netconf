@@ -353,24 +353,28 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     @Override
     public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
+        return sendRequest(message);
+    }
+
+    @Override
+    public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(NetconfMessage message) {
         sessionLock.lock();
         try {
             if (semaphore != null && !semaphore.tryAcquire()) {
                 LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
-                    + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.name());
+                        + "Discarding request of Netconf device with id: {}", concurentRpcMsgs, id.name());
                 return Futures.immediateFailedFuture(new DocumentedException(
                         "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
-                        + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
+                                + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
             }
 
-            return sendRequestWithLock(message, rpc);
+            return sendRequestWithLock(message);
         } finally {
             sessionLock.unlock();
         }
     }
 
-    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message,
-            final QName rpc) {
+    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Sending message {}", id, msgToS(message));
         }
