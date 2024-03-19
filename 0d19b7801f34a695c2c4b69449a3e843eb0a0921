@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fe5d207_45dafca1",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryContentBuilderUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-19T12:05:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d22083e0_980c41d8",
+      "revId": "0d19b7801f34a695c2c4b69449a3e843eb0a0921",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2c17085_32db8cf0",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-03-19T11:38:57Z",
       "side": 1,
       "message": "urlProvider",
+      "revId": "0d19b7801f34a695c2c4b69449a3e843eb0a0921",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0017b4c_7e498a6b",
+        "filename": "apps/yanglib-mdsal-writer/src/main/java/org/opendaylight/netconf/yanglib/writer/YangLibraryContentBuilderUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-19T12:05:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2c17085_32db8cf0",
       "revId": "0d19b7801f34a695c2c4b69449a3e843eb0a0921",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
