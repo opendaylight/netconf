@@ -134,6 +134,12 @@ module odl-netconf-device {
         default SSH;
       }
 
+      leaf-list key-id {
+        when "../protocol/name = TLS";
+        type string;
+        description "Identifiers of private keys within the keystore to be used for to establish TLS connection.";
+      }
+
       choice specification {
         case tls-case {
           container tls {
