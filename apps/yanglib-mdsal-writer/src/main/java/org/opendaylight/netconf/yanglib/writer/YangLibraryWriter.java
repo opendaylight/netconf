@@ -13,16 +13,9 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -34,15 +27,6 @@ import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
-import org.osgi.service.metatype.annotations.AttributeDefinition;
-import org.osgi.service.metatype.annotations.Designate;
-import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,16 +34,7 @@ import org.slf4j.LoggerFactory;
  * Listens for updates on global schema context, transforms context to ietf-yang-library/yang-library and writes this
  * state to operational data store.
  */
-@Singleton
-@Component(service = { }, configurationPid = "org.opendaylight.netconf.yanglib")
-@Designate(ocd = YangLibraryWriter.Configuration.class)
-public final class YangLibraryWriter implements AutoCloseable, FutureCallback<Empty> {
-    @ObjectClassDefinition
-    public @interface Configuration {
-        @AttributeDefinition(description = "Maintain RFC7895-compatible modules-state container. Defaults to true.")
-        boolean write$_$legacy() default true;
-    }
-
+final class YangLibraryWriter implements FutureCallback<Empty> {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibraryWriter.class);
     private static final InstanceIdentifier<YangLibrary> YANG_LIBRARY_INSTANCE_IDENTIFIER =
         InstanceIdentifier.create(YangLibrary.class);
@@ -77,50 +52,19 @@ public final class YangLibraryWriter implements AutoCloseable, FutureCallback<Em
     // FIXME: this really should be a dynamically-populated shard (i.e. no write operations whatsoever)!
     private TransactionChain currentChain;
 
-    public YangLibraryWriter(final DOMSchemaService schemaService, final DataBroker dataBroker,
-            final boolean writeLegacy, final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider) {
+    YangLibraryWriter(final DOMSchemaService schemaService, final DataBroker dataBroker,
+            final boolean writeLegacy, final YangLibrarySchemaSourceUrlProvider urlProvider) {
         this.dataBroker = requireNonNull(dataBroker);
-        this.urlProvider = orEmptyProvider(urlProvider);
+        this.urlProvider = requireNonNull(urlProvider);
         this.writeLegacy = writeLegacy;
         reg = schemaService.registerSchemaContextListener(this::onModelContextUpdated);
         LOG.info("ietf-yang-library writer started with modules-state {}", writeLegacy ? "enabled" : "disabled");
     }
 
-    public YangLibraryWriter(final DOMSchemaService schemaService, final DataBroker dataBroker,
-            final boolean writeLegacy) {
-        this(schemaService, dataBroker, writeLegacy, null);
-    }
-
-    @Inject
-    public YangLibraryWriter(final DOMSchemaService schemaService, final DataBroker dataBroker,
-            final Optional<YangLibrarySchemaSourceUrlProvider> urlProvider) {
-        this(schemaService, dataBroker, true, urlProvider.orElse(null));
-    }
-
-    @Activate
-    public YangLibraryWriter(final @Reference DOMSchemaService schemaService, @Reference final DataBroker dataBroker,
-            @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
-                final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider,
-            final Configuration configuration) {
-        this(schemaService, dataBroker, configuration.write$_$legacy(), urlProvider);
-    }
-
-    private static @NonNull YangLibrarySchemaSourceUrlProvider orEmptyProvider(
-            final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider) {
-        return urlProvider != null ? urlProvider : emptyProvider();
-    }
-
-    private static @NonNull YangLibrarySchemaSourceUrlProvider emptyProvider() {
-        return (moduleSetName, moduleName, revision) -> Set.of();
-    }
-
-    @Deactivate
-    @PreDestroy
-    @Override
-    public synchronized void close() throws InterruptedException, ExecutionException {
+    synchronized ListenableFuture<Empty> shutdown() {
         if (!closed.compareAndSet(false, true)) {
             // Already shut down
-            return;
+            return null;
         }
         reg.close();
 
@@ -159,8 +103,7 @@ public final class YangLibraryWriter implements AutoCloseable, FutureCallback<Em
             }
         }, MoreExecutors.directExecutor());
 
-        // We need to synchronize here, otherwise we'd end up trampling over ourselves
-        future.get();
+        return future;
     }
 
     private void onModelContextUpdated(final EffectiveModelContext context) {

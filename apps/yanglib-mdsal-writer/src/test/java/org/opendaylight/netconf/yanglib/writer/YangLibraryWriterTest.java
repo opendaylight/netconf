@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.yanglib.writer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -96,7 +97,8 @@ class YangLibraryWriterTest {
     @DisplayName("No update bc context has no ietf-yang-library")
     void noUpdate() {
         writer = new YangLibraryWriter(new FixedDOMSchemaService(parseYangResources(YangLibraryWriterTest.class,
-            "/test-module.yang", "/test-submodule.yang")), dataBroker, NO_LEGACY);
+            "/test-module.yang", "/test-submodule.yang")), dataBroker, NO_LEGACY,
+            YangLibraryWriterSingleton.emptyProvider());
         verifyNoInteractions(dataBroker);
     }
 
@@ -111,7 +113,7 @@ class YangLibraryWriterTest {
         writer = new YangLibraryWriter(new FixedDOMSchemaService(parseYangResources(YangLibraryWriterTest.class,
             "/test-module.yang", "/test-submodule.yang", "/test-more.yang", "/ietf-yang-library@2019-01-04.yang",
             "/ietf-datastores@2018-02-14.yang", "/ietf-yang-types.yang", "/ietf-inet-types.yang")), dataBroker,
-            writeLegacy, withUrls ? URL_PROVIDER : null);
+            writeLegacy, withUrls ? URL_PROVIDER : YangLibraryWriterSingleton.emptyProvider());
 
         verify(writeTransaction).put(eq(OPERATIONAL), eq(YANG_LIBRARY_PATH), yangLibraryCaptor.capture());
         assertEquals(expectedData, yangLibraryCaptor.getValue());
@@ -141,7 +143,8 @@ class YangLibraryWriterTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(writeTransaction).commit();
         doReturn(registration).when(schemaService).registerSchemaContextListener(any());
 
-        new YangLibraryWriter(schemaService, dataBroker, writeLegacy).close();
+        assertNotNull(new YangLibraryWriter(schemaService, dataBroker, writeLegacy,
+            YangLibraryWriterSingleton.emptyProvider()).shutdown());
         verify(writeTransaction).delete(OPERATIONAL, YANG_LIBRARY_PATH);
         if (writeLegacy) {
             verify(writeTransaction).delete(OPERATIONAL, MODULES_STATE_PATH);
