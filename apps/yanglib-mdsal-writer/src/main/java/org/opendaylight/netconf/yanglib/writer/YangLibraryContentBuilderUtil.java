@@ -65,8 +65,9 @@ final class YangLibraryContentBuilderUtil {
      * Builds ietf-yang-library content based on model context.
      *
      * @param context effective model context
+     * @param contentId YangLibrary content ID
      * @param urlProvider schema source URL provider
-     * @return content as YangLibrary object
+     * @return content as an {@link YangLibrary}
      */
     @NonNullByDefault
     static YangLibrary buildYangLibrary(final EffectiveModelContext context, final String contentId,
@@ -118,8 +119,9 @@ final class YangLibraryContentBuilderUtil {
      * Builds ietf-yang-library legacy content based on model context.
      *
      * @param context effective model context
+     * @param moduleSetId the ID of the constructed module set
      * @param urlProvider schema source URL provider
-     * @return content as ModulesState object
+     * @return content as a {@link ModulesState}
      * @deprecated due to model update via RFC 8525, the functionality serves backward compatibility.
      */
     @Deprecated
