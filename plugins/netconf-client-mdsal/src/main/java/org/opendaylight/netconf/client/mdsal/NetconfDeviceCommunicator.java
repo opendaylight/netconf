@@ -353,6 +353,11 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     @Override
     public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
+        return sendRequest(message);
+    }
+
+    @Override
+    public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message) {
         sessionLock.lock();
         try {
             if (semaphore != null && !semaphore.tryAcquire()) {
@@ -363,14 +368,13 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
                         + ") waiting for emptying the queue of Netconf device with id: " + id.name()));
             }
 
-            return sendRequestWithLock(message, rpc);
+            return sendRequestWithLock(message);
         } finally {
             sessionLock.unlock();
         }
     }
 
-    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message,
-            final QName rpc) {
+    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Sending message {}", id, msgToS(message));
         }
