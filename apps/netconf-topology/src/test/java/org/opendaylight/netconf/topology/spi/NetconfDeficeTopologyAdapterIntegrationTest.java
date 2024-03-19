@@ -17,7 +17,10 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.ConcurrentDataBrokerTestCustomizer;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeContext;
@@ -48,6 +51,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
+@Order(1)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 // FIXME: base on AbstractDataBrokerTest test?
 public class NetconfDeficeTopologyAdapterIntegrationTest {
     private static final RemoteDeviceId ID = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
@@ -93,6 +98,7 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
                 .build());
     }
 
+    @Order(1)
     @Test
     public void testFailedDeviceIntegration() {
         adapter.setDeviceAsFailed(null);
@@ -106,6 +112,7 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
             .isPresent());
     }
 
+    @Order(2)
     @Test
     public void testDeviceAugmentedNodePresence() throws Exception {
         final var netconfTestLeafQname = QName.create("urn:TBD:params:xml:ns:yang:network-topology-augment-test",
