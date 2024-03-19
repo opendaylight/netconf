@@ -103,7 +103,7 @@ class YangLibraryWriterTest {
     }
 
     @ParameterizedTest(name = "Write data -- with URLs: {0}, include legacy: {1}")
-    @MethodSource("writeContentArgs")
+    @MethodSource
     void writeContent(final boolean withUrls, final boolean writeLegacy, final YangLibrary expectedData,
             final ModulesState expectedLegacyData) {
         doReturn(transactionChain).when(dataBroker).createMergingTransactionChain();
@@ -126,7 +126,7 @@ class YangLibraryWriterTest {
         verify(writeTransaction).commit();
     }
 
-    private static Stream<Arguments> writeContentArgs() {
+    private static Stream<Arguments> writeContent() {
         return Stream.of(
             Arguments.of(NO_URLS, NO_LEGACY, buildYangLibrary(NO_URLS), null),
             Arguments.of(NO_URLS, WITH_LEGACY, buildYangLibrary(NO_URLS), buildModulesState(NO_URLS)),
@@ -135,7 +135,7 @@ class YangLibraryWriterTest {
     }
 
     @ParameterizedTest(name = "Clear data on close -- include legacy: {0}")
-    @ValueSource(booleans = {false, true})
+    @ValueSource(booleans = { false, true })
     void clearOnClose(final boolean writeLegacy) throws Exception {
         doReturn(transactionChain).when(dataBroker).createMergingTransactionChain();
         doReturn(writeTransaction).when(transactionChain).newWriteOnlyTransaction();
@@ -146,11 +146,7 @@ class YangLibraryWriterTest {
         assertNotNull(new YangLibraryWriter(schemaService, dataBroker, writeLegacy,
             YangLibraryWriterSingleton.emptyProvider()).shutdown());
         verify(writeTransaction).delete(OPERATIONAL, YANG_LIBRARY_PATH);
-        if (writeLegacy) {
-            verify(writeTransaction).delete(OPERATIONAL, MODULES_STATE_PATH);
-        } else {
-            verify(writeTransaction, never()).delete(OPERATIONAL, MODULES_STATE_PATH);
-        }
+        verify(writeTransaction).delete(OPERATIONAL, MODULES_STATE_PATH);
         verify(writeTransaction).commit();
     }
 
