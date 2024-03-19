@@ -12,10 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 import io.netty.handler.ssl.SslContext;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -124,6 +126,19 @@ class NetconfClientConfigurationBuilderFactoryImplTest {
         doReturn(sslContext).when(sslContextFactory).createSslContext();
         final var config = createConfig(
             nodeBuilder.setTcpOnly(false).setProtocol(new ProtocolBuilder().setName(Name.TLS).build()).build());
+        assertConfig(config);
+        assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
+        assertNotNull(config.getSslHandlerFactory());
+    }
+
+    @Test
+    void testTlsWithKeyId() {
+        final var keyIds = Set.of("key-id1", "key-id2");
+        doReturn(sslContextFactory).when(sslContextFactoryProvider).getSslContextFactory(any());
+        doReturn(sslContext).when(sslContextFactory).createSslContext(eq(keyIds));
+        final var config = createConfig(
+            nodeBuilder.setTcpOnly(false).setProtocol(
+                new ProtocolBuilder().setName(Name.TLS).setKeyId(keyIds).build()).build());
         assertConfig(config);
         assertEquals(NetconfClientProtocol.TLS, config.getProtocol());
         assertNotNull(config.getSslHandlerFactory());
