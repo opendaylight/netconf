@@ -9,8 +9,9 @@ package org.opendaylight.netconf.yanglib.writer;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Optional;
 import java.util.Set;
@@ -23,6 +24,7 @@ import javax.inject.Singleton;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -30,6 +32,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -50,7 +53,7 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Component(service = { }, configurationPid = "org.opendaylight.netconf.yanglib")
 @Designate(ocd = YangLibraryWriter.Configuration.class)
-public final class YangLibraryWriter implements AutoCloseable {
+public final class YangLibraryWriter implements AutoCloseable, FutureCallback<Empty> {
     @ObjectClassDefinition
     public @interface Configuration {
         @AttributeDefinition(description = "Maintain RFC7895-compatible modules-state container. Defaults to true.")
@@ -69,6 +72,9 @@ public final class YangLibraryWriter implements AutoCloseable {
     private final DataBroker dataBroker;
     private final boolean writeLegacy;
     private final Registration reg;
+
+    // FIXME: this really should be a dynamically-populated shard (i.e. no write operations whatsoever)!
+    private TransactionChain currentChain;
 
     public YangLibraryWriter(final DOMSchemaService schemaService, final DataBroker dataBroker,
             final boolean writeLegacy, final @Nullable YangLibrarySchemaSourceUrlProvider urlProvider) {
@@ -117,18 +123,32 @@ public final class YangLibraryWriter implements AutoCloseable {
         }
         reg.close();
 
-        // FIXME: we should be using a transaction chain for this, but, really, this should be a dynamically-populated
-        //        shard (i.e. no storage whatsoever)!
-        final var tx = dataBroker.newWriteOnlyTransaction();
-        tx.delete(LogicalDatastoreType.OPERATIONAL, YANG_LIBRARY_INSTANCE_IDENTIFIER);
-        if (writeLegacy) {
-            tx.delete(LogicalDatastoreType.OPERATIONAL, MODULES_STATE_INSTANCE_IDENTIFIER);
-        }
+        final ListenableFuture<Empty> future;
+        try (var chain = acquireChain()) {
+            future = chain.future();
+            final var tx = chain.newWriteOnlyTransaction();
+            tx.delete(LogicalDatastoreType.OPERATIONAL, YANG_LIBRARY_INSTANCE_IDENTIFIER);
+            if (writeLegacy) {
+                tx.delete(LogicalDatastoreType.OPERATIONAL, MODULES_STATE_INSTANCE_IDENTIFIER);
+            }
 
-        final var future = tx.commit();
-        future.addCallback(new FutureCallback<CommitInfo>() {
+            tx.commit().addCallback(new FutureCallback<CommitInfo>() {
+                @Override
+                public void onSuccess(final CommitInfo info) {
+                    LOG.debug("ietf-yang-library cleaned successfully");
+                }
+
+                @Override
+                public void onFailure(final Throwable throwable) {
+                    // Handled via transaction chain listener
+                }
+            }, MoreExecutors.directExecutor());
+        }
+        currentChain = null;
+
+        Futures.addCallback(future, new FutureCallback<>() {
             @Override
-            public void onSuccess(final CommitInfo info) {
+            public void onSuccess(final Empty value) {
                 LOG.info("ietf-yang-library writer stopped");
             }
 
@@ -142,7 +162,7 @@ public final class YangLibraryWriter implements AutoCloseable {
         future.get();
     }
 
-    @VisibleForTesting void onModelContextUpdated(final EffectiveModelContext context) {
+    private void onModelContextUpdated(final EffectiveModelContext context) {
         if (context.findModule(YangLibrary.QNAME.getModule()).isPresent()) {
             updateYangLibrary(context);
         } else {
@@ -159,7 +179,7 @@ public final class YangLibraryWriter implements AutoCloseable {
 
         final var nextId = String.valueOf(idCounter.incrementAndGet());
         LOG.debug("ietf-yang-library writer starting update to {}", nextId);
-        final var tx = dataBroker.newWriteOnlyTransaction();
+        final var tx = acquireChain().newWriteOnlyTransaction();
         tx.put(LogicalDatastoreType.OPERATIONAL, YANG_LIBRARY_INSTANCE_IDENTIFIER,
             YangLibraryContentBuilderUtil.buildYangLibrary(context, nextId, urlProvider));
         if (writeLegacy) {
@@ -175,8 +195,30 @@ public final class YangLibraryWriter implements AutoCloseable {
 
             @Override
             public void onFailure(final Throwable throwable) {
-                LOG.warn("Failed to update ietf-yang-library", throwable);
+                // Handled via transaction chain listener
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private TransactionChain acquireChain() {
+        var local = currentChain;
+        if (local == null) {
+            currentChain = local = dataBroker.createMergingTransactionChain();
+            LOG.debug("Allocated new transaction chain");
+            local.addCallback(this);
+        }
+        return local;
+    }
+
+    @Override
+    public synchronized void onSuccess(final Empty result) {
+        LOG.debug("ietf-yang-library writer transaction chain succeeded");
+        currentChain = null;
+    }
+
+    @Override
+    public synchronized void onFailure(final Throwable cause) {
+        LOG.info("ietf-yang-library writer transaction chain failed", cause);
+        currentChain = null;
     }
 }
