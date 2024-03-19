@@ -13,8 +13,23 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 
 public interface RemoteDeviceCommunicator extends AutoCloseable {
-    // FIXME: document this node
+    /**
+     * Send request message to current client session.
+     *
+     * @deprecated The parameter rpc is never used.
+     *             Use {@link RemoteDeviceCommunicator#sendRequest(NetconfMessage)}.
+     */
+    @Deprecated(forRemoval = true)
     ListenableFuture<RpcResult<NetconfMessage>> sendRequest(NetconfMessage message, QName rpc);
+
+    /**
+     * Send request message to current client session.
+     *
+     * @param message {@link NetconfMessage} to be sent
+     * @return A {@link ListenableFuture} which completes with result of sending give message
+     *         represented by {@link RpcResult}
+     */
+    ListenableFuture<RpcResult<NetconfMessage>> sendRequest(NetconfMessage message);
 
     @Override
     void close();
