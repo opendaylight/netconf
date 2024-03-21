@@ -12,6 +12,7 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
@@ -109,14 +110,12 @@ public final class ApiPathNormalizer implements PointNormalizer {
         }
     }
 
-    private final @NonNull ApiPathInstanceIdentifierCodec instanceIdentifierCodec;
     private final @NonNull EffectiveModelContext modelContext;
     private final @NonNull DatabindContext databind;
 
     public ApiPathNormalizer(final DatabindContext databind) {
         this.databind = requireNonNull(databind);
         modelContext = databind.modelContext();
-        instanceIdentifierCodec = new ApiPathInstanceIdentifierCodec(databind);
     }
 
     public @NonNull Path normalizePath(final ApiPath apiPath) {
@@ -353,12 +352,11 @@ public final class ApiPathNormalizer implements PointNormalizer {
         if (typedef instanceof IdentityrefTypeDefinition) {
             return toIdentityrefQName(value, schemaNode);
         }
+        if (typedef instanceof InstanceIdentifierTypeDefinition) {
+            return toInstanceIdentifier(value, schemaNode);
+        }
 
         try {
-            if (typedef instanceof InstanceIdentifierTypeDefinition) {
-                return instanceIdentifierCodec.deserialize(value);
-            }
-
             return verifyNotNull(TypeDefinitionAwareCodec.from(typedef),
                 "Unhandled type %s decoding %s", typedef, value).deserialize(value);
         } catch (IllegalArgumentException e) {
@@ -373,6 +371,20 @@ public final class ApiPathNormalizer implements PointNormalizer {
         return new NodeWithValue<>(qname, prepareValueByType(stack, schema,
             // FIXME: ahem: we probably want to do something differently here
             keyValues.get(0)));
+    }
+
+    private YangInstanceIdentifier toInstanceIdentifier(final String value, final DataSchemaNode schemaNode) {
+        if (value.isEmpty() || !value.startsWith("/")) {
+            throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        }
+
+        try {
+            return normalizeDataPath(ApiPath.parse(value.substring(1))).instance();
+        } catch (ParseException | RestconfDocumentedException e ) {
+            throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
+        }
     }
 
     private QName toIdentityrefQName(final String value, final DataSchemaNode schemaNode) {
