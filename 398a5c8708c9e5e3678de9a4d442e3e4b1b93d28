@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c64b2d2_68d672c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-03-21T13:02:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b92477a_60734dbe",
+      "revId": "398a5c8708c9e5e3678de9a4d442e3e4b1b93d28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b6ee929_ae16458e",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-03-17T14:53:56Z",
       "side": 1,
       "message": "remove this",
+      "range": {
+        "startLine": 794,
+        "startChar": 16,
+        "endLine": 794,
+        "endChar": 52
+      },
+      "revId": "398a5c8708c9e5e3678de9a4d442e3e4b1b93d28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7a57390_235237c4",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 794,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-03-21T13:02:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b6ee929_ae16458e",
       "range": {
         "startLine": 794,
         "startChar": 16,
@@ -64,6 +106,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0127b67e_6d2ea866",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 797,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-03-21T13:02:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2cd73981_24cafaaa",
+      "range": {
+        "startLine": 797,
+        "startChar": 16,
+        "endLine": 797,
+        "endChar": 78
+      },
+      "revId": "398a5c8708c9e5e3678de9a4d442e3e4b1b93d28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e348464_9cd9afa2",
@@ -77,6 +143,30 @@
       "writtenOn": "2024-03-17T14:53:56Z",
       "side": 1,
       "message": "re-formulate this FIXME to say that \u0027if we are to support yang-ext:mount\u0027, we also need to implement the yang-library rewrite",
+      "range": {
+        "startLine": 802,
+        "startChar": 16,
+        "endLine": 804,
+        "endChar": 33
+      },
+      "revId": "398a5c8708c9e5e3678de9a4d442e3e4b1b93d28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ebc8bf0_80c6a3ca",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 804,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-03-21T13:02:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2e348464_9cd9afa2",
       "range": {
         "startLine": 802,
         "startChar": 16,
@@ -124,6 +214,30 @@
       "side": 1,
       "message": "So we will remove the possibility to get modules behind mountpoint ?",
       "parentUuid": "08816e3f_a2060d42",
+      "range": {
+        "startLine": 904,
+        "startChar": 63,
+        "endLine": 904,
+        "endChar": 77
+      },
+      "revId": "398a5c8708c9e5e3678de9a4d442e3e4b1b93d28",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70790201_dec9cb0e",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/jaxrs/JaxRsRestconf.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 904,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-03-21T13:02:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "795eacc3_ae7e2c88",
       "range": {
         "startLine": 904,
         "startChar": 63,
