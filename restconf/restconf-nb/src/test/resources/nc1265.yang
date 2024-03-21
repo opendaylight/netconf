@@ -1,0 +1,45 @@
+module nc1265 {
+  namespace nc1265;
+  prefix nc1265;
+
+  identity base-id;
+
+  list foo {
+    key key;
+    leaf key {
+      type uint8;
+    }
+  }
+
+  list bar {
+    key key;
+    leaf key {
+      type instance-identifier;
+    }
+  }
+
+  list baz {
+    key key;
+    leaf key {
+      type leafref {
+        path /foo/key;
+      }
+    }
+  }
+
+  list xyzzy {
+    key key;
+    leaf key {
+      type union {
+        type instance-identifier;
+        type identityref {
+          base base-id;
+        }
+        type leafref {
+          path /foo/key;
+        }
+        type string;
+      }
+    }
+  }
+}
