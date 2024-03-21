@@ -19,6 +19,7 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.LeafrefResolver;
 
+// FIXME: Use JSONInstanceIdentifierCodec?
 final class ApiPathInstanceIdentifierCodec extends AbstractStringInstanceIdentifierCodec {
     private final @NonNull DatabindContext databind;
 
