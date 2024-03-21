@@ -11,6 +11,7 @@ import static com.google.common.base.Verify.verify;
 import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableMap;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -37,10 +38,9 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.IdentityEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.InputEffectiveStatement;
@@ -338,15 +338,20 @@ public final class ApiPathNormalizer implements PointNormalizer {
 
     private Object prepareValueByType(final SchemaInferenceStack stack, final DataSchemaNode schemaNode,
             final @NonNull String value) {
-
-        TypeDefinition<? extends TypeDefinition<?>> typedef;
-        if (schemaNode instanceof LeafListSchemaNode leafList) {
-            typedef = leafList.getType();
-        } else {
-            typedef = ((LeafSchemaNode) schemaNode).getType();
+        if (schemaNode instanceof TypedDataSchemaNode typedSchema) {
+            return prepareValueByType(stack, typedSchema, typedSchema.getType(), value);
         }
-        if (typedef instanceof LeafrefTypeDefinition leafref) {
+        throw new VerifyException("Unhandled schema " + schemaNode + " decoding '" + value + "'");
+    }
+
+    private Object prepareValueByType(final SchemaInferenceStack stack, final TypedDataSchemaNode schemaNode,
+            final TypeDefinition<?> unresolved, final @NonNull String value) {
+        // Resolve 'type leafref' before dispatching on type
+        final TypeDefinition<?> typedef;
+        if (unresolved instanceof LeafrefTypeDefinition leafref) {
             typedef = stack.resolveLeafref(leafref);
+        } else {
+            typedef = unresolved;
         }
 
         if (typedef instanceof IdentityrefTypeDefinition) {
