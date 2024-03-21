@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.text.ParseException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -61,7 +60,6 @@ class NC1205Test {
     }
 
     @Test
-    @Disabled("relies on TypeDefinitionAwareCodec's union handling")
     void unionKeyInstanceIdentifier() {
         assertNormalized(YangInstanceIdentifier.builder()
             .node(XYZZY)
