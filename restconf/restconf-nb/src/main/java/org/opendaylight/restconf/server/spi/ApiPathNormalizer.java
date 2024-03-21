@@ -49,6 +49,7 @@ import org.opendaylight.yangtools.yang.model.api.stmt.SchemaTreeEffectiveStateme
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.UnionTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -361,6 +362,9 @@ public final class ApiPathNormalizer implements PointNormalizer {
         if (typedef instanceof InstanceIdentifierTypeDefinition) {
             return toInstanceIdentifier(value, schemaNode);
         }
+        if (typedef instanceof UnionTypeDefinition union) {
+            return toUnion(stack, schemaNode, union, value);
+        }
 
         // Simple types
         final var codec = verifyNotNull(TypeDefinitionAwareCodec.from(typedef), "Unhandled type %s decoding %s",
@@ -379,6 +383,27 @@ public final class ApiPathNormalizer implements PointNormalizer {
         return new NodeWithValue<>(qname, prepareValueByType(stack, schema,
             // FIXME: ahem: we probably want to do something differently here
             keyValues.get(0)));
+    }
+
+    private Object toUnion(final SchemaInferenceStack stack, final TypedDataSchemaNode schemaNode,
+            final UnionTypeDefinition union, final @NonNull String value) {
+        // As per https://www.rfc-editor.org/rfc/rfc7950#section-9.12:
+        //   'type union' must have at least one 'type'
+        // hence this variable will always end up being non-null before being used
+        RestconfDocumentedException cause = null;
+        for (var type : union.getTypes()) {
+            try {
+                return prepareValueByType(stack, schemaNode, type, value);
+            } catch (RestconfDocumentedException e) {
+                if (cause == null) {
+                    cause = e;
+                } else {
+                    cause.addSuppressed(e);
+                }
+            }
+        }
+        throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
+            ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, cause);
     }
 
     private YangInstanceIdentifier toInstanceIdentifier(final String value, final TypedDataSchemaNode schemaNode) {

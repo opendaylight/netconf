@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.text.ParseException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -61,7 +60,6 @@ class NC1265Test {
     }
 
     @Test
-    @Disabled("relies on TypeDefinitionAwareCodec's union handling")
     void unionKeyInstanceIdentifier() {
         assertNormalized(YangInstanceIdentifier.builder()
             .node(XYZZY)
@@ -70,6 +68,30 @@ class NC1265Test {
                 .nodeWithKey(BAZ, KEY, Uint8.valueOf(123))
                 .build())
             .build(), "nc1265:xyzzy=%2Fnc1265:baz=123");
+    }
+
+    @Test
+    void unionKeyIdentityref() {
+        assertNormalized(YangInstanceIdentifier.builder()
+            .node(XYZZY)
+            .nodeWithKey(XYZZY, KEY, QName.create("nc1265", "base-id"))
+            .build(), "nc1265:xyzzy=nc1265:base-id");
+    }
+
+    @Test
+    void unionKeyLeafref() {
+        assertNormalized(YangInstanceIdentifier.builder()
+            .node(XYZZY)
+            .nodeWithKey(XYZZY, KEY, Uint8.valueOf(123))
+            .build(), "nc1265:xyzzy=123");
+    }
+
+    @Test
+    void unionKeyString() {
+        assertNormalized(YangInstanceIdentifier.builder()
+            .node(XYZZY)
+            .nodeWithKey(XYZZY, KEY, "abc")
+            .build(), "nc1265:xyzzy=abc");
     }
 
     @Test
