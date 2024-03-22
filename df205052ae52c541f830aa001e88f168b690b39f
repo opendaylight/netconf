@@ -16,6 +16,24 @@
       "message": "7.0.3 released, please bump versionst to 7.0.4-SNAPSHOT",
       "revId": "df205052ae52c541f830aa001e88f168b690b39f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d72d61c_07d25435",
+        "filename": "keystore/plaintext-api/pom.xml",
+        "patchSetId": 11
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-22T08:37:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a0ddddf_c8339160",
+      "revId": "df205052ae52c541f830aa001e88f168b690b39f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
