@@ -16,6 +16,125 @@
       "message": "recheck",
       "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39bd5eb3_d188f63a",
+        "filename": "keystore/plaintext-cli/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-03-22T14:19:36Z",
+      "side": 1,
+      "message": "No newline at end of right file.",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b264a4be_035fbd5c",
+        "filename": "keystore/plaintext-cli/src/main/java/org/opendaylight/netconf/keystore/plaintext/cli/AbstractCommand.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-03-22T14:19:36Z",
+      "side": 1,
+      "message": "extra new line",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c3aac69_db29433c",
+        "filename": "keystore/plaintext-cli/src/main/java/org/opendaylight/netconf/keystore/plaintext/cli/List.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-03-22T14:19:36Z",
+      "side": 1,
+      "message": "can be don as:\n\nfor (final var entry : storage) {",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3944f0fb_a4dcccb0",
+        "filename": "keystore/plaintext-localfile/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-03-22T14:19:36Z",
+      "side": 1,
+      "message": "No newline at end of right file.",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1f27d98_f6f285fe",
+        "filename": "keystore/plaintext-localfile/src/main/java/org/opendaylight/netconf/keystore/plaintext/localfile/CipherUtils.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-03-22T14:19:36Z",
+      "side": 1,
+      "message": "wouldn\u0027t it be better to put the while in readEntry? and make it read all entities?",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35bf547b_bfad2123",
+        "filename": "keystore/plaintext-localfile/src/main/java/org/opendaylight/netconf/keystore/plaintext/localfile/PlaintextLocalFileStorage.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-03-22T14:19:36Z",
+      "side": 1,
+      "message": "final byte\nin other methods too",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8463ff8_8c3bfffa",
+        "filename": "keystore/plaintext-localfile/src/main/resources/default.properties",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-03-22T14:19:36Z",
+      "side": 1,
+      "message": "No newline at end of right file.",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
