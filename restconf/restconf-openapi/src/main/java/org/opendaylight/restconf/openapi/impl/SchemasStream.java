@@ -183,6 +183,10 @@ public final class SchemasStream extends InputStream {
             final SchemaInferenceStack stack, final DefinitionNames definitionNames,
             final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
+            if (definitionNames.isListedNode(node)) {
+                // This means schema for this node is already processed
+                return;
+            }
             final var newTitle = title + "_" + node.getQName().getLocalName();
             final var parentNameConfigLocalName = parentName + "_" + node.getQName().getLocalName();
             final var names = List.of(parentNameConfigLocalName);

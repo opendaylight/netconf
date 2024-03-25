@@ -14261,7 +14261,7 @@
       "duplication-test_test-rpc2_input": {
         "properties": {
           "first": {
-            "$ref": "#/components/schemas/duplication-test_first1"
+            "$ref": "#/components/schemas/duplication-test_first"
           },
           "input-leaf": {
             "description": "",
@@ -14279,7 +14279,7 @@
       "duplication-test_test-rpc_input": {
         "properties": {
           "first": {
-            "$ref": "#/components/schemas/duplication-test_first1"
+            "$ref": "#/components/schemas/duplication-test_first"
           },
           "input-leaf": {
             "description": "",
@@ -14292,15 +14292,6 @@
         "xml": {
           "name": "input",
           "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
-        }
-      },
-      "duplication-test_first1": {
-        "title": "duplication-test_first",
-        "type": "object",
-        "properties": {},
-        "xml": {
-          "name": "first",
-          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
         }
       }
     },
