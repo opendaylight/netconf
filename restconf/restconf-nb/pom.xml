@@ -302,12 +302,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>net.javacrumbs.json-unit</groupId>
-      <artifactId>json-unit-assertj</artifactId>
-      <version>3.0.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>netconf-test-models</artifactId>
       <scope>test</scope>
