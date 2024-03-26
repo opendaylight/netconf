@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cfb563c_636a0106",
+        "filename": "keystore/plaintext-cli/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-26T15:57:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39bd5eb3_d188f63a",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b264a4be_035fbd5c",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-03-22T14:19:36Z",
       "side": 1,
       "message": "extra new line",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bc73e64_444a71ff",
+        "filename": "keystore/plaintext-cli/src/main/java/org/opendaylight/netconf/keystore/plaintext/cli/AbstractCommand.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-26T15:57:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b264a4be_035fbd5c",
       "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "014b887d_0e63bb61",
+        "filename": "keystore/plaintext-cli/src/main/java/org/opendaylight/netconf/keystore/plaintext/cli/List.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-26T15:57:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c3aac69_db29433c",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3944f0fb_a4dcccb0",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-03-22T14:19:36Z",
       "side": 1,
       "message": "No newline at end of right file.",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45e04e34_07b1b5f7",
+        "filename": "keystore/plaintext-localfile/pom.xml",
+        "patchSetId": 12
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-26T15:57:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3944f0fb_a4dcccb0",
       "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -103,6 +175,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "32889667_53a17927",
+        "filename": "keystore/plaintext-localfile/src/main/java/org/opendaylight/netconf/keystore/plaintext/localfile/CipherUtils.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-26T15:57:28Z",
+      "side": 1,
+      "message": "refactored",
+      "parentUuid": "b1f27d98_f6f285fe",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35bf547b_bfad2123",
@@ -120,6 +210,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "45495a13_bddd7dc3",
+        "filename": "keystore/plaintext-localfile/src/main/java/org/opendaylight/netconf/keystore/plaintext/localfile/PlaintextLocalFileStorage.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-26T15:57:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35bf547b_bfad2123",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8463ff8_8c3bfffa",
@@ -133,6 +241,24 @@
       "writtenOn": "2024-03-22T14:19:36Z",
       "side": 1,
       "message": "No newline at end of right file.",
+      "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e34a4d5_ddd469d2",
+        "filename": "keystore/plaintext-localfile/src/main/resources/default.properties",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-26T15:57:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8463ff8_8c3bfffa",
       "revId": "dd4287d52b251f17b6dc81d7db35625e3c986181",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
