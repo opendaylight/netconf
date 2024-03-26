@@ -68,7 +68,6 @@ import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.YangInstanceIdentifierSerializer;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.DataGetParams;
@@ -514,9 +513,9 @@ public abstract class RestconfStrategy {
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(new CreateResource(new YangInstanceIdentifierSerializer(databind).serializePath(
+                ret.set(new CreateResource(new ApiPathNormalizer(databind).canonicalize(
                     data instanceof MapNode mapData && !mapData.isEmpty()
-                        ? path.node(mapData.body().iterator().next().name()) : path)));
+                        ? path.node(mapData.body().iterator().next().name()) : path).toString()));
             }
 
             @Override
