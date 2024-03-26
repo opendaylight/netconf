@@ -143,6 +143,31 @@ class YangInstanceIdentifierSerializerTest {
 
     /**
      * Positive test of serialization of <code>YangInstanceIdentifier</code> to <code>String</code> when serialized
+     * <code>YangInstanceIdentifier</code> contains list with <code>YangInstanceIdentifier</code> as key.
+     * Returned <code>String</code> is compared to have expected value.
+     */
+    @Test
+    void serializeMapWithIIDKeyTest() {
+        assertEquals("""
+            serializer-test:container-iid-key/list-iid-key=serializer-test-included%3Aiid-container%2Fiid%5Bid%3D0%5D\
+            """,
+            SERIALIZER.serializePath(
+            YangInstanceIdentifier.builder()
+                .node(QName.create("serializer:test", "2016-06-06", "container-iid-key"))
+                .node(QName.create("serializer:test", "2016-06-06", "list-iid-key"))
+                .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-iid-key"),
+                    QName.create("serializer:test", "2016-06-06", "name"),
+                    YangInstanceIdentifier.builder()
+                        .node(QName.create("serializer:test:included", "2016-06-06", "iid-container"))
+                        .node(QName.create("serializer:test:included", "2016-06-06", "iid"))
+                        .nodeWithKey(QName.create("serializer:test:included", "2016-06-06", "iid"),
+                            QName.create("serializer:test:included", "2016-06-06", "id"), 0)
+                        .build())
+                .build()));
+    }
+
+    /**
+     * Positive test of serialization of <code>YangInstanceIdentifier</code> to <code>String</code> when serialized
      * <code>YangInstanceIdentifier</code> contains leaf node. Returned <code>String</code> is compared to have
      * expected value.
      */
