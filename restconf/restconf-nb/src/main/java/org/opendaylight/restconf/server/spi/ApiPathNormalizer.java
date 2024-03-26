@@ -12,13 +12,17 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.VerifyException;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
+import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert.PointNormalizer;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -30,15 +34,19 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.Composite;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
@@ -393,6 +401,137 @@ public final class ApiPathNormalizer implements PointNormalizer {
         throw new RestconfDocumentedException("Unexpected path " + path, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
+    /**
+     * Return the canonical {@link ApiPath} for specified {@link YangInstanceIdentifier}.
+     *
+     * @param path {@link YangInstanceIdentifier} to canonicalize
+     * @return An {@link ApiPath}
+     */
+    public @NonNull ApiPath canonicalize(final YangInstanceIdentifier path) {
+        final var it = path.getPathArguments().iterator();
+        if (!it.hasNext()) {
+            return ApiPath.empty();
+        }
+
+        final var stack = SchemaInferenceStack.of(databind.modelContext());
+        final var builder = ImmutableList.<Step>builder();
+        DataSchemaContext context = databind.schemaTree().getRoot();
+        QNameModule parentModule = null;
+        do {
+            final var arg = it.next();
+
+            // get module of the parent
+            if (!(context instanceof PathMixin)) {
+                parentModule = context.dataSchemaNode().getQName().getModule();
+            }
+
+            final var childContext = context instanceof Composite composite ? composite.enterChild(stack, arg) : null;
+            if (childContext == null) {
+                throw new RestconfDocumentedException(
+                    "Invalid input '%s': schema for argument '%s' (after '%s') not found".formatted(path, arg,
+                        ApiPath.of(builder.build())), ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT);
+            }
+
+            context = childContext;
+            if (childContext instanceof PathMixin) {
+                // This PathArgument is a mixed-in YangInstanceIdentifier, do not emit anything and continue
+                continue;
+            }
+
+            builder.add(canonicalize(arg, parentModule, stack, context));
+        } while (it.hasNext());
+
+        return new ApiPath(builder.build());
+    }
+
+    private @NonNull Step canonicalize(final PathArgument arg, final QNameModule prevNamespace,
+            final SchemaInferenceStack stack, final DataSchemaContext context) {
+        // append namespace before every node which is defined in other module than its parent
+        // condition is satisfied also for the first path argument
+        final var nodeType = arg.getNodeType();
+        final var module = nodeType.getModule().equals(prevNamespace) ? null : resolvePrefix(nodeType);
+        final var identifier = nodeType.unbind();
+
+        // NodeIdentifier maps to an ApiIdentifier
+        if (arg instanceof NodeIdentifier) {
+            return new ApiIdentifier(module, identifier);
+        }
+
+        // NodeWithValue addresses a LeafSetEntryNode and maps to a ListInstance with a single value
+        final var schema = context.dataSchemaNode();
+        if (arg instanceof NodeWithValue<?> withValue) {
+            if (!(schema instanceof LeafListSchemaNode leafList)) {
+                throw new RestconfDocumentedException(
+                    "Argument '%s' does not map to a leaf-list, but %s".formatted(arg, schema),
+                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+            }
+            return ListInstance.of(module, identifier, encodeValue(stack, leafList, withValue.getValue()));
+        }
+
+        // The only remaining case is NodeIdentifierWrithPredicates, verify that instead of an explicit cast
+        if (!(arg instanceof NodeIdentifierWithPredicates withPredicates)) {
+            throw new VerifyException("Unhandled " + arg);
+        }
+        // A NodeIdentifierWithPredicates adresses a MapEntryNode and maps to a ListInstance with one or more values:
+        // 1) schema has to be a ListSchemaNode
+        if (!(schema instanceof ListSchemaNode list)) {
+            throw new RestconfDocumentedException(
+                "Argument '%s' does not map to a list, but %s".formatted(arg, schema),
+                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+        }
+        // 2) the key definition must be non-empty
+        final var keyDef = list.getKeyDefinition();
+        final var size = keyDef.size();
+        if (size == 0) {
+            throw new RestconfDocumentedException(
+                "Argument '%s' maps a list without any keys %s".formatted(arg, schema),
+                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+        }
+        // 3) the number of predicates has to match the number of keys
+        if (size != withPredicates.size()) {
+            throw new RestconfDocumentedException(
+                "Argument '%s' does not match required keys %s".formatted(arg, keyDef),
+                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+        }
+
+        // ListSchemaNode implies the context is a composite, verify that instead of an unexplained cast when we look
+        // up the schema for individual keys
+        if (!(context instanceof Composite composite)) {
+            throw new VerifyException("Unexpected non-composite " + context + " with " + list);
+        }
+
+        final var builder = ImmutableList.<String>builderWithExpectedSize(size);
+        for (var key : keyDef) {
+            final var value = withPredicates.getValue(key);
+            if (value == null) {
+                throw new RestconfDocumentedException("Argument '%s' is missing predicate for %s".formatted(arg, key),
+                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+            }
+
+            final var tmpStack = stack.copy();
+            final var keyContext = composite.enterChild(tmpStack, key);
+            if (keyContext == null) {
+                throw new VerifyException("Failed to find key " + key + " in " + composite);
+            }
+            if (!(keyContext.dataSchemaNode() instanceof LeafSchemaNode leaf)) {
+                throw new VerifyException("Key " + key + " maps to non-leaf context " + keyContext);
+            }
+            builder.add(encodeValue(tmpStack, leaf, value));
+        }
+        return ListInstance.of(module, identifier, builder.build());
+    }
+
+    private String encodeValue(final SchemaInferenceStack stack, final TypedDataSchemaNode schema, final Object value) {
+        @SuppressWarnings("unchecked")
+        final var codec = (JSONCodec<Object>) databind.jsonCodecs().codecFor(schema, stack);
+        try (var jsonWriter = new HackJsonWriter()) {
+            codec.writeValue(jsonWriter, value);
+            return jsonWriter.acquireCaptured().rawString();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to serialize '" + value + "'", e);
+        }
+    }
+
     private NodeIdentifierWithPredicates prepareNodeWithPredicates(final SchemaInferenceStack stack, final QName qname,
             final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues) {
         final var keyDef = schema.getKeyDefinition();
@@ -449,5 +588,15 @@ public final class ApiPathNormalizer implements PointNormalizer {
         }
         throw new RestconfDocumentedException("Failed to lookup for module with name '" + moduleName + "'.",
             ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
+    }
+
+    /**
+     * Create prefix of namespace from {@link QName}.
+     *
+     * @param qname {@link QName}
+     * @return {@link String}
+     */
+    private @NonNull String resolvePrefix(final QName qname) {
+        return databind.modelContext().findModuleStatement(qname.getModule()).orElseThrow().argument().getLocalName();
     }
 }
