@@ -35,9 +35,11 @@ import org.opendaylight.netconf.shaded.sshd.common.io.IoServiceFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2Acceptor;
 import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2Connector;
+import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2ServiceFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2ServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController.HeartbeatType;
 import org.opendaylight.netconf.shaded.sshd.common.util.closeable.AbstractCloseable;
+import org.opendaylight.netconf.shaded.sshd.common.util.threads.NoCloseExecutor;
 import org.opendaylight.netconf.shaded.sshd.core.CoreModuleProperties;
 import org.opendaylight.netconf.shaded.sshd.server.SshServer;
 
@@ -149,12 +151,14 @@ public class SshProxyServer implements AutoCloseable {
 
         @Override
         public final IoConnector createConnector(final IoHandler handler) {
-            return new Nio2Connector(manager, handler, group, resumeTasks);
+            return new Nio2Connector(new Nio2ServiceFactory(manager, new NoCloseExecutor(null),
+                new NoCloseExecutor(resumeTasks)), manager, handler, group, resumeTasks);
         }
 
         @Override
         public final IoAcceptor createAcceptor(final IoHandler handler) {
-            return new Nio2Acceptor(manager, handler, group, resumeTasks);
+            return new Nio2Acceptor(new Nio2ServiceFactory(manager, new NoCloseExecutor(null),
+                new NoCloseExecutor(resumeTasks)), manager, handler, group, resumeTasks);
         }
 
         @Override
