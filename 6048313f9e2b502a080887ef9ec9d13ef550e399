@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a41174c_db9c97f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-26T17:53:54Z",
+      "side": 1,
+      "message": "soo... this looks like we are getting fully on board with serialization. So a couple of expansions to the test suite are needed:\n- type leafref\n- type identityref\nI think that will show that the existing FIXMEs should really get addressed",
+      "revId": "6048313f9e2b502a080887ef9ec9d13ef550e399",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a926e36_ffe6e9a9",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-26T17:53:54Z",
+      "side": 1,
+      "message": "this is still a \u0027value\u0027, coming from NodeWithValue.getValue(), or is this more contrived?",
+      "range": {
+        "startLine": 104,
+        "startChar": 75,
+        "endLine": 104,
+        "endChar": 80
+      },
+      "revId": "6048313f9e2b502a080887ef9ec9d13ef550e399",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5613372_582a5685",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-26T17:53:54Z",
+      "side": 1,
+      "message": "I am not a fan of magic booleans.",
+      "range": {
+        "startLine": 112,
+        "startChar": 12,
+        "endLine": 112,
+        "endChar": 36
+      },
+      "revId": "6048313f9e2b502a080887ef9ec9d13ef550e399",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "750e28ce_d7c9a246",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-03-26T17:53:54Z",
+      "side": 1,
+      "message": "so ... what does \u0027isForValue\u0027 mean, exactly?",
+      "range": {
+        "startLine": 124,
+        "startChar": 20,
+        "endLine": 124,
+        "endChar": 30
+      },
+      "revId": "6048313f9e2b502a080887ef9ec9d13ef550e399",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
