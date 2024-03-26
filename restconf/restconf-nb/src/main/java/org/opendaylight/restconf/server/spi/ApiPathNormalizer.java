@@ -12,13 +12,16 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.VerifyException;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
+import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert.PointNormalizer;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -30,6 +33,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -393,6 +397,71 @@ public final class ApiPathNormalizer implements PointNormalizer {
         throw new RestconfDocumentedException("Unexpected path " + path, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
+    /**
+     * Return the canonical {@link ApiPath} for specified {@link YangInstanceIdentifier}.
+     *
+     * @param path {@link YangInstanceIdentifier} to canonicalize
+     * @return An {@link ApiPath}
+     */
+    public @NonNull ApiPath canonicalize(final YangInstanceIdentifier path) {
+        final var it = path.getPathArguments().iterator();
+        if (!it.hasNext()) {
+            return ApiPath.empty();
+        }
+
+        final var builder = ImmutableList.<Step>builder();
+        DataSchemaContext currentContext = databind.schemaTree().getRoot();
+        QNameModule parentModule = null;
+        do {
+            final var arg = it.next();
+
+            // get module of the parent
+            if (!(currentContext instanceof PathMixin)) {
+                parentModule = currentContext.dataSchemaNode().getQName().getModule();
+            }
+
+            final var childContext = currentContext instanceof DataSchemaContext.Composite composite
+                ? composite.childByArg(arg) : null;
+            if (childContext == null) {
+                throw new RestconfDocumentedException(
+                    "Invalid input '%s': schema for argument '%s' (after '%s') not found".formatted(path, arg,
+                        ApiPath.of(builder.build())), ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT);
+            }
+
+            currentContext = childContext;
+            if (childContext instanceof PathMixin) {
+                continue;
+            }
+
+            // append namespace before every node which is defined in other module than its parent
+            // condition is satisfied also for the first path argument
+            final var nodeType = arg.getNodeType();
+            final var prefix = nodeType.getModule().equals(parentModule) ? null : resolvePrefix(nodeType);
+
+            final Step step;
+            if (arg instanceof NodeIdentifier) {
+                step = new ApiIdentifier(prefix, nodeType.getLocalName());
+            } else if (arg instanceof NodeWithValue<?> withValue) {
+                step = canonicalize(prefix, withValue);
+            } else if (arg instanceof NodeIdentifierWithPredicates withPredicates) {
+                step = canonicalize(prefix, withPredicates);
+            } else {
+                throw new VerifyException("Unhandled " + arg);
+            }
+            builder.add(step);
+        } while (it.hasNext());
+
+        return new ApiPath(builder.build());
+    }
+
+    private @NonNull ListInstance canonicalize(final String prefix, final NodeIdentifierWithPredicates pathArg) {
+        throw new UnsupportedOperationException();
+    }
+
+    private @NonNull ListInstance canonicalize(final String prefix, final NodeWithValue<?> pathArg) {
+        throw new UnsupportedOperationException();
+    }
+
     private NodeIdentifierWithPredicates prepareNodeWithPredicates(final SchemaInferenceStack stack, final QName qname,
             final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues) {
         final var keyDef = schema.getKeyDefinition();
@@ -449,5 +518,15 @@ public final class ApiPathNormalizer implements PointNormalizer {
         }
         throw new RestconfDocumentedException("Failed to lookup for module with name '" + moduleName + "'.",
             ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
+    }
+
+    /**
+     * Create prefix of namespace from {@link QName}.
+     *
+     * @param qname {@link QName}
+     * @return {@link String}
+     */
+    private @NonNull String resolvePrefix(final QName qname) {
+        return databind.modelContext().findModuleStatement(qname.getModule()).orElseThrow().argument().getLocalName();
     }
 }
