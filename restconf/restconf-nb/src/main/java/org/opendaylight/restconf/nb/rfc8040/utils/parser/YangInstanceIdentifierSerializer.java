@@ -9,12 +9,13 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -42,17 +43,16 @@ public final class YangInstanceIdentifierSerializer {
      * of an {@link EffectiveModelContext}.
      *
      * @param path path to data
-     * @return {@link String}
+     * @return a {@link String}
      */
     public String serializePath(final YangInstanceIdentifier path) {
-        if (path.isEmpty()) {
-            return "";
-        }
+        return new ApiPathNormalizer(databind).canonicalize(path).toString();
+    }
 
+    private String preparePath(final YangInstanceIdentifier path, final boolean isForValue) {
         final var current = databind.schemaTree().getRoot();
         final var variables = new MainVarsWrapper(current);
         final var sb = new StringBuilder();
-
         QNameModule parentModule = null;
         for (var arg : path.getPathArguments()) {
             // get module of the parent
@@ -90,38 +90,45 @@ public final class YangInstanceIdentifierSerializer {
 
             sb.append(arg.getNodeType().getLocalName());
             if (arg instanceof NodeIdentifierWithPredicates withPredicates) {
-                prepareNodeWithPredicates(sb, withPredicates.entrySet());
+                prepareNodeWithPredicates(sb, withPredicates.entrySet(), isForValue);
             } else if (arg instanceof NodeWithValue<?> withValue) {
-                prepareNodeWithValue(sb, withValue.getValue());
+                prepareNode(sb, withValue.getValue());
             }
         }
-
         return sb.toString();
     }
 
-    private static void prepareNodeWithValue(final StringBuilder path, final Object value) {
+    private static void prepareNode(final StringBuilder path, final Object entry) {
         path.append('=');
-
         // FIXME: this is quite fishy
-        final var str = String.valueOf(value);
+        final var str = String.valueOf(entry);
         path.append(ApiPath.PERCENT_ESCAPER.escape(str));
     }
 
-    private static void prepareNodeWithPredicates(final StringBuilder path, final Set<Entry<QName, Object>> entries) {
+    private void prepareNodeWithPredicates(final StringBuilder sb, final Set<Map.Entry<QName, Object>> entries,
+            final boolean isForValue) {
         final var iterator = entries.iterator();
-        if (iterator.hasNext()) {
-            path.append('=');
+        if (!isForValue && iterator.hasNext()) {
+            sb.append('=');
         }
-
         while (iterator.hasNext()) {
-            // FIXME: this is quite fishy
-            final var str = String.valueOf(iterator.next().getValue());
-            path.append(ApiPath.PERCENT_ESCAPER.escape(str));
+            final var entry = iterator.next();
+            final var entryValue = entry.getValue();
+            if (entryValue instanceof YangInstanceIdentifier yii) {
+                final var value = preparePath(yii, true);
+                sb.append(ApiPath.PERCENT_ESCAPER.escape(value));
+            } else if (isForValue) {
+                sb.append('[').append(entry.getKey().getLocalName()).append('=').append(entryValue)
+                    .append(']');
+            } else {
+                sb.append(ApiPath.PERCENT_ESCAPER.escape(entryValue.toString()));
+            }
             if (iterator.hasNext()) {
-                path.append(',');
+                sb.append(',');
             }
         }
     }
+
 
     /**
      * Create prefix of namespace from {@link QName}.
