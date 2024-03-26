@@ -12,6 +12,7 @@ import static com.google.common.base.Verify.verifyNotNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.VerifyException;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
+import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert.PointNormalizer;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -391,6 +393,30 @@ public final class ApiPathNormalizer implements PointNormalizer {
             return actionPath;
         }
         throw new RestconfDocumentedException("Unexpected path " + path, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+    }
+
+    /**
+     * Return the canonical {@link ApiPath} for specified {@link YangInstanceIdentifier}.
+     *
+     * @param instanceIdentifier {@link YangInstanceIdentifier} to canonicalize
+     * @return
+     */
+    public @NonNull ApiPath canonicalize(final YangInstanceIdentifier instanceIdentifier) {
+        final var it = instanceIdentifier.getPathArguments().iterator();
+        if (!it.hasNext()) {
+            return ApiPath.empty();
+        }
+
+        final var builder = ImmutableList.<Step>builder();
+        var current = databind.schemaTree().getRoot();
+        do {
+            final var arg = it.next();
+            // FIXME: implement this
+
+
+        } while (it.hasNext());
+
+        return new ApiPath(builder.build());
     }
 
     private NodeIdentifierWithPredicates prepareNodeWithPredicates(final SchemaInferenceStack stack, final QName qname,
