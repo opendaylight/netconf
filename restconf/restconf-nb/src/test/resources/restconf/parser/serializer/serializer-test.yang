@@ -78,6 +78,16 @@ module serializer-test {
     }
   }
 
+  container container-iid-key {
+    list list-iid-key {
+      key name;
+
+      leaf name {
+        type sti:iid-ref;
+      }
+    }
+  }
+
   augment "/sti:augmented-list" {
     leaf augmented-leaf {
       type string;

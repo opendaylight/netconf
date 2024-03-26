@@ -8,6 +8,20 @@ module serializer-test-included {
       "Initial revision.";
   }
 
+  typedef iid-ref {
+    type instance-identifier;
+  }
+
+  container iid-container {
+    list iid {
+      key id;
+
+      leaf id {
+        type uint32;
+      }
+    }
+  }
+
   list augmented-list {
     key list-key;
 
