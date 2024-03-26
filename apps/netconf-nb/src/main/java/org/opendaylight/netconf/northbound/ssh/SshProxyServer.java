@@ -33,11 +33,11 @@ import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoServiceEventListener;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoServiceFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoServiceFactoryFactory;
-import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2Acceptor;
-import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2Connector;
+import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2ServiceFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.nio2.Nio2ServiceFactoryFactory;
 import org.opendaylight.netconf.shaded.sshd.common.session.SessionHeartbeatController.HeartbeatType;
 import org.opendaylight.netconf.shaded.sshd.common.util.closeable.AbstractCloseable;
+import org.opendaylight.netconf.shaded.sshd.common.util.threads.NoCloseExecutor;
 import org.opendaylight.netconf.shaded.sshd.core.CoreModuleProperties;
 import org.opendaylight.netconf.shaded.sshd.server.SshServer;
 
@@ -127,16 +127,16 @@ public class SshProxyServer implements AutoCloseable {
     }
 
     private abstract static class AbstractNioServiceFactory extends AbstractCloseable implements IoServiceFactory {
-        private final FactoryManager manager;
         private final AsynchronousChannelGroup group;
         private final ExecutorService resumeTasks;
+        private final Nio2ServiceFactory serviceFactory;
         private IoServiceEventListener eventListener;
 
         AbstractNioServiceFactory(final FactoryManager manager, final AsynchronousChannelGroup group,
                 final ExecutorService resumeTasks) {
-            this.manager = requireNonNull(manager);
             this.group = requireNonNull(group);
             this.resumeTasks = requireNonNull(resumeTasks);
+            serviceFactory = new Nio2ServiceFactory(manager, null, new NoCloseExecutor(resumeTasks));
         }
 
         final AsynchronousChannelGroup group() {
@@ -149,12 +149,12 @@ public class SshProxyServer implements AutoCloseable {
 
         @Override
         public final IoConnector createConnector(final IoHandler handler) {
-            return new Nio2Connector(manager, handler, group, resumeTasks);
+            return serviceFactory.createConnector(handler);
         }
 
         @Override
         public final IoAcceptor createAcceptor(final IoHandler handler) {
-            return new Nio2Acceptor(manager, handler, group, resumeTasks);
+            return serviceFactory.createAcceptor(handler);
         }
 
         @Override
