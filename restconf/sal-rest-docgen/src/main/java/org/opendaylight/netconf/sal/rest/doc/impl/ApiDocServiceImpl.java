@@ -90,7 +90,7 @@ public final class ApiDocServiceImpl implements ApiDocService {
      */
     @Override
     public Response getApiExplorer(final UriInfo uriInfo) {
-        return Response.seeOther(uriInfo.getBaseUriBuilder().path("../explorer/index.html").build()).build();
+        return Response.seeOther(uriInfo.getBaseUriBuilder().path("../../explorer/index.html").build()).build();
     }
 
     @Override
