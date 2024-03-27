@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1356775f_e8531eab",
+        "filename": "transport/transport-http/src/main/java/org/opendaylight/netconf/transport/http/ClientHttp1RequestDispatcher.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-27T14:42:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ea71231_0881aae4",
+      "range": {
+        "startLine": 52,
+        "startChar": 16,
+        "endLine": 52,
+        "endChar": 28
+      },
+      "revId": "3e4cb4de336607cd841985fa91e66416fe0b157b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bcb0b23e_60906825",
@@ -59,6 +83,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2756ec93_5239342e",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HttpClientServerTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-27T14:42:16Z",
+      "side": 1,
+      "message": "The configuration model is described as grouping -\u003e bound to interface, no implementation class\n\nwhile the test implementation can be provided for the test\nthe mock usage is more compact and consistent with similar cases\nin other netconf transport modules",
+      "parentUuid": "3f6fa7fc_360757ca",
+      "revId": "3e4cb4de336607cd841985fa91e66416fe0b157b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de6f540b_953bafc5",
@@ -72,6 +114,24 @@
       "writtenOn": "2024-03-25T14:45:02Z",
       "side": 1,
       "message": "We do not have to mock this settings.",
+      "revId": "3e4cb4de336607cd841985fa91e66416fe0b157b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2925f0d1_5ed759a3",
+        "filename": "transport/transport-http/src/test/java/org/opendaylight/netconf/transport/http/HttpClientServerTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-03-27T14:42:16Z",
+      "side": 1,
+      "message": "same as above",
+      "parentUuid": "de6f540b_953bafc5",
       "revId": "3e4cb4de336607cd841985fa91e66416fe0b157b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
