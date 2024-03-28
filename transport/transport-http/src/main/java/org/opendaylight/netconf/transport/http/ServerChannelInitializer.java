@@ -150,13 +150,8 @@ class ServerChannelInitializer extends ChannelInitializer<Channel> implements Ht
 
     private static HttpServerUpgradeHandler.UpgradeCodecFactory upgradeCodecFactory(
             final Http2ConnectionHandler connectionHandler) {
-        return protocol -> {
-            if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
-                return new Http2ServerUpgradeCodec(connectionHandler);
-            } else {
-                return null;
-            }
-        };
+        return protocol -> AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)
+            ? new Http2ServerUpgradeCodec(connectionHandler) : null;
     }
 
     private static ChannelHandler serverHandler(final RequestDispatcher dispatcher) {
