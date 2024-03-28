@@ -162,31 +162,28 @@ class ServerChannelInitializer extends ChannelInitializer<Channel> implements Ht
     private static ChannelHandler serverHandler(final RequestDispatcher dispatcher) {
         return new SimpleChannelInboundHandler<FullHttpRequest>() {
             @Override
-            protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request)
-                    throws Exception {
-                Futures.addCallback(dispatcher.dispatch(request.retain()),
-                    new FutureCallback<>() {
-                        @Override
-                        public void onSuccess(final FullHttpResponse response) {
-                            copyStreamId(request, response);
-                            request.release();
-                            ctx.writeAndFlush(response);
-                        }
+            protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) {
+                Futures.addCallback(dispatcher.dispatch(request.retain()), new FutureCallback<>() {
+                    @Override
+                    public void onSuccess(final FullHttpResponse response) {
+                        copyStreamId(request, response);
+                        request.release();
+                        ctx.writeAndFlush(response);
+                    }
 
-                        @Override
-                        public void onFailure(final Throwable throwable) {
-                            final var message = throwable.getMessage();
-                            final var content = message == null ? EMPTY_BUFFER
-                                : Unpooled.wrappedBuffer(message.getBytes(StandardCharsets.UTF_8));
-                            final var response = new DefaultFullHttpResponse(request.protocolVersion(),
-                                INTERNAL_SERVER_ERROR, content);
-                            response.headers().set(CONTENT_TYPE, TEXT_PLAIN)
-                                .setInt(CONTENT_LENGTH, response.content().readableBytes());
-                            copyStreamId(request, response);
-                            request.release();
-                            ctx.writeAndFlush(response);
-                        }
-                    }, MoreExecutors.directExecutor());
+                    @Override
+                    public void onFailure(final Throwable throwable) {
+                        final var message = throwable.getMessage();
+                        final var content = message == null ? EMPTY_BUFFER
+                            : Unpooled.wrappedBuffer(message.getBytes(StandardCharsets.UTF_8));
+                        final var response = new DefaultFullHttpResponse(request.protocolVersion(),
+                            INTERNAL_SERVER_ERROR, content);
+                        response.headers()
+                            .set(CONTENT_TYPE, TEXT_PLAIN)
+                            .setInt(CONTENT_LENGTH, response.content().readableBytes());
+                        onSuccess(response);
+                    }
+                }, MoreExecutors.directExecutor());
             }
         };
     }
