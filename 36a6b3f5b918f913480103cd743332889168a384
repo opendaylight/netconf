@@ -16,6 +16,24 @@
       "message": "Do not change JUnit version in this patch. We will have https://jira.opendaylight.org/browse/NETCONF-1282.",
       "revId": "36a6b3f5b918f913480103cd743332889168a384",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea5973dd_dc3c031d",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProviderTest.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-03-28T10:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df9c830e_b9dc0f76",
+      "revId": "36a6b3f5b918f913480103cd743332889168a384",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
