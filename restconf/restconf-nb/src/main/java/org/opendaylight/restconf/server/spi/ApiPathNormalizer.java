@@ -37,6 +37,7 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
+import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
@@ -282,10 +283,19 @@ public final class ApiPathNormalizer implements PointNormalizer {
             if (step instanceof ListInstance listStep) {
                 final var values = listStep.keyValues();
                 final var schema = childNode.dataSchemaNode();
-                pathArg = schema instanceof ListSchemaNode listSchema
-                    ? prepareNodeWithPredicates(stack, qname, listSchema, values)
-                        // FIXME: recognize only leaf-list here, which has only a single item
-                        : prepareNodeWithValue(stack, qname, schema, values);
+                if (schema instanceof ListSchemaNode listSchema) {
+                    pathArg = prepareNodeWithPredicates(stack, qname, listSchema, values);
+                } else if (schema instanceof LeafListSchemaNode leafListSchema) {
+                    if (values.size() != 1) {
+                        throw new RestconfDocumentedException("Entry '" + qname + "' requires one value predicate.",
+                            ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE);
+                    }
+                    pathArg = new NodeWithValue<>(qname, prepareValueByType(stack, schema, values.get(0)));
+                } else {
+                    throw new RestconfDocumentedException(
+                        "Entry '" + qname + "' does not take a key or value predicate.",
+                        ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE);
+                }
             } else {
                 if (childNode.dataSchemaNode() instanceof ListSchemaNode list && !list.getKeyDefinition().isEmpty()) {
                     throw new RestconfDocumentedException(
@@ -429,14 +439,6 @@ public final class ApiPathNormalizer implements PointNormalizer {
             throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
         }
-    }
-
-    private NodeWithValue<?> prepareNodeWithValue(final SchemaInferenceStack stack, final QName qname,
-            final DataSchemaNode schema, final List<String> keyValues) {
-        // TODO: qname should be always equal to schema.getQName(), right?
-        return new NodeWithValue<>(qname, prepareValueByType(stack, schema,
-            // FIXME: ahem: we probably want to do something differently here
-            keyValues.get(0)));
     }
 
     private @NonNull QNameModule resolveNamespace(final String moduleName) {
