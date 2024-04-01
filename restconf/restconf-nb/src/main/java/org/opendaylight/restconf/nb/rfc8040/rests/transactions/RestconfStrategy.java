@@ -92,7 +92,7 @@ import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.InstanceReference;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.OperationPath;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Action;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Data;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Rpc;
 import org.opendaylight.restconf.server.spi.OperationInput;
@@ -1289,7 +1289,7 @@ public abstract class RestconfStrategy {
 
     public @NonNull RestconfFuture<OperationsPostResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
             final OperationInputBody body) {
-        final OperationPath.Rpc path;
+        final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
         } catch (RestconfDocumentedException e) {
@@ -1421,7 +1421,7 @@ public abstract class RestconfStrategy {
                     resourceBody, queryParameters);
             }
         }
-        if (path instanceof OperationPath.Action actionPath) {
+        if (path instanceof Action actionPath) {
             try (var inputBody = body.toOperationInput()) {
                 return dataInvokePOST(actionPath, inputBody);
             }
@@ -1460,8 +1460,7 @@ public abstract class RestconfStrategy {
         return ret;
     }
 
-    private @NonNull RestconfFuture<InvokeOperation> dataInvokePOST(final OperationPath.Action path,
-            final OperationInputBody body) {
+    private @NonNull RestconfFuture<InvokeOperation> dataInvokePOST(final Action path, final OperationInputBody body) {
         final var inference = path.inference();
         final ContainerNode input;
         try {
@@ -1493,7 +1492,7 @@ public abstract class RestconfStrategy {
      * @return {@link DOMActionResult}
      */
     private static RestconfFuture<DOMActionResult> dataInvokePOST(final DOMActionService actionService,
-            final OperationPath.Action path, final @NonNull ContainerNode input) {
+            final Action path, final @NonNull ContainerNode input) {
         final var ret = new SettableRestconfFuture<DOMActionResult>();
 
         Futures.addCallback(actionService.invokeAction(

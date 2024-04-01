@@ -22,6 +22,7 @@ import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert.PointNormalizer;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Action;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Data;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Rpc;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -232,7 +233,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
             final var stack = SchemaInferenceStack.of(modelContext);
             final var stmt = stack.enterSchemaTree(rpc.argument());
             verify(rpc.equals(stmt), "Expecting %s, inferred %s", rpc, stmt);
-            return new OperationPath.Rpc(stack.toInference(), rpc);
+            return new Rpc(stack.toInference(), rpc);
         }
 
         final var stack = SchemaInferenceStack.of(modelContext);
@@ -259,7 +260,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
                     final var actionStmt = action.asEffectiveStatement();
                     verify(actionStmt.equals(stmt), "Expecting %s, inferred %s", actionStmt, stmt);
 
-                    return new OperationPath.Action(stack.toInference(), YangInstanceIdentifier.of(path), actionStmt);
+                    return new Action(stack.toInference(), YangInstanceIdentifier.of(path), actionStmt);
                 }
             }
 
@@ -386,7 +387,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
         if (path instanceof Data dataPath) {
             return dataPath;
         }
-        if (path instanceof OperationPath.Action actionPath) {
+        if (path instanceof Action actionPath) {
             return actionPath;
         }
         throw new RestconfDocumentedException("Unexpected path " + path, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
