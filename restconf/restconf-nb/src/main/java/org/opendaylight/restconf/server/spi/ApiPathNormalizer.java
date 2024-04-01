@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableMap;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
@@ -33,7 +32,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
@@ -41,24 +39,23 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.IdentityEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.InputEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.OutputEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaTreeEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.UnionTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * Utility for normalizing {@link ApiPath}s. An {@link ApiPath} can represent a number of different constructs, as
  * denoted to in the {@link Path} interface hierarchy.
+ *
+ * <p>
+ * This process is governed by
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.5.3">RFC8040, section 3.5.3</a>. The URI provides the
+ * equivalent of NETCONF XML filter encoding, with data values being escaped RFC7891 strings.
  */
 public final class ApiPathNormalizer implements PointNormalizer {
     /**
@@ -289,6 +286,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
                 final var schema = childNode.dataSchemaNode();
                 pathArg = schema instanceof ListSchemaNode listSchema
                     ? prepareNodeWithPredicates(stack, qname, listSchema, values)
+                        // FIXME: recognize only leaf-list here, which has only a single item
                         : prepareNodeWithValue(stack, qname, schema, values);
             } else {
                 if (childNode.dataSchemaNode() instanceof ListSchemaNode list && !list.getKeyDefinition().isEmpty()) {
@@ -413,37 +411,22 @@ public final class ApiPathNormalizer implements PointNormalizer {
     private Object prepareValueByType(final SchemaInferenceStack stack, final DataSchemaNode schemaNode,
             final @NonNull String value) {
         if (schemaNode instanceof TypedDataSchemaNode typedSchema) {
-            return prepareValueByType(stack, typedSchema, typedSchema.getType(), value);
+            return parserJsonValue(stack, typedSchema, value);
         }
         throw new VerifyException("Unhandled schema " + schemaNode + " decoding '" + value + "'");
     }
 
-    private Object prepareValueByType(final SchemaInferenceStack stack, final TypedDataSchemaNode schemaNode,
-            final TypeDefinition<?> unresolved, final @NonNull String value) {
-        // Resolve 'type leafref' before dispatching on type
-        final TypeDefinition<?> typedef;
-        if (unresolved instanceof LeafrefTypeDefinition leafref) {
-            typedef = stack.resolveLeafref(leafref);
-        } else {
-            typedef = unresolved;
-        }
-
-        // Complex types
-        if (typedef instanceof IdentityrefTypeDefinition) {
-            return toIdentityrefQName(value, schemaNode);
-        }
-        if (typedef instanceof InstanceIdentifierTypeDefinition) {
-            return toInstanceIdentifier(value, schemaNode);
-        }
-        if (typedef instanceof UnionTypeDefinition union) {
-            return toUnion(stack, schemaNode, union, value);
-        }
-
-        // Simple types
-        final var codec = verifyNotNull(TypeDefinitionAwareCodec.from(typedef), "Unhandled type %s decoding %s",
-            typedef, value);
+    private Object parserJsonValue(final SchemaInferenceStack stack, final TypedDataSchemaNode schemaNode,
+            final String value) {
+        // As per https://www.rfc-editor.org/rfc/rfc8040#page-29:
+        //            The syntax for
+        //            "api-identifier" and "key-value" MUST conform to the JSON identifier
+        //            encoding rules in Section 4 of [RFC7951]: The RESTCONF root resource
+        //            path is required.  Additional sub-resource identifiers are optional.
+        //            The characters in a key value string are constrained, and some
+        //            characters need to be percent-encoded, as described in Section 3.5.3.
         try {
-            return codec.deserialize(value);
+            return databind.jsonCodecs().codecFor(schemaNode, stack).parseValue(null, value);
         } catch (IllegalArgumentException e) {
             throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
@@ -456,63 +439,6 @@ public final class ApiPathNormalizer implements PointNormalizer {
         return new NodeWithValue<>(qname, prepareValueByType(stack, schema,
             // FIXME: ahem: we probably want to do something differently here
             keyValues.get(0)));
-    }
-
-    private Object toUnion(final SchemaInferenceStack stack, final TypedDataSchemaNode schemaNode,
-            final UnionTypeDefinition union, final @NonNull String value) {
-        // As per https://www.rfc-editor.org/rfc/rfc7950#section-9.12:
-        //   'type union' must have at least one 'type'
-        // hence this variable will always end up being non-null before being used
-        RestconfDocumentedException cause = null;
-        for (var type : union.getTypes()) {
-            try {
-                return prepareValueByType(stack, schemaNode, type, value);
-            } catch (RestconfDocumentedException e) {
-                if (cause == null) {
-                    cause = e;
-                } else {
-                    cause.addSuppressed(e);
-                }
-            }
-        }
-        throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
-            ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, cause);
-    }
-
-    private YangInstanceIdentifier toInstanceIdentifier(final String value, final TypedDataSchemaNode schemaNode) {
-        if (value.isEmpty() || !value.startsWith("/")) {
-            throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
-
-        try {
-            return normalizeDataPath(ApiPath.parse(value.substring(1))).instance();
-        } catch (ParseException | RestconfDocumentedException e) {
-            throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
-        }
-    }
-
-    private QName toIdentityrefQName(final String value, final TypedDataSchemaNode schemaNode) {
-        final QNameModule namespace;
-        final String localName;
-        final int firstColon = value.indexOf(':');
-        if (firstColon != -1) {
-            namespace = resolveNamespace(value.substring(0, firstColon));
-            localName = value.substring(firstColon + 1);
-        } else {
-            namespace = schemaNode.getQName().getModule();
-            localName = value;
-        }
-
-        return modelContext.getModuleStatement(namespace)
-            .streamEffectiveSubstatements(IdentityEffectiveStatement.class)
-            .map(IdentityEffectiveStatement::argument)
-            .filter(qname -> localName.equals(qname.getLocalName()))
-            .findFirst()
-            .orElseThrow(() -> new RestconfDocumentedException(
-                "No identity found for '" + localName + "' in namespace " + namespace,
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
     }
 
     private @NonNull QNameModule resolveNamespace(final String moduleName) {

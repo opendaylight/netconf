@@ -56,7 +56,7 @@ class NC1265Test {
                 .node(BAZ)
                 .nodeWithKey(BAZ, KEY, Uint8.valueOf(123))
                 .build())
-            .build(), "nc1265:bar=%2Fnc1265:baz=123");
+            .build(), "nc1265:bar=%2Fnc1265:baz[key='123']");
     }
 
     @Test
@@ -67,7 +67,7 @@ class NC1265Test {
                 .node(BAZ)
                 .nodeWithKey(BAZ, KEY, Uint8.valueOf(123))
                 .build())
-            .build(), "nc1265:xyzzy=%2Fnc1265:baz=123");
+            .build(), "nc1265:xyzzy=%2Fnc1265:baz[key='123']");
     }
 
     @Test
@@ -90,8 +90,8 @@ class NC1265Test {
     void unionKeyString() {
         assertNormalized(YangInstanceIdentifier.builder()
             .node(XYZZY)
-            .nodeWithKey(XYZZY, KEY, "abc")
-            .build(), "nc1265:xyzzy=abc");
+            .nodeWithKey(XYZZY, KEY, ",/")
+            .build(), "nc1265:xyzzy=%2C%2F");
     }
 
     @Test
@@ -100,22 +100,23 @@ class NC1265Test {
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
         assertEquals("Invalid value 'nc1265:baz=123' for (nc1265)key", error.getErrorMessage());
-        assertEquals(null, error.getErrorInfo());
+        assertEquals("""
+            Could not parse Instance Identifier 'nc1265:baz=123'. Offset: 0 : Reason: Identifier must start with '/'.\
+            """, error.getErrorInfo());
     }
 
     @Test
     void malformedInstanceIdentifierKey() {
-        final var error = assertRestconfError("nc1265:bar=%2Fnc1265:baz=abc");
+        final var error = assertRestconfError("nc1265:bar=%2Fnc1265:baz[key='abc']");
         assertEquals(ErrorType.PROTOCOL, error.getErrorType());
         assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
-        assertEquals("Invalid value '/nc1265:baz=abc' for (nc1265)key", error.getErrorMessage());
+        assertEquals("Invalid value '/nc1265:baz[key='abc']' for (nc1265)key", error.getErrorMessage());
         assertEquals("""
-            errors: [RestconfError [error-type: protocol, error-tag: invalid-value, error-message: Invalid value 'abc' \
-            for (nc1265)key, error-info: Incorrect lexical representation of integer value: abc.
+            Incorrect lexical representation of integer value: abc.
             An integer value can be defined as:
               - a decimal number,
               - a hexadecimal number (prefix 0x),%n  - an octal number (prefix 0).
-            Signed values are allowed. Spaces between digits are NOT allowed.]]""", error.getErrorInfo());
+            Signed values are allowed. Spaces between digits are NOT allowed.""", error.getErrorInfo());
     }
 
     private static void assertNormalized(final YangInstanceIdentifier expected, final String apiPath) {
