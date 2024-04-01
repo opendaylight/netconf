@@ -33,7 +33,7 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.DataPath;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Data;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -112,7 +112,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfFuture<DataGetResult> dataGET(final DataPath path, final DataGetParams params) {
+    RestconfFuture<DataGetResult> dataGET(final Data path, final DataGetParams params) {
         final var inference = path.inference();
         final var fields = params.fields();
         final var translatedFields = fields == null ? null

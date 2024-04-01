@@ -38,7 +38,7 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.DataPath;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Data;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -82,7 +82,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfFuture<DataGetResult> dataGET(final DataPath path, final DataGetParams params) {
+    RestconfFuture<DataGetResult> dataGET(final Data path, final DataGetParams params) {
         final var inference = path.inference();
         final var fields = params.fields();
         final List<YangInstanceIdentifier> fieldPaths;

@@ -21,7 +21,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.DataPath;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Data;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -336,7 +336,7 @@ class YangInstanceIdentifierSerializerTest {
 
     private static YangInstanceIdentifier assertNormalized(final String str) {
         try {
-            return assertInstanceOf(DataPath.class, new ApiPathNormalizer(DATABIND).normalizePath(ApiPath.parse(str)))
+            return assertInstanceOf(Data.class, new ApiPathNormalizer(DATABIND).normalizePath(ApiPath.parse(str)))
                 .instance();
         } catch (ParseException e) {
             throw new AssertionError(e);

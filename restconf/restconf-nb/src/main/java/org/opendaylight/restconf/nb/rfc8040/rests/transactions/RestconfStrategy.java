@@ -91,10 +91,10 @@ import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.DataPath;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.InstanceReference;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer.OperationPath;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.OperationPath.Rpc;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Data;
+import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Rpc;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
@@ -158,7 +158,7 @@ import org.slf4j.LoggerFactory;
 //        operations. This should be handled through proper allocation indirection.
 public abstract class RestconfStrategy {
     @NonNullByDefault
-    public record StrategyAndPath(RestconfStrategy strategy, DataPath path) {
+    public record StrategyAndPath(RestconfStrategy strategy, Data path) {
         public StrategyAndPath {
             requireNonNull(strategy);
             requireNonNull(path);
@@ -333,7 +333,7 @@ public abstract class RestconfStrategy {
 
     public @NonNull RestconfFuture<DataPutResult> dataPUT(final ApiPath apiPath, final ResourceBody body,
             final Map<String, String> queryParameters) {
-        final DataPath path;
+        final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RestconfDocumentedException e) {
@@ -579,7 +579,7 @@ public abstract class RestconfStrategy {
      * @throws NullPointerException if any argument is {@code null}
      */
     public final @NonNull RestconfFuture<DataPatchResult> dataPATCH(final ApiPath apiPath, final ResourceBody body) {
-        final DataPath path;
+        final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RestconfDocumentedException e) {
@@ -597,7 +597,7 @@ public abstract class RestconfStrategy {
     }
 
     public final @NonNull RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath apiPath, final PatchBody body) {
-        final DataPath path;
+        final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RestconfDocumentedException e) {
@@ -807,7 +807,7 @@ public abstract class RestconfStrategy {
      */
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
     public final @NonNull RestconfFuture<Empty> dataDELETE(final ApiPath apiPath) {
-        final DataPath path;
+        final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RestconfDocumentedException e) {
@@ -824,7 +824,7 @@ public abstract class RestconfStrategy {
 
     public final @NonNull RestconfFuture<DataGetResult> dataGET(final ApiPath apiPath,
             final DataGetParams params) {
-        final DataPath path;
+        final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RestconfDocumentedException e) {
@@ -833,7 +833,7 @@ public abstract class RestconfStrategy {
         return dataGET(path, params);
     }
 
-    abstract @NonNull RestconfFuture<DataGetResult> dataGET(DataPath path, DataGetParams params);
+    abstract @NonNull RestconfFuture<DataGetResult> dataGET(Data path, DataGetParams params);
 
     static final @NonNull RestconfFuture<DataGetResult> completeDataGET(final Inference inference,
             final QueryParameters queryParams, final @Nullable NormalizedNode node,
@@ -1415,7 +1415,7 @@ public abstract class RestconfStrategy {
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-        if (path instanceof DataPath dataPath) {
+        if (path instanceof Data dataPath) {
             try (var resourceBody = body.toResource()) {
                 return dataCreatePOST(new DataPostPath(databind, dataPath.inference(), dataPath.instance()),
                     resourceBody, queryParameters);
