@@ -413,7 +413,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
     private Object prepareValueByType(final SchemaInferenceStack stack, final DataSchemaNode schemaNode,
             final @NonNull String value) {
         if (schemaNode instanceof TypedDataSchemaNode typedSchema) {
-            return prepareValueByType(stack, typedSchema, typedSchema.getType(), value);
+            return databind.jsonCodecs().codecFor(typedSchema, stack).parseValue(null, value);
         }
         throw new VerifyException("Unhandled schema " + schemaNode + " decoding '" + value + "'");
     }
