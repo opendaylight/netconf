@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.text.ParseException;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Objects;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -36,7 +37,7 @@ import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
  * as a series of {@link Step}s.
  */
 @NonNullByDefault
-public final class ApiPath implements HierarchicalIdentifier<ApiPath> {
+public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifier<ApiPath> {
     @java.io.Serial
     private static final long serialVersionUID = 1L;
 
@@ -173,10 +174,8 @@ public final class ApiPath implements HierarchicalIdentifier<ApiPath> {
 
     private static final ApiPath EMPTY = new ApiPath(ImmutableList.of());
 
-    private final ImmutableList<Step> steps;
-
-    private ApiPath(final ImmutableList<Step> steps) {
-        this.steps = requireNonNull(steps);
+    public ApiPath {
+        requireNonNull(steps);
     }
 
     /**
@@ -186,6 +185,10 @@ public final class ApiPath implements HierarchicalIdentifier<ApiPath> {
      */
     public static ApiPath empty() {
         return EMPTY;
+    }
+
+    public static ApiPath of(final List<Step> steps) {
+        return steps.isEmpty() ? EMPTY : new ApiPath(ImmutableList.copyOf(steps));
     }
 
     /**
@@ -279,13 +282,7 @@ public final class ApiPath implements HierarchicalIdentifier<ApiPath> {
 
     public ApiPath subPath(final int fromIndex, final int toIndex) {
         final var subList = steps.subList(fromIndex, toIndex);
-        if (subList == steps) {
-            return this;
-        } else if (subList.isEmpty()) {
-            return EMPTY;
-        } else {
-            return new ApiPath(subList);
-        }
+        return subList == steps ? this : of(subList);
     }
 
     @Override
@@ -341,7 +338,6 @@ public final class ApiPath implements HierarchicalIdentifier<ApiPath> {
     }
 
     private static ApiPath parseString(final ApiPathParser parser, final String str) throws ParseException {
-        final var steps = parser.parseSteps(str);
-        return steps.isEmpty() ? EMPTY : new ApiPath(steps);
+        return of(parser.parseSteps(str));
     }
 }
