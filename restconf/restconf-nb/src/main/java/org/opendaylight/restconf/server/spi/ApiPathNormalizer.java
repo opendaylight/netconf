@@ -36,7 +36,6 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
@@ -183,18 +182,16 @@ public final class ApiPathNormalizer implements PointNormalizer {
         OutputEffectiveStatement outputStatement();
     }
 
-    private final @NonNull EffectiveModelContext modelContext;
     private final @NonNull DatabindContext databind;
 
     public ApiPathNormalizer(final DatabindContext databind) {
         this.databind = requireNonNull(databind);
-        modelContext = databind.modelContext();
     }
 
     public @NonNull Path normalizePath(final ApiPath apiPath) {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
-            return new Data(Inference.ofDataTreePath(modelContext), YangInstanceIdentifier.of(),
+            return new Data(Inference.ofDataTreePath(databind.modelContext()), YangInstanceIdentifier.of(),
                 databind.schemaTree().getRoot());
         }
 
@@ -215,6 +212,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
         var qname = step.identifier().bindTo(namespace);
 
         // We go through more modern APIs here to get this special out of the way quickly
+        final var modelContext = databind.modelContext();
         final var optRpc = modelContext.findModuleStatement(namespace).orElseThrow()
             .findSchemaTreeNode(RpcEffectiveStatement.class, qname);
         if (optRpc.isPresent()) {
@@ -357,7 +355,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
 
         final var namespace = resolveNamespace(firstModule);
         final var qname = step.identifier().bindTo(namespace);
-        final var stack = SchemaInferenceStack.of(modelContext);
+        final var stack = SchemaInferenceStack.of(databind.modelContext());
         final SchemaTreeEffectiveStatement<?> stmt;
         try {
             stmt = stack.enterSchemaTree(qname);
@@ -442,7 +440,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
     }
 
     private @NonNull QNameModule resolveNamespace(final String moduleName) {
-        final var it = modelContext.findModuleStatements(moduleName).iterator();
+        final var it = databind.modelContext().findModuleStatements(moduleName).iterator();
         if (it.hasNext()) {
             return it.next().localQNameModule();
         }
