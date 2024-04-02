@@ -8,23 +8,27 @@
 package org.opendaylight.restconf.openapi.impl;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
 public abstract class BaseYangOpenApiGenerator {
@@ -37,17 +41,19 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo, final Integer width, final Integer depth)
-            throws IOException {
+    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo, final Integer width, final Integer depth,
+            final Integer offset, final Integer limit) throws IOException {
         final var modelContext = requireNonNull(schemaService.getGlobalContext());
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
-        final var modules = getModulesWithoutDuplications(modelContext);
-        return new OpenApiInputStream(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, true,
-            modules, basePath, width, depth);
+        final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
+        final var portionOfModels = getModelsSublist(modulesWithoutDuplications, requireNonNullElse(offset, 0),
+            requireNonNullElse(limit, 0));
+        return new OpenApiInputStream(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "", false, true,
+            portionOfModels, basePath, width, depth);
     }
 
     public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
@@ -78,7 +84,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
         final var modules = List.of(module);
-        return new OpenApiInputStream(modelContext, title, url, SECURITY,  deviceName, urlPrefix, true, false,
+        return new OpenApiInputStream(modelContext, title, url, SECURITY, deviceName, urlPrefix, true, false,
             modules, basePath, width, depth);
     }
 
@@ -97,9 +103,10 @@ public abstract class BaseYangOpenApiGenerator {
 
     public abstract String getBasePath();
 
-    public static Set<Module> getModulesWithoutDuplications(final @NonNull EffectiveModelContext modelContext) {
-        return new LinkedHashSet<>(modelContext.getModules()
+    public static List<Module> getModulesWithoutDuplications(final @NonNull EffectiveModelContext modelContext) {
+        return List.copyOf(modelContext.getModules()
             .stream()
+            .sorted(Comparator.comparing(Module::getName))
             .collect(Collectors.toMap(
                 Module::getName,
                 Function.identity(),
@@ -107,5 +114,36 @@ public abstract class BaseYangOpenApiGenerator {
                     module1.getRevision(), module2.getRevision()) > 0 ? module1 : module2,
                 LinkedHashMap::new))
             .values());
+    }
+
+    public static Collection<? extends Module> getModelsSublist(final List<Module> modulesWithoutDuplications,
+            final int offset, final int limit) {
+        if (offset != 0 || limit != 0) {
+            final var modules = modulesList(modulesWithoutDuplications);
+            if (offset > modules.size() || offset < 0 || limit < 0) {
+                return List.of();
+            } else {
+                final var end = limit == 0 ? modules.size() : Math.min(modules.size(), offset + limit);
+                final var portionOfModules = modules.subList(offset, end);
+                return portionOfModules;
+            }
+        }
+        return modulesWithoutDuplications;
+    }
+
+    private static List<Module> modulesList(final List<Module> modulesWithoutDuplications) {
+        return modulesWithoutDuplications
+            .stream()
+            .filter(BaseYangOpenApiGenerator::containsDataOrOperation)
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private static boolean containsDataOrOperation(final Module module) {
+        if (!module.getRpcs().isEmpty()) {
+            return true;
+        }
+        return module.getChildNodes()
+            .stream()
+            .anyMatch(node -> node instanceof ContainerSchemaNode || node instanceof ListSchemaNode);
     }
 }

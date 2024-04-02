@@ -38,12 +38,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component
 @Singleton
 public final class OpenApiServiceImpl implements OpenApiService {
-    // FIXME: make this configurable
-    public static final int DEFAULT_PAGESIZE = 20;
-
-    // Query parameter
-    private static final String PAGE_NUM = "pageNum";
-
     private final MountPointOpenApi mountPointOpenApiRFC8040;
     private final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040;
 
@@ -65,8 +59,10 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer width,
-            final @Nullable Integer depth) throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, width, depth);
+            final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
+            throws IOException {
+        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, width, depth, offset,
+            limit);
         return Response.ok(stream).build();
     }
 
@@ -110,11 +106,11 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer width,
-            final @Nullable Integer depth) throws IOException {
-        final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
+            final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
+            throws IOException {
         final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), stringPageNum, width,
-                depth);
+            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), width, depth, offset,
+                limit);
         return Response.ok(stream).build();
     }
 }
