@@ -10,19 +10,15 @@ package org.opendaylight.restconf.openapi.mountpoints;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
-import static org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.core.UriInfo;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -30,13 +26,9 @@ import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.restconf.openapi.impl.OpenApiInputStream;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
@@ -148,8 +140,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         return openApiGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix, deviceName);
     }
 
-    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final @Nullable String strPageNum)
-            throws IOException {
+    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final Integer offset,
+            final Integer limit) throws IOException {
         final var iid = longIdToInstanceId.get(id);
         final var context = getSchemaContext(iid);
         final var urlPrefix = getYangMountUrl(iid);
@@ -159,20 +151,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             return null;
         }
 
-        boolean includeDataStore = true;
-        var modules = context.getModules();
-        if (strPageNum != null) {
-            final var pageNum = Integer.parseInt(strPageNum);
-            final var end = DEFAULT_PAGESIZE * pageNum - 1;
-            int start = end - DEFAULT_PAGESIZE;
-            if (pageNum == 1) {
-                start++;
-            } else {
-                includeDataStore = false;
-            }
-            modules = filterByRange(context, start);
-        }
-
+        final boolean includeDataStore = openApiGenerator.isForAllModules(offset, limit);
+        final var modules = openApiGenerator.getPortionOfModels(context, offset, limit);
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var title = deviceName + " modules of RESTCONF";
@@ -211,47 +191,5 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         LOG.debug("Mount point {} removed", path);
         final Long id = instanceIdToLongId.remove(path);
         longIdToInstanceId.remove(id);
-    }
-
-    private static Set<Module> filterByRange(final EffectiveModelContext schemaContext, final Integer start) {
-        final var sortedModules = new TreeSet<Module>((module1, module2) -> {
-            int result = module1.getName().compareTo(module2.getName());
-            if (result == 0) {
-                result = Revision.compare(module1.getRevision(), module2.getRevision());
-            }
-            if (result == 0) {
-                result = module1.getNamespace().compareTo(module2.getNamespace());
-            }
-            return result;
-        });
-        sortedModules.addAll(schemaContext.getModules());
-
-        final int end = start + DEFAULT_PAGESIZE - 1;
-
-        var firstModule = sortedModules.first();
-
-        final var iterator = sortedModules.iterator();
-        int counter = 0;
-        while (iterator.hasNext() && counter < end) {
-            final var module = iterator.next();
-            if (containsListOrContainer(module.getChildNodes()) || !module.getRpcs().isEmpty()) {
-                if (counter == start) {
-                    firstModule = module;
-                }
-                counter++;
-            }
-        }
-
-        return iterator.hasNext()
-            ? sortedModules.subSet(firstModule, iterator.next()) : sortedModules.tailSet(firstModule);
-    }
-
-    private static boolean containsListOrContainer(final Iterable<? extends DataSchemaNode> nodes) {
-        for (final var child : nodes) {
-            if (child instanceof ListSchemaNode || child instanceof ContainerSchemaNode) {
-                return true;
-            }
-        }
-        return false;
     }
 }
