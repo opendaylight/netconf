@@ -63,7 +63,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public Response getAllModulesDoc(final UriInfo uriInfo) throws IOException {
+    public Response getAllModulesDoc(final UriInfo uriInfo, final Integer offset, final Integer limit)
+            throws IOException {
         final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo);
         return Response.ok(stream).build();
     }
