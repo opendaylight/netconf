@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
@@ -37,12 +38,6 @@ import org.osgi.service.component.annotations.Reference;
 @Component
 @Singleton
 public final class OpenApiServiceImpl implements OpenApiService {
-    // FIXME: make this configurable
-    public static final int DEFAULT_PAGESIZE = 20;
-
-    // Query parameter
-    private static final String PAGE_NUM = "pageNum";
-
     private final MountPointOpenApi mountPointOpenApiRFC8040;
     private final OpenApiGeneratorRFC8040 openApiGeneratorRFC8040;
 
@@ -63,8 +58,9 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public Response getAllModulesDoc(final UriInfo uriInfo) throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo);
+    public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer offset,
+            final @Nullable Integer limit) throws IOException {
+        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, offset, limit);
         return Response.ok(stream).build();
     }
 
@@ -104,10 +100,10 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public Response getMountDoc(final String instanceNum, final UriInfo uriInfo) throws IOException {
-        final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
+    public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer offset,
+            final @Nullable Integer limit) throws IOException {
         final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), stringPageNum);
+            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), offset, limit);
         return Response.ok(stream).build();
     }
 }
