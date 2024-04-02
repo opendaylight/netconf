@@ -9,20 +9,17 @@ package org.opendaylight.restconf.openapi.mountpoints;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 import static org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator.SECURITY;
-import static org.opendaylight.restconf.openapi.impl.OpenApiServiceImpl.DEFAULT_PAGESIZE;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.core.UriInfo;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -32,10 +29,7 @@ import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,8 +141,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             width, depth);
     }
 
-    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final @Nullable String strPageNum,
-            final Integer width, final Integer depth) throws IOException {
+    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final Integer width,
+            final Integer depth, final Integer offset, final Integer limit) throws IOException {
         final var iid = longIdToInstanceId.get(id);
         final var context = getModelContext(iid);
         final var urlPrefix = getYangMountUrl(iid);
@@ -158,27 +152,20 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             return null;
         }
 
-        boolean includeDataStore = true;
-        var modules = BaseYangOpenApiGenerator.getModulesWithoutDuplications(context);
-        if (strPageNum != null) {
-            final var pageNum = Integer.parseInt(strPageNum);
-            final var end = DEFAULT_PAGESIZE * pageNum - 1;
-            int start = end - DEFAULT_PAGESIZE;
-            if (pageNum == 1) {
-                start++;
-            } else {
-                includeDataStore = false;
-            }
-            modules = filterByRange(modules, start);
-        }
+        final var nonNullOffset = requireNonNullElse(offset, 0);
+        final var nonNullLimit = requireNonNullElse(limit, 0);
 
+        final boolean includeDataStore = nonNullLimit == 0 && nonNullOffset == 0;
+        final var modulesWithoutDuplications = BaseYangOpenApiGenerator.getModulesWithoutDuplications(context);
+        final var portionOfModules = BaseYangOpenApiGenerator.getModelsSublist(modulesWithoutDuplications,
+            nonNullOffset, nonNullLimit);
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var title = deviceName + " modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = openApiGenerator.getBasePath();
         return new OpenApiInputStream(context, title, url, SECURITY, deviceName, urlPrefix, false, includeDataStore,
-            modules, basePath, width, depth);
+            portionOfModules, basePath, width, depth);
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -211,35 +198,5 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         LOG.debug("Mount point {} removed", path);
         final Long id = instanceIdToLongId.remove(path);
         longIdToInstanceId.remove(id);
-    }
-
-    private static Set<Module> filterByRange(final Set<Module> modulesWithoutDuplications, final Integer start) {
-        final var sortedModules = new TreeSet<>(modulesWithoutDuplications);
-        final int end = start + DEFAULT_PAGESIZE - 1;
-        var firstModule = sortedModules.first();
-
-        final var iterator = modulesWithoutDuplications.iterator();
-        int counter = 0;
-        while (iterator.hasNext() && counter < end) {
-            final var module = iterator.next();
-            if (containsListOrContainer(module.getChildNodes()) || !module.getRpcs().isEmpty()) {
-                if (counter == start) {
-                    firstModule = module;
-                }
-                counter++;
-            }
-        }
-
-        return iterator.hasNext()
-            ? sortedModules.subSet(firstModule, iterator.next()) : sortedModules.tailSet(firstModule);
-    }
-
-    private static boolean containsListOrContainer(final Iterable<? extends DataSchemaNode> nodes) {
-        for (final var child : nodes) {
-            if (child instanceof ListSchemaNode || child instanceof ContainerSchemaNode) {
-                return true;
-            }
-        }
-        return false;
     }
 }

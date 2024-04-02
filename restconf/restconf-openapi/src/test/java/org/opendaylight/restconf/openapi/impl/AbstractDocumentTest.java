@@ -67,7 +67,7 @@ abstract class AbstractDocumentTest {
 
     protected static String getAllModulesDoc(final Integer width, final Integer depth) throws Exception {
         final var getAllController = createMockUriInfo(URI + "single");
-        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController, width, depth).getEntity();
+        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController, width, depth, 0, 0).getEntity();
 
         return new String(((OpenApiInputStream) controllerDocAll).readAllBytes(),
             StandardCharsets.UTF_8);
@@ -90,7 +90,7 @@ abstract class AbstractDocumentTest {
     protected static String getMountDoc(final Integer width, final Integer depth) throws Exception {
         final var getAllDevice = createMockUriInfo(URI + "mounts/1");
         when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
-        final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice, width, depth);
+        final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice, width, depth, 0, 0);
 
         return new String(((OpenApiInputStream) deviceDocAll.getEntity()).readAllBytes(),
             StandardCharsets.UTF_8);
