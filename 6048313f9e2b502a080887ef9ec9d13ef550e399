@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fac5f127_9c5399e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-02T18:04:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a41174c_db9c97f8",
+      "revId": "6048313f9e2b502a080887ef9ec9d13ef550e399",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a926e36_ffe6e9a9",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-03-26T17:53:54Z",
       "side": 1,
       "message": "this is still a \u0027value\u0027, coming from NodeWithValue.getValue(), or is this more contrived?",
+      "range": {
+        "startLine": 104,
+        "startChar": 75,
+        "endLine": 104,
+        "endChar": 80
+      },
+      "revId": "6048313f9e2b502a080887ef9ec9d13ef550e399",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8809e270_9a8426ce",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-02T18:04:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a926e36_ffe6e9a9",
       "range": {
         "startLine": 104,
         "startChar": 75,
@@ -64,6 +106,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3379568_8ebcacd5",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-02T18:04:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5613372_582a5685",
+      "range": {
+        "startLine": 112,
+        "startChar": 12,
+        "endLine": 112,
+        "endChar": 36
+      },
+      "revId": "6048313f9e2b502a080887ef9ec9d13ef550e399",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "750e28ce_d7c9a246",
@@ -77,6 +143,30 @@
       "writtenOn": "2024-03-26T17:53:54Z",
       "side": 1,
       "message": "so ... what does \u0027isForValue\u0027 mean, exactly?",
+      "range": {
+        "startLine": 124,
+        "startChar": 20,
+        "endLine": 124,
+        "endChar": 30
+      },
+      "revId": "6048313f9e2b502a080887ef9ec9d13ef550e399",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20b4807c_c55252b3",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-02T18:04:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "750e28ce_d7c9a246",
       "range": {
         "startLine": 124,
         "startChar": 20,
