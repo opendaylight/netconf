@@ -67,7 +67,7 @@ abstract class AbstractDocumentTest {
 
     protected static String getAllModulesDoc() throws Exception {
         final var getAllController = createMockUriInfo(URI + "single");
-        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController).getEntity();
+        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController, 0, 0).getEntity();
 
         return new String(((OpenApiInputStream) controllerDocAll).readAllBytes(),
             StandardCharsets.UTF_8);
@@ -88,7 +88,7 @@ abstract class AbstractDocumentTest {
     protected static String getMountDoc() throws Exception {
         final var getAllDevice = createMockUriInfo(URI + "mounts/1");
         when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
-        final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice);
+        final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice, 0, 0);
 
         return new String(((OpenApiInputStream) deviceDocAll.getEntity()).readAllBytes(),
             StandardCharsets.UTF_8);
