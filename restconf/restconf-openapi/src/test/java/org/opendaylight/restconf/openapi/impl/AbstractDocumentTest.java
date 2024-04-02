@@ -67,7 +67,7 @@ public abstract class AbstractDocumentTest {
 
     protected static String getAllModulesDoc() throws Exception {
         final var getAllController = createMockUriInfo(URI + "single");
-        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController).getEntity();
+        final var controllerDocAll = openApiService.getAllModulesDoc(getAllController, 0, 0).getEntity();
 
         return new String(((OpenApiInputStream) controllerDocAll).readAllBytes(),
             StandardCharsets.UTF_8);
