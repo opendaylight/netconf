@@ -26,6 +26,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.common.Uint8;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
@@ -136,8 +137,8 @@ class YangInstanceIdentifierSerializerTest {
                 .node(list)
                 .nodeWithKey(list, ImmutableMap.of(
                     QName.create(list, "name"), "value-1",
-                    QName.create(list, "number"), "2",
-                    QName.create(list, "enabled"), "true"))
+                    QName.create(list, "number"), Uint8.TWO,
+                    QName.create(list, "enabled"), Boolean.TRUE))
                 .build()));
     }
 
