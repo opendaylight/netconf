@@ -66,4 +66,43 @@ module action-types {
       }
     }
   }
+
+  list nc-list {
+    key nc-name;
+    leaf nc-name {
+      type string;
+      config false;
+    }
+    action nc-list-action {
+      input {
+        leaf nc-la-input {
+          type string;
+          config false;
+        }
+      }
+      output {
+        leaf nc-la-output {
+          type string;
+          config false;
+        }
+      }
+    }
+  }
+
+  container nc-container {
+    action nc-container-action {
+      input {
+        leaf nc-ca-input {
+          type string;
+          config false;
+        }
+      }
+      output {
+        leaf nc-ca-output {
+          type string;
+          config false;
+        }
+      }
+    }
+  }
 }
