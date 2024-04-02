@@ -159,10 +159,10 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeLeafListTest() {
-        assertEquals("serializer-test:leaf-list-0=instance", SERIALIZER.serializePath(
+        assertEquals("serializer-test:leaf-list-0=true", SERIALIZER.serializePath(
             YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "leaf-list-0"))
-                .node(new NodeWithValue<>(QName.create("serializer:test", "2016-06-06", "leaf-list-0"), "instance"))
+                .node(new NodeWithValue<>(QName.create("serializer:test", "2016-06-06", "leaf-list-0"), Boolean.TRUE))
                 .build()));
     }
 
