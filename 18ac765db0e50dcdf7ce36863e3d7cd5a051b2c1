@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a7a73c1_ff086c61",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-04-02T11:41:25Z",
+      "side": 1,
+      "message": "On second thought - it\u0027s better to pass credentials here instead of node.",
+      "range": {
+        "startLine": 70,
+        "startChar": 20,
+        "endLine": 70,
+        "endChar": 35
+      },
+      "revId": "18ac765db0e50dcdf7ce36863e3d7cd5a051b2c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca653950_202d2c63",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeContext.java",
+        "patchSetId": 26
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-04-02T11:41:25Z",
+      "side": 1,
+      "message": "setup.getNode().augmentation(NetconfNode.class).getCredentials()",
+      "range": {
+        "startLine": 160,
+        "startChar": 69,
+        "endLine": 160,
+        "endChar": 84
+      },
+      "revId": "18ac765db0e50dcdf7ce36863e3d7cd5a051b2c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
