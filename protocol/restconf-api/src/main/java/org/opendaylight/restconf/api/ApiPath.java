@@ -82,10 +82,15 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
         }
 
         void appendTo(final StringBuilder sb) {
+            appendTo(sb, module, identifier.getLocalName());
+        }
+
+        static final StringBuilder appendTo(final StringBuilder sb, final @Nullable String module,
+                final String identifier) {
             if (module != null) {
                 sb.append(module).append(':');
             }
-            sb.append(identifier.getLocalName());
+            return sb.append(identifier);
         }
     }
 
@@ -114,10 +119,31 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
     public static final class ListInstance extends Step {
         private final ImmutableList<String> keyValues;
 
-        public ListInstance(final @Nullable String module, final String identifier,
-                final ImmutableList<String> keyValues) {
+        ListInstance(final @Nullable String module, final String identifier, final ImmutableList<String> keyValues) {
             super(module, identifier);
             this.keyValues = requireNonNull(keyValues);
+        }
+
+        public static ListInstance of(final @Nullable String module, final String identifier, final String value) {
+            return new ListInstance(module, identifier, ImmutableList.of(value));
+        }
+
+        public static ListInstance of(final @Nullable String module, final String identifier, final String... values) {
+            return of(module, identifier, ImmutableList.copyOf(values));
+        }
+
+        public static ListInstance of(final @Nullable String module, final String identifier,
+                final List<String> values) {
+            return of(module, identifier, ImmutableList.copyOf(values));
+        }
+
+        public static ListInstance of(final @Nullable String module, final String identifier,
+                final ImmutableList<String> values) {
+            if (values.isEmpty()) {
+                throw new IllegalArgumentException(
+                    appendTo(new StringBuilder("empty values for "), module, identifier).toString());
+            }
+            return new ListInstance(module, identifier, values);
         }
 
         public ImmutableList<String> keyValues() {
