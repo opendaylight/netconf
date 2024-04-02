@@ -236,7 +236,7 @@ class YangInstanceIdentifierSerializerTest {
             YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "list-one-key"))
                 .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-one-key"),
-                    QName.create("serializer:test", "2016-06-06", "list-one-key"), "foo\"b\"bar")
+                    QName.create("serializer:test", "2016-06-06", "name"), "foo\"b\"bar")
             .build()));
     }
 
