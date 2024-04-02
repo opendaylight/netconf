@@ -114,7 +114,8 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
     public static final class ListInstance extends Step {
         private final ImmutableList<String> keyValues;
 
-        ListInstance(final @Nullable String module, final String identifier, final ImmutableList<String> keyValues) {
+        public ListInstance(final @Nullable String module, final String identifier,
+                final ImmutableList<String> keyValues) {
             super(module, identifier);
             this.keyValues = requireNonNull(keyValues);
         }
