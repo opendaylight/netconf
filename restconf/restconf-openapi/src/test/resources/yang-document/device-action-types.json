@@ -1297,6 +1297,415 @@
           "123 action-types"
         ]
       }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:nc-list={nc-name}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - action-types - 123 - nc-list",
+        "requestBody": {
+          "description": "nc-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action-types:nc-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/action-types_nc-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_nc-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "nc-name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - action-types - 123 - nc-list",
+        "requestBody": {
+          "description": "nc-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "action-types:nc-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/action-types_nc-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_nc-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "nc-name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - action-types - nc-list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "nc-name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - action-types - nc-list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_nc-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "nc-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/action-types_nc-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "nc-name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:nc-list={nc-name}/nc-list-action": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - action-types - nc-list-action",
+        "requestBody": {
+          "description": "nc-list-action_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/action-types_nc-list_nc-list-action_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_nc-list_nc-list-action_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC nc-list-action success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_nc-list_nc-list-action_output"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_nc-list_nc-list-action_output"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "nc-name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:nc-container": {
+      "put": {
+        "description": "",
+        "summary": "PUT - action-types - 123 - nc-container",
+        "requestBody": {
+          "description": "nc-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action-types:nc-container": {
+                    "$ref": "#/components/schemas/action-types_nc-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_nc-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - action-types - 123 - nc-container",
+        "requestBody": {
+          "description": "nc-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "action-types:nc-container": {
+                    "$ref": "#/components/schemas/action-types_nc-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_nc-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - action-types - nc-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - action-types - nc-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_nc-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "nc-container": {
+                      "$ref": "#/components/schemas/action-types_nc-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:nc-container/nc-container-action": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - action-types - nc-container-action",
+        "requestBody": {
+          "description": "nc-container-action_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/action-types_nc-container_nc-container-action_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_nc-container_nc-container-action_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC nc-container-action success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_nc-container_nc-container-action_output"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_nc-container_nc-container-action_output"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": []
+      }
     }
   },
   "components": {
@@ -1481,6 +1890,84 @@
         "type": "object",
         "xml": {
           "name": "third-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_nc-list": {
+        "title": "action-types_nc-list",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "nc-list",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_nc-list_nc-list-action_input": {
+        "title": "action-types_nc-list_nc-list-action_input",
+        "type": "object",
+        "properties": {
+          "nc-la-input": {
+            "description": "",
+            "type": "string",
+            "example": "Some nc-la-input"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_nc-list_nc-list-action_output": {
+        "title": "action-types_nc-list_nc-list-action_output",
+        "type": "object",
+        "properties": {
+          "nc-la-output": {
+            "description": "",
+            "type": "string",
+            "example": "Some nc-la-output"
+          }
+        },
+        "xml": {
+          "name": "output",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_nc-container": {
+        "title": "action-types_nc-container",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "nc-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_nc-container_nc-container-action_input": {
+        "title": "action-types_nc-container_nc-container-action_input",
+        "type": "object",
+        "properties": {
+          "nc-ca-input": {
+            "description": "",
+            "type": "string",
+            "example": "Some nc-ca-input"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_nc-container_nc-container-action_output": {
+        "title": "action-types_nc-container_nc-container-action_output",
+        "type": "object",
+        "properties": {
+          "nc-ca-output": {
+            "description": "",
+            "type": "string",
+            "example": "Some nc-ca-output"
+          }
+        },
+        "xml": {
+          "name": "output",
           "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
         }
       }
