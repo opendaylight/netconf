@@ -102,36 +102,36 @@ public final class PostDataTransactionUtil {
         final NormalizedNode readData;
         switch (insert) {
             case FIRST:
-                readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
+                readData = PutDataTransactionUtil.readList(strategy, path);
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     transaction.replace(path, data, schemaContext);
                     return transaction.commit();
                 }
-                checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
-                transaction.remove(path.getParent().getParent());
+                checkListDataDoesNotExist(path, data, strategy);
+                transaction.remove(path);
                 transaction.replace(path, data, schemaContext);
-                transaction.replace(path.getParent().getParent(), readData, schemaContext);
+                transaction.replace(path, readData, schemaContext);
                 return transaction.commit();
             case LAST:
                 makePost(path, data, schemaContext, transaction);
                 return transaction.commit();
             case BEFORE:
-                readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
+                readData = PutDataTransactionUtil.readList(strategy, path);
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     transaction.replace(path, data, schemaContext);
                     return transaction.commit();
                 }
-                checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
+                checkListDataDoesNotExist(path, data, strategy);
                 insertWithPointPost(path, data, schemaContext, params.getPoint(),
                     (NormalizedNodeContainer<?>) readData, true, transaction);
                 return transaction.commit();
             case AFTER:
-                readData = PutDataTransactionUtil.readList(strategy, path.getParent().getParent());
+                readData = PutDataTransactionUtil.readList(strategy, path);
                 if (readData == null || ((NormalizedNodeContainer<?>) readData).isEmpty()) {
                     transaction.replace(path, data, schemaContext);
                     return transaction.commit();
                 }
-                checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION, path), path);
+                checkListDataDoesNotExist(path, data, strategy);
                 insertWithPointPost(path, data, schemaContext, params.getPoint(),
                     (NormalizedNodeContainer<?>) readData, false, transaction);
                 return transaction.commit();
@@ -146,8 +146,7 @@ public final class PostDataTransactionUtil {
                                             final EffectiveModelContext schemaContext, final PointParam point,
                                             final NormalizedNodeContainer<?> readList, final boolean before,
                                             final RestconfTransaction transaction) {
-        final YangInstanceIdentifier parent = path.getParent().getParent();
-        transaction.remove(parent);
+        transaction.remove(path);
         final InstanceIdentifierContext instanceIdentifier =
             // FIXME: Point should be able to give us this method
             ParserIdentifier.toInstanceIdentifier(point.value(), schemaContext, Optional.empty());
@@ -162,13 +161,13 @@ public final class PostDataTransactionUtil {
             lastItemPosition++;
         }
         int lastInsertedPosition = 0;
-        final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, parent);
+        final NormalizedNode emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
         transaction.merge(YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         for (final NormalizedNode nodeChild : readList.body()) {
             if (lastInsertedPosition == lastItemPosition) {
                 transaction.replace(path, data, schemaContext);
             }
-            final YangInstanceIdentifier childPath = parent.node(nodeChild.getIdentifier());
+            final YangInstanceIdentifier childPath = path.node(nodeChild.getIdentifier());
             transaction.replace(childPath, nodeChild, schemaContext);
             lastInsertedPosition++;
         }
@@ -215,6 +214,25 @@ public final class PostDataTransactionUtil {
         }
 
         return uriInfo.getBaseUriBuilder().path("data").path(IdentifierCodec.serialize(path, schemaContext)).build();
+    }
+
+    /**
+     * Check if child items do NOT already exists in List at specified {@code path}.
+     *
+     * @param data Data to be checked
+     * @param path Path to be checked
+     * @throws RestconfDocumentedException if data already exists.
+     */
+    private static void checkListDataDoesNotExist(final YangInstanceIdentifier path, final NormalizedNode data,
+            final RestconfStrategy strategy) {
+        if (data instanceof NormalizedNodeContainer<?> dataNode) {
+            for (final var node : dataNode.body()) {
+                checkItemDoesNotExists(strategy.exists(LogicalDatastoreType.CONFIGURATION,
+                    path.node(node.getIdentifier())), path.node(node.getIdentifier()));
+            }
+        } else {
+            throw new RestconfDocumentedException("Unexpected node type: " + data.getClass().getName());
+        }
     }
 
     /**

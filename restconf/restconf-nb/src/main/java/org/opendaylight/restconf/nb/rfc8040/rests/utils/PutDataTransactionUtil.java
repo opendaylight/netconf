@@ -95,7 +95,7 @@ public final class PutDataTransactionUtil {
             return makePut(path, schemaContext, transaction, data);
         }
 
-        checkListAndOrderedType(schemaContext, path);
+        checkListAndOrderedType(schemaContext, path.getParent());
         final NormalizedNode readData;
         switch (insert) {
             case FIRST:
@@ -187,8 +187,7 @@ public final class PutDataTransactionUtil {
 
     public static DataSchemaNode checkListAndOrderedType(final EffectiveModelContext ctx,
             final YangInstanceIdentifier path) {
-        final YangInstanceIdentifier parent = path.getParent();
-        final DataSchemaContextNode<?> node = DataSchemaContextTree.from(ctx).findChild(parent).orElseThrow();
+        final DataSchemaContextNode<?> node = DataSchemaContextTree.from(ctx).findChild(path).orElseThrow();
         final DataSchemaNode dataSchemaNode = node.getDataSchemaNode();
 
         if (dataSchemaNode instanceof ListSchemaNode) {
