@@ -75,6 +75,7 @@ public final class PathsStream extends InputStream {
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
     private final Integer width;
+    private final Integer depth;
 
     private boolean hasRootPostLink;
     private boolean hasAddedDataStore;
@@ -85,7 +86,8 @@ public final class PathsStream extends InputStream {
     public PathsStream(final EffectiveModelContext schemaContext, final OpenApiBodyWriter writer,
             final String deviceName, final String urlPrefix, final boolean isForSingleModule,
             final boolean includeDataStore, final Iterator<? extends Module> iterator, final String basePath,
-            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width,
+            final Integer depth) {
         this.iterator = iterator;
         this.writer = writer;
         this.schemaContext = schemaContext;
@@ -97,6 +99,7 @@ public final class PathsStream extends InputStream {
         this.stream = stream;
         this.generator = generator;
         this.width = requireNonNullElse(width, 0);
+        this.depth = requireNonNullElse(depth, 0);
         hasRootPostLink = false;
         hasAddedDataStore = false;
     }
@@ -193,11 +196,12 @@ public final class PathsStream extends InputStream {
                             new PostEntity(node, deviceName, moduleName, List.of(), nodeLocalName, module, List.of())));
                     hasRootPostLink = true;
                 }
-                //process first node
+                // process first node
                 final var pathParams = new ArrayList<ParameterEntity>();
                 final var localName = moduleName + ":" + nodeLocalName;
                 final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
-                processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, null, List.of());
+                processChildNode(node, pathParams, moduleName, result, path, nodeLocalName,
+                        isConfig, null, List.of(), 0); // depth is 0 because we at fist level of model
             }
         }
         return result;
@@ -205,7 +209,8 @@ public final class PathsStream extends InputStream {
 
     private void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
-            final boolean isConfig, final SchemaNode parentNode, final List<SchemaNode> parentNodes) {
+            final boolean isConfig, final SchemaNode parentNode, final List<SchemaNode> parentNodes,
+            final int nodeDepth) {
         final var resourcePath = basePath + DATA + path;
         final var fullName = resolveFullNameFromNode(node.getQName(), schemaContext);
         final var firstChild = getListOrContainerChildNode((DataNodeContainer) node);
@@ -232,6 +237,10 @@ public final class PathsStream extends InputStream {
                     refPath, deviceName, parentNode, listOfParentsForActions));
             });
         }
+        if (depth > 0 && nodeDepth + 1 >= depth) {
+            // If true - all children from that point is deeper than applied depth and we can ignore them
+            return;
+        }
         final var childNodes = width > 0
             ? ((DataNodeContainer) node).getChildNodes().stream().limit(width).toList() // limit children to width
             : ((DataNodeContainer) node).getChildNodes(); // width not applied - processing all children
@@ -242,8 +251,8 @@ public final class PathsStream extends InputStream {
                 final var localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
-                processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
-                    node, listOfParents);
+                processChildNode(childNode, childParams, moduleName, result, resourceDataPath,
+                    newRefPath, newConfig, node, listOfParents, nodeDepth + 1);
             }
         }
     }

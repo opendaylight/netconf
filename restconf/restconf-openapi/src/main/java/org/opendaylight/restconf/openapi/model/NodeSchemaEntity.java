@@ -27,8 +27,9 @@ public final class NodeSchemaEntity extends SchemaEntity {
     public NodeSchemaEntity(final @NonNull SchemaNode value, final @NonNull String title,
             final @Nullable String discriminator, final @NonNull String type,
             final @NonNull SchemaInferenceStack context, final @NonNull String parentName, final boolean isParentConfig,
-            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width) {
-        super(value, title, discriminator, type, context, parentName, isParentConfig, definitionNames, width);
+            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width,
+            final @NonNull Integer depth) {
+        super(value, title, discriminator, type, context, parentName, isParentConfig, definitionNames, width, depth);
     }
 
     @Override
@@ -46,7 +47,7 @@ public final class NodeSchemaEntity extends SchemaEntity {
         for (final var childNode : childNodes.values()) {
             if (shouldBeAddedAsProperty(childNode, isValueConfig)) {
                 new PropertyEntity(childNode, generator, stack(), required, parentName() + "_"
-                    + value().getQName().getLocalName(), isValueConfig, definitionNames(), width);
+                    + value().getQName().getLocalName(), isValueConfig, definitionNames(), width, depth);
             }
         }
     }
