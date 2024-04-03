@@ -13,7 +13,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 /**
  * Body of a {@code POST} request as defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4">RFC8040 section 4.4</a>.
- * @see DataPostPath
  */
 @NonNullByDefault
 public abstract sealed class DataPostBody extends AbstractBody permits JsonDataPostBody, XmlDataPostBody {
