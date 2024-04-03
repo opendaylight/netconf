@@ -48,10 +48,16 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
         private final @Nullable String module;
         private final Unqualified identifier;
 
+        @Deprecated(since = "7.0.4", forRemoval = true)
         Step(final @Nullable String module, final String identifier) {
             this.identifier = verifyNotNull(UnresolvedQName.tryLocalName(identifier),
                 "Unexpected invalid identifier %s", identifier);
             this.module = module;
+        }
+
+        Step(final @Nullable String module, final Unqualified identifier) {
+            this.module = module;
+            this.identifier = requireNonNull(identifier);
         }
 
         public Unqualified identifier() {
@@ -82,15 +88,15 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
         }
 
         void appendTo(final StringBuilder sb) {
-            appendTo(sb, module, identifier.getLocalName());
+            appendTo(sb, module, identifier);
         }
 
         static final StringBuilder appendTo(final StringBuilder sb, final @Nullable String module,
-                final String identifier) {
+                final Unqualified identifier) {
             if (module != null) {
                 sb.append(module).append(':');
             }
-            return sb.append(identifier);
+            return sb.append(identifier.getLocalName());
         }
     }
 
@@ -98,7 +104,12 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
      * An {@code api-identifier} step in a {@link ApiPath}.
      */
     public static final class ApiIdentifier extends Step {
+        @Deprecated(since = "7.0.4", forRemoval = true)
         public ApiIdentifier(final @Nullable String module, final String identifier) {
+            super(module, identifier);
+        }
+
+        public ApiIdentifier(final @Nullable String module, final Unqualified identifier) {
             super(module, identifier);
         }
 
@@ -119,25 +130,27 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
     public static final class ListInstance extends Step {
         private final ImmutableList<String> keyValues;
 
-        ListInstance(final @Nullable String module, final String identifier, final ImmutableList<String> keyValues) {
+        ListInstance(final @Nullable String module, final Unqualified identifier,
+                final ImmutableList<String> keyValues) {
             super(module, identifier);
             this.keyValues = requireNonNull(keyValues);
         }
 
-        public static ListInstance of(final @Nullable String module, final String identifier, final String value) {
+        public static ListInstance of(final @Nullable String module, final Unqualified identifier, final String value) {
             return new ListInstance(module, identifier, ImmutableList.of(value));
         }
 
-        public static ListInstance of(final @Nullable String module, final String identifier, final String... values) {
+        public static ListInstance of(final @Nullable String module, final Unqualified identifier,
+                final String... values) {
             return of(module, identifier, ImmutableList.copyOf(values));
         }
 
-        public static ListInstance of(final @Nullable String module, final String identifier,
+        public static ListInstance of(final @Nullable String module, final Unqualified identifier,
                 final List<String> values) {
             return of(module, identifier, ImmutableList.copyOf(values));
         }
 
-        public static ListInstance of(final @Nullable String module, final String identifier,
+        public static ListInstance of(final @Nullable String module, final Unqualified identifier,
                 final ImmutableList<String> values) {
             if (values.isEmpty()) {
                 throw new IllegalArgumentException(

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 
 class FieldsParamTest {
     // https://www.rfc-editor.org/rfc/rfc8040#section-4.8.3:
@@ -27,11 +28,11 @@ class FieldsParamTest {
         assertEquals(2, selectors.size());
 
         var selector = selectors.get(0);
-        assertEquals(List.of(new ApiIdentifier(null, "genre")), selector.path());
+        assertEquals(List.of(new ApiIdentifier(null, Unqualified.of("genre"))), selector.path());
         assertEquals(List.of(), selector.subSelectors());
 
         selector = selectors.get(1);
-        assertEquals(List.of(new ApiIdentifier(null, "year")), selector.path());
+        assertEquals(List.of(new ApiIdentifier(null, Unqualified.of("year"))), selector.path());
         assertEquals(List.of(), selector.subSelectors());
     }
 
@@ -45,7 +46,9 @@ class FieldsParamTest {
         assertEquals(1, selectors.size());
 
         final var selector = selectors.get(0);
-        assertEquals(List.of(new ApiIdentifier(null, "admin"), new ApiIdentifier(null, "label")), selector.path());
+        assertEquals(
+            List.of(new ApiIdentifier(null, Unqualified.of("admin")), new ApiIdentifier(null, Unqualified.of("label"))),
+            selector.path());
         assertEquals(List.of(), selector.subSelectors());
     }
 
@@ -60,18 +63,18 @@ class FieldsParamTest {
         assertEquals(1, selectors.size());
 
         final var selector = selectors.get(0);
-        assertEquals(List.of(new ApiIdentifier(null, "admin")), selector.path());
+        assertEquals(List.of(new ApiIdentifier(null, Unqualified.of("admin"))), selector.path());
 
         final var subSelectors = selector.subSelectors();
         assertEquals(2, subSelectors.size());
 
         var subSelector = subSelectors.get(0);
-        assertEquals(List.of(new ApiIdentifier(null, "label")), subSelector.path());
+        assertEquals(List.of(new ApiIdentifier(null, Unqualified.of("label"))), subSelector.path());
         assertEquals(List.of(), subSelector.subSelectors());
 
 
         subSelector = subSelectors.get(1);
-        assertEquals(List.of(new ApiIdentifier(null, "catalogue-number")), subSelector.path());
+        assertEquals(List.of(new ApiIdentifier(null, Unqualified.of("catalogue-number"))), subSelector.path());
         assertEquals(List.of(), subSelector.subSelectors());
     }
 
@@ -92,18 +95,20 @@ class FieldsParamTest {
 
         final var selector = selectors.get(0);
         assertEquals(
-            List.of(new ApiIdentifier("ietf-yang-library", "modules-state"), new ApiIdentifier(null, "module")),
+            List.of(
+                new ApiIdentifier("ietf-yang-library", Unqualified.of("modules-state")),
+                new ApiIdentifier(null, Unqualified.of("module"))),
             selector.path());
 
         final var subSelectors = selector.subSelectors();
         assertEquals(2, subSelectors.size());
 
         var subSelector = subSelectors.get(0);
-        assertEquals(List.of(new ApiIdentifier(null, "name")), subSelector.path());
+        assertEquals(List.of(new ApiIdentifier(null, Unqualified.of("name"))), subSelector.path());
         assertEquals(List.of(), subSelector.subSelectors());
 
         subSelector = subSelectors.get(1);
-        assertEquals(List.of(new ApiIdentifier(null, "revision")), subSelector.path());
+        assertEquals(List.of(new ApiIdentifier(null, Unqualified.of("revision"))), subSelector.path());
         assertEquals(List.of(), subSelector.subSelectors());
     }
 
@@ -113,7 +118,7 @@ class FieldsParamTest {
         assertEquals(1, selectors.size());
 
         final var selector = selectors.get(0);
-        assertEquals(List.of(new ApiIdentifier("ietf-yang-library", "modules-state")), selector.path());
+        assertEquals(List.of(new ApiIdentifier("ietf-yang-library", Unqualified.of("modules-state"))), selector.path());
         assertEquals(List.of(), selector.subSelectors());
     }
 
@@ -123,13 +128,13 @@ class FieldsParamTest {
         assertEquals(1, selectors.size());
 
         final var selector = selectors.get(0);
-        assertEquals(List.of(new ApiIdentifier(null, "a")), selector.path());
+        assertEquals(List.of(new ApiIdentifier(null, Unqualified.of("a"))), selector.path());
 
         final var subSelectors = selector.subSelectors();
         assertEquals(1, subSelectors.size());
 
         final var subSelector = subSelectors.get(0);
-        assertEquals(List.of(new ApiIdentifier("b", "c")), subSelector.path());
+        assertEquals(List.of(new ApiIdentifier("b", Unqualified.of("c"))), subSelector.path());
         assertEquals(List.of(), subSelector.subSelectors());
     }
 
@@ -139,13 +144,13 @@ class FieldsParamTest {
         assertEquals(1, selectors.size());
 
         final var selector = selectors.get(0);
-        assertEquals(List.of(new ApiIdentifier("a", "b")), selector.path());
+        assertEquals(List.of(new ApiIdentifier("a", Unqualified.of("b"))), selector.path());
 
         final var subSelectors = selector.subSelectors();
         assertEquals(1, subSelectors.size());
 
         final var subSelector = subSelectors.get(0);
-        assertEquals(List.of(new ApiIdentifier(null, "c")), subSelector.path());
+        assertEquals(List.of(new ApiIdentifier(null, Unqualified.of("c"))), subSelector.path());
         assertEquals(List.of(), subSelector.subSelectors());
     }
 
