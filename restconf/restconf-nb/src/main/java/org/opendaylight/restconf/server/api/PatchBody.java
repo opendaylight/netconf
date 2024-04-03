@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import static com.google.common.base.Verify.verify;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -40,29 +38,34 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         throws IOException;
 
     static final YangInstanceIdentifier parsePatchTarget(final DatabindPath.@NonNull Data path, final String target) {
-        final var urlPath = path.instance();
-        if (target.equals("/")) {
-            verify(!urlPath.isEmpty(),
-                "target resource of URI must not be a datastore resource when target is '/'");
-            return urlPath;
-        }
-
-        // FIXME: NETCONF-1157: these two operations should really be a single ApiPathNormalizer step -- but for that
-        //                      we need to switch to ApiPath forms
-        final var pathNormalizer = new ApiPathNormalizer(path.databind());
-        final String targetUrl;
-        if (urlPath.isEmpty()) {
-            targetUrl = target.startsWith("/") ? target.substring(1) : target;
-        } else {
-            targetUrl = pathNormalizer.canonicalize(urlPath).toString() + target;
-        }
-
+        // As per: https://www.rfc-editor.org/rfc/rfc8072#page-18:
+        //
+        //        "Identifies the target data node for the edit
+        //        operation.  If the target has the value '/', then
+        //        the target data node is the target resource.
+        //        The target node MUST identify a data resource,
+        //        not the datastore resource.";
+        //
+        final ApiPath targetPath;
         try {
-            return pathNormalizer.normalizeDataPath(ApiPath.parse(targetUrl)).instance();
-        } catch (ParseException | RestconfDocumentedException e) {
-            throw new RestconfDocumentedException("Failed to parse target " + target,
+            targetPath = ApiPath.parse(target.startsWith("/") ? target.substring(1) : target);
+        } catch (ParseException e) {
+            throw new RestconfDocumentedException("Failed to parse edit target '" + target + "'",
                 ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE, e);
         }
+
+        final YangInstanceIdentifier result;
+        try {
+            result = ApiPathNormalizer.normalizeSubResource(path, targetPath).instance();
+        } catch (RestconfDocumentedException e) {
+            throw new RestconfDocumentedException("Invalid edit target '" + targetPath + "'",
+                ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE, e);
+        }
+        if (result.isEmpty()) {
+            throw new RestconfDocumentedException("Target node resource must not be a datastore resource",
+                ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE);
+        }
+        return result;
     }
 
     /**

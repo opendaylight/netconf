@@ -15,6 +15,7 @@ import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
@@ -208,6 +209,29 @@ public final class ApiPathNormalizer implements PointNormalizer {
         }
         throw new RestconfDocumentedException("Point '" + apiPath + "' resolves to non-data " + path,
             ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+    }
+
+    public static @NonNull Data normalizeSubResource(final Data resource, final ApiPath subResource) {
+        // If subResource is empty just return the resource
+        final var urlPath = resource.instance();
+        if (subResource.steps().isEmpty()) {
+            return resource;
+        }
+        final var normalizer = new ApiPathNormalizer(resource.databind());
+        if (urlPath.isEmpty()) {
+            // URL indicates the datastore resource, let's just normalize targetPath
+            return normalizer.normalizeDataPath(subResource);
+        }
+
+        // FIXME: We are re-parsing the concatenation. We should provide enough context for the bottom half of
+        //        normalizePath() logic instead
+        final String targetUrl = normalizer.canonicalize(urlPath).toString() + "/" + subResource.toString();
+        try {
+            return normalizer.normalizeDataPath(ApiPath.parse(targetUrl));
+        } catch (ParseException e) {
+            throw new RestconfDocumentedException("Failed to parse target " + targetUrl,
+                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e);
+        }
     }
 
     @Override
