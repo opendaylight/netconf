@@ -15,8 +15,8 @@ import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.ApiPath;
@@ -81,15 +81,16 @@ public final class ApiPathNormalizer implements PointNormalizer {
         // - it has to consider RPCs, for which we need SchemaContext
         //
         // We therefore peel that first iteration here and not worry about those details in further iterations
-        var step = it.next();
-        final var firstModule = step.module();
+        final var firstStep = it.next();
+        final var firstModule = firstStep.module();
         if (firstModule == null) {
             throw new RestconfDocumentedException(
-                "First member must use namespace-qualified form, '" + step.identifier() + "' does not",
+                "First member must use namespace-qualified form, '" + firstStep.identifier() + "' does not",
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
 
         var namespace = resolveNamespace(firstModule);
+        var step = firstStep;
         var qname = step.identifier().bindTo(namespace);
 
         // We go through more modern APIs here to get this special out of the way quickly
@@ -115,9 +116,22 @@ public final class ApiPathNormalizer implements PointNormalizer {
             return new Rpc(databind, stack.toInference(), rpc);
         }
 
-        final var stack = SchemaInferenceStack.of(modelContext);
+        return normalizeSteps(SchemaInferenceStack.of(modelContext), databind.schemaTree().getRoot(), List.of(),
+            namespace, firstStep, it);
+    }
+
+    private @NonNull DatabindPath normalizeSteps(final SchemaInferenceStack stack,
+            final @NonNull DataSchemaContext rootNode, final @NonNull List<PathArgument> pathPrefix,
+            final @NonNull QNameModule firstNamespace, final @NonNull Step firstStep,
+            final Iterator<@NonNull Step> it) {
+        var parentNode = rootNode;
+        var namespace = firstNamespace;
+        var step = firstStep;
+        var qname = step.identifier().bindTo(namespace);
+
         final var path = new ArrayList<PathArgument>();
-        DataSchemaContext parentNode = databind.schemaTree().getRoot();
+        path.addAll(pathPrefix);
+
         while (true) {
             final var parentSchema = parentNode.dataSchemaNode();
             if (parentSchema instanceof ActionNodeContainer actionParent) {
@@ -213,25 +227,27 @@ public final class ApiPathNormalizer implements PointNormalizer {
 
     public static @NonNull Data normalizeSubResource(final Data resource, final ApiPath subResource) {
         // If subResource is empty just return the resource
-        final var urlPath = resource.instance();
-        if (subResource.steps().isEmpty()) {
-            return resource;
+        final var steps = subResource.steps();
+        if (steps.isEmpty()) {
+            return requireNonNull(resource);
         }
+
         final var normalizer = new ApiPathNormalizer(resource.databind());
+        final var urlPath = resource.instance();
         if (urlPath.isEmpty()) {
             // URL indicates the datastore resource, let's just normalize targetPath
             return normalizer.normalizeDataPath(subResource);
         }
 
-        // FIXME: We are re-parsing the concatenation. We should provide enough context for the bottom half of
-        //        normalizePath() logic instead
-        final String targetUrl = normalizer.canonicalize(urlPath).toString() + "/" + subResource.toString();
-        try {
-            return normalizer.normalizeDataPath(ApiPath.parse(targetUrl));
-        } catch (ParseException e) {
-            throw new RestconfDocumentedException("Failed to parse target " + targetUrl,
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e);
+        // Defer to normalizePath(), faking things a bit. Then check the result.
+        final var it = steps.iterator();
+        final var path = normalizer.normalizeSteps(resource.inference().toSchemaInferenceStack(), resource.schema(),
+            urlPath.getPathArguments(), urlPath.getLastPathArgument().getNodeType().getModule(), it.next(), it);
+        if (path instanceof Data dataPath) {
+            return dataPath;
         }
+        throw new RestconfDocumentedException("Sub-resource '" + subResource + "' resolves to non-data " + path,
+            ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
     @Override
