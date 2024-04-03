@@ -761,7 +761,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 Response transform(final OperationsPostResult result) {
                     final var body = result.output();
                     return body == null ? Response.noContent().build()
-                        : Response.ok().entity(new NormalizedNodePayload(result.operation(), body)).build();
+                        : Response.ok().entity(new NormalizedNodePayload(result.path().inference(), body)).build();
                 }
             });
     }

@@ -108,11 +108,13 @@ public final class CreateDataChangeEventSubscriptionRpc extends RpcImplementatio
                 new RestconfDocumentedException("missing path", ErrorType.APPLICATION, ErrorTag.MISSING_ELEMENT));
         }
 
+        final var operPath = input.path();
+
         return streamRegistry.createStream(restconfURI,
             new DataTreeChangeSource(databindProvider, changeService, datastore, path),
             "Events occuring in " + datastore + " datastore under /"
-                + new ApiPathNormalizer(input.databind()).canonicalize(path).toString())
-            .transform(stream -> input.newOperationOutput(ImmutableNodes.newContainerBuilder()
+                + new ApiPathNormalizer(operPath.databind()).canonicalize(path).toString())
+            .transform(stream -> new OperationsPostResult(operPath, ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
                 .build()));

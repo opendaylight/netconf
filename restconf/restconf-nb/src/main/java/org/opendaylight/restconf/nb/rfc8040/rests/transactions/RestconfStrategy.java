@@ -87,7 +87,6 @@ import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
-import org.opendaylight.restconf.server.api.OperationsPostPath;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
@@ -1292,10 +1291,9 @@ public abstract class RestconfStrategy {
             return RestconfFuture.failed(e);
         }
 
-        final var postPath = new OperationsPostPath(databind, path.inference());
         final ContainerNode data;
         try {
-            data = body.toContainerNode(postPath);
+            data = body.toContainerNode(path);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
@@ -1305,7 +1303,7 @@ public abstract class RestconfStrategy {
         final var type = path.rpc().argument();
         final var local = localRpcs.get(type);
         if (local != null) {
-            return local.invoke(restconfURI, new OperationInput(databind, postPath.operation(), data));
+            return local.invoke(restconfURI, new OperationInput(path, data));
         }
         if (rpcService == null) {
             LOG.debug("RPC invocation is not available");
@@ -1319,7 +1317,7 @@ public abstract class RestconfStrategy {
             public void onSuccess(final DOMRpcResult response) {
                 final var errors = response.errors();
                 if (errors.isEmpty()) {
-                    ret.set(new OperationsPostResult(databind, postPath.operation(), response.value()));
+                    ret.set(new OperationsPostResult(path, response.value()));
                 } else {
                     LOG.debug("RPC invocation reported {}", response.errors());
                     ret.setFailure(new RestconfDocumentedException("RPC implementation reported errors", null,
@@ -1454,10 +1452,9 @@ public abstract class RestconfStrategy {
     }
 
     private @NonNull RestconfFuture<InvokeOperation> dataInvokePOST(final Action path, final OperationInputBody body) {
-        final var inference = path.inference();
         final ContainerNode input;
         try {
-            input = body.toContainerNode(new OperationsPostPath(databind, inference));
+            input = body.toContainerNode(path);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
@@ -1471,7 +1468,7 @@ public abstract class RestconfStrategy {
         final var future = dataInvokePOST(actionService, path, input);
         return future.transform(result -> result.getOutput()
             .flatMap(output -> output.isEmpty() ? Optional.empty()
-                : Optional.of(new InvokeOperation(new NormalizedNodePayload(inference, output))))
+                : Optional.of(new InvokeOperation(new NormalizedNodePayload(path.inference(), output))))
             .orElse(InvokeOperation.EMPTY));
     }
 

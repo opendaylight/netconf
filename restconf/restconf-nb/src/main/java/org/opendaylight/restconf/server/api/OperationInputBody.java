@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -30,16 +31,16 @@ public abstract sealed class OperationInputBody extends AbstractBody
     /**
      * Stream the {@code input} into a {@link NormalizedNodeStreamWriter}.
      *
-     * @param path The {@link OperationsPostPath} of the operation invocation
+     * @param path The {@link OperationPath} of the operation invocation
      * @return The document body, or an empty container node
      * @throws IOException when an I/O error occurs
      */
-    public @NonNull ContainerNode toContainerNode(final @NonNull OperationsPostPath path) throws IOException {
+    public @NonNull ContainerNode toContainerNode(final @NonNull OperationPath path) throws IOException {
         try (var is = new PushbackInputStream(acquireStream())) {
             final var firstByte = is.read();
             if (firstByte == -1) {
                 return ImmutableNodes.newContainerBuilder()
-                    .withNodeIdentifier(new NodeIdentifier(path.inputQName()))
+                    .withNodeIdentifier(new NodeIdentifier(path.inputStatement().argument()))
                     .build();
             }
             is.unread(firstByte);
@@ -52,6 +53,6 @@ public abstract sealed class OperationInputBody extends AbstractBody
         }
     }
 
-    abstract void streamTo(@NonNull OperationsPostPath path, @NonNull InputStream inputStream,
+    abstract void streamTo(@NonNull OperationPath path, @NonNull InputStream inputStream,
         @NonNull NormalizedNodeStreamWriter writer) throws IOException;
 }
