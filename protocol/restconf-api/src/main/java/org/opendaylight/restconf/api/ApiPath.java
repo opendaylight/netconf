@@ -54,6 +54,11 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
             this.module = module;
         }
 
+        Step(final @Nullable String module, final Unqualified identifier) {
+            this.module = module;
+            this.identifier = requireNonNull(identifier);
+        }
+
         public Unqualified identifier() {
             return identifier;
         }
@@ -98,7 +103,12 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
      * An {@code api-identifier} step in a {@link ApiPath}.
      */
     public static final class ApiIdentifier extends Step {
+        @Deprecated(since = "7.0.4", forRemoval = true)
         public ApiIdentifier(final @Nullable String module, final String identifier) {
+            super(module, identifier);
+        }
+
+        public ApiIdentifier(final @Nullable String module, final Unqualified identifier) {
             super(module, identifier);
         }
 

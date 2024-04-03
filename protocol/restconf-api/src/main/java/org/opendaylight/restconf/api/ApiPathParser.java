@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.api.ApiPath.Step;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 import org.opendaylight.yangtools.yang.common.YangNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,7 +173,7 @@ sealed class ApiPathParser {
             idx = continueIdentifer(idx, ch);
         }
 
-        steps.add(new ApiIdentifier(null, endSub(str, idx)));
+        steps.add(new ApiIdentifier(null, endUnqualified(str, idx)));
         return idx;
     }
 
@@ -188,8 +189,12 @@ sealed class ApiPathParser {
             idx = continueIdentifer(idx, ch);
         }
 
-        steps.add(new ApiIdentifier(module, endSub(str, idx)));
+        steps.add(new ApiIdentifier(module, endUnqualified(str, idx)));
         return idx;
+    }
+
+    private @NonNull Unqualified endUnqualified(final String str, final int idx) {
+        return Unqualified.of(endSub(str, idx));
     }
 
     // Starting at first key-value
