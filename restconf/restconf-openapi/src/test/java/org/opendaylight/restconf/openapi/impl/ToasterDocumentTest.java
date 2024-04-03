@@ -37,7 +37,7 @@ class ToasterDocumentTest extends AbstractDocumentTest {
      */
     @Test
     void getAllModulesDocTest() throws Exception {
-        final var jsonControllerDoc = getAllModulesDoc(0);
+        final var jsonControllerDoc = getAllModulesDoc(0, 0);
         final var expectedJson = getExpectedDoc("toaster-document/controller-all.json");
         JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
     }
@@ -49,7 +49,7 @@ class ToasterDocumentTest extends AbstractDocumentTest {
     @MethodSource
     void getDocByModuleTest(final String revision, final String jsonPath) throws Exception {
         final var expectedJson = getExpectedDoc("toaster-document/" + jsonPath);
-        final var moduleDoc = getDocByModule(TOASTER, revision, 0);
+        final var moduleDoc = getDocByModule(TOASTER, revision, 0, 0);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
@@ -66,7 +66,7 @@ class ToasterDocumentTest extends AbstractDocumentTest {
      */
     @Test
     void getMountDocTest() throws Exception {
-        final var jsonDeviceDoc = getMountDoc(0);
+        final var jsonDeviceDoc = getMountDoc(0, 0);
         final var expectedJson = getExpectedDoc("toaster-document/device-all.json");
         JSONAssert.assertEquals(expectedJson, jsonDeviceDoc, IGNORE_ORDER);
     }
@@ -78,7 +78,7 @@ class ToasterDocumentTest extends AbstractDocumentTest {
     @MethodSource
     void getMountDocByModuleTest(final String revision, final String jsonPath) throws Exception {
         final var expectedJson = getExpectedDoc("toaster-document/" + jsonPath);
-        final var moduleDoc = getMountDocByModule(TOASTER, revision, 0);
+        final var moduleDoc = getMountDocByModule(TOASTER, revision, 0, 0);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 

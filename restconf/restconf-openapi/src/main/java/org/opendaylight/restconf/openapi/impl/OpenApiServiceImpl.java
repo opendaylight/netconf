@@ -64,8 +64,9 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer width) throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, width);
+    public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer width,
+            final @Nullable Integer depth) throws IOException {
+        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, width, depth);
         return Response.ok(stream).build();
     }
 
@@ -74,8 +75,9 @@ public final class OpenApiServiceImpl implements OpenApiService {
      */
     @Override
     public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo,
-            final @Nullable Integer width) throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, width);
+            final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
+        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, width,
+            depth);
         return Response.ok(stream).build();
     }
 
@@ -98,18 +100,21 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public Response getMountDocByModule(final String instanceNum, final String module,
-            final String revision, final UriInfo uriInfo, final @Nullable Integer width) throws IOException {
+            final String revision, final UriInfo uriInfo, final @Nullable Integer width, final @Nullable Integer depth)
+            throws IOException {
         final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, width);
+            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, width,
+                depth);
         return Response.ok(stream).build();
     }
 
     @Override
-    public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer width)
-            throws IOException {
+    public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer width,
+            final @Nullable Integer depth) throws IOException {
         final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
         final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), stringPageNum, width);
+            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), stringPageNum, width,
+                depth);
         return Response.ok(stream).build();
     }
 }

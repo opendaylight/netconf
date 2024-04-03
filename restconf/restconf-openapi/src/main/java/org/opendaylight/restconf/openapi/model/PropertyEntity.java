@@ -100,35 +100,42 @@ public class PropertyEntity {
     private final @NonNull String parentName;
     private final @NonNull DefinitionNames definitionNames;
     private final @NonNull Integer width;
+    private final @NonNull Integer depth;
 
     public PropertyEntity(final @NonNull DataSchemaNode node, final @NonNull JsonGenerator generator,
             final @NonNull SchemaInferenceStack stack, final @NonNull List<String> required,
             final @NonNull String parentName, final boolean isParentConfig,
-            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width) throws IOException {
+            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width,
+            final @NonNull Integer depth, final int nodeDepth) throws IOException {
         this.node = requireNonNull(node);
         this.generator = requireNonNull(generator);
         this.required = requireNonNull(required);
         this.parentName = requireNonNull(parentName);
         this.definitionNames = requireNonNull(definitionNames);
         this.width = requireNonNull(width);
-        generate(stack, isParentConfig);
+        this.depth = requireNonNull(depth);
+        generate(stack, isParentConfig, nodeDepth);
     }
 
-    private void generate(final SchemaInferenceStack stack, final boolean isParentConfig) throws IOException {
+    private void generate(final SchemaInferenceStack stack, final boolean isParentConfig, final int nodeDepth)
+            throws IOException {
         if (node instanceof ChoiceSchemaNode choice) {
             stack.enterSchemaTree(node.getQName());
             final var isConfig = isParentConfig && node.isConfiguration();
-            processChoiceNodeRecursively(isConfig, stack, choice);
+            processChoiceNodeRecursively(isConfig, stack, choice, nodeDepth);
             stack.exit();
         } else {
             generator.writeObjectFieldStart(node.getQName().getLocalName());
-            processChildNode(node, stack, isParentConfig);
+            processChildNode(node, stack, isParentConfig, nodeDepth);
             generator.writeEndObject();
         }
     }
 
     private void processChoiceNodeRecursively(final boolean isConfig, final SchemaInferenceStack stack,
-            final ChoiceSchemaNode choice) throws IOException {
+            final ChoiceSchemaNode choice, final int nodeDepth) throws IOException {
+        if (depth > 0 && nodeDepth + 1 > depth) {
+            return;
+        }
         if (!choice.getCases().isEmpty()) {
             final var caseSchemaNode = choice.getDefaultCase().orElse(
                 choice.getCases().stream().findFirst().orElseThrow());
@@ -138,11 +145,11 @@ public class PropertyEntity {
                 if (childNode instanceof ChoiceSchemaNode childChoice) {
                     final var isChildConfig = isConfig && childNode.isConfiguration();
                     stack.enterSchemaTree(childNode.getQName());
-                    processChoiceNodeRecursively(isChildConfig, stack, childChoice);
+                    processChoiceNodeRecursively(isChildConfig, stack, childChoice, nodeDepth + 1);
                     stack.exit();
                 } else if (!isConfig || childNode.isConfiguration()) {
                     generator.writeObjectFieldStart(childNode.getQName().getLocalName());
-                    processChildNode(childNode, stack, isConfig);
+                    processChildNode(childNode, stack, isConfig, nodeDepth + 1);
                     generator.writeEndObject();
                 }
             }
@@ -151,13 +158,13 @@ public class PropertyEntity {
     }
 
     private void processChildNode(final DataSchemaNode schemaNode, final SchemaInferenceStack stack,
-            final boolean isParentConfig) throws IOException {
+            final boolean isParentConfig, final int nodeDepth) throws IOException {
         final var parentNamespace = stack.toSchemaNodeIdentifier().lastNodeIdentifier().getNamespace();
         stack.enterSchemaTree(schemaNode.getQName());
         final var name = schemaNode.getQName().getLocalName();
         final var shouldBeAddedAsChild = !isParentConfig || schemaNode.isConfiguration();
         if (schemaNode instanceof ListSchemaNode || schemaNode instanceof ContainerSchemaNode) {
-            processDataNodeContainer(schemaNode, stack);
+            processDataNodeContainer(schemaNode, stack, nodeDepth + 1);
             if (shouldBeAddedAsChild && isSchemaNodeMandatory(schemaNode)) {
                 required.add(name);
             }
@@ -178,8 +185,8 @@ public class PropertyEntity {
         stack.exit();
     }
 
-    private void processDataNodeContainer(final DataSchemaNode dataNode, final SchemaInferenceStack stack)
-            throws IOException {
+    private void processDataNodeContainer(final DataSchemaNode dataNode, final SchemaInferenceStack stack,
+            final int nodeDepth) throws IOException {
         final var localName = dataNode.getQName().getLocalName();
         final var nodeName = parentName + "_" + localName;
 
@@ -190,13 +197,16 @@ public class PropertyEntity {
             discriminator = definitionNames.getDiscriminator(dataNode);
         }
 
-        processRef(nodeName, dataNode, discriminator, stack);
+        processRef(nodeName, dataNode, discriminator, stack, nodeDepth);
     }
 
     private void processRef(final String name, final SchemaNode schemaNode, String discriminator,
-            final SchemaInferenceStack stack) throws IOException {
+            final SchemaInferenceStack stack, final int nodeDepth) throws IOException {
         final var ref = COMPONENTS_PREFIX + name + discriminator;
         if (schemaNode instanceof ListSchemaNode listNode) {
+            if (depth > 0 && nodeDepth + 1 > depth) {
+                return;
+            }
             generator.writeStringField(TYPE, ARRAY_TYPE);
             generator.writeObjectFieldStart(ITEMS);
             generator.writeStringField("$ref", ref);
