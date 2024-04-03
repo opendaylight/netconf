@@ -88,6 +88,14 @@ public interface RestconfServer {
 
     RestconfFuture<DataPostResult.CreateResource> dataPOST(ChildBody body, Map<String, String> queryParameters);
 
+    /**
+     * Create or invoke a operation, as described in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4">RFC8040 section 4.4</a>.
+     *
+     * @param identifier path to target
+     * @param body body of the post request
+     * @param queryParameters query parameters
+     */
     RestconfFuture<? extends DataPostResult> dataPOST(ApiPath identifier, DataPostBody body,
         Map<String, String> queryParameters);
 

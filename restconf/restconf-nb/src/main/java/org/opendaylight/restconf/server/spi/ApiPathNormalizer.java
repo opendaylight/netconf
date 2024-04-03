@@ -52,7 +52,6 @@ import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaTreeEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * Utility for normalizing {@link ApiPath}s. An {@link ApiPath} can represent a number of different constructs, as
@@ -73,8 +72,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
     public @NonNull DatabindPath normalizePath(final ApiPath apiPath) {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
-            return new Data(databind, Inference.ofDataTreePath(databind.modelContext()), YangInstanceIdentifier.of(),
-                databind.schemaTree().getRoot());
+            return new Data(databind);
         }
 
         // First step is somewhat special:
