@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -29,10 +30,10 @@ public final class JsonOperationInputBody extends OperationInputBody {
     }
 
     @Override
-    void streamTo(final OperationsPostPath path, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
+    void streamTo(final OperationPath path, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
             throws IOException {
         try {
-            JsonParserStream.create(writer, path.databind().jsonCodecs(), path.operation())
+            JsonParserStream.create(writer, path.databind().jsonCodecs(), path.inference())
                 .parse(new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)));
         } catch (JsonParseException e) {
             LOG.debug("Error parsing JSON input", e);

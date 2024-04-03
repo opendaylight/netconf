@@ -79,10 +79,12 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
                 ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
         }
 
+        final var operPath = input.path();
+
         return streamRegistry.createStream(restconfURI, new DeviceNotificationSource(mountPointService, path),
             "All YANG notifications occuring on mount point /"
-                + new ApiPathNormalizer(input.databind()).canonicalize(path).toString())
-            .transform(stream -> input.newOperationOutput(ImmutableNodes.newContainerBuilder()
+                + new ApiPathNormalizer(operPath.databind()).canonicalize(path).toString())
+            .transform(stream -> new OperationsPostResult(operPath, ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
                 .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_NAME_NODEID, stream.name()))
                 .build()));

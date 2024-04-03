@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -27,10 +28,13 @@ public final class XmlOperationInputBody extends OperationInputBody {
     }
 
     @Override
-    void streamTo(final OperationsPostPath path, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
+    void streamTo(final OperationPath path, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
             throws IOException {
+        final var stack = path.inference().toSchemaInferenceStack();
+        stack.enterDataTree(path.inputStatement().argument());
+
         try {
-            XmlParserStream.create(writer, path.databind().xmlCodecs(), path.input())
+            XmlParserStream.create(writer, path.databind().xmlCodecs(), stack.toInference())
                 .parse(UntrustedXML.createXMLStreamReader(inputStream));
         } catch (XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
