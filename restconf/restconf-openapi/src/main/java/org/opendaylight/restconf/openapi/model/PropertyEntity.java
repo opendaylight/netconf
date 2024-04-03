@@ -99,17 +99,20 @@ public class PropertyEntity {
     private final @NonNull String parentName;
     private final @NonNull DefinitionNames definitionNames;
     private final @NonNull Integer width;
+    private final @NonNull Integer depth;
 
     public PropertyEntity(final @NonNull DataSchemaNode node, final @NonNull JsonGenerator generator,
             final @NonNull SchemaInferenceStack stack, final @NonNull List<String> required,
             final @NonNull String parentName, final boolean isParentConfig,
-            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width) throws IOException {
+            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width,
+            final @NonNull Integer depth) throws IOException {
         this.node = requireNonNull(node);
         this.generator = requireNonNull(generator);
         this.required = requireNonNull(required);
         this.parentName = requireNonNull(parentName);
         this.definitionNames = requireNonNull(definitionNames);
         this.width = requireNonNull(width);
+        this.depth = requireNonNull(depth);
         generate(stack, isParentConfig);
     }
 
