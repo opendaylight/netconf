@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
@@ -26,9 +25,11 @@ import org.opendaylight.restconf.api.ApiPath.Step;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert.PointNormalizer;
 import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Action;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Data;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Rpc;
+import org.opendaylight.restconf.server.api.DatabindPath;
+import org.opendaylight.restconf.server.api.DatabindPath.Action;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
+import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -44,14 +45,10 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.Composite;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext.PathMixin;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.EffectiveStatementInference;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.stmt.ActionEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.InputEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.OutputEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaTreeEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -59,7 +56,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 
 /**
  * Utility for normalizing {@link ApiPath}s. An {@link ApiPath} can represent a number of different constructs, as
- * denoted to in the {@link Path} interface hierarchy.
+ * denoted to in the {@link DatabindPath} interface hierarchy.
  *
  * <p>
  * This process is governed by
@@ -67,141 +64,16 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
  * equivalent of NETCONF XML filter encoding, with data values being escaped RFC7891 strings.
  */
 public final class ApiPathNormalizer implements PointNormalizer {
-    /**
-     * A normalized {@link ApiPath}. This can be either
-     * <ul>
-     *   <li>a {@link Data} pointing to a datastore resource, or</li>
-     *   <li>an {@link Rpc} pointing to a YANG {@code rpc} statement, or</li>
-     *   <li>an {@link Action} pointing to an instantiation of a YANG {@code action} statement</li>
-     * </ul>
-     */
-    @NonNullByDefault
-    public sealed interface Path {
-        /**
-         * Returns the {@link EffectiveStatementInference} made by this path.
-         *
-         * @return the {@link EffectiveStatementInference} made by this path
-         */
-        Inference inference();
-
-        /**
-         * A {@link Path} denoting an invocation of a YANG {@code action}.
-         *
-         * @param inference the {@link EffectiveStatementInference} made by this path
-         * @param instance the {@link YangInstanceIdentifier} of the instance being referenced, guaranteed to be
-         *        non-empty
-         * @param action the {@code action}
-         */
-        record Action(Inference inference, YangInstanceIdentifier instance, ActionEffectiveStatement action)
-                implements OperationPath, InstanceReference {
-            public Action {
-                requireNonNull(inference);
-                requireNonNull(action);
-                if (instance.isEmpty()) {
-                    throw new IllegalArgumentException("action must be instantiated on a data resource");
-                }
-            }
-
-            @Override
-            public InputEffectiveStatement inputStatement() {
-                return action.input();
-            }
-
-            @Override
-            public OutputEffectiveStatement outputStatement() {
-                return action.output();
-            }
-        }
-
-        /**
-         * A {@link Path} denoting a datastore instance.
-         *
-         * @param inference the {@link EffectiveStatementInference} made by this path
-         * @param instance the {@link YangInstanceIdentifier} of the instance being referenced,
-         *                 {@link YangInstanceIdentifier#empty()} denotes the datastore
-         * @param schema the {@link DataSchemaContext} of the datastore instance
-         */
-        // FIXME: split into 'Datastore' and 'Data' with non-empty instance, so we can bind to correct
-        //        instance-identifier semantics, which does not allow YangInstanceIdentifier.empty()
-        record Data(Inference inference, YangInstanceIdentifier instance, DataSchemaContext schema)
-                implements InstanceReference {
-            public Data {
-                requireNonNull(inference);
-                requireNonNull(instance);
-                requireNonNull(schema);
-            }
-        }
-
-        /**
-         * A {@link Path} denoting an invocation of a YANG {@code rpc}.
-         *
-         * @param inference the {@link EffectiveStatementInference} made by this path
-         * @param rpc the {@code rpc}
-         */
-        record Rpc(Inference inference, RpcEffectiveStatement rpc) implements OperationPath {
-            public Rpc {
-                requireNonNull(inference);
-                requireNonNull(rpc);
-            }
-
-            @Override
-            public InputEffectiveStatement inputStatement() {
-                return rpc.input();
-            }
-
-            @Override
-            public OutputEffectiveStatement outputStatement() {
-                return rpc.output();
-            }
-        }
-    }
-
-    /**
-     * An intermediate trait of {@link Path}s which are referencing a YANG data resource. This can be either
-     * a {@link Data}, or an {@link Action}}.
-     */
-    @NonNullByDefault
-    public sealed interface InstanceReference extends Path {
-        /**
-         * Returns the {@link YangInstanceIdentifier} of the instance being referenced.
-         *
-         * @return the {@link YangInstanceIdentifier} of the instance being referenced,
-         *         {@link YangInstanceIdentifier#empty()} denotes the datastora
-         */
-        YangInstanceIdentifier instance();
-    }
-
-    /**
-     * An intermediate trait of {@link Path}s which are referencing a YANG operation. This can be either
-     * an {@link Action} on an {@link Rpc}.
-     */
-    @NonNullByDefault
-    public sealed interface OperationPath extends Path {
-        /**
-         * Returns the {@code input} statement of this operation.
-         *
-         * @return the {@code input} statement of this operation
-         */
-        InputEffectiveStatement inputStatement();
-
-        /**
-         * Returns the {@code output} statement of this operation.
-         *
-         * @return the {@code output} statement of this operation
-         */
-        OutputEffectiveStatement outputStatement();
-    }
-
     private final @NonNull DatabindContext databind;
 
     public ApiPathNormalizer(final DatabindContext databind) {
         this.databind = requireNonNull(databind);
     }
 
-    public @NonNull Path normalizePath(final ApiPath apiPath) {
+    public @NonNull DatabindPath normalizePath(final ApiPath apiPath) {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
-            return new Data(Inference.ofDataTreePath(databind.modelContext()), YangInstanceIdentifier.of(),
+            return new Data(databind, Inference.ofDataTreePath(databind.modelContext()), YangInstanceIdentifier.of(),
                 databind.schemaTree().getRoot());
         }
 
@@ -241,7 +113,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
             final var stack = SchemaInferenceStack.of(modelContext);
             final var stmt = stack.enterSchemaTree(rpc.argument());
             verify(rpc.equals(stmt), "Expecting %s, inferred %s", rpc, stmt);
-            return new Rpc(stack.toInference(), rpc);
+            return new Rpc(databind, stack.toInference(), rpc);
         }
 
         final var stack = SchemaInferenceStack.of(modelContext);
@@ -268,7 +140,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
                     final var actionStmt = action.asEffectiveStatement();
                     verify(actionStmt.equals(stmt), "Expecting %s, inferred %s", actionStmt, stmt);
 
-                    return new Action(stack.toInference(), YangInstanceIdentifier.of(path), actionStmt);
+                    return new Action(databind, stack.toInference(), YangInstanceIdentifier.of(path), actionStmt);
                 }
             }
 
@@ -317,7 +189,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
             path.add(pathArg);
 
             if (!it.hasNext()) {
-                return new Data(stack.toInference(), YangInstanceIdentifier.of(path), childNode);
+                return new Data(databind, stack.toInference(), YangInstanceIdentifier.of(path), childNode);
             }
 
             parentNode = childNode;
@@ -353,7 +225,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
         throw new IllegalArgumentException("Point '" + value + "' resolves to non-data " + path);
     }
 
-    public Path.@NonNull Rpc normalizeRpcPath(final ApiPath apiPath) {
+    public @NonNull Rpc normalizeRpcPath(final ApiPath apiPath) {
         final var steps = apiPath.steps();
         return switch (steps.size()) {
             case 0 -> throw new RestconfDocumentedException("RPC name must be present", ErrorType.PROTOCOL,
@@ -364,7 +236,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
         };
     }
 
-    public Path.@NonNull Rpc normalizeRpcPath(final ApiPath.Step step) {
+    public @NonNull Rpc normalizeRpcPath(final ApiPath.Step step) {
         final var firstModule = step.module();
         if (firstModule == null) {
             throw new RestconfDocumentedException(
@@ -383,7 +255,7 @@ public final class ApiPathNormalizer implements PointNormalizer {
                 ErrorTag.DATA_MISSING, e);
         }
         if (stmt instanceof RpcEffectiveStatement rpc) {
-            return new Rpc(stack.toInference(), rpc);
+            return new Rpc(databind, stack.toInference(), rpc);
         }
         throw new RestconfDocumentedException(qname + " does not refer to an RPC", ErrorType.PROTOCOL,
             ErrorTag.DATA_MISSING);

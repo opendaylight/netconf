@@ -33,7 +33,7 @@ import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer.Path.Data;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
