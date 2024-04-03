@@ -12385,6 +12385,41 @@
           "123 duplication-test"
         ]
       }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/duplication-test:test-rpc3": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - duplication-test - test-rpc3",
+        "requestBody": {
+          "description": "test-rpc3_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc3_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc3_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc3 success"
+          }
+        },
+        "tags": [
+          "123 duplication-test"
+        ],
+        "parameters": []
+      }
     }
   },
   "components": {
@@ -14320,6 +14355,39 @@
         "xml": {
           "name": "input",
           "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_test-rpc3_input": {
+        "title": "duplication-test_test-rpc3_input",
+        "type": "object",
+        "properties": {
+          "input-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf"
+          },
+          "first": {
+            "$ref": "#/components/schemas/duplication-test_first1"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_first1": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {
+          "input-leaf1": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf1"
+          }
+        },
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
         }
       }
     },

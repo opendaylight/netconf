@@ -23,11 +23,25 @@ module duplication-service {
     uses test-grouping;
   }
 
+  grouping test-grouping3 {
+    uses test-grouping;
+  }
+
   augment "/dt:test-rpc/dt:input" {
     uses test-grouping2;
   }
 
   augment "/dt:test-rpc2/dt:input" {
     uses test-grouping;
+  }
+
+  augment "/dt:test-rpc3/dt:input" {
+    uses test-grouping3;
+  }
+
+  augment "/dt:test-rpc3/dt:input/test-choice/first/first" {
+    leaf input-leaf1 {
+      type string;
+    }
   }
 }
