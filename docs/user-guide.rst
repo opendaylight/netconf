@@ -2388,6 +2388,32 @@ RESTCONF response:
         }
     }
 
+Reading module source
+---------------------
+
+Overview
+~~~~~~~~
+
+If user would like to read module source from a Controller or NETCONF device, it is possible to use
+the subpath "modules". Revision of the module is optional, so it is passed as a query parameter. There is
+also a possibility to read modules in yang format or in yin format.
+
+*Read module source from controller*
+
+.. code-block::
+
+    GET
+    /rests/modules/{module-name}?revision={revision}
+    Accept: application/yang or application/yin+xml
+
+*Read mounted module source from device*
+
+.. code-block::
+
+    GET
+    /rests/modules/network-topology:network-topology/topology=topology-netconf/node={node-id}/yang-ext:mount/{module-name}?revision={revision}
+    Accept: application/yang or application/yin+xml
+
 RESTCONF OpenAPI
 ----------------
 
