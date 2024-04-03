@@ -13,8 +13,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.restconf.server.api.OperationInputBody;
-import org.opendaylight.restconf.server.api.OperationsPostPath;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -25,7 +25,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 abstract class AbstractOperationInputBodyTest extends AbstractInstanceIdentifierTest {
     private static final NodeIdentifier INPUT_NID = new NodeIdentifier(QName.create(CONT_QNAME, "input"));
 
-    private static OperationsPostPath RESET_PATH;
+    private static OperationPath RESET_PATH;
 
     @BeforeClass
     public static final void setupInference() {

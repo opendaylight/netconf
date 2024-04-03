@@ -139,7 +139,10 @@ public sealed interface DatabindPath extends DatabindAware {
 
     /**
      * An intermediate trait of {@link DatabindPath}s which are referencing a YANG operation. This can be either
-     * an {@link Action} on an {@link Rpc}.
+     * an {@link Action}, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2">RFC8040 Invoke Operation Mode</a> or
+     * an {@link Rpc}, as defined in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.6">RFC8040 Operation Resource</a>.
      */
     sealed interface OperationPath extends DatabindPath {
         /**

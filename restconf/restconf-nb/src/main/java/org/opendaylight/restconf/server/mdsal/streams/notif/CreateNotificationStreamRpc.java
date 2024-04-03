@@ -73,7 +73,8 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
             .sorted()
             .collect(ImmutableSet.toImmutableSet());
 
-        final var modelContext = input.databind().modelContext();
+        final var operPath = input.path();
+        final var modelContext = operPath.databind().modelContext();
         final var description = new StringBuilder("YANG notifications matching any of {");
         var haveFirst = false;
         for (var qname : qnames) {
@@ -105,7 +106,7 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
 
         return streamRegistry.createStream(restconfURI,
             new NotificationSource(databindProvider, notificationService, qnames), description.toString())
-            .transform(stream -> input.newOperationOutput(ImmutableNodes.newContainerBuilder()
+            .transform(stream -> new OperationsPostResult(operPath, ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
                 .build()));

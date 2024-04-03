@@ -11,26 +11,21 @@ import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * RESTCONF {@code /operations} content for a {@code POST} operation as per
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.6">RFC8040 Operation Resource</a> and
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2">RFC8040 Invoke Operation Mode</a>.
  *
- * @param databind Associated {@link DatabindContext}
- * @param operation An {@link Inference} pointing to the invoked operation
+ * @param path associated {@link OperationPath}
  * @param output Operation output, or {@code null} if output would be empty
  * @see OperationsPostPath
  */
-public record OperationsPostResult(
-        @NonNull DatabindContext databind,
-        @NonNull Inference operation,
-        @Nullable ContainerNode output) implements DatabindAware {
+public record OperationsPostResult(@NonNull OperationPath path, @Nullable ContainerNode output) {
     public OperationsPostResult {
-        requireNonNull(databind);
-        requireNonNull(operation);
+        requireNonNull(path);
         if (output != null && output.isEmpty()) {
             output = null;
         }
