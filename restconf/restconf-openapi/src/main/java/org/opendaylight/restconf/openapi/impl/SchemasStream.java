@@ -49,8 +49,8 @@ public final class SchemasStream extends InputStream {
     private final boolean isForSingleModule;
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
-
     private final Integer width;
+    private final Integer depth;
 
     private Reader reader;
     private ReadableByteChannel channel;
@@ -58,7 +58,8 @@ public final class SchemasStream extends InputStream {
 
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule,
-            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width,
+            final Integer depth) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
@@ -66,6 +67,7 @@ public final class SchemasStream extends InputStream {
         this.stream = stream;
         this.generator = generator;
         this.width = width;
+        this.depth = depth;
     }
 
     @Override
@@ -174,8 +176,12 @@ public final class SchemasStream extends InputStream {
             stack.exit();
         }
 
+        var childDepth = 0;
         if (width == null || width == 0) {
             for (final var childNode : module.getChildNodes()) {
+                if (childDepth >= depth) {
+                    break;
+                }
                 processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
                     true);
             }
@@ -192,13 +198,14 @@ public final class SchemasStream extends InputStream {
         return result;
     }
 
-    private static void processDataAndActionNodes(final DataSchemaNode node, final String title,
+    private ArrayDeque<SchemaEntity> processDataAndActionNodes(final DataSchemaNode node, final String title,
             final SchemaInferenceStack stack, final DefinitionNames definitionNames,
             final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
+        final var nodeWithChildren = new ArrayDeque<SchemaEntity>();
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
             if (definitionNames.isListedNode(node)) {
                 // This means schema for this node is already processed
-                return;
+                return new ArrayDeque<>();
             }
             final var newTitle = title + "_" + node.getQName().getLocalName();
             final var parentNameConfigLocalName = parentName + "_" + node.getQName().getLocalName();
@@ -210,8 +217,13 @@ public final class SchemasStream extends InputStream {
             result.add(child);
             stack.enterSchemaTree(node.getQName());
             processActions(node, newTitle, stack, definitionNames, result, parentName);
+            var childDepth = 0;
             for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
+                if (childDepth >= depth) {
+                    break;
+                }
                 processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
+                childDepth++;
             }
             stack.exit();
         } else if (node instanceof ChoiceSchemaNode choiceNode && !choiceNode.getCases().isEmpty()) {
@@ -221,8 +233,13 @@ public final class SchemasStream extends InputStream {
                     .orElseThrow(() -> new IllegalStateException("No cases found in ChoiceSchemaNode")));
             stack.enterSchemaTree(choiceNode.getQName());
             stack.enterSchemaTree(caseNode.getQName());
+            var childDepth = 0;
             for (final var childNode : caseNode.getChildNodes()) {
+                if (childDepth >= depth) {
+                    break;
+                }
                 processDataAndActionNodes(childNode, title, stack, definitionNames, result, parentName, isParentConfig);
+                childDepth++;
             }
             stack.exit(); // Exit the CaseSchemaNode context
             stack.exit(); // Exit the ChoiceSchemaNode context
