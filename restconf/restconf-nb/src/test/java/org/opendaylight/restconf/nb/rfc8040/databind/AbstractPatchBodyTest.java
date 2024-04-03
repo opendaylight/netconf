@@ -35,7 +35,6 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
-import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -100,8 +99,7 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
         final var stratAndPath = strategy.resolveStrategyPath(apiPath);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
-            return body.toPatchContext(new DataPatchPath(stratAndPath.strategy().databind(),
-                stratAndPath.path().instance()));
+            return body.toPatchContext(stratAndPath.path());
         }
     }
 }

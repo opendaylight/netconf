@@ -44,7 +44,7 @@ public final class JsonPatchBody extends PatchBody {
     }
 
     @Override
-    PatchContext toPatchContext(final DataPatchPath path, final InputStream inputStream) throws IOException {
+    PatchContext toPatchContext(final DatabindPath.Data path, final InputStream inputStream) throws IOException {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
             final var resultList = read(jsonReader, path, patchId);
@@ -53,7 +53,7 @@ public final class JsonPatchBody extends PatchBody {
         }
     }
 
-    private static ImmutableList<PatchEntity> read(final JsonReader in, final DataPatchPath path,
+    private static ImmutableList<PatchEntity> read(final JsonReader in, final DatabindPath.Data path,
             final AtomicReference<String> patchId) throws IOException {
         final var edits = ImmutableList.<PatchEntity>builder();
         final var edit = new PatchEdit();
@@ -98,7 +98,7 @@ public final class JsonPatchBody extends PatchBody {
 
     // Switch value of parsed JsonToken.NAME and read edit definition or patch id
     private static void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
-            final @NonNull JsonReader in, final @NonNull DataPatchPath path,
+            final @NonNull JsonReader in, final DatabindPath.@NonNull Data path,
             final @NonNull Builder<PatchEntity> resultCollection, final @NonNull AtomicReference<String> patchId)
                 throws IOException {
         switch (name) {
@@ -130,7 +130,7 @@ public final class JsonPatchBody extends PatchBody {
 
     // Read one patch edit object from JSON input
     private static void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
-            final @NonNull DataPatchPath path) throws IOException {
+            final DatabindPath.@NonNull Data path) throws IOException {
         String deferredValue = null;
         in.beginObject();
 

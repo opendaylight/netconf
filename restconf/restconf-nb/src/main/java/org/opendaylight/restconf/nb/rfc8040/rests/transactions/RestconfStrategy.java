@@ -72,7 +72,6 @@ import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
-import org.opendaylight.restconf.server.api.DataPatchPath;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostPath;
@@ -604,7 +603,7 @@ public abstract class RestconfStrategy {
 
         final PatchContext patch;
         try {
-            patch = body.toPatchContext(new DataPatchPath(databind, path.instance()));
+            patch = body.toPatchContext(path);
         } catch (IOException e) {
             LOG.debug("Error parsing YANG Patch input", e);
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),

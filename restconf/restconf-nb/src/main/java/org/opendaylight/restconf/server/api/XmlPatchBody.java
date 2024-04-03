@@ -43,7 +43,7 @@ public final class XmlPatchBody extends PatchBody {
     }
 
     @Override
-    PatchContext toPatchContext(final DataPatchPath path, final InputStream inputStream) throws IOException {
+    PatchContext toPatchContext(final DatabindPath.Data path, final InputStream inputStream) throws IOException {
         try {
             return parse(path, UntrustedXML.newDocumentBuilder().parse(inputStream));
         } catch (XMLStreamException | SAXException | URISyntaxException e) {
@@ -53,7 +53,7 @@ public final class XmlPatchBody extends PatchBody {
         }
     }
 
-    private static @NonNull PatchContext parse(final DataPatchPath path, final Document doc)
+    private static @NonNull PatchContext parse(final DatabindPath.@NonNull Data path, final Document doc)
             throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final var entities = ImmutableList.<PatchEntity>builder();
         final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
