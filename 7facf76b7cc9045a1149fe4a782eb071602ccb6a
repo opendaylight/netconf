@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "55996f89_e8df251a",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountStatusReporter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-04-03T07:41:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d984be77_ee4221ac",
+      "revId": "7facf76b7cc9045a1149fe4a782eb071602ccb6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "68a62ddd_bad8bbee",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-02-05T14:08:36Z",
       "side": 1,
       "message": "What to do when we have TLS connection?",
+      "revId": "7facf76b7cc9045a1149fe4a782eb071602ccb6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08fe935a_bf525e95",
+        "filename": "apps/callhome-provider/src/main/java/org/opendaylight/netconf/topology/callhome/CallHomeMountStatusReporter.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-04-03T07:41:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "68a62ddd_bad8bbee",
       "revId": "7facf76b7cc9045a1149fe4a782eb071602ccb6a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
