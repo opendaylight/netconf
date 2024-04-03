@@ -15,9 +15,12 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
@@ -70,6 +73,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -79,6 +83,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -403,6 +408,93 @@ public class RestconfDataServiceImplTest {
     }
 
     @Test
+    public void testPostDataWithInsertLast() {
+        // Mocking the query parameters to include 'insert=last'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("last"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        doReturn(immediateFalseFluentFuture()).when(readWrite)
+                .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doNothing().when(readWrite).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
+                any(NormalizedNode.class));
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+
+        final Response response = dataService.postData(null, createPayload(), uriInfo);
+        assertEquals(201, response.getStatus());
+        verify(readWrite, times(1)).put(any(), any(), any());
+    }
+
+    @Test
+    public void testPostDataWithInsertFirst() {
+        // Mocking the query parameters to include 'insert=last'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("first"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        // Mocking existed playlist with two songs in DS
+        final var songsList = createSongList();
+        doReturn(immediateFluentFuture(Optional.of(songsList))).when(read)
+                .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+                .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doNothing().when(readWrite).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
+                any(NormalizedNode.class));
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+
+        final Response response = dataService.postData(null, createPayload(), uriInfo);
+        assertEquals(201, response.getStatus());
+        verify(readWrite, times(3)).put(any(), any(), any());
+    }
+
+    @Test
+    public void testPostDataWithInsertBefore() {
+        // Mocking the query parameters to include 'insert=last'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("before"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=2"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        // Mocking existed playlist with two songs in DS
+        final var songsList = createSongList();
+        doReturn(immediateFluentFuture(Optional.of(songsList))).when(read)
+                .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+                .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doNothing().when(readWrite).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
+                any(NormalizedNode.class));
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+        final Response response = dataService.postData(null, createPayload(), uriInfo);
+        assertEquals(201, response.getStatus());
+        verify(readWrite, times(3)).put(any(), any(), any());
+    }
+
+    @Test
+    public void testPostDataWithInsertAfter() {
+        // Mocking the query parameters to include 'insert=last'
+        final var queryParams = new MultivaluedHashMap<String, String>();
+        queryParams.put("insert", List.of("after"));
+        queryParams.put("point", List.of("example-jukebox:jukebox/playlist=0/song=1"));
+        doReturn(queryParams).when(uriInfo).getQueryParameters();
+
+        final var songsList = createSongList();
+        // Mocking existed playlist with two songs in DS
+        doReturn(immediateFluentFuture(Optional.of(songsList))).when(read)
+                .read(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+
+        doReturn(immediateFalseFluentFuture()).when(read)
+                .exists(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
+        doNothing().when(readWrite).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
+                any(NormalizedNode.class));
+        doReturn(UriBuilder.fromUri("http://localhost:8181/rests/")).when(uriInfo).getBaseUriBuilder();
+        final Response response = dataService.postData(null, createPayload(), uriInfo);
+        assertEquals(201, response.getStatus());
+        verify(readWrite, times(3)).put(any(), any(), any());
+    }
+
+    @Test
     public void testPostExistingData() {
         final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iidBase);
         final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, buildBaseCont);
@@ -532,5 +624,46 @@ public class RestconfDataServiceImplTest {
         doReturn(Optional.of(netconfService)).when(mountPoint).getService(NetconfDataTreeService.class);
         restconfStrategy = dataService.getRestconfStrategy(mountPoint);
         assertTrue(restconfStrategy instanceof NetconfRestconfStrategy);
+    }
+
+    private SystemMapNode createSongList() {
+        final QName songQname = QName.create(baseQName, "song");
+        final QName listKeyQname = QName.create(baseQName, "index");
+
+        final var songsList = ImmutableNodes.mapNodeBuilder()
+            .withNodeIdentifier(new NodeIdentifier(songQname))
+            .withChild(ImmutableNodes.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(songQname, listKeyQname,
+                    Uint32.ONE))
+                .withChild(ImmutableNodes.leafNode(listKeyQname, Uint32.ONE))
+                .build())
+            .withChild(ImmutableNodes.mapEntryBuilder()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(songQname, listKeyQname,
+                    Uint32.TWO))
+                .withChild(ImmutableNodes.leafNode(listKeyQname, Uint32.TWO))
+                .build())
+            .build();
+        return songsList;
+    }
+
+    private NormalizedNodePayload createPayload() {
+        final QName listQname = QName.create(baseQName, "playlist");
+        final QName nameQname = QName.create(baseQName, "name");
+        final QName songQname = QName.create(baseQName, "song");
+        final QName indexQname = QName.create(baseQName, "index");
+        final NodeIdentifierWithPredicates listNameNode =
+                NodeIdentifierWithPredicates.of(listQname, nameQname, "name of band");
+        final NodeIdentifierWithPredicates songIndexNode =
+                NodeIdentifierWithPredicates.of(songQname, indexQname, "3");
+        final var iid = YangInstanceIdentifier.of(baseQName).node(listQname).node(listNameNode).node(songQname);
+        final InstanceIdentifierContext iidContext = InstanceIdentifierContext.ofLocalPath(contextRef, iid);
+        final NormalizedNodePayload payload = NormalizedNodePayload.of(iidContext, Builders.mapBuilder()
+            .withNodeIdentifier(new NodeIdentifier(songQname))
+            .withChild(Builders.mapEntryBuilder()
+                .withNodeIdentifier(songIndexNode)
+                .withChild(ImmutableNodes.leafNode(QName.create(baseQName, "index"), "3"))
+                .build())
+            .build());
+        return payload;
     }
 }
