@@ -76,6 +76,7 @@ public final class PathsStream extends InputStream {
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
     private final Integer width;
+    private final Integer depth;
 
     private boolean hasRootPostLink;
     private boolean hasAddedDataStore;
@@ -86,7 +87,8 @@ public final class PathsStream extends InputStream {
     public PathsStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
             final String deviceName, final String urlPrefix, final boolean isForSingleModule,
             final boolean includeDataStore, final Iterator<? extends Module> iterator, final String basePath,
-            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width,
+            final Integer depth) {
         this.iterator = iterator;
         this.writer = writer;
         this.modelContext = modelContext;
@@ -98,6 +100,7 @@ public final class PathsStream extends InputStream {
         this.stream = stream;
         this.generator = generator;
         this.width = requireNonNullElse(width, 0);
+        this.depth = requireNonNullElse(depth, 0);
         hasRootPostLink = false;
         hasAddedDataStore = false;
     }
@@ -206,7 +209,7 @@ public final class PathsStream extends InputStream {
                 final var localName = moduleName + ":" + nodeLocalName;
                 final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
                 processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, modelContext,
-                    deviceName, basePath, null, List.of(), width);
+                    deviceName, basePath, null, List.of(), width, depth, 0);
             }
         }
         return result;
@@ -215,10 +218,14 @@ public final class PathsStream extends InputStream {
     private static void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
             final boolean isConfig, final EffectiveModelContext modelContext, final String deviceName,
-            final String basePath, final SchemaNode parentNode, final List<SchemaNode> parentNodes, final int width) {
+            final String basePath, final SchemaNode parentNode, final List<SchemaNode> parentNodes, final int width,
+            final int depth, final int nodeDepth) {
+        if (depth > 0 && nodeDepth + 1 > depth) {
+            return;
+        }
         final var resourcePath = basePath + DATA + path;
         final var fullName = resolveFullNameFromNode(node.getQName(), modelContext);
-        final var firstChild = getListOrContainerChildNode((DataNodeContainer) node, width);
+        final var firstChild = getListOrContainerChildNode((DataNodeContainer) node, width, depth, nodeDepth);
         if (firstChild != null && node instanceof ContainerSchemaNode) {
             result.add(processTopPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig,
                 fullName, firstChild, deviceName));
@@ -251,13 +258,16 @@ public final class PathsStream extends InputStream {
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
                 processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
-                    modelContext, deviceName, basePath, node, listOfParents, width);
+                    modelContext, deviceName, basePath, node, listOfParents, width, depth, nodeDepth + 1);
             }
         }
     }
 
     private static <T extends DataNodeContainer> DataSchemaNode getListOrContainerChildNode(final T node,
-            final int width) {
+            final int width, final int depth, final int nodeDepth) {
+        if (depth > 0 && nodeDepth + 2 > depth) {
+            return null;
+        }
         // Note: Since post using first container/list among children to prevent missing schema for ref error it
         // should be also limited by width here even if it means not generating POST at all
         final var childNodes = widthList(node, width);

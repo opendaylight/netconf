@@ -36,7 +36,7 @@ class OperationalDocumentTest extends AbstractDocumentTest {
     @Test
     void getAllModulesDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/controller-all.json");
-        final var allModulesDoc = getAllModulesDoc(0);
+        final var allModulesDoc = getAllModulesDoc(0, 0);
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
@@ -48,7 +48,7 @@ class OperationalDocumentTest extends AbstractDocumentTest {
     void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/" + jsonPath);
-        final var moduleDoc = getDocByModule(moduleName, revision, 0);
+        final var moduleDoc = getDocByModule(moduleName, revision, 0, 0);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
@@ -66,7 +66,7 @@ class OperationalDocumentTest extends AbstractDocumentTest {
     @Test
     void getMountDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/device-all.json");
-        final var allModulesDoc = getMountDoc(0);
+        final var allModulesDoc = getMountDoc(0, 0);
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
@@ -78,7 +78,7 @@ class OperationalDocumentTest extends AbstractDocumentTest {
     void getMountDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/" + jsonPath);
-        final var moduleDoc = getMountDocByModule(moduleName, revision, 0);
+        final var moduleDoc = getMountDocByModule(moduleName, revision, 0, 0);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
