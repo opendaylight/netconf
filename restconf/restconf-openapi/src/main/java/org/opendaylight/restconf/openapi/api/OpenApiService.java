@@ -30,7 +30,8 @@ public interface OpenApiService {
     @GET
     @Path("/single")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getAllModulesDoc(@Context UriInfo uriInfo, @QueryParam("width") Integer width) throws IOException;
+    Response getAllModulesDoc(@Context UriInfo uriInfo, @QueryParam("width") Integer width,
+                              @QueryParam("depth") Integer depth) throws IOException;
 
     /**
      * Generates Swagger compliant document listing APIs for module.
@@ -39,7 +40,8 @@ public interface OpenApiService {
     @Path("/{module}")
     @Produces(MediaType.APPLICATION_JSON)
     Response getDocByModule(@PathParam("module") String module, @QueryParam("revision") String revision,
-                            @Context UriInfo uriInfo, @QueryParam("width") Integer width) throws IOException;
+                            @Context UriInfo uriInfo, @QueryParam("width") Integer width,
+                            @QueryParam("depth") Integer depth) throws IOException;
 
     /**
      * Redirects to embedded swagger ui.
@@ -67,7 +69,8 @@ public interface OpenApiService {
     @Produces(MediaType.APPLICATION_JSON)
     Response getMountDocByModule(@PathParam("instance") String instanceNum,
                                  @PathParam("module") String module, @QueryParam("revision") String revision,
-                                 @Context UriInfo uriInfo, @QueryParam("width") Integer width) throws IOException;
+                                 @Context UriInfo uriInfo, @QueryParam("width") Integer width,
+                                 @QueryParam("depth") Integer depth) throws IOException;
 
     /**
      * Generates Swagger compliant document listing APIs for all modules of mount point.
@@ -76,5 +79,5 @@ public interface OpenApiService {
     @Path("/mounts/{instance}")
     @Produces(MediaType.APPLICATION_JSON)
     Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo,
-                         @QueryParam("width") Integer width) throws IOException;
+                         @QueryParam("width") Integer width, @QueryParam("depth") Integer depth) throws IOException;
 }
