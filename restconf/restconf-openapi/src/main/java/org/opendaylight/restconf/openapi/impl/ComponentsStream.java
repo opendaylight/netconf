@@ -36,6 +36,7 @@ public final class ComponentsStream extends InputStream {
     private final ByteArrayOutputStream stream;
     private final boolean isForSingleModule;
     private final Integer width;
+    private final Integer depth;
 
     private boolean schemasWritten;
     private boolean securityWritten;
@@ -44,7 +45,8 @@ public final class ComponentsStream extends InputStream {
 
     public ComponentsStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
             final JsonGenerator generator, final ByteArrayOutputStream stream,
-            final Iterator<? extends Module> iterator, final boolean isForSingleModule, final Integer width) {
+            final Iterator<? extends Module> iterator, final boolean isForSingleModule, final Integer width,
+            final Integer depth) {
         this.iterator = iterator;
         this.modelContext = modelContext;
         this.writer = writer;
@@ -52,6 +54,7 @@ public final class ComponentsStream extends InputStream {
         this.stream = stream;
         this.isForSingleModule = isForSingleModule;
         this.width = width;
+        this.depth = depth;
     }
 
     @Override
@@ -67,7 +70,7 @@ public final class ComponentsStream extends InputStream {
         while (read == -1) {
             if (!schemasWritten) {
                 reader = new InputStreamReader(new SchemasStream(modelContext, writer, iterator, isForSingleModule,
-                    stream, generator, width), StandardCharsets.UTF_8);
+                    stream, generator, width, depth), StandardCharsets.UTF_8);
                 read = reader.read();
                 schemasWritten = true;
                 continue;
@@ -101,7 +104,7 @@ public final class ComponentsStream extends InputStream {
         while (read == -1) {
             if (!schemasWritten) {
                 channel = Channels.newChannel(new SchemasStream(modelContext, writer, iterator, isForSingleModule,
-                    stream, generator, width));
+                    stream, generator, width, depth));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 schemasWritten = true;
                 continue;
