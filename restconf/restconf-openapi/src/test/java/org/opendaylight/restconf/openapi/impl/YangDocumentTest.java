@@ -106,7 +106,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
     @Test
     public void getAllModulesDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/controller-all.json");
-        final var allModulesDoc = getAllModulesDoc(0);
+        final var allModulesDoc = getAllModulesDoc(0, 0);
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
@@ -116,7 +116,17 @@ public class YangDocumentTest extends AbstractDocumentTest {
     @Test
     public void getAllModulesDocWidthOneTest() throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/controller-all-width-one.json");
-        final var allModulesDoc = getAllModulesDoc(1);
+        final var allModulesDoc = getAllModulesDoc(1, 0);
+        JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
+    }
+
+    /**
+     * Tests the swagger document that is result of the call to the '/single?depth=1' endpoint.
+     */
+    @Test
+    public void getAllModulesDocDepthOneTest() throws Exception {
+        final var expectedJson = getExpectedDoc("yang-document/controller-all-depth-one.json");
+        final var allModulesDoc = getAllModulesDoc(0, 1);
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
@@ -128,7 +138,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
     public void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/" + jsonPath);
-        final var moduleDoc = getDocByModule(moduleName, revision, 0);
+        final var moduleDoc = getDocByModule(moduleName, revision, 0, 0);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
@@ -160,7 +170,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
     @Test
     public void getMountDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/device-all.json");
-        final var allModulesDoc = getMountDoc(0);
+        final var allModulesDoc = getMountDoc(0, 0);
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
@@ -170,7 +180,17 @@ public class YangDocumentTest extends AbstractDocumentTest {
     @Test
     public void getMountDocWidthOneTest() throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/device-all-width-one.json");
-        final var allModulesDoc = getMountDoc(1);
+        final var allModulesDoc = getMountDoc(1, 0);
+        JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
+    }
+
+    /**
+     * Tests the swagger document that is result of the call to the '/mounts/1?width=1' endpoint.
+     */
+    @Test
+    public void getMountDocDepthOneTest() throws Exception {
+        final var expectedJson = getExpectedDoc("yang-document/device-all-depth-one.json");
+        final var allModulesDoc = getMountDoc(0, 1);
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
@@ -182,7 +202,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
     public void getMountDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/" + jsonPath);
-        final var moduleDoc = getMountDocByModule(moduleName, revision, 0);
+        final var moduleDoc = getMountDocByModule(moduleName, revision, 0, 0);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
 
     }
