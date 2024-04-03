@@ -30,16 +30,16 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         super(inputStream);
     }
 
-    public final @NonNull PatchContext toPatchContext(final @NonNull DataPatchPath path) throws IOException {
+    public final @NonNull PatchContext toPatchContext(final DatabindPath.@NonNull Data path) throws IOException {
         try (var is = acquireStream()) {
             return toPatchContext(path, is);
         }
     }
 
-    abstract @NonNull PatchContext toPatchContext(@NonNull DataPatchPath path, @NonNull InputStream inputStream)
+    abstract @NonNull PatchContext toPatchContext(DatabindPath.@NonNull Data path, @NonNull InputStream inputStream)
         throws IOException;
 
-    static final YangInstanceIdentifier parsePatchTarget(final DataPatchPath path, final String target) {
+    static final YangInstanceIdentifier parsePatchTarget(final DatabindPath.@NonNull Data path, final String target) {
         final var urlPath = path.instance();
         if (target.equals("/")) {
             verify(!urlPath.isEmpty(),
