@@ -63,9 +63,11 @@ public final class OpenApiServiceImpl implements OpenApiService {
     }
 
     @Override
-    public Response getAllModulesDoc(final UriInfo uriInfo, final Integer offset, final Integer limit)
-            throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo);
+    public Response getAllModulesDoc(final UriInfo uriInfo, final Integer offset, final Integer limit,
+            final Integer depth) throws IOException {
+        // FIXME read parameters from URI
+        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo,
+            0, 0, depth);
         return Response.ok(stream).build();
     }
 
@@ -75,7 +77,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo)
             throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo);
+        // FIXME read parameters from URI
+        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, 3);
         return Response.ok(stream).build();
     }
 
@@ -99,16 +102,21 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getMountDocByModule(final String instanceNum, final String module,
             final String revision, final UriInfo uriInfo) throws IOException {
+        // FIXMe add depth to parameter, offset and limit is 0 because we are getting just one model
         final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision);
+            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision,
+                0, 0, 3);
         return Response.ok(stream).build();
     }
 
     @Override
-    public Response getMountDoc(final String instanceNum, final UriInfo uriInfo) throws IOException {
+    public Response getMountDoc(final String instanceNum, final UriInfo uriInfo,
+            final Integer offset, final Integer limit, final Integer depth) throws IOException {
         final String stringPageNum = uriInfo.getQueryParameters().getFirst(PAGE_NUM);
+        // FIXME read parameters from URI
         final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), stringPageNum);
+            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), stringPageNum,
+                0, 0, depth);
         return Response.ok(stream).build();
     }
 }

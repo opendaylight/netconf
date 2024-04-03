@@ -74,6 +74,10 @@ public final class PathsStream extends InputStream {
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
 
+    private final Integer offset;
+    private final Integer limit;
+    private final Integer depth;
+
     private boolean hasRootPostLink;
     private boolean hasAddedDataStore;
     private Reader reader;
@@ -83,7 +87,8 @@ public final class PathsStream extends InputStream {
     public PathsStream(final EffectiveModelContext schemaContext, final OpenApiBodyWriter writer,
             final String deviceName, final String urlPrefix, final boolean isForSingleModule,
             final boolean includeDataStore, final Iterator<? extends Module> iterator, final String basePath,
-            final ByteArrayOutputStream stream, final JsonGenerator generator) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer offset,
+            final Integer limit, final Integer depth) {
         this.iterator = iterator;
         this.writer = writer;
         this.schemaContext = schemaContext;
@@ -96,6 +101,10 @@ public final class PathsStream extends InputStream {
         this.generator = generator;
         hasRootPostLink = false;
         hasAddedDataStore = false;
+
+        this.offset = offset;
+        this.limit = limit;
+        this.depth = depth;
     }
 
     @Override
@@ -167,15 +176,26 @@ public final class PathsStream extends InputStream {
             hasAddedDataStore = true;
         }
         // RPC operations (via post) - RPCs have their own path
+        var rpcDepth = 0;
         for (final var rpc : module.getRpcs()) {
+            if (rpcDepth >= depth) {
+                break;
+            }
+
             final var localName = rpc.getQName().getLocalName();
             final var post = new PostEntity(rpc, deviceName, module.getName(), List.of(), localName, null,
                 List.of());
             final var resolvedPath = basePath + OPERATIONS + urlPrefix + "/" + module.getName() + ":" + localName;
             final var entity = new PathEntity(resolvedPath, post);
             result.add(entity);
+
+            rpcDepth++;
         }
+        var childDepth = 0;
         for (final var node : module.getChildNodes()) {
+            if (childDepth >= depth) {
+                break;
+            }
             final var moduleName = module.getName();
             final boolean isConfig = node.isConfiguration();
             final var nodeLocalName = node.getQName().getLocalName();
@@ -193,12 +213,14 @@ public final class PathsStream extends InputStream {
                 final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
                 processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, schemaContext,
                     deviceName, basePath, null, List.of());
+
+                childDepth++;
             }
         }
         return result;
     }
 
-    private static void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
+    private void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
             final boolean isConfig, final EffectiveModelContext schemaContext, final String deviceName,
             final String basePath, final SchemaNode parentNode, final List<SchemaNode> parentNodes) {
@@ -229,7 +251,11 @@ public final class PathsStream extends InputStream {
                     refPath, deviceName, parentNode, listOfParentsForActions));
             });
         }
+        var childDepth = 0;
         for (final var childNode : childNodes) {
+            if (childDepth >= depth) {
+                break;
+            }
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 final var childParams = new ArrayList<>(pathParams);
                 final var newRefPath = refPath + "_" + childNode.getQName().getLocalName();
@@ -239,6 +265,7 @@ public final class PathsStream extends InputStream {
                 processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
                     schemaContext, deviceName, basePath, node, listOfParents);
             }
+            childDepth++;
         }
     }
 
