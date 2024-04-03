@@ -49,6 +49,8 @@ public interface OpenApiService {
      * @param uriInfo Requests {@link UriInfo}.
      * @param offset First model to read. 0 means read form the first model.
      * @param limit The number of models to read. 0 means read all models.
+     * @param depth Depth to which OpenAPI document is generated, the number of RPCs and child nodes processed. Value
+     *      set to 0 means to process all RPCs and child nodes of a YANG module.
      * @return Response containing the OpenAPI document for number of modules specified by {@code offset}
      *     and {@code limit}.
      * @throws IOException When I/O error occurs.
@@ -57,7 +59,7 @@ public interface OpenApiService {
     @Path("/single")
     @Produces(MediaType.APPLICATION_JSON)
     Response getAllModulesDoc(@Context UriInfo uriInfo, @QueryParam("offset") Integer offset,
-            @QueryParam("limit") Integer limit) throws IOException;
+            @QueryParam("limit") Integer limit, @QueryParam("depth") Integer depth) throws IOException;
 
     /**
      * Generates Swagger compliant document listing APIs for module.
@@ -102,5 +104,7 @@ public interface OpenApiService {
     @GET
     @Path("/mounts/{instance}")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo) throws IOException;
+    Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo,
+            @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit,
+            @QueryParam("depth") Integer depth) throws IOException;
 }

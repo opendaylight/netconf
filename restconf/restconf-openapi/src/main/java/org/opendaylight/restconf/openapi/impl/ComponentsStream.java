@@ -36,6 +36,10 @@ public final class ComponentsStream extends InputStream {
     private final ByteArrayOutputStream stream;
     private final boolean isForSingleModule;
 
+    private final Integer offset;
+    private final Integer limit;
+    private final Integer depth;
+
     private boolean schemasWritten;
     private boolean securityWritten;
     private Reader reader;
@@ -43,13 +47,18 @@ public final class ComponentsStream extends InputStream {
 
     public ComponentsStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
             final JsonGenerator generator, final ByteArrayOutputStream stream,
-            final Iterator<? extends Module> iterator, final boolean isForSingleModule) {
+            final Iterator<? extends Module> iterator, final boolean isForSingleModule,
+            final Integer offset, final Integer limit, final Integer depth) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
         this.generator = generator;
         this.stream = stream;
         this.isForSingleModule = isForSingleModule;
+
+        this.offset = offset;
+        this.limit = limit;
+        this.depth = depth;
     }
 
     @Override
@@ -65,7 +74,7 @@ public final class ComponentsStream extends InputStream {
         while (read == -1) {
             if (!schemasWritten) {
                 reader = new InputStreamReader(new SchemasStream(context, writer, iterator, isForSingleModule, stream,
-                    generator), StandardCharsets.UTF_8);
+                    generator, offset, limit, depth), StandardCharsets.UTF_8);
                 read = reader.read();
                 schemasWritten = true;
                 continue;
@@ -99,7 +108,7 @@ public final class ComponentsStream extends InputStream {
         while (read == -1) {
             if (!schemasWritten) {
                 channel = Channels.newChannel(new SchemasStream(context, writer, iterator, isForSingleModule, stream,
-                    generator));
+                    generator, offset, limit, depth));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 schemasWritten = true;
                 continue;
