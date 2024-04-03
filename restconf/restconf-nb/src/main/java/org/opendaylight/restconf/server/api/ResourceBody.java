@@ -14,7 +14,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.restconf.Data;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
@@ -40,11 +39,11 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
     /**
      * Acquire the {@link NormalizedNode} representation of this body.
      *
-     * @param path A {@link YangInstanceIdentifier} corresponding to the body
+     * @param path A {@link DatabindPath.Data} corresponding to the body
      * @throws RestconfDocumentedException if the body cannot be decoded or it does not match {@code path}
      */
     @SuppressWarnings("checkstyle:illegalCatch")
-    public @NonNull NormalizedNode toNormalizedNode(final @NonNull DataPutPath path) {
+    public @NonNull NormalizedNode toNormalizedNode(final DatabindPath.@NonNull Data path) {
         final var instance = path.instance();
         final var expectedName = instance.isEmpty() ? DATA_NID : instance.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
@@ -81,6 +80,6 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
         return data;
     }
 
-    abstract void streamTo(@NonNull DataPutPath path, @NonNull PathArgument name, @NonNull InputStream inputStream,
-        @NonNull NormalizedNodeStreamWriter writer) throws IOException;
+    abstract void streamTo(DatabindPath.@NonNull Data path, @NonNull PathArgument name,
+        @NonNull InputStream inputStream, @NonNull NormalizedNodeStreamWriter writer) throws IOException;
 }

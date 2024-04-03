@@ -92,7 +92,8 @@ public interface RestconfServer {
         Map<String, String> queryParameters);
 
     /**
-     * Replace the data store.
+     * Replace the data store, as described in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>.
      *
      * @param body data node for put to config DS
      * @param queryParameters Query parameters
@@ -101,7 +102,8 @@ public interface RestconfServer {
     RestconfFuture<DataPutResult> dataPUT(ResourceBody body, Map<String, String> queryParameters);
 
     /**
-     * Create or replace a data store resource.
+     * Create or replace a data store resource, as described in
+     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>.
      *
      * @param identifier resource identifier
      * @param body data node for put to config DS

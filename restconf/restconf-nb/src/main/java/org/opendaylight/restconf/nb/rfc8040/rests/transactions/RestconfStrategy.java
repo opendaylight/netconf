@@ -79,7 +79,6 @@ import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
-import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -348,7 +347,7 @@ public abstract class RestconfStrategy {
         }
         final NormalizedNode data;
         try {
-            data = body.toNormalizedNode(new DataPutPath(databind, path.inference(), path.instance()));
+            data = body.toNormalizedNode(path);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
@@ -587,7 +586,7 @@ public abstract class RestconfStrategy {
 
         final NormalizedNode data;
         try {
-            data = body.toNormalizedNode(new DataPutPath(databind, path.inference(), path.instance()));
+            data = body.toNormalizedNode(path);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }

@@ -35,7 +35,7 @@ public final class JsonResourceBody extends ResourceBody {
     }
 
     @Override
-    void streamTo(final DataPutPath path, final PathArgument name, final InputStream inputStream,
+    void streamTo(final DatabindPath.Data path, final PathArgument name, final InputStream inputStream,
             final NormalizedNodeStreamWriter writer) throws IOException {
         try (var jsonParser = newParser(path, writer)) {
             try (var reader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
@@ -54,7 +54,7 @@ public final class JsonResourceBody extends ResourceBody {
             ErrorTag.MALFORMED_MESSAGE, cause);
     }
 
-    private static JsonParserStream newParser(final DataPutPath path, final NormalizedNodeStreamWriter writer) {
+    private static JsonParserStream newParser(final DatabindPath.Data path, final NormalizedNodeStreamWriter writer) {
         final var codecs = path.databind().jsonCodecs();
         final var inference = path.inference();
         if (inference.isEmpty()) {
