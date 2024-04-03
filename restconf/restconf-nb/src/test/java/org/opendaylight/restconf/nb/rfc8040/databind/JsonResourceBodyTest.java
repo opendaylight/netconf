@@ -138,4 +138,17 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
               }
             }"""));
     }
+
+    @Test
+    void testBinaryTypeError() {
+        final var error = assertError(() -> parse("netconf1268:foo", """
+            {
+              "netconf1268:foo": {
+                "bar": "a"
+              }
+            }"""));
+        assertEquals("Error parsing input: Last unit does not have enough valid bits", error.getErrorMessage());
+        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+    }
 }
