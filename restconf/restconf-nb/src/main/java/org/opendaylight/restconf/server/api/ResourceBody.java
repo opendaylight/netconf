@@ -58,7 +58,8 @@ public abstract sealed class ResourceBody extends AbstractBody permits JsonResou
             throw e;
         } catch (RuntimeException e) {
             throwIfYangError(e);
-            throw e;
+            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
+                ErrorTag.MALFORMED_MESSAGE, e);
         }
 
         final var parsedData = holder.getResult().data();
