@@ -22,19 +22,24 @@ public final class RpcSchemaEntity extends SchemaEntity {
     public RpcSchemaEntity(final @NonNull SchemaNode value, final @NonNull String title,
             final @Nullable String discriminator, final @NonNull String type,
             final @NonNull SchemaInferenceStack context, final @NonNull String parentName, final boolean isParentConfig,
-            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width) {
-        super(value, title, discriminator, type, context, parentName, isParentConfig, definitionNames, width);
+            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width,
+            final @NonNull Integer depth, final @NonNull int nodeDepth) {
+        super(value, title, discriminator, type, context, parentName, isParentConfig, definitionNames, width, depth,
+            nodeDepth);
     }
 
     @Override
     void generateProperties(final @NonNull JsonGenerator generator, final @NonNull List<String> required)
             throws IOException {
+        if (depth > 0 && nodeDepth + 1 > depth) {
+            return;
+        }
         final var childNodes = width > 0
             ? ((ContainerLike) value()).getChildNodes().stream().limit(width).toList()
             : ((ContainerLike) value()).getChildNodes();
         for (final var childNode : childNodes) {
             new PropertyEntity(childNode, generator, stack(), required, parentName(), isParentConfig(),
-                definitionNames(), width);
+                definitionNames(), width, depth);
         }
     }
 }
