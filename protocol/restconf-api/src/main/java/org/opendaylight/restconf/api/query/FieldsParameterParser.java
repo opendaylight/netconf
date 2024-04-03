@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
+import org.opendaylight.yangtools.yang.common.UnresolvedQName.Unqualified;
 import org.opendaylight.yangtools.yang.common.YangNames;
 
 /**
@@ -158,7 +159,7 @@ final class FieldsParameterParser {
             int idx = offset + 1;
             while (true) {
                 if (idx == str.length()) {
-                    path.add(new ApiIdentifier(null, str.substring(offset)));
+                    path.add(new ApiIdentifier(null, Unqualified.of(str.substring(offset))));
                     return idx;
                 }
 
@@ -173,7 +174,7 @@ final class FieldsParameterParser {
                     // We have complete first identifier, now switch to parsing the second identifier
                     return parsePathStepSecond(first, str, idx + 1);
                 }
-                path.add(new ApiIdentifier(null, first));
+                path.add(new ApiIdentifier(null, Unqualified.of(first)));
 
                 return switch (ch) {
                     case ';', ')' -> /* End of this selector, return */ idx;
@@ -193,7 +194,7 @@ final class FieldsParameterParser {
             int idx = offset + 1;
             while (true) {
                 if (idx == str.length()) {
-                    path.add(new ApiIdentifier(module, str.substring(offset)));
+                    path.add(new ApiIdentifier(module, Unqualified.of(str.substring(offset))));
                     return idx;
                 }
 
@@ -202,7 +203,7 @@ final class FieldsParameterParser {
                     idx++;
                     continue;
                 }
-                path.add(new ApiIdentifier(module, str.substring(offset, idx)));
+                path.add(new ApiIdentifier(module, Unqualified.of(str.substring(offset, idx))));
 
                 return switch (ch) {
                     case ';', ')' -> /* End of this selector, return */ idx;
