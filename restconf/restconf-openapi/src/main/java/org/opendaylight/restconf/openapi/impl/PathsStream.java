@@ -74,6 +74,7 @@ public final class PathsStream extends InputStream {
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
     private final Integer width;
+    private final Integer depth;
 
     private boolean hasRootPostLink;
     private boolean hasAddedDataStore;
@@ -84,7 +85,8 @@ public final class PathsStream extends InputStream {
     public PathsStream(final EffectiveModelContext schemaContext, final OpenApiBodyWriter writer,
             final String deviceName, final String urlPrefix, final boolean isForSingleModule,
             final boolean includeDataStore, final Iterator<? extends Module> iterator, final String basePath,
-            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width,
+            final Integer depth) {
         this.iterator = iterator;
         this.writer = writer;
         this.schemaContext = schemaContext;
@@ -96,6 +98,7 @@ public final class PathsStream extends InputStream {
         this.stream = stream;
         this.generator = generator;
         this.width = width;
+        this.depth = depth;
         hasRootPostLink = false;
         hasAddedDataStore = false;
     }
@@ -177,16 +180,44 @@ public final class PathsStream extends InputStream {
             final var entity = new PathEntity(resolvedPath, post);
             result.add(entity);
         }
-        final var childNodes = !isApplied(width) ?
-            module.getChildNodes() :
-            module.getChildNodes().stream().limit(width).toList();
-        for (final var node : childNodes) {
-            processChildren(module, result, node);
+        if (!isApplied(depth)) {
+            final var childNodes = !isApplied(width) ?
+                module.getChildNodes() :
+                module.getChildNodes().stream().limit(width).toList();
+            for (final var node : childNodes) {
+                processChildren(module, result, node, 0);
+            }
+        } else {
+            if (!isApplied(width)) { // width is ignored, depth is applied
+                for (final var node : module.getChildNodes()) {
+                    final var nodeWithChildren = new ArrayDeque<PathEntity>();
+                    final var tooDeep = processChildren(module, nodeWithChildren, node, 0);
+                    if (!tooDeep) {
+                        // If child isn't too deep - adding it
+                        result.addAll(nodeWithChildren);
+                    }
+                }
+            } else { // width and depth are applied
+                var childrenCounter = 0;
+                for (final var node : module.getChildNodes()) {
+                    final var nodeWithChildren = new ArrayDeque<PathEntity>();
+                    final var tooDeep = processChildren(module, nodeWithChildren, node, 0);
+                    if (!tooDeep && childrenCounter < width) {
+                        // If child isn't too deep, and we have less children than applied width - adding it
+                        result.addAll(nodeWithChildren);
+                        childrenCounter++;
+                        if (childrenCounter >= width) {
+                            break; // Breaking loop if width is fulfilled
+                        }
+                    }
+                }
+            }
         }
         return result;
     }
 
-    private void processChildren(final Module module, final ArrayDeque<PathEntity> result, final DataSchemaNode node) {
+    private boolean processChildren(final Module module, final ArrayDeque<PathEntity> result,
+            final DataSchemaNode node, final int nodeDepth) {
         final var moduleName = module.getName();
         final boolean isConfig = node.isConfiguration();
         final var nodeLocalName = node.getQName().getLocalName();
@@ -198,19 +229,23 @@ public final class PathsStream extends InputStream {
                     new PostEntity(node, deviceName, moduleName, List.of(), nodeLocalName, module, List.of())));
                 hasRootPostLink = true;
             }
-            //process first node
+            // process first node
             final var pathParams = new ArrayList<ParameterEntity>();
             final var localName = moduleName + ":" + nodeLocalName;
             final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
-            processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, schemaContext,
-                deviceName, basePath, null, List.of());
+            return processChildNode(node, pathParams, moduleName, result, path, nodeLocalName,
+                isConfig, null, List.of(), nodeDepth);
         }
+        return true;
     }
 
-    private void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
+    private boolean processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
-            final boolean isConfig, final EffectiveModelContext schemaContext, final String deviceName,
-            final String basePath, final SchemaNode parentNode, final List<SchemaNode> parentNodes) {
+            final boolean isConfig, final SchemaNode parentNode, final List<SchemaNode> parentNodes,
+            final int nodeDepth) {
+        if (isApplied(depth) && nodeDepth >= depth) {
+            return true; // Node is too deeper than applied depth parameter - stop processing it
+        }
         final var resourcePath = basePath + DATA + path;
         final var fullName = resolveFullNameFromNode(node.getQName(), schemaContext);
         final var firstChild = getListOrContainerChildNode((DataNodeContainer) node);
@@ -247,10 +282,15 @@ public final class PathsStream extends InputStream {
                 final var localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
-                processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
-                    schemaContext, deviceName, basePath, node, listOfParents);
+                final var tooDeep = processChildNode(childNode, childParams, moduleName, result, resourceDataPath,
+                    newRefPath, newConfig, node, listOfParents, nodeDepth + 1);
+                if (isApplied(depth) && tooDeep) {
+                    // Checking if children of the node are not too deep
+                    return true;
+                }
             }
         }
+        return false; // Node not deep enough to reject it
     }
 
     private static <T extends DataNodeContainer> DataSchemaNode getListOrContainerChildNode(final T node) {

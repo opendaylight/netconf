@@ -49,8 +49,8 @@ public final class SchemasStream extends InputStream {
     private final boolean isForSingleModule;
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
-
     private final Integer width;
+    private final Integer depth;
 
     private Reader reader;
     private ReadableByteChannel channel;
@@ -58,7 +58,8 @@ public final class SchemasStream extends InputStream {
 
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule,
-            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width,
+            final Integer depth) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
@@ -66,6 +67,7 @@ public final class SchemasStream extends InputStream {
         this.stream = stream;
         this.generator = generator;
         this.width = width;
+        this.depth = depth;
     }
 
     @Override
@@ -151,7 +153,7 @@ public final class SchemasStream extends InputStream {
                     if (!children.contains(child)) {
                         children.add(child);
                         processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName,
-                            false);
+                            false, 0); // TODO Review possibility of applying width and depth for RPCs
                     }
                 }
                 stack.exit();
@@ -166,7 +168,7 @@ public final class SchemasStream extends InputStream {
                     if (!children.contains(child)) {
                         children.add(child);
                         processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName,
-                            false);
+                            false, 0); // TODO Review possibility of applying width and depth for RPCs
                     }
                 }
                 stack.exit();
@@ -174,23 +176,54 @@ public final class SchemasStream extends InputStream {
             stack.exit();
         }
 
-        final var childNodes = !isApplied(width) ?
-                module.getChildNodes() :
-                module.getChildNodes().stream().limit(width).toList();
-        for (final var childNode : childNodes) {
-            processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
-                true);
+        if (!isApplied(depth)) {
+            final var childNodes = !isApplied(width) ?
+                    module.getChildNodes() :
+                    module.getChildNodes().stream().limit(width).toList();
+            for (final var childNode : childNodes) {
+                processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
+                        true, 0);
+            }
+        } else {
+            if (!isApplied(width)) { // width is ignored, depth is applied
+                for (final var childNode : module.getChildNodes()) {
+                    final var nodeWithChildren = new ArrayDeque<SchemaEntity>();
+                    final var tooDeep = processDataAndActionNodes(childNode, moduleName, stack, definitionNames,
+                        nodeWithChildren, moduleName, true, 0);
+                    if (!tooDeep) {
+                        result.addAll(nodeWithChildren); // Child not too deep - adding it
+                    }
+                }
+            } else { // width and depth are applied
+                var childrenCounter = 0;
+                for (final var childNode : module.getChildNodes()) {
+                    final var nodeWithChildren = new ArrayDeque<SchemaEntity>();
+                    final var tooDeep = processDataAndActionNodes(childNode, moduleName, stack, definitionNames,
+                        nodeWithChildren, moduleName, true, 0);
+                    if (!tooDeep && childrenCounter < width) {
+                        result.addAll(nodeWithChildren); // Child not too deep - adding it
+                        childrenCounter++;
+                        if (childrenCounter >= width) {
+                            break; // Breaking loop if width is fulfilled
+                        }
+                    }
+                }
+            }
         }
         return result;
     }
 
-    private void processDataAndActionNodes(final DataSchemaNode node, final String title,
+    private boolean processDataAndActionNodes(final DataSchemaNode node, final String title,
             final SchemaInferenceStack stack, final DefinitionNames definitionNames,
-            final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
+            final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig,
+            final int nodeDepth) {
+        if (isApplied(depth) && nodeDepth >= depth) {
+            return true;
+        }
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
             if (definitionNames.isListedNode(node)) {
                 // This means schema for this node is already processed
-                return;
+                return false; // Ignoring this child by returning false
             }
             final var newTitle = title + "_" + node.getQName().getLocalName();
             final var parentNameConfigLocalName = parentName + "_" + node.getQName().getLocalName();
@@ -203,15 +236,30 @@ public final class SchemasStream extends InputStream {
             stack.enterSchemaTree(node.getQName());
             processActions(node, newTitle, stack, definitionNames, result, parentName);
             if (isApplied(width)) {
-                final var childrenList = ((DataNodeContainer) node).getChildNodes().toArray();
-                final var limit = width < childrenList.length ? width : childrenList.length;
-                for (int i = 0; i < limit; i++) {
-                    processDataAndActionNodes((DataSchemaNode) childrenList[i], newTitle, stack, definitionNames,
-                        result, newTitle, isConfig);
+                var childrenCounter = 0;
+                for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
+                    final var nodeWithChildren = new ArrayDeque<SchemaEntity>();
+                    final var tooDeep = processDataAndActionNodes(childNode, newTitle, stack, definitionNames,
+                        nodeWithChildren, newTitle, isConfig, nodeDepth + 1);
+                    if (isApplied(depth) && tooDeep) {
+                        stack.exit();
+                        return true;
+                    } else {
+                        result.addAll(nodeWithChildren); // Depth is ignored or child not too deep - adding it
+                        childrenCounter++;
+                        if (childrenCounter >= width) {
+                            break; // Breaking loop if width is fulfilled
+                        }
+                    }
                 }
             } else {
                 for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
-                    processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
+                    final var tooDeep = processDataAndActionNodes(childNode, newTitle, stack, definitionNames,
+                        result, newTitle, isConfig, nodeDepth + 1);
+                    if (isApplied(depth) && tooDeep) {
+                        stack.exit();
+                        return true;
+                    }
                 }
             }
             stack.exit();
@@ -222,22 +270,19 @@ public final class SchemasStream extends InputStream {
                     .orElseThrow(() -> new IllegalStateException("No cases found in ChoiceSchemaNode")));
             stack.enterSchemaTree(choiceNode.getQName());
             stack.enterSchemaTree(caseNode.getQName());
-            if (isApplied(width)) {
-                final var childrenList = caseNode.getChildNodes().toArray();
-                final var limit = width < childrenList.length ? width : childrenList.length;
-                for (int i = 0; i < limit; i++) {
-                    processDataAndActionNodes((DataSchemaNode) childrenList[i], title, stack, definitionNames, result,
-                        parentName, isParentConfig);
-                }
-            } else {
-                for (final var childNode : caseNode.getChildNodes()) {
-                    processDataAndActionNodes(childNode, title, stack, definitionNames, result, parentName,
-                        isParentConfig);
+            for (final var childNode : caseNode.getChildNodes()) {
+                final var tooDeep = processDataAndActionNodes(childNode, title, stack, definitionNames, result,
+                    parentName, isParentConfig, nodeDepth + 1);
+                if (isApplied(depth) && tooDeep) {
+                    stack.exit(); // Exit the CaseSchemaNode context
+                    stack.exit(); // Exit the ChoiceSchemaNode context
+                    return true;
                 }
             }
             stack.exit(); // Exit the CaseSchemaNode context
             stack.exit(); // Exit the ChoiceSchemaNode context
         }
+        return false;
     }
 
     private static void processActions(final DataSchemaNode node, final String title, final SchemaInferenceStack stack,
