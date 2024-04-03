@@ -53,6 +53,7 @@ public final class SchemasStream extends InputStream {
     private final JsonGenerator generator;
 
     private final Integer width;
+    private final Integer depth;
 
     private Reader reader;
     private ReadableByteChannel channel;
@@ -60,7 +61,8 @@ public final class SchemasStream extends InputStream {
 
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule,
-            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width,
+            final Integer depth) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
@@ -68,6 +70,7 @@ public final class SchemasStream extends InputStream {
         this.stream = stream;
         this.generator = generator;
         this.width = requireNonNullElse(width, 0);
+        this.depth = requireNonNullElse(depth, 0);
     }
 
     @Override
@@ -146,14 +149,14 @@ public final class SchemasStream extends InputStream {
             final var rpcInput = rpc.getInput();
             if (!rpcInput.getChildNodes().isEmpty()) {
                 final var input = new RpcSchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, null,
-                    OBJECT_TYPE, stack, moduleName, false, definitionNames, width);
+                    OBJECT_TYPE, stack, moduleName, false, definitionNames, width, depth);
                 result.add(input);
                 stack.enterSchemaTree(rpcInput.getQName());
                 for (final var child : rpcInput.getChildNodes()) {
                     if (!children.contains(child)) {
                         children.add(child);
                         processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName,
-                            false);
+                            false, 0);
                     }
                 }
                 stack.exit();
@@ -161,14 +164,14 @@ public final class SchemasStream extends InputStream {
             final var rpcOutput = rpc.getOutput();
             if (!rpcOutput.getChildNodes().isEmpty()) {
                 final var output = new RpcSchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, null,
-                    OBJECT_TYPE, stack, moduleName, false, definitionNames, width);
+                    OBJECT_TYPE, stack, moduleName, false, definitionNames, width, depth);
                 result.add(output);
                 stack.enterSchemaTree(rpcOutput.getQName());
                 for (final var child : rpcOutput.getChildNodes()) {
                     if (!children.contains(child)) {
                         children.add(child);
                         processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName,
-                            false);
+                            false, 0);
                     }
                 }
                 stack.exit();
@@ -179,20 +182,35 @@ public final class SchemasStream extends InputStream {
         final var childNodes = width > 0
             ? module.getChildNodes().stream().limit(width).toList() // limit children to width
             : module.getChildNodes(); // width not applied - processing all children
-        for (final var childNode : childNodes) {
-            processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
-                true);
+        if (depth > 0) {
+            for (final var childNode : childNodes) {
+                processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
+                    true, 0);
+            }
+        } else {
+            for (final var childNode : childNodes) {
+                final var nodeWithChildren = new ArrayDeque<SchemaEntity>();
+                final var tooDeep = processDataAndActionNodes(childNode, moduleName, stack, definitionNames,
+                    nodeWithChildren, moduleName, true, 0);
+                if (!tooDeep) {
+                    result.addAll(nodeWithChildren); // Child isn't too deep - adding it
+                }
+            }
         }
         return result;
     }
 
-    private void processDataAndActionNodes(final DataSchemaNode node, final String title,
+    private boolean processDataAndActionNodes(final DataSchemaNode node, final String title,
             final SchemaInferenceStack stack, final DefinitionNames definitionNames,
-            final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
+            final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig,
+            final int nodeDepth) {
+        if (depth > 0 && nodeDepth >= depth) {
+            return true;
+        }
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
             if (definitionNames.isListedNode(node)) {
                 // This means schema for this node is already processed
-                return;
+                return false; // Ignoring this child by returning false
             }
             final var newTitle = title + "_" + node.getQName().getLocalName();
             final var parentNameConfigLocalName = parentName + "_" + node.getQName().getLocalName();
@@ -208,7 +226,12 @@ public final class SchemasStream extends InputStream {
                 ? ((DataNodeContainer) node).getChildNodes().stream().limit(width).toList() // limit children to width
                 : ((DataNodeContainer) node).getChildNodes(); // width not applied - processing all children
             for (final var childNode : childNodes) {
-                processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
+                final var tooDeep = processDataAndActionNodes(childNode, newTitle, stack, definitionNames,
+                    result, newTitle, isConfig, nodeDepth + 1);
+                if (depth > 0 && tooDeep) {
+                    stack.exit();
+                    return true;
+                }
             }
             stack.exit();
         } else if (node instanceof ChoiceSchemaNode choiceNode && !choiceNode.getCases().isEmpty()) {
@@ -222,12 +245,18 @@ public final class SchemasStream extends InputStream {
                 ? caseNode.getChildNodes().stream().limit(width).toList() // limit children to width
                 : caseNode.getChildNodes(); // width not applied - processing all children
             for (final var childNode : childNodes) {
-                processDataAndActionNodes(childNode, title, stack, definitionNames, result, parentName,
-                    isParentConfig);
+                final var tooDeep = processDataAndActionNodes(childNode, title, stack, definitionNames, result,
+                    parentName, isParentConfig, nodeDepth + 1);
+                if (depth > 0 && tooDeep) {
+                    stack.exit(); // Exit the CaseSchemaNode context
+                    stack.exit(); // Exit the ChoiceSchemaNode context
+                    return true;
+                }
             }
             stack.exit(); // Exit the CaseSchemaNode context
             stack.exit(); // Exit the ChoiceSchemaNode context
         }
+        return false;
     }
 
     private void processActions(final DataSchemaNode node, final String title, final SchemaInferenceStack stack,
@@ -238,13 +267,13 @@ public final class SchemasStream extends InputStream {
             final var actionInput = actionDef.getInput();
             if (!actionInput.getChildNodes().isEmpty()) {
                 final var input = new RpcSchemaEntity(actionInput, title + "_" + actionName + INPUT_SUFFIX, null,
-                    OBJECT_TYPE, stack, parentName, false, definitionNames, width);
+                    OBJECT_TYPE, stack, parentName, false, definitionNames, width, depth);
                 result.add(input);
             }
             final var actionOutput = actionDef.getOutput();
             if (!actionOutput.getChildNodes().isEmpty()) {
                 final var output = new RpcSchemaEntity(actionOutput, title + "_" + actionName + OUTPUT_SUFFIX, null,
-                    OBJECT_TYPE, stack, parentName, false, definitionNames, width);
+                    OBJECT_TYPE, stack, parentName, false, definitionNames, width, depth);
                 result.add(output);
             }
             stack.exit();

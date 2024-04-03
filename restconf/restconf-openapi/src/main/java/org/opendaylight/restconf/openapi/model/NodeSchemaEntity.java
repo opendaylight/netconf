@@ -46,7 +46,7 @@ public final class NodeSchemaEntity extends SchemaEntity {
         for (final var childNode : childNodes.values()) {
             if (shouldBeAddedAsProperty(childNode, isValueConfig)) {
                 new PropertyEntity(childNode, generator, stack(), required, parentName() + "_"
-                    + value().getQName().getLocalName(), isValueConfig, definitionNames(), width);
+                    + value().getQName().getLocalName(), isValueConfig, definitionNames(), width, depth);
             }
         }
     }
