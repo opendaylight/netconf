@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindPath;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -21,14 +21,13 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 class XmlChildBodyTest extends AbstractBodyTest {
     private static final QName TOP_LEVEL_LIST = QName.create("foo", "2017-08-09", "top-level-list");
 
-    private static DataPostPath EMPTY_PATH;
-    private static DataPostPath CONT_PATH;
+    private static DatabindPath.Data EMPTY_PATH;
+    private static DatabindPath.Data CONT_PATH;
 
     @BeforeAll
     static void beforeAll() throws Exception {
@@ -37,10 +36,11 @@ class XmlChildBodyTest extends AbstractBodyTest {
         testFiles.addAll(loadFiles("/foo-xml-test/yang"));
         final var modelContext = YangParserTestUtils.parseYangFiles(testFiles);
 
-        CONT_PATH = new DataPostPath(DatabindContext.ofModel(modelContext),
-            Inference.ofDataTreePath(modelContext, CONT_QNAME), YangInstanceIdentifier.of(CONT_QNAME));
-        EMPTY_PATH = new DataPostPath(DatabindContext.ofModel(modelContext),
-            Inference.ofDataTreePath(modelContext), YangInstanceIdentifier.of());
+        final var contPath = YangInstanceIdentifier.of(CONT_QNAME);
+        final var databind = DatabindContext.ofModel(modelContext);
+        final var nodeAndStack = databind.schemaTree().enterPath(contPath).orElseThrow();
+        CONT_PATH = new DatabindPath.Data(databind, nodeAndStack.stack().toInference(), contPath, nodeAndStack.node());
+        EMPTY_PATH = new DatabindPath.Data(DatabindContext.ofModel(modelContext));
     }
 
     @Test

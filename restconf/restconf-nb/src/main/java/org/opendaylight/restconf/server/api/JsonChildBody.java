@@ -38,7 +38,7 @@ public final class JsonChildBody extends ChildBody {
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final DataPostPath path, final InputStream inputStream) {
+    PrefixAndBody toPayload(final DatabindPath.Data path, final InputStream inputStream) {
         NormalizedNode result;
         try {
             result = toNormalizedNode(path, inputStream);
@@ -73,7 +73,8 @@ public final class JsonChildBody extends ChildBody {
         return new PrefixAndBody(iiToDataList.build(), result);
     }
 
-    private static @NonNull NormalizedNode toNormalizedNode(final DataPostPath path, final InputStream inputStream) {
+    private static @NonNull NormalizedNode toNormalizedNode(final DatabindPath.Data path,
+            final InputStream inputStream) {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final var jsonParser = JsonParserStream.create(writer, path.databind().jsonCodecs(), path.inference());

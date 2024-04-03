@@ -45,7 +45,7 @@ public final class XmlChildBody extends ChildBody {
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final DataPostPath path, final InputStream inputStream) {
+    PrefixAndBody toPayload(final DatabindPath.Data path, final InputStream inputStream) {
         try {
             return parse(path, UntrustedXML.newDocumentBuilder().parse(inputStream));
         } catch (final RestconfDocumentedException e) {
@@ -58,7 +58,7 @@ public final class XmlChildBody extends ChildBody {
         }
     }
 
-    private static @NonNull PrefixAndBody parse(final DataPostPath path, final Document doc)
+    private static @NonNull PrefixAndBody parse(final DatabindPath.Data path, final Document doc)
             throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final var pathInference = path.inference();
 

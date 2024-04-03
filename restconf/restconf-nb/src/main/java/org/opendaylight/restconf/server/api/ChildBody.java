@@ -33,9 +33,9 @@ public abstract sealed class ChildBody extends AbstractBody permits JsonChildBod
      * @param path POST request path
      * @return A {@link PrefixAndBody}
      */
-    public final @NonNull PrefixAndBody toPayload(final @NonNull DataPostPath path) {
+    public final @NonNull PrefixAndBody toPayload(final DatabindPath.@NonNull Data path) {
         return toPayload(path, acquireStream());
     }
 
-    abstract @NonNull PrefixAndBody toPayload(@NonNull DataPostPath path, @NonNull InputStream inputStream);
+    abstract @NonNull PrefixAndBody toPayload(DatabindPath.@NonNull Data path, @NonNull InputStream inputStream);
 }

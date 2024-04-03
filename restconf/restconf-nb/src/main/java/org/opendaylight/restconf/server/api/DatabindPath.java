@@ -91,6 +91,12 @@ public sealed interface DatabindPath extends DatabindAware {
             requireNonNull(instance);
             requireNonNull(schema);
         }
+
+        // FIXME: this is the 'Datastore' constructor
+        public Data(final DatabindContext databind) {
+            this(databind, Inference.ofDataTreePath(databind.modelContext()), YangInstanceIdentifier.of(),
+                databind.schemaTree().getRoot());
+        }
     }
 
     /**

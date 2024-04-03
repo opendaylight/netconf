@@ -74,13 +74,13 @@ import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostBody;
-import org.opendaylight.restconf.server.api.DataPostPath;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Action;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
@@ -140,7 +140,6 @@ import org.opendaylight.yangtools.yang.model.api.source.YinTextSource;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SubmoduleEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1414,8 +1413,7 @@ public abstract class RestconfStrategy {
         }
         if (path instanceof Data dataPath) {
             try (var resourceBody = body.toResource()) {
-                return dataCreatePOST(new DataPostPath(databind, dataPath.inference(), dataPath.instance()),
-                    resourceBody, queryParameters);
+                return dataCreatePOST(dataPath, resourceBody, queryParameters);
             }
         }
         if (path instanceof Action actionPath) {
@@ -1430,12 +1428,10 @@ public abstract class RestconfStrategy {
 
     public @NonNull RestconfFuture<CreateResource> dataCreatePOST(final ChildBody body,
             final Map<String, String> queryParameters) {
-        return dataCreatePOST(new DataPostPath(databind,
-            SchemaInferenceStack.of(databind.modelContext()).toInference(), YangInstanceIdentifier.of()), body,
-            queryParameters);
+        return dataCreatePOST(new DatabindPath.Data(databind), body, queryParameters);
     }
 
-    private @NonNull RestconfFuture<CreateResource> dataCreatePOST(final DataPostPath path, final ChildBody body,
+    private @NonNull RestconfFuture<CreateResource> dataCreatePOST(final DatabindPath.Data path, final ChildBody body,
             final Map<String, String> queryParameters) {
         final Insert insert;
         try {
