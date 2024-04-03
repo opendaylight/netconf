@@ -33,7 +33,7 @@ public final class XmlResourceBody extends ResourceBody {
     }
 
     @Override
-    void streamTo(final DataPutPath path, final PathArgument name, final InputStream inputStream,
+    void streamTo(final DatabindPath.Data path, final PathArgument name, final InputStream inputStream,
             final NormalizedNodeStreamWriter writer) throws IOException {
         try (var xmlParser = XmlParserStream.create(writer, path.databind().xmlCodecs(), path.inference())) {
             final var doc = UntrustedXML.newDocumentBuilder().parse(inputStream);

@@ -28,7 +28,6 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
-import org.opendaylight.restconf.server.api.DataPutPath;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -89,8 +88,7 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
         final var stratAndPath = strategy.resolveStrategyPath(apiPath);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
-            return body.toNormalizedNode(new DataPutPath(stratAndPath.strategy().databind(),
-                stratAndPath.path().inference(), stratAndPath.path().instance()));
+            return body.toNormalizedNode(stratAndPath.path());
         }
     }
 
