@@ -15,9 +15,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERR
 import static org.opendaylight.netconf.transport.http.Http2Utils.copyStreamId;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -57,7 +55,6 @@ class ServerChannelInitializer extends ChannelInitializer<Channel> implements Ht
     private final RequestDispatcher dispatcher;
 
     ServerChannelInitializer(final HttpServerGrouping httpParams, final RequestDispatcher dispatcher) {
-        super();
         authHandler = BasicAuthHandler.ofNullable(httpParams);
         this.dispatcher = dispatcher;
     }
@@ -158,7 +155,7 @@ class ServerChannelInitializer extends ChannelInitializer<Channel> implements Ht
         return new SimpleChannelInboundHandler<FullHttpRequest>() {
             @Override
             protected void channelRead0(final ChannelHandlerContext ctx, final FullHttpRequest request) {
-                Futures.addCallback(dispatcher.dispatch(request.retain()), new FutureCallback<>() {
+                dispatcher.dispatch(request.retain(), new FutureCallback<>() {
                     @Override
                     public void onSuccess(final FullHttpResponse response) {
                         copyStreamId(request, response);
@@ -178,7 +175,7 @@ class ServerChannelInitializer extends ChannelInitializer<Channel> implements Ht
                             .setInt(CONTENT_LENGTH, response.content().readableBytes());
                         onSuccess(response);
                     }
-                }, MoreExecutors.directExecutor());
+                });
             }
         };
     }
