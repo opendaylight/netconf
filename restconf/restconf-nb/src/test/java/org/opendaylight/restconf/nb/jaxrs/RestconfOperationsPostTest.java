@@ -77,7 +77,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(false).when(result).isEmpty();
 
         prepNNC(result);
-        assertSame(result, assertNormalizedNode(200, ar -> restconf.operationsXmlPOST(
+        assertSame(result, assertOperationOutput(200, ar -> restconf.operationsXmlPOST(
             apiPath("invoke-rpc-module:rpc-test"), stringInputStream("""
                 <input xmlns="invoke:rpc:module"/>"""), uriInfo, ar)));
     }
@@ -101,7 +101,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of()))).when(rpcService)
             .invokeRpc(RPC, INPUT);
 
-        assertEquals(OUTPUT, assertNormalizedNode(200, ar -> restconf.operationsXmlPOST(
+        assertEquals(OUTPUT, assertOperationOutput(200, ar -> restconf.operationsXmlPOST(
             apiPath("invoke-rpc-module:rpc-test"), stringInputStream("""
                 <input xmlns="invoke:rpc:module">
                   <cont>
@@ -145,7 +145,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of()))).when(rpcService)
             .invokeRpc(RPC, INPUT);
 
-        assertEquals(OUTPUT, assertNormalizedNode(200,
+        assertEquals(OUTPUT, assertOperationOutput(200,
             ar -> restconf.operationsJsonPOST(
                 apiPath("ietf-yang-library:modules-state/yang-ext:mount/invoke-rpc-module:rpc-test"),
                 stringInputStream("""
@@ -188,7 +188,7 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(OUTPUT, List.of())))
             .when(rpcService).invokeRpc(RPC, INPUT);
 
-        final var payload = assertNormalizedNodePayload(200, ar -> restconf.operationsJsonPOST(
+        final var body = assertOperationOutputBody(200, ar -> restconf.operationsJsonPOST(
             apiPath("invoke-rpc-module:rpc-test"),
             stringInputStream("""
                 {
@@ -198,12 +198,11 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                     }
                   }
                 }"""), uriInfo, ar));
-        assertEquals(OUTPUT, payload.data());
+        assertEquals(OUTPUT, body.output());
         assertJson("""
-            {"invoke-rpc-module:output":{"cont-out":{"lf-out":"operation result"}}}""", payload);
+            {"invoke-rpc-module:output":{"cont-out":{"lf-out":"operation result"}}}""", body);
         assertXml("""
-            <output xmlns="invoke:rpc:module"><cont-out><lf-out>operation result</lf-out></cont-out></output>""",
-            payload);
+            <output xmlns="invoke:rpc:module"><cont-out><lf-out>operation result</lf-out></cont-out></output>""", body);
     }
 
     private void prepNNC(final ContainerNode result) {

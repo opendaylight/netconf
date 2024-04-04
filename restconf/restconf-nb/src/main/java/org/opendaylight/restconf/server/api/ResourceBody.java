@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * The body of a resource identified in the request URL, i.e. a {@code PUT} or a plain {@code PATCH} request on RESTCONF
  * data service.
  */
-public abstract sealed class ResourceBody extends AbstractBody permits JsonResourceBody, XmlResourceBody {
+public abstract sealed class ResourceBody extends RequestBody permits JsonResourceBody, XmlResourceBody {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceBody.class);
     private static final NodeIdentifier DATA_NID = NodeIdentifier.create(Data.QNAME);
 
