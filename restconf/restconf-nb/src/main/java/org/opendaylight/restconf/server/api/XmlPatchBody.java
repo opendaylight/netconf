@@ -8,6 +8,8 @@
  */
 package org.opendaylight.restconf.server.api;
 
+import static org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.YangPatch$YD.NAME;
+
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,9 +27,11 @@ import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -43,6 +47,14 @@ public final class XmlPatchBody extends PatchBody {
     }
 
     @Override
+    void streamTo(final DatabindContext databind, final InputStream inputStream,
+            final NormalizedNodeStreamWriter writer) throws IOException {
+        final var stack = SchemaInferenceStack.of(databind.modelContext());
+        stack.enterYangData(NAME);
+        XmlResourceBody.streamTo(databind.xmlCodecs(), stack.toInference(), NAME.module().namespace(), NAME.name(),
+            inputStream, writer);
+    }
+
     PatchContext toPatchContext(final ResourceContext resource, final InputStream inputStream) throws IOException {
         try {
             return parse(resource, UntrustedXML.newDocumentBuilder().parse(inputStream));

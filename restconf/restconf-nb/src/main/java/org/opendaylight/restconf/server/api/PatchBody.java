@@ -18,10 +18,17 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.YangPatch;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.edit.Value;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
 
 /**
  * A YANG Patch body.
@@ -48,18 +55,48 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
         protected abstract ResourceContext resolveRelative(ApiPath apiPath);
     }
 
+    private static final QName EDIT_ID = QName.create(YangPatch.QNAME, "edit-id").intern();
+    private static final QName OPERATION = QName.create(YangPatch.QNAME, "operation").intern();
+    private static final QName PATCH_ID = QName.create(YangPatch.QNAME, "patch-id").intern();
+    private static final QName POINT = QName.create(YangPatch.QNAME, "point").intern();
+    private static final QName TARGET = QName.create(YangPatch.QNAME, "target").intern();
+    private static final QName WHERE = QName.create(YangPatch.QNAME, "where").intern();
+    private static final QName VALUE = Value.QNAME;
+
     PatchBody(final InputStream inputStream) {
         super(inputStream);
     }
 
-    public final @NonNull PatchContext toPatchContext(final @NonNull ResourceContext resource) throws IOException {
+    public final @NonNull PatchContext toPatchContext(final ResourceContext resource) throws IOException {
+        final ContainerNode yangPatch;
         try (var is = acquireStream()) {
-            return toPatchContext(resource, is);
+            final var holder = new NormalizationResultHolder();
+            try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
+                streamTo(resource.path.databind(), is, streamWriter);
+            } catch (IOException e) {
+                throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
+                        ErrorTag.MALFORMED_MESSAGE, e);
+            }
+
+            yangPatch = (ContainerNode) holder.getResult().data();
         }
+
+        return toPatchContext(resource, yangPatch);
     }
 
-    abstract @NonNull PatchContext toPatchContext(@NonNull ResourceContext resource, @NonNull InputStream inputStream)
-        throws IOException;
+    private final @NonNull PatchContext toPatchContext(final ResourceContext resource,
+            final ContainerNode yangPatch) {
+
+
+        return new PatchContext(null, null)
+
+
+
+        throw new UnsupportedOperationException();
+    }
+
+    abstract void streamTo(DatabindContext databind, InputStream inputStream,
+        NormalizedNodeStreamWriter writer) throws IOException;
 
     static final Data parsePatchTarget(final @NonNull ResourceContext resource, final String target) {
         // As per: https://www.rfc-editor.org/rfc/rfc8072#page-18:

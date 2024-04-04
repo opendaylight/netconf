@@ -15,9 +15,12 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
+import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -35,17 +38,23 @@ public final class XmlResourceBody extends ResourceBody {
     @Override
     void streamTo(final DatabindPath.Data path, final PathArgument name, final InputStream inputStream,
             final NormalizedNodeStreamWriter writer) throws IOException {
-        try (var xmlParser = XmlParserStream.create(writer, path.databind().xmlCodecs(), path.inference())) {
+        final var qname = name.getNodeType();
+        streamTo(path.databind().xmlCodecs(), path.inference(), qname.getNamespace(), qname.getLocalName(),
+            inputStream, writer);
+    }
+
+    static void streamTo(final XmlCodecFactory codecFactory, final Inference inference, final XMLNamespace namespace,
+            final String localName, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
+                throws IOException {
+        try (var xmlParser = XmlParserStream.create(writer, codecFactory, inference)) {
             final var doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
             final var docRoot = doc.getDocumentElement();
             final var docRootName = docRoot.getLocalName();
             final var docRootNs = docRoot.getNamespaceURI();
-            final var qname = name.getNodeType();
-            final var pathName = qname.getLocalName();
-            final var pathNs = qname.getNamespace().toString();
-            if (!docRootName.equals(pathName) || !docRootNs.equals(pathNs)) {
+            final var pathNs = namespace.toString();
+            if (!docRootName.equals(localName) || !docRootNs.equals(pathNs)) {
                 throw new RestconfDocumentedException("Incorrect message root element (" + docRootNs + ")" + docRootName
-                    + ", should be (" + pathNs + ")" + pathName, ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                    + ", should be (" + pathNs + ")" + localName, ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
             }
 
             xmlParser.traverse(new DOMSource(docRoot));

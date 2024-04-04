@@ -32,6 +32,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
@@ -45,6 +46,11 @@ public final class JsonPatchBody extends PatchBody {
     }
 
     @Override
+    void streamTo(final DatabindContext databind, final InputStream inputStream,
+            final NormalizedNodeStreamWriter writer) throws IOException {
+
+    }
+
     PatchContext toPatchContext(final ResourceContext resource, final InputStream inputStream) throws IOException {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
