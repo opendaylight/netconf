@@ -36,6 +36,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.api.PatchBody;
+import org.opendaylight.restconf.server.spi.DefaultResourceContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -99,7 +100,7 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
         final var stratAndPath = strategy.resolveStrategyPath(apiPath);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {
-            return body.toPatchContext(stratAndPath.path());
+            return body.toPatchContext(new DefaultResourceContext(stratAndPath.path()));
         }
     }
 }

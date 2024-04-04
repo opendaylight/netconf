@@ -7,37 +7,61 @@
  */
 package org.opendaylight.restconf.server.api;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
+import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
  * A YANG Patch body.
  */
 public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBody, XmlPatchBody {
+    /**
+     * Resource context needed to completely resolve a {@link PatchBody}.
+     */
+    @NonNullByDefault
+    public abstract static class ResourceContext implements Immutable {
+        protected final Data path;
+
+        protected ResourceContext(final Data path) {
+            this.path = requireNonNull(path);
+        }
+
+        /**
+         * Return a {@link ResourceContext} for a sub-resource identified by an {@link ApiPath}.
+         *
+         * @param apiPath sub-resource
+         * @return A {@link ResourceContext}
+         * @throws RestconfDocumentedException if the sub-resource cannot be resolved
+         */
+        protected abstract ResourceContext resolveRelative(ApiPath apiPath);
+    }
+
     PatchBody(final InputStream inputStream) {
         super(inputStream);
     }
 
-    public final @NonNull PatchContext toPatchContext(final DatabindPath.@NonNull Data path) throws IOException {
+    public final @NonNull PatchContext toPatchContext(final @NonNull ResourceContext resource) throws IOException {
         try (var is = acquireStream()) {
-            return toPatchContext(path, is);
+            return toPatchContext(resource, is);
         }
     }
 
-    abstract @NonNull PatchContext toPatchContext(DatabindPath.@NonNull Data path, @NonNull InputStream inputStream)
+    abstract @NonNull PatchContext toPatchContext(@NonNull ResourceContext resource, @NonNull InputStream inputStream)
         throws IOException;
 
-    static final YangInstanceIdentifier parsePatchTarget(final DatabindPath.@NonNull Data path, final String target) {
+    static final Data parsePatchTarget(final @NonNull ResourceContext resource, final String target) {
         // As per: https://www.rfc-editor.org/rfc/rfc8072#page-18:
         //
         //        "Identifies the target data node for the edit
@@ -54,14 +78,14 @@ public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBod
                 ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE, e);
         }
 
-        final YangInstanceIdentifier result;
+        final Data result;
         try {
-            result = ApiPathNormalizer.normalizeSubResource(path, targetPath).instance();
+            result = resource.resolveRelative(targetPath).path;
         } catch (RestconfDocumentedException e) {
             throw new RestconfDocumentedException("Invalid edit target '" + targetPath + "'",
                 ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE, e);
         }
-        if (result.isEmpty()) {
+        if (result.instance().isEmpty()) {
             throw new RestconfDocumentedException("Target node resource must not be a datastore resource",
                 ErrorType.RPC, ErrorTag.MALFORMED_MESSAGE);
         }

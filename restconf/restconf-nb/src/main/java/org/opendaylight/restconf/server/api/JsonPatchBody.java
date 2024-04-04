@@ -32,6 +32,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizationResultHolder;
@@ -44,16 +45,16 @@ public final class JsonPatchBody extends PatchBody {
     }
 
     @Override
-    PatchContext toPatchContext(final DatabindPath.Data path, final InputStream inputStream) throws IOException {
+    PatchContext toPatchContext(final ResourceContext resource, final InputStream inputStream) throws IOException {
         try (var jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             final var patchId = new AtomicReference<String>();
-            final var resultList = read(jsonReader, path, patchId);
+            final var resultList = read(jsonReader, resource, patchId);
             // Note: patchId side-effect of above
             return new PatchContext(patchId.get(), resultList);
         }
     }
 
-    private static ImmutableList<PatchEntity> read(final JsonReader in, final DatabindPath.Data path,
+    private static ImmutableList<PatchEntity> read(final JsonReader in, final @NonNull ResourceContext resource,
             final AtomicReference<String> patchId) throws IOException {
         final var edits = ImmutableList.<PatchEntity>builder();
         final var edit = new PatchEdit();
@@ -79,7 +80,7 @@ public final class JsonPatchBody extends PatchBody {
                 case END_DOCUMENT:
                     break;
                 case NAME:
-                    parseByName(in.nextName(), edit, in, path, edits, patchId);
+                    parseByName(in.nextName(), edit, in, resource, edits, patchId);
                     break;
                 case END_OBJECT:
                     in.endObject();
@@ -98,7 +99,7 @@ public final class JsonPatchBody extends PatchBody {
 
     // Switch value of parsed JsonToken.NAME and read edit definition or patch id
     private static void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
-            final @NonNull JsonReader in, final DatabindPath.@NonNull Data path,
+            final @NonNull JsonReader in, final @NonNull ResourceContext resource,
             final @NonNull Builder<PatchEntity> resultCollection, final @NonNull AtomicReference<String> patchId)
                 throws IOException {
         switch (name) {
@@ -107,14 +108,14 @@ public final class JsonPatchBody extends PatchBody {
                     in.beginArray();
 
                     while (in.hasNext()) {
-                        readEditDefinition(edit, in, path);
+                        readEditDefinition(edit, in, resource);
                         resultCollection.add(prepareEditOperation(edit));
                         edit.clear();
                     }
 
                     in.endArray();
                 } else {
-                    readEditDefinition(edit, in, path);
+                    readEditDefinition(edit, in, resource);
                     resultCollection.add(prepareEditOperation(edit));
                     edit.clear();
                 }
@@ -130,9 +131,11 @@ public final class JsonPatchBody extends PatchBody {
 
     // Read one patch edit object from JSON input
     private static void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
-            final DatabindPath.@NonNull Data path) throws IOException {
+            final @NonNull ResourceContext resource) throws IOException {
         String deferredValue = null;
         in.beginObject();
+
+        final var codecs = resource.path.databind().jsonCodecs();
 
         while (in.hasNext()) {
             final String editDefinition = in.nextName();
@@ -145,8 +148,9 @@ public final class JsonPatchBody extends PatchBody {
                     break;
                 case "target":
                     // target can be specified completely in request URI
-                    edit.setTarget(parsePatchTarget(path, in.nextString()));
-                    final var stack = path.databind().schemaTree().enterPath(edit.getTarget()).orElseThrow().stack();
+                    final var target = parsePatchTarget(resource, in.nextString());
+                    edit.setTarget(target.instance());
+                    final var stack = target.inference().toSchemaInferenceStack();
                     if (!stack.isEmpty()) {
                         stack.exit();
                     }
@@ -167,7 +171,7 @@ public final class JsonPatchBody extends PatchBody {
                         deferredValue = readValueNode(in);
                     } else {
                         // We have a target schema node, reuse this reader without buffering the value.
-                        edit.setData(readEditData(in, edit.getTargetSchemaNode(), path.databind()));
+                        edit.setData(readEditData(in, edit.getTargetSchemaNode(), codecs));
                     }
                     break;
                 default:
@@ -181,7 +185,7 @@ public final class JsonPatchBody extends PatchBody {
         if (deferredValue != null) {
             // read saved data to normalized node when target schema is already known
             edit.setData(readEditData(new JsonReader(new StringReader(deferredValue)), edit.getTargetSchemaNode(),
-                path.databind()));
+                codecs));
         }
     }
 
@@ -285,10 +289,10 @@ public final class JsonPatchBody extends PatchBody {
      * @return NormalizedNode representing data
      */
     private static NormalizedNode readEditData(final @NonNull JsonReader in, final @NonNull Inference targetSchemaNode,
-            final @NonNull DatabindContext databind) {
+            final @NonNull JSONCodecFactory codecs) {
         final var resultHolder = new NormalizationResultHolder();
         final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        JsonParserStream.create(writer, databind.jsonCodecs(), targetSchemaNode).parse(in);
+        JsonParserStream.create(writer, codecs, targetSchemaNode).parse(in);
         return resultHolder.getResult().data();
     }
 

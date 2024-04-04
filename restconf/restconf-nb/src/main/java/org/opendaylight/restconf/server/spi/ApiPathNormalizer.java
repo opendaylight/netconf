@@ -113,10 +113,9 @@ public final class ApiPathNormalizer implements PointNormalizer {
             namespace, firstStep, it);
     }
 
-    private @NonNull DatabindPath normalizeSteps(final SchemaInferenceStack stack,
-            final @NonNull DataSchemaContext rootNode, final @NonNull List<PathArgument> pathPrefix,
-            final @NonNull QNameModule firstNamespace, final @NonNull Step firstStep,
-            final Iterator<@NonNull Step> it) {
+    @NonNull DatabindPath normalizeSteps(final SchemaInferenceStack stack, final @NonNull DataSchemaContext rootNode,
+            final @NonNull List<PathArgument> pathPrefix, final @NonNull QNameModule firstNamespace,
+            final @NonNull Step firstStep, final Iterator<@NonNull Step> it) {
         var parentNode = rootNode;
         var namespace = firstNamespace;
         var step = firstStep;
@@ -213,31 +212,6 @@ public final class ApiPathNormalizer implements PointNormalizer {
             return dataPath;
         }
         throw new RestconfDocumentedException("Point '" + apiPath + "' resolves to non-data " + path,
-            ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
-    }
-
-    public static @NonNull Data normalizeSubResource(final Data resource, final ApiPath subResource) {
-        // If subResource is empty just return the resource
-        final var steps = subResource.steps();
-        if (steps.isEmpty()) {
-            return requireNonNull(resource);
-        }
-
-        final var normalizer = new ApiPathNormalizer(resource.databind());
-        final var urlPath = resource.instance();
-        if (urlPath.isEmpty()) {
-            // URL indicates the datastore resource, let's just normalize targetPath
-            return normalizer.normalizeDataPath(subResource);
-        }
-
-        // Defer to normalizePath(), faking things a bit. Then check the result.
-        final var it = steps.iterator();
-        final var path = normalizer.normalizeSteps(resource.inference().toSchemaInferenceStack(), resource.schema(),
-            urlPath.getPathArguments(), urlPath.getLastPathArgument().getNodeType().getModule(), it.next(), it);
-        if (path instanceof Data dataPath) {
-            return dataPath;
-        }
-        throw new RestconfDocumentedException("Sub-resource '" + subResource + "' resolves to non-data " + path,
             ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 

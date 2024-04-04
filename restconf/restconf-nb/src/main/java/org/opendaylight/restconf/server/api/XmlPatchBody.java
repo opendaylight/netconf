@@ -43,9 +43,9 @@ public final class XmlPatchBody extends PatchBody {
     }
 
     @Override
-    PatchContext toPatchContext(final DatabindPath.Data path, final InputStream inputStream) throws IOException {
+    PatchContext toPatchContext(final ResourceContext resource, final InputStream inputStream) throws IOException {
         try {
-            return parse(path, UntrustedXML.newDocumentBuilder().parse(inputStream));
+            return parse(resource, UntrustedXML.newDocumentBuilder().parse(inputStream));
         } catch (XMLStreamException | SAXException | URISyntaxException e) {
             LOG.debug("Failed to parse YANG Patch XML", e);
             throw new RestconfDocumentedException("Error parsing YANG Patch XML: " + e.getMessage(), ErrorType.PROTOCOL,
@@ -53,12 +53,11 @@ public final class XmlPatchBody extends PatchBody {
         }
     }
 
-    private static @NonNull PatchContext parse(final DatabindPath.@NonNull Data path, final Document doc)
+    private static @NonNull PatchContext parse(final ResourceContext resource, final Document doc)
             throws XMLStreamException, IOException, SAXException, URISyntaxException {
         final var entities = ImmutableList.<PatchEntity>builder();
         final var patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final var editNodes = doc.getElementsByTagName("edit");
-        final var databind = path.databind();
 
         for (int i = 0; i < editNodes.getLength(); i++) {
             final Element element = (Element) editNodes.item(i);
@@ -70,31 +69,30 @@ public final class XmlPatchBody extends PatchBody {
             final Element firstValueElement = values != null ? values.get(0) : null;
 
             // find complete path to target, it can be also empty (only slash)
-            final var targetII = parsePatchTarget(path, target);
-            // move schema node
-            final var lookup = databind.schemaTree().enterPath(targetII).orElseThrow();
-
-            final var stack = lookup.stack();
-            final var inference = stack.toInference();
+            final var targetData = parsePatchTarget(resource, target);
+            final var inference = targetData.inference();
+            final var stack = inference.toSchemaInferenceStack();
             if (!stack.isEmpty()) {
                 stack.exit();
             }
 
+            final var targetPath = targetData.instance();
+
             if (requiresValue(oper)) {
                 final var resultHolder = new NormalizationResultHolder();
                 final var writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                final var xmlParser = XmlParserStream.create(writer, databind.xmlCodecs(), inference);
+                final var xmlParser = XmlParserStream.create(writer, resource.path.databind().xmlCodecs(), inference);
                 xmlParser.traverse(new DOMSource(firstValueElement));
 
                 final var result = resultHolder.getResult().data();
                 // for lists allow to manipulate with list items through their parent
-                if (targetII.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
-                    entities.add(new PatchEntity(editId, oper, targetII.getParent(), result));
+                if (targetPath.getLastPathArgument() instanceof NodeIdentifierWithPredicates) {
+                    entities.add(new PatchEntity(editId, oper, targetPath.getParent(), result));
                 } else {
-                    entities.add(new PatchEntity(editId, oper, targetII, result));
+                    entities.add(new PatchEntity(editId, oper, targetPath, result));
                 }
             } else {
-                entities.add(new PatchEntity(editId, oper, targetII));
+                entities.add(new PatchEntity(editId, oper, targetPath));
             }
         }
 
