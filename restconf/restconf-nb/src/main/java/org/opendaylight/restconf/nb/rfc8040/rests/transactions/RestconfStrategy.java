@@ -92,6 +92,7 @@ import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
+import org.opendaylight.restconf.server.spi.DefaultResourceContext;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
@@ -602,7 +603,7 @@ public abstract class RestconfStrategy {
 
         final PatchContext patch;
         try {
-            patch = body.toPatchContext(path);
+            patch = body.toPatchContext(new DefaultResourceContext(path));
         } catch (IOException e) {
             LOG.debug("Error parsing YANG Patch input", e);
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
