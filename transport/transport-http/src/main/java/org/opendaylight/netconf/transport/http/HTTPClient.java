@@ -9,10 +9,12 @@ package org.opendaylight.netconf.transport.http;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.UnsupportedConfigurationException;
 import org.opendaylight.netconf.transport.tcp.TCPClient;
@@ -28,7 +30,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.tls.client.
  * A {@link HTTPTransportStack} acting as a client.
  */
 public final class HTTPClient extends HTTPTransportStack {
-
     private final RequestDispatcher dispatcher;
 
     private HTTPClient(final TransportChannelListener listener, final HttpChannelInitializer channelInitializer,
@@ -41,10 +42,11 @@ public final class HTTPClient extends HTTPTransportStack {
      * Invokes the HTTP request over established connection.
      *
      * @param request the full http request object
-     * @return a future providing full http response or cause in case of error
+     * @param callback invoked when the request completes
      */
-    public ListenableFuture<FullHttpResponse> invoke(final FullHttpRequest request) {
-        return dispatcher.dispatch(requireNonNull(request));
+    public void invoke(final @NonNull FullHttpRequest request,
+            final @NonNull FutureCallback<@NonNull FullHttpResponse> callback) {
+        dispatcher.dispatch(request, callback);
     }
 
     /**

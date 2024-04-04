@@ -26,6 +26,7 @@ import static org.opendaylight.netconf.transport.http.ConfigUtils.clientTranspor
 import static org.opendaylight.netconf.transport.http.ConfigUtils.serverTransportTcp;
 import static org.opendaylight.netconf.transport.http.ConfigUtils.serverTransportTls;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -99,8 +100,7 @@ public class HttpClientServerTest {
         localAddress = InetAddress.getLoopbackAddress().getHostAddress();
         scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
-        requestDispatcher = request -> {
-            final var future = SettableFuture.<FullHttpResponse>create();
+        requestDispatcher = (request, callback) -> {
             // emulate asynchronous server request processing - run in separate thread with 100 millis delay
             scheduledExecutor.schedule(() -> {
                 // return 200 response with a content built from request parameters
@@ -113,9 +113,8 @@ public class HttpClientServerTest {
                     wrappedBuffer(responseMessage.getBytes(StandardCharsets.UTF_8)));
                 response.headers().set(CONTENT_TYPE, TEXT_PLAIN)
                     .setInt(CONTENT_LENGTH, response.content().readableBytes());
-                return future.set(response);
+                callback.onSuccess(response);
             }, 100, TimeUnit.MILLISECONDS);
-            return future;
         };
     }
 
@@ -188,7 +187,20 @@ public class HttpClientServerTest {
                         // allow multiple requests on same connections
                         .set(CONNECTION, KEEP_ALIVE);
 
-                    final var response = client.invoke(request).get(2, TimeUnit.SECONDS);
+                    final var future = SettableFuture.<FullHttpResponse>create();
+                    client.invoke(request, new FutureCallback<>() {
+                        @Override
+                        public void onSuccess(final FullHttpResponse result) {
+                            future.set(result.copy());
+                        }
+
+                        @Override
+                        public void onFailure(final Throwable cause) {
+                            future.setException(cause);
+                        }
+                    });
+
+                    final var response = future.get(2, TimeUnit.SECONDS);
                     assertNotNull(response);
                     assertEquals(OK, response.status());
                     final var expected = RESPONSE_TEMPLATE.formatted(method, uri, payload);

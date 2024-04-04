@@ -7,22 +7,23 @@
  */
 package org.opendaylight.netconf.transport.http;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * Functional interface for HTTP request dispatcher.
  */
+@NonNullByDefault
 @FunctionalInterface
 public interface RequestDispatcher {
-
     /**
      * Performs {@link FullHttpRequest} processing. Any error occurred is expected either to be returned within
-     * {@link FullHttpResponse} with appropriate HTTP status code or set as future cause.
+     * {@link FullHttpResponse} with appropriate HTTP status code or set as future cause. Note that
      *
-     * @param request http request
-     * @return future providing http response or cause in case of error.
+     * @param request HTTP request
+     * @param callback invoked when the request completes
      */
-    ListenableFuture<FullHttpResponse> dispatch(FullHttpRequest request);
+    void dispatch(FullHttpRequest request, FutureCallback<FullHttpResponse> callback);
 }
