@@ -13,6 +13,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodec;
 
 /**
@@ -21,6 +22,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodec;
  */
 // FIXME: remove this class once we have YANGTOOLS-1569
 final class HackJsonWriter extends JsonWriter {
+    @NonNullByDefault
     record Value(String rawString, Kind kind) {
         enum Kind {
             BOOLEAN,

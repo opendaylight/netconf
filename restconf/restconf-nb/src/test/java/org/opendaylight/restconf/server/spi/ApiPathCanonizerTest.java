@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.utils.parser;
+package org.opendaylight.restconf.server.spi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -20,7 +20,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
-import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -32,11 +31,19 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
- * Unit tests for {@link YangInstanceIdentifierSerializer}.
+ * Unit tests for {@link ApiPathNormalizer#canonicalize(YangInstanceIdentifier)}.
  */
-class YangInstanceIdentifierSerializerTest {
-    private static final ApiPathNormalizer NORMALIZER = new ApiPathNormalizer(DatabindContext.ofModel(
-        YangParserTestUtils.parseYangResourceDirectory("/restconf/parser/serializer")));
+class ApiPathCanonizerTest {
+    private static final ApiPathNormalizer NORMALIZER;
+    private static final ApiPathCanonizer CANONIZER;
+
+    static {
+        final var provider = DatabindContext.ofModel(
+            YangParserTestUtils.parseYangResourceDirectory("/restconf/parser/serializer"));
+
+        NORMALIZER = new ApiPathNormalizer(provider);
+        CANONIZER = new ApiPathCanonizer(provider);
+    }
 
     /**
      * Positive test of serialization of <code>YangInstanceIdentifier</code> containing container node to
@@ -199,7 +206,7 @@ class YangInstanceIdentifierSerializerTest {
      */
     @Test
     void serializeNullDataNegativeTest() {
-        assertThrows(NullPointerException.class, () -> NORMALIZER.canonicalize(null));
+        assertThrows(NullPointerException.class, () -> CANONIZER.dataToApiPath(null));
     }
 
     /**
@@ -342,7 +349,7 @@ class YangInstanceIdentifierSerializerTest {
     }
 
     private static void assertApiPath(final String expected, final YangInstanceIdentifier path) {
-        assertEquals(newApiPath(expected), NORMALIZER.canonicalize(path));
+        assertEquals(newApiPath(expected), CANONIZER.dataToApiPath(path));
     }
 
     private static YangInstanceIdentifier assertNormalized(final String str) {
@@ -350,7 +357,7 @@ class YangInstanceIdentifierSerializerTest {
     }
 
     private static RestconfError assertError(final YangInstanceIdentifier path) {
-        final var ex = assertThrows(RestconfDocumentedException.class, () -> NORMALIZER.canonicalize(path));
+        final var ex = assertThrows(RestconfDocumentedException.class, () -> CANONIZER.dataToApiPath(path));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
         return errors.get(0);

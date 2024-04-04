@@ -90,6 +90,7 @@ import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
@@ -509,7 +510,7 @@ public abstract class RestconfStrategy {
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(new CreateResource(new ApiPathNormalizer(databind).canonicalize(
+                ret.set(new CreateResource(new ApiPathCanonizer(databind).dataToApiPath(
                     data instanceof MapNode mapData && !mapData.isEmpty()
                         ? path.node(mapData.body().iterator().next().name()) : path).toString()));
             }
