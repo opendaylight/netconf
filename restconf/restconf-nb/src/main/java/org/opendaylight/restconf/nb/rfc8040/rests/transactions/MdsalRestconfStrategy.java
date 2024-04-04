@@ -29,7 +29,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -116,7 +115,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
         final var inference = path.inference();
         final var fields = params.fields();
         final var translatedFields = fields == null ? null
-            : WriterFieldsTranslator.translate(inference.modelContext(), path.schema(), fields);
+            : MdsalFieldsParam.translate(inference.modelContext(), path.schema(), fields);
         return completeDataGET(inference, QueryParameters.of(params, translatedFields),
             readData(params.content(), path.instance(), params.withDefaults()), null);
     }
