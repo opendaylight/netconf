@@ -22,7 +22,6 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormali
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
@@ -36,24 +35,6 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
 public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
     private static final int DEFAULT_INDENT_SPACES_NUM = 2;
-
-    @Override
-    void writeOperationOutput(final SchemaInferenceStack stack, final QueryParameters writerParameters,
-            final ContainerNode output, final OutputStream entityStream) throws IOException {
-        // RpcDefinition/ActionDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit
-        // initial output declaration
-        try (var jsonWriter = createJsonWriter(entityStream, writerParameters.prettyPrint())) {
-            final var module = stack.currentModule();
-            jsonWriter.beginObject().name(module.argument().getLocalName() + ":output").beginObject();
-
-            final var nnWriter = createNormalizedNodeWriter(stack.toInference(), jsonWriter, writerParameters,
-                module.namespace().argument());
-            writeChildren(nnWriter, output);
-            nnWriter.flush();
-
-            jsonWriter.endObject().endObject();
-        }
-    }
 
     @Override
     void writeData(final SchemaInferenceStack stack, final QueryParameters writerParameters, final NormalizedNode data,
@@ -78,13 +59,6 @@ public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBo
             nnWriter.flush();
 
             jsonWriter.endObject().flush();
-        }
-    }
-
-    private static void writeChildren(final RestconfNormalizedNodeWriter nnWriter, final ContainerNode data)
-            throws IOException {
-        for (var child : data.body()) {
-            nnWriter.write(child);
         }
     }
 

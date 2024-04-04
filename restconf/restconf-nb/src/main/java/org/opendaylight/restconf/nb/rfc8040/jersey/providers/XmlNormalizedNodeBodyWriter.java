@@ -45,17 +45,6 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
     }
 
     @Override
-    void writeOperationOutput(final SchemaInferenceStack stack, final QueryParameters writerParameters,
-            final ContainerNode output, final OutputStream entityStream) throws IOException {
-        // RpcDefinition/ActionDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit
-        // initial output declaration.
-        final var xmlWriter = createXmlWriter(entityStream, writerParameters.prettyPrint());
-        final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), writerParameters);
-        writeElements(xmlWriter, nnWriter, output);
-        nnWriter.flush();
-    }
-
-    @Override
     void writeData(final SchemaInferenceStack stack, final QueryParameters writerParameters, final NormalizedNode data,
             final OutputStream entityStream) throws IOException {
         final boolean isRoot;
@@ -131,24 +120,6 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
             xmlWriter.writeEndElement();
             xmlWriter.flush();
         } catch (XMLStreamException e) {
-            throw new IOException("Failed to write elements", e);
-        }
-    }
-
-    private static void writeElements(final XMLStreamWriter xmlWriter, final RestconfNormalizedNodeWriter nnWriter,
-            final ContainerNode data) throws IOException {
-        final QName nodeType = data.name().getNodeType();
-        final String namespace = nodeType.getNamespace().toString();
-        try {
-            xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, nodeType.getLocalName(), namespace);
-            xmlWriter.writeDefaultNamespace(namespace);
-            for (var child : data.body()) {
-                nnWriter.write(child);
-            }
-            nnWriter.flush();
-            xmlWriter.writeEndElement();
-            xmlWriter.flush();
-        } catch (final XMLStreamException e) {
             throw new IOException("Failed to write elements", e);
         }
     }

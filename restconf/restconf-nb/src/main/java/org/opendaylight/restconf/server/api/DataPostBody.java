@@ -15,7 +15,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4">RFC8040 section 4.4</a>.
  */
 @NonNullByDefault
-public abstract sealed class DataPostBody extends AbstractBody permits JsonDataPostBody, XmlDataPostBody {
+public abstract sealed class DataPostBody extends RequestBody permits JsonDataPostBody, XmlDataPostBody {
     DataPostBody(final InputStream inputStream) {
         super(inputStream);
     }

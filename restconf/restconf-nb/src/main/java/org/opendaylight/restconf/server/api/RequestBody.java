@@ -18,23 +18,25 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.yangtools.concepts.Mutable;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An abstract request body backed by an {@link InputStream}.
+ * An abstract request body backed by an {@link InputStream}. In controls the access to input stream, so that it can
+ * only be taken once.
  */
-public abstract sealed class AbstractBody implements AutoCloseable
+public abstract sealed class RequestBody implements AutoCloseable, Mutable
         permits ChildBody, DataPostBody, OperationInputBody, PatchBody, ResourceBody {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractBody.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RequestBody.class);
 
     private static final VarHandle INPUT_STREAM;
 
     static {
         try {
-            INPUT_STREAM = MethodHandles.lookup().findVarHandle(AbstractBody.class, "inputStream", InputStream.class);
+            INPUT_STREAM = MethodHandles.lookup().findVarHandle(RequestBody.class, "inputStream", InputStream.class);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -44,7 +46,7 @@ public abstract sealed class AbstractBody implements AutoCloseable
     @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile InputStream inputStream;
 
-    AbstractBody(final InputStream inputStream) {
+    RequestBody(final InputStream inputStream) {
         this.inputStream = requireNonNull(inputStream);
     }
 
@@ -67,7 +69,6 @@ public abstract sealed class AbstractBody implements AutoCloseable
         }
         return is;
     }
-
 
     /**
      * Throw a {@link RestconfDocumentedException} if the specified exception has a {@link YangNetconfError} attachment.

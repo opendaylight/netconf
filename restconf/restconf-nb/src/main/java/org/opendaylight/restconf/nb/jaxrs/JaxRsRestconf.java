@@ -69,6 +69,7 @@ import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.OperationOutputBody;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -761,7 +762,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 Response transform(final OperationsPostResult result) {
                     final var body = result.output();
                     return body == null ? Response.noContent().build()
-                        : Response.ok().entity(new NormalizedNodePayload(result.path().inference(), body)).build();
+                        : Response.ok().entity(new OperationOutputBody(result.path(), body, false)).build();
                 }
             });
     }
