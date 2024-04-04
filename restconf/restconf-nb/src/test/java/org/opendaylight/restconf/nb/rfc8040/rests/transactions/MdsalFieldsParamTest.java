@@ -6,7 +6,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.utils.parser;
+package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,14 +20,14 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
- * Unit test for {@link WriterFieldsTranslator}.
+ * Unit test for {@link MdsalFieldsParam}.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class WriterFieldsTranslatorTest extends AbstractFieldsTranslatorTest<Set<QName>> {
+public class MdsalFieldsParamTest extends AbstractFieldsTranslatorTest<Set<QName>> {
     @Override
     protected List<Set<QName>> translateFields(final EffectiveModelContext modelContext,
             final DataSchemaContext startNode, final FieldsParam fields) {
-        return WriterFieldsTranslator.translate(modelContext, startNode, fields);
+        return MdsalFieldsParam.translate(modelContext, startNode, fields);
     }
 
     @Override

@@ -33,7 +33,7 @@ import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.WriterFieldsTranslator;
+import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalFieldsParam;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -171,7 +171,7 @@ public class QueryParamsTest {
         doReturn(containerChild).when(containerChildSchema).getQName();
         doReturn(containerChildSchema).when(containerSchema).dataChildByName(containerChild);
 
-        final var queryParameters = QueryParameters.of(params, WriterFieldsTranslator.translate(
+        final var queryParameters = QueryParameters.of(params, MdsalFieldsParam.translate(
             mock(EffectiveModelContext.class), DataSchemaContext.of(containerSchema), paramsFields));
         final var fields = queryParameters.fields();
         assertNotNull(fields);
