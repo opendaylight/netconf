@@ -33,7 +33,7 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.server.api.OperationOutputBody;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -108,7 +108,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
         final var response = captor.getValue();
         assertEquals(200, response.getStatus());
 
-        final var payload = assertInstanceOf(NormalizedNodePayload.class, response.getEntity());
+        final var payload = assertInstanceOf(OperationOutputBody.class, response.getEntity());
         AbstractRestconfTest.assertJson("""
             {"instance-identifier-module:output":{"timestamp":"somevalue"}}""", payload);
         AbstractRestconfTest.assertXml("""

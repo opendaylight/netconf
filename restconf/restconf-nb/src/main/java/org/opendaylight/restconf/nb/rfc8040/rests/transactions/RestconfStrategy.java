@@ -86,6 +86,7 @@ import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.OperationInputBody;
+import org.opendaylight.restconf.server.api.OperationOutputBody;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.PatchBody;
@@ -1453,7 +1454,8 @@ public abstract class RestconfStrategy {
         return ret;
     }
 
-    private @NonNull RestconfFuture<InvokeOperation> dataInvokePOST(final Action path, final OperationInputBody body) {
+    private @NonNull RestconfFuture<InvokeOperation> dataInvokePOST(final @NonNull Action path,
+            final @NonNull OperationInputBody body) {
         final ContainerNode input;
         try {
             input = body.toContainerNode(path);
@@ -1470,7 +1472,7 @@ public abstract class RestconfStrategy {
         final var future = dataInvokePOST(actionService, path, input);
         return future.transform(result -> result.getOutput()
             .flatMap(output -> output.isEmpty() ? Optional.empty()
-                : Optional.of(new InvokeOperation(new NormalizedNodePayload(path.inference(), output))))
+                : Optional.of(new InvokeOperation(new OperationOutputBody(path, output, false))))
             .orElse(InvokeOperation.EMPTY));
     }
 

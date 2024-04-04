@@ -15,7 +15,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
-public abstract sealed class ChildBody extends AbstractBody permits JsonChildBody, XmlChildBody {
+public abstract sealed class ChildBody extends RequestBody permits JsonChildBody, XmlChildBody {
     public record PrefixAndBody(@NonNull ImmutableList<PathArgument> prefix, @NonNull NormalizedNode body) {
         public PrefixAndBody {
             requireNonNull(prefix);
