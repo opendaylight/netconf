@@ -6,7 +6,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.utils.parser;
+package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.api.query.FieldsParam;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.AbstractFieldsTranslatorTest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -24,14 +25,14 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
- * Unit test for {@link NetconfFieldsTranslator}.
+ * Unit test for {@link NetconfFieldsParam}.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class NetconfFieldsTranslatorTest extends AbstractFieldsTranslatorTest<YangInstanceIdentifier> {
+public class NetconfFieldsParamTest extends AbstractFieldsTranslatorTest<YangInstanceIdentifier> {
     @Override
     protected List<YangInstanceIdentifier> translateFields(final EffectiveModelContext modelContext,
             final DataSchemaContext startNode, final FieldsParam fields) {
-        return NetconfFieldsTranslator.translate(modelContext, startNode, fields);
+        return NetconfRestconfStrategy.fieldsParamToPaths(modelContext, startNode, fields);
     }
 
     @Override
