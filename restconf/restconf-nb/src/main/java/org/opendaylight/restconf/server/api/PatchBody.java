@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.yang.common.ErrorType;
 /**
  * A YANG Patch body.
  */
-public abstract sealed class PatchBody extends AbstractBody permits JsonPatchBody, XmlPatchBody {
+public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody, XmlPatchBody {
     /**
      * Resource context needed to completely resolve a {@link PatchBody}.
      */

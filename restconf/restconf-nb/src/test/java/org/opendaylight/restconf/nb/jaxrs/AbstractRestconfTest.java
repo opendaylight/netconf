@@ -46,6 +46,7 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.server.api.OperationOutputBody;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -86,8 +87,28 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
             MediaTypes.APPLICATION_YANG_DATA_JSON);
     }
 
+    static final void assertJson(final String expectedJson, final OperationOutputBody payload) {
+        final var baos = new ByteArrayOutputStream();
+        try {
+            payload.writeJSON(baos);
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(expectedJson, baos.toString(StandardCharsets.UTF_8));
+    }
+
     static final void assertXml(final String expectedXml, final NormalizedNodePayload payload) {
         assertPayload(expectedXml, payload, new XmlNormalizedNodeBodyWriter(), MediaTypes.APPLICATION_YANG_DATA_XML);
+    }
+
+    static final void assertXml(final String expectedXml, final OperationOutputBody payload) {
+        final var baos = new ByteArrayOutputStream();
+        try {
+            payload.writeXML(baos);
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(expectedXml, baos.toString(StandardCharsets.UTF_8));
     }
 
     private static void assertPayload(final String expected, final NormalizedNodePayload payload,

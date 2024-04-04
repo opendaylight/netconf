@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
 /**
  * Result of a {@code POST} request as defined in
@@ -47,7 +46,7 @@ public sealed interface DataPostResult {
      *
      * @param output Non-empty operation output, or {@code null}
      */
-    record InvokeOperation(@Nullable NormalizedNodePayload output) implements DataPostResult {
-        public static final InvokeOperation EMPTY = new InvokeOperation(null);
+    record InvokeOperation(@Nullable OperationOutputBody output) implements DataPostResult {
+        public static final @NonNull InvokeOperation EMPTY = new InvokeOperation(null);
     }
 }

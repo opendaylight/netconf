@@ -22,7 +22,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 /**
  * Access to an {code rpc}'s or an {@code action}'s input.
  */
-public abstract sealed class OperationInputBody extends AbstractBody
+public abstract sealed class OperationInputBody extends RequestBody
         permits JsonOperationInputBody, XmlOperationInputBody {
     OperationInputBody(final InputStream inputStream) {
         super(inputStream);
