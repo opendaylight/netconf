@@ -34,7 +34,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.NetconfFieldsTranslator;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -89,7 +88,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         if (fields != null) {
             final List<YangInstanceIdentifier> tmp;
             try {
-                tmp = NetconfFieldsTranslator.translate(inference.modelContext(), path.schema(), fields);
+                tmp = NetconfFieldsParam.translate(inference.modelContext(), path.schema(), fields);
             } catch (RestconfDocumentedException e) {
                 return RestconfFuture.failed(e);
             }

@@ -6,7 +6,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.utils.parser;
+package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
 import static java.util.Objects.requireNonNull;
 
@@ -54,7 +54,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
  *           +- 'a/d' - 'd/x/e'
  * </pre>
  */
-public final class NetconfFieldsTranslator {
+final class NetconfFieldsParam {
     /**
      * {@link DataSchemaContext} of data element grouped with identifiers of leading mixin nodes and previous path
      * element.<br>
@@ -77,7 +77,7 @@ public final class NetconfFieldsTranslator {
         }
     }
 
-    private NetconfFieldsTranslator() {
+    private NetconfFieldsParam() {
         // Hidden on purpose
     }
 
@@ -91,13 +91,12 @@ public final class NetconfFieldsTranslator {
      * @return {@link List} of {@link YangInstanceIdentifier} that are relative to the last {@link PathArgument}
      *         of provided {@code identifier}
      */
-    public static @NonNull List<YangInstanceIdentifier> translate(
-            final @NonNull EffectiveModelContext modelContext, final @NonNull DataSchemaContext startNode,
-            final @NonNull FieldsParam input) {
+    static @NonNull List<YangInstanceIdentifier> translate(final @NonNull EffectiveModelContext modelContext,
+            final @NonNull DataSchemaContext startNode, final @NonNull FieldsParam input) {
         final var parsed = new HashSet<LinkedPathElement>();
         processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(),
             new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
-        return parsed.stream().map(NetconfFieldsTranslator::buildPath).toList();
+        return parsed.stream().map(NetconfFieldsParam::buildPath).toList();
     }
 
     private static void processSelectors(final Set<LinkedPathElement> parsed, final EffectiveModelContext context,
