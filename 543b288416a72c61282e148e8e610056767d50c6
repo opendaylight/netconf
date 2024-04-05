@@ -16,6 +16,24 @@
       "message": "This is too long. IIRC max 50 chars.",
       "revId": "543b288416a72c61282e148e8e610056767d50c6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eba54a9c_edf381fa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-04-05T08:02:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "292d5e4e_952060f6",
+      "revId": "543b288416a72c61282e148e8e610056767d50c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
