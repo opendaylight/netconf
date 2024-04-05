@@ -48,7 +48,7 @@ public abstract sealed class ResourceBody extends RequestBody permits JsonResour
         final var expectedName = instance.isEmpty() ? DATA_NID : instance.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
         try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
-            streamTo(path, expectedName, acquireStream(), streamWriter);
+            streamTo(path, expectedName, consume(), streamWriter);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,

@@ -18,11 +18,11 @@ public final class JsonDataPostBody extends DataPostBody {
 
     @Override
     public JsonOperationInputBody toOperationInput() {
-        return new JsonOperationInputBody(acquireStream());
+        return new JsonOperationInputBody(consume());
     }
 
     @Override
     public JsonChildBody toResource() {
-        return new JsonChildBody(acquireStream());
+        return new JsonChildBody(consume());
     }
 }
