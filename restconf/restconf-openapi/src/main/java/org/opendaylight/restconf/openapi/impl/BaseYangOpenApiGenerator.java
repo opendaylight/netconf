@@ -12,14 +12,20 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.Module;
 
 public abstract class BaseYangOpenApiGenerator {
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
@@ -38,7 +44,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
-        final var modules = context.getModules();
+        final var modules = getModulesWithoutDuplications(context);
         return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
             modules, basePath);
     }
@@ -89,4 +95,16 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public abstract String getBasePath();
+
+    public static Set<Module> getModulesWithoutDuplications(final @NonNull EffectiveModelContext schemaContext) {
+        return new LinkedHashSet<>(schemaContext.getModules()
+            .stream()
+            .collect(Collectors.toMap(
+                Module::getName,
+                Function.identity(),
+                (module1, module2) -> Revision.compare(
+                    module1.getRevision(), module2.getRevision()) > 0 ? module1 : module2,
+                LinkedHashMap::new))
+            .values());
+    }
 }
