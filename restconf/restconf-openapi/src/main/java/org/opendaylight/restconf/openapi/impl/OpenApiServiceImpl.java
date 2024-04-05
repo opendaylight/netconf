@@ -82,6 +82,18 @@ public final class OpenApiServiceImpl implements OpenApiService {
         return Response.ok(stream).build();
     }
 
+    @Override
+    public Response getModulePath(final String module, final String revision, final String reference,
+            final UriInfo uriInfo) throws IOException {
+        return null;
+    }
+
+    @Override
+    public Response getModuleSchema(final String module, final String revision, final String reference,
+            final UriInfo uriInfo) throws IOException {
+        return null;
+    }
+
     /**
      * Redirects to embedded swagger ui.
      */
@@ -107,6 +119,18 @@ public final class OpenApiServiceImpl implements OpenApiService {
             mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision,
                 0, 0, 3);
         return Response.ok(stream).build();
+    }
+
+    @Override
+    public Response getMountPath(final String instanceNum, final String module, final String revision,
+            final String reference, final UriInfo uriInfo) throws IOException {
+        return null;
+    }
+
+    @Override
+    public Response getMountSchema(final String instanceNum, final String module, final String revision,
+            final String reference, final UriInfo uriInfo) throws IOException {
+        return null;
     }
 
     @Override

@@ -70,6 +70,18 @@ public interface OpenApiService {
     Response getDocByModule(@PathParam("module") String module, @PathParam("revision") String revision,
                             @Context UriInfo uriInfo) throws IOException;
 
+    @GET
+    @Path("/paths/{module}({revision})({ref})")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getModulePath(@PathParam("module") String module, @PathParam("revision") String revision,
+        @PathParam("ref") String reference, @Context UriInfo uriInfo) throws IOException;
+
+    @GET
+    @Path("/schemas/{module}({revision})({ref})")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getModuleSchema(@PathParam("module") String module, @PathParam("revision") String revision,
+        @PathParam("ref") String reference, @Context UriInfo uriInfo) throws IOException;
+
     /**
      * Redirects to embedded swagger ui.
      */
@@ -97,6 +109,20 @@ public interface OpenApiService {
     Response getMountDocByModule(@PathParam("instance") String instanceNum,
                                  @PathParam("module") String module, @PathParam("revision") String revision,
                                  @Context UriInfo uriInfo) throws IOException;
+
+    @GET
+    @Path("/mounts/{instance}/paths/{module}({revision})({ref})")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getMountPath(@PathParam("instance") String instanceNum,
+        @PathParam("module") String module, @PathParam("revision") String revision, @PathParam("ref") String reference,
+        @Context UriInfo uriInfo) throws IOException;
+
+    @GET
+    @Path("/mounts/{instance}/schemas/{module}({revision})({ref})")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getMountSchema(@PathParam("instance") String instanceNum,
+        @PathParam("module") String module, @PathParam("revision") String revision, @PathParam("ref") String reference,
+        @Context UriInfo uriInfo) throws IOException;
 
     /**
      * Generates Swagger compliant document listing APIs for all modules of mount point.
