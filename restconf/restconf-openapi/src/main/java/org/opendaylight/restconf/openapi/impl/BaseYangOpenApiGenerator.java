@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.Module;
 
 public abstract class BaseYangOpenApiGenerator {
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
@@ -38,20 +40,20 @@ public abstract class BaseYangOpenApiGenerator {
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
-        final var modules = context.getModules();
+        final var modules = getModulesWithoutDuplications(context);
         return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
             modules, basePath);
     }
 
     public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo)
             throws IOException {
-        final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
-        Preconditions.checkState(schemaContext != null);
-        return getApiDeclaration(module, revision, uriInfo, schemaContext, "", CONTROLLER_RESOURCE_NAME);
+        final var modelContext = schemaService.getGlobalContext();
+        Preconditions.checkState(modelContext != null);
+        return getApiDeclaration(module, revision, uriInfo, modelContext, "", CONTROLLER_RESOURCE_NAME);
     }
 
     public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
-            final EffectiveModelContext schemaContext, final String urlPrefix, final @NonNull String deviceName)
+            final EffectiveModelContext modelContext, final String urlPrefix, final @NonNull String deviceName)
             throws IOException {
         final Optional<Revision> rev;
 
@@ -61,7 +63,7 @@ public abstract class BaseYangOpenApiGenerator {
             throw new IllegalArgumentException(e);
         }
 
-        final var module = schemaContext.findModule(moduleName, rev).orElse(null);
+        final var module = modelContext.findModule(moduleName, rev).orElse(null);
         Preconditions.checkArgument(module != null,
                 "Could not find module by name,revision: " + moduleName + "," + revision);
 
@@ -71,7 +73,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
         final var modules = List.of(module);
-        return new OpenApiInputStream(schemaContext, title, url, SECURITY,  deviceName, urlPrefix, true, false,
+        return new OpenApiInputStream(modelContext, title, url, SECURITY,  deviceName, urlPrefix, true, false,
             modules, basePath);
     }
 
@@ -89,4 +91,25 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public abstract String getBasePath();
+
+    public List<Module> getModulesWithoutDuplications(final EffectiveModelContext modelContext) {
+        if (modelContext == null) {
+            return List.of();
+        }
+        final var modulesWithoutDuplications = new HashMap<String, Module>();
+
+        for (final var module : modelContext.getModules()) {
+            final var moduleName = module.getName();
+            if (modulesWithoutDuplications.containsKey(moduleName)) {
+                final var duplication = modulesWithoutDuplications.get(moduleName);
+                if (Revision.compare(module.getRevision(), duplication.getRevision()) > 0) {
+                    // new value replaces old one
+                    modulesWithoutDuplications.put(moduleName, module);
+                }
+            } else {
+                modulesWithoutDuplications.put(moduleName, module);
+            }
+        }
+        return modulesWithoutDuplications.values().stream().toList();
+    }
 }
