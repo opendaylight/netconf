@@ -16,7 +16,6 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -28,6 +27,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -65,7 +65,7 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
     }
 
     @Override
-    public RestconfFuture<OperationsPostResult> invoke(final URI restconfURI, final OperationInput input) {
+    public RestconfFuture<ContainerNode> invoke(final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final var qnames = ((LeafSetNode<String>) body.getChildByArg(NOTIFICATIONS)).body().stream()
             .map(LeafSetEntryNode::body)
@@ -73,8 +73,7 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
             .sorted()
             .collect(ImmutableSet.toImmutableSet());
 
-        final var operPath = input.path();
-        final var modelContext = operPath.databind().modelContext();
+        final var modelContext = input.path().databind().modelContext();
         final var description = new StringBuilder("YANG notifications matching any of {");
         var haveFirst = false;
         for (var qname : qnames) {
@@ -106,9 +105,9 @@ public final class CreateNotificationStreamRpc extends RpcImplementation {
 
         return streamRegistry.createStream(restconfURI,
             new NotificationSource(databindProvider, notificationService, qnames), description.toString())
-            .transform(stream -> new OperationsPostResult(operPath, ImmutableNodes.newContainerBuilder()
+            .transform(stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(SAL_REMOTE_OUTPUT_NODEID)
                 .withChild(ImmutableNodes.leafNode(STREAM_NAME_NODEID, stream.name()))
-                .build()));
+                .build());
     }
 }

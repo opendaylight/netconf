@@ -121,7 +121,7 @@ public interface RestconfServer {
     RestconfFuture<DataPutResult> dataPUT(ApiPath identifier, ResourceBody body, Map<String, String> queryParameters);
 
     /**
-     * Return the set of supported RPCs supported by {@link #operationsPOST(URI, ApiPath, OperationInputBody)},
+     * Return the set of supported RPCs supported by {@link #operationsPOST(URI, ApiPath, Map, OperationInputBody)},
      * as expressed in the <a href="https://www.rfc-editor.org/rfc/rfc8040#page-84">ietf-restconf.yang</a>
      * {@code container operations} statement.
      *
@@ -146,12 +146,14 @@ public interface RestconfServer {
      *
      * @param restconfURI Base URI of the request
      * @param operation {@code <operation>} path, really an {@link ApiPath} to an {@code rpc}
+     * @param queryParameters query parameters
      * @param body RPC operation
-     * @return A {@link RestconfFuture} completing with {@link OperationsPostResult}
+     * @return A {@link RestconfFuture} completing with {@link InvokeResult}
      */
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support yang-ext:mount,
     //        and hence it is a path right now
-    RestconfFuture<OperationsPostResult> operationsPOST(URI restconfURI, ApiPath operation, OperationInputBody body);
+    RestconfFuture<InvokeResult> operationsPOST(URI restconfURI, ApiPath operation, Map<String, String> queryParameters,
+        OperationInputBody body);
 
     /**
      * Return the revision of {@code ietf-yang-library} module implemented by this server, as defined in

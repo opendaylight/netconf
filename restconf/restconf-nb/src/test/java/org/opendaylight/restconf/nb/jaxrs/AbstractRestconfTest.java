@@ -91,7 +91,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     static final void assertJson(final String expectedJson, final OperationOutputBody payload) {
         final var baos = new ByteArrayOutputStream();
         try {
-            payload.writeJSON(baos);
+            payload.formatToJSON(baos);
         } catch (IOException e) {
             throw new AssertionError(e);
         }
@@ -105,7 +105,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     static final void assertXml(final String expectedXml, final OperationOutputBody payload) {
         final var baos = new ByteArrayOutputStream();
         try {
-            payload.writeXML(baos);
+            payload.formatToXML(baos);
         } catch (IOException e) {
             throw new AssertionError(e);
         }
@@ -160,19 +160,23 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
 
     static final List<RestconfError> assertErrors(final Consumer<AsyncResponse> invocation) {
         final var ar = mock(AsyncResponse.class);
-        final var captor = ArgumentCaptor.forClass(RestconfDocumentedException.class);
-        doReturn(true).when(ar).resume(captor.capture());
+        doReturn(true).when(ar).resume(any(RestconfDocumentedException.class));
+
         invocation.accept(ar);
-        verify(ar).resume(any(RestconfDocumentedException.class));
+
+        final var captor = ArgumentCaptor.forClass(RestconfDocumentedException.class);
+        verify(ar).resume(captor.capture());
         return captor.getValue().getErrors();
     }
 
     static final Response assertResponse(final int expectedStatus, final Consumer<AsyncResponse> invocation) {
         final var ar = mock(AsyncResponse.class);
-        final var captor = ArgumentCaptor.forClass(Response.class);
-        doReturn(true).when(ar).resume(captor.capture());
+        doReturn(true).when(ar).resume(any(Response.class));
+
         invocation.accept(ar);
-        verify(ar).resume(any(Response.class));
+
+        final var captor = ArgumentCaptor.forClass(Response.class);
+        verify(ar).resume(captor.capture());
         final var response = captor.getValue();
         assertEquals(expectedStatus, response.getStatus());
         return response;

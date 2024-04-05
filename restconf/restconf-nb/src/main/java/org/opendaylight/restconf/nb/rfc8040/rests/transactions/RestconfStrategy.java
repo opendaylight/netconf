@@ -76,7 +76,6 @@ import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
-import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -84,11 +83,13 @@ import org.opendaylight.restconf.server.api.DatabindPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Action;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
+import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
+import org.opendaylight.restconf.server.api.InvokeParams;
+import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.OperationOutputBody;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
-import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
@@ -1285,13 +1286,21 @@ public abstract class RestconfStrategy {
         return RestconfFuture.of(new OperationsGetResult.Leaf(rpc.inference().modelContext(), rpc.rpc().argument()));
     }
 
-    public @NonNull RestconfFuture<OperationsPostResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
-            final OperationInputBody body) {
+    public @NonNull RestconfFuture<InvokeResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
+            final Map<String, String> queryParameters, final OperationInputBody body) {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
+        }
+
+        final InvokeParams params;
+        try {
+            params = InvokeParams.ofQueryParameters(queryParameters);
+        } catch (IllegalArgumentException e) {
+            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
         }
 
         final ContainerNode data;
@@ -1306,7 +1315,8 @@ public abstract class RestconfStrategy {
         final var type = path.rpc().argument();
         final var local = localRpcs.get(type);
         if (local != null) {
-            return local.invoke(restconfURI, new OperationInput(path, data));
+            return local.invoke(restconfURI, new OperationInput(path, data))
+                .transform(output -> outputToInvokeResult(path, params, output));
         }
         if (rpcService == null) {
             LOG.debug("RPC invocation is not available");
@@ -1314,13 +1324,13 @@ public abstract class RestconfStrategy {
                 ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED));
         }
 
-        final var ret = new SettableRestconfFuture<OperationsPostResult>();
+        final var ret = new SettableRestconfFuture<InvokeResult>();
         Futures.addCallback(rpcService.invokeRpc(type, data), new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult response) {
                 final var errors = response.errors();
                 if (errors.isEmpty()) {
-                    ret.set(new OperationsPostResult(path, response.value()));
+                    ret.set(outputToInvokeResult(path, params, response.value()));
                 } else {
                     LOG.debug("RPC invocation reported {}", response.errors());
                     ret.setFailure(new RestconfDocumentedException("RPC implementation reported errors", null,
@@ -1341,6 +1351,12 @@ public abstract class RestconfStrategy {
             }
         }, MoreExecutors.directExecutor());
         return ret;
+    }
+
+    private static @NonNull InvokeResult outputToInvokeResult(final @NonNull OperationPath path,
+            final @NonNull InvokeParams params, final @Nullable ContainerNode value) {
+        return value == null || value.isEmpty() ? InvokeResult.EMPTY
+            : new InvokeResult(new OperationOutputBody(params, path, value));
     }
 
     public @NonNull RestconfFuture<CharSource> resolveSource(final SourceIdentifier source,
@@ -1419,7 +1435,7 @@ public abstract class RestconfStrategy {
         }
         if (path instanceof Action actionPath) {
             try (var inputBody = body.toOperationInput()) {
-                return dataInvokePOST(actionPath, inputBody);
+                return dataInvokePOST(actionPath, inputBody, queryParameters);
             }
         }
         // Note: this should never happen
@@ -1454,8 +1470,16 @@ public abstract class RestconfStrategy {
         return ret;
     }
 
-    private @NonNull RestconfFuture<InvokeOperation> dataInvokePOST(final @NonNull Action path,
-            final @NonNull OperationInputBody body) {
+    private @NonNull RestconfFuture<InvokeResult> dataInvokePOST(final @NonNull Action path,
+            final @NonNull OperationInputBody body, final Map<String, String> queryParameters) {
+        final InvokeParams params;
+        try {
+            params = InvokeParams.ofQueryParameters(queryParameters);
+        } catch (IllegalArgumentException e) {
+            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+        }
+
         final ContainerNode input;
         try {
             input = body.toContainerNode(path);
@@ -1469,11 +1493,8 @@ public abstract class RestconfStrategy {
             return RestconfFuture.failed(new RestconfDocumentedException("DOMActionService is missing."));
         }
 
-        final var future = dataInvokePOST(actionService, path, input);
-        return future.transform(result -> result.getOutput()
-            .flatMap(output -> output.isEmpty() ? Optional.empty()
-                : Optional.of(new InvokeOperation(new OperationOutputBody(path, output, false))))
-            .orElse(InvokeOperation.EMPTY));
+        return dataInvokePOST(actionService, path, input)
+            .transform(result -> outputToInvokeResult(path, params, result.getOutput().orElse(null)));
     }
 
     /**

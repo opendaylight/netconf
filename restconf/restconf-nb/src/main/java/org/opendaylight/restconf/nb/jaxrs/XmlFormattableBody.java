@@ -13,13 +13,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.api.MediaTypes;
-import org.opendaylight.restconf.server.api.ReplyBody;
+import org.opendaylight.restconf.server.api.FormattableBody;
 
 @Provider
-@Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-public final class JsonReplyBodyWriter extends ReplyBodyWriter {
+@Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+public final class XmlFormattableBody extends FormattableBodyWriter {
     @Override
-    void writeTo(final ReplyBody body, final OutputStream out) throws IOException {
-        body.writeJSON(out);
+    void writeTo(final FormattableBody body, final OutputStream out) throws IOException {
+        body.formatToXML(out);
     }
 }

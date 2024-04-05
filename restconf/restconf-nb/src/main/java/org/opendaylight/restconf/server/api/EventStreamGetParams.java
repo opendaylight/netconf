@@ -14,7 +14,6 @@ import com.google.common.base.MoreObjects;
 import java.util.Map;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.FilterParam;
@@ -75,27 +74,27 @@ public record EventStreamGetParams(
 
             switch (paramName) {
                 case FilterParam.uriName:
-                    filter = optionalParam(FilterParam::forUriValue, paramName, paramValue);
+                    filter = mandatoryParam(FilterParam::forUriValue, paramName, paramValue);
                     break;
                 case StartTimeParam.uriName:
-                    startTime = optionalParam(StartTimeParam::forUriValue, paramName, paramValue);
+                    startTime = mandatoryParam(StartTimeParam::forUriValue, paramName, paramValue);
                     break;
                 case StopTimeParam.uriName:
-                    stopTime = optionalParam(StopTimeParam::forUriValue, paramName, paramValue);
+                    stopTime = mandatoryParam(StopTimeParam::forUriValue, paramName, paramValue);
                     break;
                 case LeafNodesOnlyParam.uriName:
-                    leafNodesOnly = optionalParam(LeafNodesOnlyParam::forUriValue, paramName, paramValue);
+                    leafNodesOnly = mandatoryParam(LeafNodesOnlyParam::forUriValue, paramName, paramValue);
                     break;
                 case SkipNotificationDataParam.uriName:
-                    skipNotificationData = optionalParam(SkipNotificationDataParam::forUriValue, paramName,
+                    skipNotificationData = mandatoryParam(SkipNotificationDataParam::forUriValue, paramName,
                         paramValue);
                     break;
                 case ChangedLeafNodesOnlyParam.uriName:
-                    changedLeafNodesOnly = optionalParam(ChangedLeafNodesOnlyParam::forUriValue, paramName,
+                    changedLeafNodesOnly = mandatoryParam(ChangedLeafNodesOnlyParam::forUriValue, paramName,
                         paramValue);
                     break;
                 case ChildNodesOnlyParam.uriName:
-                    childNodesOnly = optionalParam(ChildNodesOnlyParam::forUriValue, paramName, paramValue);
+                    childNodesOnly = mandatoryParam(ChildNodesOnlyParam::forUriValue, paramName, paramValue);
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid parameter: " + paramName);
@@ -134,7 +133,7 @@ public record EventStreamGetParams(
     }
 
     // FIXME: find a better place for this method
-    public static <T> @Nullable T optionalParam(final Function<String, @NonNull T> factory, final String name,
+    public static <T> @NonNull T mandatoryParam(final Function<String, @NonNull T> factory, final String name,
             final String value) {
         try {
             return factory.apply(requireNonNull(value));

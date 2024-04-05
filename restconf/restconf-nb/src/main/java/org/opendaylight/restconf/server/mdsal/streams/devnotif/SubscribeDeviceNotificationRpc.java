@@ -15,7 +15,6 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -29,6 +28,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -58,7 +58,7 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
     }
 
     @Override
-    public RestconfFuture<OperationsPostResult> invoke(final URI restconfURI, final OperationInput input) {
+    public RestconfFuture<ContainerNode> invoke(final URI restconfURI, final OperationInput input) {
         final var body = input.input();
         final var pathLeaf = body.childByArg(DEVICE_NOTIFICATION_PATH_NODEID);
         if (pathLeaf == null) {
@@ -79,14 +79,12 @@ public final class SubscribeDeviceNotificationRpc extends RpcImplementation {
                 ErrorType.APPLICATION, ErrorTag.INVALID_VALUE));
         }
 
-        final var operPath = input.path();
-
         return streamRegistry.createStream(restconfURI, new DeviceNotificationSource(mountPointService, path),
             "All YANG notifications occuring on mount point /"
-                + new ApiPathCanonizer(operPath.databind()).dataToApiPath(path).toString())
-            .transform(stream -> new OperationsPostResult(operPath, ImmutableNodes.newContainerBuilder()
+                + new ApiPathCanonizer(input.path().databind()).dataToApiPath(path).toString())
+            .transform(stream -> ImmutableNodes.newContainerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(SubscribeDeviceNotificationOutput.QNAME))
                 .withChild(ImmutableNodes.leafNode(DEVICE_NOTIFICATION_STREAM_NAME_NODEID, stream.name()))
-                .build()));
+                .build());
     }
 }

@@ -17,22 +17,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.server.api.ReplyBody;
+import org.opendaylight.restconf.server.api.FormattableBody;
 
-abstract sealed class ReplyBodyWriter implements MessageBodyWriter<ReplyBody>
-        permits JsonReplyBodyWriter, XmlReplyBodyWriter {
+abstract sealed class FormattableBodyWriter implements MessageBodyWriter<FormattableBody>
+        permits JsonFormattableBody, XmlFormattableBody {
     @Override
     public final boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations,
             final MediaType mediaType) {
-        return ReplyBody.class.isAssignableFrom(type);
+        return FormattableBody.class.isAssignableFrom(type);
     }
 
     @Override
-    public final void writeTo(final ReplyBody body, final Class<?> type, final Type genericType,
+    public final void writeTo(final FormattableBody body, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
         writeTo(requireNonNull(body), requireNonNull(entityStream));
     }
 
-    abstract void writeTo(@NonNull ReplyBody body, @NonNull OutputStream out) throws IOException;
+    abstract void writeTo(@NonNull FormattableBody body, @NonNull OutputStream out) throws IOException;
 }

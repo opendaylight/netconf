@@ -19,10 +19,11 @@ public final class PrettyPrintParam implements RestconfQueryParam<PrettyPrintPar
     @SuppressWarnings("checkstyle:ConstantName")
     public static final String uriName = "odl-pretty-print";
 
+    public static final @NonNull PrettyPrintParam FALSE = new PrettyPrintParam(false);
+    public static final @NonNull PrettyPrintParam TRUE = new PrettyPrintParam(true);
+
     private static final @NonNull URI CAPABILITY =
         URI.create("urn:opendaylight:params:restconf:capability:pretty-print:1.0");
-    private static final @NonNull PrettyPrintParam FALSE = new PrettyPrintParam(false);
-    private static final @NonNull PrettyPrintParam TRUE = new PrettyPrintParam(true);
 
     private final boolean value;
 

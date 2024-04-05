@@ -16,7 +16,6 @@ import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
  * Supported query parameters of {@code /data} {@code GET} HTTP operation, as defined in
@@ -27,10 +26,12 @@ public record DataGetParams(
         @Nullable DepthParam depth,
         @Nullable FieldsParam fields,
         @Nullable WithDefaultsParam withDefaults,
-        @Nullable PrettyPrintParam prettyPrint) implements Immutable {
-    public static final @NonNull DataGetParams EMPTY = new DataGetParams(ContentParam.ALL, null, null, null, null);
+        @NonNull PrettyPrintParam prettyPrint) implements FormatParameters {
+    public static final @NonNull DataGetParams EMPTY =
+        new DataGetParams(ContentParam.ALL, null, null, null, PrettyPrintParam.FALSE);
 
     public DataGetParams {
         requireNonNull(content);
+        requireNonNull(prettyPrint);
     }
 }

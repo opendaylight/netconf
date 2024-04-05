@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * Result of a {@code POST} request as defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4">RFC8040 section 4.4</a>.
  */
-public sealed interface DataPostResult {
+public sealed interface DataPostResult permits DataPostResult.CreateResource, InvokeResult {
     /**
      * Result of a {@code POST} request in as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4.1">RFC8040 Create Resource Mode</a>.
@@ -38,15 +38,5 @@ public sealed interface DataPostResult {
         public CreateResource(final @NonNull String createdPath) {
             this(createdPath, null, null);
         }
-    }
-
-    /**
-     * Result of a {@code POST} request as defined in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4.2">RFC8040 Invoke Operation Mode</a>.
-     *
-     * @param output Non-empty operation output, or {@code null}
-     */
-    record InvokeOperation(@Nullable OperationOutputBody output) implements DataPostResult {
-        public static final @NonNull InvokeOperation EMPTY = new InvokeOperation(null);
     }
 }

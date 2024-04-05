@@ -10,6 +10,7 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -21,15 +22,15 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStr
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 /**
- * A {@link ReplyBody} corresponding to a {@code rpc} or {@code action} invocation.
+ * A {@link FormattableBody} corresponding to a {@code rpc} or {@code action} invocation.
  */
 @NonNullByDefault
-public final class OperationOutputBody extends ReplyBody {
+public final class OperationOutputBody extends FormattableBody {
     private final OperationPath path;
     private final ContainerNode output;
 
-    public OperationOutputBody(final OperationPath path, final ContainerNode output, final boolean prettyPrint) {
-        super(prettyPrint);
+    public OperationOutputBody(final FormatParameters format, final OperationPath path, final ContainerNode output) {
+        super(format);
         this.path = requireNonNull(path);
         this.output = requireNonNull(output);
         if (output.isEmpty()) {
@@ -43,12 +44,12 @@ public final class OperationOutputBody extends ReplyBody {
     }
 
     @Override
-    void writeJSON(final OutputStream out, final boolean prettyPrint) throws IOException {
+    void formatToJSON(final OutputStream out, final FormatParameters format) throws IOException {
         final var stack = prepareStack();
 
         // RpcDefinition/ActionDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit
         // initial output declaration
-        try (var jsonWriter = createJsonWriter(out, prettyPrint)) {
+        try (var jsonWriter = createJsonWriter(out, format)) {
             final var module = stack.currentModule();
             jsonWriter.beginObject().name(module.argument().getLocalName() + ":output").beginObject();
 
@@ -65,17 +66,22 @@ public final class OperationOutputBody extends ReplyBody {
     }
 
     @Override
-    void writeXML(final OutputStream out, final boolean prettyPrint) throws IOException {
+    void formatToXML(final OutputStream out, final FormatParameters format) throws IOException {
         final var stack = prepareStack();
 
         // RpcDefinition/ActionDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit
         // initial output declaration.
-        final var xmlWriter = createXmlWriter(out, prettyPrint);
+        final var xmlWriter = createXmlWriter(out, format);
         final var nnWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
             XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, stack.toInference()), null, null);
 
         writeElements(xmlWriter, nnWriter, output);
         nnWriter.flush();
+    }
+
+    @Override
+    ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        return super.addToStringAttributes(helper.add("path", path).add("output", output.prettyTree()));
     }
 
     private SchemaInferenceStack prepareStack() {

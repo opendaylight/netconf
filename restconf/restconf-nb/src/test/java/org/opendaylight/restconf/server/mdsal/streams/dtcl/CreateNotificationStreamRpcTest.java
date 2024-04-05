@@ -98,7 +98,7 @@ class CreateNotificationStreamRpcTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
         final var output = assertInstanceOf(ContainerNode.class, rpc.invoke(RESTCONF_URI, createInput("path", TOASTER))
-            .getOrThrow().output());
+            .getOrThrow());
 
         assertEquals(new NodeIdentifier(CreateDataChangeEventSubscriptionOutput.QNAME), output.name());
         assertEquals(1, output.size());

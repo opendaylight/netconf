@@ -9,21 +9,16 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 import javax.xml.XMLConstants;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.MediaTypes;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.server.api.FormattableBody;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -37,13 +32,6 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 @Provider
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
-    private static final XMLOutputFactory XML_FACTORY;
-
-    static {
-        XML_FACTORY = XMLOutputFactory.newFactory();
-        XML_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-    }
-
     @Override
     void writeData(final SchemaInferenceStack stack, final QueryParameters writerParameters, final NormalizedNode data,
             final OutputStream entityStream) throws IOException {
@@ -55,7 +43,7 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
             isRoot = true;
         }
 
-        final var xmlWriter = createXmlWriter(entityStream, writerParameters.prettyPrint());
+        final var xmlWriter = FormattableBody.createXmlWriter(entityStream, writerParameters);
         final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), writerParameters);
         if (data instanceof MapEntryNode mapEntry) {
             // Restconf allows returning one list item. We need to wrap it
@@ -74,18 +62,6 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
             nnWriter.write(data);
         }
         nnWriter.flush();
-    }
-
-    private static XMLStreamWriter createXmlWriter(final OutputStream entityStream,
-            final @Nullable PrettyPrintParam prettyPrint) throws IOException {
-        final XMLStreamWriter xmlWriter;
-        try {
-            xmlWriter = XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
-        } catch (XMLStreamException | FactoryConfigurationError e) {
-            throw new IOException(e);
-        }
-
-        return prettyPrint != null && prettyPrint.value() ? new IndentingXMLStreamWriter(xmlWriter) : xmlWriter;
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,

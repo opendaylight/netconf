@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.server.api.EventStreamGetParams.optionalParam;
+import static org.opendaylight.restconf.server.api.EventStreamGetParams.mandatoryParam;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
@@ -69,10 +69,10 @@ public final class Insert implements Immutable {
 
             switch (paramName) {
                 case InsertParam.uriName:
-                    insert = optionalParam(InsertParam::forUriValue, paramName, paramValue);
+                    insert = mandatoryParam(InsertParam::forUriValue, paramName, paramValue);
                     break;
                 case PointParam.uriName:
-                    point = optionalParam(PointParam::forUriValue, paramName, paramValue);
+                    point = mandatoryParam(PointParam::forUriValue, paramName, paramValue);
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid parameter: " + paramName);

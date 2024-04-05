@@ -93,7 +93,7 @@ public final class QueryParams {
         DepthParam depth = null;
         FieldsParam fields = null;
         WithDefaultsParam withDefaults = null;
-        PrettyPrintParam prettyPrint = null;
+        PrettyPrintParam prettyPrint = PrettyPrintParam.FALSE;
 
         for (var entry : uriInfo.getQueryParameters().entrySet()) {
             final var paramName = entry.getKey();

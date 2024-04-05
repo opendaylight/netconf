@@ -34,14 +34,14 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
  * to an {@link OutputStream}.
  */
 @NonNullByDefault
-public abstract class ReplyBody implements Immutable {
+public abstract class FormattableBody implements Immutable {
     private static final XMLOutputFactory XML_FACTORY = XMLOutputFactory.newFactory();
     private static final String PRETTY_PRINT_INDENT = "  ";
 
-    private final boolean prettyPrint;
+    private final FormatParameters format;
 
-    ReplyBody(final boolean prettyPrint) {
-        this.prettyPrint = prettyPrint;
+    FormattableBody(final FormatParameters format) {
+        this.format = requireNonNull(format);
     }
 
     /**
@@ -50,11 +50,11 @@ public abstract class ReplyBody implements Immutable {
      * @param out output stream
      * @throws IOException if an IO error occurs.
      */
-    public final void writeJSON(final OutputStream out) throws IOException {
-        writeJSON(requireNonNull(out), prettyPrint);
+    public final void formatToJSON(final OutputStream out) throws IOException {
+        formatToJSON(requireNonNull(out), format);
     }
 
-    abstract void writeJSON(OutputStream out, boolean prettyPrint) throws IOException;
+    abstract void formatToJSON(OutputStream out, FormatParameters format) throws IOException;
 
     /**
      * Write the content of this body as an XML document.
@@ -62,11 +62,11 @@ public abstract class ReplyBody implements Immutable {
      * @param out output stream
      * @throws IOException if an IO error occurs.
      */
-    public final void writeXML(final OutputStream out) throws IOException {
-        writeXML(requireNonNull(out), prettyPrint);
+    public final void formatToXML(final OutputStream out) throws IOException {
+        formatToXML(requireNonNull(out), format);
     }
 
-    abstract void writeXML(OutputStream out, boolean prettyPrint) throws IOException;
+    abstract void formatToXML(OutputStream out, FormatParameters format) throws IOException;
 
     @Override
     public final String toString() {
@@ -74,18 +74,19 @@ public abstract class ReplyBody implements Immutable {
     }
 
     ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-        return helper.add("prettyPrint", prettyPrint);
+        return helper.add("prettyPrint", format.prettyPrint().value());
     }
 
-    static final JsonWriter createJsonWriter(final OutputStream out, final boolean prettyPrint) {
+    public static final JsonWriter createJsonWriter(final OutputStream out, final FormatParameters format) {
         final var ret = JsonWriterFactory.createJsonWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
-        ret.setIndent(prettyPrint ? PRETTY_PRINT_INDENT : "");
+        ret.setIndent(format.prettyPrint().value() ? PRETTY_PRINT_INDENT : "");
         return ret;
     }
 
-    static final XMLStreamWriter createXmlWriter(final OutputStream out, final boolean prettyPrint) throws IOException {
+    public static final XMLStreamWriter createXmlWriter(final OutputStream out, final FormatParameters format)
+            throws IOException {
         final var xmlWriter = createXmlWriter(out);
-        return prettyPrint ? new IndentingXMLStreamWriter(xmlWriter) : xmlWriter;
+        return format.prettyPrint().value() ? new IndentingXMLStreamWriter(xmlWriter) : xmlWriter;
     }
 
     private static XMLStreamWriter createXmlWriter(final OutputStream out) throws IOException {

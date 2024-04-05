@@ -46,10 +46,10 @@ import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
-import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -337,8 +337,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<OperationsPostResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
-            final OperationInputBody body) {
+    public RestconfFuture<InvokeResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
+            final Map<String, String> queryParameters, final OperationInputBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(apiPath);
@@ -346,7 +346,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             return RestconfFuture.failed(e);
         }
         final var strategy = strategyAndTail.strategy();
-        return strategy.operationsPOST(restconfURI, strategyAndTail.tail(), body);
+        return strategy.operationsPOST(restconfURI, strategyAndTail.tail(), queryParameters, body);
     }
 
     @Override

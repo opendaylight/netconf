@@ -59,9 +59,9 @@ import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
-import org.opendaylight.restconf.server.api.DataPostResult.InvokeOperation;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
+import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.JsonChildBody;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
 import org.opendaylight.restconf.server.api.JsonOperationInputBody;
@@ -69,9 +69,7 @@ import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
-import org.opendaylight.restconf.server.api.OperationOutputBody;
 import org.opendaylight.restconf.server.api.OperationsGetResult;
-import org.opendaylight.restconf.server.api.OperationsPostResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
@@ -520,7 +518,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                     fillConfigurationMetadata(builder, createResource);
                     return builder.build();
                 }
-                if (result instanceof InvokeOperation invokeOperation) {
+                if (result instanceof InvokeResult invokeOperation) {
                     final var output = invokeOperation.output();
                     return output == null ? Response.status(Status.NO_CONTENT).build()
                         : Response.status(Status.OK).entity(output).build();
@@ -756,13 +754,13 @@ public final class JaxRsRestconf implements ParamConverterProvider {
 
     private void operationsPOST(final ApiPath identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
-        server.operationsPOST(uriInfo.getBaseUri(), identifier, body)
-            .addCallback(new JaxRsRestconfCallback<OperationsPostResult>(ar) {
+        server.operationsPOST(uriInfo.getBaseUri(), identifier, QueryParams.normalize(uriInfo), body)
+            .addCallback(new JaxRsRestconfCallback<>(ar) {
                 @Override
-                Response transform(final OperationsPostResult result) {
+                Response transform(final InvokeResult result) {
                     final var body = result.output();
                     return body == null ? Response.noContent().build()
-                        : Response.ok().entity(new OperationOutputBody(result.path(), body, false)).build();
+                        : Response.ok().entity(body).build();
                 }
             });
     }

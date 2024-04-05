@@ -18,6 +18,8 @@ import static org.mockito.Mockito.mock;
 import com.google.common.util.concurrent.Futures;
 import java.util.List;
 import java.util.Optional;
+import javax.ws.rs.core.MultivaluedHashMap;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -69,6 +71,11 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
     @Override
     EffectiveModelContext modelContext() {
         return MODEL_CONTEXT;
+    }
+
+    @BeforeEach
+    void setupUriInfo() {
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
     }
 
     @Test
