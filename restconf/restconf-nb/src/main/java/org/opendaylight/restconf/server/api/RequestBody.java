@@ -7,67 +7,21 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import static java.util.Objects.requireNonNull;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.api.ConsumableBody;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.yangtools.concepts.Mutable;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfError;
 import org.opendaylight.yangtools.yang.data.api.YangNetconfErrorAware;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An abstract request body backed by an {@link InputStream}. In controls the access to input stream, so that it can
  * only be taken once.
  */
-public abstract sealed class RequestBody implements AutoCloseable, Mutable
+abstract sealed class RequestBody extends ConsumableBody
         permits ChildBody, DataPostBody, OperationInputBody, PatchBody, ResourceBody {
-    private static final Logger LOG = LoggerFactory.getLogger(RequestBody.class);
-
-    private static final VarHandle INPUT_STREAM;
-
-    static {
-        try {
-            INPUT_STREAM = MethodHandles.lookup().findVarHandle(RequestBody.class, "inputStream", InputStream.class);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
-    private volatile InputStream inputStream;
-
     RequestBody(final InputStream inputStream) {
-        this.inputStream = requireNonNull(inputStream);
-    }
-
-    @Override
-    public final void close() {
-        final var is = getStream();
-        if (is != null) {
-            try {
-                is.close();
-            } catch (IOException e) {
-                LOG.info("Failed to close input", e);
-            }
-        }
-    }
-
-    final @NonNull InputStream acquireStream() {
-        final var is = getStream();
-        if (is == null) {
-            throw new IllegalStateException("Input stream has already been consumed");
-        }
-        return is;
+        super(inputStream);
     }
 
     /**
@@ -83,9 +37,5 @@ public abstract sealed class RequestBody implements AutoCloseable, Mutable
                     null, error.path()))
                 .toList());
         }
-    }
-
-    private @Nullable InputStream getStream() {
-        return (InputStream) INPUT_STREAM.getAndSet(this, null);
     }
 }

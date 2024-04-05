@@ -53,7 +53,7 @@ public abstract sealed class PatchBody extends RequestBody permits JsonPatchBody
     }
 
     public final @NonNull PatchContext toPatchContext(final @NonNull ResourceContext resource) throws IOException {
-        try (var is = acquireStream()) {
+        try (var is = consume()) {
             return toPatchContext(resource, is);
         }
     }

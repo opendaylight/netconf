@@ -18,11 +18,11 @@ public final class XmlDataPostBody extends DataPostBody {
 
     @Override
     public XmlOperationInputBody toOperationInput() {
-        return new XmlOperationInputBody(acquireStream());
+        return new XmlOperationInputBody(consume());
     }
 
     @Override
     public XmlChildBody toResource() {
-        return new XmlChildBody(acquireStream());
+        return new XmlChildBody(consume());
     }
 }

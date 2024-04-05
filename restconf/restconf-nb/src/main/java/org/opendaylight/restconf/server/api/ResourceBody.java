@@ -43,12 +43,12 @@ public abstract sealed class ResourceBody extends RequestBody permits JsonResour
      * @throws RestconfDocumentedException if the body cannot be decoded or it does not match {@code path}
      */
     @SuppressWarnings("checkstyle:illegalCatch")
-    public @NonNull NormalizedNode toNormalizedNode(final DatabindPath.@NonNull Data path) {
+    public final @NonNull NormalizedNode toNormalizedNode(final DatabindPath.@NonNull Data path) {
         final var instance = path.instance();
         final var expectedName = instance.isEmpty() ? DATA_NID : instance.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
         try (var streamWriter = ImmutableNormalizedNodeStreamWriter.from(holder)) {
-            streamTo(path, expectedName, acquireStream(), streamWriter);
+            streamTo(path, expectedName, consume(), streamWriter);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,

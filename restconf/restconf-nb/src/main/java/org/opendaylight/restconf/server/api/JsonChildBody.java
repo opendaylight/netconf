@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
 import java.io.InputStream;
@@ -42,8 +41,9 @@ public final class JsonChildBody extends ChildBody {
         NormalizedNode result;
         try {
             result = toNormalizedNode(path, inputStream);
+        } catch (RestconfDocumentedException e) {
+            throw e;
         } catch (Exception e) {
-            Throwables.throwIfInstanceOf(e, RestconfDocumentedException.class);
             LOG.debug("Error parsing json input", e);
 
             if (e instanceof ResultAlreadySetException) {
