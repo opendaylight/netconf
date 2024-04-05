@@ -36,7 +36,7 @@ public abstract sealed class OperationInputBody extends RequestBody
      * @throws IOException when an I/O error occurs
      */
     public @NonNull ContainerNode toContainerNode(final @NonNull OperationPath path) throws IOException {
-        try (var is = new PushbackInputStream(acquireStream())) {
+        try (var is = new PushbackInputStream(consume())) {
             final var firstByte = is.read();
             if (firstByte == -1) {
                 return ImmutableNodes.newContainerBuilder()
