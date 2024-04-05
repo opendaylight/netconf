@@ -12,14 +12,18 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.Module;
 
 public abstract class BaseYangOpenApiGenerator {
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
@@ -38,7 +42,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
-        final var modules = context.getModules();
+        final var modules = getSortedModules(context);
         return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
             modules, basePath);
     }
@@ -89,4 +93,38 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public abstract String getBasePath();
+
+    public SortedSet<Module> getSortedModules(final EffectiveModelContext schemaContext) {
+        if (schemaContext == null) {
+            return Collections.emptySortedSet();
+        }
+
+        final SortedSet<Module> sortedModules = new TreeSet<>((module1, module2) -> {
+            int result = module1.getName().compareTo(module2.getName());
+            if (result == 0) {
+                result = Revision.compare(module1.getRevision(), module2.getRevision());
+            }
+            if (result == 0) {
+                result = module1.getNamespace().compareTo(module2.getNamespace());
+            }
+            return result;
+        });
+        for (final Module m : schemaContext.getModules()) {
+            if (m != null) {
+                if (sortedModules.isEmpty() || !containsModule(m.getName(), sortedModules)) {
+                    sortedModules.add(m);
+                }
+            }
+        }
+        return sortedModules;
+    }
+
+    private boolean containsModule(final String moduleName, final SortedSet<Module> sortedModules) {
+        for (final Module m : sortedModules) {
+            if (m.getName().equals(moduleName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
