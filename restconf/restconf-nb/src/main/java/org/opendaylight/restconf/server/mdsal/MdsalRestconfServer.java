@@ -38,12 +38,12 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.ChildBody;
+import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostResult;
-import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -209,7 +209,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<CreateResource> dataPOST(final ChildBody body, final Map<String, String> queryParameters) {
+    public RestconfFuture<CreateResourceResult> dataPOST(final ChildBody body,
+            final Map<String, String> queryParameters) {
         return localStrategy().dataCreatePOST(body, queryParameters);
     }
 

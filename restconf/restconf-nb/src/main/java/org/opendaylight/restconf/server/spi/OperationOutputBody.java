@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.server.api;
+package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
@@ -22,7 +22,6 @@ import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.ParameterAwareNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
-import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;

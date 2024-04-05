@@ -66,12 +66,12 @@ import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
+import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostResult;
-import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -84,13 +84,13 @@ import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
 import org.opendaylight.restconf.server.api.InvokeParams;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
-import org.opendaylight.restconf.server.api.OperationOutputBody;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
 import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.OperationOutputBody;
 import org.opendaylight.restconf.server.spi.OperationsResource;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
@@ -494,7 +494,7 @@ public abstract class RestconfStrategy {
      * @param insert  {@link Insert}
      * @return A {@link RestconfFuture}
      */
-    public final @NonNull RestconfFuture<CreateResource> postData(final YangInstanceIdentifier path,
+    public final @NonNull RestconfFuture<CreateResourceResult> postData(final YangInstanceIdentifier path,
             final NormalizedNode data, final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
@@ -504,13 +504,13 @@ public abstract class RestconfStrategy {
             future = createAndCommit(prepareWriteExecution(), path, data);
         }
 
-        final var ret = new SettableRestconfFuture<CreateResource>();
+        final var ret = new SettableRestconfFuture<CreateResourceResult>();
         Futures.addCallback(future, new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(new CreateResource(new ApiPathCanonizer(databind).dataToApiPath(
+                ret.set(new CreateResourceResult(new ApiPathCanonizer(databind).dataToApiPath(
                     data instanceof MapNode mapData && !mapData.isEmpty()
-                        ? path.node(mapData.body().iterator().next().name()) : path).toString()));
+                        ? path.node(mapData.body().iterator().next().name()) : path)));
             }
 
             @Override
@@ -1398,13 +1398,13 @@ public abstract class RestconfStrategy {
         return RestconfFuture.failed(new RestconfDocumentedException("Unhandled path " + path));
     }
 
-    public @NonNull RestconfFuture<CreateResource> dataCreatePOST(final ChildBody body,
+    public @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final ChildBody body,
             final Map<String, String> queryParameters) {
         return dataCreatePOST(new DatabindPath.Data(databind), body, queryParameters);
     }
 
-    private @NonNull RestconfFuture<CreateResource> dataCreatePOST(final DatabindPath.Data path, final ChildBody body,
-            final Map<String, String> queryParameters) {
+    private @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final DatabindPath.Data path,
+            final ChildBody body, final Map<String, String> queryParameters) {
         final Insert insert;
         try {
             insert = Insert.ofQueryParameters(path.databind(), queryParameters);

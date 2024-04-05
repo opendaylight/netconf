@@ -87,7 +87,7 @@ public interface RestconfServer {
      */
     RestconfFuture<DataYangPatchResult> dataPATCH(ApiPath identifier, PatchBody body);
 
-    RestconfFuture<DataPostResult.CreateResource> dataPOST(ChildBody body, Map<String, String> queryParameters);
+    RestconfFuture<CreateResourceResult> dataPOST(ChildBody body, Map<String, String> queryParameters);
 
     /**
      * Create or invoke a operation, as described in

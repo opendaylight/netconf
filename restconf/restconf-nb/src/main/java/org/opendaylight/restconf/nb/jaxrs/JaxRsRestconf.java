@@ -55,10 +55,10 @@ import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
+import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostResult;
-import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.InvokeResult;
@@ -509,10 +509,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         future.addCallback(new JaxRsRestconfCallback<DataPostResult>(ar) {
             @Override
             Response transform(final DataPostResult result) {
-                if (result instanceof CreateResource createResource) {
+                if (result instanceof CreateResourceResult createResource) {
                     final var builder = Response.created(uriInfo.getBaseUriBuilder()
                         .path("data")
-                        .path(createResource.createdPath())
+                        .path(createResource.createdPath().toString())
                         .build());
                     fillConfigurationMetadata(builder, createResource);
                     return builder.build();

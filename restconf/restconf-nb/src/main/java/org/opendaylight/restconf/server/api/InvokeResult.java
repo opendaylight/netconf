@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.api;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.api.FormattableBody;
 
 /**
  * Result of a {@code POST} request resulting in an operation invocation, as defined in
@@ -17,7 +18,7 @@ import org.eclipse.jdt.annotation.Nullable;
  *
  * @param output Non-empty operation output, or {@code null}
  */
-public record InvokeResult(@Nullable OperationOutputBody output) implements DataPostResult {
+public record InvokeResult(@Nullable FormattableBody output) implements DataPostResult {
     /**
      * Empty instance. Prefer this to creating one with {@code output}.
      */
