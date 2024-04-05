@@ -85,17 +85,18 @@ import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
+import org.opendaylight.restconf.server.api.FormattableBody;
 import org.opendaylight.restconf.server.api.InvokeParams;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.OperationOutputBody;
-import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
 import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.OperationsGetBody;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -1238,12 +1239,12 @@ public abstract class RestconfStrategy {
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
     }
 
-    public @NonNull RestconfFuture<OperationsGetResult> operationsGET() {
+    public @NonNull RestconfFuture<FormattableBody> operationsGET() {
         final var modelContext = modelContext();
         final var modules = modelContext.getModuleStatements();
         if (modules.isEmpty()) {
             // No modules, or defensive return empty content
-            return RestconfFuture.of(new OperationsGetResult.Container(modelContext, ImmutableSetMultimap.of()));
+            return RestconfFuture.of(new OperationsGetBody.Container(modelContext, ImmutableSetMultimap.of()));
         }
 
         // RPC QNames by their XMLNamespace/Revision. This should be a Table, but Revision can be null, which wrecks us.
@@ -1268,10 +1269,10 @@ public abstract class RestconfStrategy {
             .findFirst()
             .ifPresent(row -> rpcs.putAll(QNameModule.of(entry.getKey(), row.getKey()), row.getValue()));
         }
-        return RestconfFuture.of(new OperationsGetResult.Container(modelContext, rpcs.build()));
+        return RestconfFuture.of(new OperationsGetBody.Container(modelContext, rpcs.build()));
     }
 
-    public @NonNull RestconfFuture<OperationsGetResult> operationsGET(final ApiPath apiPath) {
+    public @NonNull RestconfFuture<FormattableBody> operationsGET(final ApiPath apiPath) {
         if (apiPath.steps().isEmpty()) {
             return operationsGET();
         }
@@ -1283,7 +1284,7 @@ public abstract class RestconfStrategy {
             return RestconfFuture.failed(e);
         }
 
-        return RestconfFuture.of(new OperationsGetResult.Leaf(rpc.inference().modelContext(), rpc.rpc().argument()));
+        return RestconfFuture.of(new OperationsGetBody.Leaf(rpc.inference().modelContext(), rpc.rpc().argument()));
     }
 
     public @NonNull RestconfFuture<InvokeResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,

@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,26 +25,29 @@ class Netconf822Test extends AbstractRestconfTest {
 
     @Test
     void testOperationsContent() {
-        assertEquals("""
+        final var body = assertFormatableBody(200, ar -> restconf.operationsGET(ar));
+
+        assertFormat("""
             {
               "ietf-restconf:operations" : {
                 "foo:new" : [null],
                 "foo:new1" : [null]
               }
-            }""", assertEntity(200, ar -> restconf.operationsJsonGET(ar)));
-        assertEquals("""
+            }""", body::formatToJSON);
+        assertFormat("""
             <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
               <new xmlns="foo"/>
               <new1 xmlns="foo"/>
-            </operations>""", assertEntity(200, ar -> restconf.operationsXmlGET(ar)));
+            </operations>""", body::formatToXML);
     }
 
     @Test
     void testOperationsContentByIdentifier() {
-        final var apiPath = apiPath("foo:new1");
-        assertEquals("""
-            { "foo:new1" : [null] }""", assertEntity(200, ar -> restconf.operationsJsonGET(apiPath, ar)));
-        assertEquals("""
-            <new1 xmlns="foo"/>""", assertEntity(200, ar -> restconf.operationsXmlGET(apiPath, ar)));
+        final var body = assertFormatableBody(200, ar -> restconf.operationsGET(apiPath("foo:new1"), ar));
+
+        assertFormat("""
+            { "foo:new1" : [null] }""", body::formatToJSON);
+        assertFormat("""
+            <new1 xmlns="foo"/>""", body::formatToXML);
     }
 }
