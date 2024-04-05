@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.Module;
 
 public abstract class BaseYangOpenApiGenerator {
     private static final String CONTROLLER_RESOURCE_NAME = "Controller";
@@ -38,7 +40,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
-        final var modules = context.getModules();
+        final var modules = getModulesWithoutDuplications(context);
         return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
             modules, basePath);
     }
@@ -89,4 +91,36 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public abstract String getBasePath();
+
+    public List<Module> getModulesWithoutDuplications(final EffectiveModelContext modelContext) {
+        if (modelContext == null) {
+            return List.of();
+        }
+        final var unequallyModules = new ArrayList<Module>();
+
+        for (final var module : modelContext.getModules()) {
+            if (unequallyModules.isEmpty()) {
+                unequallyModules.add(module);
+            } else {
+                final var duplication = containsModule(module, unequallyModules);
+                if (duplication != null && Revision.compare(module.getRevision(), duplication.getRevision()) > 0) {
+                    unequallyModules.remove(duplication);
+                    unequallyModules.add(module);
+                } else {
+                    unequallyModules.add(module);
+                }
+            }
+        }
+        return unequallyModules;
+    }
+
+    private Module containsModule(final Module module, final List<Module> unequallyModules) {
+        final var moduleName = module.getName();
+        for (final var addedModule : unequallyModules) {
+            if (addedModule.getName().equals(moduleName)) {
+                return addedModule;
+            }
+        }
+        return null;
+    }
 }
