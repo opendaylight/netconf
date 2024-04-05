@@ -16,8 +16,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,7 +29,6 @@ import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
 import org.opendaylight.restconf.openapi.impl.OpenApiInputStream;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -160,7 +158,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         }
 
         boolean includeDataStore = true;
-        var modules = context.getModules();
+        var modules = openApiGenerator.getSortedModules(context);
         if (strPageNum != null) {
             final var pageNum = Integer.parseInt(strPageNum);
             final var end = DEFAULT_PAGESIZE * pageNum - 1;
@@ -170,7 +168,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             } else {
                 includeDataStore = false;
             }
-            modules = filterByRange(context, start);
+            modules = filterByRange(modules, start);
         }
 
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
@@ -193,7 +191,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var url = schema + "://" + host + "/";
         final var basePath = openApiGenerator.getBasePath();
-        final var modules = modelContext.getModules();
+        final var modules = openApiGenerator.getSortedModules(modelContext);
         return new OpenApiInputStream(modelContext, urlPrefix, url, SECURITY, deviceName, urlPrefix, true, false,
             modules, basePath);
     }
@@ -213,21 +211,8 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         longIdToInstanceId.remove(id);
     }
 
-    private static Set<Module> filterByRange(final EffectiveModelContext schemaContext, final Integer start) {
-        final var sortedModules = new TreeSet<Module>((module1, module2) -> {
-            int result = module1.getName().compareTo(module2.getName());
-            if (result == 0) {
-                result = Revision.compare(module1.getRevision(), module2.getRevision());
-            }
-            if (result == 0) {
-                result = module1.getNamespace().compareTo(module2.getNamespace());
-            }
-            return result;
-        });
-        sortedModules.addAll(schemaContext.getModules());
-
+    private static SortedSet<Module> filterByRange(final SortedSet<Module> sortedModules, final Integer start) {
         final int end = start + DEFAULT_PAGESIZE - 1;
-
         var firstModule = sortedModules.first();
 
         final var iterator = sortedModules.iterator();
