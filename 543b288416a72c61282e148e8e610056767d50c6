@@ -34,6 +34,24 @@
       "parentUuid": "292d5e4e_952060f6",
       "revId": "543b288416a72c61282e148e8e610056767d50c6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0debb8e4_9bbfbe63",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-04-05T08:04:17Z",
+      "side": 1,
+      "message": "I thought we use 75 for the body and the name",
+      "parentUuid": "eba54a9c_edf381fa",
+      "revId": "543b288416a72c61282e148e8e610056767d50c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
