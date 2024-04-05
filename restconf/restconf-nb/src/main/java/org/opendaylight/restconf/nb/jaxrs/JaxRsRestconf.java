@@ -190,9 +190,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             Response transform(final DataGetResult result) {
-                final var builder = Response.status(Status.OK)
-                    .entity(result.payload())
-                    .cacheControl(NO_CACHE);
+                final var builder = Response.ok().entity(result.payload()).cacheControl(NO_CACHE);
                 fillConfigurationMetadata(builder, result);
                 return builder.build();
             }
@@ -519,8 +517,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 }
                 if (result instanceof InvokeResult invokeOperation) {
                     final var output = invokeOperation.output();
-                    return output == null ? Response.status(Status.NO_CONTENT).build()
-                        : Response.ok().entity(output).build();
+                    return output == null ? Response.noContent().build() : Response.ok().entity(output).build();
                 }
                 LOG.error("Unhandled result {}", result);
                 return Response.serverError().build();
@@ -615,7 +612,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
             @Override
             Response transform(final DataPutResult result) {
                 // Note: no Location header, as it matches the request path
-                final var builder = result.created() ? Response.status(Status.CREATED) : Response.noContent();
+                final var builder = result.created() ? Response.created(null) : Response.noContent();
                 fillConfigurationMetadata(builder, result);
                 return builder.build();
             }
