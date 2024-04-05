@@ -712,7 +712,7 @@ public abstract class RestconfStrategy {
         return ret;
     }
 
-    private void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
+    private static void insertWithPointPost(final RestconfTransaction tx, final YangInstanceIdentifier path,
             final NormalizedNode data, final PathArgument pointArg, final NormalizedNodeContainer<?> readList,
             final boolean before) {
         tx.remove(path);
