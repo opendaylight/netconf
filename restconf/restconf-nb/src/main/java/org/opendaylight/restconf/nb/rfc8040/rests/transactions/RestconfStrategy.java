@@ -13,8 +13,6 @@ import static org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes.fr
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.io.CharSource;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -24,11 +22,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
@@ -85,17 +80,18 @@ import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
+import org.opendaylight.restconf.server.api.FormattableBody;
 import org.opendaylight.restconf.server.api.InvokeParams;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.OperationOutputBody;
-import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
 import org.opendaylight.restconf.server.spi.OperationInput;
+import org.opendaylight.restconf.server.spi.OperationsResource;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -103,9 +99,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
-import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -141,7 +135,6 @@ import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.api.source.YinTextSource;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SubmoduleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
@@ -191,6 +184,7 @@ public abstract class RestconfStrategy {
     private final DOMMountPointService mountPointService;
     private final DOMActionService actionService;
     private final DOMRpcService rpcService;
+    private final OperationsResource operations;
 
     RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
@@ -202,6 +196,7 @@ public abstract class RestconfStrategy {
         this.sourceProvider = sourceProvider;
         this.mountPointService = mountPointService;
         pathNormalizer = new ApiPathNormalizer(databind);
+        operations = new OperationsResource(pathNormalizer);
     }
 
     public final @NonNull StrategyAndPath resolveStrategyPath(final ApiPath path) {
@@ -1238,52 +1233,12 @@ public abstract class RestconfStrategy {
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
     }
 
-    public @NonNull RestconfFuture<OperationsGetResult> operationsGET() {
-        final var modelContext = modelContext();
-        final var modules = modelContext.getModuleStatements();
-        if (modules.isEmpty()) {
-            // No modules, or defensive return empty content
-            return RestconfFuture.of(new OperationsGetResult.Container(modelContext, ImmutableSetMultimap.of()));
-        }
-
-        // RPC QNames by their XMLNamespace/Revision. This should be a Table, but Revision can be null, which wrecks us.
-        final var table = new HashMap<XMLNamespace, Map<Revision, ImmutableSet<QName>>>();
-        for (var entry : modules.entrySet()) {
-            final var module = entry.getValue();
-            final var rpcNames = module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
-                .map(RpcEffectiveStatement::argument)
-                .collect(ImmutableSet.toImmutableSet());
-            if (!rpcNames.isEmpty()) {
-                final var namespace = entry.getKey();
-                table.computeIfAbsent(namespace.namespace(), ignored -> new HashMap<>())
-                    .put(namespace.revision(), rpcNames);
-            }
-        }
-
-        // Now pick the latest revision for each namespace
-        final var rpcs = ImmutableSetMultimap.<QNameModule, QName>builder();
-        for (var entry : table.entrySet()) {
-            entry.getValue().entrySet().stream()
-            .sorted(Comparator.comparing(Entry::getKey, (first, second) -> Revision.compare(second, first)))
-            .findFirst()
-            .ifPresent(row -> rpcs.putAll(QNameModule.of(entry.getKey(), row.getKey()), row.getValue()));
-        }
-        return RestconfFuture.of(new OperationsGetResult.Container(modelContext, rpcs.build()));
+    public @NonNull RestconfFuture<FormattableBody> operationsGET() {
+        return operations.httpGET();
     }
 
-    public @NonNull RestconfFuture<OperationsGetResult> operationsGET(final ApiPath apiPath) {
-        if (apiPath.steps().isEmpty()) {
-            return operationsGET();
-        }
-
-        final Rpc rpc;
-        try {
-            rpc = pathNormalizer.normalizeRpcPath(apiPath);
-        } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
-        }
-
-        return RestconfFuture.of(new OperationsGetResult.Leaf(rpc.inference().modelContext(), rpc.rpc().argument()));
+    public @NonNull RestconfFuture<FormattableBody> operationsGET(final ApiPath apiPath) {
+        return operations.httpGET(apiPath);
     }
 
     public @NonNull RestconfFuture<InvokeResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,

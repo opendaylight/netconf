@@ -17,7 +17,6 @@ import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Function;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -61,6 +60,7 @@ import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPostResult.CreateResource;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
+import org.opendaylight.restconf.server.api.FormattableBody;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.JsonChildBody;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
@@ -69,7 +69,6 @@ import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
-import org.opendaylight.restconf.server.api.OperationsGetResult;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
@@ -521,7 +520,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 if (result instanceof InvokeResult invokeOperation) {
                     final var output = invokeOperation.output();
                     return output == null ? Response.status(Status.NO_CONTENT).build()
-                        : Response.status(Status.OK).entity(output).build();
+                        : Response.ok().entity(output).build();
                 }
                 LOG.error("Unhandled result {}", result);
                 return Response.serverError().build();
@@ -624,71 +623,41 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     }
 
     /**
-     * List RPC and action operations in RFC7951 format.
+     * List RPC and action operations.
      *
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Path("/operations")
-    @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-    public void operationsJsonGET(@Suspended final AsyncResponse ar) {
-        completeOperationsJsonGet(server.operationsGET(), ar);
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML,
+        MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON
+    })
+    public void operationsGET(@Suspended final AsyncResponse ar) {
+        completeOperationsGet(server.operationsGET(), ar);
     }
 
     /**
-     * Retrieve list of operations and actions supported by the server or device in JSON format.
+     * Retrieve list of operations and actions supported by the server or device.
      *
      * @param operation path parameter to identify device and/or operation
      * @param ar {@link AsyncResponse} which needs to be completed
      */
     @GET
     @Path("/operations/{operation:.+}")
-    @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
-    public void operationsJsonGET(@PathParam("operation") final ApiPath operation, @Suspended final AsyncResponse ar) {
-        completeOperationsGet(server.operationsGET(operation), ar, OperationsGetResult::toJSON);
+    @Produces({
+        MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML,
+        MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON
+    })
+    public void operationsGET(@PathParam("operation") final ApiPath operation, @Suspended final AsyncResponse ar) {
+        completeOperationsGet(server.operationsGET(operation), ar);
     }
 
-    private static void completeOperationsJsonGet(final RestconfFuture<OperationsGetResult> future,
-            final AsyncResponse ar) {
-        completeOperationsGet(future, ar, OperationsGetResult::toJSON);
-    }
-
-    /**
-     * List RPC and action operations in RFC8040 XML format.
-     *
-     * @param ar {@link AsyncResponse} which needs to be completed
-     */
-    @GET
-    @Path("/operations")
-    @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public void operationsXmlGET(@Suspended final AsyncResponse ar) {
-        completeOperationsXmlGet(server.operationsGET(), ar);
-    }
-
-    /**
-     * Retrieve list of operations and actions supported by the server or device in XML format.
-     *
-     * @param operation path parameter to identify device and/or operation
-     * @param ar {@link AsyncResponse} which needs to be completed
-     */
-    @GET
-    @Path("/operations/{operation:.+}")
-    @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public void operationsXmlGET(@PathParam("operation") final ApiPath operation, @Suspended final AsyncResponse ar) {
-        completeOperationsXmlGet(server.operationsGET(operation), ar);
-    }
-
-    private static void completeOperationsXmlGet(final RestconfFuture<OperationsGetResult> future,
-            final AsyncResponse ar) {
-        completeOperationsGet(future, ar, OperationsGetResult::toXML);
-    }
-
-    private static void completeOperationsGet(final RestconfFuture<OperationsGetResult> future, final AsyncResponse ar,
-            final Function<OperationsGetResult, String> toString) {
-        future.addCallback(new JaxRsRestconfCallback<OperationsGetResult>(ar) {
+    private static void completeOperationsGet(final RestconfFuture<FormattableBody> future, final AsyncResponse ar) {
+        future.addCallback(new JaxRsRestconfCallback<FormattableBody>(ar) {
             @Override
-            Response transform(final OperationsGetResult result) {
-                return Response.ok().entity(toString.apply(result)).build();
+            Response transform(final FormattableBody result) {
+                return Response.ok().entity(result).build();
             }
         });
     }

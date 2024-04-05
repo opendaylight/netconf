@@ -40,7 +40,7 @@ public abstract class FormattableBody implements Immutable {
 
     private final FormatParameters format;
 
-    FormattableBody(final FormatParameters format) {
+    protected FormattableBody(final FormatParameters format) {
         this.format = requireNonNull(format);
     }
 
@@ -54,7 +54,7 @@ public abstract class FormattableBody implements Immutable {
         formatToJSON(requireNonNull(out), format);
     }
 
-    abstract void formatToJSON(OutputStream out, FormatParameters format) throws IOException;
+    protected abstract void formatToJSON(OutputStream out, FormatParameters format) throws IOException;
 
     /**
      * Write the content of this body as an XML document.
@@ -66,14 +66,14 @@ public abstract class FormattableBody implements Immutable {
         formatToXML(requireNonNull(out), format);
     }
 
-    abstract void formatToXML(OutputStream out, FormatParameters format) throws IOException;
+    protected abstract void formatToXML(OutputStream out, FormatParameters format) throws IOException;
 
     @Override
     public final String toString() {
         return addToStringAttributes(MoreObjects.toStringHelper(this)).toString();
     }
 
-    ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return helper.add("prettyPrint", format.prettyPrint().value());
     }
 

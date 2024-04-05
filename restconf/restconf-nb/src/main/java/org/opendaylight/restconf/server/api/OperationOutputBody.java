@@ -44,7 +44,7 @@ public final class OperationOutputBody extends FormattableBody {
     }
 
     @Override
-    void formatToJSON(final OutputStream out, final FormatParameters format) throws IOException {
+    protected void formatToJSON(final OutputStream out, final FormatParameters format) throws IOException {
         final var stack = prepareStack();
 
         // RpcDefinition/ActionDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit
@@ -66,7 +66,7 @@ public final class OperationOutputBody extends FormattableBody {
     }
 
     @Override
-    void formatToXML(final OutputStream out, final FormatParameters format) throws IOException {
+    protected void formatToXML(final OutputStream out, final FormatParameters format) throws IOException {
         final var stack = prepareStack();
 
         // RpcDefinition/ActionDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit
@@ -80,7 +80,7 @@ public final class OperationOutputBody extends FormattableBody {
     }
 
     @Override
-    ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
         return super.addToStringAttributes(helper.add("path", path).add("output", output.prettyTree()));
     }
 

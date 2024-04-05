@@ -46,6 +46,7 @@ import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.server.api.FormattableBody;
 import org.opendaylight.restconf.server.api.OperationOutputBody;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
@@ -121,6 +122,10 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
             throw new AssertionError(e);
         }
         assertEquals(expected, baos.toString(StandardCharsets.UTF_8));
+    }
+
+    static final FormattableBody assertFormatableBody(final int status, final Consumer<AsyncResponse> invocation) {
+        return assertEntity(FormattableBody.class, status, invocation);
     }
 
     static final ContainerNode assertOperationOutput(final int status, final Consumer<AsyncResponse> invocation) {

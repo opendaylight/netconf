@@ -1,0 +1,81 @@
+/*
+ * Copyright (c) 2021 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.restconf.server.spi;
+
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
+import org.opendaylight.restconf.server.api.FormattableBody;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
+
+/**
+ * RESTCONF {@code /operations} content for a {@code GET} operation as per
+ * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC8040</a>.
+ */
+public final class OperationsResource {
+    private final ApiPathNormalizer pathNormalizer;
+
+    public OperationsResource(final ApiPathNormalizer pathNormalizer) {
+        this.pathNormalizer = requireNonNull(pathNormalizer);
+    }
+
+    public @NonNull RestconfFuture<FormattableBody> httpGET() {
+        // RPC QNames by their XMLNamespace/Revision. This should be a Table, but Revision can be null, which wrecks us.
+        final var table = new HashMap<XMLNamespace, Map<Revision, ImmutableSet<QName>>>();
+        final var modelContext = pathNormalizer.databind().modelContext();
+        for (var entry :  modelContext.getModuleStatements().entrySet()) {
+            final var module = entry.getValue();
+            final var rpcNames = module.streamEffectiveSubstatements(RpcEffectiveStatement.class)
+                .map(RpcEffectiveStatement::argument)
+                .collect(ImmutableSet.toImmutableSet());
+            if (!rpcNames.isEmpty()) {
+                final var namespace = entry.getKey();
+                table.computeIfAbsent(namespace.namespace(), ignored -> new HashMap<>())
+                    .put(namespace.revision(), rpcNames);
+            }
+        }
+
+        // Now pick the latest revision for each namespace
+        final var rpcs = ImmutableSetMultimap.<QNameModule, QName>builder();
+        for (var entry : table.entrySet()) {
+            entry.getValue().entrySet().stream()
+                .sorted(Comparator.comparing(Entry::getKey, (first, second) -> Revision.compare(second, first)))
+                .findFirst()
+                .ifPresent(row -> rpcs.putAll(QNameModule.of(entry.getKey(), row.getKey()), row.getValue()));
+        }
+        return RestconfFuture.of(new AllOperations(modelContext, rpcs.build()));
+    }
+
+    public @NonNull RestconfFuture<FormattableBody> httpGET(final ApiPath apiPath) {
+        if (apiPath.steps().isEmpty()) {
+            return httpGET();
+        }
+
+        final Rpc path;
+        try {
+            path = pathNormalizer.normalizeRpcPath(apiPath);
+        } catch (RestconfDocumentedException e) {
+            return RestconfFuture.failed(e);
+        }
+        return RestconfFuture.of(new OneOperation(path.inference().modelContext(), path.rpc().argument()));
+    }
+}
