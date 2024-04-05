@@ -159,7 +159,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         try {
             return new URI(scheme, restconfURI.getRawUserInfo(), restconfURI.getHost(), restconfURI.getPort(),
-                restconfURI.getPath() + '/' + URLConstants.STREAMS_SUBPATH, null, null)
+                restconfURI.getPath() + URLConstants.STREAMS_SUBPATH, null, null)
                 .toString();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Cannot derive streams location", e);
