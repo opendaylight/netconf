@@ -18,7 +18,6 @@ import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
 /**
  * A {@link ReplyBody} corresponding to a {@code rpc} or {@code action} invocation.
@@ -44,43 +43,21 @@ public final class OperationOutputBody extends ReplyBody {
 
     @Override
     void writeJSON(final OutputStream out, final boolean prettyPrint) throws IOException {
-        final var stack = prepareStack();
-
-        // RpcDefinition/ActionDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit
-        // initial output declaration
-        try (var jsonWriter = createJsonWriter(out, prettyPrint)) {
-            final var module = stack.currentModule();
-            jsonWriter.beginObject().name(module.argument().getLocalName() + ":output").beginObject();
-
-            final var nnWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                JSONNormalizedNodeStreamWriter.createNestedWriter(path.databind().jsonCodecs(), stack.toInference(),
-                    module.namespace().argument(), jsonWriter), null, null);
-            for (var child : output.body()) {
-                nnWriter.write(child);
-            }
-            nnWriter.flush();
-
-            jsonWriter.endObject().endObject();
+        try (var nnWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
+             JSONNormalizedNodeStreamWriter.createExclusiveWriter(path.databind().jsonCodecs(), path.inference(), null,
+                 createJsonWriter(out, prettyPrint)), null, null)) {
+            nnWriter.write(output);
         }
     }
 
     @Override
     void writeXML(final OutputStream out, final boolean prettyPrint) throws IOException {
-        final var stack = prepareStack();
-
         // RpcDefinition/ActionDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit
         // initial output declaration.
-        final var xmlWriter = createXmlWriter(out, prettyPrint);
-        final var nnWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-            XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, stack.toInference()), null, null);
-
-        writeElements(xmlWriter, nnWriter, output);
-        nnWriter.flush();
-    }
-
-    private SchemaInferenceStack prepareStack() {
-        final var stack = path.inference().toSchemaInferenceStack();
-        stack.enterSchemaTree(path.outputStatement().argument());
-        return stack;
+        try (var nnWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
+            XMLStreamNormalizedNodeStreamWriter.create(createXmlWriter(out, prettyPrint), path.inference()),
+                null, null)) {
+            nnWriter.write(output);
+        }
     }
 }
