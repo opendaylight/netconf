@@ -150,7 +150,8 @@ public interface RestconfServer {
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.6">RFC8040 Operation Resource</a>.
      *
      * @param request {@link ServerRequest} for this request
-     * @param restconfURI Base URI of the request
+     * @param restconfURI Base URI of the request, the absolute equivalent to {@code {+restconf}} URI with a trailing
+     *                    slash
      * @param operation {@code <operation>} path, really an {@link ApiPath} to an {@code rpc}
      * @param body RPC operation
      * @return A {@link RestconfFuture} completing with {@link InvokeResult}

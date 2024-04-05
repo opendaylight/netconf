@@ -143,7 +143,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     /**
      * Return the base location URL of the streams service based on request URI.
      *
-     * @param restconfURI request base URI
+     * @param restconfURI request base URI, with trailing slash
      * @throws IllegalArgumentException if the result would have been malformed
      */
     protected final @NonNull String baseStreamLocation(final URI restconfURI) {
@@ -159,7 +159,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         try {
             return new URI(scheme, restconfURI.getRawUserInfo(), restconfURI.getHost(), restconfURI.getPort(),
-                restconfURI.getPath() + '/' + URLConstants.STREAMS_SUBPATH, null, null)
+                restconfURI.getPath() + URLConstants.STREAMS_SUBPATH, null, null)
                 .toString();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Cannot derive streams location", e);
