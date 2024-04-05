@@ -7,8 +7,13 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -27,6 +32,12 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractJukeboxTest {
+    @FunctionalInterface
+    protected interface FormatMethod {
+
+        void invoke(@NonNull OutputStream out) throws IOException;
+    }
+
     // container jukebox
     protected static final QName JUKEBOX_QNAME =
         QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
@@ -97,5 +108,15 @@ public abstract class AbstractJukeboxTest {
 
     protected static final InputStream stringInputStream(final String str) {
         return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
+    }
+
+    protected static void assertFormat(final String expected, final FormatMethod formatMethod) {
+        final var baos = new ByteArrayOutputStream();
+        try {
+            formatMethod.invoke(baos);
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(expected, baos.toString(StandardCharsets.UTF_8));
     }
 }

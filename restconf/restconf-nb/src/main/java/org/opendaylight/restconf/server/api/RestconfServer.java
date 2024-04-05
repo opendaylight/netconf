@@ -125,9 +125,9 @@ public interface RestconfServer {
      * as expressed in the <a href="https://www.rfc-editor.org/rfc/rfc8040#page-84">ietf-restconf.yang</a>
      * {@code container operations} statement.
      *
-     * @return A {@link RestconfFuture} completing with an {@link OperationsGetResult}
+     * @return A {@link RestconfFuture} completing with an {@link FormattableBody}
      */
-    RestconfFuture<OperationsGetResult> operationsGET();
+    RestconfFuture<FormattableBody> operationsGET();
 
     /*
      * Return the details about a particular operation supported by
@@ -136,9 +136,9 @@ public interface RestconfServer {
      * {@code container operations} statement.
      *
      * @param operation An operation
-     * @return A {@link RestconfFuture} completing with an {@link OperationsGetResult}
+     * @return A {@link RestconfFuture} completing with an {@link FormattableBody}
      */
-    RestconfFuture<OperationsGetResult> operationsGET(ApiPath operation);
+    RestconfFuture<FormattableBody> operationsGET(ApiPath operation);
 
     /**
      * Invoke an RPC operation, as defined in

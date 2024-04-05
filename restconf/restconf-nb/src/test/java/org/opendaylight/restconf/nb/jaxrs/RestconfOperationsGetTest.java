@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
@@ -61,13 +60,11 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
     }
 
     @Test
-    void testOperationsJson() {
-        assertEquals(EXPECTED_JSON, assertEntity(200, ar -> restconf.operationsJsonGET(ar)));
-    }
+    void testOperations() {
+        final var body = assertFormatableBody(200, ar -> restconf.operationsGET(ar));
 
-    @Test
-    void testOperationsXml() {
-        assertEquals(EXPECTED_XML, assertEntity(200, ar -> restconf.operationsXmlGET(ar)));
+        assertFormat(EXPECTED_JSON, body::formatToJSON);
+        assertFormat(EXPECTED_XML, body::formatToXML);
     }
 
     private void mockMountPoint() {
@@ -82,30 +79,22 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
     }
 
     @Test
-    void testMountPointOperationsJson() {
+    void testMountPointOperations() {
         mockMountPoint();
-        assertEquals(EXPECTED_JSON, assertEntity(200, ar -> restconf.operationsJsonGET(DEVICE_ID, ar)));
-    }
 
-    @Test
-    void testMountPointOperationsXml() {
-        mockMountPoint();
-        assertEquals(EXPECTED_XML, assertEntity(200, ar -> restconf.operationsXmlGET(DEVICE_ID, ar)));
+        final var body = assertFormatableBody(200, ar -> restconf.operationsGET(DEVICE_ID, ar));
+        assertFormat(EXPECTED_JSON, body::formatToJSON);
+        assertFormat(EXPECTED_XML, body::formatToXML);
     }
 
     @Test
     void testMountPointSpecificOperationsJson() {
         mockMountPoint();
-        assertEquals("""
-            { "module1:dummy-rpc1-module1" : [null] }""",
-            assertEntity(200, ar -> restconf.operationsJsonGET(DEVICE_RPC1_MODULE1_ID, ar)));
-    }
 
-    @Test
-    void testMountPointSpecificOperationsXml() {
-        mockMountPoint();
-        assertEquals("""
-            <dummy-rpc1-module1 xmlns="module:1"/>""",
-            assertEntity(200, ar -> restconf.operationsXmlGET(DEVICE_RPC1_MODULE1_ID, ar)));
+        final var body = assertFormatableBody(200, ar -> restconf.operationsGET(DEVICE_RPC1_MODULE1_ID, ar));
+        assertFormat("""
+            { "module1:dummy-rpc1-module1" : [null] }""", body::formatToJSON);
+        assertFormat("""
+            <dummy-rpc1-module1 xmlns="module:1"/>""", body::formatToXML);
     }
 }
