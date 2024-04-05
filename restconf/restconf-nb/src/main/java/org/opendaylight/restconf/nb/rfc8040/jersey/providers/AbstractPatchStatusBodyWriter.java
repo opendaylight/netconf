@@ -11,7 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyWriter;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.server.api.PatchStatusContext;
 
 abstract class AbstractPatchStatusBodyWriter implements MessageBodyWriter<PatchStatusContext> {
     @Override

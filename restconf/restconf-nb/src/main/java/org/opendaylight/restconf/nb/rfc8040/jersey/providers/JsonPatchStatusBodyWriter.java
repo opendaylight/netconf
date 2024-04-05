@@ -10,21 +10,19 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
-import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.PatchStatusContext;
+import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 
 @Provider
 @Produces(MediaTypes.APPLICATION_YANG_DATA_JSON)
@@ -33,17 +31,16 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
     public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
-        final var jsonWriter = createJsonWriter(entityStream);
+        final var jsonWriter = FormattableBodySupport.createJsonWriter(entityStream, () -> PrettyPrintParam.FALSE);
         jsonWriter.beginObject().name("ietf-yang-patch:yang-patch-status")
             .beginObject().name("patch-id").value(patchStatusContext.patchId());
 
         if (patchStatusContext.ok()) {
             reportSuccess(jsonWriter);
         } else {
-            final var modelContext = patchStatusContext.context();
             final var globalErrors = patchStatusContext.globalErrors();
             if (globalErrors != null) {
-                reportErrors(modelContext, globalErrors, jsonWriter);
+                reportErrors(patchStatusContext.databind(), globalErrors, jsonWriter);
             } else {
                 jsonWriter.name("edit-status").beginObject()
                     .name("edit").beginArray();
@@ -52,7 +49,7 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
                     final var editErrors = editStatus.getEditErrors();
                     if (editErrors != null) {
-                        reportErrors(modelContext, editErrors, jsonWriter);
+                        reportErrors(patchStatusContext.databind(), editErrors, jsonWriter);
                     } else if (editStatus.isOk()) {
                         reportSuccess(jsonWriter);
                     }
@@ -68,7 +65,7 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         jsonWriter.name("ok").beginArray().nullValue().endArray();
     }
 
-    private static void reportErrors(final EffectiveModelContext context, final List<RestconfError> errors,
+    private static void reportErrors(final DatabindContext databind, final List<RestconfError> errors,
             final JsonWriter jsonWriter) throws IOException {
         jsonWriter.name("errors").beginObject().name("error").beginArray();
 
@@ -80,8 +77,7 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             final var errorPath = restconfError.getErrorPath();
             if (errorPath != null) {
                 jsonWriter.name("error-path");
-                JSONCodecFactorySupplier.RFC7951.getShared(context).instanceIdentifierCodec()
-                    .writeValue(jsonWriter, errorPath);
+                databind.jsonCodecs().instanceIdentifierCodec().writeValue(jsonWriter, errorPath);
             }
             final var errorMessage = restconfError.getErrorMessage();
             if (errorMessage != null) {
@@ -96,9 +92,5 @@ public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         }
 
         jsonWriter.endArray().endObject();
-    }
-
-    private static JsonWriter createJsonWriter(final OutputStream entityStream) {
-        return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
     }
 }

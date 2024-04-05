@@ -22,10 +22,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
-import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 @Provider
 @Produces(MediaTypes.APPLICATION_YANG_DATA_XML)
@@ -64,7 +63,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         } else {
             final var globalErrors = context.globalErrors();
             if (globalErrors != null) {
-                reportErrors(context.context(), globalErrors, writer);
+                reportErrors(context.databind(), globalErrors, writer);
             } else {
                 writer.writeStartElement("edit-status");
                 for (var patchStatusEntity : context.editCollection()) {
@@ -75,7 +74,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
                     final var editErrors = patchStatusEntity.getEditErrors();
                     if (editErrors != null) {
-                        reportErrors(context.context(), editErrors, writer);
+                        reportErrors(context.databind(), editErrors, writer);
                     } else if (patchStatusEntity.isOk()) {
                         writer.writeEmptyElement("ok");
                     }
@@ -88,7 +87,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
         writer.flush();
     }
 
-    private static void reportErrors(final EffectiveModelContext modelContext, final List<RestconfError> errors,
+    private static void reportErrors(final DatabindContext databind, final List<RestconfError> errors,
             final XMLStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement("errors");
 
@@ -105,8 +104,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
             final var errorPath = restconfError.getErrorPath();
             if (errorPath != null) {
                 writer.writeStartElement("error-path");
-                XmlCodecFactory.create(modelContext).instanceIdentifierCodec()
-                    .writeValue(writer, errorPath);
+                databind.xmlCodecs().instanceIdentifierCodec().writeValue(writer, errorPath);
                 writer.writeEndElement();
             }
 

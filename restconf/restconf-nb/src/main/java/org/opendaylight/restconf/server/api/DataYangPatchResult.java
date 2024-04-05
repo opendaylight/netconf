@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
 
 /**
  * Result of a {@code PATCH} request as defined in

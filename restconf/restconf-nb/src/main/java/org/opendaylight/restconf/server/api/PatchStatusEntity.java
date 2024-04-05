@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.common.patch;
+package org.opendaylight.restconf.server.api;
 
 import java.util.List;
 import org.opendaylight.restconf.common.errors.RestconfError;

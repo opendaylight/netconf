@@ -58,8 +58,6 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -85,6 +83,8 @@ import org.opendaylight.restconf.server.api.InvokeParams;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchBody;
+import org.opendaylight.restconf.server.api.PatchStatusContext;
+import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
@@ -689,7 +689,7 @@ public abstract class RestconfStrategy {
         if (!noError) {
             tx.cancel();
             ret.set(new DataYangPatchResult(
-                new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), false, null)));
+                new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), false, null)));
             return ret;
         }
 
@@ -697,14 +697,14 @@ public abstract class RestconfStrategy {
             @Override
             public void onSuccess(final CommitInfo result) {
                 ret.set(new DataYangPatchResult(
-                    new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), true, null)));
+                    new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), true, null)));
             }
 
             @Override
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 ret.set(new DataYangPatchResult(
-                    new PatchStatusContext(modelContext(), patch.patchId(), List.copyOf(editCollection), false,
+                    new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), false,
                         TransactionUtil.decodeException(cause, "PATCH", null, modelContext()).getErrors())));
             }
         }, MoreExecutors.directExecutor());

@@ -17,8 +17,9 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfError;
-import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.common.patch.PatchStatusEntity;
+import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.PatchStatusContext;
+import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -28,7 +29,7 @@ public class XmlPatchStatusBodyWriterTest {
         "Data already exists");
     private final PatchStatusEntity statusEntity = new PatchStatusEntity("patch1", true, null);
     private final PatchStatusEntity statusEntityError = new PatchStatusEntity("patch1", false, List.of(error));
-    private final EffectiveModelContext context = mock(EffectiveModelContext.class);
+    private final DatabindContext databind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
     private final XmlPatchStatusBodyWriter writer = new XmlPatchStatusBodyWriter();
 
     /**
@@ -37,7 +38,7 @@ public class XmlPatchStatusBodyWriterTest {
     @Test
     public void testOutputWithGlobalError() throws IOException {
         final var outputStream = new ByteArrayOutputStream();
-        final var patchStatusContext = new PatchStatusContext(context, "patch", List.of(statusEntity),
+        final var patchStatusContext = new PatchStatusContext(databind, "patch", List.of(statusEntity),
             false, List.of(error));
         writer.writeTo(patchStatusContext, null, null, null, MediaType.APPLICATION_XML_TYPE, null, outputStream);
 
@@ -58,7 +59,7 @@ public class XmlPatchStatusBodyWriterTest {
     @Test
     public void testOutputWithoutGlobalError() throws IOException {
         final var outputStream = new ByteArrayOutputStream();
-        final var patchStatusContext = new PatchStatusContext(context,"patch", List.of(statusEntityError),
+        final var patchStatusContext = new PatchStatusContext(databind,"patch", List.of(statusEntityError),
             false, null);
         writer.writeTo(patchStatusContext, null, null, null, MediaType.APPLICATION_XML_TYPE, null, outputStream);
         assertEquals("""
