@@ -62,7 +62,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 @ExtendWith(MockitoExtension.class)
 class CreateNotificationStreamRpcTest {
     private static final EffectiveModelContext SCHEMA_CTX = YangParserTestUtils.parseYangResourceDirectory("/streams");
-    private static final URI RESTCONF_URI = URI.create("/rests");
+    private static final URI RESTCONF_URI = URI.create("/rests/");
     private static final YangInstanceIdentifier TOASTER = YangInstanceIdentifier.of(
         QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toaster"));
 

@@ -143,8 +143,17 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
     /**
      * Return the base location URL of the streams service based on request URI.
      *
+     * This method constructs the URI for stream services by adjusting the scheme
+     * for WebSocket usage and appending a stream-specific subpath to the base URI.
+     * It is crucial to note that the `restconfURI.getPath()` always
+     * returns a path that ends with a slash ('/'). This consistent ending slash
+     * is essential for correct URI concatenation, ensuring that the appended
+     * stream-specific subpath forms a valid and well-structured URI.
+     *
      * @param restconfURI request base URI
      * @throws IllegalArgumentException if the result would have been malformed
+     *
+     * Example of `restconfURI.getPath()`: "/rests/"
      */
     protected final @NonNull String baseStreamLocation(final URI restconfURI) {
         var scheme = restconfURI.getScheme();
@@ -159,7 +168,7 @@ public abstract class AbstractRestconfStreamRegistry implements RestconfStream.R
 
         try {
             return new URI(scheme, restconfURI.getRawUserInfo(), restconfURI.getHost(), restconfURI.getPort(),
-                restconfURI.getPath() + '/' + URLConstants.STREAMS_SUBPATH, null, null)
+                restconfURI.getPath() + URLConstants.STREAMS_SUBPATH, null, null)
                 .toString();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Cannot derive streams location", e);
