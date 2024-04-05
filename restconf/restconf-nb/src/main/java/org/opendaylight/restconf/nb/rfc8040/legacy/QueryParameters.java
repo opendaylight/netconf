@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DataGetParams;
-import org.opendaylight.restconf.server.api.FormatParameters;
 import org.opendaylight.yangtools.yang.common.QName;
 
 /**

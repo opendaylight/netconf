@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
-import org.opendaylight.restconf.server.api.FormattableBody;
+import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -46,7 +46,7 @@ public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBo
                 .build()
                 : data;
 
-        try (var jsonWriter = FormattableBody.createJsonWriter(entityStream, writerParameters)) {
+        try (var jsonWriter = FormattableBodySupport.createJsonWriter(entityStream, writerParameters)) {
             jsonWriter.beginObject();
 
             final var nnWriter = createNormalizedNodeWriter(stack.toInference(), jsonWriter, writerParameters, null);

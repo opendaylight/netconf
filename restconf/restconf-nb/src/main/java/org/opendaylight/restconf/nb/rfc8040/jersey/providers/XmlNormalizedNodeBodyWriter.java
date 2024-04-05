@@ -18,7 +18,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
-import org.opendaylight.restconf.server.api.FormattableBody;
+import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -43,7 +43,7 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
             isRoot = true;
         }
 
-        final var xmlWriter = FormattableBody.createXmlWriter(entityStream, writerParameters);
+        final var xmlWriter = FormattableBodySupport.createXmlWriter(entityStream, writerParameters);
         final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), writerParameters);
         if (data instanceof MapEntryNode mapEntry) {
             // Restconf allows returning one list item. We need to wrap it

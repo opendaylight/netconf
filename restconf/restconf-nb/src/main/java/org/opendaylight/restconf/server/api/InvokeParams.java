@@ -12,6 +12,7 @@ import static org.opendaylight.restconf.server.api.EventStreamGetParams.mandator
 
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 
 /**

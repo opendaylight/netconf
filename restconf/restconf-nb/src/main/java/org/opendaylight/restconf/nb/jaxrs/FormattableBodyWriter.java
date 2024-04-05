@@ -17,7 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.server.api.FormattableBody;
+import org.opendaylight.restconf.api.FormattableBody;
 
 abstract sealed class FormattableBodyWriter implements MessageBodyWriter<FormattableBody>
         permits JsonFormattableBody, XmlFormattableBody {
