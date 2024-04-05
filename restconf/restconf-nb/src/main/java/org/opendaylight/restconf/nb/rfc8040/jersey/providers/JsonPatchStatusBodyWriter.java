@@ -10,12 +10,8 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.List;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -28,28 +24,26 @@ import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 @Produces(MediaTypes.APPLICATION_YANG_DATA_JSON)
 public class JsonPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
     @Override
-    public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
-            final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
-            final OutputStream entityStream) throws IOException {
-        final var jsonWriter = FormattableBodySupport.createJsonWriter(entityStream, () -> PrettyPrintParam.FALSE);
+    void writeTo(final PatchStatusContext body, final OutputStream out) throws IOException {
+        final var jsonWriter = FormattableBodySupport.createJsonWriter(out, () -> PrettyPrintParam.FALSE);
         jsonWriter.beginObject().name("ietf-yang-patch:yang-patch-status")
-            .beginObject().name("patch-id").value(patchStatusContext.patchId());
+            .beginObject().name("patch-id").value(body.patchId());
 
-        if (patchStatusContext.ok()) {
+        if (body.ok()) {
             reportSuccess(jsonWriter);
         } else {
-            final var globalErrors = patchStatusContext.globalErrors();
+            final var globalErrors = body.globalErrors();
             if (globalErrors != null) {
-                reportErrors(patchStatusContext.databind(), globalErrors, jsonWriter);
+                reportErrors(body.databind(), globalErrors, jsonWriter);
             } else {
                 jsonWriter.name("edit-status").beginObject()
                     .name("edit").beginArray();
-                for (var editStatus : patchStatusContext.editCollection()) {
+                for (var editStatus : body.editCollection()) {
                     jsonWriter.beginObject().name("edit-id").value(editStatus.getEditId());
 
                     final var editErrors = editStatus.getEditErrors();
                     if (editErrors != null) {
-                        reportErrors(patchStatusContext.databind(), editErrors, jsonWriter);
+                        reportErrors(body.databind(), editErrors, jsonWriter);
                     } else if (editStatus.isOk()) {
                         reportSuccess(jsonWriter);
                     }

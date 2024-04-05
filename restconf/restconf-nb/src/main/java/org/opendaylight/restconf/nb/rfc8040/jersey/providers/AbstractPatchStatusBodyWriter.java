@@ -7,10 +7,16 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
+import static java.util.Objects.requireNonNull;
+
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 
 abstract class AbstractPatchStatusBodyWriter implements MessageBodyWriter<PatchStatusContext> {
@@ -19,4 +25,13 @@ abstract class AbstractPatchStatusBodyWriter implements MessageBodyWriter<PatchS
             final MediaType mediaType) {
         return type.equals(PatchStatusContext.class);
     }
+
+    @Override
+    public final void writeTo(final PatchStatusContext body, final Class<?> type, final Type genericType,
+            final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
+            final OutputStream entityStream) throws IOException {
+        writeTo(requireNonNull(body), requireNonNull(entityStream));
+    }
+
+    abstract void writeTo(@NonNull PatchStatusContext body, @NonNull OutputStream out) throws IOException;
 }

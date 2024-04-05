@@ -9,13 +9,9 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -38,35 +34,31 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
     }
 
     @Override
-    public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
-                        final Annotation[] annotations, final MediaType mediaType,
-                        final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
-            throws IOException {
+    void writeTo(final PatchStatusContext body, final OutputStream out) throws IOException {
         try {
-            final XMLStreamWriter xmlWriter =
-                    XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
-            writeDocument(xmlWriter, patchStatusContext);
+            final var xmlWriter = XML_FACTORY.createXMLStreamWriter(out, StandardCharsets.UTF_8.name());
+            writeDocument(xmlWriter, body);
         } catch (final XMLStreamException e) {
             throw new IOException("Failed to write body", e);
         }
     }
 
-    private static void writeDocument(final XMLStreamWriter writer, final PatchStatusContext context)
+    private static void writeDocument(final XMLStreamWriter writer, final PatchStatusContext body)
             throws XMLStreamException {
         writer.writeStartElement("", "yang-patch-status", XML_NAMESPACE);
         writer.writeStartElement("patch-id");
-        writer.writeCharacters(context.patchId());
+        writer.writeCharacters(body.patchId());
         writer.writeEndElement();
 
-        if (context.ok()) {
+        if (body.ok()) {
             writer.writeEmptyElement("ok");
         } else {
-            final var globalErrors = context.globalErrors();
+            final var globalErrors = body.globalErrors();
             if (globalErrors != null) {
-                reportErrors(context.databind(), globalErrors, writer);
+                reportErrors(body.databind(), globalErrors, writer);
             } else {
                 writer.writeStartElement("edit-status");
-                for (var patchStatusEntity : context.editCollection()) {
+                for (var patchStatusEntity : body.editCollection()) {
                     writer.writeStartElement("edit");
                     writer.writeStartElement("edit-id");
                     writer.writeCharacters(patchStatusEntity.getEditId());
@@ -74,7 +66,7 @@ public class XmlPatchStatusBodyWriter extends AbstractPatchStatusBodyWriter {
 
                     final var editErrors = patchStatusEntity.getEditErrors();
                     if (editErrors != null) {
-                        reportErrors(context.databind(), editErrors, writer);
+                        reportErrors(body.databind(), editErrors, writer);
                     } else if (patchStatusEntity.isOk()) {
                         writer.writeEmptyElement("ok");
                     }
