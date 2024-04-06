@@ -24,7 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.restconf.server.api.PatchStatusContext;
+import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 
@@ -44,7 +44,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
         doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
-        final var status = assertEntity(PatchStatusContext.class, 200,
+        final var status = assertEntity(YangPatchStatusBody.class, 200,
             ar -> restconf.dataYangJsonPATCH(stringInputStream("""
                 {
                   "ietf-yang-patch:yang-patch" : {
@@ -81,7 +81,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                       }
                     ]
                   }
-                }"""), ar));
+                }"""), ar)).status();
         assertTrue(status.ok());
         final var edits = status.editCollection();
         assertEquals(3, edits.size());
@@ -97,7 +97,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
         doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(tx).cancel();
 
-        final var status = assertEntity(PatchStatusContext.class, 409, ar -> restconf.dataYangJsonPATCH(
+        final var status = assertEntity(YangPatchStatusBody.class, 409, ar -> restconf.dataYangJsonPATCH(
             stringInputStream("""
                 {
                   "ietf-yang-patch:yang-patch" : {
@@ -127,7 +127,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                       }
                     ]
                   }
-                }"""), ar));
+                }"""), ar)).status();
         assertFalse(status.ok());
         final var edits = status.editCollection();
         assertEquals(3, edits.size());
@@ -151,7 +151,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        final var status = assertEntity(PatchStatusContext.class, 200,
+        final var status = assertEntity(YangPatchStatusBody.class, 200,
             ar -> restconf.dataYangXmlPATCH(stringInputStream("""
                 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                   <patch-id>test patch id</patch-id>
@@ -184,7 +184,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                     <operation>delete</operation>
                     <target>/example-jukebox:jukebox/player/gap</target>
                   </edit>
-                </yang-patch>"""), ar));
+                </yang-patch>"""), ar)).status();
         assertTrue(status.ok());
         assertNull(status.globalErrors());
         final var edits = status.editCollection();
