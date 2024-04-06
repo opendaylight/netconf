@@ -24,9 +24,7 @@ import org.opendaylight.restconf.nb.jaxrs.JaxRsWebHostMetadata;
 import org.opendaylight.restconf.nb.jaxrs.JsonFormattableBody;
 import org.opendaylight.restconf.nb.jaxrs.XmlFormattableBody;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonPatchStatusBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlPatchStatusBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
 import org.opendaylight.restconf.server.api.RestconfServer;
@@ -62,9 +60,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                     new Application() {
                         @Override
                         public Set<Class<?>> getClasses() {
-                            return Set.of(
-                                JsonNormalizedNodeBodyWriter.class, XmlNormalizedNodeBodyWriter.class,
-                                JsonPatchStatusBodyWriter.class, XmlPatchStatusBodyWriter.class);
+                            return Set.of(JsonNormalizedNodeBodyWriter.class, XmlNormalizedNodeBodyWriter.class);
                         }
 
                         @Override
