@@ -71,6 +71,7 @@ import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
+import org.opendaylight.restconf.server.api.DataYangPatchParams;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath;
@@ -592,6 +593,14 @@ public abstract class RestconfStrategy {
 
     public final @NonNull RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath apiPath,
             final Map<String, String> queryParameters, final PatchBody body) {
+        final DataYangPatchParams params;
+        try {
+            params = DataYangPatchParams.ofQueryParameters(queryParameters);
+        } catch (IllegalArgumentException e) {
+            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+        }
+
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
@@ -607,7 +616,7 @@ public abstract class RestconfStrategy {
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
         }
-        return patchData(patch);
+        return patchData(params, patch);
     }
 
     /**
@@ -616,7 +625,9 @@ public abstract class RestconfStrategy {
      * @param patch Patch context to be processed
      * @return {@link PatchStatusContext}
      */
-    public final @NonNull RestconfFuture<DataYangPatchResult> patchData(final PatchContext patch) {
+    @VisibleForTesting
+    public final @NonNull RestconfFuture<DataYangPatchResult> patchData(final DataYangPatchParams params,
+            final PatchContext patch) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var tx = prepareWriteExecution();
 
@@ -689,7 +700,7 @@ public abstract class RestconfStrategy {
         // We have errors
         if (!noError) {
             tx.cancel();
-            ret.set(new DataYangPatchResult(
+            ret.set(new DataYangPatchResult(params,
                 new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), false, null)));
             return ret;
         }
@@ -697,14 +708,14 @@ public abstract class RestconfStrategy {
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(new DataYangPatchResult(
+                ret.set(new DataYangPatchResult(params,
                     new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), true, null)));
             }
 
             @Override
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                ret.set(new DataYangPatchResult(
+                ret.set(new DataYangPatchResult(params,
                     new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), false,
                         TransactionUtil.decodeException(cause, "PATCH", null, modelContext()).getErrors())));
             }

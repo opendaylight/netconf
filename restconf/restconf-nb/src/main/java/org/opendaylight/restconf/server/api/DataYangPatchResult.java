@@ -17,11 +17,13 @@ import org.eclipse.jdt.annotation.Nullable;
  * Result of a {@code PATCH} request as defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
  *
+ * @param params A {@link DataYangPatchParams}
  * @param status A {@link PatchStatusContext}
  * @param entityTag response {@code ETag} header, or {@code null} if not applicable
  * @param lastModified response {@code Last-Modified} header, or {@code null} if not applicable
  */
 public record DataYangPatchResult(
+        @NonNull DataYangPatchParams params,
         @NonNull PatchStatusContext status,
         @Nullable EntityTag entityTag,
         @Nullable Instant lastModified) implements ConfigurationMetadata {
@@ -29,7 +31,7 @@ public record DataYangPatchResult(
         requireNonNull(status);
     }
 
-    public DataYangPatchResult(final @NonNull PatchStatusContext status) {
-        this(status, null, null);
+    public DataYangPatchResult(final @NonNull DataYangPatchParams params, final @NonNull PatchStatusContext status) {
+        this(params, status, null, null);
     }
 }

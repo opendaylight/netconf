@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.server.api;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.restconf.server.api.EventStreamGetParams.mandatoryParam;
 
 import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
@@ -36,22 +35,6 @@ public record InvokeParams(@NonNull PrettyPrintParam prettyPrint) implements For
      * @throws IllegalArgumentException if the parameters are invalid
      */
     public static @NonNull InvokeParams ofQueryParameters(final Map<String, String> queryParameters) {
-        if (queryParameters.isEmpty()) {
-            return EMPTY;
-        }
-
-        PrettyPrintParam prettyPrint = PrettyPrintParam.FALSE;
-
-        for (var entry : queryParameters.entrySet()) {
-            final var paramName = entry.getKey();
-            final var paramValue = entry.getValue();
-
-            prettyPrint = switch (paramName) {
-                case PrettyPrintParam.uriName -> mandatoryParam(PrettyPrintParam::forUriValue, paramName, paramValue);
-                default -> throw new IllegalArgumentException("Invalid parameter: " + paramName);
-            };
-        }
-
-        return new InvokeParams(requireNonNull(prettyPrint));
+        return FormatParametersHelper.ofQueryParameters(queryParameters, InvokeParams::new, EMPTY);
     }
 }
