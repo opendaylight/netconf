@@ -21,6 +21,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Before;
@@ -88,7 +89,8 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
 
     @Override
     RestconfStrategy newStrategy(final DatabindContext databind) {
-        return new MdsalRestconfStrategy(databind, dataBroker, rpcService, null, null, mountPointService);
+        return new MdsalRestconfStrategy(databind, dataBroker, ImmutableMap.of(), rpcService, null, null,
+            mountPointService);
     }
 
     private @NonNull RestconfStrategy modulesStrategy() {

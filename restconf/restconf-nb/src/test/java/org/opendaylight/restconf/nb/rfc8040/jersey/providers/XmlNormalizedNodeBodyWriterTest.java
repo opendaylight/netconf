@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
+import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -33,7 +34,8 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
 
         final NormalizedNodePayload nodePayload = new NormalizedNodePayload(Inference.ofDataTreePath(schemaContext),
-            ImmutableNodes.newContainerBuilder().withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build());
+            ImmutableNodes.newContainerBuilder().withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build(),
+            WriterParameters.EMPTY);
 
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final XmlNormalizedNodeBodyWriter xmlWriter = new XmlNormalizedNodeBodyWriter();
@@ -58,7 +60,7 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
                     .withNodeIdentifier(new NodeIdentifier(
                         QName.create("bar:module", "2016-09-29", "foo-bar-container")))
                     .build())
-                .build());
+                .build(), WriterParameters.EMPTY);
 
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final XmlNormalizedNodeBodyWriter xmlWriter = new XmlNormalizedNodeBodyWriter();

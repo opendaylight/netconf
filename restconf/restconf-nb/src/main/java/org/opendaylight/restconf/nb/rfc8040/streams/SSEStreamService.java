@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableMap;
 import java.io.UnsupportedEncodingException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
@@ -23,8 +22,10 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import javax.xml.xpath.XPathExpressionException;
-import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
+import org.opendaylight.restconf.api.QueryParameters;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
+import org.opendaylight.restconf.server.api.QueryParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.slf4j.Logger;
@@ -68,16 +69,11 @@ final class SSEStreamService {
             throw new NotFoundException("No such stream: " + streamName);
         }
 
-        final ImmutableMap<String, String> queryParameters;
+        final EventStreamGetParams getParams;
         try {
-            queryParameters = QueryParams.normalize(uriInfo);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(e.getMessage(), e);
-        }
-
-        final EventStreamGetParams params;
-        try {
-            params = EventStreamGetParams.ofQueryParameters(queryParameters);
+            getParams = EventStreamGetParams.of(new QueryParams(
+                // FIXME: figure this out
+                QueryParameters.ofMultiValue(uriInfo.getQueryParameters()), PrettyPrintParam.FALSE));
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
@@ -85,7 +81,7 @@ final class SSEStreamService {
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
         // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
         //        handler.init()/handler.close()
-        final var handler = new SSESender(pingExecutor, sink, sse, stream, encodingName, params,
+        final var handler = new SSESender(pingExecutor, sink, sse, stream, encodingName, getParams,
             maximumFragmentLength, heartbeatInterval);
 
         try {

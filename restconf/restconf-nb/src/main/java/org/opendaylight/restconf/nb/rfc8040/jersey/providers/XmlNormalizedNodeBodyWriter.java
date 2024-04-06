@@ -17,7 +17,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
     @Override
-    void writeData(final SchemaInferenceStack stack, final QueryParameters writerParameters, final NormalizedNode data,
+    void writeData(final SchemaInferenceStack stack, final WriterParameters writerParameters, final NormalizedNode data,
             final OutputStream entityStream) throws IOException {
         final boolean isRoot;
         if (!stack.isEmpty()) {
@@ -65,7 +65,7 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
-            final Inference inference, final QueryParameters writerParameters) {
+            final Inference inference, final WriterParameters writerParameters) {
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(
             XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, inference),
             writerParameters.depth(), writerParameters.fields());
