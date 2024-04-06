@@ -75,6 +75,7 @@ import org.opendaylight.restconf.server.api.XmlDataPostBody;
 import org.opendaylight.restconf.server.api.XmlOperationInputBody;
 import org.opendaylight.restconf.server.api.XmlPatchBody;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
+import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.slf4j.Logger;
@@ -391,7 +392,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
             @Override
             Response transform(final DataYangPatchResult result) {
                 final var status = result.status();
-                final var builder = Response.status(statusOf(status)).entity(status);
+                final var builder = Response.status(statusOf(status)).entity(new YangPatchStatusBody(status));
                 fillConfigurationMetadata(builder, result);
                 return builder.build();
             }

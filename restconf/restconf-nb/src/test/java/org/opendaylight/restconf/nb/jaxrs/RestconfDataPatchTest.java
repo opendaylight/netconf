@@ -7,10 +7,6 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
@@ -24,9 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.restconf.server.api.PatchStatusContext;
-import org.opendaylight.yangtools.yang.common.ErrorTag;
-import org.opendaylight.yangtools.yang.common.ErrorType;
+import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 
 @ExtendWith(MockitoExtension.class)
 class RestconfDataPatchTest extends AbstractRestconfTest {
@@ -44,7 +38,8 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
         doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(immediateTrueFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
-        final var status = assertEntity(PatchStatusContext.class, 200,
+
+        final var body = assertEntity(YangPatchStatusBody.class, 200,
             ar -> restconf.dataYangJsonPATCH(stringInputStream("""
                 {
                   "ietf-yang-patch:yang-patch" : {
@@ -82,12 +77,9 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                     ]
                   }
                 }"""), ar));
-        assertTrue(status.ok());
-        final var edits = status.editCollection();
-        assertEquals(3, edits.size());
-        assertTrue(edits.get(0).isOk());
-        assertTrue(edits.get(1).isOk());
-        assertTrue(edits.get(2).isOk());
+
+        assertFormat("""
+            {"ietf-yang-patch:yang-patch-status":{"patch-id":"test patch id","ok":[null]}}""", body::formatToJSON);
     }
 
     @Test
@@ -97,7 +89,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
         doReturn(immediateFalseFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(true).when(tx).cancel();
 
-        final var status = assertEntity(PatchStatusContext.class, 409, ar -> restconf.dataYangJsonPATCH(
+        final var body = assertEntity(YangPatchStatusBody.class, 409, ar -> restconf.dataYangJsonPATCH(
             stringInputStream("""
                 {
                   "ietf-yang-patch:yang-patch" : {
@@ -128,20 +120,14 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                     ]
                   }
                 }"""), ar));
-        assertFalse(status.ok());
-        final var edits = status.editCollection();
-        assertEquals(3, edits.size());
-        assertTrue(edits.get(0).isOk());
-        assertTrue(edits.get(1).isOk());
-        final var edit = edits.get(2);
-        assertFalse(edit.isOk());
-        final var errors = edit.getEditErrors();
-        assertEquals(1, errors.size());
-        final var error = errors.get(0);
-        assertEquals("Data does not exist", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
-        assertEquals(GAP_IID, error.getErrorPath());
+
+        assertFormat("""
+            {"ietf-yang-patch:yang-patch-status":{"patch-id":"test patch id","edit-status":{"edit":[\
+            {"edit-id":"create data","ok":[null]},\
+            {"edit-id":"remove data","ok":[null]},\
+            {"edit-id":"delete data","errors":{"error":[{"error-type":"protocol","error-tag":"data-missing",\
+            "error-path":"/example-jukebox:jukebox/player/gap","error-message":"Data does not exist"}]}}]}}}""",
+            body::formatToJSON);
     }
 
     @Test
@@ -151,7 +137,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
         doReturn(immediateTrueFluentFuture()).when(tx).exists(LogicalDatastoreType.CONFIGURATION, GAP_IID);
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        final var status = assertEntity(PatchStatusContext.class, 200,
+        final var body = assertEntity(YangPatchStatusBody.class, 200,
             ar -> restconf.dataYangXmlPATCH(stringInputStream("""
                 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                   <patch-id>test patch id</patch-id>
@@ -185,12 +171,10 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                     <target>/example-jukebox:jukebox/player/gap</target>
                   </edit>
                 </yang-patch>"""), ar));
-        assertTrue(status.ok());
-        assertNull(status.globalErrors());
-        final var edits = status.editCollection();
-        assertEquals(3, edits.size());
-        assertTrue(edits.get(0).isOk());
-        assertTrue(edits.get(1).isOk());
-        assertTrue(edits.get(2).isOk());
+
+        assertFormat("""
+            <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">\
+            <patch-id>test patch id</patch-id><ok/>\
+            </yang-patch-status>""", body::formatToXML);
     }
 }
