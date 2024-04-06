@@ -46,6 +46,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
@@ -392,7 +393,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
             @Override
             Response transform(final DataYangPatchResult result) {
                 final var status = result.status();
-                final var builder = Response.status(statusOf(status)).entity(new YangPatchStatusBody(status));
+                final var builder = Response.status(statusOf(status))
+                    .entity(new YangPatchStatusBody(() -> PrettyPrintParam.FALSE, status));
                 fillConfigurationMetadata(builder, result);
                 return builder.build();
             }

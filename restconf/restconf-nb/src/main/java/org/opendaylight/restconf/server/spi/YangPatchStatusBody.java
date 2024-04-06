@@ -18,7 +18,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
@@ -35,11 +34,6 @@ public final class YangPatchStatusBody extends FormattableBody {
     public YangPatchStatusBody(final FormatParameters format, final PatchStatusContext status) {
         super(format);
         this.status = requireNonNull(status);
-    }
-
-    @Deprecated
-    public YangPatchStatusBody(final PatchStatusContext status) {
-        this(() -> PrettyPrintParam.FALSE, status);
     }
 
     @Override

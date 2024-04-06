@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.util.List;
 import org.junit.Test;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -33,25 +34,33 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
      */
     @Test
     public void testOutputWithGlobalError() throws IOException {
-        final var body = new YangPatchStatusBody(new PatchStatusContext(databind, "patch", List.of(statusEntity),
-            false, List.of(error)));
+        final var body = new YangPatchStatusBody(() -> PrettyPrintParam.TRUE,
+            new PatchStatusContext(databind, "patch", List.of(statusEntity), false, List.of(error)));
 
         assertFormat("""
-            {"ietf-yang-patch:yang-patch-status":{\
-            "patch-id":"patch",\
-            "errors":{"error":[{\
-            "error-type":"protocol",\
-            "error-tag":"data-exists",\
-            "error-message":"Data already exists"\
-            }]}}}""", body::formatToJSON);
+            {
+              "ietf-yang-patch:yang-patch-status": {
+                "patch-id": "patch",
+                "errors": {
+                  "error": [
+                    {
+                      "error-type": "protocol",
+                      "error-tag": "data-exists",
+                      "error-message": "Data already exists"
+                    }
+                  ]
+                }
+              }
+            }""", body::formatToJSON);
         assertFormat("""
-            <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">\
-            <patch-id>patch</patch-id>\
-            <errors>\
-            <error-type>protocol</error-type>\
-            <error-tag>data-exists</error-tag>\
-            <error-message>Data already exists</error-message>\
-            </errors></yang-patch-status>""", body::formatToXML);
+            <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>patch</patch-id>
+              <errors>
+                <error-type>protocol</error-type>
+                <error-tag>data-exists</error-tag>
+                <error-message>Data already exists</error-message>
+              </errors>
+            </yang-patch-status>""", body::formatToXML);
     }
 
     /**
@@ -59,29 +68,44 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
      */
     @Test
     public void testOutputWithoutGlobalError() throws IOException {
-        final var body = new YangPatchStatusBody(new PatchStatusContext(databind,"patch", List.of(statusEntityError),
-            false, null));
+        final var body = new YangPatchStatusBody(() -> PrettyPrintParam.TRUE,
+            new PatchStatusContext(databind,"patch", List.of(statusEntityError), false, null));
 
         assertFormat("""
-            {"ietf-yang-patch:yang-patch-status":{\
-            "patch-id":"patch",\
-            "edit-status":{"edit":[{\
-            "edit-id":"patch1",\
-            "errors":{"error":[{\
-            "error-type":"protocol",\
-            "error-tag":"data-exists",\
-            "error-message":"Data already exists"\
-            }]}}]}}}""", body::formatToJSON);
+            {
+              "ietf-yang-patch:yang-patch-status": {
+                "patch-id": "patch",
+                "edit-status": {
+                  "edit": [
+                    {
+                      "edit-id": "patch1",
+                      "errors": {
+                        "error": [
+                          {
+                            "error-type": "protocol",
+                            "error-tag": "data-exists",
+                            "error-message": "Data already exists"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }""", body::formatToJSON);
         assertFormat("""
-            <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">\
-            <patch-id>patch</patch-id>\
-            <edit-status><edit>\
-            <edit-id>patch1</edit-id>\
-            <errors>\
-            <error-type>protocol</error-type>\
-            <error-tag>data-exists</error-tag>\
-            <error-message>Data already exists</error-message>\
-            </errors></edit></edit-status>\
+            <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>patch</patch-id>
+              <edit-status>
+                <edit>
+                  <edit-id>patch1</edit-id>
+                  <errors>
+                    <error-type>protocol</error-type>
+                    <error-tag>data-exists</error-tag>
+                    <error-message>Data already exists</error-message>
+                  </errors>
+                </edit>
+              </edit-status>
             </yang-patch-status>""", body::formatToXML);
     }
 }
