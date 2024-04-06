@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
@@ -70,7 +71,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
 
         final var restconf = new JaxRsRestconf(new MdsalRestconfServer(
             new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)), dataBroker, rpcService, actionService,
-            mountPointService));
+            mountPointService), PrettyPrintParam.FALSE);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
         restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
@@ -95,7 +96,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
 
         final var restconf = new JaxRsRestconf(new MdsalRestconfServer(
             new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)), dataBroker, rpcService, actionService,
-            mountPointService));
+            mountPointService), PrettyPrintParam.FALSE);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
         restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),

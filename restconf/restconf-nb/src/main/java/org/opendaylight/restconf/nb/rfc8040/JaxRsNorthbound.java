@@ -68,7 +68,7 @@ public final class JaxRsNorthbound implements AutoCloseable {
                             return Set.of(
                                 new JsonFormattableBody(), new XmlFormattableBody(),
                                 new RestconfDocumentedExceptionMapper(databindProvider),
-                                new JaxRsRestconf(server));
+                                new JaxRsRestconf(server, servletFactory.prettyPrint()));
                         }
                     }).build())
                 .asyncSupported(true)

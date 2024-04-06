@@ -22,7 +22,6 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 
 import com.google.common.util.concurrent.Futures;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -36,6 +35,9 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ImmutableQueryParameters;
+import org.opendaylight.restconf.api.query.InsertParam;
+import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.JsonDataPostBody;
@@ -252,13 +254,11 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
             .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "0")).node(SONG_QNAME).build();
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(songListPath);
 
-        // Creating query params to insert new item after last existing item in list
-        final var queryParams = new HashMap<String, String>();
-        queryParams.put("insert", "after");
-        queryParams.put("point", "example-jukebox:jukebox/playlist=0/song=2");
-
         // Inserting new song at 3rd position (aka as last element)
         spyStrategy.dataPUT(ApiPath.parse("example-jukebox:jukebox/playlist=0/song=3"),
+            ImmutableQueryParameters.of(
+                // insert new item after last existing item in list
+                InsertParam.AFTER, PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")),
             new JsonResourceBody(stringInputStream("""
                 {
                   "example-jukebox:song" : [
@@ -267,7 +267,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
                        "id" = "C"
                     }
                   ]
-                }""")), queryParams);
+                }""")));
 
         // Counting how many times we insert items in list
         verify(spyTx, times(3)).replace(any(), any());
@@ -291,13 +291,11 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
             .node(NodeIdentifierWithPredicates.of(PLAYLIST_QNAME, NAME_QNAME, "0")).node(SONG_QNAME).build();
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(songListPath);
 
-        // Creating query params to insert new item after last existing item in list
-        final var queryParams = new HashMap<String, String>();
-        queryParams.put("insert", "after");
-        queryParams.put("point", "example-jukebox:jukebox/playlist=0/song=2");
-
         // Inserting new song at 3rd position (aka as last element)
         spyStrategy.dataPOST(ApiPath.parse("example-jukebox:jukebox/playlist=0"),
+            // insert new item after last existing item in list
+            ImmutableQueryParameters.of(InsertParam.AFTER,
+                PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")),
             new JsonDataPostBody(stringInputStream("""
                 {
                   "example-jukebox:song" : [
@@ -306,7 +304,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
                        "id" = "C"
                     }
                   ]
-                }""")), queryParams);
+                }""")));
 
         // Counting how many times we insert items in list
         verify(spyTx, times(3)).replace(any(), any());

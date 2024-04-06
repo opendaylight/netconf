@@ -41,6 +41,7 @@ import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
@@ -77,7 +78,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     final void setupRestconf() {
         restconf = new JaxRsRestconf(new MdsalRestconfServer(
             new MdsalDatabindProvider(new FixedDOMSchemaService(modelContext())), dataBroker, rpcService, actionService,
-            mountPointService));
+            mountPointService), PrettyPrintParam.FALSE);
     }
 
     EffectiveModelContext modelContext() {

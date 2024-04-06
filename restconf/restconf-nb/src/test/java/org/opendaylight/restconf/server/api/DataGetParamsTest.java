@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.databind.jaxrs;
+package org.opendaylight.restconf.server.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -15,16 +15,14 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.withSettings;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.restconf.api.ImmutableQueryParameters;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.InsertParam;
@@ -32,10 +30,8 @@ import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
-import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -46,30 +42,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.ContainerEffectiveStatement;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class QueryParamsTest {
-    /**
-     * Test when parameter is present at most once.
-     */
-    @Test
-    public void optionalParamTest() {
-        assertEquals("all", QueryParams.optionalParam(ContentParam.uriName, List.of("all")));
-    }
-
-    /**
-     * Test when parameter is present more than once.
-     */
-    @Test
-    public void optionalParamMultipleTest() {
-        final var ex = assertThrows(RestconfDocumentedException.class,
-            () -> QueryParams.optionalParam(ContentParam.uriName, List.of("config", "nonconfig", "all")));
-        final var errors = ex.getErrors();
-        assertEquals(1, errors.size());
-
-        final var error = errors.get(0);
-        assertEquals("Error type is not correct", ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, error.getErrorTag());
-    }
-
+public class DataGetParamsTest {
     /**
      * Test when not allowed parameter type is used.
      */
@@ -77,11 +50,11 @@ public class QueryParamsTest {
     public void checkParametersTypesNegativeTest() {
         final var mockDatabind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
         assertInvalidIAE(EventStreamGetParams::ofQueryParameters);
-        assertUnknownParam(QueryParams::newDataGetParams);
+        assertUnknownParam(DataGetParams::ofQueryParameters);
         assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mockDatabind, queryParams));
 
         assertInvalidIAE(EventStreamGetParams::ofQueryParameters, ContentParam.ALL);
-        assertInvalidParam(QueryParams::newDataGetParams, InsertParam.LAST);
+        assertInvalidParam(DataGetParams::ofQueryParameters, InsertParam.LAST);
         assertInvalidIAE(queryParams -> Insert.ofQueryParameters(mockDatabind, queryParams), ContentParam.ALL);
     }
 
@@ -91,7 +64,7 @@ public class QueryParamsTest {
     @Test
     public void parseUriParametersDefaultTest() {
         // no parameters, default values should be used
-        final var params = assertParams(QueryParams::newDataGetParams, new MultivaluedHashMap<>());
+        final var params = DataGetParams.ofQueryParameters(ImmutableQueryParameters.of());
         assertEquals(ContentParam.ALL, params.content());
         assertNull(params.depth());
         assertNull(params.fields());
@@ -99,14 +72,14 @@ public class QueryParamsTest {
 
     @Test
     public void testInvalidValueReadDataParams() {
-        assertInvalidValue(QueryParams::newDataGetParams, ContentParam.uriName);
-        assertInvalidValue(QueryParams::newDataGetParams, DepthParam.uriName);
-        assertInvalidValue(QueryParams::newDataGetParams, WithDefaultsParam.uriName);
+        assertInvalidValue(DataGetParams::ofQueryParameters, ContentParam.uriName);
+        assertInvalidValue(DataGetParams::ofQueryParameters, DepthParam.uriName);
+        assertInvalidValue(DataGetParams::ofQueryParameters, WithDefaultsParam.uriName);
 
         // inserted value is too high
-        assertInvalidValue(QueryParams::newDataGetParams, DepthParam.uriName, "65536");
+        assertInvalidValue(DataGetParams::ofQueryParameters, DepthParam.uriName, "65536");
         // inserted value is too low
-        assertInvalidValue(QueryParams::newDataGetParams, DepthParam.uriName, "0");
+        assertInvalidValue(DataGetParams::ofQueryParameters, DepthParam.uriName, "0");
     }
 
     /**
@@ -114,7 +87,8 @@ public class QueryParamsTest {
      */
     @Test
     public void parseUriParametersWithDefaultAndTaggedTest() {
-        final var params = assertParams(QueryParams::newDataGetParams, WithDefaultsParam.uriName, "report-all-tagged");
+        final var params = assertParams(DataGetParams::ofQueryParameters, WithDefaultsParam.uriName,
+            "report-all-tagged");
         assertEquals(WithDefaultsParam.REPORT_ALL_TAGGED, params.withDefaults());
     }
 
@@ -123,7 +97,8 @@ public class QueryParamsTest {
      */
     @Test
     public void parseUriParametersWithDefaultAndReportAllTest() {
-        final var params = assertParams(QueryParams::newDataGetParams, WithDefaultsParam.uriName, "report-all");
+        final var params = assertParams(DataGetParams::ofQueryParameters, WithDefaultsParam.uriName,
+            "report-all");
         assertEquals(WithDefaultsParam.REPORT_ALL, params.withDefaults());
     }
 
@@ -133,7 +108,8 @@ public class QueryParamsTest {
      */
     @Test
     public void parseUriParametersWithDefaultAndNonTaggedTest() {
-        final var params = assertParams(QueryParams::newDataGetParams, WithDefaultsParam.uriName, "explicit");
+        final var params = assertParams(DataGetParams::ofQueryParameters, WithDefaultsParam.uriName,
+            "explicit");
         assertEquals(WithDefaultsParam.EXPLICIT, params.withDefaults());
     }
 
@@ -144,12 +120,10 @@ public class QueryParamsTest {
     public void parseUriParametersUserDefinedTest() {
         final QName containerChild = QName.create("ns", "container-child");
 
-        final var parameters = new MultivaluedHashMap<String, String>();
-        parameters.putSingle("content", "config");
-        parameters.putSingle("depth", "10");
-        parameters.putSingle("fields", "container-child");
-
-        final var params = assertParams(QueryParams::newDataGetParams, parameters);
+        final var params = DataGetParams.ofQueryParameters(ImmutableQueryParameters.of(Map.of(
+            "content", "config",
+            "depth", "10",
+            "fields", "container-child")));
         // content
         assertEquals(ContentParam.CONFIG, params.content());
 
@@ -171,56 +145,50 @@ public class QueryParamsTest {
         doReturn(containerChild).when(containerChildSchema).getQName();
         doReturn(containerChildSchema).when(containerSchema).dataChildByName(containerChild);
 
-        final var queryParameters = QueryParameters.of(params, MdsalRestconfStrategy.translateFieldsParam(
+        final var writerParameters = WriterParameters.of(params, MdsalRestconfStrategy.translateFieldsParam(
             mock(EffectiveModelContext.class), DataSchemaContext.of(containerSchema), paramsFields));
-        final var fields = queryParameters.fields();
+        final var fields = writerParameters.fields();
         assertNotNull(fields);
         assertEquals(1, fields.size());
         assertEquals(Set.of(containerChild), fields.get(0));
     }
 
-    private static void assertInvalidParam(final Function<UriInfo, ?> paramsMethod, final RestconfQueryParam<?> param) {
-        final var params = new MultivaluedHashMap<String, String>();
-        params.putSingle(param.paramName(), "odl-test-value");
-        assertParamsThrows(ErrorTag.MALFORMED_MESSAGE, paramsMethod, params);
+    private static void assertInvalidParam(final Function<QueryParameters, ?> paramsMethod,
+            final RestconfQueryParam<?> param) {
+        assertParamsThrows(ErrorTag.MALFORMED_MESSAGE, paramsMethod,
+            ImmutableQueryParameters.of(param.paramName(), "odl-test-value"));
     }
 
-    private static void assertInvalidIAE(final Function<Map<String, String>, ?> paramsMethod,
+    private static void assertInvalidIAE(final Function<QueryParameters, ?> paramsMethod,
             final RestconfQueryParam<?> param) {
         final var ex = assertThrows(IllegalArgumentException.class,
-            () -> paramsMethod.apply(Map.of(param.paramName(), "odl-test-value")));
+            () -> paramsMethod.apply(ImmutableQueryParameters.of(param.paramName(), "odl-test-value")));
         assertEquals("Invalid parameter: " + param.paramName(), ex.getMessage());
     }
 
-    private static void assertInvalidIAE(final Function<Map<String, String>, ?> paramsMethod) {
+    private static void assertInvalidIAE(final Function<QueryParameters, ?> paramsMethod) {
         final var ex = assertThrows(IllegalArgumentException.class,
-            () -> paramsMethod.apply(Map.of("odl-unknown-param", "odl-test-value")));
+            () -> paramsMethod.apply(ImmutableQueryParameters.of("odl-unknown-param", "odl-test-value")));
         assertEquals("Invalid parameter: odl-unknown-param", ex.getMessage());
     }
 
-    private static void assertUnknownParam(final Function<UriInfo, ?> paramsMethod) {
-        final var params = new MultivaluedHashMap<String, String>();
-        params.putSingle("odl-unknown-param", "odl-test-value");
-        assertParamsThrows(ErrorTag.UNKNOWN_ATTRIBUTE, paramsMethod, params);
+    private static void assertUnknownParam(final Function<QueryParameters, ?> paramsMethod) {
+        assertParamsThrows(ErrorTag.UNKNOWN_ATTRIBUTE, paramsMethod,
+            ImmutableQueryParameters.of("odl-unknown-param", "odl-test-value"));
     }
 
-    private static void assertInvalidValue(final Function<UriInfo, ?> paramsMethod, final String name) {
+    private static void assertInvalidValue(final Function<QueryParameters, ?> paramsMethod, final String name) {
         assertInvalidValue(paramsMethod, name, "odl-invalid-value");
     }
 
-    private static void assertInvalidValue(final Function<UriInfo, ?> paramsMethod, final String name,
+    private static void assertInvalidValue(final Function<QueryParameters, ?> paramsMethod, final String name,
             final String value) {
-        final var params = new MultivaluedHashMap<String, String>();
-        params.putSingle(name, value);
-        assertParamsThrows(ErrorTag.INVALID_VALUE, paramsMethod, params);
+        assertParamsThrows(ErrorTag.INVALID_VALUE, paramsMethod, ImmutableQueryParameters.of(name, value));
     }
 
-    private static void assertParamsThrows(final ErrorTag expectedTag, final Function<UriInfo, ?> paramsMethod,
-            final MultivaluedMap<String, String> params) {
-        final var uriInfo = mock(UriInfo.class);
-        doReturn(params).when(uriInfo).getQueryParameters();
-
-        final var ex = assertThrows(RestconfDocumentedException.class,  () -> paramsMethod.apply(uriInfo));
+    private static void assertParamsThrows(final ErrorTag expectedTag, final Function<QueryParameters, ?> paramsMethod,
+            final QueryParameters params) {
+        final var ex = assertThrows(RestconfDocumentedException.class, () -> paramsMethod.apply(params));
         final var errors = ex.getErrors();
         assertEquals(1, errors.size());
 
@@ -229,17 +197,8 @@ public class QueryParamsTest {
         assertEquals(expectedTag, error.getErrorTag());
     }
 
-    private static <T> T assertParams(final Function<UriInfo, T> paramsMethod, final String name,
+    private static <T> T assertParams(final Function<QueryParameters, T> paramsMethod, final String name,
             final String value) {
-        final var params = new MultivaluedHashMap<String, String>();
-        params.putSingle(name, value);
-        return assertParams(paramsMethod, params);
-    }
-
-    private static <T> T assertParams(final Function<UriInfo, T> paramsMethod,
-            final MultivaluedMap<String, String> params) {
-        final var uriInfo = mock(UriInfo.class);
-        doReturn(params).when(uriInfo).getQueryParameters();
-        return paramsMethod.apply(uriInfo);
+        return paramsMethod.apply(ImmutableQueryParameters.of(name, value));
     }
 }

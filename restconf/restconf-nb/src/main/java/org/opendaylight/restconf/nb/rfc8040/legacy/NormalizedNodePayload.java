@@ -18,7 +18,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
  * messy details needed to deal with the payload.
  */
 @NonNullByDefault
-public record NormalizedNodePayload(Inference inference, NormalizedNode data, QueryParameters writerParameters) {
+public record NormalizedNodePayload(Inference inference, NormalizedNode data, WriterParameters writerParameters) {
     public NormalizedNodePayload {
         requireNonNull(inference);
         requireNonNull(data);
@@ -26,6 +26,6 @@ public record NormalizedNodePayload(Inference inference, NormalizedNode data, Qu
     }
 
     public NormalizedNodePayload(final Inference inference, final NormalizedNode data) {
-        this(inference, data, QueryParameters.EMPTY);
+        this(inference, data, WriterParameters.EMPTY);
     }
 }

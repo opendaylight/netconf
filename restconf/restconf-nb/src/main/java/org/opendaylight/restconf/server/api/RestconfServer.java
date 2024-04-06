@@ -13,6 +13,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -38,7 +39,7 @@ public interface RestconfServer {
      * @param params {@link DataGetParams} for this request
      * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<DataGetResult> dataGET(DataGetParams params);
+    RestconfFuture<DataGetResult> dataGET(QueryParameters params);
 
     /**
      * Return the content of a data resource.
@@ -47,7 +48,7 @@ public interface RestconfServer {
      * @param params {@link DataGetParams} for this request
      * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<DataGetResult> dataGET(ApiPath identifier, DataGetParams params);
+    RestconfFuture<DataGetResult> dataGET(ApiPath identifier, QueryParameters params);
 
     /**
      * Partially modify the target data resource, as defined in
@@ -72,57 +73,55 @@ public interface RestconfServer {
      * Ordered list of edits that are applied to the datastore by the server, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
-     * @param queryParameters query parameters
+     * @param params query parameters
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    RestconfFuture<DataYangPatchResult> dataPATCH(Map<String, String> queryParameters, PatchBody body);
+    RestconfFuture<DataYangPatchResult> dataPATCH(QueryParameters params, PatchBody body);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param identifier path to target
-     * @param queryParameters query parameters
+     * @param params query parameters
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    RestconfFuture<DataYangPatchResult> dataPATCH(ApiPath identifier, Map<String, String> queryParameters,
-        PatchBody body);
+    RestconfFuture<DataYangPatchResult> dataPATCH(ApiPath identifier, QueryParameters params, PatchBody body);
 
-    RestconfFuture<CreateResourceResult> dataPOST(ChildBody body, Map<String, String> queryParameters);
+    RestconfFuture<CreateResourceResult> dataPOST(QueryParameters params, ChildBody body);
 
     /**
      * Create or invoke a operation, as described in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4">RFC8040 section 4.4</a>.
      *
      * @param identifier path to target
+     * @param params query parameters
      * @param body body of the post request
-     * @param queryParameters query parameters
      */
-    RestconfFuture<? extends DataPostResult> dataPOST(ApiPath identifier, DataPostBody body,
-        Map<String, String> queryParameters);
+    RestconfFuture<? extends DataPostResult> dataPOST(ApiPath identifier, QueryParameters params, DataPostBody body);
 
     /**
      * Replace the data store, as described in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>.
      *
      * @param body data node for put to config DS
-     * @param queryParameters Query parameters
+     * @param params query parameters
      * @return A {@link RestconfFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(ResourceBody body, Map<String, String> queryParameters);
+    RestconfFuture<DataPutResult> dataPUT(QueryParameters params, ResourceBody body);
 
     /**
      * Create or replace a data store resource, as described in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>.
      *
      * @param identifier resource identifier
+     * @param params query parameters
      * @param body data node for put to config DS
-     * @param queryParameters Query parameters
      * @return A {@link RestconfFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(ApiPath identifier, ResourceBody body, Map<String, String> queryParameters);
+    RestconfFuture<DataPutResult> dataPUT(ApiPath identifier, QueryParameters params, ResourceBody body);
 
     /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, ApiPath, Map, OperationInputBody)},
@@ -150,13 +149,13 @@ public interface RestconfServer {
      *
      * @param restconfURI Base URI of the request
      * @param operation {@code <operation>} path, really an {@link ApiPath} to an {@code rpc}
-     * @param queryParameters query parameters
+     * @param params query parameters
      * @param body RPC operation
      * @return A {@link RestconfFuture} completing with {@link InvokeResult}
      */
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support yang-ext:mount,
     //        and hence it is a path right now
-    RestconfFuture<InvokeResult> operationsPOST(URI restconfURI, ApiPath operation, Map<String, String> queryParameters,
+    RestconfFuture<InvokeResult> operationsPOST(URI restconfURI, ApiPath operation, QueryParameters params,
         OperationInputBody body);
 
     /**
