@@ -12,6 +12,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import java.util.Map;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriInfo;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,7 +36,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
     @BeforeEach
     void beforeEach() {
         doReturn(tx).when(dataBroker).newReadWriteTransaction();
-        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
+        doReturn(new MultivaluedHashMap<>(Map.of(PrettyPrintParam.uriName, "true"))).when(uriInfo).getQueryParameters();
     }
 
     @Test
@@ -84,7 +86,14 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                 }"""), uriInfo, ar));
 
         assertFormat("""
-            {"ietf-yang-patch:yang-patch-status":{"patch-id":"test patch id","ok":[null]}}""", body::formatToJSON);
+            {
+              "ietf-yang-patch:yang-patch-status": {
+                "patch-id": "test patch id",
+                "ok": [
+                  null
+                ]
+              }
+            }""", body::formatToJSON);
     }
 
     @Test
@@ -127,12 +136,40 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                 }"""), uriInfo, ar));
 
         assertFormat("""
-            {"ietf-yang-patch:yang-patch-status":{"patch-id":"test patch id","edit-status":{"edit":[\
-            {"edit-id":"create data","ok":[null]},\
-            {"edit-id":"remove data","ok":[null]},\
-            {"edit-id":"delete data","errors":{"error":[{"error-type":"protocol","error-tag":"data-missing",\
-            "error-path":"/example-jukebox:jukebox/player/gap","error-message":"Data does not exist"}]}}]}}}""",
-            body::formatToJSON);
+            {
+              "ietf-yang-patch:yang-patch-status": {
+                "patch-id": "test patch id",
+                "edit-status": {
+                  "edit": [
+                    {
+                      "edit-id": "create data",
+                      "ok": [
+                        null
+                      ]
+                    },
+                    {
+                      "edit-id": "remove data",
+                      "ok": [
+                        null
+                      ]
+                    },
+                    {
+                      "edit-id": "delete data",
+                      "errors": {
+                        "error": [
+                          {
+                            "error-type": "protocol",
+                            "error-tag": "data-missing",
+                            "error-path": "/example-jukebox:jukebox/player/gap",
+                            "error-message": "Data does not exist"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }""", body::formatToJSON);
     }
 
     @Test
@@ -178,8 +215,9 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                 </yang-patch>"""), uriInfo, ar));
 
         assertFormat("""
-            <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">\
-            <patch-id>test patch id</patch-id><ok/>\
+            <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
+              <patch-id>test patch id</patch-id>
+              <ok/>
             </yang-patch-status>""", body::formatToXML);
     }
 }
