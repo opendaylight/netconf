@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -84,7 +85,8 @@ abstract class AbstractResourceBodyTest extends AbstractBodyTest {
             throw new AssertionError(e);
         }
 
-        final var strategy = new MdsalRestconfStrategy(DATABIND, dataBroker, null, null, null, mountPointService);
+        final var strategy = new MdsalRestconfStrategy(DATABIND, dataBroker, ImmutableMap.of(), null, null, null,
+            mountPointService);
         final var stratAndPath = strategy.resolveStrategyPath(apiPath);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {

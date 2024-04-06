@@ -16,7 +16,7 @@ import javax.ws.rs.ext.Provider;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
 public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
     @Override
-    void writeData(final SchemaInferenceStack stack, final QueryParameters writerParameters, final NormalizedNode data,
+    void writeData(final SchemaInferenceStack stack, final WriterParameters writerParameters, final NormalizedNode data,
             final OutputStream entityStream) throws IOException {
         if (!stack.isEmpty()) {
             stack.exit();
@@ -58,7 +58,7 @@ public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBo
     }
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final Inference inference,
-            final JsonWriter jsonWriter, final QueryParameters writerParameters,
+            final JsonWriter jsonWriter, final WriterParameters writerParameters,
             final @Nullable XMLNamespace initialNamespace) {
         // TODO: Performance: Cache JSON Codec factory and schema context
         final var codecs = JSONCodecFactorySupplier.RFC7951.getShared(inference.modelContext());
