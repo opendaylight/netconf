@@ -38,19 +38,25 @@ public final class OSGiNorthbound {
     public @interface Configuration {
         @AttributeDefinition(min = "0", max = "" + StreamsConfiguration.MAXIMUM_FRAGMENT_LENGTH_LIMIT)
         int maximum$_$fragment$_$length() default 0;
+
         @AttributeDefinition(min = "0")
         int heartbeat$_$interval() default 10000;
+
         @AttributeDefinition(min = "1")
         int idle$_$timeout() default 30000;
+
         @AttributeDefinition(min = "1")
         String ping$_$executor$_$name$_$prefix() default DefaultPingExecutor.DEFAULT_NAME_PREFIX;
+
         // FIXME: this is a misnomer: it specifies the core pool size, i.e. minimum thread count, the maximum is set to
         //        Integer.MAX_VALUE, which is not what we want
         @AttributeDefinition(min = "0")
         int max$_$thread$_$count() default DefaultPingExecutor.DEFAULT_CORE_POOL_SIZE;
+
         @Deprecated(since = "7.0.0", forRemoval = true)
         @AttributeDefinition
         boolean use$_$sse() default true;
+
         @AttributeDefinition(name = "{+restconf}", description = """
             The value of RFC8040 {+restconf} URI template, pointing to the root resource. Must not end with '/'.""")
         String restconf() default "rests";

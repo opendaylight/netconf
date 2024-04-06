@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -96,7 +97,8 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
             throw new AssertionError(e);
         }
 
-        final var strategy = new MdsalRestconfStrategy(IID_DATABIND, dataBroker, null, null, null, mountPointService);
+        final var strategy = new MdsalRestconfStrategy(IID_DATABIND, dataBroker, ImmutableMap.of(), null, null, null,
+            mountPointService);
         final var stratAndPath = strategy.resolveStrategyPath(apiPath);
 
         try (var body = bodyConstructor.apply(stringInputStream(patchBody))) {

@@ -18,7 +18,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 
@@ -37,6 +37,6 @@ abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<Nor
             requireNonNull(entityStream));
     }
 
-    abstract void writeData(@NonNull SchemaInferenceStack stack, @NonNull QueryParameters writerParameters,
+    abstract void writeData(@NonNull SchemaInferenceStack stack, @NonNull WriterParameters writerParameters,
         @NonNull NormalizedNode data, @NonNull OutputStream entityStream) throws IOException;
 }

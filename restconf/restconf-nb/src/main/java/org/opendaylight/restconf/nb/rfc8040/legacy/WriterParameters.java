@@ -17,7 +17,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.yangtools.yang.common.QName;
 
 /**
@@ -26,24 +25,18 @@ import org.opendaylight.yangtools.yang.common.QName;
  * needs to be processed (for example filtered).
  */
 @Beta
-// FIXME: this probably needs to be renamed back to WriterParams, or somesuch
-public record QueryParameters(
-        @Nullable DepthParam depth,
+public record WriterParameters(
         @NonNull PrettyPrintParam prettyPrint,
+        @Nullable DepthParam depth,
         @Nullable List<Set<QName>> fields) implements FormatParameters {
-    public static final @NonNull QueryParameters EMPTY = new QueryParameters(null, PrettyPrintParam.FALSE, null);
+    public static final @NonNull WriterParameters EMPTY = new WriterParameters(PrettyPrintParam.FALSE, null, null);
 
-    public QueryParameters {
+    public WriterParameters {
         requireNonNull(prettyPrint);
     }
 
-    public static @NonNull QueryParameters of(final DataGetParams params) {
-        final var depth = params.depth();
-        final var prettyPrint = params.prettyPrint();
-        return depth == null && !prettyPrint.value() ? EMPTY : new QueryParameters(depth, prettyPrint, null);
-    }
-
-    public static @NonNull QueryParameters of(final DataGetParams params, final List<Set<QName>> fields) {
-        return fields == null ? of(params) : new QueryParameters(params.depth(), params.prettyPrint(), fields);
+    public static @NonNull WriterParameters of(final @NonNull PrettyPrintParam prettyPrint,
+            final @Nullable DepthParam depth) {
+        return depth == null && !prettyPrint.value() ? EMPTY : new WriterParameters(prettyPrint, depth, null);
     }
 }
