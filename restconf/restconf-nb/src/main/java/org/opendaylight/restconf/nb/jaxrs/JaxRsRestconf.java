@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -46,6 +47,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
@@ -115,10 +117,12 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         }
     };
 
-    private final RestconfServer server;
+    private final @NonNull RestconfServer server;
+    private final @NonNull PrettyPrintParam prettyPrint;
 
-    public JaxRsRestconf(final RestconfServer server) {
+    public JaxRsRestconf(final RestconfServer server, final PrettyPrintParam prettyPrint) {
         this.server = requireNonNull(server);
+        this.prettyPrint = requireNonNull(prettyPrint);
     }
 
     @Override
@@ -320,7 +324,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangJsonPATCH(final InputStream body, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(QueryParams.normalize(uriInfo), jsonBody), ar);
+            completeDataYangPATCH(server.dataPATCH(queryParamsWithPrettyPrint(uriInfo), jsonBody), ar);
         }
     }
 
@@ -343,7 +347,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(identifier, QueryParams.normalize(uriInfo), jsonBody), ar);
+            completeDataYangPATCH(server.dataPATCH(identifier, queryParamsWithPrettyPrint(uriInfo), jsonBody), ar);
         }
     }
 
@@ -365,7 +369,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangXmlPATCH(final InputStream body, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(QueryParams.normalize(uriInfo), xmlBody), ar);
+            completeDataYangPATCH(server.dataPATCH(queryParamsWithPrettyPrint(uriInfo), xmlBody), ar);
         }
     }
 
@@ -388,7 +392,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(identifier, QueryParams.normalize(uriInfo), xmlBody), ar);
+            completeDataYangPATCH(server.dataPATCH(identifier, queryParamsWithPrettyPrint(uriInfo), xmlBody), ar);
         }
     }
 
@@ -445,7 +449,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void postDataJSON(final InputStream body, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonChildBody(body)) {
-            completeDataPOST(server.dataPOST(jsonBody, QueryParams.normalize(uriInfo)), uriInfo, ar);
+            completeDataPOST(server.dataPOST(jsonBody, queryParamsWithPrettyPrint(uriInfo)), uriInfo, ar);
         }
     }
 
@@ -465,7 +469,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void postDataJSON(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        completeDataPOST(server.dataPOST(identifier, new JsonDataPostBody(body), QueryParams.normalize(uriInfo)),
+        completeDataPOST(server.dataPOST(identifier, new JsonDataPostBody(body), queryParamsWithPrettyPrint(uriInfo)),
             uriInfo, ar);
     }
 
@@ -485,7 +489,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void postDataXML(final InputStream body, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlChildBody(body)) {
-            completeDataPOST(server.dataPOST(xmlBody, QueryParams.normalize(uriInfo)), uriInfo, ar);
+            completeDataPOST(server.dataPOST(xmlBody, queryParamsWithPrettyPrint(uriInfo)), uriInfo, ar);
         }
     }
 
@@ -506,7 +510,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void postDataXML(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        completeDataPOST(server.dataPOST(identifier, new XmlDataPostBody(body), QueryParams.normalize(uriInfo)),
+        completeDataPOST(server.dataPOST(identifier, new XmlDataPostBody(body), queryParamsWithPrettyPrint(uriInfo)),
             uriInfo, ar);
     }
 
@@ -548,7 +552,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataJsonPUT(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            completeDataPUT(server.dataPUT(jsonBody, QueryParams.normalize(uriInfo)), ar);
+            completeDataPUT(server.dataPUT(jsonBody, queryParams(uriInfo)), ar);
         }
     }
 
@@ -569,7 +573,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataJsonPUT(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            completeDataPUT(server.dataPUT(identifier, jsonBody, QueryParams.normalize(uriInfo)), ar);
+            completeDataPUT(server.dataPUT(identifier, jsonBody, queryParams(uriInfo)), ar);
         }
     }
 
@@ -589,7 +593,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataXmlPUT(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            completeDataPUT(server.dataPUT(xmlBody, QueryParams.normalize(uriInfo)), ar);
+            completeDataPUT(server.dataPUT(xmlBody, queryParams(uriInfo)), ar);
         }
     }
 
@@ -611,7 +615,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataXmlPUT(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            completeDataPUT(server.dataPUT(identifier, xmlBody, QueryParams.normalize(uriInfo)), ar);
+            completeDataPUT(server.dataPUT(identifier, xmlBody, queryParams(uriInfo)), ar);
         }
     }
 
@@ -728,7 +732,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
 
     private void operationsPOST(final ApiPath identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
-        server.operationsPOST(uriInfo.getBaseUri(), identifier, QueryParams.normalize(uriInfo), body)
+        server.operationsPOST(uriInfo.getBaseUri(), identifier, queryParamsWithPrettyPrint(uriInfo), body)
             .addCallback(new JaxRsRestconfCallback<>(ar) {
                 @Override
                 Response transform(final InvokeResult result) {
@@ -855,4 +859,13 @@ public final class JaxRsRestconf implements ParamConverterProvider {
             }
         });
     }
+
+    private static @NonNull ImmutableMap<@NonNull String, @NonNull String> queryParams(final UriInfo uriInfo) {
+        return QueryParams.normalize(uriInfo, null);
+    }
+
+    private @NonNull ImmutableMap<@NonNull String, @NonNull String> queryParamsWithPrettyPrint(final UriInfo uriInfo) {
+        return QueryParams.normalize(uriInfo, prettyPrint);
+    }
+
 }

@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.concepts.Immutable;
@@ -73,6 +74,9 @@ public final class Insert implements Immutable {
                     break;
                 case PointParam.uriName:
                     point = mandatoryParam(PointParam::forUriValue, paramName, paramValue);
+                    break;
+                case PrettyPrintParam.uriName:
+                    // Ignored
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid parameter: " + paramName);

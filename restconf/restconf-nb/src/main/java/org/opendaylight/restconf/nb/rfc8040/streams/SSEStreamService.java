@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import javax.xml.xpath.XPathExpressionException;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
@@ -39,6 +40,7 @@ final class SSEStreamService {
     private static final Logger LOG = LoggerFactory.getLogger(SSEStreamService.class);
 
     private final RestconfStream.Registry streamRegistry;
+    private final PrettyPrintParam prettyPrint;
     private final PingExecutor pingExecutor;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
@@ -49,6 +51,7 @@ final class SSEStreamService {
         this.pingExecutor = requireNonNull(pingExecutor);
         heartbeatInterval = configuration.heartbeatInterval();
         maximumFragmentLength = configuration.maximumFragmentLength();
+        prettyPrint = configuration.prettyPrint();
     }
 
     /**
@@ -70,7 +73,7 @@ final class SSEStreamService {
 
         final ImmutableMap<String, String> queryParameters;
         try {
-            queryParameters = QueryParams.normalize(uriInfo);
+            queryParameters = QueryParams.normalize(uriInfo, prettyPrint);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }

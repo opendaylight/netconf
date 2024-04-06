@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.ws.rs.core.Application;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -84,6 +85,11 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     @Override
     public String restconf() {
         return restconf;
+    }
+
+    @Override
+    public PrettyPrintParam prettyPrint() {
+        return streamsConfiguration.prettyPrint();
     }
 
     @Override

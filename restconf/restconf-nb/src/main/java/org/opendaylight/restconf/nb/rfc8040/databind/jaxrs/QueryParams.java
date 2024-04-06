@@ -59,13 +59,20 @@ public final class QueryParams {
      * Normalize query parameters from an {@link UriInfo}.
      *
      * @param uriInfo An {@link UriInfo}
+     * @param defaultPrettyPrint Default value of {@link PrettyPrintParam}, if applicable
      * @return Normalized query parameters
      * @throws NullPointerException if {@code uriInfo} is {@code null}
      * @throws IllegalArgumentException if there are multiple values for a parameter
      */
-    public static @NonNull ImmutableMap<String, String> normalize(final UriInfo uriInfo) {
+    public static @NonNull ImmutableMap<String, String> normalize(final UriInfo uriInfo,
+            final @Nullable PrettyPrintParam defaultPrettyPrint) {
+        final var queryParameters = uriInfo.getQueryParameters();
+        if (defaultPrettyPrint != null) {
+            queryParameters.putIfAbsent(PrettyPrintParam.uriName, List.of(defaultPrettyPrint.paramValue()));
+        }
+
         final var builder = ImmutableMap.<String, String>builder();
-        for (var entry : uriInfo.getQueryParameters().entrySet()) {
+        for (var entry : queryParameters.entrySet()) {
             final var values = entry.getValue();
             switch (values.size()) {
                 case 0:

@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.server.api;
 
 import java.util.Map;
-import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
@@ -22,21 +21,19 @@ final class FormatParametersHelper {
     }
 
     static <T extends FormatParameters> @NonNull T ofQueryParameters(final Map<String, String> queryParameters,
-            final Function<@NonNull PrettyPrintParam, @NonNull T> factory, final @NonNull T empty) {
-        if (queryParameters.isEmpty()) {
-            return empty;
-        }
-
+            final @NonNull T compact, final @NonNull T pretty) {
         var prettyPrint = PrettyPrintParam.FALSE;
-        for (var entry : queryParameters.entrySet()) {
-            final var paramName = entry.getKey();
+        if (!queryParameters.isEmpty()) {
+            for (var entry : queryParameters.entrySet()) {
+                final var paramName = entry.getKey();
 
-            prettyPrint = switch (paramName) {
-                case PrettyPrintParam.uriName -> EventStreamGetParams.mandatoryParam(PrettyPrintParam::forUriValue,
-                    paramName, entry.getValue());
-                default -> throw new IllegalArgumentException("Invalid parameter: " + paramName);
-            };
+                prettyPrint = switch (paramName) {
+                    case PrettyPrintParam.uriName -> EventStreamGetParams.mandatoryParam(PrettyPrintParam::forUriValue,
+                        paramName, entry.getValue());
+                    default -> throw new IllegalArgumentException("Invalid parameter: " + paramName);
+                };
+            }
         }
-        return factory.apply(prettyPrint);
+        return prettyPrint.value() ? pretty : compact;
     }
 }

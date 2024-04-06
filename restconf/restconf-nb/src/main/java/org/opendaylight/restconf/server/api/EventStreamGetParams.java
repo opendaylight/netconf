@@ -18,6 +18,7 @@ import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.FilterParam;
 import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
 import org.opendaylight.restconf.api.query.StartTimeParam;
 import org.opendaylight.restconf.api.query.StopTimeParam;
@@ -95,6 +96,9 @@ public record EventStreamGetParams(
                     break;
                 case ChildNodesOnlyParam.uriName:
                     childNodesOnly = mandatoryParam(ChildNodesOnlyParam::forUriValue, paramName, paramValue);
+                    break;
+                case PrettyPrintParam.uriName:
+                    // ignored
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid parameter: " + paramName);

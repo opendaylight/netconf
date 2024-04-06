@@ -25,6 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
@@ -83,7 +84,7 @@ public class RestconfSchemaServiceMountTest {
 
         restconf = new JaxRsRestconf(new MdsalRestconfServer(
             new MdsalDatabindProvider(new FixedDOMSchemaService(SCHEMA_CONTEXT_WITH_MOUNT_POINTS)), dataBroker,
-            rpcService, actionService, mountPointService));
+            rpcService, actionService, mountPointService), PrettyPrintParam.FALSE);
     }
 
     /**
