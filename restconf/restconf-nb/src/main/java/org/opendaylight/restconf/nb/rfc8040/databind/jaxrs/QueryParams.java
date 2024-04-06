@@ -63,9 +63,14 @@ public final class QueryParams {
      * @throws NullPointerException if {@code uriInfo} is {@code null}
      * @throws IllegalArgumentException if there are multiple values for a parameter
      */
-    public static @NonNull ImmutableMap<String, String> normalize(final UriInfo uriInfo) {
+    public static @NonNull ImmutableMap<String, String> normalize(final UriInfo uriInfo,
+            final boolean defaultPrettyPrint) {
+        final var queryParameters = uriInfo.getQueryParameters();
+        queryParameters.putIfAbsent(PrettyPrintParam.uriName,
+            List.of(PrettyPrintParam.of(defaultPrettyPrint).paramValue()));
+
         final var builder = ImmutableMap.<String, String>builder();
-        for (var entry : uriInfo.getQueryParameters().entrySet()) {
+        for (var entry : queryParameters.entrySet()) {
             final var values = entry.getValue();
             switch (values.size()) {
                 case 0:

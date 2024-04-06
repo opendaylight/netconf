@@ -77,7 +77,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     final void setupRestconf() {
         restconf = new JaxRsRestconf(new MdsalRestconfServer(
             new MdsalDatabindProvider(new FixedDOMSchemaService(modelContext())), dataBroker, rpcService, actionService,
-            mountPointService));
+            mountPointService), false);
     }
 
     EffectiveModelContext modelContext() {

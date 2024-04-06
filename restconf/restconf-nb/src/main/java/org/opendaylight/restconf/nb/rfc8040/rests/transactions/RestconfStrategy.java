@@ -189,7 +189,8 @@ public abstract class RestconfStrategy {
 
     RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final YangTextSourceExtension sourceProvider, final @Nullable DOMMountPointService mountPointService) {
+            final @Nullable YangTextSourceExtension sourceProvider,
+            final @Nullable DOMMountPointService mountPointService) {
         this.databind = requireNonNull(databind);
         this.localRpcs = requireNonNull(localRpcs);
         this.rpcService = rpcService;
@@ -231,7 +232,7 @@ public abstract class RestconfStrategy {
         return createStrategy(mountPath, mountPoint).resolveStrategy(path.subPath(mount + 1));
     }
 
-    private static @NonNull RestconfStrategy createStrategy(final ApiPath mountPath, final DOMMountPoint mountPoint) {
+    private @NonNull RestconfStrategy createStrategy(final ApiPath mountPath, final DOMMountPoint mountPoint) {
         final var mountSchemaService = mountPoint.getService(DOMSchemaService.class)
             .orElseThrow(() -> new RestconfDocumentedException(
                 "Mount point '" + mountPath + "' does not expose DOMSchemaService",
@@ -256,8 +257,8 @@ public abstract class RestconfStrategy {
         }
         final var dataBroker = mountPoint.getService(DOMDataBroker.class);
         if (dataBroker.isPresent()) {
-            return new MdsalRestconfStrategy(mountDatabind, dataBroker.orElseThrow(), rpcService, actionService,
-                sourceProvider, mountPointService);
+            return new MdsalRestconfStrategy(mountDatabind, dataBroker.orElseThrow(), ImmutableMap.of(), rpcService,
+                actionService, sourceProvider, mountPointService);
         }
         LOG.warn("Mount point {} does not expose a suitable access interface", mountPath);
         throw new RestconfDocumentedException("Could not find a supported access interface in mount point",

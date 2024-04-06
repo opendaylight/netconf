@@ -19,7 +19,8 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
  * There is no such thing in RFC8073, but we support pretty-printing of the resulting {@code yang-patch-status}.
  */
 public record DataYangPatchParams(@NonNull PrettyPrintParam prettyPrint) implements FormatParameters {
-    public static final @NonNull DataYangPatchParams EMPTY = new DataYangPatchParams(PrettyPrintParam.FALSE);
+    public static final @NonNull DataYangPatchParams COMPACT = new DataYangPatchParams(PrettyPrintParam.FALSE);
+    public static final @NonNull DataYangPatchParams PRETTY = new DataYangPatchParams(PrettyPrintParam.TRUE);
 
     public DataYangPatchParams {
         requireNonNull(prettyPrint);
@@ -34,6 +35,6 @@ public record DataYangPatchParams(@NonNull PrettyPrintParam prettyPrint) impleme
      * @throws IllegalArgumentException if the parameters are invalid
      */
     public static @NonNull DataYangPatchParams ofQueryParameters(final Map<String, String> queryParameters) {
-        return FormatParametersHelper.ofQueryParameters(queryParameters, DataYangPatchParams::new, EMPTY);
+        return FormatParametersHelper.ofQueryParameters(queryParameters, COMPACT, PRETTY);
     }
 }

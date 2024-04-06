@@ -126,8 +126,8 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     private @NonNull MdsalRestconfStrategy createLocalStrategy(final DatabindContext databind) {
-        return new MdsalRestconfStrategy(databind, dataBroker, rpcService, actionService,
-            databindProvider.sourceProvider(), mountPointService, localRpcs);
+        return new MdsalRestconfStrategy(databind, dataBroker, localRpcs, rpcService, actionService,
+            databindProvider.sourceProvider(), mountPointService);
     }
 
     private @NonNull MdsalRestconfStrategy localStrategy() {

@@ -70,7 +70,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
 
         final var restconf = new JaxRsRestconf(new MdsalRestconfServer(
             new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)), dataBroker, rpcService, actionService,
-            mountPointService));
+            mountPointService), false);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
         restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
@@ -95,7 +95,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
 
         final var restconf = new JaxRsRestconf(new MdsalRestconfServer(
             new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)), dataBroker, rpcService, actionService,
-            mountPointService));
+            mountPointService), false);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
         restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),

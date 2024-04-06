@@ -64,19 +64,11 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final DOMDataBroker dataBroker;
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
-            final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final @Nullable YangTextSourceExtension sourceProvider,
-            final @Nullable DOMMountPointService mountPointService,
-            final ImmutableMap<QName, RpcImplementation> localRpcs) {
+            final ImmutableMap<QName, RpcImplementation> localRpcs, final @Nullable DOMRpcService rpcService,
+            final @Nullable DOMActionService actionService, final @Nullable YangTextSourceExtension sourceProvider,
+            final @Nullable DOMMountPointService mountPointService) {
         super(databind, localRpcs, rpcService, actionService, sourceProvider, mountPointService);
         this.dataBroker = requireNonNull(dataBroker);
-    }
-
-    public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
-            final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final @Nullable YangTextSourceExtension sourceProvider,
-            final @Nullable DOMMountPointService mountPointService) {
-        this(databind, dataBroker, rpcService, actionService, sourceProvider, mountPointService, ImmutableMap.of());
     }
 
     @Override

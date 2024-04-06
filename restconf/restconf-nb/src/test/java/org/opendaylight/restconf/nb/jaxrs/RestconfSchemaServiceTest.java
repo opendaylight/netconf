@@ -68,7 +68,7 @@ public class RestconfSchemaServiceTest {
     public void setup() throws Exception {
         restconf = new JaxRsRestconf(new MdsalRestconfServer(
             new MdsalDatabindProvider(new FixedDOMSchemaService(() -> MODEL_CONTEXT, sourceProvider)), dataBroker,
-            rpcService, actionService, mountPointService));
+            rpcService, actionService, mountPointService), false);
     }
 
     /**
