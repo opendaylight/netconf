@@ -19,7 +19,6 @@ import java.net.URI;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,6 +30,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.QueryParameters;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
@@ -39,7 +40,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
-import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostBody;
@@ -51,8 +51,10 @@ import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchBody;
+import org.opendaylight.restconf.server.api.QueryParams;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.spi.RestconfServerConfiguration;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.Restconf;
@@ -73,12 +75,14 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.osgi.service.metatype.annotations.Designate;
 
 /**
  * A RESTCONF server implemented on top of MD-SAL.
  */
 @Singleton
-@Component(service = RestconfServer.class)
+@Component(service = RestconfServer.class, configurationPid = "org.opendaylight.restconf.server")
+@Designate(ocd = RestconfServerConfiguration.class)
 public final class MdsalRestconfServer implements RestconfServer, AutoCloseable {
     private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
     private static final VarHandle LOCAL_STRATEGY;
@@ -98,36 +102,66 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     private final @NonNull DOMDataBroker dataBroker;
     private final @Nullable DOMRpcService rpcService;
     private final @Nullable DOMActionService actionService;
+    private final @NonNull PrettyPrintParam prettyPrint;
 
     @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile MdsalRestconfStrategy localStrategy;
 
-    @Inject
-    @Activate
-    public MdsalRestconfServer(@Reference final MdsalDatabindProvider databindProvider,
-            @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
-            @Reference final DOMActionService actionService,
-            @Reference final DOMMountPointService mountPointService,
-            @Reference(policyOption = ReferencePolicyOption.GREEDY) final List<RpcImplementation> localRpcs) {
+    public MdsalRestconfServer(final MdsalDatabindProvider databindProvider, final DOMDataBroker dataBroker,
+            final DOMRpcService rpcService, final DOMActionService actionService,
+            final DOMMountPointService mountPointService, final List<RpcImplementation> localRpcs,
+            final PrettyPrintParam prettyPrint) {
         this.databindProvider = requireNonNull(databindProvider);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcService = requireNonNull(rpcService);
         this.actionService = requireNonNull(actionService);
         this.mountPointService = requireNonNull(mountPointService);
+        this.prettyPrint = requireNonNull(prettyPrint);
 
         this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
         localStrategy = createLocalStrategy(databindProvider.currentDatabind());
     }
 
+    @Inject
+    public MdsalRestconfServer(@Reference final MdsalDatabindProvider databindProvider,
+            @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
+            @Reference final DOMActionService actionService,
+            @Reference final DOMMountPointService mountPointService,
+            @Reference(policyOption = ReferencePolicyOption.GREEDY) final List<RpcImplementation> localRpcs) {
+        this(databindProvider, dataBroker, rpcService, actionService, mountPointService, localRpcs,
+            PrettyPrintParam.FALSE);
+    }
+
+    @Activate
+    public MdsalRestconfServer(@Reference final MdsalDatabindProvider databindProvider,
+            @Reference final DOMDataBroker dataBroker, @Reference final DOMRpcService rpcService,
+            @Reference final DOMActionService actionService,
+            @Reference final DOMMountPointService mountPointService,
+            @Reference(policyOption = ReferencePolicyOption.GREEDY) final List<RpcImplementation> localRpcs,
+            // FIXME: dynamic at some point
+            final RestconfServerConfiguration configuration) {
+        this(databindProvider, dataBroker, rpcService, actionService, mountPointService, localRpcs,
+            PrettyPrintParam.of(configuration.pretty$_$print()));
+    }
+
+    public MdsalRestconfServer(final MdsalDatabindProvider databindProvider, final DOMDataBroker dataBroker,
+            final DOMRpcService rpcService, final DOMActionService actionService,
+            final DOMMountPointService mountPointService, final PrettyPrintParam prettyPrint,
+            final RpcImplementation... localRpcs) {
+        this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs),
+            prettyPrint);
+    }
+
     public MdsalRestconfServer(final MdsalDatabindProvider databindProvider, final DOMDataBroker dataBroker,
             final DOMRpcService rpcService, final DOMActionService actionService,
             final DOMMountPointService mountPointService, final RpcImplementation... localRpcs) {
-        this(databindProvider, dataBroker, rpcService, actionService, mountPointService, List.of(localRpcs));
+        this(databindProvider, dataBroker, rpcService, actionService, mountPointService, PrettyPrintParam.FALSE,
+            localRpcs);
     }
 
     private @NonNull MdsalRestconfStrategy createLocalStrategy(final DatabindContext databind) {
-        return new MdsalRestconfStrategy(databind, dataBroker, rpcService, actionService,
-            databindProvider.sourceProvider(), mountPointService, localRpcs);
+        return new MdsalRestconfStrategy(databind, dataBroker, localRpcs, rpcService, actionService,
+            databindProvider.sourceProvider(), mountPointService);
     }
 
     private @NonNull MdsalRestconfStrategy localStrategy() {
@@ -149,6 +183,10 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         localStrategy = null;
     }
 
+    private @NonNull QueryParams queryParams(final @NonNull QueryParameters params) {
+        return new QueryParams(params, prettyPrint);
+    }
+
     @Override
     public RestconfFuture<Empty> dataDELETE(final ApiPath identifier) {
         final StrategyAndTail stratAndTail;
@@ -161,19 +199,19 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<DataGetResult> dataGET(final DataGetParams params) {
-        return localStrategy().dataGET(ApiPath.empty(), params);
+    public RestconfFuture<DataGetResult> dataGET(final QueryParameters params) {
+        return localStrategy().dataGET(ApiPath.empty(), queryParams(params));
     }
 
     @Override
-    public RestconfFuture<DataGetResult> dataGET(final ApiPath identifier, final DataGetParams params) {
+    public RestconfFuture<DataGetResult> dataGET(final ApiPath identifier, final QueryParameters params) {
         final StrategyAndTail stratAndTail;
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-        return stratAndTail.strategy().dataGET(stratAndTail.tail(), params);
+        return stratAndTail.strategy().dataGET(stratAndTail.tail(), queryParams(params));
     }
 
     @Override
@@ -193,56 +231,54 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<DataYangPatchResult> dataPATCH(final Map<String, String> queryParameters,
+    public RestconfFuture<DataYangPatchResult> dataPATCH(final QueryParameters params, final PatchBody body) {
+        return localStrategy().dataPATCH(ApiPath.empty(), queryParams(params), body);
+    }
+
+    @Override
+    public RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath identifier, final QueryParameters params,
             final PatchBody body) {
-        return localStrategy().dataPATCH(ApiPath.empty(), queryParameters, body);
-    }
-
-    @Override
-    public RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath identifier,
-            final Map<String, String> queryParameters, final PatchBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-        return strategyAndTail.strategy().dataPATCH(strategyAndTail.tail(), queryParameters, body);
+        return strategyAndTail.strategy().dataPATCH(strategyAndTail.tail(), queryParams(params), body);
     }
 
     @Override
-    public RestconfFuture<CreateResourceResult> dataPOST(final ChildBody body,
-            final Map<String, String> queryParameters) {
-        return localStrategy().dataCreatePOST(body, queryParameters);
+    public RestconfFuture<CreateResourceResult> dataPOST(final QueryParameters params, final ChildBody body) {
+        return localStrategy().dataCreatePOST(queryParams(params), body);
     }
 
     @Override
-    public RestconfFuture<? extends DataPostResult> dataPOST(final ApiPath identifier, final DataPostBody body,
-            final Map<String, String> queryParameters) {
+    public RestconfFuture<? extends DataPostResult> dataPOST(final ApiPath identifier, final QueryParameters params,
+            final DataPostBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-        return strategyAndTail.strategy().dataPOST(strategyAndTail.tail(), body, queryParameters);
+        return strategyAndTail.strategy().dataPOST(strategyAndTail.tail(), queryParams(params), body);
     }
 
     @Override
-    public RestconfFuture<DataPutResult> dataPUT(final ResourceBody body, final Map<String, String> query) {
-        return localStrategy().dataPUT(ApiPath.empty(), body, query);
+    public RestconfFuture<DataPutResult> dataPUT(final QueryParameters params, final ResourceBody body) {
+        return localStrategy().dataPUT(ApiPath.empty(), queryParams(params), body);
     }
 
     @Override
-    public RestconfFuture<DataPutResult> dataPUT(final ApiPath identifier, final ResourceBody body,
-             final Map<String, String> queryParameters) {
+    public RestconfFuture<DataPutResult> dataPUT(final ApiPath identifier, final QueryParameters params,
+            final ResourceBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-        return strategyAndTail.strategy().dataPUT(strategyAndTail.tail(), body, queryParameters);
+        return strategyAndTail.strategy().dataPUT(strategyAndTail.tail(), queryParams(params), body);
     }
 
     @Override
@@ -341,7 +377,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public RestconfFuture<InvokeResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
-            final Map<String, String> queryParameters, final OperationInputBody body) {
+            final QueryParameters params, final OperationInputBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(apiPath);
@@ -349,7 +385,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
             return RestconfFuture.failed(e);
         }
         final var strategy = strategyAndTail.strategy();
-        return strategy.operationsPOST(restconfURI, strategyAndTail.tail(), queryParameters, body);
+        return strategy.operationsPOST(restconfURI, strategyAndTail.tail(), queryParams(params), body);
     }
 
     @Override

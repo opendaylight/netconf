@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.api.query;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import java.net.URI;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -23,18 +21,26 @@ public final class DepthParam implements RestconfQueryParam<DepthParam> {
     public static final @NonNull String uriName = "depth";
 
     private static final @NonNull URI CAPABILITY = URI.create("urn:ietf:params:restconf:capability:depth:1.0");
-    private static final @NonNull DepthParam MIN = of(1);
-    private static final @NonNull DepthParam MAX = of(65535);
+    private static final @NonNull DepthParam MIN = new DepthParam(1);
+    private static final @NonNull DepthParam MAX = new DepthParam(65535);
 
     private final int value;
 
     private DepthParam(final int value) {
         this.value = value;
-        checkArgument(value >= 1 && value <= 65535);
     }
 
     public static @NonNull DepthParam of(final int value) {
-        return new DepthParam(value);
+        return switch (value) {
+            case 1 -> min();
+            case 65535 -> max();
+            default -> {
+                if (value < 1 || value > 65535) {
+                    throw new IllegalArgumentException(value + " is not between 1 and 65535");
+                }
+                yield new DepthParam(value);
+            }
+        };
     }
 
     @Override
@@ -61,7 +67,25 @@ public final class DepthParam implements RestconfQueryParam<DepthParam> {
     }
 
     public static @Nullable DepthParam forUriValue(final String uriValue) {
-        return "unbounded".equals(uriValue) ? null : of(Integer.parseUnsignedInt(uriValue, 10));
+        if ("unbounded".equals(uriValue)) {
+            return null;
+        }
+
+        final int value;
+        try {
+            value = Integer.parseUnsignedInt(uriValue, 10);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                "The depth parameter must be \"unbounded\" or an integer between 1 and 65535. \""
+                    + uriValue + "\" is not a valid integer", e);
+        }
+        try {
+            return of(value);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                "The depth parameter must be \"unbounded\" or an integer between 1 and 65535. "
+                    + e.getMessage(), e);
+        }
     }
 
     public int value() {

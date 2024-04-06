@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.api;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.FormatParameters;
@@ -34,5 +35,57 @@ public record DataGetParams(
     public DataGetParams {
         requireNonNull(content);
         requireNonNull(prettyPrint);
+    }
+
+    /**
+     * Return {@link DataGetParams} for specified query parameters.
+     *
+     * @param params Parameters and their values
+     * @return A {@link DataGetParams}
+     * @throws NullPointerException if {@code queryParameters} is {@code null}
+     * @throws IllegalArgumentException if the parameters are invalid
+     */
+    public static @NonNull DataGetParams of(final QueryParams params) {
+        ContentParam content = ContentParam.ALL;
+        DepthParam depth = null;
+        FieldsParam fields = null;
+        WithDefaultsParam withDefaults = null;
+        PrettyPrintParam prettyPrint = params.prettyPrint();
+
+        for (var entry : params.asCollection()) {
+            final var name = entry.getKey();
+            final var value = entry.getValue();
+
+            switch (name) {
+                case ContentParam.uriName:
+                    content = parseParam(ContentParam::forUriValue, name, value);
+                    break;
+                case DepthParam.uriName:
+                    depth = DepthParam.forUriValue(value);
+                    break;
+                case FieldsParam.uriName:
+                    fields = parseParam(FieldsParam::forUriValue, name, value);
+                    break;
+                case WithDefaultsParam.uriName:
+                    withDefaults = parseParam(WithDefaultsParam::forUriValue, name, value);
+                    break;
+                case PrettyPrintParam.uriName:
+                    prettyPrint = parseParam(PrettyPrintParam::forUriValue, name, value);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown parameter in /data GET: " + name);
+            }
+        }
+
+        return new DataGetParams(content, depth, fields, withDefaults, prettyPrint);
+    }
+
+    private static <T> @NonNull T parseParam(final Function<@NonNull String, @NonNull T> method, final String name,
+            final @NonNull String value) {
+        try {
+            return method.apply(value);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid " + name + " value: " + e.getMessage(), e);
+        }
     }
 }
