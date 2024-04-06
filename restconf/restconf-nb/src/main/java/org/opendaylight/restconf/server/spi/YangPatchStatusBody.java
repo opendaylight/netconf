@@ -12,9 +12,8 @@ import static java.util.Objects.requireNonNull;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import javax.xml.stream.XMLOutputFactory;
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.api.FormatParameters;
@@ -29,15 +28,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.
  * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2.3">RFC8072, section 2.3</a>.
  */
 public final class YangPatchStatusBody extends FormattableBody {
-    private static final String XML_NAMESPACE = YangPatchStatus.QNAME.getNamespace().toString();
-    // FIXME: remove this factory
-    private static final XMLOutputFactory XML_FACTORY;
-
-    static {
-        final var f = XMLOutputFactory.newFactory();
-        f.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-        XML_FACTORY = f;
-    }
+    private static final String IETF_YANG_PATCH_NAMESPACE = YangPatchStatus.QNAME.getNamespace().toString();
 
     private final PatchStatusContext status;
 
@@ -53,7 +44,7 @@ public final class YangPatchStatusBody extends FormattableBody {
 
     @Override
     protected void formatToJSON(final OutputStream out, final FormatParameters format) throws IOException {
-        try (var writer = FormattableBodySupport.createJsonWriter(out, () -> PrettyPrintParam.FALSE)) {
+        try (var writer = FormattableBodySupport.createJsonWriter(out, format)) {
             writer.beginObject().name("ietf-yang-patch:yang-patch-status")
                 .beginObject().name("patch-id").value(status.patchId());
 
@@ -86,8 +77,8 @@ public final class YangPatchStatusBody extends FormattableBody {
 
     @Override
     protected void formatToXML(final OutputStream out, final FormatParameters format) throws IOException {
+        final var writer = FormattableBodySupport.createXmlWriter(out, format);
         try {
-            final var writer = XML_FACTORY.createXMLStreamWriter(out, StandardCharsets.UTF_8.name());
             formatToXML(writer);
         } catch (XMLStreamException e) {
             throw new IOException("Failed to write body", e);
@@ -95,7 +86,8 @@ public final class YangPatchStatusBody extends FormattableBody {
     }
 
     private void formatToXML(final XMLStreamWriter writer) throws XMLStreamException {
-        writer.writeStartElement("", "yang-patch-status", XML_NAMESPACE);
+        writer.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, "yang-patch-status", IETF_YANG_PATCH_NAMESPACE);
+        writer.writeDefaultNamespace(IETF_YANG_PATCH_NAMESPACE);
         writer.writeStartElement("patch-id");
         writer.writeCharacters(status.patchId());
         writer.writeEndElement();
@@ -126,7 +118,7 @@ public final class YangPatchStatusBody extends FormattableBody {
             }
         }
         writer.writeEndElement();
-        writer.flush();
+        writer.close();
     }
 
     private static void writeOk(final JsonWriter writer) throws IOException {
