@@ -72,20 +72,23 @@ public interface RestconfServer {
      * Ordered list of edits that are applied to the datastore by the server, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
+     * @param queryParameters query parameters
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    RestconfFuture<DataYangPatchResult> dataPATCH(PatchBody body);
+    RestconfFuture<DataYangPatchResult> dataPATCH(Map<String, String> queryParameters, PatchBody body);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param identifier path to target
+     * @param queryParameters query parameters
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    RestconfFuture<DataYangPatchResult> dataPATCH(ApiPath identifier, PatchBody body);
+    RestconfFuture<DataYangPatchResult> dataPATCH(ApiPath identifier, Map<String, String> queryParameters,
+        PatchBody body);
 
     RestconfFuture<CreateResourceResult> dataPOST(ChildBody body, Map<String, String> queryParameters);
 

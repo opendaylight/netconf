@@ -12,6 +12,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.UriInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,10 +28,13 @@ import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 class RestconfDataPatchTest extends AbstractRestconfTest {
     @Mock
     private DOMDataTreeReadWriteTransaction tx;
+    @Mock
+    private UriInfo uriInfo;
 
     @BeforeEach
     void beforeEach() {
         doReturn(tx).when(dataBroker).newReadWriteTransaction();
+        doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
     }
 
     @Test
@@ -76,7 +81,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                       }
                     ]
                   }
-                }"""), ar));
+                }"""), uriInfo, ar));
 
         assertFormat("""
             {"ietf-yang-patch:yang-patch-status":{"patch-id":"test patch id","ok":[null]}}""", body::formatToJSON);
@@ -119,7 +124,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                       }
                     ]
                   }
-                }"""), ar));
+                }"""), uriInfo, ar));
 
         assertFormat("""
             {"ietf-yang-patch:yang-patch-status":{"patch-id":"test patch id","edit-status":{"edit":[\
@@ -170,7 +175,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                     <operation>delete</operation>
                     <target>/example-jukebox:jukebox/player/gap</target>
                   </edit>
-                </yang-patch>"""), ar));
+                </yang-patch>"""), uriInfo, ar));
 
         assertFormat("""
             <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">\

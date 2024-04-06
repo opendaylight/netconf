@@ -193,19 +193,21 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<DataYangPatchResult> dataPATCH(final PatchBody body) {
-        return localStrategy().dataPATCH(ApiPath.empty(), body);
+    public RestconfFuture<DataYangPatchResult> dataPATCH(final Map<String, String> queryParameters,
+            final PatchBody body) {
+        return localStrategy().dataPATCH(ApiPath.empty(), queryParameters, body);
     }
 
     @Override
-    public RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath identifier, final PatchBody body) {
+    public RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath identifier,
+            final Map<String, String> queryParameters, final PatchBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-        return strategyAndTail.strategy().dataPATCH(strategyAndTail.tail(), body);
+        return strategyAndTail.strategy().dataPATCH(strategyAndTail.tail(), queryParameters, body);
     }
 
     @Override

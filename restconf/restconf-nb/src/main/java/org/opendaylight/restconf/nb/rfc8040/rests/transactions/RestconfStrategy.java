@@ -590,7 +590,8 @@ public abstract class RestconfStrategy {
         return merge(path.instance(), data);
     }
 
-    public final @NonNull RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath apiPath, final PatchBody body) {
+    public final @NonNull RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath apiPath,
+            final Map<String, String> queryParameters, final PatchBody body) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);

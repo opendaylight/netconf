@@ -308,6 +308,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param body YANG Patch body
+     * @param uriInfo URI info
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
@@ -317,9 +318,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public void dataYangJsonPATCH(final InputStream body, @Suspended final AsyncResponse ar) {
+    public void dataYangJsonPATCH(final InputStream body, @Context final UriInfo uriInfo,
+            @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(jsonBody), ar);
+            completeDataYangPATCH(server.dataPATCH(QueryParams.normalize(uriInfo), jsonBody), ar);
         }
     }
 
@@ -329,6 +331,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      *
      * @param identifier path to target
      * @param body YANG Patch body
+     * @param uriInfo URI info
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
@@ -339,9 +342,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
-            @Suspended final AsyncResponse ar) {
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(identifier, jsonBody), ar);
+            completeDataYangPATCH(server.dataPATCH(identifier, QueryParams.normalize(uriInfo), jsonBody), ar);
         }
     }
 
@@ -350,6 +353,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param body YANG Patch body
+     * @param uriInfo URI info
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
     @PATCH
@@ -359,9 +363,10 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_JSON,
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
-    public void dataYangXmlPATCH(final InputStream body, @Suspended final AsyncResponse ar) {
+    public void dataYangXmlPATCH(final InputStream body, @Context final UriInfo uriInfo,
+            @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(xmlBody), ar);
+            completeDataYangPATCH(server.dataPATCH(QueryParams.normalize(uriInfo), xmlBody), ar);
         }
     }
 
@@ -370,6 +375,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
      * @param identifier path to target
+     * @param uriInfo URI info
      * @param body YANG Patch body
      * @param ar {@link AsyncResponse} which needs to be completed with a {@link PatchStatusContext}
      */
@@ -381,9 +387,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_XML
     })
     public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
-            @Suspended final AsyncResponse ar) {
+            @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(identifier, xmlBody), ar);
+            completeDataYangPATCH(server.dataPATCH(identifier, QueryParams.normalize(uriInfo), xmlBody), ar);
         }
     }
 
