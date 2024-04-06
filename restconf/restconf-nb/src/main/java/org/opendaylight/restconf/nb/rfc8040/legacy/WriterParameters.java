@@ -26,24 +26,23 @@ import org.opendaylight.yangtools.yang.common.QName;
  * needs to be processed (for example filtered).
  */
 @Beta
-// FIXME: this probably needs to be renamed back to WriterParams, or somesuch
-public record QueryParameters(
+public record WriterParameters(
         @Nullable DepthParam depth,
         @NonNull PrettyPrintParam prettyPrint,
         @Nullable List<Set<QName>> fields) implements FormatParameters {
-    public static final @NonNull QueryParameters EMPTY = new QueryParameters(null, PrettyPrintParam.FALSE, null);
+    public static final @NonNull WriterParameters EMPTY = new WriterParameters(null, PrettyPrintParam.FALSE, null);
 
-    public QueryParameters {
+    public WriterParameters {
         requireNonNull(prettyPrint);
     }
 
-    public static @NonNull QueryParameters of(final DataGetParams params) {
+    public static @NonNull WriterParameters of(final DataGetParams params) {
         final var depth = params.depth();
         final var prettyPrint = params.prettyPrint();
-        return depth == null && !prettyPrint.value() ? EMPTY : new QueryParameters(depth, prettyPrint, null);
+        return depth == null && !prettyPrint.value() ? EMPTY : new WriterParameters(depth, prettyPrint, null);
     }
 
-    public static @NonNull QueryParameters of(final DataGetParams params, final List<Set<QName>> fields) {
-        return fields == null ? of(params) : new QueryParameters(params.depth(), params.prettyPrint(), fields);
+    public static @NonNull WriterParameters of(final DataGetParams params, final List<Set<QName>> fields) {
+        return fields == null ? of(params) : new WriterParameters(params.depth(), params.prettyPrint(), fields);
     }
 }

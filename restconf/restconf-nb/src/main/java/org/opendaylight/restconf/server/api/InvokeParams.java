@@ -9,9 +9,9 @@ package org.opendaylight.restconf.server.api;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.FormatParameters;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 
 /**
@@ -20,7 +20,8 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
  * {@code output} container.
  */
 public record InvokeParams(@NonNull PrettyPrintParam prettyPrint) implements FormatParameters {
-    public static final @NonNull InvokeParams EMPTY = new InvokeParams(PrettyPrintParam.FALSE);
+    public static final @NonNull InvokeParams COMPACT = new InvokeParams(PrettyPrintParam.FALSE);
+    public static final @NonNull InvokeParams PRETTY = new InvokeParams(PrettyPrintParam.TRUE);
 
     public InvokeParams {
         requireNonNull(prettyPrint);
@@ -34,7 +35,7 @@ public record InvokeParams(@NonNull PrettyPrintParam prettyPrint) implements For
      * @throws NullPointerException if {@code queryParameters} is {@code null}
      * @throws IllegalArgumentException if the parameters are invalid
      */
-    public static @NonNull InvokeParams ofQueryParameters(final Map<String, String> queryParameters) {
-        return FormatParametersHelper.ofQueryParameters(queryParameters, InvokeParams::new, EMPTY);
+    public static @NonNull InvokeParams ofQueryParameters(final QueryParameters queryParameters) {
+        return FormatParametersHelper.ofQueryParameters(queryParameters, COMPACT, PRETTY);
     }
 }

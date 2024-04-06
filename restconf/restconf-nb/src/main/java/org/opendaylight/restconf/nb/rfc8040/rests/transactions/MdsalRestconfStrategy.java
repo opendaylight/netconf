@@ -37,7 +37,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.ParameterAwareNormalizedNodeWriter;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -64,19 +64,11 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     private final DOMDataBroker dataBroker;
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
-            final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final @Nullable YangTextSourceExtension sourceProvider,
-            final @Nullable DOMMountPointService mountPointService,
-            final ImmutableMap<QName, RpcImplementation> localRpcs) {
+            final ImmutableMap<QName, RpcImplementation> localRpcs, final @Nullable DOMRpcService rpcService,
+            final @Nullable DOMActionService actionService, final @Nullable YangTextSourceExtension sourceProvider,
+            final @Nullable DOMMountPointService mountPointService) {
         super(databind, localRpcs, rpcService, actionService, sourceProvider, mountPointService);
         this.dataBroker = requireNonNull(dataBroker);
-    }
-
-    public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
-            final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final @Nullable YangTextSourceExtension sourceProvider,
-            final @Nullable DOMMountPointService mountPointService) {
-        this(databind, dataBroker, rpcService, actionService, sourceProvider, mountPointService, ImmutableMap.of());
     }
 
     @Override
@@ -127,7 +119,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     RestconfFuture<DataGetResult> dataGET(final Data path, final DataGetParams params) {
         final var inference = path.inference();
         final var fields = params.fields();
-        return completeDataGET(inference, QueryParameters.of(params,
+        return completeDataGET(inference, WriterParameters.of(params,
             fields == null ? null : translateFieldsParam(inference.modelContext(), path.schema(), fields)),
             readData(params.content(), path.instance(), params.withDefaults()), null);
     }

@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ImmutableMap;
 import java.io.UnsupportedEncodingException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
@@ -23,7 +22,9 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 import javax.xml.xpath.XPathExpressionException;
-import org.opendaylight.restconf.nb.rfc8040.databind.jaxrs.QueryParams;
+import org.opendaylight.restconf.api.ImmutableQueryParameters;
+import org.opendaylight.restconf.api.PrettyPrintQueryParameters;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
@@ -39,6 +40,7 @@ final class SSEStreamService {
     private static final Logger LOG = LoggerFactory.getLogger(SSEStreamService.class);
 
     private final RestconfStream.Registry streamRegistry;
+    private final PrettyPrintParam prettyPrint;
     private final PingExecutor pingExecutor;
     private final int maximumFragmentLength;
     private final int heartbeatInterval;
@@ -49,6 +51,7 @@ final class SSEStreamService {
         this.pingExecutor = requireNonNull(pingExecutor);
         heartbeatInterval = configuration.heartbeatInterval();
         maximumFragmentLength = configuration.maximumFragmentLength();
+        prettyPrint = configuration.prettyPrint();
     }
 
     /**
@@ -68,16 +71,16 @@ final class SSEStreamService {
             throw new NotFoundException("No such stream: " + streamName);
         }
 
-        final ImmutableMap<String, String> queryParameters;
+        final ImmutableQueryParameters params;
         try {
-            queryParameters = QueryParams.normalize(uriInfo);
+            params = ImmutableQueryParameters.ofMultiValue(uriInfo.getQueryParameters());
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
 
-        final EventStreamGetParams params;
+        final EventStreamGetParams getParams;
         try {
-            params = EventStreamGetParams.ofQueryParameters(queryParameters);
+            getParams = EventStreamGetParams.ofQueryParameters(new PrettyPrintQueryParameters(params, prettyPrint));
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
@@ -85,7 +88,7 @@ final class SSEStreamService {
         LOG.debug("Listener for stream with name {} has been found, SSE session handler will be created.", streamName);
         // FIXME: invert control here: we should call 'listener.addSession()', which in turn should call
         //        handler.init()/handler.close()
-        final var handler = new SSESender(pingExecutor, sink, sse, stream, encodingName, params,
+        final var handler = new SSESender(pingExecutor, sink, sse, stream, encodingName, getParams,
             maximumFragmentLength, heartbeatInterval);
 
         try {

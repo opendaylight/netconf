@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import javax.servlet.http.HttpServlet;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 
 /**
@@ -25,6 +26,8 @@ public interface RestconfStreamServletFactory {
      * @return the value of {@code {+restconf}} macro
      */
     @NonNull String restconf();
+
+    @NonNull PrettyPrintParam prettyPrint();
 
     @NonNull HttpServlet newStreamServlet();
 }

@@ -13,13 +13,14 @@ import static org.opendaylight.restconf.server.api.EventStreamGetParams.mandator
 import com.google.common.annotations.Beta;
 import com.google.common.base.MoreObjects;
 import java.text.ParseException;
-import java.util.Map;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.concepts.Immutable;
@@ -53,19 +54,18 @@ public final class Insert implements Immutable {
     /**
      * Return an {@link Insert} parameter for specified query parameters.
      *
-     * @param queryParameters Parameters and their values
+     * @param params Parameters and their values
      * @return An {@link Insert}, or {@code null} if no insert information is present
      * @throws NullPointerException if any argument is {@code null}
      * @throws IllegalArgumentException if the parameters are invalid
      */
-    public static @Nullable Insert ofQueryParameters(final DatabindContext databind,
-            final Map<String, String> queryParameters) {
+    public static @Nullable Insert ofQueryParameters(final DatabindContext databind, final QueryParameters params) {
         InsertParam insert = null;
         PointParam point = null;
 
-        for (var entry : queryParameters.entrySet()) {
-            final var paramName = entry.getKey();
-            final var paramValue = entry.getValue();
+        for (var param : params.asCollection()) {
+            final var paramName = param.getKey();
+            final var paramValue = param.getValue();
 
             switch (paramName) {
                 case InsertParam.uriName:
@@ -73,6 +73,9 @@ public final class Insert implements Immutable {
                     break;
                 case PointParam.uriName:
                     point = mandatoryParam(PointParam::forUriValue, paramName, paramValue);
+                    break;
+                case PrettyPrintParam.uriName:
+                    // Ignored
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid parameter: " + paramName);

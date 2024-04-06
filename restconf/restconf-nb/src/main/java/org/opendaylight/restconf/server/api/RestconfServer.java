@@ -13,6 +13,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -76,7 +77,7 @@ public interface RestconfServer {
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    RestconfFuture<DataYangPatchResult> dataPATCH(Map<String, String> queryParameters, PatchBody body);
+    RestconfFuture<DataYangPatchResult> dataPATCH(QueryParameters params, PatchBody body);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
@@ -87,10 +88,9 @@ public interface RestconfServer {
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    RestconfFuture<DataYangPatchResult> dataPATCH(ApiPath identifier, Map<String, String> queryParameters,
-        PatchBody body);
+    RestconfFuture<DataYangPatchResult> dataPATCH(ApiPath identifier, QueryParameters params, PatchBody body);
 
-    RestconfFuture<CreateResourceResult> dataPOST(ChildBody body, Map<String, String> queryParameters);
+    RestconfFuture<CreateResourceResult> dataPOST(QueryParameters params, ChildBody body);
 
     /**
      * Create or invoke a operation, as described in
@@ -100,8 +100,7 @@ public interface RestconfServer {
      * @param body body of the post request
      * @param queryParameters query parameters
      */
-    RestconfFuture<? extends DataPostResult> dataPOST(ApiPath identifier, DataPostBody body,
-        Map<String, String> queryParameters);
+    RestconfFuture<? extends DataPostResult> dataPOST(ApiPath identifier, QueryParameters params, DataPostBody body);
 
     /**
      * Replace the data store, as described in
@@ -111,7 +110,7 @@ public interface RestconfServer {
      * @param queryParameters Query parameters
      * @return A {@link RestconfFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(ResourceBody body, Map<String, String> queryParameters);
+    RestconfFuture<DataPutResult> dataPUT(QueryParameters params, ResourceBody body);
 
     /**
      * Create or replace a data store resource, as described in
@@ -122,7 +121,7 @@ public interface RestconfServer {
      * @param queryParameters Query parameters
      * @return A {@link RestconfFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(ApiPath identifier, ResourceBody body, Map<String, String> queryParameters);
+    RestconfFuture<DataPutResult> dataPUT(ApiPath identifier, QueryParameters params, ResourceBody body);
 
     /**
      * Return the set of supported RPCs supported by {@link #operationsPOST(URI, ApiPath, Map, OperationInputBody)},
@@ -156,7 +155,7 @@ public interface RestconfServer {
      */
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support yang-ext:mount,
     //        and hence it is a path right now
-    RestconfFuture<InvokeResult> operationsPOST(URI restconfURI, ApiPath operation, Map<String, String> queryParameters,
+    RestconfFuture<InvokeResult> operationsPOST(URI restconfURI, ApiPath operation, QueryParameters params,
         OperationInputBody body);
 
     /**

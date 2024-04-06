@@ -51,6 +51,7 @@ import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -61,7 +62,7 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
@@ -189,7 +190,8 @@ public abstract class RestconfStrategy {
 
     RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
-            final YangTextSourceExtension sourceProvider, final @Nullable DOMMountPointService mountPointService) {
+            final @Nullable YangTextSourceExtension sourceProvider,
+            final @Nullable DOMMountPointService mountPointService) {
         this.databind = requireNonNull(databind);
         this.localRpcs = requireNonNull(localRpcs);
         this.rpcService = rpcService;
@@ -256,8 +258,8 @@ public abstract class RestconfStrategy {
         }
         final var dataBroker = mountPoint.getService(DOMDataBroker.class);
         if (dataBroker.isPresent()) {
-            return new MdsalRestconfStrategy(mountDatabind, dataBroker.orElseThrow(), rpcService, actionService,
-                sourceProvider, mountPointService);
+            return new MdsalRestconfStrategy(mountDatabind, dataBroker.orElseThrow(), ImmutableMap.of(), rpcService,
+                actionService, sourceProvider, mountPointService);
         }
         LOG.warn("Mount point {} does not expose a suitable access interface", mountPath);
         throw new RestconfDocumentedException("Could not find a supported access interface in mount point",
@@ -326,8 +328,8 @@ public abstract class RestconfStrategy {
         }, MoreExecutors.directExecutor());
     }
 
-    public @NonNull RestconfFuture<DataPutResult> dataPUT(final ApiPath apiPath, final ResourceBody body,
-            final Map<String, String> queryParameters) {
+    public @NonNull RestconfFuture<DataPutResult> dataPUT(final ApiPath apiPath, final QueryParameters params,
+            final ResourceBody body) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
@@ -337,7 +339,7 @@ public abstract class RestconfStrategy {
 
         final Insert insert;
         try {
-            insert = Insert.ofQueryParameters(databind, queryParameters);
+            insert = Insert.ofQueryParameters(databind, params);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
@@ -592,10 +594,10 @@ public abstract class RestconfStrategy {
     }
 
     public final @NonNull RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath apiPath,
-            final Map<String, String> queryParameters, final PatchBody body) {
-        final DataYangPatchParams params;
+            final QueryParameters params, final PatchBody body) {
+        final DataYangPatchParams patchParams;
         try {
-            params = DataYangPatchParams.ofQueryParameters(queryParameters);
+            patchParams = DataYangPatchParams.ofQueryParameters(params);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
@@ -616,7 +618,7 @@ public abstract class RestconfStrategy {
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
         }
-        return patchData(params, patch);
+        return patchData(patchParams, patch);
     }
 
     /**
@@ -842,7 +844,7 @@ public abstract class RestconfStrategy {
     abstract @NonNull RestconfFuture<DataGetResult> dataGET(Data path, DataGetParams params);
 
     static final @NonNull RestconfFuture<DataGetResult> completeDataGET(final Inference inference,
-            final QueryParameters queryParams, final @Nullable NormalizedNode node,
+            final WriterParameters writerParams, final @Nullable NormalizedNode node,
             final @Nullable ConfigurationMetadata metadata) {
         if (node == null) {
             return RestconfFuture.failed(new RestconfDocumentedException(
@@ -850,7 +852,7 @@ public abstract class RestconfStrategy {
                 ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
         }
 
-        final var payload = new NormalizedNodePayload(inference, node, queryParams);
+        final var payload = new NormalizedNodePayload(inference, node, writerParams);
         return RestconfFuture.of(metadata == null ? new DataGetResult(payload)
             : new DataGetResult(payload, metadata.entityTag(), metadata.lastModified()));
     }
@@ -1254,7 +1256,7 @@ public abstract class RestconfStrategy {
     }
 
     public @NonNull RestconfFuture<InvokeResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
-            final Map<String, String> queryParameters, final OperationInputBody body) {
+            final QueryParameters params, final OperationInputBody body) {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
@@ -1262,9 +1264,9 @@ public abstract class RestconfStrategy {
             return RestconfFuture.failed(e);
         }
 
-        final InvokeParams params;
+        final InvokeParams invokeParams;
         try {
-            params = InvokeParams.ofQueryParameters(queryParameters);
+            invokeParams = InvokeParams.ofQueryParameters(params);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
@@ -1283,7 +1285,7 @@ public abstract class RestconfStrategy {
         final var local = localRpcs.get(type);
         if (local != null) {
             return local.invoke(restconfURI, new OperationInput(path, data))
-                .transform(output -> outputToInvokeResult(path, params, output));
+                .transform(output -> outputToInvokeResult(path, invokeParams, output));
         }
         if (rpcService == null) {
             LOG.debug("RPC invocation is not available");
@@ -1297,7 +1299,7 @@ public abstract class RestconfStrategy {
             public void onSuccess(final DOMRpcResult response) {
                 final var errors = response.errors();
                 if (errors.isEmpty()) {
-                    ret.set(outputToInvokeResult(path, params, response.value()));
+                    ret.set(outputToInvokeResult(path, invokeParams, response.value()));
                 } else {
                     LOG.debug("RPC invocation reported {}", response.errors());
                     ret.setFailure(new RestconfDocumentedException("RPC implementation reported errors", null,
@@ -1385,9 +1387,9 @@ public abstract class RestconfStrategy {
     }
 
     public final @NonNull RestconfFuture<? extends DataPostResult> dataPOST(final ApiPath apiPath,
-            final DataPostBody body, final Map<String, String> queryParameters) {
+            final QueryParameters params, final DataPostBody body) {
         if (apiPath.steps().isEmpty()) {
-            return dataCreatePOST(body.toResource(), queryParameters);
+            return dataCreatePOST(params, body.toResource());
         }
         final InstanceReference path;
         try {
@@ -1397,12 +1399,12 @@ public abstract class RestconfStrategy {
         }
         if (path instanceof Data dataPath) {
             try (var resourceBody = body.toResource()) {
-                return dataCreatePOST(dataPath, resourceBody, queryParameters);
+                return dataCreatePOST(dataPath, params, resourceBody);
             }
         }
         if (path instanceof Action actionPath) {
             try (var inputBody = body.toOperationInput()) {
-                return dataInvokePOST(actionPath, inputBody, queryParameters);
+                return dataInvokePOST(actionPath, params, inputBody);
             }
         }
         // Note: this should never happen
@@ -1410,16 +1412,16 @@ public abstract class RestconfStrategy {
         return RestconfFuture.failed(new RestconfDocumentedException("Unhandled path " + path));
     }
 
-    public @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final ChildBody body,
-            final Map<String, String> queryParameters) {
-        return dataCreatePOST(new DatabindPath.Data(databind), body, queryParameters);
+    public @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final QueryParameters params,
+            final ChildBody body) {
+        return dataCreatePOST(new DatabindPath.Data(databind), params, body);
     }
 
     private @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final DatabindPath.Data path,
-            final ChildBody body, final Map<String, String> queryParameters) {
+            final QueryParameters params, final ChildBody body) {
         final Insert insert;
         try {
-            insert = Insert.ofQueryParameters(path.databind(), queryParameters);
+            insert = Insert.ofQueryParameters(path.databind(), params);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
@@ -1438,10 +1440,10 @@ public abstract class RestconfStrategy {
     }
 
     private @NonNull RestconfFuture<InvokeResult> dataInvokePOST(final @NonNull Action path,
-            final @NonNull OperationInputBody body, final Map<String, String> queryParameters) {
-        final InvokeParams params;
+            final @NonNull QueryParameters params, final @NonNull OperationInputBody body) {
+        final InvokeParams invokeParams;
         try {
-            params = InvokeParams.ofQueryParameters(queryParameters);
+            invokeParams = InvokeParams.ofQueryParameters(params);
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
@@ -1461,7 +1463,7 @@ public abstract class RestconfStrategy {
         }
 
         return dataInvokePOST(actionService, path, input)
-            .transform(result -> outputToInvokeResult(path, params, result.getOutput().orElse(null)));
+            .transform(result -> outputToInvokeResult(path, invokeParams, result.getOutput().orElse(null)));
     }
 
     /**

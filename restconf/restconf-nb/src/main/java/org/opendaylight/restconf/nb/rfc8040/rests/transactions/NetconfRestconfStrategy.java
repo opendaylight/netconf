@@ -40,7 +40,7 @@ import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.legacy.QueryParameters;
+import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -122,7 +122,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         } else {
             node = readData(params.content(), path.instance(), params.withDefaults());
         }
-        return completeDataGET(inference, QueryParameters.of(params), node, null);
+        return completeDataGET(inference, WriterParameters.of(params), node, null);
     }
 
     @Override

@@ -7,10 +7,9 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import java.util.Map;
-import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.FormatParameters;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 
 /**
@@ -21,14 +20,10 @@ final class FormatParametersHelper {
         // Hidden on purpose
     }
 
-    static <T extends FormatParameters> @NonNull T ofQueryParameters(final Map<String, String> queryParameters,
-            final Function<@NonNull PrettyPrintParam, @NonNull T> factory, final @NonNull T empty) {
-        if (queryParameters.isEmpty()) {
-            return empty;
-        }
-
-        var prettyPrint = PrettyPrintParam.FALSE;
-        for (var entry : queryParameters.entrySet()) {
+    static <T extends FormatParameters> @NonNull T ofQueryParameters(final QueryParameters queryParameters,
+            final @NonNull T compact, final @NonNull T pretty) {
+        var prettyPrint = queryParameters.getDefault(PrettyPrintParam.class);
+        for (var entry : queryParameters.asCollection()) {
             final var paramName = entry.getKey();
 
             prettyPrint = switch (paramName) {
@@ -37,6 +32,6 @@ final class FormatParametersHelper {
                 default -> throw new IllegalArgumentException("Invalid parameter: " + paramName);
             };
         }
-        return factory.apply(prettyPrint);
+        return prettyPrint.value() ? pretty : compact;
     }
 }

@@ -11,9 +11,9 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
-import java.util.Map;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ChangedLeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.ChildNodesOnlyParam;
 import org.opendaylight.restconf.api.query.FilterParam;
@@ -59,7 +59,7 @@ public record EventStreamGetParams(
      * @throws NullPointerException if {@code queryParameters} is {@code null}
      * @throws IllegalArgumentException if the parameters are invalid
      */
-    public static @NonNull EventStreamGetParams ofQueryParameters(final Map<String, String> queryParameters) {
+    public static @NonNull EventStreamGetParams ofQueryParameters(final QueryParameters queryParameters) {
         StartTimeParam startTime = null;
         StopTimeParam stopTime = null;
         FilterParam filter = null;
@@ -68,7 +68,7 @@ public record EventStreamGetParams(
         ChangedLeafNodesOnlyParam changedLeafNodesOnly = null;
         ChildNodesOnlyParam childNodesOnly = null;
 
-        for (var entry : queryParameters.entrySet()) {
+        for (var entry : queryParameters.asCollection()) {
             final var paramName = entry.getKey();
             final var paramValue = entry.getValue();
 

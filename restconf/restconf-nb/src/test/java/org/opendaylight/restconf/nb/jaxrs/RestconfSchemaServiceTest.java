@@ -27,6 +27,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -68,7 +69,7 @@ public class RestconfSchemaServiceTest {
     public void setup() throws Exception {
         restconf = new JaxRsRestconf(new MdsalRestconfServer(
             new MdsalDatabindProvider(new FixedDOMSchemaService(() -> MODEL_CONTEXT, sourceProvider)), dataBroker,
-            rpcService, actionService, mountPointService));
+            rpcService, actionService, mountPointService), PrettyPrintParam.FALSE);
     }
 
     /**
