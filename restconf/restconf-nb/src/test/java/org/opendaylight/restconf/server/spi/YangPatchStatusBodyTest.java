@@ -5,18 +5,15 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
+package org.opendaylight.restconf.server.spi;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
@@ -24,33 +21,37 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
-public class XmlPatchStatusBodyWriterTest {
+public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
     private final RestconfError error = new RestconfError(ErrorType.PROTOCOL, new ErrorTag("data-exists"),
         "Data already exists");
     private final PatchStatusEntity statusEntity = new PatchStatusEntity("patch1", true, null);
     private final PatchStatusEntity statusEntityError = new PatchStatusEntity("patch1", false, List.of(error));
     private final DatabindContext databind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
-    private final XmlPatchStatusBodyWriter writer = new XmlPatchStatusBodyWriter();
 
     /**
      * Test if per-operation status is omitted if global error is present.
      */
     @Test
     public void testOutputWithGlobalError() throws IOException {
-        final var outputStream = new ByteArrayOutputStream();
-        final var patchStatusContext = new PatchStatusContext(databind, "patch", List.of(statusEntity),
-            false, List.of(error));
-        writer.writeTo(patchStatusContext, null, null, null, MediaType.APPLICATION_XML_TYPE, null, outputStream);
+        final var body = new YangPatchStatusBody(new PatchStatusContext(databind, "patch", List.of(statusEntity),
+            false, List.of(error)));
 
-        assertEquals("""
+        assertFormat("""
+            {"ietf-yang-patch:yang-patch-status":{\
+            "patch-id":"patch",\
+            "errors":{"error":[{\
+            "error-type":"protocol",\
+            "error-tag":"data-exists",\
+            "error-message":"Data already exists"\
+            }]}}}""", body::formatToJSON);
+        assertFormat("""
             <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">\
             <patch-id>patch</patch-id>\
             <errors>\
             <error-type>protocol</error-type>\
             <error-tag>data-exists</error-tag>\
             <error-message>Data already exists</error-message>\
-            </errors></yang-patch-status>""", outputStream.toString(StandardCharsets.UTF_8));
-
+            </errors></yang-patch-status>""", body::formatToXML);
     }
 
     /**
@@ -58,11 +59,20 @@ public class XmlPatchStatusBodyWriterTest {
      */
     @Test
     public void testOutputWithoutGlobalError() throws IOException {
-        final var outputStream = new ByteArrayOutputStream();
-        final var patchStatusContext = new PatchStatusContext(databind,"patch", List.of(statusEntityError),
-            false, null);
-        writer.writeTo(patchStatusContext, null, null, null, MediaType.APPLICATION_XML_TYPE, null, outputStream);
-        assertEquals("""
+        final var body = new YangPatchStatusBody(new PatchStatusContext(databind,"patch", List.of(statusEntityError),
+            false, null));
+
+        assertFormat("""
+            {"ietf-yang-patch:yang-patch-status":{\
+            "patch-id":"patch",\
+            "edit-status":{"edit":[{\
+            "edit-id":"patch1",\
+            "errors":{"error":[{\
+            "error-type":"protocol",\
+            "error-tag":"data-exists",\
+            "error-message":"Data already exists"\
+            }]}}]}}}""", body::formatToJSON);
+        assertFormat("""
             <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">\
             <patch-id>patch</patch-id>\
             <edit-status><edit>\
@@ -72,6 +82,6 @@ public class XmlPatchStatusBodyWriterTest {
             <error-tag>data-exists</error-tag>\
             <error-message>Data already exists</error-message>\
             </errors></edit></edit-status>\
-            </yang-patch-status>""", outputStream.toString(StandardCharsets.UTF_8));
+            </yang-patch-status>""", body::formatToXML);
     }
 }
