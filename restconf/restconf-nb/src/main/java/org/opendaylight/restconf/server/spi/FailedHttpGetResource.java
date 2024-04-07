@@ -10,19 +10,25 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.QueryParams;
 
 @NonNullByDefault
-record FailedYangLibraryVersionResource(RestconfDocumentedException cause) implements YangLibraryVersionResource {
-    FailedYangLibraryVersionResource {
+public record FailedHttpGetResource(RestconfDocumentedException cause) implements HttpGetResource {
+    public FailedHttpGetResource {
         requireNonNull(cause);
     }
 
     @Override
-    public RestconfFuture<NormalizedNodePayload> httpGET(final QueryParams params) {
+    public RestconfFuture<FormattableBody> httpGET(final QueryParams params) {
         return RestconfFuture.failed(cause);
+    }
+
+    @Override
+    public RestconfFuture<FormattableBody> httpGET(final ApiPath apiPath, final QueryParams params) {
+        throw new UnsupportedOperationException();
     }
 }
