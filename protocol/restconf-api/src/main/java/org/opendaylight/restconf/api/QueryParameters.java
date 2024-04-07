@@ -27,6 +27,8 @@ import org.opendaylight.yangtools.concepts.Immutable;
 @NonNullByDefault
 public interface QueryParameters extends Immutable {
 
+    boolean isEmpty();
+
     Collection<? extends Entry<String, String>> asCollection();
 
     @Nullable String lookup(String paramName);

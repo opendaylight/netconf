@@ -27,6 +27,11 @@ public record QueryParams(QueryParameters delegate, PrettyPrintParam prettyPrint
     }
 
     @Override
+    public boolean isEmpty() {
+        return delegate.isEmpty();
+    }
+
+    @Override
     public Collection<? extends Entry<String, String>> asCollection() {
         return delegate.asCollection();
     }

@@ -34,6 +34,11 @@ record ImmutableQueryParameters(ImmutableMap<String, String> params) implements 
     }
 
     @Override
+    public boolean isEmpty() {
+        return params.isEmpty();
+    }
+
+    @Override
     public Collection<Entry<String, String>> asCollection() {
         return params.entrySet();
     }
