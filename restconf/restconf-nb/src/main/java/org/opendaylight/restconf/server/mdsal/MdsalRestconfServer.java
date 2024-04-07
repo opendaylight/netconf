@@ -35,7 +35,6 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
@@ -57,20 +56,16 @@ import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.RestconfServerConfiguration;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.Restconf;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangNames;
-import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.source.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.source.SourceRepresentation;
 import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.api.source.YinTextSource;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -85,7 +80,6 @@ import org.osgi.service.metatype.annotations.Designate;
 @Component(service = RestconfServer.class, configurationPid = "org.opendaylight.restconf.server")
 @Designate(ocd = RestconfServerConfiguration.class)
 public final class MdsalRestconfServer implements RestconfServer, AutoCloseable {
-    private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
     private static final VarHandle LOCAL_STRATEGY;
 
     static {
@@ -389,18 +383,6 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public RestconfFuture<NormalizedNodePayload> yangLibraryVersionGET() {
-        final var stack = SchemaInferenceStack.of(localStrategy().modelContext());
-        try {
-            stack.enterYangData(YangApi.NAME);
-            stack.enterDataTree(Restconf.QNAME);
-            stack.enterDataTree(YANG_LIBRARY_VERSION);
-        } catch (IllegalArgumentException e) {
-            return RestconfFuture.failed(new RestconfDocumentedException("RESTCONF is not available"));
-        }
-        return RestconfFuture.of(new NormalizedNodePayload(stack.toInference(),
-            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION,
-                stack.modelContext().findModuleStatements("ietf-yang-library").iterator().next().localQNameModule()
-                    .revisionUnion().unionString()),
-            WriterParameters.of(prettyPrint, null)));
+        return localStrategy().yangLibraryVersionGET(queryParams(QueryParameters.of()));
     }
 }
