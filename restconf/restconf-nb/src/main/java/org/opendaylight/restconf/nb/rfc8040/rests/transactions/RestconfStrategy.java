@@ -91,6 +91,7 @@ import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
+import org.opendaylight.restconf.server.spi.HttpGetResource;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.OperationOutputBody;
 import org.opendaylight.restconf.server.spi.OperationsResource;
@@ -186,7 +187,7 @@ public abstract class RestconfStrategy {
     private final DOMMountPointService mountPointService;
     private final DOMActionService actionService;
     private final DOMRpcService rpcService;
-    private final OperationsResource operations;
+    private final HttpGetResource operations;
 
     RestconfStrategy(final DatabindContext databind, final ImmutableMap<QName, RpcImplementation> localRpcs,
             final @Nullable DOMRpcService rpcService, final @Nullable DOMActionService actionService,
@@ -1255,12 +1256,14 @@ public abstract class RestconfStrategy {
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));
     }
 
-    public @NonNull RestconfFuture<FormattableBody> operationsGET() {
-        return operations.httpGET();
+    @NonNullByDefault
+    public RestconfFuture<FormattableBody> operationsGET(final QueryParams params) {
+        return operations.httpGET(params);
     }
 
-    public @NonNull RestconfFuture<FormattableBody> operationsGET(final ApiPath apiPath) {
-        return operations.httpGET(apiPath);
+    @NonNullByDefault
+    public RestconfFuture<FormattableBody> operationsGET(final ApiPath apiPath, final QueryParams params) {
+        return operations.httpGET(apiPath, params);
     }
 
     public @NonNull RestconfFuture<InvokeResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,

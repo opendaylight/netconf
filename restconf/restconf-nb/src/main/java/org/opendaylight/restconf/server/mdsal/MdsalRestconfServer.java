@@ -97,7 +97,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     private final @NonNull DOMDataBroker dataBroker;
     private final @Nullable DOMRpcService rpcService;
     private final @Nullable DOMActionService actionService;
-    private final @NonNull PrettyPrintParam prettyPrint;
+    private final @NonNull QueryParams emptyQueryParams;
 
     @SuppressFBWarnings(value = "URF_UNREAD_FIELD", justification = "https://github.com/spotbugs/spotbugs/issues/2749")
     private volatile MdsalRestconfStrategy localStrategy;
@@ -111,7 +111,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         this.rpcService = requireNonNull(rpcService);
         this.actionService = requireNonNull(actionService);
         this.mountPointService = requireNonNull(mountPointService);
-        this.prettyPrint = requireNonNull(prettyPrint);
+        emptyQueryParams = new QueryParams(QueryParameters.of(), prettyPrint);
 
         this.localRpcs = Maps.uniqueIndex(localRpcs, RpcImplementation::qname);
         localStrategy = createLocalStrategy(databindProvider.currentDatabind());
@@ -177,7 +177,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     private @NonNull QueryParams queryParams(final @NonNull QueryParameters params) {
-        return new QueryParams(params, prettyPrint);
+        return params.isEmpty() ? emptyQueryParams : new QueryParams(params, emptyQueryParams.prettyPrint());
     }
 
     @Override
@@ -354,7 +354,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public RestconfFuture<FormattableBody> operationsGET() {
-        return localStrategy().operationsGET();
+        return localStrategy().operationsGET(emptyQueryParams);
     }
 
     @Override
@@ -365,7 +365,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
         }
-        return strategyAndTail.strategy().operationsGET(strategyAndTail.tail());
+        return strategyAndTail.strategy().operationsGET(strategyAndTail.tail(), emptyQueryParams);
     }
 
     @Override
@@ -383,6 +383,6 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
     @Override
     public RestconfFuture<NormalizedNodePayload> yangLibraryVersionGET() {
-        return localStrategy().yangLibraryVersionGET(queryParams(QueryParameters.of()));
+        return localStrategy().yangLibraryVersionGET(emptyQueryParams);
     }
 }
