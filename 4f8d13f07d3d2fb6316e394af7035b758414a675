@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e20a3b31_9f769c7f",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-07T07:22:45Z",
+      "side": 0,
+      "message": "so what the commit message is not saying, but should, is that:\n- URI.getPath() here always ends with a slash?\n- UriInfo.getBaseUri() (in JaxRsRestconf) always does this?\n\nIf so, that fact needs to be documented where it occurs -- because it is *NOT* usual that a URI.getPath() ends with a slash!",
+      "range": {
+        "startLine": 162,
+        "startChar": 16,
+        "endLine": 162,
+        "endChar": 43
+      },
+      "revId": "4f8d13f07d3d2fb6316e394af7035b758414a675",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
