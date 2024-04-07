@@ -92,7 +92,7 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
      */
     @Test
     public void writeRootDataTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null, null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null);
 
         parameterWriter.write(rootDataContainerData);
 
@@ -106,7 +106,7 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
 
     @Test
     public void writeEmptyRootContainerTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null, null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null);
 
         parameterWriter.write(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME))

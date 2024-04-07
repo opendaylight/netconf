@@ -88,7 +88,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeContainerWithoutChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
 
         parameterWriter.write(containerNodeData);
 
@@ -104,7 +104,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeContainerWithChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
 
         parameterWriter.write(containerNodeData);
 
@@ -123,7 +123,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeMapNodeWithoutChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
 
         parameterWriter.write(mapNodeData);
 
@@ -144,7 +144,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Ignore
     @Test
     public void writeMapNodeWithChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
 
         parameterWriter.write(mapNodeData);
 
@@ -170,7 +170,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeLeafSetNodeWithoutChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
 
         parameterWriter.write(leafSetNodeData);
 
@@ -186,7 +186,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeLeafSetNodeWithChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
 
         parameterWriter.write(leafSetNodeData);
 
@@ -204,7 +204,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeLeafSetEntryNodeDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max(), null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
 
         parameterWriter.write(leafSetEntryNodeData);
 
@@ -262,8 +262,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeMapEntryNodeOrderedWithoutChildrenTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, true, DepthParam.min(),
-            null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
 
         parameterWriter.write(mapEntryNodeData);
 
@@ -283,8 +282,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Ignore
     @Test
     public void writeMapEntryNodeOrderedTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, true, DepthParam.max(),
-            null);
+        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
 
         parameterWriter.write(mapEntryNodeData);
 

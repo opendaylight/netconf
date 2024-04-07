@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -31,19 +32,20 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.ParameterAwareNormalizedNodeWriter;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.QueryParams;
+import org.opendaylight.restconf.server.spi.HttpGetResource;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.restconf.server.spi.YangLibraryVersionResource;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -64,7 +66,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * @see DOMDataTreeReadWriteTransaction
  */
 public final class MdsalRestconfStrategy extends RestconfStrategy {
-    private final @NonNull YangLibraryVersionResource yangLibraryVersion;
+    private final @NonNull HttpGetResource yangLibraryVersion;
     private final @NonNull DOMDataBroker dataBroker;
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
@@ -76,7 +78,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
         yangLibraryVersion = YangLibraryVersionResource.of(databind);
     }
 
-    public @NonNull RestconfFuture<NormalizedNodePayload> yangLibraryVersionGET(final QueryParams params) {
+    @NonNullByDefault
+    public RestconfFuture<FormattableBody> yangLibraryVersionGET(final QueryParams params) {
         return yangLibraryVersion.httpGET(params);
     }
 
