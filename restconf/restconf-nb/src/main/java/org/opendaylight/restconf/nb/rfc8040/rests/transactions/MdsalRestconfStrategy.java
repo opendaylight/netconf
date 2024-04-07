@@ -37,12 +37,15 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.ParameterAwareNormalizedNodeWriter;
+import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.QueryParams;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.restconf.server.spi.YangLibraryVersionResource;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -61,7 +64,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * @see DOMDataTreeReadWriteTransaction
  */
 public final class MdsalRestconfStrategy extends RestconfStrategy {
-    private final DOMDataBroker dataBroker;
+    private final @NonNull YangLibraryVersionResource yangLibraryVersion;
+    private final @NonNull DOMDataBroker dataBroker;
 
     public MdsalRestconfStrategy(final DatabindContext databind, final DOMDataBroker dataBroker,
             final ImmutableMap<QName, RpcImplementation> localRpcs, final @Nullable DOMRpcService rpcService,
@@ -69,6 +73,11 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             final @Nullable DOMMountPointService mountPointService) {
         super(databind, localRpcs, rpcService, actionService, sourceProvider, mountPointService);
         this.dataBroker = requireNonNull(dataBroker);
+        yangLibraryVersion = YangLibraryVersionResource.of(databind);
+    }
+
+    public @NonNull RestconfFuture<NormalizedNodePayload> yangLibraryVersionGET(final QueryParams params) {
+        return yangLibraryVersion.httpGET(params);
     }
 
     @Override
@@ -302,8 +311,6 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
             level.add(qualifiedName);
             currentNode = currentMixin.childByQName(qualifiedName);
         }
-
         return currentNode;
     }
-
 }
