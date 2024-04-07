@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.common.Ordering;
@@ -71,11 +72,23 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
      *
      * @param writer Back-end writer
      * @param maxDepth Maximal depth to write
+     * @return A new instance.
+     */
+    public static @NonNull ParameterAwareNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
+            final @Nullable DepthParam maxDepth) {
+        return forStreamWriter(writer, true,  maxDepth, null);
+    }
+
+    /**
+     * Create a new writer backed by a {@link NormalizedNodeStreamWriter}.
+     *
+     * @param writer Back-end writer
+     * @param maxDepth Maximal depth to write
      * @param fields Selected child nodes to write
      * @return A new instance.
      */
-    public static @NonNull ParameterAwareNormalizedNodeWriter forStreamWriter(
-            final NormalizedNodeStreamWriter writer, final DepthParam maxDepth, final List<Set<QName>> fields) {
+    public static @NonNull ParameterAwareNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
+            final @Nullable DepthParam maxDepth, final List<Set<QName>> fields) {
         return forStreamWriter(writer, true,  maxDepth, fields);
     }
 
