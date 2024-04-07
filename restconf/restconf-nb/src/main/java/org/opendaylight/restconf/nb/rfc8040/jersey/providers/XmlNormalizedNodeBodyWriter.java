@@ -16,7 +16,6 @@ import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.api.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -24,6 +23,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
@@ -64,7 +64,7 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
         nnWriter.flush();
     }
 
-    private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
+    private static NormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
             final Inference inference, final WriterParameters writerParameters) {
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(
             XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, inference),
@@ -72,7 +72,7 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
     }
 
     private static void writeAndWrapInDataNode(final XMLStreamWriter xmlWriter,
-            final RestconfNormalizedNodeWriter nnWriter, final NormalizedNode data) throws IOException {
+            final NormalizedNodeWriter nnWriter, final NormalizedNode data) throws IOException {
         final QName nodeType = data.name().getNodeType();
         final String namespace = nodeType.getNamespace().toString();
         try {
