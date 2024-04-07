@@ -7,29 +7,42 @@
  */
 package org.opendaylight.restconf.server.spi;
 
+import static java.util.Objects.requireNonNull;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.QueryParams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.Restconf;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * RESTCONF {@code /yang-library-version} content for a {@code GET} operation as per
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">RFC8040, section 3.3.3</a>.
  */
 @NonNullByDefault
-public sealed interface YangLibraryVersionResource
-        permits DefaultYangLibraryVersionResource, FailedYangLibraryVersionResource {
+public record YangLibraryVersionResource(DatabindContext databind, Inference leafInference, LeafNode<String> leaf)
+        implements HttpGetResource {
+    private static final Logger LOG = LoggerFactory.getLogger(YangLibraryVersionResource.class);
+    private static final QName YANG_LIBRARY_VERSION = QName.create(Restconf.QNAME, "yang-library-version").intern();
 
-    RestconfFuture<NormalizedNodePayload> httpGET(QueryParams params);
+    public YangLibraryVersionResource {
+        requireNonNull(databind);
+        requireNonNull(leafInference);
+        requireNonNull(leaf);
+    }
 
-    static YangLibraryVersionResource of(final DatabindContext databind) {
+    public static HttpGetResource of(final DatabindContext databind) {
         final var modelContext = databind.modelContext();
 
         final Inference leafInference;
@@ -37,18 +50,31 @@ public sealed interface YangLibraryVersionResource
             final var stack = SchemaInferenceStack.of(modelContext);
             stack.enterYangData(YangApi.NAME);
             stack.enterDataTree(Restconf.QNAME);
-            stack.enterDataTree(DefaultYangLibraryVersionResource.YANG_LIBRARY_VERSION);
+            stack.enterDataTree(YANG_LIBRARY_VERSION);
             leafInference = stack.toInference();
         } catch (IllegalArgumentException e) {
-            return new FailedYangLibraryVersionResource(new RestconfDocumentedException(
+            LOG.debug("Cannot find yang-library-version", e);
+            return new FailedHttpGetResource(new RestconfDocumentedException(
                 "yang-library-version is not available", e));
         }
 
         final var it = modelContext.findModuleStatements("ietf-yang-library").iterator();
-        return it.hasNext()
-            ? new DefaultYangLibraryVersionResource(leafInference,
-                ImmutableNodes.leafNode(DefaultYangLibraryVersionResource.YANG_LIBRARY_VERSION,
-                    it.next().localQNameModule().revisionUnion().unionString()))
-            : new FailedYangLibraryVersionResource(new RestconfDocumentedException("No ietf-yang-library present"));
+        if (!it.hasNext()) {
+            LOG.debug("Cannot find ietf-yang-library");
+            return new FailedHttpGetResource(new RestconfDocumentedException("No ietf-yang-library present"));
+        }
+
+        return new YangLibraryVersionResource(databind, leafInference,
+            ImmutableNodes.leafNode(YANG_LIBRARY_VERSION, it.next().localQNameModule().revisionUnion().unionString()));
+    }
+
+    @Override
+    public RestconfFuture<FormattableBody> httpGET(final QueryParams params) {
+        return RestconfFuture.of(new NormalizedFormattableBody<>(params::prettyPrint, databind, leafInference, leaf));
+    }
+
+    @Override
+    public RestconfFuture<FormattableBody> httpGET(final ApiPath apiPath, final QueryParams params) {
+        throw new UnsupportedOperationException();
     }
 }

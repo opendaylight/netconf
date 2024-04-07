@@ -10,18 +10,19 @@ package org.opendaylight.restconf.server.spi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.MoreObjects.ToStringHelper;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.ParameterAwareNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
+import org.opendaylight.restconf.server.api.DatabindPathFormattableBody;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
@@ -32,13 +33,11 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
  * A {@link FormattableBody} corresponding to a {@code rpc} or {@code action} invocation.
  */
 @NonNullByDefault
-public final class OperationOutputBody extends FormattableBody {
-    private final OperationPath path;
+public final class OperationOutputBody extends DatabindPathFormattableBody<OperationPath> {
     private final ContainerNode output;
 
     public OperationOutputBody(final FormatParameters format, final OperationPath path, final ContainerNode output) {
-        super(format);
-        this.path = requireNonNull(path);
+        super(format, path);
         this.output = requireNonNull(output);
         if (output.isEmpty()) {
             throw new IllegalArgumentException("output may not be empty");
@@ -51,7 +50,8 @@ public final class OperationOutputBody extends FormattableBody {
     }
 
     @Override
-    protected void formatToJSON(final OutputStream out, final FormatParameters format) throws IOException {
+    protected void formatToJSON(final OutputStream out, final FormatParameters format)
+            throws IOException {
         final var stack = prepareStack();
 
         // RpcDefinition/ActionDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit
@@ -61,7 +61,7 @@ public final class OperationOutputBody extends FormattableBody {
             jsonWriter.beginObject().name(module.argument().getLocalName() + ":output").beginObject();
 
             final var nnWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                JSONNormalizedNodeStreamWriter.createNestedWriter(path.databind().jsonCodecs(), stack.toInference(),
+                JSONNormalizedNodeStreamWriter.createNestedWriter(path().databind().jsonCodecs(), stack.toInference(),
                     module.namespace().argument(), jsonWriter), null, null);
             for (var child : output.body()) {
                 nnWriter.write(child);
@@ -87,11 +87,12 @@ public final class OperationOutputBody extends FormattableBody {
     }
 
     @Override
-    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-        return super.addToStringAttributes(helper.add("path", path).add("output", output.prettyTree()));
+    protected @NonNull Object bodyAttribute() {
+        return output.prettyTree();
     }
 
     private SchemaInferenceStack prepareStack() {
+        final var path = path();
         final var stack = path.inference().toSchemaInferenceStack();
         stack.enterSchemaTree(path.outputStatement().argument());
         return stack;

@@ -15,12 +15,13 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
+import org.opendaylight.restconf.server.api.QueryParams;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -31,14 +32,16 @@ import org.opendaylight.yangtools.yang.model.api.stmt.RpcEffectiveStatement;
  * RESTCONF {@code /operations} content for a {@code GET} operation as per
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.2">RFC8040</a>.
  */
-public final class OperationsResource {
+@NonNullByDefault
+public final class OperationsResource implements HttpGetResource {
     private final ApiPathNormalizer pathNormalizer;
 
     public OperationsResource(final ApiPathNormalizer pathNormalizer) {
         this.pathNormalizer = requireNonNull(pathNormalizer);
     }
 
-    public @NonNull RestconfFuture<FormattableBody> httpGET() {
+    @Override
+    public RestconfFuture<FormattableBody> httpGET(final QueryParams params) {
         // RPC QNames by their XMLNamespace/Revision. This should be a Table, but Revision can be null, which wrecks us.
         final var table = new HashMap<XMLNamespace, Map<Revision, ImmutableSet<QName>>>();
         final var modelContext = pathNormalizer.databind().modelContext();
@@ -65,11 +68,8 @@ public final class OperationsResource {
         return RestconfFuture.of(new AllOperations(modelContext, rpcs.build()));
     }
 
-    public @NonNull RestconfFuture<FormattableBody> httpGET(final ApiPath apiPath) {
-        if (apiPath.steps().isEmpty()) {
-            return httpGET();
-        }
-
+    @Override
+    public RestconfFuture<FormattableBody> httpGET(final ApiPath apiPath, final QueryParams params) {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);

@@ -7,14 +7,9 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.Restconf;
-import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -27,7 +22,14 @@ class RestconfYangLibraryVersionGetTest extends AbstractRestconfTest {
 
     @Test
     void testLibraryVersion() {
-        assertEquals(ImmutableNodes.leafNode(QName.create(Restconf.QNAME, "yang-library-version"), "2019-01-04"),
-            assertNormalizedNode(200, ar -> restconf.yangLibraryVersionGET(ar)));
+        final var body = assertFormatableBody(200, ar -> restconf.yangLibraryVersionGET(ar));
+
+        assertFormat("""
+            {
+              "ietf-restconf:yang-library-version": "2019-01-04"
+            }""", body::formatToJSON);
+        assertFormat("""
+            <yang-library-version xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">2019-01-04</yang-library-version""",
+            body::formatToXML);
     }
 }
