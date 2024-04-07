@@ -15,13 +15,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.MediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -57,7 +57,7 @@ public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBo
         }
     }
 
-    private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final Inference inference,
+    private static NormalizedNodeWriter createNormalizedNodeWriter(final Inference inference,
             final JsonWriter jsonWriter, final WriterParameters writerParameters,
             final @Nullable XMLNamespace initialNamespace) {
         // TODO: Performance: Cache JSON Codec factory and schema context
