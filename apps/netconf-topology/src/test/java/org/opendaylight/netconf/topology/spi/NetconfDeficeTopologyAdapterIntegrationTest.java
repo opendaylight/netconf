@@ -7,16 +7,16 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.ConcurrentDataBrokerTestCustomizer;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeContext;
@@ -58,17 +58,17 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
 
     private NetconfDeviceTopologyAdapter adapter;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() {
         RUNTIME_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(NetconfNode.class, Node1.class);
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterClass() {
         RUNTIME_CONTEXT = null;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final var customizer = new ConcurrentDataBrokerTestCustomizer(true);
         domDataBroker = customizer.getDOMDataBroker();
