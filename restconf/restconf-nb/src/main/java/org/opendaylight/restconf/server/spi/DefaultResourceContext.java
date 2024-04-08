@@ -27,8 +27,7 @@ public final class DefaultResourceContext extends ResourceContext {
     @Override
     protected ResourceContext resolveRelative(final ApiPath apiPath) {
         // If subResource is empty just return this resource
-        final var steps = apiPath.steps();
-        if (steps.isEmpty()) {
+        if (apiPath.isEmpty()) {
             return this;
         }
 
@@ -40,7 +39,7 @@ public final class DefaultResourceContext extends ResourceContext {
         }
 
         // Defer to normalizeSteps(), faking things a bit. Then check the result.
-        final var it = steps.iterator();
+        final var it = apiPath.steps().iterator();
         final var resolved = normalizer.normalizeSteps(path.inference().toSchemaInferenceStack(), path.schema(),
             urlPath.getPathArguments(), urlPath.getLastPathArgument().getNodeType().getModule(), it.next(), it);
         if (resolved instanceof Data dataPath) {

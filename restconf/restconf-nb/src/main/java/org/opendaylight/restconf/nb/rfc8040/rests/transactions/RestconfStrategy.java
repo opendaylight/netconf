@@ -1399,7 +1399,7 @@ public abstract class RestconfStrategy {
 
     public final @NonNull RestconfFuture<? extends DataPostResult> dataPOST(final ApiPath apiPath,
             final QueryParams params, final DataPostBody body) {
-        if (apiPath.steps().isEmpty()) {
+        if (apiPath.isEmpty()) {
             return dataCreatePOST(params, body.toResource());
         }
         final InstanceReference path;

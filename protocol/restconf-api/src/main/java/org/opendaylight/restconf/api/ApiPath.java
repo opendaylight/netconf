@@ -268,6 +268,15 @@ public record ApiPath(ImmutableList<Step> steps) implements HierarchicalIdentifi
         return steps;
     }
 
+    /**
+     * Returns the same as {@code steps().isEmpty()}.
+     *
+     * @return the same as {@code steps().isEmpty()}
+     */
+    public boolean isEmpty() {
+        return steps.isEmpty();
+    }
+
     @Override
     public boolean contains(final ApiPath other) {
         if (this == other) {

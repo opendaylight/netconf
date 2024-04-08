@@ -367,7 +367,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
 
         final var strategy = strategyAndTail.strategy();
         final var tail = strategyAndTail.tail();
-        return tail.steps().isEmpty() ? strategy.operationsGET(emptyQueryParams)
+        return tail.isEmpty() ? strategy.operationsGET(emptyQueryParams)
             : strategy.operationsGET(tail, emptyQueryParams);
     }
 
