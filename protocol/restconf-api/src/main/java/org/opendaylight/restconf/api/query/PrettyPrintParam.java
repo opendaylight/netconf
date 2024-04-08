@@ -39,7 +39,8 @@ public final class PrettyPrintParam implements RestconfQueryParam<PrettyPrintPar
         return switch (uriValue) {
             case "false" -> FALSE;
             case "true" -> TRUE;
-            default -> throw new IllegalArgumentException("Value can be 'false' or 'true', not '" + uriValue + "'");
+            default -> throw new IllegalArgumentException(
+                "Invalid " + uriName + " value: Value can be 'false' or 'true', not '" + uriValue + "'");
         };
     }
 

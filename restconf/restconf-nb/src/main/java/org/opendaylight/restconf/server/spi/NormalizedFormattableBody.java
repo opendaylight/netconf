@@ -39,9 +39,8 @@ public final class NormalizedFormattableBody<N extends NormalizedNode> extends D
     private final Inference parent;
     private final N data;
 
-    public NormalizedFormattableBody(final FormatParameters format, final DatabindContext databind,
-            final Inference parent, final N data) {
-        super(format, databind);
+    public NormalizedFormattableBody(final DatabindContext databind, final Inference parent, final N data) {
+        super(databind);
         this.parent = requireNonNull(parent);
         this.data = requireNonNull(data);
         // RESTCONF allows returning one list item. We need to wrap it in map node in order to serialize it properly,
@@ -62,14 +61,14 @@ public final class NormalizedFormattableBody<N extends NormalizedNode> extends D
     }
 
     @Override
-    protected void formatToJSON(final OutputStream out, final FormatParameters format, final DatabindContext databind)
+    protected void formatToJSON(final DatabindContext databind, final FormatParameters format, final OutputStream out)
             throws IOException {
         writeTo(JSONNormalizedNodeStreamWriter.createExclusiveWriter(databind.jsonCodecs(), parent, null,
             FormattableBodySupport.createJsonWriter(out, format)));
     }
 
     @Override
-    protected void formatToXML(final OutputStream out, final FormatParameters format, final DatabindContext databind)
+    protected void formatToXML(final DatabindContext databind, final FormatParameters format, final OutputStream out)
             throws IOException {
         final var xmlWriter = FormattableBodySupport.createXmlWriter(out, format);
         writeTo(XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, parent));
@@ -82,7 +81,7 @@ public final class NormalizedFormattableBody<N extends NormalizedNode> extends D
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-        return super.addToStringAttributes(helper.add("body", data.prettyTree()));
+        return helper.add("body", data.prettyTree());
     }
 
     private void writeTo(final NormalizedNodeStreamWriter streamWriter) throws IOException {

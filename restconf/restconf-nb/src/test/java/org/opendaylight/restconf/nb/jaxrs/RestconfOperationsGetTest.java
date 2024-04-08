@@ -61,10 +61,10 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
 
     @Test
     void testOperations() {
-        final var body = assertFormatableBody(200, ar -> restconf.operationsGET(ar));
+        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(ar));
 
-        assertFormat(EXPECTED_JSON, body::formatToJSON);
-        assertFormat(EXPECTED_XML, body::formatToXML);
+        assertFormat(EXPECTED_JSON, body::formatToJSON, true);
+        assertFormat(EXPECTED_XML, body::formatToXML, true);
     }
 
     private void mockMountPoint() {
@@ -82,19 +82,19 @@ class RestconfOperationsGetTest extends AbstractRestconfTest {
     void testMountPointOperations() {
         mockMountPoint();
 
-        final var body = assertFormatableBody(200, ar -> restconf.operationsGET(DEVICE_ID, ar));
-        assertFormat(EXPECTED_JSON, body::formatToJSON);
-        assertFormat(EXPECTED_XML, body::formatToXML);
+        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(DEVICE_ID, ar));
+        assertFormat(EXPECTED_JSON, body::formatToJSON, true);
+        assertFormat(EXPECTED_XML, body::formatToXML, true);
     }
 
     @Test
     void testMountPointSpecificOperationsJson() {
         mockMountPoint();
 
-        final var body = assertFormatableBody(200, ar -> restconf.operationsGET(DEVICE_RPC1_MODULE1_ID, ar));
+        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(DEVICE_RPC1_MODULE1_ID, ar));
         assertFormat("""
-            { "module1:dummy-rpc1-module1" : [null] }""", body::formatToJSON);
+            { "module1:dummy-rpc1-module1" : [null] }""", body::formatToJSON, false);
         assertFormat("""
-            <dummy-rpc1-module1 xmlns="module:1"/>""", body::formatToXML);
+            <dummy-rpc1-module1 xmlns="module:1"/>""", body::formatToXML, false);
     }
 }

@@ -21,7 +21,7 @@ import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
-import org.opendaylight.restconf.server.api.QueryParams;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -41,7 +41,7 @@ public final class OperationsResource implements HttpGetResource {
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final QueryParams params) {
+    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request) {
         // RPC QNames by their XMLNamespace/Revision. This should be a Table, but Revision can be null, which wrecks us.
         final var table = new HashMap<XMLNamespace, Map<Revision, ImmutableSet<QName>>>();
         final var modelContext = pathNormalizer.databind().modelContext();
@@ -69,7 +69,7 @@ public final class OperationsResource implements HttpGetResource {
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final ApiPath apiPath, final QueryParams params) {
+    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request, final ApiPath apiPath) {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);

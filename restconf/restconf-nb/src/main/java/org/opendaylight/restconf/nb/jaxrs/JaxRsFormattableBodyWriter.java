@@ -16,11 +16,12 @@ import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
 
-abstract sealed class FormattableBodyWriter implements MessageBodyWriter<FormattableBody>
-        permits JsonFormattableBody, XmlFormattableBody {
+abstract sealed class JaxRsFormattableBodyWriter implements MessageBodyWriter<JaxRsFormattableBody>
+        permits JsonJaxRsFormattableBodyWriter, XmlJaxRsFormattableBodyWriter {
     @Override
     public final boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations,
             final MediaType mediaType) {
@@ -28,11 +29,12 @@ abstract sealed class FormattableBodyWriter implements MessageBodyWriter<Formatt
     }
 
     @Override
-    public final void writeTo(final FormattableBody body, final Class<?> type, final Type genericType,
+    public final void writeTo(final JaxRsFormattableBody entity, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
-        writeTo(requireNonNull(body), requireNonNull(entityStream));
+        writeTo(entity.body(), entity.format(), requireNonNull(entityStream));
     }
 
-    abstract void writeTo(@NonNull FormattableBody body, @NonNull OutputStream out) throws IOException;
+    @NonNullByDefault
+    abstract void writeTo(FormattableBody body, FormatParameters format, OutputStream out) throws IOException;
 }

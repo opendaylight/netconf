@@ -22,10 +22,8 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.MessageBodyWriter;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,13 +37,12 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
@@ -75,57 +72,38 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
 
     @BeforeEach
     final void setupRestconf() {
-        restconf = new JaxRsRestconf(new MdsalRestconfServer(
-            new MdsalDatabindProvider(new FixedDOMSchemaService(modelContext())), dataBroker, rpcService, actionService,
-            mountPointService));
+        restconf = new JaxRsRestconf(
+            new MdsalRestconfServer(new MdsalDatabindProvider(new FixedDOMSchemaService(modelContext())),
+                dataBroker, rpcService, actionService, mountPointService),
+            PrettyPrintParam.FALSE);
     }
 
     EffectiveModelContext modelContext() {
         return JUKEBOX_SCHEMA;
     }
 
-    static final void assertJson(final String expectedJson, final NormalizedNodePayload payload) {
-        assertPayload(expectedJson, payload, new JsonNormalizedNodeBodyWriter(),
-            MediaTypes.APPLICATION_YANG_DATA_JSON);
-    }
-
     static final void assertJson(final String expectedJson, final OperationOutputBody payload) {
         final var baos = new ByteArrayOutputStream();
         try {
-            payload.formatToJSON(baos);
+            payload.formatToJSON(FormatParameters.COMPACT, baos);
         } catch (IOException e) {
             throw new AssertionError(e);
         }
         assertEquals(expectedJson, baos.toString(StandardCharsets.UTF_8));
     }
 
-    static final void assertXml(final String expectedXml, final NormalizedNodePayload payload) {
-        assertPayload(expectedXml, payload, new XmlNormalizedNodeBodyWriter(), MediaTypes.APPLICATION_YANG_DATA_XML);
-    }
-
     static final void assertXml(final String expectedXml, final OperationOutputBody payload) {
         final var baos = new ByteArrayOutputStream();
         try {
-            payload.formatToXML(baos);
+            payload.formatToXML(FormatParameters.COMPACT, baos);
         } catch (IOException e) {
             throw new AssertionError(e);
         }
         assertEquals(expectedXml, baos.toString(StandardCharsets.UTF_8));
     }
 
-    private static void assertPayload(final String expected, final NormalizedNodePayload payload,
-            final MessageBodyWriter<NormalizedNodePayload> writer, final String mediaType) {
-        final var baos = new ByteArrayOutputStream();
-        try {
-            writer.writeTo(payload, null, null, null, MediaType.valueOf(mediaType), null, baos);
-        } catch (IOException e) {
-            throw new AssertionError(e);
-        }
-        assertEquals(expected, baos.toString(StandardCharsets.UTF_8));
-    }
-
-    static final FormattableBody assertFormatableBody(final int status, final Consumer<AsyncResponse> invocation) {
-        return assertEntity(FormattableBody.class, status, invocation);
+    static final FormattableBody assertFormattableBody(final int status, final Consumer<AsyncResponse> invocation) {
+        return assertEntity(JaxRsFormattableBody.class, status, invocation).body();
     }
 
     static final ContainerNode assertOperationOutput(final int status, final Consumer<AsyncResponse> invocation) {

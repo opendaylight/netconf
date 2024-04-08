@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,13 +32,12 @@ public final class YangPatchStatusBody extends FormattableBody {
 
     private final PatchStatusContext status;
 
-    public YangPatchStatusBody(final FormatParameters format, final PatchStatusContext status) {
-        super(format);
+    public YangPatchStatusBody(final PatchStatusContext status) {
         this.status = requireNonNull(status);
     }
 
     @Override
-    protected void formatToJSON(final OutputStream out, final FormatParameters format) throws IOException {
+    public void formatToJSON(final FormatParameters format, final OutputStream out) throws IOException {
         try (var writer = FormattableBodySupport.createJsonWriter(out, format)) {
             writer.beginObject().name("ietf-yang-patch:yang-patch-status")
                 .beginObject().name("patch-id").value(status.patchId());
@@ -70,7 +70,7 @@ public final class YangPatchStatusBody extends FormattableBody {
     }
 
     @Override
-    protected void formatToXML(final OutputStream out, final FormatParameters format) throws IOException {
+    public void formatToXML(final FormatParameters format, final OutputStream out) throws IOException {
         final var writer = FormattableBodySupport.createXmlWriter(out, format);
         try {
             formatToXML(writer);
@@ -186,5 +186,10 @@ public final class YangPatchStatusBody extends FormattableBody {
         }
 
         writer.writeEndElement();
+    }
+
+    @Override
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        return helper.add("status", status);
     }
 }

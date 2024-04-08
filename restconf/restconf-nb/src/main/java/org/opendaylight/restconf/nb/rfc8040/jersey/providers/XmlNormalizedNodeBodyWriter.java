@@ -15,6 +15,7 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
@@ -33,8 +34,8 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
     @Override
-    void writeData(final SchemaInferenceStack stack, final WriterParameters writerParameters, final NormalizedNode data,
-            final OutputStream entityStream) throws IOException {
+    void writeData(final SchemaInferenceStack stack, final NormalizedNode data, final WriterParameters writerParameters,
+            final FormatParameters format, final OutputStream out) throws IOException {
         final boolean isRoot;
         if (!stack.isEmpty()) {
             stack.exit();
@@ -43,7 +44,7 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
             isRoot = true;
         }
 
-        final var xmlWriter = FormattableBodySupport.createXmlWriter(entityStream, writerParameters);
+        final var xmlWriter = FormattableBodySupport.createXmlWriter(out, format);
         final var nnWriter = createNormalizedNodeWriter(xmlWriter, stack.toInference(), writerParameters);
         if (data instanceof MapEntryNode mapEntry) {
             // Restconf allows returning one list item. We need to wrap it

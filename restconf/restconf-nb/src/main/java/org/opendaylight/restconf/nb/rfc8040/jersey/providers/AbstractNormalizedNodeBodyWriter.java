@@ -16,7 +16,8 @@ import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -33,10 +34,11 @@ abstract class AbstractNormalizedNodeBodyWriter implements MessageBodyWriter<Nor
     public final void writeTo(final NormalizedNodePayload context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
-        writeData(context.inference().toSchemaInferenceStack(), context.writerParameters(), context.data(),
-            requireNonNull(entityStream));
+        writeData(context.inference().toSchemaInferenceStack(), context.data(), context.writerParameters(),
+            context.format(), requireNonNull(entityStream));
     }
 
-    abstract void writeData(@NonNull SchemaInferenceStack stack, @NonNull WriterParameters writerParameters,
-        @NonNull NormalizedNode data, @NonNull OutputStream entityStream) throws IOException;
+    @NonNullByDefault
+    abstract void writeData(SchemaInferenceStack stack, NormalizedNode data, WriterParameters writerParameters,
+        FormatParameters format, OutputStream out) throws IOException;
 }

@@ -13,7 +13,7 @@ import com.google.common.io.CharSource;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * Result of an {@link RestconfServer#modulesYangGET(String, String)} invocation.
+ * Result of an {@link RestconfServer#modulesYangGET(ServerRequest, String, String)} invocation.
  *
  * @param source A {@link CharSource} containing the body
  */

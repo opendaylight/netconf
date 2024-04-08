@@ -44,7 +44,7 @@ import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
-import org.opendaylight.restconf.server.api.QueryParams;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.HttpGetResource;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.restconf.server.spi.YangLibraryVersionResource;
@@ -79,8 +79,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @NonNullByDefault
-    public RestconfFuture<FormattableBody> yangLibraryVersionGET(final QueryParams params) {
-        return yangLibraryVersion.httpGET(params);
+    public RestconfFuture<FormattableBody> yangLibraryVersionGET(final ServerRequest request) {
+        return yangLibraryVersion.httpGET(request);
     }
 
     @Override
@@ -89,7 +89,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    void delete(final SettableRestconfFuture<Empty> future, final YangInstanceIdentifier path) {
+    void delete(final SettableRestconfFuture<Empty> future, final ServerRequest request,
+            final YangInstanceIdentifier path) {
         final var tx = dataBroker.newReadWriteTransaction();
         tx.exists(CONFIGURATION, path).addCallback(new FutureCallback<>() {
             @Override
@@ -128,12 +129,12 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfFuture<DataGetResult> dataGET(final Data path, final DataGetParams params) {
+    RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final Data path, final DataGetParams params) {
         final var inference = path.inference();
         final var fields = params.fields();
-        return completeDataGET(inference,
-            fields == null ? WriterParameters.of(params.prettyPrint(), params.depth())
-                : new WriterParameters(params.prettyPrint(), params.depth(),
+        return completeDataGET(request.format(), inference,
+            fields == null ? WriterParameters.of(params.depth())
+                : new WriterParameters(params.depth(),
                     translateFieldsParam(inference.modelContext(), path.schema(), fields)),
             readData(params.content(), path.instance(), params.withDefaults()), null);
     }

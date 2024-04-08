@@ -21,8 +21,8 @@ import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsWebHostMetadata;
-import org.opendaylight.restconf.nb.jaxrs.JsonFormattableBody;
-import org.opendaylight.restconf.nb.jaxrs.XmlFormattableBody;
+import org.opendaylight.restconf.nb.jaxrs.JsonJaxRsFormattableBodyWriter;
+import org.opendaylight.restconf.nb.jaxrs.XmlJaxRsFormattableBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
@@ -66,9 +66,9 @@ public final class JaxRsNorthbound implements AutoCloseable {
                         @Override
                         public Set<Object> getSingletons() {
                             return Set.of(
-                                new JsonFormattableBody(), new XmlFormattableBody(),
+                                new JsonJaxRsFormattableBodyWriter(), new XmlJaxRsFormattableBodyWriter(),
                                 new RestconfDocumentedExceptionMapper(databindProvider),
-                                new JaxRsRestconf(server));
+                                new JaxRsRestconf(server, servletFactory.prettyPrint()));
                         }
                     }).build())
                 .asyncSupported(true)

@@ -35,8 +35,8 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 public final class OperationOutputBody extends DatabindPathFormattableBody<OperationPath> {
     private final ContainerNode output;
 
-    public OperationOutputBody(final FormatParameters format, final OperationPath path, final ContainerNode output) {
-        super(format, path);
+    public OperationOutputBody(final OperationPath path, final ContainerNode output) {
+        super(path);
         this.output = requireNonNull(output);
         if (output.isEmpty()) {
             throw new IllegalArgumentException("output may not be empty");
@@ -49,8 +49,7 @@ public final class OperationOutputBody extends DatabindPathFormattableBody<Opera
     }
 
     @Override
-    protected void formatToJSON(final OutputStream out, final FormatParameters format)
-            throws IOException {
+    public void formatToJSON(final FormatParameters format, final OutputStream out) throws IOException {
         final var stack = prepareStack();
 
         // RpcDefinition/ActionDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit
@@ -72,7 +71,7 @@ public final class OperationOutputBody extends DatabindPathFormattableBody<Opera
     }
 
     @Override
-    protected void formatToXML(final OutputStream out, final FormatParameters format) throws IOException {
+    public void formatToXML(final FormatParameters format, final OutputStream out) throws IOException {
         final var stack = prepareStack();
 
         // RpcDefinition/ActionDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit

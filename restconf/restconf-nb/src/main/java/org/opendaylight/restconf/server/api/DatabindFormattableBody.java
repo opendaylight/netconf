@@ -19,32 +19,26 @@ import org.opendaylight.restconf.api.FormattableBody;
  * A {@link FormattableBody} which has an attached {@link DatabindContext}.
  */
 @NonNullByDefault
-public abstract class DatabindFormattableBody extends FormattableBody implements DatabindAware {
+public abstract class DatabindFormattableBody extends FormattableBody {
     private final DatabindContext databind;
 
-    protected DatabindFormattableBody(final FormatParameters format, final DatabindContext databind) {
-        super(format);
+    protected DatabindFormattableBody(final DatabindContext databind) {
         this.databind = requireNonNull(databind);
     }
 
     @Override
-    public final DatabindContext databind() {
-        return databind;
+    public final void formatToJSON(final FormatParameters format, final OutputStream out) throws IOException {
+        formatToJSON(databind, format, out);
     }
 
-    @Override
-    protected final void formatToJSON(final OutputStream out, final FormatParameters format) throws IOException {
-        formatToJSON(out, format, databind());
-    }
-
-    protected abstract void formatToJSON(OutputStream out, FormatParameters format, DatabindContext databind)
+    protected abstract void formatToJSON(DatabindContext databind, FormatParameters format, OutputStream out)
         throws IOException;
 
     @Override
-    protected final void formatToXML(final OutputStream out, final FormatParameters format) throws IOException {
-        formatToXML(out, format, databind());
+    public final void formatToXML(final FormatParameters format, final OutputStream out) throws IOException {
+        formatToXML(databind, format, out);
     }
 
-    protected abstract void formatToXML(OutputStream out, FormatParameters format, DatabindContext databind)
+    protected abstract void formatToXML(DatabindContext databind, FormatParameters format, OutputStream out)
         throws IOException;
 }

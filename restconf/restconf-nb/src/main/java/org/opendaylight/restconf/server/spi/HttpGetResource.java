@@ -11,7 +11,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.server.api.QueryParams;
+import org.opendaylight.restconf.server.api.ServerRequest;
 
 /**
  * A resource which supports HTTP GET and produces a {@link FormattableBody}.
@@ -19,7 +19,7 @@ import org.opendaylight.restconf.server.api.QueryParams;
 @NonNullByDefault
 public interface HttpGetResource {
 
-    RestconfFuture<FormattableBody> httpGET(QueryParams params);
+    RestconfFuture<FormattableBody> httpGET(ServerRequest request);
 
-    RestconfFuture<FormattableBody> httpGET(ApiPath apiPath, QueryParams params);
+    RestconfFuture<FormattableBody> httpGET(ServerRequest request, ApiPath apiPath);
 }

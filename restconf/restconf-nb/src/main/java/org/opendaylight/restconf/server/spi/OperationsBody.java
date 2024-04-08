@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -29,12 +28,11 @@ abstract sealed class OperationsBody extends FormattableBody permits AllOperatio
     private final EffectiveModelContext modelContext;
 
     OperationsBody(final EffectiveModelContext modelContext) {
-        super(() -> PrettyPrintParam.TRUE);
         this.modelContext = requireNonNull(modelContext);
     }
 
     @Override
-    protected final void formatToJSON(final OutputStream out, final FormatParameters format) throws IOException {
+    public final void formatToJSON(final FormatParameters format, final OutputStream out) throws IOException {
         try (var writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
             formatToJSON(writer);
         }
@@ -43,7 +41,7 @@ abstract sealed class OperationsBody extends FormattableBody permits AllOperatio
     abstract void formatToJSON(@NonNull Writer out) throws IOException;
 
     @Override
-    protected final void formatToXML(final OutputStream out, final FormatParameters format) throws IOException {
+    public final void formatToXML(final FormatParameters format, final OutputStream out) throws IOException {
         try (var writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
             formatToXML(writer);
         }

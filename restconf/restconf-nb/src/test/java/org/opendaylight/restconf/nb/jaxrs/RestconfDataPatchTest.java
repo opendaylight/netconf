@@ -93,7 +93,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                   null
                 ]
               }
-            }""", body::formatToJSON);
+            }""", body::formatToJSON, true);
     }
 
     @Test
@@ -169,7 +169,7 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
                   ]
                 }
               }
-            }""", body::formatToJSON);
+            }""", body::formatToJSON, true);
     }
 
     @Test
@@ -218,6 +218,6 @@ class RestconfDataPatchTest extends AbstractRestconfTest {
             <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
               <patch-id>test patch id</patch-id>
               <ok/>
-            </yang-patch-status>""", body::formatToXML);
+            </yang-patch-status>""", body::formatToXML, true);
     }
 }

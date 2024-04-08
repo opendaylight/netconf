@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.api;
 
+import static java.util.Objects.requireNonNull;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.api.query.RestconfQueryParam;
@@ -14,13 +16,18 @@ import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
  * The set of {@link RestconfQueryParam}s governing output formatting.
+ *
+ * @param prettyPrint the {@link PrettyPrintParam} parameter
  */
 @NonNullByDefault
-public interface FormatParameters extends Immutable {
+public record FormatParameters(PrettyPrintParam prettyPrint) implements Immutable {
+    public static final FormatParameters COMPACT = new FormatParameters(PrettyPrintParam.FALSE);
+    public static final FormatParameters PRETTY = new FormatParameters(PrettyPrintParam.TRUE);
+
     /**
      * Return the {@link PrettyPrintParam} parameter.
-     *
-     * @return the {@link PrettyPrintParam} parameter
      */
-    PrettyPrintParam prettyPrint();
+    public FormatParameters {
+        requireNonNull(prettyPrint);
+    }
 }

@@ -24,7 +24,6 @@ import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.DepthParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.api.query.RestconfQueryParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
@@ -156,32 +155,32 @@ public class ParamsTest {
         assertEquals(Set.of(containerChild), fields.get(0));
     }
 
-    private static void assertInvalidIAE(final Function<QueryParams, ?> paramsMethod,
+    private static void assertInvalidIAE(final Function<QueryParameters, ?> paramsMethod,
             final RestconfQueryParam<?> param) {
         assertParamsThrows("Invalid parameter: " + param.paramName(), paramsMethod, param.paramName(),
             "odl-test-value");
     }
 
-    private static void assertInvalidIAE(final Function<QueryParams, ?> paramsMethod) {
+    private static void assertInvalidIAE(final Function<QueryParameters, ?> paramsMethod) {
         assertParamsThrows("Invalid parameter: odl-unknown-param", paramsMethod, "odl-unknown-param", "odl-test-value");
     }
 
     private static void assertParamsThrows(final String expectedMessage,
-            final Function<QueryParams, ?> paramsMethod, final String name, final String value) {
+            final Function<QueryParameters, ?> paramsMethod, final String name, final String value) {
         assertParamsThrows(expectedMessage, paramsMethod, QueryParameters.of(name, value));
     }
 
     private static void assertParamsThrows(final String expectedMessage,
-            final Function<QueryParams, ?> paramsMethod, final QueryParameters params) {
+            final Function<QueryParameters, ?> paramsMethod, final QueryParameters params) {
         final var ex = assertThrows(IllegalArgumentException.class, () -> assertParams(paramsMethod, params));
         assertEquals(expectedMessage, ex.getMessage());
     }
 
-    private static <T> T assertParams(final Function<QueryParams, T> paramsMethod, final QueryParameters params) {
-        return paramsMethod.apply(new QueryParams(params, PrettyPrintParam.FALSE));
+    private static <T> T assertParams(final Function<QueryParameters, T> paramsMethod, final QueryParameters params) {
+        return paramsMethod.apply(params);
     }
 
-    private static <T> T assertParams(final Function<QueryParams, T> paramsMethod, final String name,
+    private static <T> T assertParams(final Function<QueryParameters, T> paramsMethod, final String name,
             final String value) {
         return assertParams(paramsMethod, QueryParameters.of(name, value));
     }
