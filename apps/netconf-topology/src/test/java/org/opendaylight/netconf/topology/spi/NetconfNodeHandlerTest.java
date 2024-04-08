@@ -30,6 +30,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -129,7 +130,7 @@ public class NetconfNodeHandlerTest {
         BASE_SCHEMAS = new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory());
     }
 
-    @BeforeClass
+    @AfterClass
     public static void afterClass() throws Exception {
         BASE_SCHEMAS = null;
     }
