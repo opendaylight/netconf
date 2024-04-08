@@ -7,18 +7,17 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
@@ -42,8 +41,8 @@ import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.binding.Rpc;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfTopologyRPCProviderTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfTopologyRPCProviderTest {
     private static final NodeId NODE_ID = new NodeId("testing-node");
     private static final String TOPOLOGY_ID = "testing-topology";
     private static final String TEST_PWD =  "test";
@@ -60,15 +59,15 @@ public class NetconfTopologyRPCProviderTest {
 
     private NetconfTopologyRPCProvider rpcProvider;
 
-    @Before
-    public void setUp() throws Exception {
-        doReturn(ENC_PWD.getBytes()).when(encryptionService).encrypt(TEST_PWD.getBytes());
+    @BeforeEach
+    void setUp() {
         doReturn(rpcReg).when(rpcProviderService).registerRpcImplementations(any(Rpc[].class));
         rpcProvider = new NetconfTopologyRPCProvider(rpcProviderService, dataBroker, encryptionService, TOPOLOGY_ID);
     }
 
     @Test
-    public void testEncryptPassword() {
+    void testEncryptPassword() throws Exception {
+        doReturn(ENC_PWD.getBytes()).when(encryptionService).encrypt(TEST_PWD.getBytes());
         final var encryptedPwNode = rpcProvider.encryptPassword(getInput(true));
         final var loginPw = assertInstanceOf(LoginPw.class, encryptedPwNode.getCredentials());
 
@@ -76,12 +75,9 @@ public class NetconfTopologyRPCProviderTest {
     }
 
     @Test
-    public void testNoEncryption() {
+    void testNoEncryption() {
         final NetconfNode encryptedPwNode = rpcProvider.encryptPassword(getInput(false));
-
-        final Credentials credentials = encryptedPwNode.getCredentials();
-        assertTrue(credentials instanceof LoginPwUnencrypted);
-        final LoginPwUnencrypted loginPw = (LoginPwUnencrypted) credentials;
+        final var loginPw = assertInstanceOf(LoginPwUnencrypted.class, encryptedPwNode.getCredentials());
 
         assertEquals(TEST_PWD, loginPw.getLoginPasswordUnencrypted().getPassword());
     }

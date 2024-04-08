@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.NoSuchElementException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.DomainName;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -25,9 +25,9 @@ import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
-public class NetconfNodeUtilsTest {
+class NetconfNodeUtilsTest {
     @Test
-    public void testCreateRemoteDeviceId() {
+    void testCreateRemoteDeviceId() {
         final var host = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
         final var id = NetconfNodeUtils.toRemoteDeviceId(new NodeId("testing-node"), new NetconfNodeBuilder()
             .setHost(host)
@@ -40,7 +40,7 @@ public class NetconfNodeUtilsTest {
     }
 
     @Test
-    public void toInetSocketAddressRequiresHostPort() {
+    void toInetSocketAddressRequiresHostPort() {
         // Creates a netconfNode without specifying a Port and Host.
         final var builder = new NetconfNodeBuilder()
             .setReconnectOnChangedSchema(true)

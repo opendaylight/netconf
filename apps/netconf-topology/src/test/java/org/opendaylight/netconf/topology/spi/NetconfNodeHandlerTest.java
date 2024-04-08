@@ -7,10 +7,8 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,16 +27,16 @@ import io.netty.util.TimerTask;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.client.NetconfClientFactory;
@@ -76,8 +74,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfNodeHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfNodeHandlerTest {
     private static final RemoteDeviceId DEVICE_ID = new RemoteDeviceId("netconf-topology",
         new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
     private static final NodeId NODE_ID = new NodeId("testing-node");
@@ -125,18 +123,18 @@ public class NetconfNodeHandlerTest {
     private NetconfTopologySchemaAssembler schemaAssembler;
     private NetconfNodeHandler handler;
 
-    @BeforeClass
-    public static void beforeClass() throws Exception {
+    @BeforeAll
+    static void beforeClass() throws Exception {
         BASE_SCHEMAS = new DefaultBaseNetconfSchemaProvider(new DefaultYangParserFactory());
     }
 
-    @AfterClass
-    public static void afterClass() throws Exception {
+    @AfterAll
+    static void afterClass() throws Exception {
         BASE_SCHEMAS = null;
     }
 
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
 
         // Instantiate the handler
@@ -168,13 +166,13 @@ public class NetconfNodeHandlerTest {
                 .build(), null);
     }
 
-    @After
-    public void after() {
+    @AfterEach
+    void after() {
         schemaAssembler.close();
     }
 
     @Test
-    public void successfulOnDeviceConnectedPropagates() throws Exception {
+    void successfulOnDeviceConnectedPropagates() throws Exception {
         assertSuccessfulConnect();
         assertEquals(1, handler.attempts());
 
@@ -195,7 +193,7 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
-    public void failedSchemaCausesReconnect() throws Exception {
+    void failedSchemaCausesReconnect() throws Exception {
         assertSuccessfulConnect();
         assertEquals(1, handler.attempts());
 
@@ -213,7 +211,7 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
-    public void downAfterUpCausesReconnect() throws Exception {
+    void downAfterUpCausesReconnect() throws Exception {
         // Let's borrow common bits
         successfulOnDeviceConnectedPropagates();
 
@@ -231,7 +229,7 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
-    public void socketFailuresAreRetried() throws Exception {
+    void socketFailuresAreRetried() throws Exception {
         final var firstFuture = SettableFuture.create();
         final var secondFuture = SettableFuture.create();
         doReturn(firstFuture, secondFuture).when(clientFactory).createClient(any());
@@ -252,7 +250,7 @@ public class NetconfNodeHandlerTest {
         final var throwableCaptor = ArgumentCaptor.forClass(Throwable.class);
         doNothing().when(delegate).onDeviceFailed(throwableCaptor.capture());
         secondFuture.setException(new AssertionError("second"));
-        assertThat(throwableCaptor.getValue(), instanceOf(ConnectGivenUpException.class));
+        assertInstanceOf(ConnectGivenUpException.class, throwableCaptor.getValue());
 
         // but nothing else happens
         assertEquals(2, handler.attempts());
@@ -268,7 +266,7 @@ public class NetconfNodeHandlerTest {
     }
 
     @Test
-    public void failToConnectOnUnsupportedConfiguration() {
+    void failToConnectOnUnsupportedConfiguration() {
         final var defaultTimer = new DefaultNetconfTimer();
         final var factory = new NetconfClientFactoryImpl(defaultTimer);
 
@@ -309,7 +307,7 @@ public class NetconfNodeHandlerTest {
         // attempt to connect fails due to unsupported configuration, and there is attempt to reconnect
         final var captor = ArgumentCaptor.forClass(Throwable.class);
         verify(delegate).onDeviceFailed(captor.capture());
-        assertTrue(captor.getValue() instanceof ConnectGivenUpException);
+        assertInstanceOf(ConnectGivenUpException.class, captor.getValue());
         assertEquals(1, keyAuthHandler.attempts());
     }
 }

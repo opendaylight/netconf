@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -21,13 +21,13 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutionException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -47,8 +47,8 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfDeviceTopologyAdapterTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfDeviceTopologyAdapterTest {
     private static final KeyedInstanceIdentifier<Topology, TopologyKey> TEST_TOPOLOGY_ID =
         // FIXME: do not use this constant
         NetconfNodeUtils.DEFAULT_TOPOLOGY_IID;
@@ -65,8 +65,8 @@ public class NetconfDeviceTopologyAdapterTest {
 
     private NetconfDeviceTopologyAdapter adapter;
 
-    @Before
-    public void before() {
+    @BeforeEach
+    void before() {
         doReturn(mockTx).when(mockChain).newWriteOnlyTransaction();
         // FIXME: exact match
         doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class),
@@ -80,7 +80,7 @@ public class NetconfDeviceTopologyAdapterTest {
     }
 
     @Test
-    public void replaceChainIfFailed() {
+    void replaceChainIfFailed() {
         doNothing().when(mockChain).close();
         doReturn("mockChain").when(mockChain).toString();
         adapter.onFailure(new Exception("chain failed"));
@@ -88,7 +88,7 @@ public class NetconfDeviceTopologyAdapterTest {
     }
 
     @Test
-    public void testFailedDevice() {
+    void testFailedDevice() {
         // FIXME: exact match
         doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class),
             any(NetconfNode.class));
@@ -102,7 +102,7 @@ public class NetconfDeviceTopologyAdapterTest {
     }
 
     @Test
-    public void testDeviceUpdate() throws Exception {
+    void testDeviceUpdate() throws Exception {
         // FIXME: exact match
         doNothing().when(mockTx).put(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class),
             any(NetconfNode.class));
@@ -114,7 +114,7 @@ public class NetconfDeviceTopologyAdapterTest {
     }
 
     @Test
-    public void testRemoveDeviceConfiguration() throws Exception {
+    void testRemoveDeviceConfiguration() throws Exception {
         // FIXME: exact match
         doNothing().when(mockTx).delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
         doNothing().when(mockChain).close();
@@ -137,7 +137,7 @@ public class NetconfDeviceTopologyAdapterTest {
     }
 
     @Test
-    public void testShutdownCompletion() throws Exception {
+    void testShutdownCompletion() throws Exception {
         // FIXME: exact match
         doNothing().when(mockTx).delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
         doNothing().when(mockChain).close();
