@@ -23,7 +23,6 @@ import org.eclipse.jdt.annotation.Nullable;
  * @param lastModified response {@code Last-Modified} header, or {@code null} if not applicable
  */
 public record DataYangPatchResult(
-        @NonNull DataYangPatchParams params,
         @NonNull PatchStatusContext status,
         @Nullable EntityTag entityTag,
         @Nullable Instant lastModified) implements ConfigurationMetadata {
@@ -31,7 +30,7 @@ public record DataYangPatchResult(
         requireNonNull(status);
     }
 
-    public DataYangPatchResult(final @NonNull DataYangPatchParams params, final @NonNull PatchStatusContext status) {
-        this(params, status, null, null);
+    public DataYangPatchResult(final @NonNull PatchStatusContext status) {
+        this(status, null, null);
     }
 }

@@ -45,8 +45,10 @@ import javax.ws.rs.ext.ParamConverterProvider;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.QueryParameters;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
@@ -70,6 +72,7 @@ import org.opendaylight.restconf.server.api.ModulesGetResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.RestconfServer;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
 import org.opendaylight.restconf.server.api.XmlOperationInputBody;
@@ -115,10 +118,31 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         }
     };
 
-    private final @NonNull RestconfServer server;
 
-    public JaxRsRestconf(final RestconfServer server) {
+//    final DataYangPatchParams patchParams;
+//    try {
+//        patchParams = DataYangPatchParams.of(params);
+//    } catch (IllegalArgumentException e) {
+//        return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
+//            ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+//    }
+
+    private final @NonNull RestconfServer server;
+    private final @NonNull ServerRequest emptyRequest;
+
+    public JaxRsRestconf(final RestconfServer server, final PrettyPrintParam prettyPrint) {
         this.server = requireNonNull(server);
+        emptyRequest = ServerRequest.of(QueryParameters.of(), prettyPrint);
+    }
+
+    private @NonNull ServerRequest requestOf(final UriInfo uriInfo) {
+        final QueryParameters params;
+        try {
+            params = QueryParameters.ofMultiValue(uriInfo.getQueryParameters());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
+        return params.isEmpty() ? emptyRequest : new ServerRequest(params, emptyRequest.format());
     }
 
     @Override
@@ -126,14 +150,6 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public <T> ParamConverter<T> getConverter(final Class<T> rawType, final Type genericType,
             final Annotation[] annotations) {
         return ApiPath.class.equals(rawType) ? (ParamConverter<T>) API_PATH_CONVERTER : null;
-    }
-
-    private static @NonNull QueryParameters queryParams(final UriInfo uriInfo) {
-        try {
-            return QueryParameters.ofMultiValue(uriInfo.getQueryParameters());
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(e.getMessage(), e);
-        }
     }
 
     /**
@@ -147,7 +163,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
     public void dataDELETE(@Encoded @PathParam("identifier") final ApiPath identifier,
             @Suspended final AsyncResponse ar) {
-        server.dataDELETE(identifier).addCallback(new JaxRsRestconfCallback<>(ar) {
+        server.dataDELETE(emptyRequest, identifier).addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             Response transform(final Empty result) {
                 return Response.noContent().build();
@@ -171,7 +187,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void dataGET(@Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        completeDataGET(server.dataGET(queryParams(uriInfo)), ar);
+        completeDataGET(server.dataGET(requestOf(uriInfo)), ar);
     }
 
     /**
@@ -192,7 +208,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
-        completeDataGET(server.dataGET(identifier, queryParams(uriInfo)), ar);
+        completeDataGET(server.dataGET(requestOf(uriInfo), identifier), ar);
     }
 
     private static void completeDataGET(final RestconfFuture<DataGetResult> future, final AsyncResponse ar) {
@@ -233,7 +249,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataXmlPATCH(final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            completeDataPATCH(server.dataPATCH(xmlBody), ar);
+            completeDataPATCH(server.dataPATCH(emptyRequest, xmlBody), ar);
         }
     }
 
@@ -255,7 +271,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            completeDataPATCH(server.dataPATCH(identifier, xmlBody), ar);
+            completeDataPATCH(server.dataPATCH(emptyRequest, identifier, xmlBody), ar);
         }
     }
 
@@ -274,7 +290,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataJsonPATCH(final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            completeDataPATCH(server.dataPATCH(jsonBody), ar);
+            completeDataPATCH(server.dataPATCH(emptyRequest, jsonBody), ar);
         }
     }
 
@@ -295,7 +311,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            completeDataPATCH(server.dataPATCH(identifier, jsonBody), ar);
+            completeDataPATCH(server.dataPATCH(emptyRequest, identifier, jsonBody), ar);
         }
     }
 
@@ -328,7 +344,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangJsonPATCH(final InputStream body, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(queryParams(uriInfo), jsonBody), ar);
+            completeDataYangPATCH(server.dataPATCH(requestOf(uriInfo), jsonBody), ar);
         }
     }
 
@@ -351,7 +367,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangJsonPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(identifier, queryParams(uriInfo), jsonBody), ar);
+            completeDataYangPATCH(server.dataPATCH(requestOf(uriInfo), identifier, jsonBody), ar);
         }
     }
 
@@ -373,7 +389,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangXmlPATCH(final InputStream body, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(queryParams(uriInfo), xmlBody), ar);
+            completeDataYangPATCH(server.dataPATCH(requestOf(uriInfo), xmlBody), ar);
         }
     }
 
@@ -396,7 +412,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataYangXmlPATCH(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlPatchBody(body)) {
-            completeDataYangPATCH(server.dataPATCH(identifier, queryParams(uriInfo), xmlBody), ar);
+            completeDataYangPATCH(server.dataPATCH(requestOf(uriInfo), identifier, xmlBody), ar);
         }
     }
 
@@ -407,7 +423,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
             Response transform(final DataYangPatchResult result) {
                 final var status = result.status();
                 final var builder = Response.status(statusOf(status))
-                    .entity(new YangPatchStatusBody(result.params(), status));
+                    .entity(new YangPatchStatusBody(status));
                 fillConfigurationMetadata(builder, result);
                 return builder.build();
             }
@@ -453,7 +469,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void postDataJSON(final InputStream body, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonChildBody(body)) {
-            completeDataPOST(server.dataPOST(queryParams(uriInfo), jsonBody), uriInfo, ar);
+            final var request = requestOf(uriInfo);
+            completeDataPOST(server.dataPOST(request, jsonBody), request.format(), uriInfo, ar);
         }
     }
 
@@ -473,7 +490,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void postDataJSON(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        completeDataPOST(server.dataPOST(identifier, queryParams(uriInfo), new JsonDataPostBody(body)), uriInfo, ar);
+        final var request = requestOf(uriInfo);
+        completeDataPOST(server.dataPOST(request, identifier, new JsonDataPostBody(body)), request.format(), uriInfo,
+            ar);
     }
 
     /**
@@ -492,7 +511,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void postDataXML(final InputStream body, @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlChildBody(body)) {
-            completeDataPOST(server.dataPOST(queryParams(uriInfo), xmlBody), uriInfo, ar);
+            final var request = requestOf(uriInfo);
+            completeDataPOST(server.dataPOST(request, xmlBody), request.format(), uriInfo, ar);
         }
     }
 
@@ -513,11 +533,13 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void postDataXML(@Encoded @PathParam("identifier") final ApiPath identifier, final InputStream body,
             @Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        completeDataPOST(server.dataPOST(identifier, queryParams(uriInfo), new XmlDataPostBody(body)), uriInfo, ar);
+        final var request = requestOf(uriInfo);
+        completeDataPOST(server.dataPOST(request, identifier, new XmlDataPostBody(body)), request.format(), uriInfo,
+            ar);
     }
 
-    private static void completeDataPOST(final RestconfFuture<? extends DataPostResult> future, final UriInfo uriInfo,
-            final AsyncResponse ar) {
+    private static void completeDataPOST(final RestconfFuture<? extends DataPostResult> future,
+            final FormatParameters format, final UriInfo uriInfo, final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<DataPostResult>(ar) {
             @Override
             Response transform(final DataPostResult result) {
@@ -531,7 +553,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 }
                 if (result instanceof InvokeResult invokeOperation) {
                     final var output = invokeOperation.output();
-                    return output == null ? Response.noContent().build() : Response.ok().entity(output).build();
+                    return output == null ? Response.noContent().build()
+                        : Response.ok().entity(new JaxRsFormattableBody(output, format)).build();
                 }
                 LOG.error("Unhandled result {}", result);
                 return Response.serverError().build();
@@ -554,7 +577,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataJsonPUT(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            completeDataPUT(server.dataPUT(queryParams(uriInfo), jsonBody), ar);
+            completeDataPUT(server.dataPUT(requestOf(uriInfo), jsonBody), ar);
         }
     }
 
@@ -575,7 +598,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataJsonPUT(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             final InputStream body, @Suspended final AsyncResponse ar) {
         try (var jsonBody = new JsonResourceBody(body)) {
-            completeDataPUT(server.dataPUT(identifier, queryParams(uriInfo), jsonBody), ar);
+            completeDataPUT(server.dataPUT(requestOf(uriInfo), identifier, jsonBody), ar);
         }
     }
 
@@ -595,7 +618,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataXmlPUT(@Context final UriInfo uriInfo, final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            completeDataPUT(server.dataPUT(queryParams(uriInfo), xmlBody), ar);
+            completeDataPUT(server.dataPUT(requestOf(uriInfo), xmlBody), ar);
         }
     }
 
@@ -617,7 +640,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void dataXmlPUT(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             final InputStream body, @Suspended final AsyncResponse ar) {
         try (var xmlBody = new XmlResourceBody(body)) {
-            completeDataPUT(server.dataPUT(identifier, queryParams(uriInfo), xmlBody), ar);
+            completeDataPUT(server.dataPUT(requestOf(uriInfo), identifier, xmlBody), ar);
         }
     }
 
@@ -645,7 +668,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON
     })
     public void operationsGET(@Suspended final AsyncResponse ar) {
-        server.operationsGET().addCallback(new FormattableBodyCallback(ar));
+        server.operationsGET(emptyRequest).addCallback(new FormattableBodyCallback(ar, emptyRequest.format()));
     }
 
     /**
@@ -661,7 +684,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON
     })
     public void operationsGET(@PathParam("operation") final ApiPath operation, @Suspended final AsyncResponse ar) {
-        server.operationsGET(operation).addCallback(new FormattableBodyCallback(ar));
+        server.operationsGET(emptyRequest, operation)
+            .addCallback(new FormattableBodyCallback(ar, emptyRequest.format()));
     }
 
     /**
@@ -725,7 +749,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
 
     private void operationsPOST(final ApiPath identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
-        server.operationsPOST(uriInfo.getBaseUri(), identifier, queryParams(uriInfo), body)
+        server.operationsPOST(requestOf(uriInfo), uriInfo.getBaseUri(), identifier, body)
             .addCallback(new JaxRsRestconfCallback<>(ar) {
                 @Override
                 Response transform(final InvokeResult result) {
@@ -751,7 +775,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void yangLibraryVersionGET(@Suspended final AsyncResponse ar) {
-        server.yangLibraryVersionGET().addCallback(new FormattableBodyCallback(ar));
+        server.yangLibraryVersionGET(emptyRequest).addCallback(new FormattableBodyCallback(ar, emptyRequest.format()));
     }
 
     // FIXME: References to these resources are generated by our yang-library implementation. That means:
@@ -781,7 +805,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
     public void modulesYangGET(@PathParam("fileName") final String fileName,
             @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
-        completeModulesGET(server.modulesYangGET(fileName, revision), ar);
+        completeModulesGET(server.modulesYangGET(emptyRequest, fileName, revision), ar);
     }
 
     /**
@@ -798,7 +822,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void modulesYangGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
             @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
             @Suspended final AsyncResponse ar) {
-        completeModulesGET(server.modulesYangGET(mountPath, fileName, revision), ar);
+        completeModulesGET(server.modulesYangGET(emptyRequest, mountPath, fileName, revision), ar);
     }
 
     /**
@@ -813,7 +837,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     @Path("/" + URLConstants.MODULES_SUBPATH + "/{fileName : [^/]+}")
     public void modulesYinGET(@PathParam("fileName") final String fileName,
             @QueryParam("revision") final String revision, @Suspended final AsyncResponse ar) {
-        completeModulesGET(server.modulesYinGET(fileName, revision), ar);
+        completeModulesGET(server.modulesYinGET(emptyRequest, fileName, revision), ar);
     }
 
     /**
@@ -830,7 +854,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     public void modulesYinGET(@Encoded @PathParam("mountPath") final ApiPath mountPath,
             @PathParam("fileName") final String fileName, @QueryParam("revision") final String revision,
             @Suspended final AsyncResponse ar) {
-        completeModulesGET(server.modulesYinGET(mountPath, fileName, revision), ar);
+        completeModulesGET(server.modulesYinGET(emptyRequest, mountPath, fileName, revision), ar);
     }
 
     private static void completeModulesGET(final RestconfFuture<ModulesGetResult> future, final AsyncResponse ar) {

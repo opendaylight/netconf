@@ -45,6 +45,7 @@ import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -83,7 +84,8 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    void delete(final SettableRestconfFuture<Empty> future, final YangInstanceIdentifier path) {
+    void delete(final SettableRestconfFuture<Empty> future, final ServerRequest request,
+            final YangInstanceIdentifier path) {
         final var tx = prepareWriteExecution();
         tx.delete(path);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
@@ -100,7 +102,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfFuture<DataGetResult> dataGET(final Data path, final DataGetParams params) {
+    RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final Data path, final DataGetParams params) {
         final var inference = path.inference();
         final var fields = params.fields();
         final List<YangInstanceIdentifier> fieldPaths;
@@ -123,7 +125,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             node = readData(params.content(), path.instance(), params.withDefaults());
         }
 
-        return completeDataGET(inference, WriterParameters.of(params.prettyPrint(), params.depth()), node, null);
+        return completeDataGET(request.format(), inference, WriterParameters.of(params.depth()), node, null);
     }
 
     @Override

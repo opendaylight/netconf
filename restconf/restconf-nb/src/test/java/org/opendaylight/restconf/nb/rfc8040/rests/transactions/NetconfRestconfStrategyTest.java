@@ -45,7 +45,7 @@ import org.opendaylight.restconf.server.api.JsonDataPostBody;
 import org.opendaylight.restconf.server.api.JsonResourceBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
-import org.opendaylight.restconf.server.api.QueryParams;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yangtools.yang.common.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -113,7 +113,7 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(LogicalDatastoreType.CONFIGURATION, song2Path);
 
-        jukeboxStrategy().delete(new SettableRestconfFuture<>(), songListPath);
+        jukeboxStrategy().delete(new SettableRestconfFuture<>(), null, songListPath);
         verify(netconfService).getConfig(songListWildcardPath, songKeyFields);
         verify(netconfService).delete(LogicalDatastoreType.CONFIGURATION, song1Path);
         verify(netconfService).delete(LogicalDatastoreType.CONFIGURATION, song2Path);
@@ -257,11 +257,11 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(songListPath);
 
         // Inserting new song at 3rd position (aka as last element)
-        spyStrategy.dataPUT(ApiPath.parse("example-jukebox:jukebox/playlist=0/song=3"),
-            new QueryParams(QueryParameters.of(
-                // insert new item after last existing item in list
-                InsertParam.AFTER, PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")),
-                PrettyPrintParam.TRUE),
+        spyStrategy.dataPUT(ServerRequest.of(QueryParameters.of(
+            // insert new item after last existing item in list
+            InsertParam.AFTER, PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")),
+            PrettyPrintParam.TRUE),
+            ApiPath.parse("example-jukebox:jukebox/playlist=0/song=3"),
             new JsonResourceBody(stringInputStream("""
                 {
                   "example-jukebox:song" : [
@@ -295,10 +295,10 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         doReturn(immediateFluentFuture(Optional.of(PLAYLIST_WITH_SONGS))).when(spyTx).read(songListPath);
 
         // Inserting new song at 3rd position (aka as last element)
-        spyStrategy.dataPOST(ApiPath.parse("example-jukebox:jukebox/playlist=0"),
+        spyStrategy.dataPOST(ServerRequest.of(QueryParameters.of(InsertParam.AFTER,
+            PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")), PrettyPrintParam.FALSE),
+            ApiPath.parse("example-jukebox:jukebox/playlist=0"),
             // insert new item after last existing item in list
-            new QueryParams(QueryParameters.of(InsertParam.AFTER,
-                PointParam.forUriValue("example-jukebox:jukebox/playlist=0/song=2")), PrettyPrintParam.FALSE),
             new JsonDataPostBody(stringInputStream("""
                 {
                   "example-jukebox:song" : [

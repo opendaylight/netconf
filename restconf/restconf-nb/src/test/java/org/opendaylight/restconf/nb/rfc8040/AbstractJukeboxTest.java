@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.FormatParameters;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.Decimal64;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -33,9 +35,9 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractJukeboxTest {
     @FunctionalInterface
-    protected interface FormatMethod {
+    public interface FormatMethod {
 
-        void invoke(@NonNull OutputStream out) throws IOException;
+        void invoke(@NonNull FormatParameters format, @NonNull OutputStream out) throws IOException;
     }
 
     // container jukebox
@@ -110,10 +112,11 @@ public abstract class AbstractJukeboxTest {
         return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
     }
 
-    protected static void assertFormat(final String expected, final FormatMethod formatMethod) {
+    public static void assertFormat(final String expected, final FormatMethod formatMethod,
+            final boolean prettyPrint) {
         final var baos = new ByteArrayOutputStream();
         try {
-            formatMethod.invoke(baos);
+            formatMethod.invoke(new FormatParameters(PrettyPrintParam.of(prettyPrint)), baos);
         } catch (IOException e) {
             throw new AssertionError(e);
         }

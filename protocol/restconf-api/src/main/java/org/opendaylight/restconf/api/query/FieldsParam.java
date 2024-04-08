@@ -114,7 +114,8 @@ public final class FieldsParam implements RestconfQueryParam<FieldsParam> {
         try {
             return parse(uriValue);
         } catch (ParseException e) {
-            throw new IllegalArgumentException(e.getMessage() + " [at offset " + e.getErrorOffset() + "]", e);
+            throw new IllegalArgumentException("Invalid " + uriName + " value: " + e.getMessage()
+            + " [at offset " + e.getErrorOffset() + "]", e);
         }
     }
 

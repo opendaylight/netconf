@@ -17,10 +17,10 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.api.QueryParams;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -58,7 +58,7 @@ public final class Insert implements Immutable {
      * @throws NullPointerException if any argument is {@code null}
      * @throws IllegalArgumentException if the parameters are invalid
      */
-    public static @Nullable Insert of(final DatabindContext databind, final QueryParams params) {
+    public static @Nullable Insert of(final DatabindContext databind, final QueryParameters params) {
         InsertParam insert = null;
         PointParam point = null;
 

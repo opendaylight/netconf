@@ -50,6 +50,7 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -71,7 +72,6 @@ import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
-import org.opendaylight.restconf.server.api.DataYangPatchParams;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath;
@@ -80,14 +80,13 @@ import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
-import org.opendaylight.restconf.server.api.InvokeParams;
 import org.opendaylight.restconf.server.api.InvokeResult;
 import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
-import org.opendaylight.restconf.server.api.QueryParams;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
@@ -329,7 +328,7 @@ public abstract class RestconfStrategy {
         }, MoreExecutors.directExecutor());
     }
 
-    public @NonNull RestconfFuture<DataPutResult> dataPUT(final ApiPath apiPath, final QueryParams params,
+    public @NonNull RestconfFuture<DataPutResult> dataPUT(final ServerRequest request, final ApiPath apiPath,
             final ResourceBody body) {
         final Data path;
         try {
@@ -340,7 +339,7 @@ public abstract class RestconfStrategy {
 
         final Insert insert;
         try {
-            insert = Insert.of(databind, params);
+            insert = Insert.of(databind, request.queryParameters());
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
@@ -594,16 +593,7 @@ public abstract class RestconfStrategy {
         return merge(path.instance(), data);
     }
 
-    public final @NonNull RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath apiPath, final QueryParams params,
-            final PatchBody body) {
-        final DataYangPatchParams patchParams;
-        try {
-            patchParams = DataYangPatchParams.of(params);
-        } catch (IllegalArgumentException e) {
-            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
-        }
-
+    public final @NonNull RestconfFuture<DataYangPatchResult> dataPATCH(final ApiPath apiPath, final PatchBody body) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
@@ -619,7 +609,7 @@ public abstract class RestconfStrategy {
             return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
         }
-        return patchData(patchParams, patch);
+        return patchData(patch);
     }
 
     /**
@@ -629,8 +619,7 @@ public abstract class RestconfStrategy {
      * @return {@link PatchStatusContext}
      */
     @VisibleForTesting
-    public final @NonNull RestconfFuture<DataYangPatchResult> patchData(final DataYangPatchParams params,
-            final PatchContext patch) {
+    public final @NonNull RestconfFuture<DataYangPatchResult> patchData(final PatchContext patch) {
         final var editCollection = new ArrayList<PatchStatusEntity>();
         final var tx = prepareWriteExecution();
 
@@ -703,7 +692,7 @@ public abstract class RestconfStrategy {
         // We have errors
         if (!noError) {
             tx.cancel();
-            ret.set(new DataYangPatchResult(params,
+            ret.set(new DataYangPatchResult(
                 new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), false, null)));
             return ret;
         }
@@ -711,14 +700,14 @@ public abstract class RestconfStrategy {
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                ret.set(new DataYangPatchResult(params,
+                ret.set(new DataYangPatchResult(
                     new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), true, null)));
             }
 
             @Override
             public void onFailure(final Throwable cause) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
-                ret.set(new DataYangPatchResult(params,
+                ret.set(new DataYangPatchResult(
                     new PatchStatusContext(databind(), patch.patchId(), List.copyOf(editCollection), false,
                         TransactionUtil.decodeException(cause, "PATCH", null, modelContext()).getErrors())));
             }
@@ -814,8 +803,9 @@ public abstract class RestconfStrategy {
      * @return A {@link RestconfFuture}
      * @throws NullPointerException if {@code apiPath} is {@code null}
      */
+    @NonNullByDefault
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
-    public final @NonNull RestconfFuture<Empty> dataDELETE(final ApiPath apiPath) {
+    public final RestconfFuture<Empty> dataDELETE(final ServerRequest request, final ApiPath apiPath) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
@@ -825,13 +815,14 @@ public abstract class RestconfStrategy {
 
         // FIXME: reject empty YangInstanceIdentifier, as datastores may not be deleted
         final var ret = new SettableRestconfFuture<Empty>();
-        delete(ret, path.instance());
+        delete(ret, request, path.instance());
         return ret;
     }
 
-    abstract void delete(@NonNull SettableRestconfFuture<Empty> future, @NonNull YangInstanceIdentifier path);
+    @NonNullByDefault
+    abstract void delete(SettableRestconfFuture<Empty> future, ServerRequest request, YangInstanceIdentifier path);
 
-    public final @NonNull RestconfFuture<DataGetResult> dataGET(final ApiPath apiPath, final QueryParams params) {
+    public final @NonNull RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final ApiPath apiPath) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
@@ -841,19 +832,19 @@ public abstract class RestconfStrategy {
 
         final DataGetParams getParams;
         try {
-            getParams = DataGetParams.of(params);
+            getParams = DataGetParams.of(request.queryParameters());
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e,
                 new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Invalid GET /data parameters", null,
                     e.getMessage())));
         }
-        return dataGET(path, getParams);
+        return dataGET(request, path, getParams);
     }
 
-    abstract @NonNull RestconfFuture<DataGetResult> dataGET(Data path, DataGetParams params);
+    abstract @NonNull RestconfFuture<DataGetResult> dataGET(ServerRequest request, Data path, DataGetParams params);
 
-    static final @NonNull RestconfFuture<DataGetResult> completeDataGET(final Inference inference,
-            final WriterParameters writerParams, final @Nullable NormalizedNode node,
+    static final @NonNull RestconfFuture<DataGetResult> completeDataGET(final FormatParameters format,
+            final Inference inference, final WriterParameters writerParams, final @Nullable NormalizedNode node,
             final @Nullable ConfigurationMetadata metadata) {
         if (node == null) {
             return RestconfFuture.failed(new RestconfDocumentedException(
@@ -861,7 +852,7 @@ public abstract class RestconfStrategy {
                 ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
         }
 
-        final var payload = new NormalizedNodePayload(inference, node, writerParams);
+        final var payload = new NormalizedNodePayload(inference, node, writerParams, format);
         return RestconfFuture.of(metadata == null ? new DataGetResult(payload)
             : new DataGetResult(payload, metadata.entityTag(), metadata.lastModified()));
     }
@@ -1257,30 +1248,22 @@ public abstract class RestconfStrategy {
     }
 
     @NonNullByDefault
-    public RestconfFuture<FormattableBody> operationsGET(final QueryParams params) {
-        return operations.httpGET(params);
+    public RestconfFuture<FormattableBody> operationsGET(final ServerRequest request) {
+        return operations.httpGET(request);
     }
 
     @NonNullByDefault
-    public RestconfFuture<FormattableBody> operationsGET(final ApiPath apiPath, final QueryParams params) {
-        return operations.httpGET(apiPath, params);
+    public RestconfFuture<FormattableBody> operationsGET(final ServerRequest request, final ApiPath apiPath) {
+        return operations.httpGET(request, apiPath);
     }
 
-    public @NonNull RestconfFuture<InvokeResult> operationsPOST(final URI restconfURI, final ApiPath apiPath,
-            final QueryParams params, final OperationInputBody body) {
+    public @NonNull RestconfFuture<InvokeResult> operationsPOST(final ServerRequest request, final URI restconfURI,
+            final ApiPath apiPath, final OperationInputBody body) {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
         } catch (RestconfDocumentedException e) {
             return RestconfFuture.failed(e);
-        }
-
-        final InvokeParams invokeParams;
-        try {
-            invokeParams = InvokeParams.of(params);
-        } catch (IllegalArgumentException e) {
-            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
         }
 
         final ContainerNode data;
@@ -1296,7 +1279,7 @@ public abstract class RestconfStrategy {
         final var local = localRpcs.get(type);
         if (local != null) {
             return local.invoke(restconfURI, new OperationInput(path, data))
-                .transform(output -> outputToInvokeResult(path, invokeParams, output));
+                .transform(output -> outputToInvokeResult(path, output));
         }
         if (rpcService == null) {
             LOG.debug("RPC invocation is not available");
@@ -1310,7 +1293,7 @@ public abstract class RestconfStrategy {
             public void onSuccess(final DOMRpcResult response) {
                 final var errors = response.errors();
                 if (errors.isEmpty()) {
-                    ret.set(outputToInvokeResult(path, invokeParams, response.value()));
+                    ret.set(outputToInvokeResult(path, response.value()));
                 } else {
                     LOG.debug("RPC invocation reported {}", response.errors());
                     ret.setFailure(new RestconfDocumentedException("RPC implementation reported errors", null,
@@ -1334,9 +1317,9 @@ public abstract class RestconfStrategy {
     }
 
     private static @NonNull InvokeResult outputToInvokeResult(final @NonNull OperationPath path,
-            final @NonNull InvokeParams params, final @Nullable ContainerNode value) {
+            final @Nullable ContainerNode value) {
         return value == null || value.isEmpty() ? InvokeResult.EMPTY
-            : new InvokeResult(new OperationOutputBody(params, path, value));
+            : new InvokeResult(new OperationOutputBody(path, value));
     }
 
     public @NonNull RestconfFuture<CharSource> resolveSource(final SourceIdentifier source,
@@ -1397,10 +1380,10 @@ public abstract class RestconfStrategy {
             ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
     }
 
-    public final @NonNull RestconfFuture<? extends DataPostResult> dataPOST(final ApiPath apiPath,
-            final QueryParams params, final DataPostBody body) {
+    public final @NonNull RestconfFuture<? extends DataPostResult> dataPOST(final ServerRequest request,
+            final ApiPath apiPath, final DataPostBody body) {
         if (apiPath.isEmpty()) {
-            return dataCreatePOST(params, body.toResource());
+            return dataCreatePOST(request, body.toResource());
         }
         final InstanceReference path;
         try {
@@ -1410,12 +1393,12 @@ public abstract class RestconfStrategy {
         }
         if (path instanceof Data dataPath) {
             try (var resourceBody = body.toResource()) {
-                return dataCreatePOST(dataPath, params, resourceBody);
+                return dataCreatePOST(request, dataPath, resourceBody);
             }
         }
         if (path instanceof Action actionPath) {
             try (var inputBody = body.toOperationInput()) {
-                return dataInvokePOST(actionPath, params, inputBody);
+                return dataInvokePOST(actionPath, inputBody);
             }
         }
         // Note: this should never happen
@@ -1423,16 +1406,16 @@ public abstract class RestconfStrategy {
         return RestconfFuture.failed(new RestconfDocumentedException("Unhandled path " + path));
     }
 
-    public @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final QueryParams params,
+    public @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final ServerRequest request,
             final ChildBody body) {
-        return dataCreatePOST(new DatabindPath.Data(databind), params, body);
+        return dataCreatePOST(request, new DatabindPath.Data(databind), body);
     }
 
-    private @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final DatabindPath.Data path,
-            final QueryParams params, final ChildBody body) {
+    private @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final ServerRequest request,
+            final DatabindPath.Data path, final ChildBody body) {
         final Insert insert;
         try {
-            insert = Insert.of(path.databind(), params);
+            insert = Insert.of(path.databind(), request.queryParameters());
         } catch (IllegalArgumentException e) {
             return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
@@ -1451,15 +1434,7 @@ public abstract class RestconfStrategy {
     }
 
     private @NonNull RestconfFuture<InvokeResult> dataInvokePOST(final @NonNull Action path,
-            final @NonNull QueryParams params, final @NonNull OperationInputBody body) {
-        final InvokeParams invokeParams;
-        try {
-            invokeParams = InvokeParams.of(params);
-        } catch (IllegalArgumentException e) {
-            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
-        }
-
+            final @NonNull OperationInputBody body) {
         final ContainerNode input;
         try {
             input = body.toContainerNode(path);
@@ -1474,7 +1449,7 @@ public abstract class RestconfStrategy {
         }
 
         return dataInvokePOST(actionService, path, input)
-            .transform(result -> outputToInvokeResult(path, invokeParams, result.getOutput().orElse(null)));
+            .transform(result -> outputToInvokeResult(path, result.getOutput().orElse(null)));
     }
 
     /**

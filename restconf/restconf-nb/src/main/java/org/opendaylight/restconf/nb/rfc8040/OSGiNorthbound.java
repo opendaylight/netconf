@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.streams.DefaultPingExecutor;
 import org.opendaylight.restconf.nb.rfc8040.streams.DefaultRestconfStreamServletFactory;
 import org.opendaylight.restconf.nb.rfc8040.streams.StreamsConfiguration;
@@ -60,6 +61,11 @@ public final class OSGiNorthbound {
         @AttributeDefinition(name = "{+restconf}", description = """
             The value of RFC8040 {+restconf} URI template, pointing to the root resource. Must not end with '/'.""")
         String restconf() default "rests";
+
+        @AttributeDefinition(
+            name = "default pretty-print",
+            description = "Control the default value of the '" + PrettyPrintParam.uriName + "' query parameter.")
+        boolean pretty$_$print() default false;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -87,7 +93,7 @@ public final class OSGiNorthbound {
         registry = registryFactory.newInstance(FrameworkUtil.asDictionary(MdsalRestconfStreamRegistry.props(useSSE)));
 
         servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(), registry.getInstance(),
-            useSSE,
+            PrettyPrintParam.of(configuration.pretty$_$print()), useSSE,
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());
@@ -106,9 +112,8 @@ public final class OSGiNorthbound {
                 MdsalRestconfStreamRegistry.props(useSSE)));
             LOG.debug("ListenersBroker restarted with {}", newUseSSE ? "SSE" : "Websockets");
         }
-
         final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
-            registry.getInstance(), useSSE,
+            registry.getInstance(), PrettyPrintParam.of(configuration.pretty$_$print()), useSSE,
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());

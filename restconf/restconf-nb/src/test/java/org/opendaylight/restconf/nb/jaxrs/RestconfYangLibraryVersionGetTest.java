@@ -22,12 +22,12 @@ class RestconfYangLibraryVersionGetTest extends AbstractRestconfTest {
 
     @Test
     void testLibraryVersion() {
-        final var body = assertFormatableBody(200, ar -> restconf.yangLibraryVersionGET(ar));
+        final var body = assertFormattableBody(200, ar -> restconf.yangLibraryVersionGET(ar));
 
         assertFormat("""
-            {"ietf-restconf:yang-library-version":"2019-01-04"}""", body::formatToJSON);
+            {"ietf-restconf:yang-library-version":"2019-01-04"}""", body::formatToJSON, false);
         assertFormat("""
             <yang-library-version xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">2019-01-04\
-            </yang-library-version>""", body::formatToXML);
+            </yang-library-version>""", body::formatToXML, false);
     }
 }

@@ -7,12 +7,16 @@
  */
 package org.opendaylight.restconf.api;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.RestconfQueryParam;
@@ -25,56 +29,63 @@ import org.opendaylight.yangtools.concepts.Immutable;
  * once.
  */
 @NonNullByDefault
-public interface QueryParameters extends Immutable {
+public final class QueryParameters implements Immutable {
+    static final QueryParameters EMPTY = new QueryParameters(ImmutableMap.of());
 
-    boolean isEmpty();
+    private final ImmutableMap<String, String> params;
 
-    Collection<? extends Entry<String, String>> asCollection();
-
-    @Nullable String lookup(String paramName);
-
-    static QueryParameters of() {
-        return ImmutableQueryParameters.EMPTY;
+    private QueryParameters(final ImmutableMap<String, String> params) {
+        this.params = requireNonNull(params);
     }
 
-    static QueryParameters of(final String paramName, final String paramValue) {
-        return new ImmutableQueryParameters(ImmutableMap.of(paramName, paramValue));
+    private QueryParameters(final Collection<RestconfQueryParam<?>> params) {
+        // TODO: consider caching common request parameter combinations
+        this(params.stream()
+            .collect(ImmutableMap.toImmutableMap(RestconfQueryParam::paramName, RestconfQueryParam::paramValue)));
     }
 
-    static QueryParameters of(final Entry<String, String> entry) {
+    public static QueryParameters of() {
+        return EMPTY;
+    }
+
+    public static QueryParameters of(final String paramName, final String paramValue) {
+        return new QueryParameters(ImmutableMap.of(paramName, paramValue));
+    }
+
+    public static QueryParameters of(final Entry<String, String> entry) {
         return of(entry.getKey(), entry.getValue());
     }
 
-    static QueryParameters of(final RestconfQueryParam<?> param) {
+    public static QueryParameters of(final RestconfQueryParam<?> param) {
         return of(param.paramName(), param.paramValue());
     }
 
-    static QueryParameters of(final RestconfQueryParam<?>... params) {
+    public static QueryParameters of(final RestconfQueryParam<?>... params) {
         return switch (params.length) {
             case 0 -> of();
             case 1 -> of(params[0]);
-            default -> new ImmutableQueryParameters(Arrays.asList(params));
+            default -> new QueryParameters(Arrays.asList(params));
         };
     }
 
-    static QueryParameters of(final Collection<RestconfQueryParam<?>> params) {
+    public static QueryParameters of(final Collection<RestconfQueryParam<?>> params) {
         return params instanceof List ? of((List<RestconfQueryParam<?>>) params) : switch (params.size()) {
             case 0 -> of();
             case 1 -> of(params.iterator().next());
-            default -> new ImmutableQueryParameters(params);
+            default -> new QueryParameters(params);
         };
     }
 
-    static QueryParameters of(final List<RestconfQueryParam<?>> params) {
+    public static QueryParameters of(final List<RestconfQueryParam<?>> params) {
         return switch (params.size()) {
             case 0 -> of();
             case 1 -> of(params.get(0));
-            default -> new ImmutableQueryParameters(params);
+            default -> new QueryParameters(params);
         };
     }
 
-    static QueryParameters of(final Map<String, String> params) {
-        return params.isEmpty() ? of() : new ImmutableQueryParameters(ImmutableMap.copyOf(params));
+    public static QueryParameters of(final Map<String, String> params) {
+        return params.isEmpty() ? of() : new QueryParameters(ImmutableMap.copyOf(params));
     }
 
     /**
@@ -82,11 +93,11 @@ public interface QueryParameters extends Immutable {
      * from JAX-RS's {@code UriInfo}.
      *
      * @param multiParams Input map
-     * @return An {@link ImmutableQueryParameters} instance
+     * @return A {@link QueryParameters} instance
      * @throws NullPointerException if {@code uriInfo} is {@code null}
      * @throws IllegalArgumentException if there are multiple values for a parameter
      */
-    static QueryParameters ofMultiValue(final Map<String, List<String>> multiParams) {
+    public static QueryParameters ofMultiValue(final Map<String, List<String>> multiParams) {
         if (multiParams.isEmpty()) {
             return of();
         }
@@ -105,6 +116,36 @@ public interface QueryParameters extends Immutable {
         }
 
         final var params = builder.build();
-        return params.isEmpty() ? of() : new ImmutableQueryParameters(params);
+        return params.isEmpty() ? of() : new QueryParameters(params);
     }
+
+    public boolean isEmpty() {
+        return params.isEmpty();
+    }
+
+    public Collection<Entry<String, String>> asCollection() {
+        return params.entrySet();
+    }
+
+    public @Nullable String lookup(final String paramName) {
+        return params.get(requireNonNull(paramName));
+    }
+
+    public <T> @Nullable T lookup(final String paramName, final Function<String, T> parseFunction) {
+        final var str = lookup(paramName);
+        if (str != null) {
+            return parseFunction.apply(str);
+        }
+        return null;
+    }
+
+    public QueryParameters withoutParam(final String paramName) {
+        return params.containsKey(paramName) ? of(Maps.filterKeys(params, key -> !key.equals(paramName))) : this;
+    }
+
+    @Override
+    public String toString() {
+        return QueryParameters.class.getSimpleName() + "(" + params + ")";
+    }
+
 }

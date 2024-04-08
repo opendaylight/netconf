@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableSetMultimap;
 import java.io.IOException;
 import java.io.Writer;
@@ -81,5 +82,10 @@ final class AllOperations extends OperationsBody {
             appendXML(out, rpc);
         }
         out.write("\n</operations>");
+    }
+
+    @Override
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        return helper.add("rpcs", rpcs);
     }
 }

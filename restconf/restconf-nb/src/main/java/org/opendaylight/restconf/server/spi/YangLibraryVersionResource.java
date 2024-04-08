@@ -15,7 +15,7 @@ import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.server.api.DatabindContext;
-import org.opendaylight.restconf.server.api.QueryParams;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangApi;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.restconf.Restconf;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -70,12 +70,12 @@ public record YangLibraryVersionResource(DatabindContext databind, Inference res
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final QueryParams params) {
-        return RestconfFuture.of(new NormalizedFormattableBody<>(params::prettyPrint, databind, restconf, leaf));
+    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request) {
+        return RestconfFuture.of(new NormalizedFormattableBody<>(databind, restconf, leaf));
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final ApiPath apiPath, final QueryParams params) {
+    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request, final ApiPath apiPath) {
         throw new UnsupportedOperationException();
     }
 }

@@ -60,7 +60,11 @@ public enum WithDefaultsParam implements RestconfQueryParam<WithDefaultsParam> {
     }
 
     public static @NonNull WithDefaultsParam forUriValue(final String uriValue) {
-        return of(WithDefaultsMode.ofName(uriValue));
+        try {
+            return of(WithDefaultsMode.ofName(uriValue));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid " + uriName + " value: " + e.getMessage(), e);
+        }
     }
 
     @Override

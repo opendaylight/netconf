@@ -7,8 +7,12 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
+import static java.util.Objects.requireNonNull;
+
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 
@@ -16,12 +20,15 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
  * A {@link JaxRsRestconfCallback} producing a {@link FormattableBody}.
  */
 final class FormattableBodyCallback extends JaxRsRestconfCallback<FormattableBody> {
-    FormattableBodyCallback(final AsyncResponse ar) {
+    private final @NonNull FormatParameters format;
+
+    FormattableBodyCallback(final AsyncResponse ar, final FormatParameters format) {
         super(ar);
+        this.format = requireNonNull(format);
     }
 
     @Override
     Response transform(final FormattableBody result) throws RestconfDocumentedException {
-        return Response.ok().entity(result).build();
+        return Response.ok().entity(new JaxRsFormattableBody(result, format)).build();
     }
 }
