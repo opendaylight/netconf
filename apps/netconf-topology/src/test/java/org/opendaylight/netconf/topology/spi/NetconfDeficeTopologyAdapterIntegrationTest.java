@@ -7,16 +7,16 @@
  */
 package org.opendaylight.netconf.topology.spi;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.ConcurrentDataBrokerTestCustomizer;
 import org.opendaylight.mdsal.binding.runtime.api.BindingRuntimeContext;
@@ -45,7 +45,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 // FIXME: base on AbstractDataBrokerTest test?
-public class NetconfDeficeTopologyAdapterIntegrationTest {
+class NetconfDeficeTopologyAdapterIntegrationTest {
     private static final RemoteDeviceId ID = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
     private static final KeyedInstanceIdentifier<Topology, TopologyKey> TEST_TOPOLOGY_ID =
         // FIXME: do not use this constant
@@ -58,18 +58,18 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
 
     private NetconfDeviceTopologyAdapter adapter;
 
-    @BeforeClass
-    public static void beforeClass() {
+    @BeforeAll
+    static void beforeClass() {
         RUNTIME_CONTEXT = BindingRuntimeHelpers.createRuntimeContext(NetconfNode.class, Node1.class);
     }
 
-    @AfterClass
-    public static void afterClass() {
+    @AfterAll
+    static void afterClass() {
         RUNTIME_CONTEXT = null;
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         final var customizer = new ConcurrentDataBrokerTestCustomizer(true);
         domDataBroker = customizer.getDOMDataBroker();
         dataBroker = customizer.createDataBroker();
@@ -85,7 +85,7 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
     }
 
     @Test
-    public void testFailedDeviceIntegration() {
+    void testFailedDeviceIntegration() {
         adapter.setDeviceAsFailed(null);
 
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> dataBroker.newReadWriteTransaction()
@@ -98,7 +98,7 @@ public class NetconfDeficeTopologyAdapterIntegrationTest {
     }
 
     @Test
-    public void testDeviceAugmentedNodePresence() throws Exception {
+    void testDeviceAugmentedNodePresence() throws Exception {
         QName netconfTestLeafQname = QName.create(
                 "urn:TBD:params:xml:ns:yang:network-topology-augment-test", "2016-08-08", "test-id").intern();
 
