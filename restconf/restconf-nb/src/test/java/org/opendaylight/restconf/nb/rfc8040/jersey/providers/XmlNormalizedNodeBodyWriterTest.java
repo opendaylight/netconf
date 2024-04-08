@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
@@ -35,7 +36,7 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
 
         final NormalizedNodePayload nodePayload = new NormalizedNodePayload(Inference.ofDataTreePath(schemaContext),
             ImmutableNodes.newContainerBuilder().withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME)).build(),
-            WriterParameters.EMPTY);
+            WriterParameters.EMPTY, FormatParameters.COMPACT);
 
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final XmlNormalizedNodeBodyWriter xmlWriter = new XmlNormalizedNodeBodyWriter();
@@ -60,7 +61,7 @@ public class XmlNormalizedNodeBodyWriterTest extends AbstractInstanceIdentifierT
                     .withNodeIdentifier(new NodeIdentifier(
                         QName.create("bar:module", "2016-09-29", "foo-bar-container")))
                     .build())
-                .build(), WriterParameters.EMPTY);
+                .build(), WriterParameters.EMPTY, FormatParameters.COMPACT);
 
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final XmlNormalizedNodeBodyWriter xmlWriter = new XmlNormalizedNodeBodyWriter();

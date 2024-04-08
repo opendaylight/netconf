@@ -48,6 +48,6 @@ final class OneOperation extends OperationsBody {
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-        return super.addToStringAttributes(helper.add("rpc", rpc));
+        return helper.add("rpc", rpc);
     }
 }

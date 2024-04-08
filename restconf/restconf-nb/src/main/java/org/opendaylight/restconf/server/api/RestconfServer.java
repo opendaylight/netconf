@@ -12,7 +12,6 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -30,107 +29,110 @@ public interface RestconfServer {
      * @return A {@link RestconfFuture} of the operation
      */
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
-    RestconfFuture<Empty> dataDELETE(ApiPath identifier);
+    RestconfFuture<Empty> dataDELETE(ServerRequest request, ApiPath identifier);
 
     /**
      * Return the content of the datastore.
      *
-     * @param params {@link DataGetParams} for this request
+     * @param request {@link ServerRequest} for this request
      * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<DataGetResult> dataGET(QueryParameters params);
+    RestconfFuture<DataGetResult> dataGET(ServerRequest request);
 
     /**
      * Return the content of a data resource.
      *
+     * @param request {@link ServerRequest} for this request
      * @param identifier resource identifier
-     * @param params {@link DataGetParams} for this request
      * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<DataGetResult> dataGET(ApiPath identifier, QueryParameters params);
+    RestconfFuture<DataGetResult> dataGET(ServerRequest request, ApiPath identifier);
 
     /**
      * Partially modify the target data resource, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
      *
+     * @param request {@link ServerRequest} for this request
      * @param body data node for put to config DS
      * @return A {@link RestconfFuture} of the operation
      */
-    RestconfFuture<DataPatchResult> dataPATCH(ResourceBody body);
+    RestconfFuture<DataPatchResult> dataPATCH(ServerRequest request, ResourceBody body);
 
     /**
      * Partially modify the target data resource, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.6.1">RFC8040, section 4.6.1</a>.
      *
+     * @param request {@link ServerRequest} for this request
      * @param identifier resource identifier
      * @param body data node for put to config DS
      * @return A {@link RestconfFuture} of the operation
      */
-    RestconfFuture<DataPatchResult> dataPATCH(ApiPath identifier, ResourceBody body);
+    RestconfFuture<DataPatchResult> dataPATCH(ServerRequest request, ApiPath identifier, ResourceBody body);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
-     * @param params query parameters
+     * @param request {@link ServerRequest} for this request
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    RestconfFuture<DataYangPatchResult> dataPATCH(QueryParameters params, PatchBody body);
+    RestconfFuture<DataYangPatchResult> dataPATCH(ServerRequest request, PatchBody body);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8072#section-2">RFC8072, section 2</a>.
      *
+     * @param request {@link ServerRequest} for this request
      * @param identifier path to target
-     * @param params query parameters
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    RestconfFuture<DataYangPatchResult> dataPATCH(ApiPath identifier, QueryParameters params, PatchBody body);
+    RestconfFuture<DataYangPatchResult> dataPATCH(ServerRequest request, ApiPath identifier, PatchBody body);
 
-    RestconfFuture<CreateResourceResult> dataPOST(QueryParameters params, ChildBody body);
+    RestconfFuture<CreateResourceResult> dataPOST(ServerRequest request, ChildBody body);
 
     /**
      * Create or invoke a operation, as described in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4">RFC8040 section 4.4</a>.
      *
+     * @param request {@link ServerRequest} for this request
      * @param identifier path to target
-     * @param params query parameters
      * @param body body of the post request
      */
-    RestconfFuture<? extends DataPostResult> dataPOST(ApiPath identifier, QueryParameters params, DataPostBody body);
+    RestconfFuture<? extends DataPostResult> dataPOST(ServerRequest request, ApiPath identifier, DataPostBody body);
 
     /**
      * Replace the data store, as described in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>.
      *
+     * @param request {@link ServerRequest} for this request
      * @param body data node for put to config DS
-     * @param params query parameters
      * @return A {@link RestconfFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(QueryParameters params, ResourceBody body);
+    RestconfFuture<DataPutResult> dataPUT(ServerRequest request, ResourceBody body);
 
     /**
      * Create or replace a data store resource, as described in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.5">RFC8040 section 4.5</a>.
      *
+     * @param request {@link ServerRequest} for this request
      * @param identifier resource identifier
-     * @param params query parameters
      * @param body data node for put to config DS
      * @return A {@link RestconfFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(ApiPath identifier, QueryParameters params, ResourceBody body);
+    RestconfFuture<DataPutResult> dataPUT(ServerRequest request, ApiPath identifier, ResourceBody body);
 
     /**
      * Return the set of supported RPCs supported by
-     *  {@link #operationsPOST(URI, ApiPath, QueryParameters, OperationInputBody)},
+     * {@link #operationsPOST(ServerRequest, URI, ApiPath, OperationInputBody)},
      * as expressed in the <a href="https://www.rfc-editor.org/rfc/rfc8040#page-84">ietf-restconf.yang</a>
      * {@code container operations} statement.
      *
+     * @param request {@link ServerRequest} for this request
      * @return A {@link RestconfFuture} completing with an {@link FormattableBody}
      */
-    RestconfFuture<FormattableBody> operationsGET();
+    RestconfFuture<FormattableBody> operationsGET(ServerRequest request);
 
     /*
      * Return the details about a particular operation supported by
@@ -138,42 +140,44 @@ public interface RestconfServer {
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#page-84">ietf-restconfig.yang</a>
      * {@code container operations} statement.
      *
+     * @param request {@link ServerRequest} for this request
      * @param operation An operation
      * @return A {@link RestconfFuture} completing with an {@link FormattableBody}
      */
-    RestconfFuture<FormattableBody> operationsGET(ApiPath operation);
+    RestconfFuture<FormattableBody> operationsGET(ServerRequest request, ApiPath operation);
 
     /**
      * Invoke an RPC operation, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.6">RFC8040 Operation Resource</a>.
      *
+     * @param request {@link ServerRequest} for this request
      * @param restconfURI Base URI of the request
      * @param operation {@code <operation>} path, really an {@link ApiPath} to an {@code rpc}
-     * @param params query parameters
      * @param body RPC operation
      * @return A {@link RestconfFuture} completing with {@link InvokeResult}
      */
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support yang-ext:mount,
     //        and hence it is a path right now
-    RestconfFuture<InvokeResult> operationsPOST(URI restconfURI, ApiPath operation, QueryParameters params,
+    RestconfFuture<InvokeResult> operationsPOST(ServerRequest request, URI restconfURI, ApiPath operation,
         OperationInputBody body);
 
     /**
      * Return the revision of {@code ietf-yang-library} module implemented by this server, as defined in
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">RFC8040 {+restconf}/yang-library-version</a>.
      *
+     * @param request {@link ServerRequest} for this request
      * @return A {@link RestconfFuture} completing with {@link NormalizedNodePayload} containing a single
      *        {@code yang-library-version} leaf element.
      */
-    // FIXME: this is a simple encoding-variadic return, similar to how OperationsContent is handled use a common
-    //        construct for both cases -- in this case it carries a yang.common.Revision
-    RestconfFuture<FormattableBody> yangLibraryVersionGET();
+    RestconfFuture<FormattableBody> yangLibraryVersionGET(ServerRequest request);
 
-    RestconfFuture<ModulesGetResult> modulesYangGET(String fileName, @Nullable String revision);
+    RestconfFuture<ModulesGetResult> modulesYangGET(ServerRequest request, String fileName, @Nullable String revision);
 
-    RestconfFuture<ModulesGetResult> modulesYangGET(ApiPath mountPath, String fileName, @Nullable String revision);
+    RestconfFuture<ModulesGetResult> modulesYangGET(ServerRequest request, ApiPath mountPath, String fileName,
+        @Nullable String revision);
 
-    RestconfFuture<ModulesGetResult> modulesYinGET(String fileName, @Nullable String revision);
+    RestconfFuture<ModulesGetResult> modulesYinGET(ServerRequest request, String fileName, @Nullable String revision);
 
-    RestconfFuture<ModulesGetResult> modulesYinGET(ApiPath mountPath, String fileName, @Nullable String revision);
+    RestconfFuture<ModulesGetResult> modulesYinGET(ServerRequest request, ApiPath mountPath, String fileName,
+        @Nullable String revision);
 }

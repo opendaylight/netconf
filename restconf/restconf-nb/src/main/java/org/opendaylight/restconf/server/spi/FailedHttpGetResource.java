@@ -14,7 +14,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.server.api.QueryParams;
+import org.opendaylight.restconf.server.api.ServerRequest;
 
 @NonNullByDefault
 public record FailedHttpGetResource(RestconfDocumentedException cause) implements HttpGetResource {
@@ -23,12 +23,12 @@ public record FailedHttpGetResource(RestconfDocumentedException cause) implement
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final QueryParams params) {
+    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request) {
         return RestconfFuture.failed(cause);
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final ApiPath apiPath, final QueryParams params) {
+    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request, final ApiPath apiPath) {
         throw new UnsupportedOperationException();
     }
 }

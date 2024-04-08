@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.jaxrs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,10 +31,11 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
+import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
-import org.opendaylight.restconf.server.spi.OperationOutputBody;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
@@ -68,9 +68,10 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
             .build())))
             .when(actionService).invokeAction(eq(RESET_PATH), any(), any());
 
-        final var restconf = new JaxRsRestconf(new MdsalRestconfServer(
-            new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)), dataBroker, rpcService, actionService,
-            mountPointService));
+        final var restconf = new JaxRsRestconf(
+            new MdsalRestconfServer(new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)),
+                dataBroker, rpcService, actionService, mountPointService),
+            PrettyPrintParam.FALSE);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
         restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
@@ -93,25 +94,27 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
             .build())))
             .when(actionService).invokeAction(eq(RESET_PATH), any(), any());
 
-        final var restconf = new JaxRsRestconf(new MdsalRestconfServer(
-            new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)), dataBroker, rpcService, actionService,
-            mountPointService));
+        final var restconf = new JaxRsRestconf(
+            new MdsalRestconfServer(new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)),
+                dataBroker, rpcService, actionService, mountPointService),
+            PrettyPrintParam.FALSE);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
-        doReturn(true).when(asyncResponse).resume(captor.capture());
-        restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
-            stringInputStream("""
-            {
-              "instance-identifier-module:input": {
-                "delay": 600
-              }
-            }"""), uriInfo, asyncResponse);
-        final var response = captor.getValue();
-        assertEquals(200, response.getStatus());
 
-        final var payload = assertInstanceOf(OperationOutputBody.class, response.getEntity());
-        AbstractRestconfTest.assertJson("""
-            {"instance-identifier-module:output":{"timestamp":"somevalue"}}""", payload);
-        AbstractRestconfTest.assertXml("""
-            <output xmlns="instance:identifier:module"><timestamp>somevalue</timestamp></output>""", payload);
+        final var apiPath = ApiPath.parse("instance-identifier-module:cont/cont1/reset");
+        final var body = AbstractRestconfTest.assertFormattableBody(200, ar -> {
+            restconf.postDataJSON(apiPath,
+                stringInputStream("""
+                    {
+                      "instance-identifier-module:input": {
+                        "delay": 600
+                      }
+                    }"""), uriInfo, ar);
+        });
+
+        AbstractJukeboxTest.assertFormat("""
+            {"instance-identifier-module:output":{"timestamp":"somevalue"}}""", body::formatToJSON, false);
+        AbstractJukeboxTest.assertFormat("""
+            <output xmlns="instance:identifier:module"><timestamp>somevalue</timestamp></output>""", body::formatToXML,
+            false);
     }
 }

@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -34,8 +33,8 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
      */
     @Test
     public void testOutputWithGlobalError() throws IOException {
-        final var body = new YangPatchStatusBody(() -> PrettyPrintParam.TRUE,
-            new PatchStatusContext(databind, "patch", List.of(statusEntity), false, List.of(error)));
+        final var body = new YangPatchStatusBody(new PatchStatusContext(databind, "patch", List.of(statusEntity), false,
+            List.of(error)));
 
         assertFormat("""
             {
@@ -51,7 +50,7 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
                   ]
                 }
               }
-            }""", body::formatToJSON);
+            }""", body::formatToJSON, true);
         assertFormat("""
             <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
               <patch-id>patch</patch-id>
@@ -60,7 +59,7 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
                 <error-tag>data-exists</error-tag>
                 <error-message>Data already exists</error-message>
               </errors>
-            </yang-patch-status>""", body::formatToXML);
+            </yang-patch-status>""", body::formatToXML, true);
     }
 
     /**
@@ -68,8 +67,8 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
      */
     @Test
     public void testOutputWithoutGlobalError() throws IOException {
-        final var body = new YangPatchStatusBody(() -> PrettyPrintParam.TRUE,
-            new PatchStatusContext(databind,"patch", List.of(statusEntityError), false, null));
+        final var body = new YangPatchStatusBody(new PatchStatusContext(databind,"patch", List.of(statusEntityError),
+            false, null));
 
         assertFormat("""
             {
@@ -92,7 +91,7 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
                   ]
                 }
               }
-            }""", body::formatToJSON);
+            }""", body::formatToJSON, true);
         assertFormat("""
             <yang-patch-status xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
               <patch-id>patch</patch-id>
@@ -106,6 +105,6 @@ public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
                   </errors>
                 </edit>
               </edit-status>
-            </yang-patch-status>""", body::formatToXML);
+            </yang-patch-status>""", body::formatToXML, true);
     }
 }

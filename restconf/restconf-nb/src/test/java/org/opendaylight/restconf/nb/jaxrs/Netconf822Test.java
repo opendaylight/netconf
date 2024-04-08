@@ -25,7 +25,7 @@ class Netconf822Test extends AbstractRestconfTest {
 
     @Test
     void testOperationsContent() {
-        final var body = assertFormatableBody(200, ar -> restconf.operationsGET(ar));
+        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(ar));
 
         assertFormat("""
             {
@@ -33,21 +33,21 @@ class Netconf822Test extends AbstractRestconfTest {
                 "foo:new" : [null],
                 "foo:new1" : [null]
               }
-            }""", body::formatToJSON);
+            }""", body::formatToJSON, true);
         assertFormat("""
             <operations xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf">
               <new xmlns="foo"/>
               <new1 xmlns="foo"/>
-            </operations>""", body::formatToXML);
+            </operations>""", body::formatToXML, true);
     }
 
     @Test
     void testOperationsContentByIdentifier() {
-        final var body = assertFormatableBody(200, ar -> restconf.operationsGET(apiPath("foo:new1"), ar));
+        final var body = assertFormattableBody(200, ar -> restconf.operationsGET(apiPath("foo:new1"), ar));
 
         assertFormat("""
-            { "foo:new1" : [null] }""", body::formatToJSON);
+            { "foo:new1" : [null] }""", body::formatToJSON, false);
         assertFormat("""
-            <new1 xmlns="foo"/>""", body::formatToXML);
+            <new1 xmlns="foo"/>""", body::formatToXML, false);
     }
 }

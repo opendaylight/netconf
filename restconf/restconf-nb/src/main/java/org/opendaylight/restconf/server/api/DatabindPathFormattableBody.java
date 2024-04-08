@@ -13,7 +13,6 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
 
 /**
@@ -23,8 +22,7 @@ import org.opendaylight.restconf.api.FormattableBody;
 public abstract class DatabindPathFormattableBody<P extends DatabindPath> extends FormattableBody {
     private final @NonNull P path;
 
-    protected DatabindPathFormattableBody(final FormatParameters format, final P path) {
-        super(format);
+    protected DatabindPathFormattableBody(final P path) {
         this.path = requireNonNull(path);
     }
 
@@ -34,7 +32,7 @@ public abstract class DatabindPathFormattableBody<P extends DatabindPath> extend
 
     @Override
     protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
-        return super.addToStringAttributes(helper.add("path", path).add("body", bodyAttribute()));
+        return helper.add("path", path).add("body", bodyAttribute());
     }
 
     protected abstract @Nullable Object bodyAttribute();

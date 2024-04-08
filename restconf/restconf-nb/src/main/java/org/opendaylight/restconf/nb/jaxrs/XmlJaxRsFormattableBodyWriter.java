@@ -12,14 +12,15 @@ import java.io.OutputStream;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
+import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.MediaTypes;
 
 @Provider
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-public final class XmlFormattableBody extends FormattableBodyWriter {
+public final class XmlJaxRsFormattableBodyWriter extends JaxRsFormattableBodyWriter {
     @Override
-    void writeTo(final FormattableBody body, final OutputStream out) throws IOException {
-        body.formatToXML(out);
+    void writeTo(final FormattableBody body, final FormatParameters format, final OutputStream out) throws IOException {
+        body.formatToXML(format, out);
     }
 }

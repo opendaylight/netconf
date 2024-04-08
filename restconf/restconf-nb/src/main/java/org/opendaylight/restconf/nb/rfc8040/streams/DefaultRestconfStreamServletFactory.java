@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.ws.rs.core.Application;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -43,8 +44,10 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     private static final String PROP_USE_WEBSOCKETS = ".useWebsockets";
     private static final String PROP_STREAMS_CONFIGURATION = ".streamsConfiguration";
     private static final String PROP_RESTCONF = ".restconf";
+    private static final String PROP_PRETTY_PRINT = ".prettyPrint";
 
     private final @NonNull String restconf;
+    private final @NonNull PrettyPrintParam prettyPrint;
     private final RestconfStream.Registry streamRegistry;
     private final ServletSupport servletSupport;
 
@@ -54,7 +57,8 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
 
     public DefaultRestconfStreamServletFactory(final ServletSupport servletSupport, final String restconf,
             final RestconfStream.Registry streamRegistry, final StreamsConfiguration streamsConfiguration,
-            final String namePrefix, final int corePoolSize, final boolean useWebsockets) {
+            final PrettyPrintParam prettyPrint, final String namePrefix, final int corePoolSize,
+            final boolean useWebsockets) {
         this.servletSupport = requireNonNull(servletSupport);
         this.restconf = requireNonNull(restconf);
         if (restconf.endsWith("/")) {
@@ -62,6 +66,7 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
         }
         this.streamRegistry = requireNonNull(streamRegistry);
         this.streamsConfiguration = requireNonNull(streamsConfiguration);
+        this.prettyPrint = requireNonNull(prettyPrint);
         pingExecutor = new DefaultPingExecutor(namePrefix, corePoolSize);
         this.useWebsockets = useWebsockets;
         if (useWebsockets) {
@@ -77,6 +82,7 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
         this(servletSupport, (String) props.get(PROP_RESTCONF),
             (RestconfStream.Registry) props.get(PROP_STREAM_REGISTRY),
             (StreamsConfiguration) props.get(PROP_STREAMS_CONFIGURATION),
+            (PrettyPrintParam) props.get(PROP_PRETTY_PRINT),
             (String) props.get(PROP_NAME_PREFIX), (int) requireNonNull(props.get(PROP_CORE_POOL_SIZE)),
             (boolean) requireNonNull(props.get(PROP_USE_WEBSOCKETS)));
     }
@@ -99,17 +105,23 @@ public final class DefaultRestconfStreamServletFactory implements RestconfStream
     }
 
     @Override
+    public PrettyPrintParam prettyPrint() {
+        return prettyPrint;
+    }
+
+    @Override
     @Deactivate
     public void close() {
         pingExecutor.close();
     }
 
     public static Map<String, ?> props(final String restconf, final RestconfStream.Registry streamRegistry,
-            final boolean useSSE, final StreamsConfiguration streamsConfiguration, final String namePrefix,
-            final int corePoolSize) {
+            final PrettyPrintParam prettyPrint, final boolean useSSE, final StreamsConfiguration streamsConfiguration,
+            final String namePrefix, final int corePoolSize) {
         return Map.of(
             PROP_RESTCONF, restconf,
             PROP_STREAM_REGISTRY, streamRegistry,
+            PROP_PRETTY_PRINT, prettyPrint,
             PROP_USE_WEBSOCKETS, !useSSE,
             PROP_STREAMS_CONFIGURATION, streamsConfiguration,
             PROP_NAME_PREFIX, namePrefix,

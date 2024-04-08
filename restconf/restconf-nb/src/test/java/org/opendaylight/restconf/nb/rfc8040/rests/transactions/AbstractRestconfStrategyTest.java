@@ -28,15 +28,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.ContentParam;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
-import org.opendaylight.restconf.server.api.DataYangPatchParams;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
+import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.yang.patch.Edit.Operation;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -210,6 +212,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
         .build();
     private static final NodeIdentifier NODE_IDENTIFIER =
         new NodeIdentifier(QName.create("ns", "2016-02-28", "container"));
+    private static final ServerRequest REQUEST = ServerRequest.of(QueryParameters.of(), PrettyPrintParam.TRUE);
 
     @Mock
     private EffectiveModelContext mockSchemaContext;
@@ -238,7 +241,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      */
     @Test
     public final void testDeleteData() throws Exception {
-        final var future = testDeleteDataStrategy().dataDELETE(ApiPath.empty());
+        final var future = testDeleteDataStrategy().dataDELETE(REQUEST, ApiPath.empty());
         assertNotNull(Futures.getDone(future));
     }
 
@@ -249,7 +252,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
      */
     @Test
     public final void testNegativeDeleteData() {
-        final var future = testNegativeDeleteDataStrategy().dataDELETE(ApiPath.empty());
+        final var future = testNegativeDeleteDataStrategy().dataDELETE(REQUEST, ApiPath.empty());
         final var ex = assertThrows(ExecutionException.class, () -> Futures.getDone(future)).getCause();
         assertThat(ex, instanceOf(RestconfDocumentedException.class));
         final var errors = ((RestconfDocumentedException) ex).getErrors();
@@ -350,7 +353,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     @Test
     public final void testDeleteNonexistentData() {
-        final var status = deleteNonexistentDataTestStrategy().patchData(DataYangPatchParams.COMPACT,
+        final var status = deleteNonexistentDataTestStrategy().patchData(
             new PatchContext("patchD", List.of(new PatchEntity("edit", Operation.Delete, CREATE_AND_DELETE_TARGET))))
             .getOrThrow().status();
         assertEquals("patchD", status.patchId());
@@ -496,8 +499,7 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
     }
 
     private static void patch(final PatchContext patchContext, final RestconfStrategy strategy, final boolean failed) {
-        final var patchStatusContext = strategy.patchData(DataYangPatchParams.COMPACT, patchContext).getOrThrow()
-            .status();
+        final var patchStatusContext = strategy.patchData(patchContext).getOrThrow().status();
         for (var entity : patchStatusContext.editCollection()) {
             if (failed) {
                 assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());
