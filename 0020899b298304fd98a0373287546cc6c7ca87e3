@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6afeb2e2_8eeadbdf",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-09T06:09:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "480e057b_45efdce9",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 6
+      },
+      "revId": "0020899b298304fd98a0373287546cc6c7ca87e3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "546af7d3_e9a5d825",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "841155d3_ec525430",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfNodeHandlerTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-09T06:09:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "546af7d3_e9a5d825",
+      "range": {
+        "startLine": 10,
+        "startChar": 27,
+        "endLine": 10,
+        "endChar": 50
+      },
+      "revId": "0020899b298304fd98a0373287546cc6c7ca87e3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "adbf7fec_f45d1bcb",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-04-08T16:47:29Z",
       "side": 1,
       "message": "fix up mocking structure so that lenient() is not required",
+      "range": {
+        "startLine": 16,
+        "startChar": 34,
+        "endLine": 16,
+        "endChar": 41
+      },
+      "revId": "0020899b298304fd98a0373287546cc6c7ca87e3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4977477_d83b4895",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProviderTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-09T06:09:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "adbf7fec_f45d1bcb",
       "range": {
         "startLine": 16,
         "startChar": 34,
