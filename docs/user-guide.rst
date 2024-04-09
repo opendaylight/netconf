@@ -747,22 +747,32 @@ Opendaylight provides the way to stream the device notifications over a http ses
       }
     }
 
-The response suggests the http url for reading the notifications.
+The response contains the stream name for reading the notifications.
 
 .. code-block:: json
 
     {
        "odl-device-notification:output": {
-            "stream-path": "http://localhost:8181/rests/notif/test_device?notificationType=test_device"
+            "stream-name": "urn:uuid:91e630ec-1324-4f57-bae3-0925b6d11ffd"
         }
     }
 
-- Step 5: User can access the url in the response and the notifications will be as follows.
+- Step 5: To receive notifications send GET request to url as follows:
+
+.. code-block::
+
+    http://localhost:8181/rests/streams/{encoding}/{stream-name}
+
+{stream-name} - being **stream-name** received in previous step
+
+{encoding} - being desired encoding to be received, either "xml" or "json"
+
+The request for xml encoding and **stream-name** from previous example would look like this:
 
 .. code-block::
 
     GET
-    http://localhost:8181/rests/notif/test_device?notificationType=test_device
+    http://localhost:8181/rests/streams/xml/urn:uuid:91e630ec-1324-4f57-bae3-0925b6d11ffd
     Content-Type: application/xml
     Accept: application/xml
 
