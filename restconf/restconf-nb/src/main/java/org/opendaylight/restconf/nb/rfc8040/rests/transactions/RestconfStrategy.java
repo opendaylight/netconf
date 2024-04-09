@@ -84,6 +84,10 @@ import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.api.ServerResponse.Failure;
+import org.opendaylight.restconf.server.api.ServerResponse.Success;
+import org.opendaylight.restconf.server.api.ServerResponseFuture;
+import org.opendaylight.restconf.server.api.YangErrorsBody;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
@@ -94,6 +98,7 @@ import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.OperationOutputBody;
 import org.opendaylight.restconf.server.spi.OperationsResource;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
+import org.opendaylight.restconf.server.spi.ServerException;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.with.defaults.rev110601.WithDefaultsMode;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -270,6 +275,33 @@ public abstract class RestconfStrategy {
 
     public final @NonNull EffectiveModelContext modelContext() {
         return databind.modelContext();
+    }
+
+    @NonNullByDefault
+    final Failure newFailure(final RestconfError error) {
+        return new Failure(error.getErrorTag(), YangErrorsBody.of(databind, error));
+    }
+
+    final <T extends Success> @NonNull ServerResponseFuture<T> newFailureFuture(final ErrorType errorType,
+            final ErrorTag errorTag, final Throwable cause) {
+        LOG.debug("Request failed {}", cause);
+        return ServerResponseFuture.of(newFailure(new RestconfError(errorType, errorTag, cause.getMessage(), null, null,
+            null)));
+    }
+
+    @NonNullByDefault
+    final Failure newFailure(final ServerException se) {
+        LOG.debug("Request failed {}", se);
+        return newFailure(se.error());
+    }
+
+    // FIXME: remove this method once we have migrated away from RestconfDocumentedException
+    @NonNullByDefault
+    static final Failure newFailure(final RestconfDocumentedException rde) {
+        LOG.debug("Request failed {}", rde);
+        final var errors = rde.getErrors();
+        return new Failure(errors.get(0).getErrorTag(),
+            YangErrorsBody.of(DatabindContext.ofModel(rde.modelContext()), errors));
     }
 
     /**
@@ -495,7 +527,7 @@ public abstract class RestconfStrategy {
      * @param insert  {@link Insert}
      * @return A {@link RestconfFuture}
      */
-    public final @NonNull RestconfFuture<CreateResourceResult> postData(final YangInstanceIdentifier path,
+    public final @NonNull ServerResponseFuture<CreateResourceResult> postData(final YangInstanceIdentifier path,
             final NormalizedNode data, final @Nullable Insert insert) {
         final ListenableFuture<? extends CommitInfo> future;
         if (insert != null) {
@@ -1379,7 +1411,7 @@ public abstract class RestconfStrategy {
             ErrorType.APPLICATION, ErrorTag.DATA_MISSING));
     }
 
-    public final @NonNull RestconfFuture<? extends DataPostResult> dataPOST(final ServerRequest request,
+    public final @NonNull ServerResponseFuture<? extends DataPostResult> dataPOST(final ServerRequest request,
             final ApiPath apiPath, final DataPostBody body) {
         if (apiPath.isEmpty()) {
             return dataCreatePOST(request, body.toResource());
@@ -1405,19 +1437,18 @@ public abstract class RestconfStrategy {
         return RestconfFuture.failed(new RestconfDocumentedException("Unhandled path " + path));
     }
 
-    public @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final ServerRequest request,
+    public @NonNull ServerResponseFuture<CreateResourceResult> dataCreatePOST(final ServerRequest request,
             final ChildBody body) {
         return dataCreatePOST(request, new DatabindPath.Data(databind), body);
     }
 
-    private @NonNull RestconfFuture<CreateResourceResult> dataCreatePOST(final ServerRequest request,
+    private @NonNull ServerResponseFuture<CreateResourceResult> dataCreatePOST(final ServerRequest request,
             final DatabindPath.Data path, final ChildBody body) {
         final Insert insert;
         try {
             insert = Insert.of(path.databind(), request.queryParameters());
         } catch (IllegalArgumentException e) {
-            return RestconfFuture.failed(new RestconfDocumentedException(e.getMessage(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e));
+            return newFailureFuture(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
         }
 
         final var payload = body.toPayload(path);

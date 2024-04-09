@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.jaxrs;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -50,7 +51,6 @@ import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
@@ -73,11 +73,13 @@ import org.opendaylight.restconf.server.api.OperationInputBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.api.ServerResponseFuture;
 import org.opendaylight.restconf.server.api.XmlChildBody;
 import org.opendaylight.restconf.server.api.XmlDataPostBody;
 import org.opendaylight.restconf.server.api.XmlOperationInputBody;
 import org.opendaylight.restconf.server.api.XmlPatchBody;
 import org.opendaylight.restconf.server.api.XmlResourceBody;
+import org.opendaylight.restconf.server.spi.ServerException;
 import org.opendaylight.restconf.server.spi.YangPatchStatusBody;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -546,9 +548,9 @@ public final class JaxRsRestconf implements ParamConverterProvider {
             uriInfo, ar);
     }
 
-    private static void completeDataPOST(final RestconfFuture<? extends DataPostResult> future,
+    private static void completeDataPOST(final ServerResponseFuture<? extends DataPostResult> future,
             final PrettyPrintParam prettyPrint, final UriInfo uriInfo, final AsyncResponse ar) {
-        future.addCallback(new JaxRsRestconfCallback<DataPostResult>(ar) {
+        future.onComplete(new JaxRsOnComplete<DataPostResult>(ar) {
             @Override
             Response transform(final DataPostResult result) {
                 if (result instanceof CreateResourceResult createResource) {
@@ -567,7 +569,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 LOG.error("Unhandled result {}", result);
                 return Response.serverError().build();
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     /**
@@ -652,8 +654,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         }
     }
 
-    private static void completeDataPUT(final RestconfFuture<DataPutResult> future, final AsyncResponse ar) {
-        future.addCallback(new JaxRsRestconfCallback<>(ar) {
+    private static void completeDataPUT(final ServerResponseFuture<DataPutResult> future, final AsyncResponse ar) {
+        future.onComplete(new JaxRsOnComplete<>(ar) {
             @Override
             Response transform(final DataPutResult result) {
                 // Note: no Location header, as it matches the request path
@@ -661,7 +663,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                 fillConfigurationMetadata(builder, result);
                 return builder.build();
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     /**
@@ -758,14 +760,13 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     private void operationsPOST(final ApiPath identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
         server.operationsPOST(requestOf(uriInfo), uriInfo.getBaseUri(), identifier, body)
-            .addCallback(new JaxRsRestconfCallback<>(ar) {
+            .onComplete(new JaxRsOnComplete<>(ar) {
                 @Override
                 Response transform(final InvokeResult result) {
                     final var body = result.output();
-                    return body == null ? Response.noContent().build()
-                        : Response.ok().entity(body).build();
+                    return body == null ? Response.noContent().build() : Response.ok().entity(body).build();
                 }
-            });
+            }, MoreExecutors.directExecutor());
     }
 
     /**
@@ -865,18 +866,18 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         completeModulesGET(server.modulesYinGET(emptyRequest, mountPath, fileName, revision), ar);
     }
 
-    private static void completeModulesGET(final RestconfFuture<ModulesGetResult> future, final AsyncResponse ar) {
-        future.addCallback(new JaxRsRestconfCallback<>(ar) {
+    private static void completeModulesGET(final ServerResponseFuture<ModulesGetResult> future, final AsyncResponse ar) {
+        future.onComplete(new JaxRsOnComplete<>(ar) {
             @Override
-            Response transform(final ModulesGetResult result) {
+            Response transform(final ModulesGetResult result) throws ServerException {
                 final Reader reader;
                 try {
                     reader = result.source().openStream();
                 } catch (IOException e) {
-                    throw new RestconfDocumentedException("Cannot open source", e);
+                    throw new ServerException("Cannot open source", e);
                 }
                 return Response.ok(reader).build();
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 }
