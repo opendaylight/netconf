@@ -90,7 +90,7 @@ public interface RestconfServer {
      */
     RestconfFuture<DataYangPatchResult> dataPATCH(ServerRequest request, ApiPath identifier, PatchBody body);
 
-    RestconfFuture<CreateResourceResult> dataPOST(ServerRequest request, ChildBody body);
+    ServerResponseFuture<CreateResourceResult> dataPOST(ServerRequest request, ChildBody body);
 
     /**
      * Create or invoke a operation, as described in
@@ -99,8 +99,9 @@ public interface RestconfServer {
      * @param request {@link ServerRequest} for this request
      * @param identifier path to target
      * @param body body of the post request
+     * @return A {@link ServerResponseFuture} completing with a {@link DataPostResult}
      */
-    RestconfFuture<? extends DataPostResult> dataPOST(ServerRequest request, ApiPath identifier, DataPostBody body);
+    ServerResponseFuture<DataPostResult> dataPOST(ServerRequest request, ApiPath identifier, DataPostBody body);
 
     /**
      * Replace the data store, as described in
@@ -108,9 +109,9 @@ public interface RestconfServer {
      *
      * @param request {@link ServerRequest} for this request
      * @param body data node for put to config DS
-     * @return A {@link RestconfFuture} completing with {@link DataPutResult}
+     * @return A {@link ServerResponseFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(ServerRequest request, ResourceBody body);
+    ServerResponseFuture<DataPutResult> dataPUT(ServerRequest request, ResourceBody body);
 
     /**
      * Create or replace a data store resource, as described in
@@ -119,9 +120,9 @@ public interface RestconfServer {
      * @param request {@link ServerRequest} for this request
      * @param identifier resource identifier
      * @param body data node for put to config DS
-     * @return A {@link RestconfFuture} completing with {@link DataPutResult}
+     * @return A {@link ServerResponseFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(ServerRequest request, ApiPath identifier, ResourceBody body);
+    ServerResponseFuture<DataPutResult> dataPUT(ServerRequest request, ApiPath identifier, ResourceBody body);
 
     /**
      * Return the set of supported RPCs supported by
@@ -154,11 +155,11 @@ public interface RestconfServer {
      * @param restconfURI Base URI of the request
      * @param operation {@code <operation>} path, really an {@link ApiPath} to an {@code rpc}
      * @param body RPC operation
-     * @return A {@link RestconfFuture} completing with {@link InvokeResult}
+     * @return A {@link ServerResponseFuture} completing with {@link InvokeResult}
      */
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support yang-ext:mount,
     //        and hence it is a path right now
-    RestconfFuture<InvokeResult> operationsPOST(ServerRequest request, URI restconfURI, ApiPath operation,
+    ServerResponseFuture<InvokeResult> operationsPOST(ServerRequest request, URI restconfURI, ApiPath operation,
         OperationInputBody body);
 
     /**
@@ -171,13 +172,15 @@ public interface RestconfServer {
      */
     RestconfFuture<FormattableBody> yangLibraryVersionGET(ServerRequest request);
 
-    RestconfFuture<ModulesGetResult> modulesYangGET(ServerRequest request, String fileName, @Nullable String revision);
-
-    RestconfFuture<ModulesGetResult> modulesYangGET(ServerRequest request, ApiPath mountPath, String fileName,
+    ServerResponseFuture<ModulesGetResult> modulesYangGET(ServerRequest request, String fileName,
         @Nullable String revision);
 
-    RestconfFuture<ModulesGetResult> modulesYinGET(ServerRequest request, String fileName, @Nullable String revision);
+    ServerResponseFuture<ModulesGetResult> modulesYangGET(ServerRequest request, ApiPath mountPath, String fileName,
+        @Nullable String revision);
 
-    RestconfFuture<ModulesGetResult> modulesYinGET(ServerRequest request, ApiPath mountPath, String fileName,
+    ServerResponseFuture<ModulesGetResult> modulesYinGET(ServerRequest request, String fileName,
+        @Nullable String revision);
+
+    ServerResponseFuture<ModulesGetResult> modulesYinGET(ServerRequest request, ApiPath mountPath, String fileName,
         @Nullable String revision);
 }
