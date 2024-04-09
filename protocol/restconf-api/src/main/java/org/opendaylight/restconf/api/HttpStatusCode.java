@@ -256,10 +256,6 @@ public final class HttpStatusCode {
 
     @Override
     public String toString() {
-        final var sb = new StringBuilder(HttpStatusCode.class.getSimpleName()).append('(').append(code);
-        if (phrase != null) {
-            sb.append(' ').append(phrase);
-        }
-        return sb.append(')').toString();
+        return phrase == null ? Integer.toString(code) : code + " " + phrase;
     }
 }
