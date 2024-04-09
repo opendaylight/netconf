@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.io.CharSource;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.server.api.ServerResponse.Success;
 
 /**
  * Result of an {@link RestconfServer#modulesYangGET(ServerRequest, String, String)} invocation.
@@ -18,7 +19,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
  * @param source A {@link CharSource} containing the body
  */
 @NonNullByDefault
-public record ModulesGetResult(CharSource source) {
+public record ModulesGetResult(CharSource source) implements Success {
     public ModulesGetResult {
         requireNonNull(source);
     }
