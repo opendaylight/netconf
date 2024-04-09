@@ -30,6 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsMediaTypes;
+import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -51,7 +52,8 @@ public class RestconfDocumentedExceptionMapperTest {
         final var schemaContext = YangParserTestUtils.parseYangResources(
                 RestconfDocumentedExceptionMapperTest.class, "/restconf/impl/ietf-restconf@2017-01-26.yang",
                 "/instanceidentifier/yang/instance-identifier-patch-module.yang");
-        exceptionMapper = new RestconfDocumentedExceptionMapper(() -> DatabindContext.ofModel(schemaContext));
+        exceptionMapper = new RestconfDocumentedExceptionMapper(() -> DatabindContext.ofModel(schemaContext),
+            ErrorTagMapping.RFC8040);
     }
 
     /**

@@ -34,6 +34,7 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
+import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -71,7 +72,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
         final var restconf = new JaxRsRestconf(
             new MdsalRestconfServer(new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)),
                 dataBroker, rpcService, actionService, mountPointService),
-            PrettyPrintParam.FALSE);
+            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
         doReturn(true).when(asyncResponse).resume(captor.capture());
         restconf.postDataJSON(ApiPath.parse("instance-identifier-module:cont/cont1/reset"),
@@ -97,7 +98,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
         final var restconf = new JaxRsRestconf(
             new MdsalRestconfServer(new MdsalDatabindProvider(new FixedDOMSchemaService(IID_SCHEMA)),
                 dataBroker, rpcService, actionService, mountPointService),
-            PrettyPrintParam.FALSE);
+            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters();
 
         final var apiPath = ApiPath.parse("instance-identifier-module:cont/cont1/reset");

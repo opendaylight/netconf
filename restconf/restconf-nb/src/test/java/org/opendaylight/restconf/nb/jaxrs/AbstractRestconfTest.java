@@ -43,6 +43,7 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
+import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
@@ -75,7 +76,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         restconf = new JaxRsRestconf(
             new MdsalRestconfServer(new MdsalDatabindProvider(new FixedDOMSchemaService(modelContext())),
                 dataBroker, rpcService, actionService, mountPointService),
-            PrettyPrintParam.FALSE);
+            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
     }
 
     EffectiveModelContext modelContext() {

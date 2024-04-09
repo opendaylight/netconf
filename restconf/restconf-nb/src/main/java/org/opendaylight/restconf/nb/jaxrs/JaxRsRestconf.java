@@ -38,7 +38,6 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
@@ -46,14 +45,15 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormatParameters;
+import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
-import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
@@ -121,11 +121,19 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     private final @NonNull RestconfServer server;
     private final @NonNull ServerRequest emptyRequest;
     private final @NonNull PrettyPrintParam prettyPrint;
+    private final @NonNull ErrorTagMapping errorTagMapping;
 
-    public JaxRsRestconf(final RestconfServer server, final PrettyPrintParam prettyPrint) {
+    public JaxRsRestconf(final RestconfServer server, final ErrorTagMapping errorTagMapping,
+            final PrettyPrintParam prettyPrint) {
         this.server = requireNonNull(server);
+        this.errorTagMapping = requireNonNull(errorTagMapping);
         this.prettyPrint = requireNonNull(prettyPrint);
         emptyRequest = ServerRequest.of(QueryParameters.of(), prettyPrint);
+
+        LOG.info("RESTCONF data-missing condition is reported as HTTP status {}", switch (errorTagMapping) {
+            case ERRATA_5565 -> "404 (Errata 5565)";
+            case RFC8040 -> "409 (RFC8040)";
+        });
     }
 
     private @NonNull ServerRequest requestOf(final UriInfo uriInfo) {
@@ -409,21 +417,22 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         }
     }
 
-    private static void completeDataYangPATCH(final RestconfFuture<DataYangPatchResult> future,
+    private void completeDataYangPATCH(final RestconfFuture<DataYangPatchResult> future,
             final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             Response transform(final DataYangPatchResult result) {
-                final var status = result.status();
-                final var builder = Response.status(statusOf(status))
-                    .entity(new YangPatchStatusBody(status));
+                final var patchStatus = result.status();
+                final var statusCode = statusOf(patchStatus);
+                final var builder = Response.status(statusCode.code(), statusCode.phrase())
+                    .entity(new YangPatchStatusBody(patchStatus));
                 fillConfigurationMetadata(builder, result);
                 return builder.build();
             }
 
-            private static Status statusOf(final PatchStatusContext result) {
+            private HttpStatusCode statusOf(final PatchStatusContext result) {
                 if (result.ok()) {
-                    return Status.OK;
+                    return HttpStatusCode.OK;
                 }
                 final var globalErrors = result.globalErrors();
                 if (globalErrors != null && !globalErrors.isEmpty()) {
@@ -437,11 +446,11 @@ public final class JaxRsRestconf implements ParamConverterProvider {
                         }
                     }
                 }
-                return Status.INTERNAL_SERVER_ERROR;
+                return HttpStatusCode.INTERNAL_SERVER_ERROR;
             }
 
-            private static Status statusOfFirst(final List<RestconfError> error) {
-                return ErrorTags.statusOf(error.get(0).getErrorTag());
+            private @NonNull HttpStatusCode statusOfFirst(final List<RestconfError> error) {
+                return errorTagMapping.statusOf(error.get(0).getErrorTag());
             }
         });
     }

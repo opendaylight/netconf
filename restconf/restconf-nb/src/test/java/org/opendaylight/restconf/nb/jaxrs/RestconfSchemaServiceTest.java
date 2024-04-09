@@ -28,6 +28,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -71,7 +72,7 @@ public class RestconfSchemaServiceTest {
             new MdsalRestconfServer(new MdsalDatabindProvider(
                 new FixedDOMSchemaService(() -> MODEL_CONTEXT, sourceProvider)), dataBroker, rpcService, actionService,
                 mountPointService),
-            PrettyPrintParam.FALSE);
+            ErrorTagMapping.RFC8040, PrettyPrintParam.FALSE);
     }
 
     /**

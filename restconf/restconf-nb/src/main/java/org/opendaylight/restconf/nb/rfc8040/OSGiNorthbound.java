@@ -66,6 +66,16 @@ public final class OSGiNorthbound {
             name = "default pretty-print",
             description = "Control the default value of the '" + PrettyPrintParam.uriName + "' query parameter.")
         boolean pretty$_$print() default false;
+
+        @AttributeDefinition(
+            name = "Report 404 on data-missing",
+            description = """
+                Control the HTTP status code reporting of conditions corresponding to "data-missing". When this is set
+                to true, the server will violate RFC8040 and report "404" instead of "409".
+
+                For details and reasoning see https://www.rfc-editor.org/errata/eid5565 and
+                https://mailarchive.ietf.org/arch/browse/netconf/?gbt=1&index=XcF9r3ek3LvZ4DjF-7_B8kxuiwA""")
+        boolean data$_$missing$_$is$_$404() default false;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OSGiNorthbound.class);
@@ -93,6 +103,7 @@ public final class OSGiNorthbound {
         registry = registryFactory.newInstance(FrameworkUtil.asDictionary(MdsalRestconfStreamRegistry.props(useSSE)));
 
         servletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(), registry.getInstance(),
+            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
             PrettyPrintParam.of(configuration.pretty$_$print()), useSSE,
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
@@ -113,7 +124,9 @@ public final class OSGiNorthbound {
             LOG.debug("ListenersBroker restarted with {}", newUseSSE ? "SSE" : "Websockets");
         }
         final var newServletProps = DefaultRestconfStreamServletFactory.props(configuration.restconf(),
-            registry.getInstance(), PrettyPrintParam.of(configuration.pretty$_$print()), useSSE,
+            registry.getInstance(),
+            configuration.data$_$missing$_$is$_$404() ? ErrorTagMapping.ERRATA_5565 : ErrorTagMapping.RFC8040,
+            PrettyPrintParam.of(configuration.pretty$_$print()), useSSE,
             new StreamsConfiguration(configuration.maximum$_$fragment$_$length(),
                 configuration.idle$_$timeout(), configuration.heartbeat$_$interval()),
             configuration.ping$_$executor$_$name$_$prefix(), configuration.max$_$thread$_$count());

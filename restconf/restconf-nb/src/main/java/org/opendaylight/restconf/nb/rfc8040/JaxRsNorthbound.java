@@ -65,10 +65,12 @@ public final class JaxRsNorthbound implements AutoCloseable {
 
                         @Override
                         public Set<Object> getSingletons() {
+                            final var errorTagMapping = servletFactory.errorTagMapping();
+
                             return Set.of(
                                 new JsonJaxRsFormattableBodyWriter(), new XmlJaxRsFormattableBodyWriter(),
-                                new RestconfDocumentedExceptionMapper(databindProvider),
-                                new JaxRsRestconf(server, servletFactory.prettyPrint()));
+                                new RestconfDocumentedExceptionMapper(databindProvider, errorTagMapping),
+                                new JaxRsRestconf(server, errorTagMapping, servletFactory.prettyPrint()));
                         }
                     }).build())
                 .asyncSupported(true)

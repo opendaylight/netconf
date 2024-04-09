@@ -8,8 +8,9 @@
 package org.opendaylight.restconf.nb.rfc8040.streams;
 
 import javax.servlet.http.HttpServlet;
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 
 /**
@@ -18,6 +19,7 @@ import org.opendaylight.restconf.server.spi.RestconfStream;
  * @deprecated This interface exists only to support SSE/Websocket delivery. It will be removed when support for
  *             WebSockets is removed.
  */
+@NonNullByDefault
 @Deprecated(since = "7.0.0", forRemoval = true)
 public interface RestconfStreamServletFactory {
     /**
@@ -25,9 +27,11 @@ public interface RestconfStreamServletFactory {
      *
      * @return the value of {@code {+restconf}} macro
      */
-    @NonNull String restconf();
+    String restconf();
 
-    @NonNull HttpServlet newStreamServlet();
+    HttpServlet newStreamServlet();
 
-    @NonNull PrettyPrintParam prettyPrint();
+    PrettyPrintParam prettyPrint();
+
+    ErrorTagMapping errorTagMapping();
 }

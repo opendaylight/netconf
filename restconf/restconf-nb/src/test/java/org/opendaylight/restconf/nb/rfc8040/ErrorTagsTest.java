@@ -5,11 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.legacy;
+package org.opendaylight.restconf.nb.rfc8040;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
+import org.eclipse.jdt.annotation.NonNull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,8 +19,8 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 class ErrorTagsTest {
     @ParameterizedTest(name = "{0} => {1}")
     @MethodSource
-    void testStatusOf(final String tagName, final int status) {
-        assertEquals(status, ErrorTags.statusOf(new ErrorTag(tagName)).getStatusCode());
+    void testStatusOf(final @NonNull String tagName, final int status) {
+        assertEquals(status, ErrorTagMapping.RFC8040.statusOf(new ErrorTag(tagName)).code());
     }
 
     static List<Arguments> testStatusOf() {

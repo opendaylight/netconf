@@ -28,7 +28,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLOutputFactory;
@@ -38,9 +37,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsMediaTypes;
-import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
+import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.errors.Errors;
@@ -64,7 +64,6 @@ import org.slf4j.LoggerFactory;
 public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<RestconfDocumentedException> {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
     private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
-    private static final Status DEFAULT_STATUS_CODE = Status.INTERNAL_SERVER_ERROR;
     private static final QName ERROR_TYPE_QNAME = qnameOf("error-type");
     private static final QName ERROR_TAG_QNAME = qnameOf("error-tag");
     private static final QName ERROR_APP_TAG_QNAME = qnameOf("error-app-tag");
@@ -80,6 +79,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     }
 
     private final DatabindProvider databindProvider;
+    private final ErrorTagMapping errorTagMapping;
 
     @Context
     private HttpHeaders headers;
@@ -89,8 +89,10 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      *
      * @param databindProvider A {@link DatabindProvider}
      */
-    public RestconfDocumentedExceptionMapper(final DatabindProvider databindProvider) {
+    public RestconfDocumentedExceptionMapper(final DatabindProvider databindProvider,
+            final ErrorTagMapping errorTagMapping) {
         this.databindProvider = requireNonNull(databindProvider);
+        this.errorTagMapping = requireNonNull(errorTagMapping);
     }
 
     @Override
@@ -98,14 +100,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
             + "we don't to have full stack trace - getMessage(..) method provides finer output.")
     public Response toResponse(final RestconfDocumentedException exception) {
         LOG.debug("Starting to map received exception to error response: {}", exception.getMessage());
-        final Status responseStatus = getResponseStatusCode(exception);
-        if (responseStatus != Response.Status.FORBIDDEN
-                && responseStatus.getFamily() == Response.Status.Family.CLIENT_ERROR
-                && exception.getErrors().isEmpty()) {
-            // There should be at least one error entry for 4xx errors except 409 according to RFC8040, but we do not
-            // have it. Issue a warning with the call trace so we can fix whoever was the originator.
-            LOG.warn("Input exception has a family of 4xx but does not contain any descriptive errors", exception);
-        }
+        final var responseStatus = getResponseStatusCode(exception);
 
         final String serializedResponseBody;
         final MediaType responseMediaType = transformToResponseMediaType(getSupportedMediaType());
@@ -115,7 +110,7 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
             serializedResponseBody = serializeExceptionToXml(exception, databindProvider);
         }
 
-        final Response preparedResponse = Response.status(responseStatus)
+        final Response preparedResponse = Response.status(responseStatus.code(), responseStatus.phrase())
                 .type(responseMediaType)
                 .entity(serializedResponseBody)
                 .build();
@@ -257,21 +252,21 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * Deriving of the status code from the thrown exception. At the first step, status code is tried to be read using
      * {@link RestconfDocumentedException#getStatus()}. If it is {@code null}, status code will be derived from status
      * codes appended to error entries (the first that will be found). If there are not any error entries,
-     * {@link RestconfDocumentedExceptionMapper#DEFAULT_STATUS_CODE} will be used.
+     * {@link HttpStatusCode#INTERNAL_SERVER_ERROR} will be used.
      *
      * @param exception Thrown exception.
      * @return Derived status code.
      */
-    private static Status getResponseStatusCode(final RestconfDocumentedException exception) {
+    private HttpStatusCode getResponseStatusCode(final RestconfDocumentedException exception) {
         final var errors = exception.getErrors();
         if (errors.isEmpty()) {
             // if the module, that thrown exception, doesn't specify status code, it is treated as internal
             // server error
-            return DEFAULT_STATUS_CODE;
+            return HttpStatusCode.INTERNAL_SERVER_ERROR;
         }
 
         final var allStatusCodesOfErrorEntries = errors.stream()
-                .map(restconfError -> ErrorTags.statusOf(restconfError.getErrorTag()))
+                .map(restconfError -> errorTagMapping.statusOf(restconfError.getErrorTag()))
                 // we would like to preserve iteration order in collected entries - hence usage of LinkedHashSet
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         // choosing of the first status code from appended errors, if there are different status codes in error
