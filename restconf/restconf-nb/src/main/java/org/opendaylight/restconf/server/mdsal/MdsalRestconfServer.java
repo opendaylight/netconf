@@ -51,6 +51,7 @@ import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.ResourceBody;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.api.ServerResponseFuture;
 import org.opendaylight.restconf.server.spi.RpcImplementation;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -204,13 +205,13 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<CreateResourceResult> dataPOST(final ServerRequest request, final ChildBody body) {
+    public ServerResponseFuture<CreateResourceResult> dataPOST(final ServerRequest request, final ChildBody body) {
         return localStrategy().dataCreatePOST(request, body);
     }
 
     @Override
-    public RestconfFuture<? extends DataPostResult> dataPOST(final ServerRequest request, final ApiPath identifier,
-            final DataPostBody body) {
+    public ServerResponseFuture<DataPostResult> dataPOST(final ServerRequest request,
+            final ApiPath identifier, final DataPostBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
@@ -221,12 +222,12 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<DataPutResult> dataPUT(final ServerRequest request, final ResourceBody body) {
+    public ServerResponseFuture<DataPutResult> dataPUT(final ServerRequest request, final ResourceBody body) {
         return localStrategy().dataPUT(request, ApiPath.empty(), body);
     }
 
     @Override
-    public RestconfFuture<DataPutResult> dataPUT(final ServerRequest request, final ApiPath identifier,
+    public ServerResponseFuture<DataPutResult> dataPUT(final ServerRequest request, final ApiPath identifier,
             final ResourceBody body) {
         final StrategyAndTail strategyAndTail;
         try {
@@ -238,30 +239,30 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<ModulesGetResult> modulesYangGET(final ServerRequest request, final String fileName,
+    public ServerResponseFuture<ModulesGetResult> modulesYangGET(final ServerRequest request, final String fileName,
             final String revision) {
         return modulesGET(fileName, revision, YangTextSource.class);
     }
 
     @Override
-    public RestconfFuture<ModulesGetResult> modulesYangGET(final ServerRequest request, final ApiPath mountPath,
+    public ServerResponseFuture<ModulesGetResult> modulesYangGET(final ServerRequest request, final ApiPath mountPath,
             final String fileName, final String revision) {
         return modulesGET(mountPath, fileName, revision, YangTextSource.class);
     }
 
     @Override
-    public RestconfFuture<ModulesGetResult> modulesYinGET(final ServerRequest request, final String fileName,
+    public ServerResponseFuture<ModulesGetResult> modulesYinGET(final ServerRequest request, final String fileName,
             final String revision) {
         return modulesGET(fileName, revision, YinTextSource.class);
     }
 
     @Override
-    public RestconfFuture<ModulesGetResult> modulesYinGET(final ServerRequest request, final ApiPath mountPath,
+    public ServerResponseFuture<ModulesGetResult> modulesYinGET(final ServerRequest request, final ApiPath mountPath,
             final String fileName, final String revision) {
         return modulesGET(mountPath, fileName, revision, YinTextSource.class);
     }
 
-    private @NonNull RestconfFuture<ModulesGetResult> modulesGET(final String fileName, final String revision,
+    private @NonNull ServerResponseFuture<ModulesGetResult> modulesGET(final String fileName, final String revision,
             final Class<? extends SourceRepresentation> representation) {
         return modulesGET(localStrategy(), fileName, revision, representation);
     }
@@ -283,7 +284,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
         return modulesGET(stratAndTail.strategy(), fileName, revision, representation);
     }
 
-    private static @NonNull RestconfFuture<ModulesGetResult> modulesGET(final RestconfStrategy strategy,
+    private static @NonNull ServerResponseFuture<ModulesGetResult> modulesGET(final RestconfStrategy strategy,
             final String moduleName, final String revisionStr,
             final Class<? extends SourceRepresentation> representation) {
         if (moduleName == null) {
@@ -337,7 +338,7 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<InvokeResult> operationsPOST(final ServerRequest request, final URI restconfURI,
+    public ServerResponseFuture<InvokeResult> operationsPOST(final ServerRequest request, final URI restconfURI,
             final ApiPath apiPath, final OperationInputBody body) {
         final StrategyAndTail strategyAndTail;
         try {

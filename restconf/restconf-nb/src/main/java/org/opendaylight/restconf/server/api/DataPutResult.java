@@ -9,6 +9,7 @@ package org.opendaylight.restconf.server.api;
 
 import java.time.Instant;
 import org.eclipse.jdt.annotation.Nullable;
+import org.opendaylight.restconf.server.api.ServerResponse.Success;
 
 /**
  * Result of a {@code PUT} request as defined in
@@ -22,7 +23,7 @@ import org.eclipse.jdt.annotation.Nullable;
 public record DataPutResult(
         boolean created,
         @Nullable EntityTag entityTag,
-        @Nullable Instant lastModified) implements ConfigurationMetadata {
+        @Nullable Instant lastModified) implements Success, ConfigurationMetadata {
     public DataPutResult(final boolean created) {
         this(created, null, null);
     }
