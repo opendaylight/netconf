@@ -7,10 +7,12 @@
  */
 package org.opendaylight.restconf.server.api;
 
+import org.opendaylight.restconf.server.api.ServerResponse.Success;
+
 /**
  * Result of a {@code POST} request as defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.4">RFC8040 section 4.4</a>.
  */
-public sealed interface DataPostResult permits CreateResourceResult, InvokeResult {
+public sealed interface DataPostResult extends Success permits CreateResourceResult, InvokeResult {
     // Just a marker
 }
