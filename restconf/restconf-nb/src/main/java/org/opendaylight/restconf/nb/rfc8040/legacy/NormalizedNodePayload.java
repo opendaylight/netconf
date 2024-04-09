@@ -10,7 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.legacy;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.api.FormatParameters;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
@@ -23,11 +23,11 @@ public record NormalizedNodePayload(
         Inference inference,
         NormalizedNode data,
         WriterParameters writerParameters,
-        FormatParameters format) {
+        PrettyPrintParam prettyPrint) {
     public NormalizedNodePayload {
         requireNonNull(inference);
         requireNonNull(data);
         requireNonNull(writerParameters);
-        requireNonNull(format);
+        requireNonNull(prettyPrint);
     }
 }

@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindFormattableBody;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
@@ -61,16 +61,16 @@ public final class NormalizedFormattableBody<N extends NormalizedNode> extends D
     }
 
     @Override
-    protected void formatToJSON(final DatabindContext databind, final FormatParameters format, final OutputStream out)
-            throws IOException {
+    protected void formatToJSON(final DatabindContext databind, final PrettyPrintParam prettyPrint,
+            final OutputStream out) throws IOException {
         writeTo(JSONNormalizedNodeStreamWriter.createExclusiveWriter(databind.jsonCodecs(), parent, null,
-            FormattableBodySupport.createJsonWriter(out, format)));
+            FormattableBodySupport.createJsonWriter(out, prettyPrint)));
     }
 
     @Override
-    protected void formatToXML(final DatabindContext databind, final FormatParameters format, final OutputStream out)
-            throws IOException {
-        final var xmlWriter = FormattableBodySupport.createXmlWriter(out, format);
+    protected void formatToXML(final DatabindContext databind, final PrettyPrintParam prettyPrint,
+            final OutputStream out) throws IOException {
+        final var xmlWriter = FormattableBodySupport.createXmlWriter(out, prettyPrint);
         writeTo(XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, parent));
         try {
             xmlWriter.close();

@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 
@@ -19,24 +18,20 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
  * HTTP transport layer. This includes:
  * <ul>
  *   <li>HTTP request {@link #queryParameters() query parameters},</li>
- *   <li>{@link #format() format parameters}, including those affected by query parameters<li>
+ *   <li>{@link #prettyPrint() pretty printing}, including affected by query parameters<li>
  * </ul>
  * It notably does <b>not</b> hold the HTTP request path, nor the request body. Those are passed as separate arguments
  * to server methods as implementations of those methods are expected to act on them.
  */
 @NonNullByDefault
-public record ServerRequest(QueryParameters queryParameters, FormatParameters format) {
+public record ServerRequest(QueryParameters queryParameters, PrettyPrintParam prettyPrint) {
     // TODO: this is where a binding to security principal and access control should be:
     //       - we would like to be able to have java.security.Principal#name() for logging purposes
     //       - we need to have a NACM-capable interface, through which we can check permissions (such as data PUT) and
     //         establish output filters (i.e. excluding paths inaccessible path to user from a data GET a ContainerNode)
     public ServerRequest {
         requireNonNull(queryParameters);
-        requireNonNull(format);
-    }
-
-    private ServerRequest(final QueryParameters queryParameters, final PrettyPrintParam prettyPrint) {
-        this(queryParameters, prettyPrint.value() ? FormatParameters.PRETTY : FormatParameters.COMPACT);
+        requireNonNull(prettyPrint);
     }
 
     public static ServerRequest of(final QueryParameters queryParameters, final PrettyPrintParam defaultPrettyPrint) {

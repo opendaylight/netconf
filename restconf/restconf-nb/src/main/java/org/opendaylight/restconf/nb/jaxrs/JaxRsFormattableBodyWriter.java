@@ -17,8 +17,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 
 abstract sealed class JaxRsFormattableBodyWriter implements MessageBodyWriter<JaxRsFormattableBody>
         permits JsonJaxRsFormattableBodyWriter, XmlJaxRsFormattableBodyWriter {
@@ -32,9 +32,9 @@ abstract sealed class JaxRsFormattableBodyWriter implements MessageBodyWriter<Ja
     public final void writeTo(final JaxRsFormattableBody entity, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException {
-        writeTo(entity.body(), entity.format(), requireNonNull(entityStream));
+        writeTo(entity.body(), entity.prettyPrint(), requireNonNull(entityStream));
     }
 
     @NonNullByDefault
-    abstract void writeTo(FormattableBody body, FormatParameters format, OutputStream out) throws IOException;
+    abstract void writeTo(FormattableBody body, PrettyPrintParam prettyPrint, OutputStream out) throws IOException;
 }

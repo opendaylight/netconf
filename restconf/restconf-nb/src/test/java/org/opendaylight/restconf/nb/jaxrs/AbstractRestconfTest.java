@@ -37,7 +37,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -86,7 +85,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     static final void assertJson(final String expectedJson, final OperationOutputBody payload) {
         final var baos = new ByteArrayOutputStream();
         try {
-            payload.formatToJSON(FormatParameters.COMPACT, baos);
+            payload.formatToJSON(PrettyPrintParam.FALSE, baos);
         } catch (IOException e) {
             throw new AssertionError(e);
         }
@@ -96,7 +95,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     static final void assertXml(final String expectedXml, final OperationOutputBody payload) {
         final var baos = new ByteArrayOutputStream();
         try {
-            payload.formatToXML(FormatParameters.COMPACT, baos);
+            payload.formatToXML(PrettyPrintParam.FALSE, baos);
         } catch (IOException e) {
             throw new AssertionError(e);
         }

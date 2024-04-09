@@ -14,8 +14,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.spi.FormattableBodySupport;
@@ -34,7 +34,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
 public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBodyWriter {
     @Override
     void writeData(final SchemaInferenceStack stack, final NormalizedNode data, final WriterParameters writerParameters,
-            final FormatParameters format, final OutputStream out) throws IOException {
+            final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
         if (!stack.isEmpty()) {
             stack.exit();
         }
@@ -47,7 +47,7 @@ public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBo
                 .build()
                 : data;
 
-        try (var jsonWriter = FormattableBodySupport.createJsonWriter(out, format)) {
+        try (var jsonWriter = FormattableBodySupport.createJsonWriter(out, prettyPrint)) {
             jsonWriter.beginObject();
 
             final var nnWriter = createNormalizedNodeWriter(stack.toInference(), jsonWriter, writerParameters, null);

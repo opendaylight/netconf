@@ -12,15 +12,16 @@ import java.io.OutputStream;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.MediaTypes;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 
 @Provider
 @Produces({ MediaTypes.APPLICATION_YANG_DATA_JSON, MediaType.APPLICATION_JSON })
 public final class JsonJaxRsFormattableBodyWriter extends JaxRsFormattableBodyWriter {
     @Override
-    void writeTo(final FormattableBody body, final FormatParameters format, final OutputStream out) throws IOException {
-        body.formatToJSON(format, out);
+    void writeTo(final FormattableBody body, final PrettyPrintParam prettyPrint, final OutputStream out)
+            throws IOException {
+        body.formatToJSON(prettyPrint, out);
     }
 }

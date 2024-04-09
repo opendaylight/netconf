@@ -12,8 +12,8 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 
 /**
  * A {@link FormattableBody} which has an attached {@link DatabindContext}.
@@ -27,18 +27,18 @@ public abstract class DatabindFormattableBody extends FormattableBody {
     }
 
     @Override
-    public final void formatToJSON(final FormatParameters format, final OutputStream out) throws IOException {
-        formatToJSON(databind, format, out);
+    public final void formatToJSON(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
+        formatToJSON(databind, prettyPrint, out);
     }
 
-    protected abstract void formatToJSON(DatabindContext databind, FormatParameters format, OutputStream out)
+    protected abstract void formatToJSON(DatabindContext databind, PrettyPrintParam prettyPrint, OutputStream out)
         throws IOException;
 
     @Override
-    public final void formatToXML(final FormatParameters format, final OutputStream out) throws IOException {
-        formatToXML(databind, format, out);
+    public final void formatToXML(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
+        formatToXML(databind, prettyPrint, out);
     }
 
-    protected abstract void formatToXML(DatabindContext databind, FormatParameters format, OutputStream out)
+    protected abstract void formatToXML(DatabindContext databind, PrettyPrintParam prettyPrint, OutputStream out)
         throws IOException;
 }

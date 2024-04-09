@@ -18,8 +18,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
 /**
@@ -34,16 +34,16 @@ public final class FormattableBodySupport {
         // Hidden on purpose
     }
 
-    public static JsonWriter createJsonWriter(final OutputStream out, final FormatParameters format) {
+    public static JsonWriter createJsonWriter(final OutputStream out, final PrettyPrintParam prettyPrint) {
         final var ret = JsonWriterFactory.createJsonWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
-        ret.setIndent(format.prettyPrint().value() ? PRETTY_PRINT_INDENT : "");
+        ret.setIndent(prettyPrint.value() ? PRETTY_PRINT_INDENT : "");
         return ret;
     }
 
-    public static XMLStreamWriter createXmlWriter(final OutputStream out, final FormatParameters format)
+    public static XMLStreamWriter createXmlWriter(final OutputStream out, final PrettyPrintParam prettyPrint)
             throws IOException {
         final var xmlWriter = createXmlWriter(out);
-        return format.prettyPrint().value() ? new IndentingXMLStreamWriter(xmlWriter) : xmlWriter;
+        return prettyPrint.value() ? new IndentingXMLStreamWriter(xmlWriter) : xmlWriter;
     }
 
     private static XMLStreamWriter createXmlWriter(final OutputStream out) throws IOException {

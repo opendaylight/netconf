@@ -12,31 +12,32 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.yangtools.concepts.Immutable;
 
 /**
  * A body which is capable of being formatted to an {@link OutputStream} in either JSON or XML format using particular
- * {@link FormatParameters}.
+ * {@link PrettyPrintParam}.
  */
 @NonNullByDefault
 public abstract class FormattableBody implements Immutable {
     /**
      * Write the content of this body as a JSON document.
      *
-     * @param format {@link FormatParameters}
+     * @param prettyPrint a {@link PrettyPrintParam}
      * @param out output stream
      * @throws IOException if an IO error occurs.
      */
-    public abstract void formatToJSON(FormatParameters format, OutputStream out) throws IOException;
+    public abstract void formatToJSON(PrettyPrintParam prettyPrint, OutputStream out) throws IOException;
 
     /**
      * Write the content of this body as an XML document.
      *
-     * @param format {@link FormatParameters}
+     * @param prettyPrint a {@link PrettyPrintParam}
      * @param out output stream
      * @throws IOException if an IO error occurs.
      */
-    public abstract void formatToXML(FormatParameters format, OutputStream out) throws IOException;
+    public abstract void formatToXML(PrettyPrintParam prettyPrint, OutputStream out) throws IOException;
 
     protected abstract ToStringHelper addToStringAttributes(ToStringHelper helper);
 

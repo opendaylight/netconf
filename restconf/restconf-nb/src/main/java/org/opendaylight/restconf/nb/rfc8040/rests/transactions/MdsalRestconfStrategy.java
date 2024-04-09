@@ -132,7 +132,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final Data path, final DataGetParams params) {
         final var inference = path.inference();
         final var fields = params.fields();
-        return completeDataGET(request.format(), inference,
+        return completeDataGET(request.prettyPrint(), inference,
             fields == null ? WriterParameters.of(params.depth())
                 : new WriterParameters(params.depth(),
                     translateFieldsParam(inference.modelContext(), path.schema(), fields)),

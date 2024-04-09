@@ -17,8 +17,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.restconf.server.api.DatabindPathFormattableBody;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -49,12 +49,12 @@ public final class OperationOutputBody extends DatabindPathFormattableBody<Opera
     }
 
     @Override
-    public void formatToJSON(final FormatParameters format, final OutputStream out) throws IOException {
+    public void formatToJSON(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
         final var stack = prepareStack();
 
         // RpcDefinition/ActionDefinition is not supported as initial codec in JSONStreamWriter, so we need to emit
         // initial output declaration
-        try (var jsonWriter = FormattableBodySupport.createJsonWriter(out, format)) {
+        try (var jsonWriter = FormattableBodySupport.createJsonWriter(out, prettyPrint)) {
             final var module = stack.currentModule();
             jsonWriter.beginObject().name(module.argument().getLocalName() + ":output").beginObject();
 
@@ -71,12 +71,12 @@ public final class OperationOutputBody extends DatabindPathFormattableBody<Opera
     }
 
     @Override
-    public void formatToXML(final FormatParameters format, final OutputStream out) throws IOException {
+    public void formatToXML(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
         final var stack = prepareStack();
 
         // RpcDefinition/ActionDefinition is not supported as initial codec in XMLStreamWriter, so we need to emit
         // initial output declaration.
-        final var xmlWriter = FormattableBodySupport.createXmlWriter(out, format);
+        final var xmlWriter = FormattableBodySupport.createXmlWriter(out, prettyPrint);
         final var nnWriter = NormalizedNodeWriter.forStreamWriter(
             XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, stack.toInference()));
 

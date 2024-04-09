@@ -10,16 +10,16 @@ package org.opendaylight.restconf.nb.jaxrs;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 
 /**
- * A bridge capturing a {@link FormattableBody} and {@link FormatParameters}./
+ * A bridge capturing a {@link FormattableBody} and {@link PrettyPrintParam}.
  */
 @NonNullByDefault
-record JaxRsFormattableBody(FormattableBody body, FormatParameters format) {
+record JaxRsFormattableBody(FormattableBody body, PrettyPrintParam prettyPrint) {
     JaxRsFormattableBody {
         requireNonNull(body);
-        requireNonNull(format);
+        requireNonNull(prettyPrint);
     }
 }

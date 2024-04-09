@@ -50,9 +50,9 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.ContentParam;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -843,7 +843,7 @@ public abstract class RestconfStrategy {
 
     abstract @NonNull RestconfFuture<DataGetResult> dataGET(ServerRequest request, Data path, DataGetParams params);
 
-    static final @NonNull RestconfFuture<DataGetResult> completeDataGET(final FormatParameters format,
+    static final @NonNull RestconfFuture<DataGetResult> completeDataGET(final PrettyPrintParam prettyPrint,
             final Inference inference, final WriterParameters writerParams, final @Nullable NormalizedNode node,
             final @Nullable ConfigurationMetadata metadata) {
         if (node == null) {
@@ -852,7 +852,7 @@ public abstract class RestconfStrategy {
                 ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
         }
 
-        final var payload = new NormalizedNodePayload(inference, node, writerParams, format);
+        final var payload = new NormalizedNodePayload(inference, node, writerParams, prettyPrint);
         return RestconfFuture.of(metadata == null ? new DataGetResult(payload)
             : new DataGetResult(payload, metadata.entityTag(), metadata.lastModified()));
     }

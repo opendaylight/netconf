@@ -125,7 +125,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             node = readData(params.content(), path.instance(), params.withDefaults());
         }
 
-        return completeDataGET(request.format(), inference, WriterParameters.of(params.depth()), node, null);
+        return completeDataGET(request.prettyPrint(), inference, WriterParameters.of(params.depth()), node, null);
     }
 
     @Override

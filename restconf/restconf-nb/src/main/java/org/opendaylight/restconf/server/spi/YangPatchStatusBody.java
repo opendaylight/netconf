@@ -17,8 +17,8 @@ import java.util.List;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
@@ -37,8 +37,8 @@ public final class YangPatchStatusBody extends FormattableBody {
     }
 
     @Override
-    public void formatToJSON(final FormatParameters format, final OutputStream out) throws IOException {
-        try (var writer = FormattableBodySupport.createJsonWriter(out, format)) {
+    public void formatToJSON(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
+        try (var writer = FormattableBodySupport.createJsonWriter(out, prettyPrint)) {
             writer.beginObject().name("ietf-yang-patch:yang-patch-status")
                 .beginObject().name("patch-id").value(status.patchId());
 
@@ -70,8 +70,8 @@ public final class YangPatchStatusBody extends FormattableBody {
     }
 
     @Override
-    public void formatToXML(final FormatParameters format, final OutputStream out) throws IOException {
-        final var writer = FormattableBodySupport.createXmlWriter(out, format);
+    public void formatToXML(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
+        final var writer = FormattableBodySupport.createXmlWriter(out, prettyPrint);
         try {
             formatToXML(writer);
         } catch (XMLStreamException e) {

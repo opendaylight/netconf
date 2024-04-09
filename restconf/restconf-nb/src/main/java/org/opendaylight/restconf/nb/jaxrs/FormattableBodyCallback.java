@@ -12,23 +12,23 @@ import static java.util.Objects.requireNonNull;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.api.FormatParameters;
 import org.opendaylight.restconf.api.FormattableBody;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 
 /**
  * A {@link JaxRsRestconfCallback} producing a {@link FormattableBody}.
  */
 final class FormattableBodyCallback extends JaxRsRestconfCallback<FormattableBody> {
-    private final @NonNull FormatParameters format;
+    private final @NonNull PrettyPrintParam prettyPrint;
 
-    FormattableBodyCallback(final AsyncResponse ar, final FormatParameters format) {
+    FormattableBodyCallback(final AsyncResponse ar, final PrettyPrintParam prettyPrint) {
         super(ar);
-        this.format = requireNonNull(format);
+        this.prettyPrint = requireNonNull(prettyPrint);
     }
 
     @Override
     Response transform(final FormattableBody result) throws RestconfDocumentedException {
-        return Response.ok().entity(new JaxRsFormattableBody(result, format)).build();
+        return Response.ok().entity(new JaxRsFormattableBody(result, prettyPrint)).build();
     }
 }
