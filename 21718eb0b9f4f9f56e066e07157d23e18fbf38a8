@@ -198,6 +198,24 @@
       "parentUuid": "99ca1fa2_46eb533b",
       "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1bc2036_93d0f3bd",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/ToasterDocumentTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-04-10T11:46:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8cff04e2_005d28b6",
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
