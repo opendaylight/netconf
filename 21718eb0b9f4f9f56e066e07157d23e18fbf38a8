@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a5c68b4_2754b05e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-10T11:35:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86fb626c_bdd62bd2",
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34c4a518_86855a5c",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-04-10T11:06:03Z",
       "side": 1,
       "message": "is this necessary?",
+      "range": {
+        "startLine": 102,
+        "startChar": 1,
+        "endLine": 103,
+        "endChar": 55
+      },
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be775427_db7f782c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-10T11:35:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34c4a518_86855a5c",
       "range": {
         "startLine": 102,
         "startChar": 1,
@@ -58,6 +100,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98c52588_31255dec",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-10T11:35:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c92601f7_06a6e67a",
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52f7f8d8_a156d41d",
@@ -81,6 +141,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0287eb1c_e4a60b5b",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-10T11:35:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52f7f8d8_a156d41d",
+      "range": {
+        "startLine": 215,
+        "startChar": 65,
+        "endLine": 215,
+        "endChar": 81
+      },
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "99ca1fa2_46eb533b",
@@ -94,6 +178,24 @@
       "writtenOn": "2024-04-10T11:06:03Z",
       "side": 1,
       "message": "would testing if there is not more a problem with duplicated keys be possible?\nas I understand this doesn\u0027t test that",
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cff04e2_005d28b6",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/ToasterDocumentTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-10T11:35:08Z",
+      "side": 1,
+      "message": "IMO it is tested by getAllDocTest. Module with older revision is added and nothing changes in returned document. Before these changes there would be unexcepted objects.",
+      "parentUuid": "99ca1fa2_46eb533b",
       "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
