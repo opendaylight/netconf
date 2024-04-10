@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86fb626c_bdd62bd2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-04-10T11:06:03Z",
+      "side": 1,
+      "message": "maybe just as consideration if using for example map and having module.name as key\nand checking if it\u0027s already present that way wouldn\u0027t be possible or better?",
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34c4a518_86855a5c",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-04-10T11:06:03Z",
+      "side": 1,
+      "message": "is this necessary?",
+      "range": {
+        "startLine": 102,
+        "startChar": 1,
+        "endLine": 103,
+        "endChar": 55
+      },
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c92601f7_06a6e67a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-04-10T11:06:03Z",
+      "side": 1,
+      "message": "imo just inline this",
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52f7f8d8_a156d41d",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-04-10T11:06:03Z",
+      "side": 1,
+      "message": "unique?",
+      "range": {
+        "startLine": 215,
+        "startChar": 65,
+        "endLine": 215,
+        "endChar": 81
+      },
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99ca1fa2_46eb533b",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/ToasterDocumentTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-04-10T11:06:03Z",
+      "side": 1,
+      "message": "would testing if there is not more a problem with duplicated keys be possible?\nas I understand this doesn\u0027t test that",
+      "revId": "21718eb0b9f4f9f56e066e07157d23e18fbf38a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
