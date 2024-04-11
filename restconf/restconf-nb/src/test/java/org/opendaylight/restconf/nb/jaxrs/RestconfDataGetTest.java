@@ -74,7 +74,22 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
-        assertEquals(EMPTY_JUKEBOX, assertNormalizedNode(200, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar)));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar));
+        assertEquals(EMPTY_JUKEBOX, body.data());
+        assertFormat("""
+            {
+              "example-jukebox:jukebox": {
+                "player": {
+                  "gap": "0.2"
+                }
+              }
+            }""", body::formatToJSON, true);
+        assertFormat("""
+            <jukebox xmlns="http://example.com/ns/example-jukebox">
+              <player>
+                <gap>0.2</gap>
+              </player>
+            </jukebox>""", body::formatToXML, true);
     }
 
     @Test
@@ -87,12 +102,30 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .when(tx)
                 .read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.of());
 
-        final var data = assertInstanceOf(ContainerNode.class,
-            assertNormalizedNode(200, ar -> restconf.dataGET(uriInfo, ar)));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(uriInfo, ar));
+        final var data = assertInstanceOf(ContainerNode.class, body.data());
         final var rootNodes = data.body();
         assertEquals(1, rootNodes.size());
         final var allDataChildren = assertInstanceOf(ContainerNode.class, rootNodes.iterator().next()).body();
         assertEquals(3, allDataChildren.size());
+
+        assertFormat("""
+            {
+              "example-jukebox:jukebox": {
+                "player": {
+                  "gap": "0.2"
+                }
+              }
+            }""", body::formatToJSON, true);
+        assertFormat("""
+            <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+              <jukebox xmlns="http://example.com/ns/example-jukebox">
+                <library/>
+                <player>
+                  <gap>0.2</gap>
+                </player>
+              </jukebox>
+            </data>""", body::formatToXML, true);
     }
 
     private static ContainerNode wrapNodeByDataRootContainer(final DataContainerChild data) {
@@ -125,13 +158,29 @@ class RestconfDataGetTest extends AbstractRestconfTest {
         doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
 
         // response must contain all child nodes from config and operational containers merged in one container
-        final var data = assertInstanceOf(ContainerNode.class,
-            assertNormalizedNode(200, ar -> restconf.dataGET(
-               apiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), uriInfo, ar)));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(
+            apiPath("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox"), uriInfo, ar));
+        final var data = assertInstanceOf(ContainerNode.class, body.data());
         assertEquals(3, data.size());
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
         assertNotNull(data.childByArg(LIBRARY_NID));
         assertNotNull(data.childByArg(PLAYLIST_NID));
+
+        assertFormat("""
+            {
+              "example-jukebox:jukebox": {
+                "player": {
+                  "gap": "0.2"
+                }
+              }
+            }""", body::formatToJSON, true);
+        assertFormat("""
+            <jukebox xmlns="http://example.com/ns/example-jukebox">
+              <library/>
+              <player>
+                <gap>0.2</gap>
+              </player>
+            </jukebox>""", body::formatToXML, true);
     }
 
     @Test
@@ -162,13 +211,29 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .read(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
 
         // response must contain only config data
-        final var data = assertInstanceOf(ContainerNode.class,
-            assertNormalizedNode(200, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar)));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar));
+        final var data = assertInstanceOf(ContainerNode.class, body.data());
         // config data present
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
         assertNotNull(data.childByArg(LIBRARY_NID));
         // state data absent
         assertNull(data.childByArg(PLAYLIST_NID));
+
+        assertFormat("""
+            {
+              "example-jukebox:jukebox": {
+                "player": {
+                  "gap": "0.2"
+                }
+              }
+            }""", body::formatToJSON, true);
+        assertFormat("""
+            <jukebox xmlns="http://example.com/ns/example-jukebox">
+              <library/>
+              <player>
+                <gap>0.2</gap>
+              </player>
+            </jukebox>""", body::formatToXML, true);
     }
 
     /**
@@ -184,13 +249,28 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
         // response must contain only operational data
-        final var data = assertInstanceOf(ContainerNode.class, assertNormalizedNode(200,
-            ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar)));
+        final var body = assertNormalizedBody(200, ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar));
+        final var data = assertInstanceOf(ContainerNode.class, body.data());
         // state data present
         assertNotNull(data.childByArg(CONT_PLAYER.name()));
         assertNotNull(data.childByArg(PLAYLIST_NID));
 
         // config data absent
         assertNull(data.childByArg(LIBRARY_NID));
+
+        assertFormat("""
+            {
+              "example-jukebox:jukebox": {
+                "player": {
+                  "gap": "0.2"
+                }
+              }
+            }""", body::formatToJSON, true);
+        assertFormat("""
+            <jukebox xmlns="http://example.com/ns/example-jukebox">
+              <player>
+                <gap>0.2</gap>
+              </player>
+            </jukebox>""", body::formatToXML, true);
     }
 }

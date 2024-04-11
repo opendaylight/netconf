@@ -12,25 +12,24 @@ import static java.util.Objects.requireNonNull;
 import java.time.Instant;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 
 /**
  * Result of a {@code GET} request as defined in
  * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-4.3">RFC8040 section 4.3</a>.
  *
- * @param payload Resulting payload
+ * @param body Resulting body
  * @param entityTag response {@code ETag} header, or {@code null} if not applicable
  * @param lastModified response {@code Last-Modified} header, or {@code null} if not applicable
  */
 public record DataGetResult(
-        @NonNull NormalizedNodePayload payload,
+        @NonNull DatabindFormattableBody body,
         @Nullable EntityTag entityTag,
         @Nullable Instant lastModified) implements ConfigurationMetadata {
     public DataGetResult {
-        requireNonNull(payload);
+        requireNonNull(body);
     }
 
-    public DataGetResult(final @NonNull NormalizedNodePayload payload) {
-        this(payload, null, null);
+    public DataGetResult(final @NonNull DatabindFormattableBody body) {
+        this(body, null, null);
     }
 }
