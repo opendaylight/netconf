@@ -52,7 +52,6 @@ import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.ContentParam;
-import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -61,8 +60,6 @@ import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.Insert;
 import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
-import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.api.ChildBody;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
@@ -91,6 +88,8 @@ import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
 import org.opendaylight.restconf.server.spi.HttpGetResource;
+import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
+import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
 import org.opendaylight.restconf.server.spi.OperationInput;
 import org.opendaylight.restconf.server.spi.OperationOutputBody;
 import org.opendaylight.restconf.server.spi.OperationsResource;
@@ -138,7 +137,6 @@ import org.opendaylight.yangtools.yang.model.api.source.YangTextSource;
 import org.opendaylight.yangtools.yang.model.api.source.YinTextSource;
 import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.api.stmt.SubmoduleEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -843,18 +841,19 @@ public abstract class RestconfStrategy {
 
     abstract @NonNull RestconfFuture<DataGetResult> dataGET(ServerRequest request, Data path, DataGetParams params);
 
-    static final @NonNull RestconfFuture<DataGetResult> completeDataGET(final PrettyPrintParam prettyPrint,
-            final Inference inference, final WriterParameters writerParams, final @Nullable NormalizedNode node,
-            final @Nullable ConfigurationMetadata metadata) {
+    @NonNullByDefault
+    static final RestconfFuture<DataGetResult> completeDataGET(final @Nullable NormalizedNode node, final Data path,
+            final NormalizedNodeWriterFactory writerFactory, final @Nullable ConfigurationMetadata metadata) {
+        // Non-existing data
         if (node == null) {
             return RestconfFuture.failed(new RestconfDocumentedException(
                 "Request could not be completed because the relevant data model content does not exist",
                 ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
         }
 
-        final var payload = new NormalizedNodePayload(inference, node, writerParams, prettyPrint);
-        return RestconfFuture.of(metadata == null ? new DataGetResult(payload)
-            : new DataGetResult(payload, metadata.entityTag(), metadata.lastModified()));
+        final var body = NormalizedFormattableBody.of(path, node, writerFactory);
+        return RestconfFuture.of(metadata == null ? new DataGetResult(body)
+            : new DataGetResult(body, metadata.entityTag(), metadata.lastModified()));
     }
 
     /**

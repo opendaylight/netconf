@@ -42,8 +42,10 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.HttpStatusCode;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.QueryParameters;
@@ -53,7 +55,6 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 import org.opendaylight.restconf.nb.rfc8040.URLConstants;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.api.ConfigurationMetadata;
 import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -187,7 +188,8 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void dataGET(@Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        completeDataGET(server.dataGET(requestOf(uriInfo)), ar);
+        final var request = requestOf(uriInfo);
+        completeDataGET(server.dataGET(request), request.prettyPrint(), ar);
     }
 
     /**
@@ -208,14 +210,19 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
-        completeDataGET(server.dataGET(requestOf(uriInfo), identifier), ar);
+        final var request = requestOf(uriInfo);
+        completeDataGET(server.dataGET(request, identifier), request.prettyPrint(), ar);
     }
 
-    private static void completeDataGET(final RestconfFuture<DataGetResult> future, final AsyncResponse ar) {
+    @NonNullByDefault
+    private static void completeDataGET(final RestconfFuture<DataGetResult> future, final PrettyPrintParam prettyPrint,
+            final AsyncResponse ar) {
         future.addCallback(new JaxRsRestconfCallback<>(ar) {
             @Override
             Response transform(final DataGetResult result) {
-                final var builder = Response.ok().entity(result.payload()).cacheControl(NO_CACHE);
+                final var builder = Response.ok()
+                    .entity(new JaxRsFormattableBody(result.body(), prettyPrint))
+                    .cacheControl(NO_CACHE);
                 fillConfigurationMetadata(builder, result);
                 return builder.build();
             }
@@ -695,7 +702,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param identifier module name and rpc identifier string for the desired operation
      * @param body the body of the operation
      * @param uriInfo URI info
-     * @param ar {@link AsyncResponse} which needs to be completed with a {@link NormalizedNodePayload} output
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link FormattableBody} output
      */
     @POST
     // FIXME: identifier is just a *single* QName
@@ -725,7 +732,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
      * @param identifier module name and rpc identifier string for the desired operation
      * @param body the body of the operation
      * @param uriInfo URI info
-     * @param ar {@link AsyncResponse} which needs to be completed with a {@link NormalizedNodePayload} output
+     * @param ar {@link AsyncResponse} which needs to be completed with a {@link FormattableBody} output
      */
     @POST
     // FIXME: identifier is just a *single* QName

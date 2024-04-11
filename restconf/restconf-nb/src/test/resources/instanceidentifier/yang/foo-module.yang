@@ -6,6 +6,5 @@ module foo-module {
   }
 
   /* This container has the same name as container in bar-module */
-  container foo-bar-container {
-  }
+  container foo-bar-container;
 }
