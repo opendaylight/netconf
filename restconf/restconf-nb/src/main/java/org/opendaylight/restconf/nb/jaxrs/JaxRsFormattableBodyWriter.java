@@ -25,7 +25,7 @@ abstract sealed class JaxRsFormattableBodyWriter implements MessageBodyWriter<Ja
     @Override
     public final boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations,
             final MediaType mediaType) {
-        return FormattableBody.class.isAssignableFrom(type);
+        return JaxRsFormattableBody.class.isAssignableFrom(type);
     }
 
     @Override
