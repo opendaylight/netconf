@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
+package org.opendaylight.restconf.server.spi;
 
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 /**
- * Unit test for {@link RestconfNormalizedNodeWriter} used with fields parameter.
+ * Unit test for {@link NormalizedNodeWriter} used with fields parameter.
  */
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RestconfNormalizedNodeWriterFieldsTest {
@@ -79,7 +79,7 @@ public class RestconfNormalizedNodeWriterFieldsTest {
      */
     @Test
     public void writeContainerWithLimitedFieldsTest() throws Exception {
-        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, null, List.of(Set.of()));
+        final var parameterWriter = NormalizedNodeWriter.forStreamWriter(writer, null, List.of(Set.of()));
 
         parameterWriter.write(containerNodeData);
 
@@ -95,7 +95,7 @@ public class RestconfNormalizedNodeWriterFieldsTest {
      */
     @Test
     public void writeContainerAllFieldsTest() throws Exception {
-        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(
+        final var parameterWriter = NormalizedNodeWriter.forStreamWriter(
                 writer, null, List.of(Set.of(leafSetNodeIdentifier.getNodeType())));
 
         parameterWriter.write(containerNodeData);
@@ -115,7 +115,7 @@ public class RestconfNormalizedNodeWriterFieldsTest {
      */
     @Test
     public void writeMapEntryNodeWithLimitedFieldsTest() throws Exception {
-        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, null, List.of(Set.of()));
+        final var parameterWriter = NormalizedNodeWriter.forStreamWriter(writer, null, List.of(Set.of()));
 
         parameterWriter.write(mapNodeData);
 
@@ -132,7 +132,7 @@ public class RestconfNormalizedNodeWriterFieldsTest {
      */
     @Test
     public void writeMapNodeAllFieldsTest() throws Exception {
-        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, null,
+        final var parameterWriter = NormalizedNodeWriter.forStreamWriter(writer, null,
             List.of(Set.of(keyLeafNodeData.name().getNodeType())));
 
         parameterWriter.write(mapNodeData);

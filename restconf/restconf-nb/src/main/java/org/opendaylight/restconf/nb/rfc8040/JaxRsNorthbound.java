@@ -23,7 +23,7 @@ import org.opendaylight.restconf.nb.jaxrs.JaxRsRestconf;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsWebHostMetadata;
 import org.opendaylight.restconf.nb.jaxrs.JsonJaxRsFormattableBodyWriter;
 import org.opendaylight.restconf.nb.jaxrs.XmlJaxRsFormattableBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
+import org.opendaylight.restconf.nb.rfc8040.legacy.RestconfDocumentedExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.streams.RestconfStreamServletFactory;
 import org.opendaylight.restconf.server.api.RestconfServer;
 import org.opendaylight.restconf.server.spi.DatabindProvider;
