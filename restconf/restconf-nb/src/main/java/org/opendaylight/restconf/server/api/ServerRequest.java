@@ -9,9 +9,14 @@ package org.opendaylight.restconf.server.api;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableList;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.ErrorMessage;
+import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 
 /**
  * A request to {@link RestconfServer}. It contains state and binding established by whoever is performing binding to
@@ -38,5 +43,52 @@ public record ServerRequest(QueryParameters queryParameters, PrettyPrintParam pr
         final var prettyPrint = queryParameters.lookup(PrettyPrintParam.uriName, PrettyPrintParam::forUriValue);
         return prettyPrint == null ? new ServerRequest(queryParameters, defaultPrettyPrint)
             : new ServerRequest(queryParameters.withoutParam(PrettyPrintParam.uriName), prettyPrint);
+    }
+
+    /**
+     * Complete this request with a failure.
+     *
+     * @param errorTag the {@link ErrorTag} for HTTP status determination
+     * @param body response body
+     */
+    public void failWith(final ErrorTag errorTag, final FormattableBody body) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void failWith(final ServerError error) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void failWith(final ServerException cause) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void failWith(final RestconfDocumentedException cause) {
+        DatabindContext databind = null;
+        final var errors = cause.getErrors();
+        final var builder = ImmutableList.<ServerError>builderWithExpectedSize(errors.size());
+        for (var error : errors) {
+            final var toDisplay = error.getErrorMessage();
+            // FIXME: add language indication
+            final var message = toDisplay == null ? null : new ErrorMessage(toDisplay, null);
+
+            final var yiid = error.getErrorPath();
+            final ServerErrorPath path;
+            if (yiid != null) {
+                if (databind == null) {
+                    databind = DatabindContext.ofModel(cause.modelContext());
+                }
+                path = new ServerErrorPath(databind, yiid);
+            } else {
+                path = null;
+            }
+
+            final var info = error.getErrorInfo();
+            builder.add(new ServerError(error.getErrorType(), error.getErrorTag(), message, error.getErrorAppTag(),
+                path, info == null ? null : new ServerErrorInfo(info)));
+        }
+
+        // FIXME: build the list, the errors template FormattableBody
+        failWith(errors.get(0).getErrorTag(), null);
     }
 }
