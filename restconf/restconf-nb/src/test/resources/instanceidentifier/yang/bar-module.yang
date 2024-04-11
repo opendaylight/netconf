@@ -7,5 +7,6 @@ module bar-module {
 
   /* This container has the same name as container in foo-module */
   container foo-bar-container {
+    presence "has semantic meaning";
   }
 }
