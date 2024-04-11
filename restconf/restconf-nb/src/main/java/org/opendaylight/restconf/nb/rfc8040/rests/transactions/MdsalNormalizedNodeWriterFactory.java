@@ -15,7 +15,7 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.DepthParam;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.RestconfNormalizedNodeWriter;
+import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -34,8 +34,8 @@ final class MdsalNormalizedNodeWriterFactory extends NormalizedNodeWriterFactory
     }
 
     @Override
-    protected RestconfNormalizedNodeWriter newWriter(final NormalizedNodeStreamWriter streamWriter) {
-        return RestconfNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
+    protected NormalizedNodeWriter newWriter(final NormalizedNodeStreamWriter streamWriter) {
+        return NormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
     }
 
     @Override

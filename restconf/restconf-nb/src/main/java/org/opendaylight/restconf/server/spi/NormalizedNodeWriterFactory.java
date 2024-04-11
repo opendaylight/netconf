@@ -12,11 +12,10 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.DepthParam;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.RestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 
 /**
- * Interface for instantiating a {@link RestconfNormalizedNodeWriter} to handle the data writeout to a
+ * Interface for instantiating a {@link NormalizedNodeWriter} to handle the data writeout to a
  * {@link NormalizedNodeStreamWriter}.
  */
 @NonNullByDefault
@@ -35,12 +34,12 @@ public abstract class NormalizedNodeWriterFactory {
     }
 
     /**
-     * Create a new {@link RestconfNormalizedNodeWriter} for specified {@link NormalizedNodeStreamWriter}.
+     * Create a new {@link NormalizedNodeWriter} for specified {@link NormalizedNodeStreamWriter}.
      *
      * @param streamWriter target {@link NormalizedNodeStreamWriter}
-     * @return A {@link RestconfNormalizedNodeWriter}
+     * @return A {@link NormalizedNodeWriter}
      */
-    protected abstract RestconfNormalizedNodeWriter newWriter(NormalizedNodeStreamWriter streamWriter);
+    protected abstract NormalizedNodeWriter newWriter(NormalizedNodeStreamWriter streamWriter);
 
     protected abstract ToStringHelper addToStringAttributes(ToStringHelper helper);
 

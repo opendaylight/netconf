@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors;
+package org.opendaylight.restconf.nb.rfc8040.legacy;
 
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.yang.svc.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.rev170126.YangModuleInfoImpl.qnameOf;

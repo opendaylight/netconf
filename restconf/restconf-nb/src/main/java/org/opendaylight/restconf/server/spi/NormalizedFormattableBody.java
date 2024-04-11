@@ -19,7 +19,6 @@ import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindFormattableBody;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
@@ -106,7 +105,7 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
     protected abstract void formatToXML(DatabindContext databind, N data, XMLStreamWriter writer)
         throws IOException, XMLStreamException;
 
-    protected final RestconfNormalizedNodeWriter newWriter(final NormalizedNodeStreamWriter streamWriter) {
+    protected final NormalizedNodeWriter newWriter(final NormalizedNodeStreamWriter streamWriter) {
         return writerFactory.newWriter(streamWriter);
     }
 
