@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.HttpStatusCode;
-import org.opendaylight.restconf.nb.rfc8040.legacy.ErrorTags;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 
 /**
