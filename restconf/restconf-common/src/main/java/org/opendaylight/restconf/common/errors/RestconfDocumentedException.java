@@ -26,6 +26,7 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
  * @author Devin Avery
  * @author Thomas Pantelis
  */
+@Deprecated
 public class RestconfDocumentedException extends RuntimeException {
     @java.io.Serial
     private static final long serialVersionUID = 3L;
