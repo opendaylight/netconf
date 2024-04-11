@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
+package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 // FIXME: this is a copy&paste from yangtools' NormalizedNodeWriter then adapted for filtering
 @Beta
-public sealed class RestconfNormalizedNodeWriter implements Flushable, Closeable {
+public sealed class NormalizedNodeWriter implements Flushable, Closeable {
     private static final QName ROOT_DATA_QNAME = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "data");
 
     final @NonNull NormalizedNodeStreamWriter writer;
@@ -58,7 +58,7 @@ public sealed class RestconfNormalizedNodeWriter implements Flushable, Closeable
 
     int currentDepth = 0;
 
-    private RestconfNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final DepthParam depth,
+    private NormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final DepthParam depth,
             final List<Set<QName>> fields) {
         this.writer = requireNonNull(writer);
         maxDepth = depth == null ? null : depth.value();
@@ -72,7 +72,7 @@ public sealed class RestconfNormalizedNodeWriter implements Flushable, Closeable
      * @param maxDepth Maximal depth to write
      * @return A new instance.
      */
-    public static @NonNull RestconfNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
+    public static @NonNull NormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
             final @Nullable DepthParam maxDepth) {
         return forStreamWriter(writer, true,  maxDepth, null);
     }
@@ -85,7 +85,7 @@ public sealed class RestconfNormalizedNodeWriter implements Flushable, Closeable
      * @param fields Selected child nodes to write
      * @return A new instance.
      */
-    public static @NonNull RestconfNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
+    public static @NonNull NormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
             final @Nullable DepthParam maxDepth, final @Nullable List<Set<QName>> fields) {
         return forStreamWriter(writer, true,  maxDepth, fields);
     }
@@ -105,10 +105,10 @@ public sealed class RestconfNormalizedNodeWriter implements Flushable, Closeable
      * @param fields Selected child nodes to write
      * @return A new instance.
      */
-    public static @NonNull RestconfNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
+    public static @NonNull NormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
             final boolean orderKeyLeaves, final DepthParam depth, final List<Set<QName>> fields) {
         return orderKeyLeaves ? new OrderedRestconfNormalizedNodeWriter(writer, depth, fields)
-                : new RestconfNormalizedNodeWriter(writer, depth, fields);
+                : new NormalizedNodeWriter(writer, depth, fields);
     }
 
     /**
@@ -119,7 +119,7 @@ public sealed class RestconfNormalizedNodeWriter implements Flushable, Closeable
      * @return {@code ParameterAwareNormalizedNodeWriter}
      * @throws IOException when thrown from the backing writer.
      */
-    public final RestconfNormalizedNodeWriter write(final NormalizedNode node) throws IOException {
+    public final NormalizedNodeWriter write(final NormalizedNode node) throws IOException {
         if (wasProcessedAsCompositeNode(node) || wasProcessAsSimpleNode(node)) {
             return this;
         }
@@ -294,7 +294,7 @@ public sealed class RestconfNormalizedNodeWriter implements Flushable, Closeable
         return processedAsCompositeNode;
     }
 
-    private static final class OrderedRestconfNormalizedNodeWriter extends RestconfNormalizedNodeWriter {
+    private static final class OrderedRestconfNormalizedNodeWriter extends NormalizedNodeWriter {
         private static final Logger LOG = LoggerFactory.getLogger(OrderedRestconfNormalizedNodeWriter.class);
 
         OrderedRestconfNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final DepthParam depth,

@@ -9,7 +9,6 @@ package org.opendaylight.restconf.server.spi;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.RestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 
 /**
@@ -24,8 +23,8 @@ final class DefaultNormalizedNodeWriterFactory extends NormalizedNodeWriterFacto
     }
 
     @Override
-    protected RestconfNormalizedNodeWriter newWriter(final NormalizedNodeStreamWriter streamWriter) {
-        return RestconfNormalizedNodeWriter.forStreamWriter(streamWriter, null);
+    protected NormalizedNodeWriter newWriter(final NormalizedNodeStreamWriter streamWriter) {
+        return NormalizedNodeWriter.forStreamWriter(streamWriter, null);
     }
 
     @Override

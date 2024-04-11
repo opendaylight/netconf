@@ -12,11 +12,10 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.query.DepthParam;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.RestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 
 /**
- * A {@link NormalizedNodeWriterFactory} returning a {@link RestconfNormalizedNodeWriter} which emits the data only to
+ * A {@link NormalizedNodeWriterFactory} returning a {@link NormalizedNodeWriter} which emits the data only to
  *  a certain
  * depth.
  */
@@ -29,8 +28,8 @@ final class MaxDepthNormalizedNodeWriterFactory extends NormalizedNodeWriterFact
     }
 
     @Override
-    protected RestconfNormalizedNodeWriter newWriter(final NormalizedNodeStreamWriter streamWriter) {
-        return RestconfNormalizedNodeWriter.forStreamWriter(streamWriter, depth);
+    protected NormalizedNodeWriter newWriter(final NormalizedNodeStreamWriter streamWriter) {
+        return NormalizedNodeWriter.forStreamWriter(streamWriter, depth);
     }
 
     @Override
