@@ -132,9 +132,18 @@ public sealed interface DatabindPath extends DatabindAware {
          * Returns the {@link YangInstanceIdentifier} of the instance being referenced.
          *
          * @return the {@link YangInstanceIdentifier} of the instance being referenced,
-         *         {@link YangInstanceIdentifier#empty()} denotes the datastora
+         *         {@link YangInstanceIdentifier#empty()} denotes the data root
          */
         YangInstanceIdentifier instance();
+
+        /**
+         * Returns this reference as a {@link ServerErrorPath}.
+         *
+         * @return this reference as a {@link ServerErrorPath}
+         */
+        default ServerErrorPath toErrorPath() {
+            return new ServerErrorPath(databind(), instance());
+        }
     }
 
     /**
