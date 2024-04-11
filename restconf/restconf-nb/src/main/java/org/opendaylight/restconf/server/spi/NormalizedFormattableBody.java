@@ -7,75 +7,113 @@
  */
 package org.opendaylight.restconf.server.spi;
 
-import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
+import com.google.common.base.VerifyException;
+import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindFormattableBody;
+import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.model.api.stmt.DataTreeEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.LeafListEffectiveStatement;
-import org.opendaylight.yangtools.yang.model.api.stmt.ListEffectiveStatement;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
 
 /**
  * A {@link FormattableBody} representing a data resource.
  */
 @NonNullByDefault
-public final class NormalizedFormattableBody<N extends NormalizedNode> extends DatabindFormattableBody {
-    private final Inference parent;
+public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode> extends DatabindFormattableBody
+        permits DataFormattableBody, RootFormattableBody {
+    private final NormalizedNodeWriterFactory writerFactory;
     private final N data;
 
-    public NormalizedFormattableBody(final DatabindContext databind, final Inference parent, final N data) {
+    NormalizedFormattableBody(final DatabindContext databind, final NormalizedNodeWriterFactory writerFactory,
+            final N data) {
         super(databind);
-        this.parent = requireNonNull(parent);
+        this.writerFactory = requireNonNull(writerFactory);
         this.data = requireNonNull(data);
-        // RESTCONF allows returning one list item. We need to wrap it in map node in order to serialize it properly,
-        // which is where the notion of "parent Inference" may be confusing. We mean
-        // 'inference to the parent NormalizedNode', which for *EntryNode ends up the corresponding statement
-        if (data instanceof MapEntryNode) {
-            verifyParent(parent, ListEffectiveStatement.class, data);
-        } else if (data instanceof LeafSetEntryNode) {
-            verifyParent(parent, LeafListEffectiveStatement.class, data);
+    }
+
+    public static NormalizedFormattableBody<?> of(final Data path, final NormalizedNode data,
+            final NormalizedNodeWriterFactory writerFactory) {
+        final var inference = path.inference();
+        if (inference.isEmpty()) {
+            // Read of the entire /data resource
+            if (data instanceof ContainerNode container) {
+                return new RootFormattableBody(path.databind(), writerFactory, container);
+            }
+            throw new VerifyException("Unexpected root data contract " + data.contract());
+        }
+
+        // Read of a sub-resource. We need to adjust the inference to point to the NormalizedNode parent of the node
+        // being output.
+        final Inference parentInference;
+        if (data instanceof MapEntryNode || data instanceof LeafSetEntryNode || data instanceof UnkeyedListEntryNode) {
+            parentInference = inference;
+        } else {
+            final var stack = inference.toSchemaInferenceStack();
+            stack.exitToDataTree();
+            parentInference = stack.toInference();
+        }
+
+        return new DataFormattableBody<>(path.databind(), parentInference, data, writerFactory);
+    }
+
+    /**
+     * Return data.
+     *
+     * @return data
+     */
+    public final N data() {
+        return data;
+    }
+
+    @Override
+    protected final void formatToJSON(final DatabindContext databind, final PrettyPrintParam prettyPrint,
+            final OutputStream out) throws IOException {
+        try (var writer = FormattableBodySupport.createJsonWriter(out, prettyPrint)) {
+            formatToJSON(databind, data, writer);
         }
     }
 
-    private static void verifyParent(final Inference inference,
-            final Class<? extends DataTreeEffectiveStatement<?>> expectedStmt, final NormalizedNode data) {
-        // Let's not bother with niceties of error report -- if we trip here, the caller is doing the wrong
-        final var qname = expectedStmt.cast(inference.toSchemaInferenceStack().currentStatement()).argument();
-        verify(qname.equals(data.name().getNodeType()));
-    }
+    protected abstract void formatToJSON(DatabindContext databind, N data, JsonWriter writer) throws IOException;
 
     @Override
-    protected void formatToJSON(final DatabindContext databind, final PrettyPrintParam prettyPrint,
+    protected final void formatToXML(final DatabindContext databind, final PrettyPrintParam prettyPrint,
             final OutputStream out) throws IOException {
-        writeTo(JSONNormalizedNodeStreamWriter.createExclusiveWriter(databind.jsonCodecs(), parent, null,
-            FormattableBodySupport.createJsonWriter(out, prettyPrint)));
-    }
-
-    @Override
-    protected void formatToXML(final DatabindContext databind, final PrettyPrintParam prettyPrint,
-            final OutputStream out) throws IOException {
-        final var xmlWriter = FormattableBodySupport.createXmlWriter(out, prettyPrint);
-        writeTo(XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, parent));
+        final var writer = FormattableBodySupport.createXmlWriter(out, prettyPrint);
         try {
-            xmlWriter.close();
+            formatToXML(databind, data, writer);
+            writer.close();
         } catch (XMLStreamException e) {
             throw new IOException("Failed to write data", e);
+        }
+    }
+
+    protected abstract void formatToXML(DatabindContext databind, N data, XMLStreamWriter writer)
+        throws IOException, XMLStreamException;
+
+    protected final RestconfNormalizedNodeWriter newWriter(final NormalizedNodeStreamWriter streamWriter) {
+        return writerFactory.newWriter(streamWriter);
+    }
+
+    final void writeTo(final NormalizedNode toWrite, final NormalizedNodeStreamWriter streamWriter)
+            throws IOException {
+        try (var writer = newWriter(streamWriter)) {
+            writer.write(toWrite);
         }
     }
 
@@ -84,9 +122,5 @@ public final class NormalizedFormattableBody<N extends NormalizedNode> extends D
         return helper.add("body", data.prettyTree());
     }
 
-    private void writeTo(final NormalizedNodeStreamWriter streamWriter) throws IOException {
-        try (var writer = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
-            writer.write(data);
-        }
-    }
+
 }

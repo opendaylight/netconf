@@ -40,12 +40,12 @@ import org.opendaylight.restconf.api.query.WithDefaultsParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ServerRequest;
+import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -103,13 +103,12 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     @Override
     RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final Data path, final DataGetParams params) {
-        final var inference = path.inference();
         final var fields = params.fields();
         final List<YangInstanceIdentifier> fieldPaths;
         if (fields != null) {
             final List<YangInstanceIdentifier> tmp;
             try {
-                tmp = fieldsParamToPaths(inference.modelContext(), path.schema(), fields);
+                tmp = fieldsParamToPaths(path.inference().modelContext(), path.schema(), fields);
             } catch (RestconfDocumentedException e) {
                 return RestconfFuture.failed(e);
             }
@@ -124,8 +123,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         } else {
             node = readData(params.content(), path.instance(), params.withDefaults());
         }
-
-        return completeDataGET(request.prettyPrint(), inference, WriterParameters.of(params.depth()), node, null);
+        return completeDataGET(node, path, NormalizedNodeWriterFactory.of(params.depth()), null);
     }
 
     @Override

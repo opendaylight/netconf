@@ -13,7 +13,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.yangtools.yang.common.Empty;
 
 /**
@@ -166,7 +165,7 @@ public interface RestconfServer {
      * <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.3.3">RFC8040 {+restconf}/yang-library-version</a>.
      *
      * @param request {@link ServerRequest} for this request
-     * @return A {@link RestconfFuture} completing with {@link NormalizedNodePayload} containing a single
+     * @return A {@link RestconfFuture} completing with {@link FormattableBody} containing a single
      *        {@code yang-library-version} leaf element.
      */
     RestconfFuture<FormattableBody> yangLibraryVersionGET(ServerRequest request);

@@ -25,6 +25,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -43,9 +44,9 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
-import org.opendaylight.restconf.nb.rfc8040.legacy.NormalizedNodePayload;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
+import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
 import org.opendaylight.restconf.server.spi.OperationOutputBody;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -102,6 +103,12 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         assertEquals(expectedXml, baos.toString(StandardCharsets.UTF_8));
     }
 
+    @NonNullByDefault
+    static final <N extends NormalizedNode> NormalizedFormattableBody<N> assertNormalizedBody(final int status,
+            final Consumer<AsyncResponse> invocation) {
+        return assertInstanceOf(NormalizedFormattableBody.class, assertFormattableBody(status, invocation));
+    }
+
     static final FormattableBody assertFormattableBody(final int status, final Consumer<AsyncResponse> invocation) {
         return assertEntity(JaxRsFormattableBody.class, status, invocation).body();
     }
@@ -113,15 +120,6 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
     static final OperationOutputBody assertOperationOutputBody(final int status,
             final Consumer<AsyncResponse> invocation) {
         return assertEntity(OperationOutputBody.class, status, invocation);
-    }
-
-    static final NormalizedNode assertNormalizedNode(final int status, final Consumer<AsyncResponse> invocation) {
-        return assertNormalizedNodePayload(status, invocation).data();
-    }
-
-    static final NormalizedNodePayload assertNormalizedNodePayload(final int status,
-            final Consumer<AsyncResponse> invocation) {
-        return assertEntity(NormalizedNodePayload.class, status, invocation);
     }
 
     static final <T> T assertEntity(final Class<T> expectedType, final int expectedStatus,
