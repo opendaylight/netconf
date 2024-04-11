@@ -109,7 +109,7 @@ public class DummyMonitoringService implements NetconfMonitoringService {
         final var capabilityList = capabilityMultiMap.get(moduleName);
         if (revision.isPresent()) {
             for (var capability : capabilityList) {
-                if (capability.getRevision().orElseThrow().equals(revision.orElseThrow())) {
+                if (capability.getRevision().orElse("").equals(revision.orElseThrow())) {
                     return capability.getCapabilitySchema().orElseThrow();
                 }
             }
