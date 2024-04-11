@@ -63,7 +63,7 @@ public final class OperationsResource implements HttpGetResource {
             entry.getValue().entrySet().stream()
                 .sorted(Comparator.comparing(Entry::getKey, (first, second) -> Revision.compare(second, first)))
                 .findFirst()
-                .ifPresent(row -> rpcs.putAll(QNameModule.of(entry.getKey(), row.getKey()), row.getValue()));
+                .ifPresent(row -> rpcs.putAll(QNameModule.ofRevision(entry.getKey(), row.getKey()), row.getValue()));
         }
         return RestconfFuture.of(new AllOperations(modelContext, rpcs.build()));
     }
