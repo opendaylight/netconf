@@ -6,6 +6,8 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * Interface to a RESTCONF server instance. The primary entry point is {@link RestconfServer}.
+ * Interface to a RESTCONF server instance. The primary entry point is {@link RestconfServer}, which is typically given
+ * a {@link ServerRequest} coupled with an {@link org.opendaylight.restconf.api.ApiPath} and perhaps a
+ * {@link RequestBody}.
  */
 package org.opendaylight.restconf.server.api;
