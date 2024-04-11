@@ -34,10 +34,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 /**
- * Unit test for {@link ParameterAwareNormalizedNodeWriter} used with depth parameter.
+ * Unit test for {@link RestconfNormalizedNodeWriter} used with depth parameter.
  */
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class ParameterAwareNormalizedNodeWriterDepthTest {
+public class RestconfNormalizedNodeWriterDepthTest {
     private final String leafSetEntryNodeValue = "leaf-set-value";
     private final String keyLeafNodeValue = "key-value";
     private final String anotherLeafNodeValue = "another-value";
@@ -88,7 +88,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeContainerWithoutChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
 
         parameterWriter.write(containerNodeData);
 
@@ -104,7 +104,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeContainerWithChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
 
         parameterWriter.write(containerNodeData);
 
@@ -123,7 +123,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeMapNodeWithoutChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
 
         parameterWriter.write(mapNodeData);
 
@@ -144,7 +144,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Ignore
     @Test
     public void writeMapNodeWithChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
 
         parameterWriter.write(mapNodeData);
 
@@ -170,7 +170,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeLeafSetNodeWithoutChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
 
         parameterWriter.write(leafSetNodeData);
 
@@ -186,7 +186,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeLeafSetNodeWithChildrenDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
 
         parameterWriter.write(leafSetNodeData);
 
@@ -204,7 +204,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeLeafSetEntryNodeDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
 
         parameterWriter.write(leafSetEntryNodeData);
 
@@ -221,7 +221,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeMapEntryNodeUnorderedOnlyKeysDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, false, DepthParam.min(),
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, false, DepthParam.min(),
             null);
 
         parameterWriter.write(mapEntryNodeData);
@@ -241,7 +241,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeMapEntryNodeUnorderedDepthTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, false, DepthParam.max(),
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, false, DepthParam.max(),
             null);
 
         parameterWriter.write(mapEntryNodeData);
@@ -262,7 +262,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeMapEntryNodeOrderedWithoutChildrenTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min());
 
         parameterWriter.write(mapEntryNodeData);
 
@@ -282,7 +282,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Ignore
     @Test
     public void writeMapEntryNodeOrderedTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, DepthParam.max());
 
         parameterWriter.write(mapEntryNodeData);
 

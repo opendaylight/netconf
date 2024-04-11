@@ -32,10 +32,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 /**
- * Unit test for {@link ParameterAwareNormalizedNodeWriter} used with fields parameter.
+ * Unit test for {@link RestconfNormalizedNodeWriter} used with fields parameter.
  */
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class ParameterAwareNormalizedNodeWriterFieldsTest {
+public class RestconfNormalizedNodeWriterFieldsTest {
     private final String leafSetEntryNodeValue = "leaf-set-value";
     private final String keyLeafNodeValue = "key-value";
     private final NodeIdentifier containerNodeIdentifier =
@@ -79,7 +79,7 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
      */
     @Test
     public void writeContainerWithLimitedFieldsTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null, List.of(Set.of()));
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, null, List.of(Set.of()));
 
         parameterWriter.write(containerNodeData);
 
@@ -95,7 +95,7 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
      */
     @Test
     public void writeContainerAllFieldsTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(
                 writer, null, List.of(Set.of(leafSetNodeIdentifier.getNodeType())));
 
         parameterWriter.write(containerNodeData);
@@ -115,7 +115,7 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
      */
     @Test
     public void writeMapEntryNodeWithLimitedFieldsTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null, List.of(Set.of()));
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, null, List.of(Set.of()));
 
         parameterWriter.write(mapNodeData);
 
@@ -132,7 +132,7 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
      */
     @Test
     public void writeMapNodeAllFieldsTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null,
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, null,
             List.of(Set.of(keyLeafNodeData.name().getNodeType())));
 
         parameterWriter.write(mapNodeData);

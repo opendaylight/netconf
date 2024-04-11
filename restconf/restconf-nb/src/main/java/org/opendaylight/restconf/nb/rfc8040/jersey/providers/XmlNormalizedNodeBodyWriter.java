@@ -17,7 +17,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -67,7 +66,7 @@ public final class XmlNormalizedNodeBodyWriter extends AbstractNormalizedNodeBod
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
             final Inference inference, final WriterParameters writerParameters) {
-        return ParameterAwareNormalizedNodeWriter.forStreamWriter(
+        return RestconfNormalizedNodeWriter.forStreamWriter(
             XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, inference),
             writerParameters.depth(), writerParameters.fields());
     }

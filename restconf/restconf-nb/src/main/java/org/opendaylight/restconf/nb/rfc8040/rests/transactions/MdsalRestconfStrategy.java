@@ -38,7 +38,7 @@ import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.ParameterAwareNormalizedNodeWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -156,7 +156,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     /**
      * Translate a {@link FieldsParam} to a complete list of child nodes organized into levels, suitable for use with
-     * {@link ParameterAwareNormalizedNodeWriter}.
+     * {@link RestconfNormalizedNodeWriter}.
      *
      * <p>
      * Fields parser that stores set of {@link QName}s in each level. Because of this fact, from the output it is only

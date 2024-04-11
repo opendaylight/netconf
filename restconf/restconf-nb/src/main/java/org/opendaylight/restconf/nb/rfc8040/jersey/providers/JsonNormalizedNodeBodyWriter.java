@@ -16,7 +16,6 @@ import javax.ws.rs.ext.Provider;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.MediaTypes;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.restconf.nb.rfc8040.legacy.WriterParameters;
 import org.opendaylight.restconf.server.spi.FormattableBodySupport;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
@@ -63,7 +62,7 @@ public final class JsonNormalizedNodeBodyWriter extends AbstractNormalizedNodeBo
             final @Nullable XMLNamespace initialNamespace) {
         // TODO: Performance: Cache JSON Codec factory and schema context
         final var codecs = JSONCodecFactorySupplier.RFC7951.getShared(inference.modelContext());
-        return ParameterAwareNormalizedNodeWriter.forStreamWriter(
+        return RestconfNormalizedNodeWriter.forStreamWriter(
             JSONNormalizedNodeStreamWriter.createNestedWriter(codecs, inference,
                 initialNamespace, jsonWriter), writerParameters.depth(), writerParameters.fields());
     }

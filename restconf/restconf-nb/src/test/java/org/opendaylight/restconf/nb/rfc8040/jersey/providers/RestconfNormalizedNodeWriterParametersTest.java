@@ -29,10 +29,10 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
- * Unit test for {@link ParameterAwareNormalizedNodeWriter} used with all parameters.
+ * Unit test for {@link RestconfNormalizedNodeWriter} used with all parameters.
  */
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class ParameterAwareNormalizedNodeWriterParametersTest {
+public class RestconfNormalizedNodeWriterParametersTest {
     private final String leafSetEntryNodeValue = "leaf-set-value";
     private final NodeIdentifier containerNodeIdentifier =
         NodeIdentifier.create(QName.create("namespace", "container"));
@@ -70,7 +70,7 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
      */
     @Test
     public void writeContainerParameterPrioritiesTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min(),
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, DepthParam.min(),
             List.of(
                 Set.of(leafSetNodeIdentifier.getNodeType()),
                 Set.of(leafSetEntryNodeIdentifier.getNodeType())));
@@ -92,7 +92,7 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
      */
     @Test
     public void writeRootDataTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null);
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, null);
 
         parameterWriter.write(rootDataContainerData);
 
@@ -106,7 +106,7 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
 
     @Test
     public void writeEmptyRootContainerTest() throws Exception {
-        final var parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(writer, null);
+        final var parameterWriter = RestconfNormalizedNodeWriter.forStreamWriter(writer, null);
 
         parameterWriter.write(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(SchemaContext.NAME))
