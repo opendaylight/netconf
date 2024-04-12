@@ -36,6 +36,10 @@ public final class ServerException extends Exception {
         this.error = requireNonNull(error);
     }
 
+    public ServerException(final ServerError error) {
+        this(error.message().elementBody(), error, null);
+    }
+
     public ServerException(final String message) {
         this(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, requireNonNull(message));
     }
