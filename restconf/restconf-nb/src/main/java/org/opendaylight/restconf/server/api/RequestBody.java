@@ -25,11 +25,13 @@ abstract sealed class RequestBody extends ConsumableBody
     }
 
     /**
-     * Throw a {@link RestconfDocumentedException} if the specified exception has a {@link YangNetconfError} attachment.
+     * Throw a {@link ServerException} if the specified exception has a {@link YangNetconfError} attachment.
      *
-     * @param cause Proposed cause of a RestconfDocumentedException
+     * @param databind the {@link DatabindContext}
+     * @param cause Proposed cause of a ServerException
+     * @throws ServerException if {@code cause} is {@link YangNetconfErrorAware}
      */
-    static void throwIfYangError(final Exception cause) {
+    static void throwIfYangError(final DatabindContext databind, final Exception cause) throws ServerException {
         if (cause instanceof YangNetconfErrorAware infoAware) {
             throw new RestconfDocumentedException(cause, infoAware.getNetconfErrors().stream()
                 .map(error -> new RestconfError(error.type(), error.tag(), error.message(), error.appTag(),

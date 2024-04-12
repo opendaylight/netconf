@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.restconf.common.errors.RestconfError;
 
 /**
  * Holder of patch status context.
@@ -22,7 +21,7 @@ public record PatchStatusContext(
     @NonNull String patchId,
     @NonNull List<PatchStatusEntity> editCollection,
     boolean ok,
-    @Nullable List<RestconfError> globalErrors) implements DatabindAware {
+    @Nullable List<ServerError> globalErrors) implements DatabindAware {
 
     public PatchStatusContext {
         requireNonNull(databind);

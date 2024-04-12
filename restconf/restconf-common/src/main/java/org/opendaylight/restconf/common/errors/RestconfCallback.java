@@ -15,6 +15,7 @@ import org.eclipse.jdt.annotation.NonNull;
  *
  * @param <V> value type
  */
+@Deprecated(since = "7.0.5", forRemoval = true)
 public abstract class RestconfCallback<V> implements FutureCallback<@NonNull V> {
     @Override
     public final void onFailure(final Throwable cause) {

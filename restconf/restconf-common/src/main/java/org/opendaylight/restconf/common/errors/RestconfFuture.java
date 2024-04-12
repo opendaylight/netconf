@@ -24,6 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
  *
  * @param <V> resulting value type
  */
+@Deprecated(since = "7.0.5", forRemoval = true)
 public sealed class RestconfFuture<V> extends AbstractFuture<@NonNull V> permits SettableRestconfFuture {
     RestconfFuture() {
         // Hidden on purpose

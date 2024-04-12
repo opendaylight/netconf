@@ -95,9 +95,9 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaForNotExistingModuleTest() {
         final var error = assertError(ar -> restconf.modulesYinGET("not-existing", "2016-01-01", ar));
-        assertEquals("Source not-existing@2016-01-01 not found", error.getErrorMessage());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
-        assertEquals(ErrorType.APPLICATION, error.getErrorType());
+        assertEquals("Source not-existing@2016-01-01 not found", error.message());
+        assertEquals(ErrorTag.DATA_MISSING, error.tag());
+        assertEquals(ErrorType.APPLICATION, error.type());
     }
 
     /**
@@ -107,9 +107,9 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithEmptyIdentifierTest() {
         final var error = assertError(ar -> restconf.modulesYangGET("", null, ar));
-        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
     }
 
     /**
@@ -119,9 +119,9 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWithNotParsableIdentifierTest() {
         final var error = assertError(ar -> restconf.modulesYangGET("01_module", "2016-01-01", ar));
-        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
     }
 
     /**
@@ -134,9 +134,9 @@ public class RestconfSchemaServiceTest {
     @Test
     public void getSchemaWrongIdentifierTest() {
         final var error = assertError(ar -> restconf.modulesYangGET("2014-01-01", null, ar));
-        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.INVALID_VALUE, error.getErrorTag());
+        assertEquals("Identifier must start with character from set 'a-zA-Z_", error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.INVALID_VALUE, error.tag());
     }
 
     /**

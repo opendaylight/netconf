@@ -369,9 +369,9 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         assertNotNull(globalErrors);
         assertEquals(1, globalErrors.size());
         final var globalError = globalErrors.get(0);
-        assertEquals("Data does not exist", globalError.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, globalError.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, globalError.getErrorTag());
+        assertEquals("Data does not exist", globalError.message());
+        assertEquals(ErrorType.PROTOCOL, globalError.type());
+        assertEquals(ErrorTag.DATA_MISSING, globalError.tag());
     }
 
     @Override

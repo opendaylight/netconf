@@ -100,9 +100,9 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
             }"""));
         assertEquals("""
             Payload name ((urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring?revision=2017-01-26)restconf-state) is \
-            different from identifier name ((ns?revision=2016-02-28)cont)""", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+            different from identifier name ((ns?revision=2016-02-28)cont)""", error.message().elementBody());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.tag());
     }
 
     @Test
@@ -115,9 +115,9 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
                 }"""));
         assertEquals("""
             Error parsing input: List entry (urn:nested:module?revision=2014-06-03)depth2-list2 is missing leaf values \
-            for [depth3-lf2-key]""", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+            for [depth3-lf2-key]""", error.message().elementBody());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.tag());
     }
 
     @Test
@@ -147,8 +147,8 @@ class JsonResourceBodyTest extends AbstractResourceBodyTest {
                 "bar": "a"
               }
             }"""));
-        assertEquals("Error parsing input: Last unit does not have enough valid bits", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+        assertEquals("Error parsing input: Last unit does not have enough valid bits", error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.tag());
     }
 }

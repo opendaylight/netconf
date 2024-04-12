@@ -36,12 +36,11 @@ import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.HttpGetResource;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriter;
@@ -79,8 +78,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @NonNullByDefault
-    public RestconfFuture<FormattableBody> yangLibraryVersionGET(final ServerRequest request) {
-        return yangLibraryVersion.httpGET(request);
+    public void yangLibraryVersionGET(final ServerRequest<FormattableBody> request) {
+        yangLibraryVersion.httpGET(request);
     }
 
     @Override
@@ -89,8 +88,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    void delete(final SettableRestconfFuture<Empty> future, final ServerRequest request,
-            final YangInstanceIdentifier path) {
+    void delete(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
         final var tx = dataBroker.newReadWriteTransaction();
         tx.exists(CONFIGURATION, path).addCallback(new FutureCallback<>() {
             @Override
@@ -105,39 +103,54 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
                 tx.commit().addCallback(new FutureCallback<CommitInfo>() {
                     @Override
                     public void onSuccess(final CommitInfo result) {
-                        future.set(Empty.value());
+                        request.succeedWith(Empty.value());
                     }
 
                     @Override
                     public void onFailure(final Throwable cause) {
-                        future.setFailure(new RestconfDocumentedException("Transaction to delete " + path + " failed",
-                            cause));
+                        request.failWith(new ServerException("Transaction to delete " + path + " failed", cause));
                     }
                 }, MoreExecutors.directExecutor());
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                cancelTx(new RestconfDocumentedException("Failed to access " + path, cause));
+                cancelTx(new ServerException("Failed to access " + path, cause));
             }
 
-            private void cancelTx(final RestconfDocumentedException ex) {
+            private void cancelTx(final @NonNull ServerException ex) {
                 tx.cancel();
-                future.setFailure(ex);
+                request.failWith(ex);
             }
         }, MoreExecutors.directExecutor());
     }
 
     @Override
-    RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final Data path, final DataGetParams params) {
+    void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var depth = params.depth();
         final var fields = params.fields();
-        final var writerFactory = fields == null ? NormalizedNodeWriterFactory.of(depth)
-            : new MdsalNormalizedNodeWriterFactory(
-                translateFieldsParam(path.inference().modelContext(), path.schema(), fields), depth);
+        final NormalizedNodeWriterFactory writerFactory;
+        if (fields != null) {
+            final List<Set<QName>> translated;
+            try {
+                translated = translateFieldsParam(path.inference().modelContext(), path.schema(), fields);
+            } catch (ServerException e) {
+                request.failWith(e);
+                return;
+            }
+            writerFactory = new MdsalNormalizedNodeWriterFactory(translated, depth);
+        } else {
+            writerFactory = NormalizedNodeWriterFactory.of(depth);
+        }
 
-        return completeDataGET(readData(params.content(), path.instance(), params.withDefaults()), path, writerFactory,
-            null);
+        final NormalizedNode data;
+        try {
+            data = readData(params.content(), path.instance(), params.withDefaults());
+        } catch (ServerException e) {
+            request.failWith(e);
+            return;
+        }
+        completeDataGET(request, data, path, writerFactory, null);
     }
 
     @Override
@@ -177,7 +190,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
      */
     @VisibleForTesting
     public static @NonNull List<Set<QName>> translateFieldsParam(final @NonNull EffectiveModelContext modelContext,
-            final DataSchemaContext startNode, final @NonNull FieldsParam input) {
+            final DataSchemaContext startNode, final @NonNull FieldsParam input) throws ServerException {
         final var parsed = new ArrayList<Set<QName>>();
         processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(), startNode,
             input.nodeSelectors(), 0);
@@ -186,7 +199,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     private static void processSelectors(final List<Set<QName>> parsed, final EffectiveModelContext context,
             final QNameModule startNamespace, final DataSchemaContext startNode, final List<NodeSelector> selectors,
-            final int index) {
+            final int index) throws ServerException {
         final Set<QName> startLevel;
         if (parsed.size() <= index) {
             startLevel = new HashSet<>();
@@ -273,22 +286,19 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
      * @return {@link DataSchemaContextNode}
      */
     private static DataSchemaContext addChildToResult(final DataSchemaContext currentNode, final QName childQName,
-            final Set<QName> level) {
+            final Set<QName> level) throws ServerException {
         // resolve parent node
         final var parentNode = resolveMixinNode(currentNode, level, currentNode.dataSchemaNode().getQName());
         if (parentNode == null) {
-            throw new RestconfDocumentedException(
-                    "Not-mixin node missing in " + currentNode.getPathStep().getNodeType().getLocalName(),
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                    "Not-mixin node missing in " + currentNode.getPathStep().getNodeType().getLocalName());
         }
 
         // resolve child node
-        final DataSchemaContext childNode = resolveMixinNode(childByQName(parentNode, childQName), level, childQName);
+        final var childNode = resolveMixinNode(childByQName(parentNode, childQName), level, childQName);
         if (childNode == null) {
-            throw new RestconfDocumentedException(
-                    "Child " + childQName.getLocalName() + " node missing in "
-                            + currentNode.getPathStep().getNodeType().getLocalName(),
-                    ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Child %s node missing in %s",
+                childQName.getLocalName(), currentNode.getPathStep().getNodeType().getLocalName());
         }
 
         // add final childNode node to level nodes
