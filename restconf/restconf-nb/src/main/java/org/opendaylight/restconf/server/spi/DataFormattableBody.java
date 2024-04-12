@@ -18,6 +18,7 @@ import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
@@ -31,10 +32,10 @@ import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference
  * A {@link NormalizedFormattableBody} representing a data resource.
  */
 @NonNullByDefault
-final class DataFormattableBody<N extends NormalizedNode> extends NormalizedFormattableBody<N> {
+final class DataFormattableBody extends NormalizedFormattableBody<NormalizedNode> {
     private final Inference parent;
 
-    DataFormattableBody(final DatabindContext databind, final Inference parent, final N data,
+    DataFormattableBody(final DatabindContext databind, final Inference parent, final NormalizedNode data,
             final NormalizedNodeWriterFactory writerFactory) {
         super(databind, writerFactory, data);
         this.parent = requireNonNull(parent);
@@ -49,7 +50,7 @@ final class DataFormattableBody<N extends NormalizedNode> extends NormalizedForm
         }
     }
 
-    DataFormattableBody(final DatabindContext databind, final Inference parent, final N data) {
+    DataFormattableBody(final DatabindContext databind, final Inference parent, final NormalizedNode data) {
         this(databind, parent, data, NormalizedNodeWriterFactory.of());
     }
 
@@ -61,14 +62,21 @@ final class DataFormattableBody<N extends NormalizedNode> extends NormalizedForm
     }
 
     @Override
-    protected void formatToJSON(final JSONCodecFactory codecs, final N data, final JsonWriter writer)
+    protected void formatToJSON(final JSONCodecFactory codecs, final NormalizedNode data, final JsonWriter writer)
             throws IOException {
         writeTo(data, JSONNormalizedNodeStreamWriter.createExclusiveWriter(codecs, parent, null, writer));
     }
 
     @Override
-    protected void formatToXML(final XmlCodecFactory codecs, final N data, final XMLStreamWriter xmlWriter)
+    protected void formatToXML(final XmlCodecFactory codecs, final NormalizedNode data, final XMLStreamWriter xmlWriter)
             throws IOException {
         writeTo(data, XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, parent));
+    }
+
+    private void writeTo(final NormalizedNode toWrite, final NormalizedNodeStreamWriter streamWriter)
+            throws IOException {
+        try (var writer = newWriter(streamWriter)) {
+            writer.write(toWrite);
+        }
     }
 }

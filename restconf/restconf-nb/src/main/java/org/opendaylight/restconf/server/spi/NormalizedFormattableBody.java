@@ -22,15 +22,14 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindFormattableBody;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
-import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack.Inference;
+import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
 /**
  * A {@link FormattableBody} representing a data resource.
@@ -59,18 +58,30 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
             throw new VerifyException("Unexpected root data contract " + data.contract());
         }
 
-        // Read of a sub-resource. We need to adjust the inference to point to the NormalizedNode parent of the node
-        // being output.
-        final Inference parentInference;
-        if (data instanceof MapEntryNode || data instanceof LeafSetEntryNode || data instanceof UnkeyedListEntryNode) {
-            parentInference = inference;
-        } else {
-            final var stack = inference.toSchemaInferenceStack();
-            stack.exitToDataTree();
-            parentInference = stack.toInference();
-        }
+        // RESTCONF allows returning one list item. We need to wrap it in map node in order to serialize it properly.
+        // We need to point to a 'a parent inference' and provide an appropriate data entry. Unfortunately it is not
+        // quite defined what that actually means.
+        //
+        // This is a tricky thing, as JSON and XML have different representations of a MapNode. In JSON it is the array
+        // containing individual objects. In XML it is transparent.
+        //
+        // This means that for XML we could just move 'parent inference' to the MapNode and emit the MapEntryNode as
+        // usual. For JSON that does not work, as we also need to wrap the MapEntryNode in a MapNode.
+        //
+        // What we do here is we unconditionally:
+        //   - wrap the node if it is a list entry node
+        //   - move the inference to parent
+        //
+        // For XML that does not seem to matter. For JSON it does matter a lot.
+        final var stack = inference.toSchemaInferenceStack();
+        stack.exit();
 
-        return new DataFormattableBody<>(path.databind(), parentInference, data, writerFactory);
+        return new DataFormattableBody(path.databind(), stack.toInference(), data instanceof MapEntryNode mapEntry
+            ? ImmutableNodes.newSystemMapBuilder()
+                .withNodeIdentifier(new NodeIdentifier(data.name().getNodeType()))
+                .withChild(mapEntry)
+                .build()
+            : data, writerFactory);
     }
 
     /**
@@ -109,13 +120,6 @@ public abstract sealed class NormalizedFormattableBody<N extends NormalizedNode>
 
     protected final NormalizedNodeWriter newWriter(final NormalizedNodeStreamWriter streamWriter) {
         return writerFactory.newWriter(streamWriter);
-    }
-
-    final void writeTo(final NormalizedNode toWrite, final NormalizedNodeStreamWriter streamWriter)
-            throws IOException {
-        try (var writer = newWriter(streamWriter)) {
-            writer.write(toWrite);
-        }
     }
 
     @Override

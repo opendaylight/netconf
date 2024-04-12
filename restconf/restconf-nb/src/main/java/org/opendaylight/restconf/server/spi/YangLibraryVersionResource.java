@@ -71,7 +71,7 @@ public record YangLibraryVersionResource(DatabindContext databind, Inference res
 
     @Override
     public RestconfFuture<FormattableBody> httpGET(final ServerRequest request) {
-        return RestconfFuture.of(new DataFormattableBody<>(databind, restconf, leaf));
+        return RestconfFuture.of(new DataFormattableBody(databind, restconf, leaf));
     }
 
     @Override
