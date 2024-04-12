@@ -36,7 +36,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy.StrategyAndTail;
 import org.opendaylight.restconf.server.api.ChildBody;
-import org.opendaylight.restconf.server.api.CreateResourceResult;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DataPostBody;
@@ -143,120 +142,125 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<Empty> dataDELETE(final ServerRequest request, final ApiPath identifier) {
+    public void dataDELETE(final ServerRequest<Empty> request, final ApiPath identifier) {
         final StrategyAndTail stratAndTail;
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
-        return stratAndTail.strategy().dataDELETE(request, stratAndTail.tail());
+        stratAndTail.strategy().dataDELETE(request, stratAndTail.tail());
     }
 
     @Override
-    public RestconfFuture<DataGetResult> dataGET(final ServerRequest request) {
-        return localStrategy().dataGET(request, ApiPath.empty());
+    public void dataGET(final ServerRequest<DataGetResult> request) {
+        localStrategy().dataGET(request, ApiPath.empty());
     }
 
     @Override
-    public RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final ApiPath identifier) {
+    public void dataGET(final ServerRequest<DataGetResult> request, final ApiPath identifier) {
         final StrategyAndTail stratAndTail;
         try {
             stratAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
-        return stratAndTail.strategy().dataGET(request, stratAndTail.tail());
+        stratAndTail.strategy().dataGET(request, stratAndTail.tail());
     }
 
     @Override
-    public RestconfFuture<DataPatchResult> dataPATCH(final ServerRequest request, final ResourceBody body) {
+    public void dataPATCH(final ServerRequest<DataPatchResult> request, final ResourceBody body) {
         return localStrategy().dataPATCH(ApiPath.empty(), body);
     }
 
     @Override
-    public RestconfFuture<DataPatchResult> dataPATCH(final ServerRequest request, final ApiPath identifier,
+    public void dataPATCH(final ServerRequest<DataPatchResult> request, final ApiPath identifier,
             final ResourceBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
         return strategyAndTail.strategy().dataPATCH(strategyAndTail.tail(), body);
     }
 
     @Override
-    public RestconfFuture<DataYangPatchResult> dataPATCH(final ServerRequest request, final PatchBody body) {
+    public void dataPATCH(final ServerRequest<DataYangPatchResult> request, final PatchBody body) {
         return localStrategy().dataPATCH(ApiPath.empty(), body);
     }
 
     @Override
-    public RestconfFuture<DataYangPatchResult> dataPATCH(final ServerRequest request, final ApiPath identifier,
+    public void dataPATCH(final ServerRequest<DataYangPatchResult> request, final ApiPath identifier,
             final PatchBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
         return strategyAndTail.strategy().dataPATCH(strategyAndTail.tail(), body);
     }
 
     @Override
-    public RestconfFuture<CreateResourceResult> dataPOST(final ServerRequest request, final ChildBody body) {
-        return localStrategy().dataCreatePOST(request, body);
+    public void dataPOST(final ServerRequest<DataPostResult> request, final ChildBody body) {
+        localStrategy().dataCreatePOST(request, body);
     }
 
     @Override
-    public RestconfFuture<? extends DataPostResult> dataPOST(final ServerRequest request, final ApiPath identifier,
+    public void dataPOST(final ServerRequest<DataPostResult> request, final ApiPath identifier,
             final DataPostBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
-        return strategyAndTail.strategy().dataPOST(request, strategyAndTail.tail(), body);
+        strategyAndTail.strategy().dataPOST(request, strategyAndTail.tail(), body);
     }
 
     @Override
-    public RestconfFuture<DataPutResult> dataPUT(final ServerRequest request, final ResourceBody body) {
-        return localStrategy().dataPUT(request, ApiPath.empty(), body);
+    public void dataPUT(final ServerRequest<DataPutResult> request, final ResourceBody body) {
+        localStrategy().dataPUT(request, ApiPath.empty(), body);
     }
 
     @Override
-    public RestconfFuture<DataPutResult> dataPUT(final ServerRequest request, final ApiPath identifier,
-            final ResourceBody body) {
+    public void dataPUT(final ServerRequest<DataPutResult> request, final ApiPath identifier, final ResourceBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(identifier);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
-        return strategyAndTail.strategy().dataPUT(request, strategyAndTail.tail(), body);
+        strategyAndTail.strategy().dataPUT(request, strategyAndTail.tail(), body);
     }
 
     @Override
-    public RestconfFuture<ModulesGetResult> modulesYangGET(final ServerRequest request, final String fileName,
+    public void modulesYangGET(final ServerRequest<ModulesGetResult> request, final String fileName,
             final String revision) {
         return modulesGET(fileName, revision, YangTextSource.class);
     }
 
     @Override
-    public RestconfFuture<ModulesGetResult> modulesYangGET(final ServerRequest request, final ApiPath mountPath,
+    public void modulesYangGET(final ServerRequest<ModulesGetResult> request, final ApiPath mountPath,
             final String fileName, final String revision) {
         return modulesGET(mountPath, fileName, revision, YangTextSource.class);
     }
 
     @Override
-    public RestconfFuture<ModulesGetResult> modulesYinGET(final ServerRequest request, final String fileName,
+    public void modulesYinGET(final ServerRequest<ModulesGetResult> request, final String fileName,
             final String revision) {
         return modulesGET(fileName, revision, YinTextSource.class);
     }
 
     @Override
-    public RestconfFuture<ModulesGetResult> modulesYinGET(final ServerRequest request, final ApiPath mountPath,
+    public void modulesYinGET(final ServerRequest<ModulesGetResult> request, final ApiPath mountPath,
             final String fileName, final String revision) {
         return modulesGET(mountPath, fileName, revision, YinTextSource.class);
     }
@@ -318,39 +322,45 @@ public final class MdsalRestconfServer implements RestconfServer, AutoCloseable 
     }
 
     @Override
-    public RestconfFuture<FormattableBody> operationsGET(final ServerRequest request) {
-        return localStrategy().operationsGET(request);
+    public void operationsGET(final ServerRequest<FormattableBody> request) {
+        localStrategy().operationsGET(request);
     }
 
     @Override
-    public RestconfFuture<FormattableBody> operationsGET(final ServerRequest request, final ApiPath operation) {
+    public void operationsGET(final ServerRequest<FormattableBody> request, final ApiPath operation) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(operation);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
 
         final var strategy = strategyAndTail.strategy();
         final var tail = strategyAndTail.tail();
-        return tail.isEmpty() ? strategy.operationsGET(request) : strategy.operationsGET(request, tail);
+        if (tail.isEmpty()) {
+            strategy.operationsGET(request);
+        } else {
+            strategy.operationsGET(request, tail);
+        }
     }
 
     @Override
-    public RestconfFuture<InvokeResult> operationsPOST(final ServerRequest request, final URI restconfURI,
-            final ApiPath apiPath, final OperationInputBody body) {
+    public void operationsPOST(final ServerRequest<InvokeResult> request, final URI restconfURI, final ApiPath apiPath,
+            final OperationInputBody body) {
         final StrategyAndTail strategyAndTail;
         try {
             strategyAndTail = localStrategy().resolveStrategy(apiPath);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
         final var strategy = strategyAndTail.strategy();
-        return strategy.operationsPOST(request, restconfURI, strategyAndTail.tail(), body);
+        strategy.operationsPOST(request, restconfURI, strategyAndTail.tail(), body);
     }
 
     @Override
-    public RestconfFuture<FormattableBody> yangLibraryVersionGET(final ServerRequest request) {
-        return localStrategy().yangLibraryVersionGET(request);
+    public void yangLibraryVersionGET(final ServerRequest<FormattableBody> request) {
+        localStrategy().yangLibraryVersionGET(request);
     }
 }
