@@ -34,18 +34,16 @@ public interface RestconfServer {
      * Return the content of the datastore.
      *
      * @param request {@link ServerRequest} for this request
-     * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<DataGetResult> dataGET(ServerRequest request);
+    void dataGET(ServerRequest<DataGetResult> request);
 
     /**
      * Return the content of a data resource.
      *
      * @param request {@link ServerRequest} for this request
      * @param identifier resource identifier
-     * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<DataGetResult> dataGET(ServerRequest request, ApiPath identifier);
+    void dataGET(ServerRequest<DataGetResult> request, ApiPath identifier);
 
     /**
      * Partially modify the target data resource, as defined in

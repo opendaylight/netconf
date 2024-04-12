@@ -119,7 +119,6 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     };
 
     private final @NonNull RestconfServer server;
-    private final @NonNull ServerRequest emptyRequest;
     private final @NonNull PrettyPrintParam prettyPrint;
     private final @NonNull ErrorTagMapping errorTagMapping;
 
@@ -128,7 +127,6 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         this.server = requireNonNull(server);
         this.errorTagMapping = requireNonNull(errorTagMapping);
         this.prettyPrint = requireNonNull(prettyPrint);
-        emptyRequest = ServerRequest.of(QueryParameters.of(), prettyPrint);
 
         LOG.info("RESTCONF data-missing condition is reported as HTTP status {}", switch (errorTagMapping) {
             case ERRATA_5565 -> "404 (Errata 5565)";
@@ -137,6 +135,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     }
 
     private @NonNull ServerRequest requestOf(final UriInfo uriInfo) {
+
         final QueryParameters params;
         try {
             params = QueryParameters.ofMultiValue(uriInfo.getQueryParameters());
@@ -188,8 +187,7 @@ public final class JaxRsRestconf implements ParamConverterProvider {
         MediaType.TEXT_XML
     })
     public void dataGET(@Context final UriInfo uriInfo, @Suspended final AsyncResponse ar) {
-        final var request = requestOf(uriInfo);
-        completeDataGET(server.dataGET(request), request.prettyPrint(), ar);
+        server.dataGET(newRequest(uriInfo, ar, COMPLETE_DATA_GET));
     }
 
     /**
@@ -210,23 +208,21 @@ public final class JaxRsRestconf implements ParamConverterProvider {
     })
     public void dataGET(@Encoded @PathParam("identifier") final ApiPath identifier, @Context final UriInfo uriInfo,
             @Suspended final AsyncResponse ar) {
-        final var request = requestOf(uriInfo);
-        completeDataGET(server.dataGET(request, identifier), request.prettyPrint(), ar);
+        server.dataGET(newRequest(uriInfo, ar, COMPLETE_DATA_GET), identifier);
     }
 
     @NonNullByDefault
-    private static void completeDataGET(final RestconfFuture<DataGetResult> future, final PrettyPrintParam prettyPrint,
-            final AsyncResponse ar) {
-        future.addCallback(new JaxRsRestconfCallback<>(ar) {
-            @Override
-            Response transform(final DataGetResult result) {
-                final var builder = Response.ok()
-                    .entity(new JaxRsFormattableBody(result.body(), prettyPrint))
-                    .cacheControl(NO_CACHE);
-                fillConfigurationMetadata(builder, result);
-                return builder.build();
-            }
-        });
+    private static final JaxRsServerRequest.Transform<DataGetResult> COMPLETE_DATA_GET = (prettyPrint, result) -> {
+        final var builder = Response.ok()
+            .entity(new JaxRsFormattableBody(result.body(), prettyPrint))
+            .cacheControl(NO_CACHE);
+        fillConfigurationMetadata(builder, result);
+        return builder.build();
+    };
+
+    private <T> JaxRsServerRequest<T> newRequest(final UriInfo uriInfo, final AsyncResponse ar,
+            final JaxRsServerRequest.Transform<T> transform) {
+        return new JaxRsServerRequest<>(prettyPrint, uriInfo, ar, transform);
     }
 
     private static void fillConfigurationMetadata(final ResponseBuilder builder, final ConfigurationMetadata metadata) {
