@@ -50,6 +50,7 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
@@ -84,6 +85,9 @@ import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
 import org.opendaylight.restconf.server.api.ResourceBody;
+import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.restconf.server.api.ServerErrorPath;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.ApiPathCanonizer;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
@@ -328,8 +332,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         }, MoreExecutors.directExecutor());
     }
 
-    public @NonNull RestconfFuture<DataPutResult> dataPUT(final ServerRequest request, final ApiPath apiPath,
-            final ResourceBody body) {
+    public void dataPUT(final ServerRequest<DataPutResult> request, final ApiPath apiPath, final ResourceBody body) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
@@ -767,15 +770,16 @@ public abstract class RestconfStrategy implements DatabindAware {
      *
      * @param data Data to be checked
      * @param path Path to be checked
-     * @throws RestconfDocumentedException if data already exists.
+     * @throws ServerException if data already exists.
      */
-    private void checkListDataDoesNotExist(final YangInstanceIdentifier path, final NormalizedNode data) {
+    private void checkListDataDoesNotExist(final YangInstanceIdentifier path, final NormalizedNode data)
+            throws ServerException {
         if (data instanceof NormalizedNodeContainer<?> dataNode) {
             for (final var node : dataNode.body()) {
                 checkItemDoesNotExists(exists(path.node(node.name())), path.node(node.name()));
             }
         } else {
-            throw new RestconfDocumentedException("Unexpected node type: " + data.getClass().getName());
+            throw new ServerException("Unexpected node type: " + data.getClass().getName());
         }
     }
 
@@ -786,12 +790,27 @@ public abstract class RestconfStrategy implements DatabindAware {
      * @param path         Path to be checked
      * @throws RestconfDocumentedException if data already exists.
      */
-    static void checkItemDoesNotExists(final ListenableFuture<Boolean> existsFuture,
-            final YangInstanceIdentifier path) {
+    private void checkItemDoesNotExists(final ListenableFuture<Boolean> existsFuture,
+            final YangInstanceIdentifier path) throws ServerException {
+        checkItemDoesNotExists(existsFuture, databind, path);
+    }
+
+    /**
+     * Check if items do NOT already exists at specified {@code path}.
+     *
+     * @param existsFuture if checked data exists
+     * @param databidnd    a {@link DatabindContext}
+     * @param path         Path to be checked
+     * @throws RestconfDocumentedException if data already exists.
+     */
+    static void checkItemDoesNotExists(final ListenableFuture<Boolean> existsFuture, final DatabindContext databind,
+            final YangInstanceIdentifier path) throws ServerException {
         if (TransactionUtil.syncAccess(existsFuture, path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
-            throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
-                path);
+            final var error = new ServerError(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
+                new ErrorMessage("Data already exists"), null, new ServerErrorPath(databind, path), null);
+
+            throw new ServerException(error);
         }
     }
 
@@ -805,56 +824,59 @@ public abstract class RestconfStrategy implements DatabindAware {
      */
     @NonNullByDefault
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
-    public final RestconfFuture<Empty> dataDELETE(final ServerRequest request, final ApiPath apiPath) {
+    public final void dataDELETE(final ServerRequest<Empty> request, final ApiPath apiPath) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
 
         // FIXME: reject empty YangInstanceIdentifier, as datastores may not be deleted
-        final var ret = new SettableRestconfFuture<Empty>();
-        delete(ret, request, path.instance());
-        return ret;
+        delete(request, path.instance());
     }
 
     @NonNullByDefault
-    abstract void delete(SettableRestconfFuture<Empty> future, ServerRequest request, YangInstanceIdentifier path);
+    abstract void delete(ServerRequest<Empty> request, YangInstanceIdentifier path);
 
-    public final @NonNull RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final ApiPath apiPath) {
+    public final void dataGET(final ServerRequest<DataGetResult> request, final ApiPath apiPath) {
         final Data path;
         try {
             path = pathNormalizer.normalizeDataPath(apiPath);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
 
         final DataGetParams getParams;
         try {
             getParams = DataGetParams.of(request.queryParameters());
         } catch (IllegalArgumentException e) {
-            return RestconfFuture.failed(new RestconfDocumentedException(e,
+            request.failWith(new RestconfDocumentedException(e,
                 new RestconfError(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Invalid GET /data parameters", null,
                     e.getMessage())));
+            return;
         }
-        return dataGET(request, path, getParams);
+        dataGET(request, path, getParams);
     }
 
-    abstract @NonNull RestconfFuture<DataGetResult> dataGET(ServerRequest request, Data path, DataGetParams params);
+    @NonNullByDefault
+    abstract void dataGET(ServerRequest<DataGetResult> request, Data path, DataGetParams params);
 
     @NonNullByDefault
-    static final RestconfFuture<DataGetResult> completeDataGET(final @Nullable NormalizedNode node, final Data path,
-            final NormalizedNodeWriterFactory writerFactory, final @Nullable ConfigurationMetadata metadata) {
+    static final void completeDataGET(final ServerRequest<DataGetResult> request,
+            final @Nullable NormalizedNode node, final Data path, final NormalizedNodeWriterFactory writerFactory,
+            final @Nullable ConfigurationMetadata metadata) {
         // Non-existing data
         if (node == null) {
-            return RestconfFuture.failed(new RestconfDocumentedException(
-                "Request could not be completed because the relevant data model content does not exist",
-                ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
+            request.failWith(new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                "Request could not be completed because the relevant data model content does not exist"));
+            return;
         }
 
         final var body = NormalizedFormattableBody.of(path, node, writerFactory);
-        return RestconfFuture.of(metadata == null ? new DataGetResult(body)
+        request.succeedWith(metadata == null ? new DataGetResult(body)
             : new DataGetResult(body, metadata.entityTag(), metadata.lastModified()));
     }
 
@@ -1249,22 +1271,23 @@ public abstract class RestconfStrategy implements DatabindAware {
     }
 
     @NonNullByDefault
-    public RestconfFuture<FormattableBody> operationsGET(final ServerRequest request) {
+    public void operationsGET(final ServerRequest<FormattableBody> request) {
         return operations.httpGET(request);
     }
 
     @NonNullByDefault
-    public RestconfFuture<FormattableBody> operationsGET(final ServerRequest request, final ApiPath apiPath) {
+    public void operationsGET(final ServerRequest<FormattableBody> request, final ApiPath apiPath) {
         return operations.httpGET(request, apiPath);
     }
 
-    public @NonNull RestconfFuture<InvokeResult> operationsPOST(final ServerRequest request, final URI restconfURI,
-            final ApiPath apiPath, final OperationInputBody body) {
+    public void operationsPOST(final ServerRequest<InvokeResult> request, final URI restconfURI, final ApiPath apiPath,
+            final OperationInputBody body) {
         final Rpc path;
         try {
             path = pathNormalizer.normalizeRpcPath(apiPath);
         } catch (RestconfDocumentedException e) {
-            return RestconfFuture.failed(e);
+            request.failWith(e);
+            return;
         }
 
         final ContainerNode data;
@@ -1272,8 +1295,9 @@ public abstract class RestconfStrategy implements DatabindAware {
             data = body.toContainerNode(path);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
-            return RestconfFuture.failed(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
+            request.failWith(new RestconfDocumentedException("Error parsing input: " + e.getMessage(),
                 ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE, e));
+            return;
         }
 
         final var type = path.rpc().argument();
