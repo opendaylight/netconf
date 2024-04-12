@@ -28,24 +28,22 @@ public interface RestconfServer {
      * @return A {@link RestconfFuture} of the operation
      */
     @SuppressWarnings("checkstyle:abbreviationAsWordInName")
-    RestconfFuture<Empty> dataDELETE(ServerRequest request, ApiPath identifier);
+    void dataDELETE(ServerRequest<Empty> request, ApiPath identifier);
 
     /**
      * Return the content of the datastore.
      *
      * @param request {@link ServerRequest} for this request
-     * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<DataGetResult> dataGET(ServerRequest request);
+    void dataGET(ServerRequest<DataGetResult> request);
 
     /**
      * Return the content of a data resource.
      *
      * @param request {@link ServerRequest} for this request
      * @param identifier resource identifier
-     * @return A {@link RestconfFuture} of the {@link DataGetResult} content
      */
-    RestconfFuture<DataGetResult> dataGET(ServerRequest request, ApiPath identifier);
+    void dataGET(ServerRequest<DataGetResult> request, ApiPath identifier);
 
     /**
      * Partially modify the target data resource, as defined in
@@ -55,7 +53,7 @@ public interface RestconfServer {
      * @param body data node for put to config DS
      * @return A {@link RestconfFuture} of the operation
      */
-    RestconfFuture<DataPatchResult> dataPATCH(ServerRequest request, ResourceBody body);
+    void dataPATCH(ServerRequest<DataPatchResult> request, ResourceBody body);
 
     /**
      * Partially modify the target data resource, as defined in
@@ -66,7 +64,7 @@ public interface RestconfServer {
      * @param body data node for put to config DS
      * @return A {@link RestconfFuture} of the operation
      */
-    RestconfFuture<DataPatchResult> dataPATCH(ServerRequest request, ApiPath identifier, ResourceBody body);
+    void dataPATCH(ServerRequest<DataPatchResult> request, ApiPath identifier, ResourceBody body);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
@@ -76,7 +74,7 @@ public interface RestconfServer {
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    RestconfFuture<DataYangPatchResult> dataPATCH(ServerRequest request, PatchBody body);
+    void dataPATCH(ServerRequest<DataYangPatchResult> request, PatchBody body);
 
     /**
      * Ordered list of edits that are applied to the datastore by the server, as defined in
@@ -87,9 +85,9 @@ public interface RestconfServer {
      * @param body YANG Patch body
      * @return A {@link RestconfFuture} of the {@link DataYangPatchResult} content
      */
-    RestconfFuture<DataYangPatchResult> dataPATCH(ServerRequest request, ApiPath identifier, PatchBody body);
+    void dataPATCH(ServerRequest<DataYangPatchResult> request, ApiPath identifier, PatchBody body);
 
-    RestconfFuture<CreateResourceResult> dataPOST(ServerRequest request, ChildBody body);
+    void dataPOST(ServerRequest<DataPostResult> request, ChildBody body);
 
     /**
      * Create or invoke a operation, as described in
@@ -99,7 +97,7 @@ public interface RestconfServer {
      * @param identifier path to target
      * @param body body of the post request
      */
-    RestconfFuture<? extends DataPostResult> dataPOST(ServerRequest request, ApiPath identifier, DataPostBody body);
+    void dataPOST(ServerRequest<DataPostResult> request, ApiPath identifier, DataPostBody body);
 
     /**
      * Replace the data store, as described in
@@ -107,9 +105,8 @@ public interface RestconfServer {
      *
      * @param request {@link ServerRequest} for this request
      * @param body data node for put to config DS
-     * @return A {@link RestconfFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(ServerRequest request, ResourceBody body);
+    void dataPUT(ServerRequest<DataPutResult> request, ResourceBody body);
 
     /**
      * Create or replace a data store resource, as described in
@@ -118,9 +115,8 @@ public interface RestconfServer {
      * @param request {@link ServerRequest} for this request
      * @param identifier resource identifier
      * @param body data node for put to config DS
-     * @return A {@link RestconfFuture} completing with {@link DataPutResult}
      */
-    RestconfFuture<DataPutResult> dataPUT(ServerRequest request, ApiPath identifier, ResourceBody body);
+    void dataPUT(ServerRequest<DataPutResult> request, ApiPath identifier, ResourceBody body);
 
     /**
      * Return the set of supported RPCs supported by
@@ -129,9 +125,8 @@ public interface RestconfServer {
      * {@code container operations} statement.
      *
      * @param request {@link ServerRequest} for this request
-     * @return A {@link RestconfFuture} completing with an {@link FormattableBody}
      */
-    RestconfFuture<FormattableBody> operationsGET(ServerRequest request);
+    void operationsGET(ServerRequest<FormattableBody> request);
 
     /*
      * Return the details about a particular operation supported by
@@ -141,9 +136,8 @@ public interface RestconfServer {
      *
      * @param request {@link ServerRequest} for this request
      * @param operation An operation
-     * @return A {@link RestconfFuture} completing with an {@link FormattableBody}
      */
-    RestconfFuture<FormattableBody> operationsGET(ServerRequest request, ApiPath operation);
+    void operationsGET(ServerRequest<FormattableBody> request, ApiPath operation);
 
     /**
      * Invoke an RPC operation, as defined in
@@ -154,11 +148,10 @@ public interface RestconfServer {
      *                    slash
      * @param operation {@code <operation>} path, really an {@link ApiPath} to an {@code rpc}
      * @param body RPC operation
-     * @return A {@link RestconfFuture} completing with {@link InvokeResult}
      */
     // FIXME: 'operation' should really be an ApiIdentifier with non-null module, but we also support yang-ext:mount,
     //        and hence it is a path right now
-    RestconfFuture<InvokeResult> operationsPOST(ServerRequest request, URI restconfURI, ApiPath operation,
+    void operationsPOST(ServerRequest<InvokeResult> request, URI restconfURI, ApiPath operation,
         OperationInputBody body);
 
     /**
@@ -169,15 +162,15 @@ public interface RestconfServer {
      * @return A {@link RestconfFuture} completing with {@link FormattableBody} containing a single
      *        {@code yang-library-version} leaf element.
      */
-    RestconfFuture<FormattableBody> yangLibraryVersionGET(ServerRequest request);
+    void yangLibraryVersionGET(ServerRequest<FormattableBody> request);
 
-    RestconfFuture<ModulesGetResult> modulesYangGET(ServerRequest request, String fileName, @Nullable String revision);
+    void modulesYangGET(ServerRequest<ModulesGetResult> request, String fileName, @Nullable String revision);
 
-    RestconfFuture<ModulesGetResult> modulesYangGET(ServerRequest request, ApiPath mountPath, String fileName,
+    void modulesYangGET(ServerRequest<ModulesGetResult> request, ApiPath mountPath, String fileName,
         @Nullable String revision);
 
-    RestconfFuture<ModulesGetResult> modulesYinGET(ServerRequest request, String fileName, @Nullable String revision);
+    void modulesYinGET(ServerRequest<ModulesGetResult> request, String fileName, @Nullable String revision);
 
-    RestconfFuture<ModulesGetResult> modulesYinGET(ServerRequest request, ApiPath mountPath, String fileName,
+    void modulesYinGET(ServerRequest<ModulesGetResult> request, ApiPath mountPath, String fileName,
         @Nullable String revision);
 }
