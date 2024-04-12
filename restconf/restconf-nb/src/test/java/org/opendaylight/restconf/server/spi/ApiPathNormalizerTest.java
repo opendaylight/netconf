@@ -21,6 +21,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Action;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -450,11 +451,19 @@ class ApiPathNormalizerTest {
     }
 
     private static Action assertNormalizedAction(final String path) {
-        return assertInstanceOf(Action.class, NORMALIZER.normalizePath(assertApiPath(path)));
+        try {
+            return assertInstanceOf(Action.class, NORMALIZER.normalizePath(assertApiPath(path)));
+        } catch (ServerException e) {
+            throw new AssertionError(e);
+        }
     }
 
     private static YangInstanceIdentifier assertNormalizedPath(final String path) {
-        return assertInstanceOf(Data.class, NORMALIZER.normalizePath(assertApiPath(path))).instance();
+        try {
+            return assertInstanceOf(Data.class, NORMALIZER.normalizePath(assertApiPath(path))).instance();
+        } catch (ServerException e) {
+            throw new AssertionError(e);
+        }
     }
 
     private static ApiPath assertApiPath(final String path) {

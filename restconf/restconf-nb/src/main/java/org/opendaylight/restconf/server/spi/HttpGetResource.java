@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.spi;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.server.api.ServerRequest;
 
 /**
@@ -19,7 +18,7 @@ import org.opendaylight.restconf.server.api.ServerRequest;
 @NonNullByDefault
 public interface HttpGetResource {
 
-    RestconfFuture<FormattableBody> httpGET(ServerRequest request);
+    void httpGET(ServerRequest<FormattableBody> request);
 
-    RestconfFuture<FormattableBody> httpGET(ServerRequest request, ApiPath apiPath);
+    void httpGET(ServerRequest<FormattableBody> request, ApiPath apiPath);
 }

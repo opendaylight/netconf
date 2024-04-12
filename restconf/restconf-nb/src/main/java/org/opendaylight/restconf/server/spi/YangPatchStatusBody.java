@@ -19,8 +19,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
+import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.patch.rev170222.yang.patch.status.YangPatchStatus;
 
 /**
@@ -119,26 +119,26 @@ public final class YangPatchStatusBody extends FormattableBody {
         writer.name("ok").beginArray().nullValue().endArray();
     }
 
-    private void writeErrors(final List<RestconfError> errors, final JsonWriter writer) throws IOException {
+    private static void writeErrors(final List<ServerError> errors, final JsonWriter writer) throws IOException {
         writer.name("errors").beginObject().name("error").beginArray();
 
         for (var restconfError : errors) {
             writer.beginObject()
-                .name("error-type").value(restconfError.getErrorType().elementBody())
-                .name("error-tag").value(restconfError.getErrorTag().elementBody());
+                .name("error-type").value(restconfError.type().elementBody())
+                .name("error-tag").value(restconfError.tag().elementBody());
 
-            final var errorPath = restconfError.getErrorPath();
+            final var errorPath = restconfError.path();
             if (errorPath != null) {
                 writer.name("error-path");
-                status.databind().jsonCodecs().instanceIdentifierCodec().writeValue(writer, errorPath);
+                errorPath.databind().jsonCodecs().instanceIdentifierCodec().writeValue(writer, errorPath.path());
             }
-            final var errorMessage = restconfError.getErrorMessage();
+            final var errorMessage = restconfError.message();
             if (errorMessage != null) {
-                writer.name("error-message").value(errorMessage);
+                writer.name("error-message").value(errorMessage.elementBody());
             }
-            final var errorInfo = restconfError.getErrorInfo();
+            final var errorInfo = restconfError.info();
             if (errorInfo != null) {
-                writer.name("error-info").value(errorInfo);
+                writer.name("error-info").value(errorInfo.elementBody());
             }
 
             writer.endObject();
@@ -147,40 +147,41 @@ public final class YangPatchStatusBody extends FormattableBody {
         writer.endArray().endObject();
     }
 
-    private void reportErrors(final List<RestconfError> errors, final XMLStreamWriter writer)
+    private static void reportErrors(final List<ServerError> errors, final XMLStreamWriter writer)
             throws XMLStreamException {
         writer.writeStartElement("errors");
 
         for (var restconfError : errors) {
             writer.writeStartElement("error-type");
-            writer.writeCharacters(restconfError.getErrorType().elementBody());
+            writer.writeCharacters(restconfError.type().elementBody());
             writer.writeEndElement();
 
             writer.writeStartElement("error-tag");
-            writer.writeCharacters(restconfError.getErrorTag().elementBody());
+            writer.writeCharacters(restconfError.tag().elementBody());
             writer.writeEndElement();
 
             // optional node
-            final var errorPath = restconfError.getErrorPath();
+            final var errorPath = restconfError.path();
             if (errorPath != null) {
                 writer.writeStartElement("error-path");
-                status.databind().xmlCodecs().instanceIdentifierCodec().writeValue(writer, errorPath);
+                errorPath.databind().xmlCodecs().instanceIdentifierCodec().writeValue(writer, errorPath.path());
                 writer.writeEndElement();
             }
 
             // optional node
-            final var errorMessage = restconfError.getErrorMessage();
+            final var errorMessage = restconfError.message();
             if (errorMessage != null) {
                 writer.writeStartElement("error-message");
-                writer.writeCharacters(errorMessage);
+                // FIXME: propagate xml:lang
+                writer.writeCharacters(errorMessage.elementBody());
                 writer.writeEndElement();
             }
 
             // optional node
-            final var errorInfo = restconfError.getErrorInfo();
+            final var errorInfo = restconfError.info();
             if (errorInfo != null) {
                 writer.writeStartElement("error-info");
-                writer.writeCharacters(errorInfo);
+                writer.writeCharacters(errorInfo.elementBody());
                 writer.writeEndElement();
             }
         }

@@ -12,18 +12,17 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.PatchStatusContext;
 import org.opendaylight.restconf.server.api.PatchStatusEntity;
+import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class YangPatchStatusBodyTest extends AbstractJukeboxTest {
-    private final RestconfError error = new RestconfError(ErrorType.PROTOCOL, new ErrorTag("data-exists"),
-        "Data already exists");
+    private final ServerError error = new ServerError(ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, "Data already exists");
     private final PatchStatusEntity statusEntity = new PatchStatusEntity("patch1", true, null);
     private final PatchStatusEntity statusEntityError = new PatchStatusEntity("patch1", false, List.of(error));
     private final DatabindContext databind = DatabindContext.ofModel(mock(EffectiveModelContext.class));
