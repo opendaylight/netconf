@@ -21,6 +21,8 @@ import org.opendaylight.restconf.api.query.LeafNodesOnlyParam;
 import org.opendaylight.restconf.api.query.SkipNotificationDataParam;
 import org.opendaylight.restconf.api.query.StartTimeParam;
 import org.opendaylight.restconf.api.query.StopTimeParam;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 
 /**
  * Query parameters valid in the scope of a GET request on an event stream resource, as outline in
@@ -57,9 +59,9 @@ public record EventStreamGetParams(
      * @param parames Parameters and their values
      * @return A {@link EventStreamGetParams}
      * @throws NullPointerException if {@code queryParameters} is {@code null}
-     * @throws IllegalArgumentException if the parameters are invalid
+     * @throws ServerException if the parameters are invalid
      */
-    public static @NonNull EventStreamGetParams of(final QueryParameters parames) {
+    public static @NonNull EventStreamGetParams of(final QueryParameters parames) throws ServerException {
         StartTimeParam startTime = null;
         StopTimeParam stopTime = null;
         FilterParam filter = null;
@@ -97,7 +99,8 @@ public record EventStreamGetParams(
                     childNodesOnly = mandatoryParam(ChildNodesOnlyParam::forUriValue, paramName, paramValue);
                     break;
                 default:
-                    throw new IllegalArgumentException("Invalid parameter: " + paramName);
+                    throw new ServerException(ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ATTRIBUTE,
+                        "Invalid parameter: %s", paramName);
             }
         }
 
@@ -134,11 +137,12 @@ public record EventStreamGetParams(
 
     // FIXME: find a better place for this method
     public static <T> @NonNull T mandatoryParam(final Function<String, @NonNull T> factory, final String name,
-            final String value) {
+            final String value) throws ServerException {
         try {
             return factory.apply(requireNonNull(value));
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid " + name + " value: " + value, e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Invalid " + name + " value: " + value, e);
         }
     }
 }

@@ -21,8 +21,11 @@ import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.InsertParam;
 import org.opendaylight.restconf.api.query.PointParam;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.spi.ApiPathNormalizer;
 import org.opendaylight.yangtools.concepts.Immutable;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 
 /**
@@ -39,7 +42,7 @@ public final class Insert implements Immutable {
     @FunctionalInterface
     public interface PointNormalizer {
 
-        PathArgument normalizePoint(ApiPath value);
+        PathArgument normalizePoint(ApiPath value) throws ServerException;
     }
 
     private final @NonNull InsertParam insert;
@@ -56,9 +59,10 @@ public final class Insert implements Immutable {
      * @param params Parameters and their values
      * @return An {@link Insert}, or {@code null} if no insert information is present
      * @throws NullPointerException if any argument is {@code null}
-     * @throws IllegalArgumentException if the parameters are invalid
+     * @throws ServerException if the parameters are invalid
      */
-    public static @Nullable Insert of(final DatabindContext databind, final QueryParameters params) {
+    public static @Nullable Insert of(final DatabindContext databind, final QueryParameters params)
+            throws ServerException {
         InsertParam insert = null;
         PointParam point = null;
 
@@ -82,10 +86,10 @@ public final class Insert implements Immutable {
     }
 
     public static @Nullable Insert forParams(final @Nullable InsertParam insert, final @Nullable PointParam point,
-            final PointNormalizer pointParser) {
+            final PointNormalizer pointParser) throws ServerException {
         if (insert == null) {
             if (point != null) {
-                throw invalidPointIAE();
+                throw invalidPoint();
             }
             return null;
         }
@@ -97,8 +101,8 @@ public final class Insert implements Immutable {
                 //        parameter for the "insert" query parameter MUST also be present, or a
                 //        "400 Bad Request" status-line is returned.
                 if (point == null) {
-                    throw new IllegalArgumentException(
-                        "Insert parameter " + insert.paramValue() + " cannot be used without a Point parameter.");
+                    throw new ServerException(ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE,
+                        "Insert parameter %s cannot be used without a Point parameter.", insert.paramValue());
                 }
                 yield new Insert(insert, parsePoint(pointParser, point.value()));
             }
@@ -109,25 +113,27 @@ public final class Insert implements Immutable {
                 //        than "before" or "after", then a "400 Bad Request" status-line is
                 //        returned.
                 if (point != null) {
-                    throw invalidPointIAE();
+                    throw invalidPoint();
                 }
                 yield new Insert(insert, null);
             }
         };
     }
 
-    private static PathArgument parsePoint(final PointNormalizer pointParser, final String value) {
+    private static PathArgument parsePoint(final PointNormalizer pointParser, final String value)
+            throws ServerException {
         final ApiPath pointPath;
         try {
             pointPath = ApiPath.parse(value);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Malformed point parameter '" + value + "': " + e.getMessage(), e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Malformed point parameter '" + value + "': " + e.getMessage(), e);
         }
         return pointParser.normalizePoint(pointPath);
     }
 
-    private static IllegalArgumentException invalidPointIAE() {
-        return new IllegalArgumentException(
+    private static ServerException invalidPoint() {
+        return new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
             "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
     }
 

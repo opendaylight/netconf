@@ -19,7 +19,9 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.DatabindPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -349,11 +351,23 @@ class ApiPathCanonizerTest {
     }
 
     private static void assertApiPath(final String expected, final YangInstanceIdentifier path) {
-        assertEquals(newApiPath(expected), CANONIZER.dataToApiPath(path));
+        final ApiPath apiPath;
+        try {
+            apiPath = CANONIZER.dataToApiPath(path);
+        } catch (ServerException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(newApiPath(expected), apiPath);
     }
 
     private static YangInstanceIdentifier assertNormalized(final String str) {
-        return assertInstanceOf(Data.class, NORMALIZER.normalizePath(newApiPath(str))).instance();
+        final DatabindPath path;
+        try {
+            path = NORMALIZER.normalizePath(newApiPath(str));
+        } catch (ServerException e) {
+            throw new AssertionError(e);
+        }
+        return assertInstanceOf(Data.class, path).instance();
     }
 
     private static RestconfError assertError(final YangInstanceIdentifier path) {

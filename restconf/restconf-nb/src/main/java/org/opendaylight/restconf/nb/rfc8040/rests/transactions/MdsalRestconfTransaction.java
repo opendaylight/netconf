@@ -17,9 +17,12 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.api.ErrorMessage;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.ExistenceCheck.Conflict;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.ServerError;
+import org.opendaylight.restconf.server.api.ServerErrorPath;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -50,13 +53,13 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void deleteImpl(final YangInstanceIdentifier path) {
+    void deleteImpl(final YangInstanceIdentifier path) throws ServerException {
         if (TransactionUtil.syncAccess(verifyNotNull(rwTx).exists(CONFIGURATION, path), path)) {
             rwTx.delete(CONFIGURATION, path);
         } else {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
-            throw new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
-                path);
+            throw new ServerException(new ServerError(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                new ErrorMessage("Data does not exist"), null, new ServerErrorPath(databind, path), null));
         }
     }
 
@@ -71,7 +74,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
+    void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) throws ServerException {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
             final var emptySubTree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
@@ -90,11 +93,12 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
             // ... finally collect existence checks and abort the transaction if any of them failed.
             if (check.getOrThrow() instanceof Conflict conflict) {
-                throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
-                    conflict.path());
+                throw new ServerException(new ServerError(
+                    ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, new ErrorMessage("Data already exists"),
+                    null, new ServerErrorPath(databind, conflict.path()), null));
             }
         } else {
-            RestconfStrategy.checkItemDoesNotExists(verifyNotNull(rwTx).exists(CONFIGURATION, path), path);
+            RestconfStrategy.checkItemDoesNotExists(verifyNotNull(rwTx).exists(CONFIGURATION, path), databind, path);
             ensureParentsByMerge(path);
             verifyNotNull(rwTx).put(CONFIGURATION, path, data);
         }
@@ -130,7 +134,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     }
 
     @Override
-    NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) {
+    NormalizedNodeContainer<?> readList(final YangInstanceIdentifier path) throws ServerException {
         return (NormalizedNodeContainer<?>) TransactionUtil.syncAccess(read(path), path).orElse(null);
     }
 }

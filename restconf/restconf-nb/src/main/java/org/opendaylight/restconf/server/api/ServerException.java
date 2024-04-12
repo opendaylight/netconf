@@ -14,6 +14,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
+import java.util.List;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.ErrorMessage;
@@ -29,11 +30,22 @@ public final class ServerException extends Exception {
     @java.io.Serial
     private static final long serialVersionUID = 0L;
 
-    private final ServerError error;
+    private final List<ServerError> errors;
 
-    private ServerException(final String message, final ServerError error, final @Nullable Throwable cause) {
+    private ServerException(final String message, final List<ServerError> errors, final @Nullable Throwable cause) {
         super(message, cause);
-        this.error = requireNonNull(error);
+        this.errors = List.copyOf(errors);
+        if (this.errors.isEmpty()) {
+            throw new IllegalArgumentException("errors must not be empty");
+        }
+    }
+
+    public ServerException(final ServerError error) {
+        this(error, null);
+    }
+
+    public ServerException(final ServerError error, final @Nullable Throwable cause) {
+        this(requireNonNull(error.message()).elementBody(), error, cause);
     }
 
     public ServerException(final String message) {
@@ -57,13 +69,14 @@ public final class ServerException extends Exception {
     }
 
     public ServerException(final ErrorType type, final ErrorTag tag, final Throwable cause) {
-        this(cause.toString(), new ServerError(type, tag, new ErrorMessage(cause.getMessage()), null, null, null),
+        this(cause.toString(),
+            List.of(new ServerError(type, tag, new ErrorMessage(cause.getMessage()), null, null, null)),
             cause);
     }
 
     public ServerException(final ErrorType type, final ErrorTag tag, final String message,
             final @Nullable Throwable cause) {
-        this(requireNonNull(message), new ServerError(type, tag, message), cause);
+        this(requireNonNull(message), List.of(new ServerError(type, tag, message)), cause);
     }
 
     public ServerException(final ErrorType type, final ErrorTag tag, final String format,
@@ -72,12 +85,12 @@ public final class ServerException extends Exception {
     }
 
     /**
-     * Return the reported {@link ServerError}.
+     * Return the reported {@link ServerError}s.
      *
-     * @return the reported {@link ServerError}
+     * @return the reported {@link ServerError}s
      */
-    public ServerError error() {
-        return error;
+    public List<ServerError> errors() {
+        return errors;
     }
 
     @java.io.Serial

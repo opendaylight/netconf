@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.restconf.api.query.FieldsParam;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -31,7 +32,11 @@ public class NetconfFieldsParamTest extends AbstractFieldsTranslatorTest<YangIns
     @Override
     protected List<YangInstanceIdentifier> translateFields(final EffectiveModelContext modelContext,
             final DataSchemaContext startNode, final FieldsParam fields) {
-        return NetconfRestconfStrategy.fieldsParamToPaths(modelContext, startNode, fields);
+        try {
+            return NetconfRestconfStrategy.fieldsParamToPaths(modelContext, startNode, fields);
+        } catch (ServerException e) {
+            throw new AssertionError(e);
+        }
     }
 
     @Override

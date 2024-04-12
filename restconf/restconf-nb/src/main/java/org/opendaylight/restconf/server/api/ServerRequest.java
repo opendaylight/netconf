@@ -10,8 +10,13 @@ package org.opendaylight.restconf.server.api;
 import static java.util.Objects.requireNonNull;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
+import org.opendaylight.yangtools.concepts.Mutable;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A request to {@link RestconfServer}. It contains state and binding established by whoever is performing binding to
@@ -24,19 +29,58 @@ import org.opendaylight.restconf.api.query.PrettyPrintParam;
  * to server methods as implementations of those methods are expected to act on them.
  */
 @NonNullByDefault
-public record ServerRequest(QueryParameters queryParameters, PrettyPrintParam prettyPrint) {
+public abstract class ServerRequest<T> implements Mutable {
+    private static final Logger LOG = LoggerFactory.getLogger(ServerRequest.class);
+
     // TODO: this is where a binding to security principal and access control should be:
     //       - we would like to be able to have java.security.Principal#name() for logging purposes
     //       - we need to have a NACM-capable interface, through which we can check permissions (such as data PUT) and
     //         establish output filters (i.e. excluding paths inaccessible path to user from a data GET a ContainerNode)
-    public ServerRequest {
-        requireNonNull(queryParameters);
-        requireNonNull(prettyPrint);
+
+    private final QueryParameters queryParameters;
+    private final PrettyPrintParam prettyPrint;
+
+    protected ServerRequest(final QueryParameters queryParameters,
+            final PrettyPrintParam defaultPrettyPrint) {
+        final var prettyParam = queryParameters.lookup(PrettyPrintParam.uriName, PrettyPrintParam::forUriValue);
+        if (prettyParam == null) {
+            this.queryParameters = queryParameters;
+            prettyPrint = requireNonNull(defaultPrettyPrint);
+        } else {
+            this.queryParameters = queryParameters.withoutParam(PrettyPrintParam.uriName);
+            prettyPrint = prettyParam;
+        }
     }
 
-    public static ServerRequest of(final QueryParameters queryParameters, final PrettyPrintParam defaultPrettyPrint) {
-        final var prettyPrint = queryParameters.lookup(PrettyPrintParam.uriName, PrettyPrintParam::forUriValue);
-        return prettyPrint == null ? new ServerRequest(queryParameters, defaultPrettyPrint)
-            : new ServerRequest(queryParameters.withoutParam(PrettyPrintParam.uriName), prettyPrint);
+    public final QueryParameters queryParameters() {
+        return queryParameters;
     }
+
+    // FIXME: remove this method?
+    public final PrettyPrintParam prettyPrint() {
+        return prettyPrint;
+    }
+
+    /**
+     * Complete this request with a failure.
+     *
+     * @param errorTag the {@link ErrorTag} for HTTP status determination
+     * @param body response body
+     */
+    public abstract void failWith(ErrorTag errorTag, FormattableBody body);
+
+    public final void failWith(final ServerError error) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Request failed", new ServerException(error));
+        }
+        failWith(error.tag(), new YangErrorsBody(error));
+    }
+
+    public final void failWith(final ServerException cause) {
+        LOG.debug("Request failed", cause);
+        final var errors = cause.errors();
+        failWith(errors.get(0).tag(), new YangErrorsBody(errors));
+    }
+
+    public abstract void succeedWith(T result);
 }

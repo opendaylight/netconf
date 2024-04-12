@@ -230,64 +230,54 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         final var editErrors = edit.getEditErrors();
         assertEquals(1, editErrors.size());
         final var editError = editErrors.get(0);
-        assertEquals("Data does not exist", editError.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, editError.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, editError.getErrorTag());
+        assertEquals("Data does not exist", editError.message());
+        assertEquals(ErrorType.PROTOCOL, editError.type());
+        assertEquals(ErrorTag.DATA_MISSING, editError.tag());
     }
 
     @Override
     RestconfStrategy readDataConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
-            .read(LogicalDatastoreType.CONFIGURATION, PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read).read(LogicalDatastoreType.CONFIGURATION, PATH);
         return mockStrategy();
     }
 
     @Override
     RestconfStrategy readAllHavingOnlyConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
-            .read(LogicalDatastoreType.CONFIGURATION, PATH);
-        doReturn(immediateFluentFuture(Optional.empty())).when(read)
-            .read(LogicalDatastoreType.OPERATIONAL, PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read).read(LogicalDatastoreType.CONFIGURATION, PATH);
+        doReturn(immediateFluentFuture(Optional.empty())).when(read).read(LogicalDatastoreType.OPERATIONAL, PATH);
         return mockStrategy();
     }
 
     @Override
     RestconfStrategy readAllHavingOnlyNonConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
-            .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
-        doReturn(immediateFluentFuture(Optional.empty())).when(read)
-            .read(LogicalDatastoreType.CONFIGURATION, PATH_2);
+        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read).read(LogicalDatastoreType.OPERATIONAL, PATH_2);
+        doReturn(immediateFluentFuture(Optional.empty())).when(read).read(LogicalDatastoreType.CONFIGURATION, PATH_2);
         return mockStrategy();
     }
 
     @Override
     RestconfStrategy readDataNonConfigTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read)
-            .read(LogicalDatastoreType.OPERATIONAL, PATH_2);
+        doReturn(immediateFluentFuture(Optional.of(DATA_2))).when(read).read(LogicalDatastoreType.OPERATIONAL, PATH_2);
         return mockStrategy();
     }
 
     @Override
     RestconfStrategy readContainerDataAllTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
-            .read(LogicalDatastoreType.CONFIGURATION, PATH);
-        doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(read)
-            .read(LogicalDatastoreType.OPERATIONAL, PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read).read(LogicalDatastoreType.CONFIGURATION, PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(read).read(LogicalDatastoreType.OPERATIONAL, PATH);
         return mockStrategy();
     }
 
     @Override
     RestconfStrategy readContainerDataConfigNoValueOfContentTestStrategy() {
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read)
-            .read(LogicalDatastoreType.CONFIGURATION, PATH);
-        doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(read)
-            .read(LogicalDatastoreType.OPERATIONAL, PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_3))).when(read).read(LogicalDatastoreType.CONFIGURATION, PATH);
+        doReturn(immediateFluentFuture(Optional.of(DATA_4))).when(read).read(LogicalDatastoreType.OPERATIONAL, PATH);
         return mockStrategy();
     }
 
@@ -349,23 +339,21 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     }
 
     @Test
-    public void readLeafWithDefaultParameters() {
+    public void readLeafWithDefaultParameters() throws Exception {
         final var data = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
             .withChild(ImmutableNodes.leafNode(QName.create(BASE, "exampleLeaf"), "i am leaf"))
             .build();
         final var path = YangInstanceIdentifier.of(CONT_QNAME);
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, path);
-        doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, path);
+        doReturn(immediateFluentFuture(Optional.of(data))).when(read).read(LogicalDatastoreType.CONFIGURATION, path);
+        doReturn(immediateFluentFuture(Optional.of(data))).when(read).read(LogicalDatastoreType.OPERATIONAL, path);
 
         assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
     }
 
     @Test
-    public void readContainerWithDefaultParameters() {
+    public void readContainerWithDefaultParameters() throws Exception {
         final var exampleList = new NodeIdentifier(QName.create(BASE, "exampleList"));
         final var data = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
@@ -386,16 +374,14 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
             .build();
         final var path = YangInstanceIdentifier.of(CONT_QNAME);
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, path);
-        doReturn(immediateFluentFuture(Optional.of(data))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, path);
+        doReturn(immediateFluentFuture(Optional.of(data))).when(read).read(LogicalDatastoreType.CONFIGURATION, path);
+        doReturn(immediateFluentFuture(Optional.of(data))).when(read).read(LogicalDatastoreType.OPERATIONAL, path);
 
         assertEquals(data, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
     }
 
     @Test
-    public void readLeafInListWithDefaultParameters() {
+    public void readLeafInListWithDefaultParameters() throws Exception {
         final var exampleList = new NodeIdentifier(QName.create(BASE, "exampleList"));
         final var content = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new NodeIdentifier(CONT_QNAME))
@@ -409,16 +395,14 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
             .build();
         final var path = YangInstanceIdentifier.of(CONT_QNAME);
         doReturn(read).when(dataBroker).newReadOnlyTransaction();
-        doReturn(immediateFluentFuture(Optional.of(content))).when(read)
-                .read(LogicalDatastoreType.CONFIGURATION, path);
-        doReturn(immediateFluentFuture(Optional.of(content))).when(read)
-                .read(LogicalDatastoreType.OPERATIONAL, path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(read).read(LogicalDatastoreType.CONFIGURATION, path);
+        doReturn(immediateFluentFuture(Optional.of(content))).when(read).read(LogicalDatastoreType.OPERATIONAL, path);
 
         assertEquals(content, modulesStrategy().readData(ContentParam.ALL, path, WithDefaultsParam.TRIM));
     }
 
     @Test
-    public void testGetRestconfStrategyLocal() {
+    public void testGetRestconfStrategyLocal() throws Exception {
         final var strategy = jukeboxStrategy();
         assertEquals(new StrategyAndTail(strategy, ApiPath.empty()), strategy.resolveStrategy(ApiPath.empty()));
     }

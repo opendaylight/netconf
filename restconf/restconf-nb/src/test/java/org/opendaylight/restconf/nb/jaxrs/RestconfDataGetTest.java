@@ -200,10 +200,10 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, JUKEBOX_IID);
 
         final var error = assertError(ar -> restconf.dataGET(JUKEBOX_API_PATH, uriInfo, ar));
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.DATA_MISSING, error.tag());
         assertEquals("Request could not be completed because the relevant data model content does not exist",
-            error.getErrorMessage());
+            error.message());
     }
 
     /**
