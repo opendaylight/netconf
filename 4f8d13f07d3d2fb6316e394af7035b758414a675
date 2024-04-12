@@ -22,6 +22,30 @@
       },
       "revId": "4f8d13f07d3d2fb6316e394af7035b758414a675",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34e27e44_702e68d1",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/spi/AbstractRestconfStreamRegistry.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-04-12T10:51:25Z",
+      "side": 0,
+      "message": "https://github.com/eclipse-ee4j/jersey/blob/74781a97fb818e0400c3e1b025992d31dbe4380b/containers/jersey-servlet-core/src/main/java/org/glassfish/jersey/servlet/ServletContainer.java#L291\nImplementation of jeresey Servlet always append slash in the end of baseURI",
+      "parentUuid": "e20a3b31_9f769c7f",
+      "range": {
+        "startLine": 162,
+        "startChar": 16,
+        "endLine": 162,
+        "endChar": 43
+      },
+      "revId": "4f8d13f07d3d2fb6316e394af7035b758414a675",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
