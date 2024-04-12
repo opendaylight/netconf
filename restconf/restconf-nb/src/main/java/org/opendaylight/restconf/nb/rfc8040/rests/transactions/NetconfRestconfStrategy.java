@@ -102,7 +102,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final Data path, final DataGetParams params) {
+    void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var fields = params.fields();
         final List<YangInstanceIdentifier> fieldPaths;
         if (fields != null) {
