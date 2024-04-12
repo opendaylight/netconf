@@ -35,11 +35,19 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
+// FIXME: this test suite should be refactored as an AbstractDataBrokerTest without mocks:
+//          - AbstractRestconfTest.restconf should be replaced with an instance wired to
+//            AbstractDataBrokerTest.getDomBroker() et al.
+//          - then each test case should initialize the datastores with test data
+//          - then each test case should execute the request
+//        if you are doing this, please structure it so that the infra can be brought down to AbstractRestconfTest and
+//        reused in Netconf822Test and the like
 @ExtendWith(MockitoExtension.class)
 class RestconfDataGetTest extends AbstractRestconfTest {
     private static final NodeIdentifier PLAYLIST_NID = new NodeIdentifier(PLAYLIST_QNAME);
@@ -272,5 +280,37 @@ class RestconfDataGetTest extends AbstractRestconfTest {
                 <gap>0.2</gap>
               </player>
             </jukebox>""", body::formatToXML, true);
+    }
+
+    @Test
+    void readListEntry() {
+        final var parameters = new MultivaluedHashMap<String, String>();
+        parameters.putSingle("content", "nonconfig");
+
+        doReturn(parameters).when(uriInfo).getQueryParameters();
+        doReturn(immediateFluentFuture(Optional.of(ImmutableNodes.newMapEntryBuilder()
+            .withNodeIdentifier(NodeIdentifierWithPredicates.of(ARTIST_QNAME, NAME_QNAME, "IAmN0t"))
+            .withChild(ImmutableNodes.leafNode(NAME_QNAME, "IAmN0t"))
+            .build()))).when(tx).read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.builder()
+                .node(JUKEBOX_QNAME)
+                .node(LIBRARY_QNAME)
+                .node(ARTIST_QNAME)
+                .nodeWithKey(ARTIST_QNAME, NAME_QNAME, "IAmN0t")
+                .build());
+
+        final var body = assertNormalizedBody(200,
+            ar -> restconf.dataGET(apiPath("example-jukebox:jukebox/library/artist=IAmN0t"), uriInfo, ar));
+        assertFormat("""
+            {
+              "example-jukebox:artist": [
+                {
+                  "name": "IAmN0t"
+                }
+              ]
+            }""", body::formatToJSON, true);
+        assertFormat("""
+            <artist xmlns="http://example.com/ns/example-jukebox">
+              <name>IAmN0t</name>
+            </artist>""", body::formatToXML, true);
     }
 }
