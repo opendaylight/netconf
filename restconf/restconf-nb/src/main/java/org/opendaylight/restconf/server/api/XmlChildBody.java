@@ -16,7 +16,6 @@ import java.net.URISyntaxException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -45,16 +44,16 @@ public final class XmlChildBody extends ChildBody {
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final DatabindPath.Data path, final InputStream inputStream) {
+    PrefixAndBody toPayload(final DatabindPath.Data path, final InputStream inputStream) throws ServerException {
         try {
             return parse(path, UntrustedXML.newDocumentBuilder().parse(inputStream));
-        } catch (final RestconfDocumentedException e) {
+        } catch (ServerException e) {
             throw e;
-        } catch (final Exception e) {
+        } catch (Exception e) {
             LOG.debug("Error parsing xml input", e);
-            throwIfYangError(e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
+            throwIfYangError(path.databind(), e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "Error parsing input: " + e.getMessage(), e);
         }
     }
 

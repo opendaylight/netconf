@@ -10,7 +10,6 @@ package org.opendaylight.restconf.server.api;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DatabindPath.OperationPath;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -29,7 +28,7 @@ public final class XmlOperationInputBody extends OperationInputBody {
 
     @Override
     void streamTo(final OperationPath path, final InputStream inputStream, final NormalizedNodeStreamWriter writer)
-            throws IOException {
+            throws IOException, ServerException {
         final var stack = path.inference().toSchemaInferenceStack();
         stack.enterDataTree(path.inputStatement().argument());
 
@@ -38,9 +37,9 @@ public final class XmlOperationInputBody extends OperationInputBody {
                 .parse(UntrustedXML.createXMLStreamReader(inputStream));
         } catch (XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
-            throwIfYangError(e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
+            throwIfYangError(path.databind(), e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "Error parsing input: " + e.getMessage(), e);
         }
     }
 }

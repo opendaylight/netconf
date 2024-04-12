@@ -41,9 +41,9 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.AbstractJukeboxTest;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
+import org.opendaylight.restconf.server.api.ServerError;
 import org.opendaylight.restconf.server.mdsal.MdsalDatabindProvider;
 import org.opendaylight.restconf.server.mdsal.MdsalRestconfServer;
 import org.opendaylight.restconf.server.spi.NormalizedFormattableBody;
@@ -130,7 +130,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return assertResponse(expectedStatus, invocation).getEntity();
     }
 
-    static final RestconfError assertError(final Consumer<AsyncResponse> invocation) {
+    static final ServerError assertError(final Consumer<AsyncResponse> invocation) {
         final var errors = assertErrors(invocation);
         assertEquals(1, errors.size());
         final var error = errors.get(0);
@@ -138,7 +138,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
         return error;
     }
 
-    static final List<RestconfError> assertErrors(final Consumer<AsyncResponse> invocation) {
+    static final List<ServerError> assertErrors(final Consumer<AsyncResponse> invocation) {
         final var ar = mock(AsyncResponse.class);
         doReturn(true).when(ar).resume(any(RestconfDocumentedException.class));
 

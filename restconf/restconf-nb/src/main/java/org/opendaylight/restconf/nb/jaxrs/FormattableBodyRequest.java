@@ -7,28 +7,23 @@
  */
 package org.opendaylight.restconf.nb.jaxrs;
 
-import static java.util.Objects.requireNonNull;
-
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
-import org.eclipse.jdt.annotation.NonNull;
+import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
 
-/**
- * A {@link JaxRsRestconfCallback} producing a {@link FormattableBody}.
- */
-final class FormattableBodyCallback extends JaxRsRestconfCallback<FormattableBody> {
-    private final @NonNull PrettyPrintParam prettyPrint;
-
-    FormattableBodyCallback(final AsyncResponse ar, final PrettyPrintParam prettyPrint) {
-        super(ar);
-        this.prettyPrint = requireNonNull(prettyPrint);
+@NonNullByDefault
+final class FormattableBodyRequest extends JaxRsServerRequest<FormattableBody> {
+    FormattableBodyRequest(final PrettyPrintParam defaultPrettyPrint, final ErrorTagMapping errorTagMapping,
+            final UriInfo uriInfo, final AsyncResponse ar) {
+        super(defaultPrettyPrint, errorTagMapping, uriInfo, ar);
     }
 
     @Override
-    Response transform(final FormattableBody result) throws RestconfDocumentedException {
+    Response createResponse(final PrettyPrintParam prettyPrint, final FormattableBody result) {
         return Response.ok().entity(new JaxRsFormattableBody(result, prettyPrint)).build();
     }
 }

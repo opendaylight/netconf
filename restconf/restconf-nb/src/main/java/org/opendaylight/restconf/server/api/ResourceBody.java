@@ -43,7 +43,8 @@ public abstract sealed class ResourceBody extends RequestBody permits JsonResour
      * @throws RestconfDocumentedException if the body cannot be decoded or it does not match {@code path}
      */
     @SuppressWarnings("checkstyle:illegalCatch")
-    public final @NonNull NormalizedNode toNormalizedNode(final DatabindPath.@NonNull Data path) {
+    public final @NonNull NormalizedNode toNormalizedNode(final DatabindPath.@NonNull Data path)
+            throws ServerException {
         final var instance = path.instance();
         final var expectedName = instance.isEmpty() ? DATA_NID : instance.getLastPathArgument();
         final var holder = new NormalizationResultHolder();
@@ -51,14 +52,12 @@ public abstract sealed class ResourceBody extends RequestBody permits JsonResour
             streamTo(path, expectedName, consume(), streamWriter);
         } catch (IOException e) {
             LOG.debug("Error reading input", e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
-        } catch (RestconfDocumentedException e) {
-            throw e;
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "Error parsing input: " + e.getMessage(), e);
         } catch (RuntimeException e) {
-            throwIfYangError(e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                ErrorTag.MALFORMED_MESSAGE, e);
+            throwIfYangError(path.databind(), e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "Error parsing input: " + e.getMessage(), e);
         }
 
         final var parsedData = holder.getResult().data();
@@ -73,14 +72,14 @@ public abstract sealed class ResourceBody extends RequestBody permits JsonResour
 
         final var dataName = data.name();
         if (!dataName.equals(expectedName)) {
-            throw new RestconfDocumentedException(
-                "Payload name (" + dataName + ") is different from identifier name (" + expectedName + ")",
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "Payload name (%s) is different from identifier name (%s)", dataName, expectedName);
         }
 
         return data;
     }
 
     abstract void streamTo(DatabindPath.@NonNull Data path, @NonNull PathArgument name,
-        @NonNull InputStream inputStream, @NonNull NormalizedNodeStreamWriter writer) throws IOException;
+        @NonNull InputStream inputStream, @NonNull NormalizedNodeStreamWriter writer)
+            throws IOException, ServerException;
 }

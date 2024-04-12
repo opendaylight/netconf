@@ -16,8 +16,8 @@ import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ApiIdentifier;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.api.ApiPath.Step;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.DatabindContext;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -54,7 +54,7 @@ public final class ApiPathCanonizer {
      * @param path {@link YangInstanceIdentifier} to canonicalize
      * @return An {@link ApiPath}
      */
-    public @NonNull ApiPath dataToApiPath(final YangInstanceIdentifier path) {
+    public @NonNull ApiPath dataToApiPath(final YangInstanceIdentifier path) throws ServerException {
         final var it = path.getPathArguments().iterator();
         if (!it.hasNext()) {
             return ApiPath.empty();
@@ -74,9 +74,9 @@ public final class ApiPathCanonizer {
 
             final var childContext = context instanceof Composite composite ? composite.enterChild(stack, arg) : null;
             if (childContext == null) {
-                throw new RestconfDocumentedException(
-                    "Invalid input '%s': schema for argument '%s' (after '%s') not found".formatted(path, arg,
-                        ApiPath.of(builder.build())), ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT);
+                throw new ServerException(ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT,
+                    "Invalid input '%s': schema for argument '%s' (after '%s') not found", path, arg,
+                    ApiPath.of(builder.build()));
             }
 
             context = childContext;
@@ -91,7 +91,7 @@ public final class ApiPathCanonizer {
     }
 
     private @NonNull Step argToStep(final PathArgument arg, final QNameModule prevNamespace,
-            final SchemaInferenceStack stack, final DataSchemaContext context) {
+            final SchemaInferenceStack stack, final DataSchemaContext context) throws ServerException {
         // append namespace before every node which is defined in other module than its parent
         // condition is satisfied also for the first path argument
         final var nodeType = arg.getNodeType();
@@ -107,9 +107,8 @@ public final class ApiPathCanonizer {
         final var schema = context.dataSchemaNode();
         if (arg instanceof NodeWithValue<?> withValue) {
             if (!(schema instanceof LeafListSchemaNode leafList)) {
-                throw new RestconfDocumentedException(
-                    "Argument '%s' does not map to a leaf-list, but %s".formatted(arg, schema),
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+                throw new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                    "Argument '%s' does not map to a leaf-list, but %s", arg, schema);
             }
             return ListInstance.of(module, identifier, valueToString(stack, leafList, withValue.getValue()));
         }
@@ -121,23 +120,20 @@ public final class ApiPathCanonizer {
         // A NodeIdentifierWithPredicates adresses a MapEntryNode and maps to a ListInstance with one or more values:
         // 1) schema has to be a ListSchemaNode
         if (!(schema instanceof ListSchemaNode list)) {
-            throw new RestconfDocumentedException(
-                "Argument '%s' does not map to a list, but %s".formatted(arg, schema),
-                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+            throw new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Argument '%s' does not map to a list, but %s", arg, schema);
         }
         // 2) the key definition must be non-empty
         final var keyDef = list.getKeyDefinition();
         final var size = keyDef.size();
         if (size == 0) {
-            throw new RestconfDocumentedException(
-                "Argument '%s' maps a list without any keys %s".formatted(arg, schema),
-                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+            throw new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Argument '%s' maps a list without any keys %s", arg, schema);
         }
         // 3) the number of predicates has to match the number of keys
         if (size != withPredicates.size()) {
-            throw new RestconfDocumentedException(
-                "Argument '%s' does not match required keys %s".formatted(arg, keyDef),
-                ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+            throw new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                "Argument '%s' does not match required keys %s", arg, keyDef);
         }
 
         // ListSchemaNode implies the context is a composite, verify that instead of an unexplained cast when we look
@@ -150,8 +146,8 @@ public final class ApiPathCanonizer {
         for (var key : keyDef) {
             final var value = withPredicates.getValue(key);
             if (value == null) {
-                throw new RestconfDocumentedException("Argument '%s' is missing predicate for %s".formatted(arg, key),
-                    ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+                throw new ServerException(ErrorType.APPLICATION, ErrorTag.INVALID_VALUE,
+                    "Argument '%s' is missing predicate for %s", arg, key);
             }
 
             final var tmpStack = stack.copy();

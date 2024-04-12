@@ -12,23 +12,22 @@ import static java.util.Objects.requireNonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 
 @NonNullByDefault
-public record FailedHttpGetResource(RestconfDocumentedException cause) implements HttpGetResource {
+public record FailedHttpGetResource(ServerException cause) implements HttpGetResource {
     public FailedHttpGetResource {
         requireNonNull(cause);
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request) {
-        return RestconfFuture.failed(cause);
+    public void httpGET(final ServerRequest<FormattableBody> request) {
+        request.failWith(cause);
     }
 
     @Override
-    public RestconfFuture<FormattableBody> httpGET(final ServerRequest request, final ApiPath apiPath) {
-        throw new UnsupportedOperationException();
+    public void httpGET(final ServerRequest<FormattableBody> request, final ApiPath apiPath) {
+        request.failWith(cause);
     }
 }

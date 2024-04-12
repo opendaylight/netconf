@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
@@ -34,7 +33,7 @@ public final class XmlResourceBody extends ResourceBody {
 
     @Override
     void streamTo(final DatabindPath.Data path, final PathArgument name, final InputStream inputStream,
-            final NormalizedNodeStreamWriter writer) throws IOException {
+            final NormalizedNodeStreamWriter writer) throws IOException, ServerException {
         try (var xmlParser = XmlParserStream.create(writer, path.databind().xmlCodecs(), path.inference())) {
             final var doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
             final var docRoot = doc.getDocumentElement();
@@ -44,16 +43,17 @@ public final class XmlResourceBody extends ResourceBody {
             final var pathName = qname.getLocalName();
             final var pathNs = qname.getNamespace().toString();
             if (!docRootName.equals(pathName) || !docRootNs.equals(pathNs)) {
-                throw new RestconfDocumentedException("Incorrect message root element (" + docRootNs + ")" + docRootName
-                    + ", should be (" + pathNs + ")" + pathName, ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                    "Incorrect message root element (%s)%s, should be (%s)%s", docRootNs, docRootName, pathNs,
+                    pathName);
             }
 
             xmlParser.traverse(new DOMSource(docRoot));
         } catch (SAXException | XMLStreamException e) {
             LOG.debug("Error parsing XML input", e);
-            throwIfYangError(e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE, e);
+            throwIfYangError(path.databind(), e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "Error parsing input: " + e.getMessage(), e);
         }
     }
 }

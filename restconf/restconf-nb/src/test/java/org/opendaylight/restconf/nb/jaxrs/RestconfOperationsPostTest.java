@@ -133,9 +133,9 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                   }
                 }"""), uriInfo, ar));
         assertEquals("No implementation of RPC (invoke:rpc:module?revision=2013-12-03)rpc-test available.",
-            error.getErrorMessage());
-        assertEquals(ErrorType.RPC, error.getErrorType());
-        assertEquals(ErrorTag.OPERATION_FAILED, error.getErrorTag());
+            error.message());
+        assertEquals(ErrorType.RPC, error.type());
+        assertEquals(ErrorTag.OPERATION_FAILED, error.tag());
     }
 
     @Test
@@ -185,9 +185,9 @@ class RestconfOperationsPostTest extends AbstractRestconfTest {
                       "invoke-rpc-module:input" : {
                       }
                     }"""), uriInfo, ar));
-        assertEquals("RPC invocation is not available", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, error.getErrorTag());
+        assertEquals("RPC invocation is not available", error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.OPERATION_NOT_SUPPORTED, error.tag());
     }
 
     @Test

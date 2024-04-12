@@ -37,13 +37,11 @@ import org.opendaylight.restconf.api.query.ContentParam;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.api.query.WithDefaultsParam;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
-import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.api.ServerRequest;
 import org.opendaylight.restconf.server.spi.NormalizedNodeWriterFactory;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -84,33 +82,39 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    void delete(final SettableRestconfFuture<Empty> future, final ServerRequest request,
-            final YangInstanceIdentifier path) {
+    void delete(final ServerRequest<Empty> request, final YangInstanceIdentifier path) {
         final var tx = prepareWriteExecution();
-        tx.delete(path);
+        try {
+            tx.delete(path);
+        } catch (ServerException e) {
+            tx.cancel();
+            request.failWith(e);
+            return;
+        }
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                future.set(Empty.value());
+                request.succeedWith(Empty.value());
             }
 
             @Override
             public void onFailure(final Throwable cause) {
-                future.setFailure(TransactionUtil.decodeException(cause, "DELETE", path, modelContext()));
+                request.failWith(TransactionUtil.decodeException(cause, "DELETE", path, databind()));
             }
         }, MoreExecutors.directExecutor());
     }
 
     @Override
-    RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final Data path, final DataGetParams params) {
+    void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var fields = params.fields();
         final List<YangInstanceIdentifier> fieldPaths;
         if (fields != null) {
             final List<YangInstanceIdentifier> tmp;
             try {
                 tmp = fieldsParamToPaths(path.inference().modelContext(), path.schema(), fields);
-            } catch (RestconfDocumentedException e) {
-                return RestconfFuture.failed(e);
+            } catch (ServerException e) {
+                request.failWith(e);
+                return;
             }
             fieldPaths = tmp.isEmpty() ? null : tmp;
         } else {
@@ -118,12 +122,14 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         }
 
         final NormalizedNode node;
-        if (fieldPaths != null) {
-            node = readData(params.content(), path.instance(), params.withDefaults(), fieldPaths);
-        } else {
-            node = readData(params.content(), path.instance(), params.withDefaults());
+        try {
+            node = fieldPaths == null ? readData(params.content(), path.instance(), params.withDefaults())
+                : readData(params.content(), path.instance(), params.withDefaults(), fieldPaths);
+        } catch (ServerException e) {
+            request.failWith(e);
+            return;
         }
-        return completeDataGET(node, path, NormalizedNodeWriterFactory.of(params.depth()), null);
+        completeDataGET(request, node, path, NormalizedNodeWriterFactory.of(params.depth()), null);
     }
 
     @Override
@@ -156,7 +162,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
     // FIXME: NETCONF-1155: this method should asynchronous
     public @Nullable NormalizedNode readData(final @NonNull ContentParam content,
             final @NonNull YangInstanceIdentifier path, final @Nullable WithDefaultsParam withDefa,
-            final @NonNull List<YangInstanceIdentifier> fields) {
+            final @NonNull List<YangInstanceIdentifier> fields) throws ServerException {
         return switch (content) {
             case ALL -> {
                 // PREPARE STATE DATA NODE
@@ -183,9 +189,11 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      * @param path                  parent path to selected fields
      * @param fields                paths to selected subtrees which should be read, relative to the parent path
      * @return {@link NormalizedNode}
+     * @throws ServerException
      */
     private @Nullable NormalizedNode readDataViaTransaction(final @NonNull LogicalDatastoreType store,
-            final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields) {
+            final @NonNull YangInstanceIdentifier path, final @NonNull List<YangInstanceIdentifier> fields)
+                throws ServerException {
         return TransactionUtil.syncAccess(read(store, path, fields), path).orElse(null);
     }
 
@@ -240,7 +248,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
      */
     @VisibleForTesting
     static @NonNull List<YangInstanceIdentifier> fieldsParamToPaths(final @NonNull EffectiveModelContext modelContext,
-            final @NonNull DataSchemaContext startNode, final @NonNull FieldsParam input) {
+            final @NonNull DataSchemaContext startNode, final @NonNull FieldsParam input) throws ServerException {
         final var parsed = new HashSet<LinkedPathElement>();
         processSelectors(parsed, modelContext, startNode.dataSchemaNode().getQName().getModule(),
             new LinkedPathElement(null, List.of(), startNode), input.nodeSelectors());
@@ -249,7 +257,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     private static void processSelectors(final Set<LinkedPathElement> parsed, final EffectiveModelContext context,
             final QNameModule startNamespace, final LinkedPathElement startPathElement,
-            final List<NodeSelector> selectors) {
+            final List<NodeSelector> selectors) throws ServerException {
         for (var selector : selectors) {
             var pathElement = startPathElement;
             var namespace = startNamespace;
@@ -269,16 +277,16 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
             } while (it.hasNext());
 
             final var subs = selector.subSelectors();
-            if (!subs.isEmpty()) {
-                processSelectors(parsed, context, namespace, pathElement, subs);
-            } else {
+            if (subs.isEmpty()) {
                 parsed.add(pathElement);
+            } else {
+                processSelectors(parsed, context, namespace, pathElement, subs);
             }
         }
     }
 
     private static LinkedPathElement addChildPathElement(final LinkedPathElement currentElement,
-            final QName childQName) {
+            final QName childQName) throws ServerException {
         final var collectedMixinNodes = new ArrayList<PathArgument>();
 
         DataSchemaContext currentNode = currentElement.targetNode;
@@ -304,9 +312,9 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
         }
 
         if (actualContextNode == null) {
-            throw new RestconfDocumentedException("Child " + childQName.getLocalName() + " node missing in "
-                + currentNode.getPathStep().getNodeType().getLocalName(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Child " + childQName.getLocalName() + " node missing in "
+                    + currentNode.getPathStep().getNodeType().getLocalName());
         }
 
         return new LinkedPathElement(currentElement, collectedMixinNodes, actualContextNode);

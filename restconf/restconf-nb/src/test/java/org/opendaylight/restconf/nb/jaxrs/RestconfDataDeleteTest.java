@@ -52,7 +52,7 @@ class RestconfDataDeleteTest extends AbstractRestconfTest {
                 .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(CommitInfo.emptyFluentFuture()).when(tx).commit();
 
-        assertNull(assertEntity(204, ar -> restconf.dataDELETE(JUKEBOX_API_PATH, ar)));
+        assertNull(assertEntity(204, ar -> restconf.dataDELETE(JUKEBOX_API_PATH, uriInfo, ar)));
     }
 
     @Test
@@ -61,9 +61,9 @@ class RestconfDataDeleteTest extends AbstractRestconfTest {
                 .when(tx).exists(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID);
         doReturn(true).when(tx).cancel();
 
-        final var error = assertError(ar -> restconf.dataDELETE(JUKEBOX_API_PATH, ar));
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.DATA_MISSING, error.getErrorTag());
+        final var error = assertError(ar -> restconf.dataDELETE(JUKEBOX_API_PATH, uriInfo, ar));
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.DATA_MISSING, error.tag());
     }
 
     /**

@@ -200,9 +200,9 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
             <restconf-state xmlns="urn:ietf:params:xml:ns:yang:ietf-restconf"/>"""));
         assertEquals("""
             Incorrect message root element (urn:ietf:params:xml:ns:yang:ietf-restconf)restconf-state, should be \
-            (ns)cont""", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+            (ns)cont""", error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.tag());
     }
 
     @Test
@@ -213,8 +213,8 @@ class XmlResourceBodyTest extends AbstractResourceBodyTest {
                 </depth2-list2>"""));
         assertEquals("""
             Error parsing input: List entry (urn:nested:module?revision=2014-06-03)depth2-list2 is missing leaf values \
-            for [depth3-lf2-key]""", error.getErrorMessage());
-        assertEquals(ErrorType.PROTOCOL, error.getErrorType());
-        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.getErrorTag());
+            for [depth3-lf2-key]""", error.message());
+        assertEquals(ErrorType.PROTOCOL, error.type());
+        assertEquals(ErrorTag.MALFORMED_MESSAGE, error.tag());
     }
 }

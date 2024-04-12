@@ -20,7 +20,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.ApiPath.ListInstance;
 import org.opendaylight.restconf.api.ApiPath.Step;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Insert.PointNormalizer;
 import org.opendaylight.restconf.server.api.DatabindAware;
 import org.opendaylight.restconf.server.api.DatabindContext;
@@ -29,6 +28,7 @@ import org.opendaylight.restconf.server.api.DatabindPath.Action;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.DatabindPath.InstanceReference;
 import org.opendaylight.restconf.server.api.DatabindPath.Rpc;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -69,7 +69,7 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
         return databind;
     }
 
-    public @NonNull DatabindPath normalizePath(final ApiPath apiPath) {
+    public @NonNull DatabindPath normalizePath(final ApiPath apiPath) throws ServerException {
         final var it = apiPath.steps().iterator();
         if (!it.hasNext()) {
             return new Data(databind);
@@ -83,9 +83,8 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
         final var firstStep = it.next();
         final var firstModule = firstStep.module();
         if (firstModule == null) {
-            throw new RestconfDocumentedException(
-                "First member must use namespace-qualified form, '" + firstStep.identifier() + "' does not",
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "First member must use namespace-qualified form, '%s' does not", firstStep.identifier());
         }
 
         var namespace = resolveNamespace(firstModule);
@@ -101,12 +100,13 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
 
             // We have found an RPC match,
             if (it.hasNext()) {
-                throw new RestconfDocumentedException("First step in the path resolves to RPC '" + qname + "' and "
-                    + "therefore it must be the only step present", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                    "First step in the path resolves to RPC '%s' and therefore it must be the only step present",
+                    qname);
             }
             if (step instanceof ListInstance) {
-                throw new RestconfDocumentedException("First step in the path resolves to RPC '" + qname + "' and "
-                    + "therefore it must not contain key values", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                    "First step in the path resolves to RPC '%s' and therefore it must not contain key values", qname);
             }
 
             final var stack = SchemaInferenceStack.of(modelContext);
@@ -121,7 +121,7 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
 
     @NonNull DatabindPath normalizeSteps(final SchemaInferenceStack stack, final @NonNull DataSchemaContext rootNode,
             final @NonNull List<PathArgument> pathPrefix, final @NonNull QNameModule firstNamespace,
-            final @NonNull Step firstStep, final Iterator<@NonNull Step> it) {
+            final @NonNull Step firstStep, final Iterator<@NonNull Step> it) throws ServerException {
         var parentNode = rootNode;
         var namespace = firstNamespace;
         var step = firstStep;
@@ -136,13 +136,12 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
                     final var action = optAction.orElseThrow();
 
                     if (it.hasNext()) {
-                        throw new RestconfDocumentedException("Request path resolves to action '" + qname + "' and "
-                            + "therefore it must not continue past it", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                            "Request path resolves to action '%s' and therefore it must not continue past it", qname);
                     }
                     if (step instanceof ListInstance) {
-                        throw new RestconfDocumentedException("Request path resolves to action '" + qname + "' and "
-                            + "therefore it must not contain key values",
-                            ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+                        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                            "Request path resolves to action '%s' and therefore it must not contain key values", qname);
                     }
 
                     final var stmt = stack.enterSchemaTree(qname);
@@ -157,8 +156,8 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
             final var found = parentNode instanceof DataSchemaContext.Composite composite
                 ? composite.enterChild(stack, qname) : null;
             if (found == null) {
-                throw new RestconfDocumentedException("Schema for '" + qname + "' not found",
-                    ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+                throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Schema for '%s' not found",
+                    qname);
             }
 
             // Now add all mixins encountered to the path
@@ -177,20 +176,18 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
                     pathArg = prepareNodeWithPredicates(stack, qname, listSchema, values);
                 } else if (schema instanceof LeafListSchemaNode leafListSchema) {
                     if (values.size() != 1) {
-                        throw new RestconfDocumentedException("Entry '" + qname + "' requires one value predicate.",
-                            ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE);
+                        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE,
+                            "Entry '%s' requires one value predicate.", qname);
                     }
                     pathArg = new NodeWithValue<>(qname, parserJsonValue(stack, leafListSchema, values.get(0)));
                 } else {
-                    throw new RestconfDocumentedException(
-                        "Entry '" + qname + "' does not take a key or value predicate.",
-                        ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE);
+                    throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
+                        "Entry '%s' does not take a key or value predicate.", qname);
                 }
             } else {
                 if (childNode.dataSchemaNode() instanceof ListSchemaNode list && !list.getKeyDefinition().isEmpty()) {
-                    throw new RestconfDocumentedException(
-                        "Entry '" + qname + "' requires key or value predicate to be present.",
-                        ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE);
+                    throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MISSING_ATTRIBUTE,
+                        "Entry '%s' requires key or value predicate to be present.", qname);
                 }
                 pathArg = childNode.getPathStep();
             }
@@ -212,45 +209,45 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
         }
     }
 
-    public @NonNull Data normalizeDataPath(final ApiPath apiPath) {
+    public @NonNull Data normalizeDataPath(final ApiPath apiPath) throws ServerException {
         final var path = normalizePath(apiPath);
         if (path instanceof Data dataPath) {
             return dataPath;
         }
-        throw new RestconfDocumentedException("Point '" + apiPath + "' resolves to non-data " + path,
-            ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+            "Point '%s' resolves to non-data %s", apiPath, path);
     }
 
     @Override
-    public PathArgument normalizePoint(final ApiPath value) {
+    public PathArgument normalizePoint(final ApiPath value) throws ServerException {
         final var path = normalizePath(value);
         if (path instanceof Data dataPath) {
             final var lastArg = dataPath.instance().getLastPathArgument();
             if (lastArg != null) {
                 return lastArg;
             }
-            throw new IllegalArgumentException("Point '" + value + "' resolves to an empty path");
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Point '%s' resolves to an empty path", value);
         }
-        throw new IllegalArgumentException("Point '" + value + "' resolves to non-data " + path);
+        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+            "Point '%s' resolves to non-data %s", value, path);
     }
 
-    public @NonNull Rpc normalizeRpcPath(final ApiPath apiPath) {
+    public @NonNull Rpc normalizeRpcPath(final ApiPath apiPath) throws ServerException {
         final var steps = apiPath.steps();
         return switch (steps.size()) {
-            case 0 -> throw new RestconfDocumentedException("RPC name must be present", ErrorType.PROTOCOL,
-                ErrorTag.DATA_MISSING);
+            case 0 -> throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "RPC name must be present");
             case 1 -> normalizeRpcPath(steps.get(0));
-            default -> throw new RestconfDocumentedException(apiPath + " does not refer to an RPC", ErrorType.PROTOCOL,
-                ErrorTag.DATA_MISSING);
+            default -> throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                "%s does not refer to an RPC", apiPath);
         };
     }
 
-    public @NonNull Rpc normalizeRpcPath(final ApiPath.Step step) {
+    public @NonNull Rpc normalizeRpcPath(final ApiPath.Step step) throws ServerException {
         final var firstModule = step.module();
         if (firstModule == null) {
-            throw new RestconfDocumentedException(
-                "First member must use namespace-qualified form, '" + step.identifier() + "' does not",
-                ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "First member must use namespace-qualified form, '%s' does not", step.identifier());
         }
 
         final var namespace = resolveNamespace(firstModule);
@@ -260,17 +257,16 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
         try {
             stmt = stack.enterSchemaTree(qname);
         } catch (IllegalArgumentException e) {
-            throw new RestconfDocumentedException(qname + " does not refer to an RPC", ErrorType.PROTOCOL,
-                ErrorTag.DATA_MISSING, e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, qname + " does not refer to an RPC",
+                e);
         }
         if (stmt instanceof RpcEffectiveStatement rpc) {
             return new Rpc(databind, stack.toInference(), rpc);
         }
-        throw new RestconfDocumentedException(qname + " does not refer to an RPC", ErrorType.PROTOCOL,
-            ErrorTag.DATA_MISSING);
+        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, qname + " does not refer to an RPC");
     }
 
-    public @NonNull InstanceReference normalizeDataOrActionPath(final ApiPath apiPath) {
+    public @NonNull InstanceReference normalizeDataOrActionPath(final ApiPath apiPath) throws ServerException {
         // FIXME: optimize this
         final var path = normalizePath(apiPath);
         if (path instanceof Data dataPath) {
@@ -279,18 +275,18 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
         if (path instanceof Action actionPath) {
             return actionPath;
         }
-        throw new RestconfDocumentedException("Unexpected path " + path, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "Unexpected path " + path);
     }
 
     private NodeIdentifierWithPredicates prepareNodeWithPredicates(final SchemaInferenceStack stack, final QName qname,
-            final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues) {
+            final @NonNull ListSchemaNode schema, final List<@NonNull String> keyValues) throws ServerException {
         final var keyDef = schema.getKeyDefinition();
         final var keySize = keyDef.size();
         final var varSize = keyValues.size();
         if (keySize != varSize) {
-            throw new RestconfDocumentedException(
-                "Schema for " + qname + " requires " + keySize + " key values, " + varSize + " supplied",
-                ErrorType.PROTOCOL, keySize > varSize ? ErrorTag.MISSING_ATTRIBUTE : ErrorTag.UNKNOWN_ATTRIBUTE);
+            throw new ServerException(ErrorType.PROTOCOL,
+                keySize > varSize ? ErrorTag.MISSING_ATTRIBUTE : ErrorTag.UNKNOWN_ATTRIBUTE,
+                "Schema for %s requires %s key values, %s supplied", qname, keySize, varSize);
         }
 
         final var values = ImmutableMap.<QName, Object>builderWithExpectedSize(keySize);
@@ -307,7 +303,7 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
     }
 
     private Object prepareValueByType(final SchemaInferenceStack stack, final DataSchemaNode schemaNode,
-            final @NonNull String value) {
+            final @NonNull String value) throws ServerException {
         if (schemaNode instanceof TypedDataSchemaNode typedSchema) {
             return parserJsonValue(stack, typedSchema, value);
         }
@@ -315,7 +311,7 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
     }
 
     private Object parserJsonValue(final SchemaInferenceStack stack, final TypedDataSchemaNode schemaNode,
-            final String value) {
+            final String value) throws ServerException {
         // As per https://www.rfc-editor.org/rfc/rfc8040#page-29:
         //            The syntax for
         //            "api-identifier" and "key-value" MUST conform to the JSON identifier
@@ -326,17 +322,17 @@ public final class ApiPathNormalizer implements DatabindAware, PointNormalizer {
         try {
             return databind.jsonCodecs().codecFor(schemaNode, stack).parseValue(null, value);
         } catch (IllegalArgumentException e) {
-            throw new RestconfDocumentedException("Invalid value '" + value + "' for " + schemaNode.getQName(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
+                "Invalid value '" + value + "' for " + schemaNode.getQName(), e);
         }
     }
 
-    private @NonNull QNameModule resolveNamespace(final String moduleName) {
+    private @NonNull QNameModule resolveNamespace(final String moduleName) throws ServerException {
         final var it = databind.modelContext().findModuleStatements(moduleName).iterator();
         if (it.hasNext()) {
             return it.next().localQNameModule();
         }
-        throw new RestconfDocumentedException("Failed to lookup for module with name '" + moduleName + "'.",
-            ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
+        throw new ServerException(ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT,
+            "Failed to lookup for module with name '%s'.", moduleName);
     }
 }

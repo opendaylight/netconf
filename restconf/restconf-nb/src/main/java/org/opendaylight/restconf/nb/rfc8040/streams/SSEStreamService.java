@@ -24,6 +24,7 @@ import javax.ws.rs.sse.SseEventSink;
 import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.restconf.api.QueryParameters;
 import org.opendaylight.restconf.server.api.EventStreamGetParams;
+import org.opendaylight.restconf.server.api.ServerException;
 import org.opendaylight.restconf.server.spi.RestconfStream;
 import org.opendaylight.restconf.server.spi.RestconfStream.EncodingName;
 import org.slf4j.Logger;
@@ -70,7 +71,7 @@ public final class SSEStreamService {
         final EventStreamGetParams getParams;
         try {
             getParams = EventStreamGetParams.of(QueryParameters.ofMultiValue(uriInfo.getQueryParameters()));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ServerException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
 

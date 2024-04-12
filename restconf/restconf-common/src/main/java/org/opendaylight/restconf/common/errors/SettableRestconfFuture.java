@@ -15,6 +15,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <V> resulting value type
  */
+@Deprecated(since = "7.0.5", forRemoval = true)
 public final class SettableRestconfFuture<V> extends RestconfFuture<V> {
     @Override
     public boolean set(final V value) {

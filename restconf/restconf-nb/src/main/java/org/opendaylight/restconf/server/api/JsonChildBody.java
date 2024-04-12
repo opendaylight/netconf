@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -37,24 +36,22 @@ public final class JsonChildBody extends ChildBody {
 
     @Override
     @SuppressWarnings("checkstyle:illegalCatch")
-    PrefixAndBody toPayload(final DatabindPath.Data path, final InputStream inputStream) {
+    PrefixAndBody toPayload(final DatabindPath.Data path, final InputStream inputStream) throws ServerException {
         NormalizedNode result;
         try {
             result = toNormalizedNode(path, inputStream);
-        } catch (RestconfDocumentedException e) {
-            throw e;
         } catch (Exception e) {
             LOG.debug("Error parsing json input", e);
 
             if (e instanceof ResultAlreadySetException) {
-                throw new RestconfDocumentedException(
-                    "Error parsing json input: Failed to create new parse result data. "
-                        + "Are you creating multiple resources/subresources in POST request?", e);
+                throw new ServerException("""
+                    Error parsing json input: Failed to create new parse result data. Are you creating multiple \
+                    resources/subresources in POST request?""", e);
             }
 
-            throwIfYangError(e);
-            throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                ErrorTag.MALFORMED_MESSAGE, e);
+            throwIfYangError(path.databind(), e);
+            throw new ServerException(ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE,
+                "Error parsing input: " + e.getMessage(), e);
         }
 
         final var iiToDataList = ImmutableList.<PathArgument>builder();
