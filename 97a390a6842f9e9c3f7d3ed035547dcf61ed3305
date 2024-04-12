@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9eb0390_979d533c",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProviderTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-12T11:45:03Z",
+      "side": 1,
+      "message": "so this assertTrue(instanceof)/cast pattern should be rewritten as:\n\nfinal var loginPw \u003d assertInstanceOf(LoginPwUnencrypted.class, encryptedPwNode.getCredentials());\n\nnot only here, but anywhere in the converted tests",
+      "range": {
+        "startLine": 84,
+        "startChar": 43,
+        "endLine": 84,
+        "endChar": 75
+      },
+      "revId": "97a390a6842f9e9c3f7d3ed035547dcf61ed3305",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
