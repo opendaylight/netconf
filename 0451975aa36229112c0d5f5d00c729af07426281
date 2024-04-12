@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c36e29e_fda7911a",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9063
+      },
+      "writtenOn": "2024-04-12T16:17:09Z",
+      "side": 1,
+      "message": "1 tab is enough",
+      "range": {
+        "startLine": 95,
+        "startChar": 8,
+        "endLine": 99,
+        "endChar": 26
+      },
+      "revId": "0451975aa36229112c0d5f5d00c729af07426281",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
