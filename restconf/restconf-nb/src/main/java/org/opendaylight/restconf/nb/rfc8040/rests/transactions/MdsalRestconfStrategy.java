@@ -36,7 +36,6 @@ import org.opendaylight.restconf.api.FormattableBody;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.restconf.api.query.FieldsParam.NodeSelector;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
@@ -79,8 +78,8 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @NonNullByDefault
-    public RestconfFuture<FormattableBody> yangLibraryVersionGET(final ServerRequest request) {
-        return yangLibraryVersion.httpGET(request);
+    public void yangLibraryVersionGET(final ServerRequest<FormattableBody> request) {
+        yangLibraryVersion.httpGET(request);
     }
 
     @Override
@@ -129,7 +128,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
     }
 
     @Override
-    RestconfFuture<DataGetResult> dataGET(final ServerRequest request, final Data path, final DataGetParams params) {
+    void dataGET(final ServerRequest<DataGetResult> request, final Data path, final DataGetParams params) {
         final var depth = params.depth();
         final var fields = params.fields();
         final var writerFactory = fields == null ? NormalizedNodeWriterFactory.of(depth)
