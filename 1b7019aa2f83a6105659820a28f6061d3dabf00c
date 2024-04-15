@@ -16,6 +16,24 @@
       "message": "Consider using var instead of explicitly defining the type on multiple occurrences within this class, as well as in version 6.0.x",
       "revId": "1b7019aa2f83a6105659820a28f6061d3dabf00c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "332dddbe_48babf50",
+        "filename": "restconf/restconf-nb/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImplTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-04-15T13:54:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b80790e5_885971c2",
+      "revId": "1b7019aa2f83a6105659820a28f6061d3dabf00c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
