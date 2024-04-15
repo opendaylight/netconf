@@ -1,0 +1,15 @@
+.pagination div {
+  width: 30px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.txt-clr-accent-2 {
+  color: #89bf04;
+}
