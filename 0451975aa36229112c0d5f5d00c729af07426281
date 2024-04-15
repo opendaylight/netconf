@@ -22,6 +22,30 @@
       },
       "revId": "0451975aa36229112c0d5f5d00c729af07426281",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4aa4510_5fd37c82",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-04-15T09:04:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c36e29e_fda7911a",
+      "range": {
+        "startLine": 95,
+        "startChar": 8,
+        "endLine": 99,
+        "endChar": 26
+      },
+      "revId": "0451975aa36229112c0d5f5d00c729af07426281",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
