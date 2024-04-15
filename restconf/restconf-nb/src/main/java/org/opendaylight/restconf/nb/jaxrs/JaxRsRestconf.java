@@ -757,13 +757,14 @@ public final class JaxRsRestconf implements ParamConverterProvider {
 
     private void operationsPOST(final ApiPath identifier, final UriInfo uriInfo, final AsyncResponse ar,
             final OperationInputBody body) {
-        server.operationsPOST(requestOf(uriInfo), uriInfo.getBaseUri(), identifier, body)
+        final var request = requestOf(uriInfo);
+        server.operationsPOST(request, uriInfo.getBaseUri(), identifier, body)
             .addCallback(new JaxRsRestconfCallback<>(ar) {
                 @Override
                 Response transform(final InvokeResult result) {
                     final var body = result.output();
                     return body == null ? Response.noContent().build()
-                        : Response.ok().entity(body).build();
+                        : Response.ok().entity(new JaxRsFormattableBody(body, request.prettyPrint())).build();
                 }
             });
     }

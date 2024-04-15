@@ -119,7 +119,7 @@ abstract class AbstractRestconfTest extends AbstractJukeboxTest {
 
     static final OperationOutputBody assertOperationOutputBody(final int status,
             final Consumer<AsyncResponse> invocation) {
-        return assertEntity(OperationOutputBody.class, status, invocation);
+        return assertInstanceOf(OperationOutputBody.class, assertFormattableBody(status, invocation));
     }
 
     static final <T> T assertEntity(final Class<T> expectedType, final int expectedStatus,
