@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 // FIXME: integrate this service into JaxRsRestconf once we remove support for WebSockets
-final class SSEStreamService {
+public final class SSEStreamService {
     private static final Logger LOG = LoggerFactory.getLogger(SSEStreamService.class);
 
     private final RestconfStream.Registry streamRegistry;
