@@ -22,6 +22,30 @@
       },
       "revId": "97a390a6842f9e9c3f7d3ed035547dcf61ed3305",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03ab33c2_a22c6da7",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfTopologyRPCProviderTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-15T12:45:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9eb0390_979d533c",
+      "range": {
+        "startLine": 84,
+        "startChar": 43,
+        "endLine": 84,
+        "endChar": 75
+      },
+      "revId": "97a390a6842f9e9c3f7d3ed035547dcf61ed3305",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
