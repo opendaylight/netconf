@@ -7,12 +7,10 @@
  */
 package org.opendaylight.restconf.server.api;
 
-import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.opendaylight.restconf.api.FormattableBody;
@@ -24,11 +22,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.restconf.re
 /**
  * A {@link FormattableBody} of <a href="https://www.rfc-editor.org/rfc/rfc8040#section-3.9">yang-errors</a> data
  * template.
- *
- * @param errors reported errors, guaranteed to have at least one element
  */
 @NonNullByDefault
-public record YangErrorsBody(List<ServerError> errors) {
+public final class YangErrorsBody extends FormattableBody {
     private static final String XML_NAMESPACE = Errors.QNAME.getNamespace().toString();
     private static final String ERRORS = Errors.QNAME.getLocalName();
     private static final String ERROR = Error.QNAME.getLocalName();
@@ -39,13 +35,7 @@ public record YangErrorsBody(List<ServerError> errors) {
     private static final String ERROR_INFO = "error-info";
     private static final String ERROR_PATH = "error-path";
 
-    // FIXME: do not use repairing output factory
-    private static final XMLOutputFactory XML_OUTPUT_FACTORY;
-
-    static {
-        XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
-        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
-    }
+    private final List<ServerError> errors;
 
     public YangErrorsBody(final List<ServerError> errors) {
         if (errors.isEmpty()) {
@@ -58,7 +48,17 @@ public record YangErrorsBody(List<ServerError> errors) {
         this(List.of(error));
     }
 
-    public void formatToJSON(final OutputStream out) throws IOException {
+    /**
+     * Returns reported errors, guaranteed to have at least one element.
+     *
+     * @return reported errors, guaranteed to have at least one element
+     */
+    public List<ServerError> errors() {
+        return errors;
+    }
+
+    @Override
+    public void formatToJSON(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
         try (var writer = FormattableBodySupport.createJsonWriter(out, PrettyPrintParam.TRUE)) {
             writer.beginObject()
                 .name(ERRORS).beginObject()
@@ -92,62 +92,65 @@ public record YangErrorsBody(List<ServerError> errors) {
         }
     }
 
-    public void formatToXML(final OutputStream out) throws IOException, XMLStreamException {
-        final var writer = FormattableBodySupport.indentXmlWriter(
-            XML_OUTPUT_FACTORY.createXMLStreamWriter(out, StandardCharsets.UTF_8.name()),
-            PrettyPrintParam.TRUE);
+    @Override
+    public void formatToXML(final PrettyPrintParam prettyPrint, final OutputStream out) throws IOException {
+        try {
+            final var writer = FormattableBodySupport.createXmlWriter(out, prettyPrint);
 
-        writer.writeStartDocument();
-        writer.writeStartElement(ERRORS);
-        writer.writeDefaultNamespace(XML_NAMESPACE);
-        for (final var error : errors) {
-            writer.writeStartElement(ERROR);
-            // Write error-type element
-            writer.writeStartElement(ERROR_TYPE);
-            writer.writeCharacters(error.type().elementBody());
+            writer.writeStartDocument();
+            writer.writeStartElement(ERRORS);
+            writer.writeDefaultNamespace(XML_NAMESPACE);
+            for (final var error : errors) {
+                writer.writeStartElement(ERROR);
+                // Write error-type element
+                writer.writeStartElement(ERROR_TYPE);
+                writer.writeCharacters(error.type().elementBody());
+                writer.writeEndElement();
+
+                final var path = error.path();
+                if (path != null) {
+                    writer.writeStartElement(ERROR_PATH);
+                    path.databind().xmlCodecs().instanceIdentifierCodec().writeValue(writer, path.path());
+                    writer.writeEndElement();
+                }
+                final var message = error.message();
+                if (message != null) {
+                    writer.writeStartElement(ERROR_MESSAGE);
+                    // FIXME: propagate xml:lang
+                    writer.writeCharacters(message.elementBody());
+                    writer.writeEndElement();
+                }
+
+                // Write error-tag element
+                writer.writeStartElement(ERROR_TAG);
+                writer.writeCharacters(error.tag().elementBody());
+                writer.writeEndElement();
+
+                final var appTag = error.appTag();
+                if (appTag != null) {
+                    writer.writeStartElement(ERROR_APP_TAG);
+                    writer.writeCharacters(appTag);
+                    writer.writeEndElement();
+                }
+                final var info = error.info();
+                if (info != null) {
+                    // FIXME: defer to FormattableBody?
+                    writer.writeStartElement(ERROR_INFO);
+                    writer.writeCharacters(info.elementBody());
+                    writer.writeEndElement();
+                }
+                writer.writeEndElement();
+            }
             writer.writeEndElement();
-
-            final var path = error.path();
-            if (path != null) {
-                writer.writeStartElement(ERROR_PATH);
-                path.databind().xmlCodecs().instanceIdentifierCodec().writeValue(writer, path.path());
-                writer.writeEndElement();
-            }
-            final var message = error.message();
-            if (message != null) {
-                writer.writeStartElement(ERROR_MESSAGE);
-                // FIXME: propagate xml:lang
-                writer.writeCharacters(message.elementBody());
-                writer.writeEndElement();
-            }
-
-            // Write error-tag element
-            writer.writeStartElement(ERROR_TAG);
-            writer.writeCharacters(error.tag().elementBody());
-            writer.writeEndElement();
-
-            final var appTag = error.appTag();
-            if (appTag != null) {
-                writer.writeStartElement(ERROR_APP_TAG);
-                writer.writeCharacters(appTag);
-                writer.writeEndElement();
-            }
-            final var info = error.info();
-            if (info != null) {
-                // FIXME: defer to FormattableBody?
-                writer.writeStartElement(ERROR_INFO);
-                writer.writeCharacters(info.elementBody());
-                writer.writeEndElement();
-            }
-            writer.writeEndElement();
+            writer.writeEndDocument();
+            writer.close();
+        } catch (XMLStreamException e) {
+            throw new IOException(e);
         }
-        writer.writeEndElement();
-        writer.writeEndDocument();
-        writer.close();
     }
 
     @Override
-    public final String toString() {
-        return MoreObjects.toStringHelper(this).add("errors", errors).toString();
+    protected ToStringHelper addToStringAttributes(final ToStringHelper helper) {
+        return helper.add("errors", errors);
     }
 }
