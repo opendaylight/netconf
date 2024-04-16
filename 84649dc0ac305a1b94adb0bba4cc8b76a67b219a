@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c736c53_86fa850e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-04-16T09:01:02Z",
+      "side": 1,
+      "message": "There will be two parameters:\nwidth \u003d the number of child\ndepth \u003d the number of nesting\n\n\ncont1 {\n  cont2 {\n   c2ch1;\n   c2ch2; \n  }\n  ch1;\n  ch2;\n  ch3;\n}\n\ndepth\u003d 2 means\ncont1 {\n  cont2 {\n   c2ch1;\n   c2ch2; \n  }\n  ch1;\n  ch2;\n  ch3;\n}\n\ndepth\u003d 2; width \u003d 1\ncont1 {\n  cont2 {\n   c2ch1; \n  }\n  ch1;\n}",
+      "revId": "84649dc0ac305a1b94adb0bba4cc8b76a67b219a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
