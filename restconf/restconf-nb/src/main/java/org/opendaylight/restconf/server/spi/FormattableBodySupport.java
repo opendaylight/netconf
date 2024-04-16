@@ -42,8 +42,7 @@ public final class FormattableBodySupport {
 
     public static XMLStreamWriter createXmlWriter(final OutputStream out, final PrettyPrintParam prettyPrint)
             throws IOException {
-        final var xmlWriter = createXmlWriter(out);
-        return prettyPrint.value() ? new IndentingXMLStreamWriter(xmlWriter) : xmlWriter;
+        return indentXmlWriter(createXmlWriter(out), prettyPrint);
     }
 
     private static XMLStreamWriter createXmlWriter(final OutputStream out) throws IOException {
@@ -52,5 +51,9 @@ public final class FormattableBodySupport {
         } catch (XMLStreamException | FactoryConfigurationError e) {
             throw new IOException(e);
         }
+    }
+
+    public static XMLStreamWriter indentXmlWriter(final XMLStreamWriter writer, final PrettyPrintParam prettyPrint) {
+        return prettyPrint.value() ? new IndentingXMLStreamWriter(writer) : writer;
     }
 }

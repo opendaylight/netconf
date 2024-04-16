@@ -20,8 +20,8 @@ import com.google.common.annotations.Beta;
 // FIXME: given that the normalized-node-based FormattableBody lives in server.spi, this should probably be an interface
 //        implemented in at server.spi level.
 @Beta
-public record ServerErrorInfo(String value) {
+public record ServerErrorInfo(String elementBody) {
     public ServerErrorInfo {
-        requireNonNull(value);
+        requireNonNull(elementBody);
     }
 }
