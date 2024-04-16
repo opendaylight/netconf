@@ -24,8 +24,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import javax.xml.stream.XMLStreamException;
 import org.opendaylight.restconf.api.ErrorMessage;
+import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsMediaTypes;
 import org.opendaylight.restconf.nb.rfc8040.ErrorTagMapping;
@@ -123,11 +123,11 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         final var baos = new ByteArrayOutputStream();
         try {
             if (JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON.equals(responseMediaType)) {
-                body.formatToJSON(baos);
+                body.formatToJSON(PrettyPrintParam.TRUE, baos);
             } else {
-                body.formatToXML(baos);
+                body.formatToXML(PrettyPrintParam.TRUE, baos);
             }
-        } catch (IOException | XMLStreamException e) {
+        } catch (IOException e) {
             throw new IllegalStateException("Error while serializing yang-errors body", e);
         }
 
