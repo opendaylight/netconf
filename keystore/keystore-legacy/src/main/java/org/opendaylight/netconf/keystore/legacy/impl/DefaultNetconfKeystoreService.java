@@ -163,7 +163,7 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
 
             final byte[] keyBytes;
             try {
-                keyBytes = base64Decode(new String(key.requireData(), StandardCharsets.UTF_8));
+                keyBytes = base64Decode(removeKeyHeaders(new String(key.requireData(), StandardCharsets.UTF_8)));
             } catch (IllegalArgumentException e) {
                 LOG.debug("Failed to decode private key {}", keyName, e);
                 failure = updateFailure(failure, e);
@@ -296,5 +296,12 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             return failure;
         }
         return ex;
+    }
+
+    private String removeKeyHeaders(final String pemPrivateKey) {
+        return pemPrivateKey
+            .replace("-----BEGIN RSA PRIVATE KEY-----", "")
+            .replace(System.lineSeparator(), "")
+            .replace("-----END RSA PRIVATE KEY-----", "");
     }
 }
