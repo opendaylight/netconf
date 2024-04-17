@@ -1,0 +1,3757 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "123 modules of RESTCONF",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That's because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/operations/nodes/node=123/yang-ext:mount/duplication-test:test-rpc": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - duplication-test - test-rpc",
+        "requestBody": {
+          "description": "test-rpc_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc success"
+          }
+        },
+        "tags": [
+          "123 duplication-test"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/duplication-test:test-rpc2": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - duplication-test - test-rpc2",
+        "requestBody": {
+          "description": "test-rpc2_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc2_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc2_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc2 success"
+          }
+        },
+        "tags": [
+          "123 duplication-test"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/duplication-test:test-rpc3": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - duplication-test - test-rpc3",
+        "requestBody": {
+          "description": "test-rpc3_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc3_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc3_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc3 success"
+          }
+        },
+        "tags": [
+          "123 duplication-test"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - mandatory-test - root-container",
+        "requestBody": {
+          "description": "optional-presence-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "optional-presence-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "put": {
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - root-container",
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - root-container",
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - root-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - root-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-container": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/optional-presence-container": {
+      "put": {
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - optional-presence-container",
+        "requestBody": {
+          "description": "optional-presence-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:optional-presence-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - optional-presence-container",
+        "requestBody": {
+          "description": "optional-presence-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:optional-presence-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - optional-presence-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - optional-presence-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "optional-presence-container": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/mandatory-container": {
+      "put": {
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - mandatory-container",
+        "requestBody": {
+          "description": "mandatory-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:mandatory-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - mandatory-container",
+        "requestBody": {
+          "description": "mandatory-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:mandatory-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - mandatory-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - mandatory-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "mandatory-container": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/optional-list={id}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - optional-list",
+        "requestBody": {
+          "description": "optional-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:optional-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_optional-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_optional-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - optional-list",
+        "requestBody": {
+          "description": "optional-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:optional-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_optional-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_optional-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - optional-list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - optional-list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container_optional-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "optional-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/mandatory-test_root-container_optional-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container/mandatory-list={id}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - mandatory-list",
+        "requestBody": {
+          "description": "mandatory-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - mandatory-list",
+        "requestBody": {
+          "description": "mandatory-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - mandatory-list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - mandatory-list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "mandatory-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-optional-list={id}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - root-optional-list",
+        "requestBody": {
+          "description": "root-optional-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-optional-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-optional-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-optional-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - root-optional-list",
+        "requestBody": {
+          "description": "root-optional-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-optional-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-optional-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-optional-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - root-optional-list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - root-optional-list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-optional-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-optional-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/mandatory-test_root-optional-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-mandatory-list={id}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - root-mandatory-list",
+        "requestBody": {
+          "description": "root-mandatory-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - root-mandatory-list",
+        "requestBody": {
+          "description": "root-mandatory-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/mandatory-test_root-mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - root-mandatory-list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - root-mandatory-list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-mandatory-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-mandatory-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/mandatory-test_root-mandatory-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/my-yang:data": {
+      "put": {
+        "description": "",
+        "summary": "PUT - my-yang - 123 - data",
+        "requestBody": {
+          "description": "data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "my-yang:data": {
+                    "$ref": "#/components/schemas/my-yang_data",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/my-yang_data"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 my-yang"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - my-yang - 123 - data",
+        "requestBody": {
+          "description": "data",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "my-yang:data": {
+                    "$ref": "#/components/schemas/my-yang_data",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/my-yang_data"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 my-yang"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - my-yang - data",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 my-yang"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - my-yang - data",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/my-yang_data"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/my-yang_data",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 my-yang"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - path-params-test - cont",
+        "requestBody": {
+          "description": "list1",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "list1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": []
+      },
+      "put": {
+        "description": "",
+        "summary": "PUT - path-params-test - 123 - cont",
+        "requestBody": {
+          "description": "cont",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:cont": {
+                    "$ref": "#/components/schemas/path-params-test_cont",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - path-params-test - 123 - cont",
+        "requestBody": {
+          "description": "cont",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:cont": {
+                    "$ref": "#/components/schemas/path-params-test_cont",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - path-params-test - cont",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - path-params-test - cont",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "cont": {
+                      "$ref": "#/components/schemas/path-params-test_cont",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - path-params-test - 123 - list1",
+        "requestBody": {
+          "description": "list1",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - path-params-test - 123 - list1",
+        "requestBody": {
+          "description": "list1",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - path-params-test - list1",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - path-params-test - list1",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list1"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list1": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/path-params-test_cont_list1",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list2={name1}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - path-params-test - 123 - list2",
+        "requestBody": {
+          "description": "list2",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list2": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1_list2",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_list2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - path-params-test - 123 - list2",
+        "requestBody": {
+          "description": "list2",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list2": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1_list2",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_list2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - path-params-test - list2",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - path-params-test - list2",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list1_list2"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list2": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/path-params-test_cont_list1_list2",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/cont2": {
+      "put": {
+        "description": "",
+        "summary": "PUT - path-params-test - 123 - cont2",
+        "requestBody": {
+          "description": "cont2",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:cont2": {
+                    "$ref": "#/components/schemas/path-params-test_cont_list1_cont2",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_cont2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - path-params-test - 123 - cont2",
+        "requestBody": {
+          "description": "cont2",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:cont2": {
+                    "$ref": "#/components/schemas/path-params-test_cont_list1_cont2",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_cont2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - path-params-test - cont2",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - path-params-test - cont2",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list1_cont2"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "cont2": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1_cont2",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}/list4={name1}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - path-params-test - 123 - list4",
+        "requestBody": {
+          "description": "list4",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list4": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1_list4",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_list4"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - path-params-test - 123 - list4",
+        "requestBody": {
+          "description": "list4",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list4": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1_list4",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1_list4"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - path-params-test - list4",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - path-params-test - list4",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list1_list4"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list4": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/path-params-test_cont_list1_list4",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list3={name}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - path-params-test - 123 - list3",
+        "requestBody": {
+          "description": "list3",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list3": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list3",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list3"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - path-params-test - 123 - list3",
+        "requestBody": {
+          "description": "list3",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list3": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list3",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list3"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - path-params-test - list3",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - path-params-test - list3",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list3"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list3": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/path-params-test_cont_list3",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - recursive - container-root",
+        "requestBody": {
+          "description": "root-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "root-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/recursive_container-root_root-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root_root-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": []
+      },
+      "put": {
+        "description": "",
+        "summary": "PUT - recursive - 123 - container-root",
+        "requestBody": {
+          "description": "container-root",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "recursive:container-root": {
+                    "$ref": "#/components/schemas/recursive_container-root",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - recursive - 123 - container-root",
+        "requestBody": {
+          "description": "container-root",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "recursive:container-root": {
+                    "$ref": "#/components/schemas/recursive_container-root",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - recursive - container-root",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - recursive - container-root",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/recursive_container-root"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "container-root": {
+                      "$ref": "#/components/schemas/recursive_container-root",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - recursive - 123 - root-list",
+        "requestBody": {
+          "description": "root-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "recursive:root-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/recursive_container-root_root-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root_root-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - recursive - 123 - root-list",
+        "requestBody": {
+          "description": "root-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "recursive:root-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/recursive_container-root_root-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root_root-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - recursive - root-list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - recursive - root-list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/recursive_container-root_root-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/recursive_container-root_root-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}/nested-list={name1}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - recursive - 123 - nested-list",
+        "requestBody": {
+          "description": "nested-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "recursive:nested-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - recursive - 123 - nested-list",
+        "requestBody": {
+          "description": "nested-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "recursive:nested-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - recursive - nested-list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - recursive - nested-list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "nested-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}/nested-list={name1}/super-nested-list={name2}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - recursive - 123 - super-nested-list",
+        "requestBody": {
+          "description": "super-nested-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "recursive:super-nested-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list_super-nested-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list_super-nested-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name2",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - recursive - 123 - super-nested-list",
+        "requestBody": {
+          "description": "super-nested-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "recursive:super-nested-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list_super-nested-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list_super-nested-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name2",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - recursive - super-nested-list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name2",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - recursive - super-nested-list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list_super-nested-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "super-nested-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list_super-nested-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name1",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name2",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "duplication-test_test-rpc_input": {
+        "title": "duplication-test_test-rpc_input",
+        "type": "object",
+        "properties": {
+          "input-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf"
+          },
+          "first": {
+            "$ref": "#/components/schemas/duplication-test_first"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_first": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      },
+      "duplication-test_test-rpc2_input": {
+        "title": "duplication-test_test-rpc2_input",
+        "type": "object",
+        "properties": {
+          "input-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf"
+          },
+          "first": {
+            "$ref": "#/components/schemas/duplication-test_first"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_test-rpc3_input": {
+        "title": "duplication-test_test-rpc3_input",
+        "type": "object",
+        "properties": {
+          "input-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf"
+          },
+          "first": {
+            "$ref": "#/components/schemas/duplication-test_first1"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_first1": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {
+          "input-leaf1": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf1"
+          }
+        },
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      },
+      "mandatory-test_root-container": {
+        "title": "mandatory-test_root-container",
+        "type": "object",
+        "properties": {
+          "optional-list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/mandatory-test_root-container_optional-list"
+            },
+            "description": ""
+          },
+          "mandatory-container": {
+            "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-container"
+          },
+          "mandatory-list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/mandatory-test_root-container_mandatory-list"
+            },
+            "description": "",
+            "example": [
+              {
+                "id": 0,
+                "mandatory-list-field": "Some mandatory-list-field"
+              },
+              {
+                "id": 1,
+                "mandatory-list-field": "Some mandatory-list-field"
+              }
+            ],
+            "minItems": 2
+          },
+          "optional-first-choice": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-first-choice"
+          },
+          "mandatory-first-choice": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-first-choice"
+          },
+          "mandatory-root-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-root-leaf"
+          },
+          "optional-presence-container": {
+            "$ref": "#/components/schemas/mandatory-test_root-container_optional-presence-container"
+          },
+          "optional-root-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-root-leaf"
+          }
+        },
+        "required": [
+          "mandatory-container",
+          "mandatory-list",
+          "mandatory-first-choice",
+          "mandatory-root-leaf"
+        ],
+        "xml": {
+          "name": "root-container",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "mandatory-test_root-container_optional-presence-container": {
+        "title": "mandatory-test_root-container_optional-presence-container",
+        "type": "object",
+        "properties": {
+          "presence-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some presence-leaf"
+          }
+        },
+        "xml": {
+          "name": "optional-presence-container",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "mandatory-test_root-container_mandatory-container": {
+        "title": "mandatory-test_root-container_mandatory-container",
+        "type": "object",
+        "properties": {
+          "leaf-list-with-min-elements": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "string",
+              "example": "Some leaf-list-with-min-elements"
+            },
+            "description": "",
+            "example": [
+              "Some leaf-list-with-min-elements",
+              "Some leaf-list-with-min-elements"
+            ]
+          },
+          "mandatory-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-leaf"
+          }
+        },
+        "required": [
+          "leaf-list-with-min-elements",
+          "mandatory-leaf"
+        ],
+        "xml": {
+          "name": "mandatory-container",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "mandatory-test_root-container_optional-list": {
+        "title": "mandatory-test_root-container_optional-list",
+        "type": "object",
+        "properties": {
+          "optional-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-list-field"
+          },
+          "id": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          }
+        },
+        "xml": {
+          "name": "optional-list",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "mandatory-test_root-container_mandatory-list": {
+        "title": "mandatory-test_root-container_mandatory-list",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          },
+          "mandatory-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some mandatory-list-field"
+          }
+        },
+        "required": [
+          "mandatory-list-field"
+        ],
+        "xml": {
+          "name": "mandatory-list",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "mandatory-test_root-optional-list": {
+        "title": "mandatory-test_root-optional-list",
+        "type": "object",
+        "properties": {
+          "root-optional-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some root-optional-list-field"
+          },
+          "id": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          }
+        },
+        "xml": {
+          "name": "root-optional-list",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "mandatory-test_root-mandatory-list": {
+        "title": "mandatory-test_root-mandatory-list",
+        "type": "object",
+        "properties": {
+          "root-mandatory-list-field": {
+            "description": "",
+            "type": "string",
+            "example": "Some root-mandatory-list-field"
+          },
+          "id": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          }
+        },
+        "xml": {
+          "name": "root-mandatory-list",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "my-yang_data": {
+        "title": "my-yang_data",
+        "type": "object",
+        "properties": {
+          "my-data": {
+            "description": "",
+            "type": "string",
+            "example": "Some my-data"
+          }
+        },
+        "xml": {
+          "name": "data",
+          "namespace": "urn:opendaylight:params:xml:ns:yang:my-yang"
+        }
+      },
+      "path-params-test_cont": {
+        "title": "path-params-test_cont",
+        "type": "object",
+        "properties": {
+          "list1": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/path-params-test_cont_list1"
+            },
+            "description": ""
+          },
+          "list3": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/path-params-test_cont_list3"
+            },
+            "description": ""
+          }
+        },
+        "xml": {
+          "name": "cont",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "path-params-test_cont_list1": {
+        "title": "path-params-test_cont_list1",
+        "type": "object",
+        "properties": {
+          "list4": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/path-params-test_cont_list1_list4"
+            },
+            "description": ""
+          },
+          "list2": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/path-params-test_cont_list1_list2"
+            },
+            "description": ""
+          },
+          "cont2": {
+            "$ref": "#/components/schemas/path-params-test_cont_list1_cont2"
+          },
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list1",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "path-params-test_cont_list1_list2": {
+        "title": "path-params-test_cont_list1_list2",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list2",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "path-params-test_cont_list1_cont2": {
+        "title": "path-params-test_cont_list1_cont2",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "cont2",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "path-params-test_cont_list1_list4": {
+        "title": "path-params-test_cont_list1_list4",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list4",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "path-params-test_cont_list3": {
+        "title": "path-params-test_cont_list3",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list3",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "recursive_container-root": {
+        "title": "recursive_container-root",
+        "type": "object",
+        "properties": {
+          "root-list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/recursive_container-root_root-list"
+            },
+            "description": ""
+          }
+        },
+        "xml": {
+          "name": "container-root",
+          "namespace": "urn:opendaylight:test:recursive"
+        }
+      },
+      "recursive_container-root_root-list": {
+        "title": "recursive_container-root_root-list",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          },
+          "nested-list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list"
+            },
+            "description": ""
+          }
+        },
+        "xml": {
+          "name": "root-list",
+          "namespace": "urn:opendaylight:test:recursive"
+        }
+      },
+      "recursive_container-root_root-list_nested-list": {
+        "title": "recursive_container-root_root-list_nested-list",
+        "type": "object",
+        "properties": {
+          "super-nested-list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/recursive_container-root_root-list_nested-list_super-nested-list"
+            },
+            "description": ""
+          },
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "nested-list",
+          "namespace": "urn:opendaylight:test:recursive"
+        }
+      },
+      "recursive_container-root_root-list_nested-list_super-nested-list": {
+        "title": "recursive_container-root_root-list_nested-list_super-nested-list",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "super-nested-list",
+          "namespace": "urn:opendaylight:test:recursive"
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
