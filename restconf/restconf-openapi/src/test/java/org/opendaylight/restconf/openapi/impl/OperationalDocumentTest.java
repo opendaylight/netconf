@@ -36,7 +36,7 @@ public class OperationalDocumentTest extends AbstractDocumentTest {
     @Test
     public void getAllModulesDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/controller-all.json");
-        final var allModulesDoc = getAllModulesDoc();
+        final var allModulesDoc = getAllModulesDoc(0, 0);
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
@@ -66,7 +66,7 @@ public class OperationalDocumentTest extends AbstractDocumentTest {
     @Test
     public void getMountDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/device-all.json");
-        final var allModulesDoc = getMountDoc();
+        final var allModulesDoc = getMountDoc(0, 0);
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
