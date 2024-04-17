@@ -96,7 +96,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     @Override
     void deleteImpl(final YangInstanceIdentifier path) {
-        if (isListPath(path, modelContext)) {
+        if (isListPath(path, databind.modelContext())) {
             final var items = getListItemsForRemove(path);
             if (items.isEmpty()) {
                 LOG.debug("Path {} contains no items, delete operation omitted.", path);
@@ -111,7 +111,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
 
     @Override
     void removeImpl(final YangInstanceIdentifier path) {
-        if (isListPath(path, modelContext)) {
+        if (isListPath(path, databind.modelContext())) {
             final var items = getListItemsForRemove(path);
             if (items.isEmpty()) {
                 LOG.debug("Path {} contains no items, remove operation omitted.", path);
@@ -139,7 +139,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
             return cached;
         }
         // check if keys only can be filtered out to minimize amount of data retrieved
-        final var keyFields = keyFieldsFrom(path, modelContext);
+        final var keyFields = keyFieldsFrom(path, databind.modelContext());
         final var future =  keyFields.isEmpty() ? netconfService.getConfig(path)
             // using list wildcard as a root path, it's required for proper key field path construction
             // on building get-config filter
@@ -157,7 +157,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     @Override
     void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(modelContext, path);
+            final var emptySubTree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
 
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {
@@ -172,7 +172,7 @@ final class NetconfRestconfTransaction extends RestconfTransaction {
     @Override
     void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(modelContext, path);
+            final var emptySubTree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
 
             for (var child : ((NormalizedNodeContainer<?>) data).body()) {

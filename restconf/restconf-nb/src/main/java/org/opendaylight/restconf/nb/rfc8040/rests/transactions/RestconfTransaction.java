@@ -17,11 +17,11 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.odlparent.logging.markers.Markers;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +33,10 @@ import org.slf4j.LoggerFactory;
 abstract class RestconfTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfTransaction.class);
 
-    final @NonNull EffectiveModelContext modelContext;
+    final @NonNull DatabindContext databind;
 
-    RestconfTransaction(final EffectiveModelContext modelContext) {
-        this.modelContext = requireNonNull(modelContext);
+    RestconfTransaction(final DatabindContext databind) {
+        this.databind = requireNonNull(databind);
     }
 
     /**
@@ -151,6 +151,6 @@ abstract class RestconfTransaction {
         }
 
         merge(rootNormalizedPath,
-            fromInstanceId(modelContext, YangInstanceIdentifier.of(normalizedPathWithoutChildArgs)));
+            fromInstanceId(databind.modelContext(), YangInstanceIdentifier.of(normalizedPathWithoutChildArgs)));
     }
 }

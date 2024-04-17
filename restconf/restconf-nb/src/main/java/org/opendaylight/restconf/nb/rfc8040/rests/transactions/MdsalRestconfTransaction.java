@@ -19,6 +19,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.ExistenceCheck.Conflict;
+import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -27,7 +28,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
-import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +36,8 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
 
     private DOMDataTreeReadWriteTransaction rwTx;
 
-    MdsalRestconfTransaction(final EffectiveModelContext modelContext, final DOMDataBroker dataBroker) {
-        super(modelContext);
+    MdsalRestconfTransaction(final DatabindContext databind, final DOMDataBroker dataBroker) {
+        super(databind);
         rwTx = dataBroker.newReadWriteTransaction();
     }
 
@@ -73,7 +73,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     @Override
     void createImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubTree = fromInstanceId(modelContext, path);
+            final var emptySubTree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubTree.name()), emptySubTree);
             ensureParentsByMerge(path);
 
@@ -103,7 +103,7 @@ final class MdsalRestconfTransaction extends RestconfTransaction {
     @Override
     void replaceImpl(final YangInstanceIdentifier path, final NormalizedNode data) {
         if (data instanceof MapNode || data instanceof LeafSetNode) {
-            final var emptySubtree = fromInstanceId(modelContext, path);
+            final var emptySubtree = fromInstanceId(databind.modelContext(), path);
             merge(YangInstanceIdentifier.of(emptySubtree.name()), emptySubtree);
             ensureParentsByMerge(path);
 
