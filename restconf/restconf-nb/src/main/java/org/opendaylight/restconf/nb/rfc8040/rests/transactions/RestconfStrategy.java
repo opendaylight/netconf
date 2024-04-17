@@ -70,6 +70,7 @@ import org.opendaylight.restconf.server.api.DataPostBody;
 import org.opendaylight.restconf.server.api.DataPostResult;
 import org.opendaylight.restconf.server.api.DataPutResult;
 import org.opendaylight.restconf.server.api.DataYangPatchResult;
+import org.opendaylight.restconf.server.api.DatabindAware;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath;
 import org.opendaylight.restconf.server.api.DatabindPath.Action;
@@ -148,7 +149,7 @@ import org.slf4j.LoggerFactory;
  */
 // FIXME: it seems the first three operations deal with lifecycle of a transaction, while others invoke various
 //        operations. This should be handled through proper allocation indirection.
-public abstract class RestconfStrategy {
+public abstract class RestconfStrategy implements DatabindAware {
     @NonNullByDefault
     public record StrategyAndPath(RestconfStrategy strategy, Data path) {
         public StrategyAndPath {
@@ -264,7 +265,8 @@ public abstract class RestconfStrategy {
             ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, mountPoint.getIdentifier());
     }
 
-    public final @NonNull DatabindContext databind() {
+    @Override
+    public final DatabindContext databind() {
         return databind;
     }
 

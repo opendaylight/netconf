@@ -85,7 +85,7 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
 
     @Override
     RestconfTransaction prepareWriteExecution() {
-        return new MdsalRestconfTransaction(modelContext(), dataBroker);
+        return new MdsalRestconfTransaction(databind(), dataBroker);
     }
 
     @Override

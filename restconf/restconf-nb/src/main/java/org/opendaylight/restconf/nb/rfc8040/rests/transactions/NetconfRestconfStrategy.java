@@ -80,7 +80,7 @@ public final class NetconfRestconfStrategy extends RestconfStrategy {
 
     @Override
     RestconfTransaction prepareWriteExecution() {
-        return new NetconfRestconfTransaction(modelContext(), netconfService);
+        return new NetconfRestconfTransaction(databind(), netconfService);
     }
 
     @Override
