@@ -111,7 +111,22 @@ class YangDocumentTest extends AbstractDocumentTest {
     @Test
     void getAllModulesDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/controller-all.json");
-        final var allModulesDoc = getAllModulesDoc();
+        final var allModulesDoc = getAllModulesDoc(0, 0);
+        JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
+    }
+
+    /**
+     * Tests the swagger document that is result of the call to the '/single?offset=3&limit=5' endpoint. The offset is
+     * set to 3 and the limit is set to 5, so we expect only 5 modules starting from the 4th module. The modules are
+     * sorted by name. Expected modules are: duplication-test(index: 4), mandatory-test(index: 5), my-yang(index: 6),
+     * path-params-test(index: 8) and recursive(index: 9). For modules duplication-service(index: 3) and
+     * opflex(index: 7) we expect that they are not included in the result because they not contain any rpcs of data
+     * nodes.
+     */
+    @Test
+    public void getLimitedModulesDocTest() throws Exception {
+        final var expectedJson = getExpectedDoc("yang-document/controller-offset3&limit5.json");
+        final var allModulesDoc = getAllModulesDoc(3, 5);
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
@@ -156,7 +171,22 @@ class YangDocumentTest extends AbstractDocumentTest {
     @Test
     void getMountDocTest() throws Exception {
         final var expectedJson = getExpectedDoc("yang-document/device-all.json");
-        final var allModulesDoc = getMountDoc();
+        final var allModulesDoc = getMountDoc(0, 0);
+        JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
+    }
+
+    /**
+     * Tests the swagger document that is result of the call to the '/mounts/1?offset=3&limit=5' endpoint. The offset is
+     * set to 3 and the limit is set to 5, so we expect only 5 modules starting from the 4th module. The modules are
+     * sorted by name. Expected modules are: duplication-test(index: 4), mandatory-test(index: 5), my-yang(index: 6),
+     * path-params-test(index: 8) and recursive(index: 9). For modules duplication-service(index: 3) and
+     * opflex(index: 7) we expect that they are not included in the result because they not contain any rpcs, containers
+     * and lists.
+     */
+    @Test
+    public void getLimitedMountDocTest() throws Exception {
+        final var expectedJson = getExpectedDoc("yang-document/device-offset3&limit5.json");
+        final var allModulesDoc = getMountDoc(3, 5);
         JSONAssert.assertEquals(expectedJson, allModulesDoc, IGNORE_ORDER);
     }
 
