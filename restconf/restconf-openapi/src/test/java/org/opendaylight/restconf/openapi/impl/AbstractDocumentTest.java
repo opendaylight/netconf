@@ -70,9 +70,7 @@ abstract class AbstractDocumentTest {
         final var getAllController = createMockUriInfo(URI + "single");
         final var controllerDocAll = openApiService.getAllModulesDoc(getAllController, width, depth, offset, limit)
             .getEntity();
-
-        return new String(((OpenApiInputStream) controllerDocAll).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return getData((OpenApiDataStream) controllerDocAll);
     }
 
     protected static String getDocByModule(final String moduleName, final String revision, final Integer width,
@@ -85,8 +83,7 @@ abstract class AbstractDocumentTest {
         final var controllerDocModule = openApiService.getDocByModule(moduleName, revision, getModuleController, width,
             depth);
 
-        return new String(((OpenApiInputStream) controllerDocModule.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return getData((OpenApiDataStream) controllerDocModule.getEntity());
     }
 
     protected static String getMountDoc(final Integer width, final Integer depth, final Integer offset,
@@ -94,9 +91,7 @@ abstract class AbstractDocumentTest {
         final var getAllDevice = createMockUriInfo(URI + "mounts/1");
         when(getAllDevice.getQueryParameters()).thenReturn(ImmutableMultivaluedMap.empty());
         final var deviceDocAll = openApiService.getMountDoc("1", getAllDevice, width, depth, offset, limit);
-
-        return new String(((OpenApiInputStream) deviceDocAll.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return getData((OpenApiDataStream) deviceDocAll.getEntity());
     }
 
     protected static String getMountDocByModule(final String moduleName, final String revision, final Integer width,
@@ -104,8 +99,12 @@ abstract class AbstractDocumentTest {
         final var getDevice = createMockUriInfo(URI + "mounts/1/" + moduleName);
         final var deviceDoc = openApiService.getMountDocByModule("1", moduleName, revision, getDevice, width, depth);
 
-        return new String(((OpenApiInputStream) deviceDoc.getEntity()).readAllBytes(),
-            StandardCharsets.UTF_8);
+        return getData((OpenApiDataStream) deviceDoc.getEntity());
+    }
+
+    private static String getData(final OpenApiDataStream stream) throws Exception {
+        final var json = MAPPER.readTree(new String(stream.readAllBytes(), StandardCharsets.UTF_8));
+        return json.get("data").toString();
     }
 
     protected static UriInfo createMockUriInfo(final String urlPrefix) throws Exception {
