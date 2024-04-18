@@ -13,8 +13,6 @@ import static java.util.Objects.requireNonNullElse;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -27,9 +25,7 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
 public abstract class BaseYangOpenApiGenerator {
@@ -42,7 +38,7 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo, final Integer offset, final Integer limit)
+    public OpenApiDataStream getControllerModulesDoc(final UriInfo uriInfo, final Integer offset, final Integer limit)
             throws IOException {
         final var modelContext = requireNonNull(schemaService.getGlobalContext());
         final var schema = createSchemaFromUriInfo(uriInfo);
@@ -51,20 +47,20 @@ public abstract class BaseYangOpenApiGenerator {
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
         final var modulesWithoutDuplications = getModulesWithoutDuplications(modelContext);
-        final var portionOfModels = getPortionOfModels(modulesWithoutDuplications, requireNonNullElse(offset, 0),
+        final var paginationContext = new PaginationService(modulesWithoutDuplications, requireNonNullElse(offset, 0),
             requireNonNullElse(limit, 0));
-        return new OpenApiInputStream(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "", false, false,
-            portionOfModels, basePath);
+        return new OpenApiDataStream(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "", false, false,
+            paginationContext.getModules(), basePath, paginationContext.getMetadata());
     }
 
-    public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo)
+    public OpenApiDataStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo)
             throws IOException {
         final var modelContext = schemaService.getGlobalContext();
         Preconditions.checkState(modelContext != null);
         return getApiDeclaration(module, revision, uriInfo, modelContext, "", CONTROLLER_RESOURCE_NAME);
     }
 
-    public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
+    public OpenApiDataStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
             final EffectiveModelContext modelContext, final String urlPrefix, final @NonNull String deviceName)
             throws IOException {
         final Optional<Revision> rev;
@@ -84,9 +80,9 @@ public abstract class BaseYangOpenApiGenerator {
         final var title = module.getName();
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
-        final var modules = List.of(module);
-        return new OpenApiInputStream(modelContext, title, url, SECURITY, deviceName, urlPrefix, true, false,
-            modules, basePath);
+        final var paginationContext = new PaginationService(module);
+        return new OpenApiDataStream(modelContext, title, url, SECURITY, deviceName, urlPrefix, true, false,
+            paginationContext.getModules(), basePath, paginationContext.getMetadata());
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {
@@ -114,46 +110,5 @@ public abstract class BaseYangOpenApiGenerator {
                     module1.getRevision(), module2.getRevision()) > 0 ? module1 : module2,
                 LinkedHashMap::new))
             .values());
-    }
-
-    public static Collection<? extends Module> getPortionOfModels(final Set<Module> modulesWithoutDuplications,
-            final @NonNull Integer offset, final @NonNull Integer limit) {
-        if (offset != 0 || limit != 0) {
-            final var augmentingModules = new ArrayList<Module>();
-            final var modules = modulesList(modulesWithoutDuplications, augmentingModules);
-            if (offset > modules.size() || offset < 0 || limit < 0) {
-                return List.of();
-            } else {
-                final var end = limit == 0 ? modules.size() : Math.min(modules.size(), offset + limit);
-                final var portionOfModules = modules.subList(offset, end);
-                portionOfModules.addAll(augmentingModules);
-                return portionOfModules;
-            }
-        }
-        return modulesWithoutDuplications;
-    }
-
-    private static List<Module> modulesList(final Set<Module> modulesWithoutDuplications,
-            final List<Module> augmentingModules) {
-        return modulesWithoutDuplications
-            .stream()
-            .filter(module -> {
-                if (containsDataOrOperation(module)) {
-                    return true;
-                } else {
-                    augmentingModules.add(module);
-                    return false;
-                }
-            })
-            .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    private static boolean containsDataOrOperation(final Module module) {
-        if (!module.getRpcs().isEmpty()) {
-            return true;
-        }
-        return module.getChildNodes()
-            .stream()
-            .anyMatch(node -> node instanceof ContainerSchemaNode || node instanceof ListSchemaNode);
     }
 }
