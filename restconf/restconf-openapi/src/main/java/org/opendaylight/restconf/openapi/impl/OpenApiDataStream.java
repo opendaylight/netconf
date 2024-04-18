@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -20,22 +21,15 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
-import org.opendaylight.restconf.openapi.model.InfoEntity;
-import org.opendaylight.restconf.openapi.model.OpenApiVersionEntity;
-import org.opendaylight.restconf.openapi.model.SecurityEntity;
-import org.opendaylight.restconf.openapi.model.ServerEntity;
-import org.opendaylight.restconf.openapi.model.ServersEntity;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
 
-public final class OpenApiInputStream extends InputStream {
-    private final ByteArrayOutputStream stream;
-    private final JsonGenerator generator;
+public final class OpenApiDataStream extends InputStream {
+    private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    private final JsonGenerator generator = new JsonFactoryBuilder().build().createGenerator(stream);
     private final Deque<InputStream> stack = new ArrayDeque<>();
 
     private Reader reader;
@@ -43,21 +37,14 @@ public final class OpenApiInputStream extends InputStream {
 
     private boolean eof;
 
-    public OpenApiInputStream(final EffectiveModelContext modelContext, final String title, final String url,
+    public OpenApiDataStream(final EffectiveModelContext modelContext, final String title, final String url,
             final List<Map<String, List<String>>> security, final String deviceName, final String urlPrefix,
-            final boolean isForSingleModule, final boolean includeDataStore, final Collection<? extends Module> modules,
-            final String basePath, final OpenApiBodyWriter writer, final ByteArrayOutputStream stream,
-            final JsonGenerator generator, final Integer width, final Integer depth) {
-        this.generator = generator;
-        this.stream = stream;
-        stack.add(new OpenApiVersionStream(new OpenApiVersionEntity(), writer));
-        stack.add(new InfoStream(new InfoEntity(title), writer));
-        stack.add(new ServersStream(new ServersEntity(List.of(new ServerEntity(url))), writer));
-        stack.add(new PathsStream(modelContext, writer, deviceName, urlPrefix, isForSingleModule, includeDataStore,
-            modules.iterator(), basePath, stream, generator, width, depth));
-        stack.add(new ComponentsStream(modelContext, writer, generator, stream, modules.iterator(), isForSingleModule,
-            width, depth));
-        stack.add(new SecurityStream(writer, new SecurityEntity(security)));
+            final boolean isForSingleModule, final boolean includeDataStore, final PaginationService paginationContext,
+            final String basePath, final Integer width, final Integer depth) throws IOException {
+        final var writer = new OpenApiBodyWriter(generator, stream);
+        stack.add(new OpenApiInputStream(modelContext, title, url, security, deviceName, urlPrefix, isForSingleModule,
+            includeDataStore, paginationContext.getModules(), basePath, writer, stream, generator, width, depth));
+        stack.add(new MetadataStream(paginationContext.getMetadata(), writer));
     }
 
     @Override
@@ -66,7 +53,7 @@ public final class OpenApiInputStream extends InputStream {
             return -1;
         }
         if (reader == null) {
-            generator.writeObjectFieldStart("data");
+            generator.writeStartObject();
             generator.flush();
             reader = new BufferedReader(
                 new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()), StandardCharsets.UTF_8));
@@ -97,7 +84,7 @@ public final class OpenApiInputStream extends InputStream {
             return -1;
         }
         if (channel == null) {
-            generator.writeObjectFieldStart("data");
+            generator.writeStartObject();
             generator.flush();
             channel = Channels.newChannel(new ByteArrayInputStream(stream.toByteArray()));
             stream.reset();

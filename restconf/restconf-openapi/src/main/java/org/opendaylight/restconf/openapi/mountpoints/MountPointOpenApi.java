@@ -24,7 +24,8 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.openapi.impl.BaseYangOpenApiGenerator;
-import org.opendaylight.restconf.openapi.impl.OpenApiInputStream;
+import org.opendaylight.restconf.openapi.impl.OpenApiDataStream;
+import org.opendaylight.restconf.openapi.impl.PaginationService;
 import org.opendaylight.yangtools.concepts.Registration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -123,7 +124,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             .orElse(null);
     }
 
-    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
+    public OpenApiDataStream getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
             final String revision, final Integer width, final Integer depth) throws IOException  {
         final YangInstanceIdentifier iid = longIdToInstanceId.get(id);
         final EffectiveModelContext modelContext = getModelContext(iid);
@@ -141,14 +142,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
             width, depth);
     }
 
-    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final Integer width,
+    public OpenApiDataStream getMountPointApi(final UriInfo uriInfo, final Long id, final Integer width,
             final Integer depth, final Integer offset, final Integer limit) throws IOException {
         final var iid = longIdToInstanceId.get(id);
-        final var context = getModelContext(iid);
+        final var modelContext = getModelContext(iid);
         final var urlPrefix = getYangMountUrl(iid);
         final var deviceName = extractDeviceName(iid);
 
-        if (context == null) {
+        if (modelContext == null) {
             return null;
         }
 
@@ -156,16 +157,14 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var nonNullLimit = requireNonNullElse(limit, 0);
 
         final boolean includeDataStore = nonNullLimit == 0 && nonNullOffset == 0;
-        final var modulesWithoutDuplications = BaseYangOpenApiGenerator.getModulesWithoutDuplications(context);
-        final var portionOfModules = BaseYangOpenApiGenerator.getModelsSublist(modulesWithoutDuplications,
-            nonNullOffset, nonNullLimit);
+        final var paginationContext = new PaginationService(modelContext, offset, limit);
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var title = deviceName + " modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = openApiGenerator.getBasePath();
-        return new OpenApiInputStream(context, title, url, SECURITY, deviceName, urlPrefix, false, includeDataStore,
-            portionOfModules, basePath, width, depth);
+        return new OpenApiDataStream(modelContext, title, url, SECURITY, deviceName, urlPrefix, false,
+            includeDataStore, paginationContext, basePath, width, depth);
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -173,16 +172,16 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
                 .values().getElement().toString();
     }
 
-    private OpenApiInputStream generateDataStoreOpenApi(final EffectiveModelContext modelContext,
+    private OpenApiDataStream generateDataStoreOpenApi(final EffectiveModelContext modelContext,
             final UriInfo uriInfo, final String urlPrefix, final String deviceName, final Integer width,
             final Integer depth) throws IOException {
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var url = schema + "://" + host + "/";
         final var basePath = openApiGenerator.getBasePath();
-        final var modules = BaseYangOpenApiGenerator.getModulesWithoutDuplications(modelContext);
-        return new OpenApiInputStream(modelContext, urlPrefix, url, SECURITY, deviceName, urlPrefix, true, false,
-            modules, basePath, width, depth);
+        final var paginationContext = new PaginationService(modelContext);
+        return new OpenApiDataStream(modelContext, urlPrefix, url, SECURITY, deviceName, urlPrefix, true, false,
+            paginationContext, basePath, width, depth);
     }
 
     @Override
