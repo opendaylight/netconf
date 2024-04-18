@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2024 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -9,21 +9,16 @@ package org.opendaylight.restconf.server.spi;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.Beta;
-import com.google.common.collect.Iterables;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
-import javax.xml.transform.dom.DOMSource;
-import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.DepthParam;
-import org.opendaylight.yangtools.yang.common.Ordering;
+import org.opendaylight.restconf.server.spi.DefaultNormalizedNodeWriter.OrderedRestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
@@ -32,14 +27,11 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.SystemMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
-import org.opendaylight.yangtools.yang.data.api.schema.UserMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is an experimental iterator over a {@link NormalizedNode}. This is essentially
@@ -47,22 +39,12 @@ import org.slf4j.LoggerFactory;
  * the backing data, this encapsulates a {@link NormalizedNodeStreamWriter} and allows
  * us to write multiple nodes.
  */
-// FIXME: this is a copy&paste from yangtools' NormalizedNodeWriter then adapted for filtering
-@Beta
-public sealed class NormalizedNodeWriter implements Flushable, Closeable {
-    private static final QName ROOT_DATA_QNAME = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "data");
+@NonNullByDefault
+public abstract class NormalizedNodeWriter implements Flushable, Closeable {
+    protected final NormalizedNodeStreamWriter writer;
 
-    final @NonNull NormalizedNodeStreamWriter writer;
-    private final Integer maxDepth;
-    private final List<Set<QName>> fields;
-
-    int currentDepth = 0;
-
-    private NormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final DepthParam depth,
-            final List<Set<QName>> fields) {
+    NormalizedNodeWriter(final NormalizedNodeStreamWriter writer) {
         this.writer = requireNonNull(writer);
-        maxDepth = depth == null ? null : depth.value();
-        this.fields = fields;
     }
 
     /**
@@ -72,7 +54,7 @@ public sealed class NormalizedNodeWriter implements Flushable, Closeable {
      * @param maxDepth Maximal depth to write
      * @return A new instance.
      */
-    public static @NonNull NormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
+    public static final NormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
             final @Nullable DepthParam maxDepth) {
         return forStreamWriter(writer, true,  maxDepth, null);
     }
@@ -85,7 +67,7 @@ public sealed class NormalizedNodeWriter implements Flushable, Closeable {
      * @param fields Selected child nodes to write
      * @return A new instance.
      */
-    public static @NonNull NormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
+    public static final NormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
             final @Nullable DepthParam maxDepth, final @Nullable List<Set<QName>> fields) {
         return forStreamWriter(writer, true,  maxDepth, fields);
     }
@@ -105,25 +87,10 @@ public sealed class NormalizedNodeWriter implements Flushable, Closeable {
      * @param fields Selected child nodes to write
      * @return A new instance.
      */
-    public static @NonNull NormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
-            final boolean orderKeyLeaves, final DepthParam depth, final List<Set<QName>> fields) {
+    public static final NormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
+            final boolean orderKeyLeaves, final @Nullable DepthParam depth, final @Nullable List<Set<QName>> fields) {
         return orderKeyLeaves ? new OrderedRestconfNormalizedNodeWriter(writer, depth, fields)
-                : new NormalizedNodeWriter(writer, depth, fields);
-    }
-
-    /**
-     * Iterate over the provided {@link NormalizedNode} and emit write events to the encapsulated
-     * {@link NormalizedNodeStreamWriter}.
-     *
-     * @param node Node
-     * @return {@code ParameterAwareNormalizedNodeWriter}
-     * @throws IOException when thrown from the backing writer.
-     */
-    public final NormalizedNodeWriter write(final NormalizedNode node) throws IOException {
-        if (wasProcessedAsCompositeNode(node) || wasProcessAsSimpleNode(node)) {
-            return this;
-        }
-        throw new IllegalStateException("It wasn't possible to serialize node " + node);
+                : new DefaultNormalizedNodeWriter(writer, depth, fields);
     }
 
     @Override
@@ -137,200 +104,62 @@ public sealed class NormalizedNodeWriter implements Flushable, Closeable {
         writer.close();
     }
 
-    private boolean wasProcessAsSimpleNode(final NormalizedNode node) throws IOException {
-        if (node instanceof LeafSetEntryNode<?> nodeAsLeafList) {
-            if (selectedByParameters(node, false)) {
-                writer.startLeafSetEntryNode(nodeAsLeafList.name());
-                writer.scalarValue(nodeAsLeafList.body());
-                writer.endNode();
-            }
-        } else if (node instanceof LeafNode<?> nodeAsLeaf) {
-            writer.startLeafNode(nodeAsLeaf.name());
-            writer.scalarValue(nodeAsLeaf.body());
-            writer.endNode();
-        } else if (node instanceof AnyxmlNode<?> anyxmlNode) {
-            final var objectModel = anyxmlNode.bodyObjectModel();
-            if (writer.startAnyxmlNode(anyxmlNode.name(), objectModel)) {
-                if (DOMSource.class.isAssignableFrom(objectModel)) {
-                    writer.domSourceValue((DOMSource) anyxmlNode.body());
-                } else {
-                    writer.scalarValue(anyxmlNode.body());
-                }
-                writer.endNode();
-            }
-        } else if (node instanceof AnydataNode<?> anydataNode) {
-            final var objectModel = anydataNode.bodyObjectModel();
-            if (writer.startAnydataNode(anydataNode.name(), objectModel)) {
-                writer.scalarValue(anydataNode.body());
-                writer.endNode();
-            }
-        } else {
-            return false;
-        }
-        return true;
-    }
-
     /**
-     * Check if node should be written according to parameters fields and depth.
-     * See <a href="https://tools.ietf.org/html/draft-ietf-netconf-restconf-18#page-49">Restconf draft</a>.
-     * @param node Node to be written
-     * @param mixinParent {@code true} if parent is mixin, {@code false} otherwise
-     * @return {@code true} if node will be written, {@code false} otherwise
-     */
-    protected boolean selectedByParameters(final NormalizedNode node, final boolean mixinParent) {
-        // nodes to be written are not limited by fields, only by depth
-        if (fields == null) {
-            return maxDepth == null || currentDepth < maxDepth;
-        }
-
-        // children of mixin nodes are never selected in fields but must be written if they are first in selected target
-        if (mixinParent && currentDepth == 0) {
-            return true;
-        }
-
-        // write only selected nodes
-        if (currentDepth > 0 && currentDepth <= fields.size()) {
-            return fields.get(currentDepth - 1).contains(node.name().getNodeType());
-        }
-
-        // after this depth only depth parameter is used to determine when to write node
-        return maxDepth == null || currentDepth < maxDepth;
-    }
-
-    /**
-     * Emit events for all children and then emit an endNode() event.
+     * Iterate over the provided {@link NormalizedNode} and emit write events to the encapsulated
+     * {@link NormalizedNodeStreamWriter}.
      *
-     * @param children Child iterable
-     * @param mixinParent {@code true} if parent is mixin, {@code false} otherwise
-     * @return True
-     * @throws IOException when the writer reports it
+     * @param node Node
+     * @return {@code ParameterAwareNormalizedNodeWriter}
+     * @throws IOException when thrown from the backing writer.
      */
-    protected final boolean writeChildren(final Iterable<? extends NormalizedNode> children, final boolean mixinParent)
-            throws IOException {
-        for (var child : children) {
-            if (selectedByParameters(child, mixinParent)) {
-                write(child);
-            }
-        }
-        writer.endNode();
-        return true;
-    }
-
-    private boolean writeMapEntryChildren(final MapEntryNode mapEntryNode) throws IOException {
-        if (selectedByParameters(mapEntryNode, false)) {
-            writeChildren(mapEntryNode.body(), false);
-        } else if (fields == null && maxDepth != null && currentDepth == maxDepth) {
-            writeOnlyKeys(mapEntryNode.name().entrySet());
-        }
-        return true;
-    }
-
-    private void writeOnlyKeys(final Set<Entry<QName, Object>> entries) throws IOException {
-        for (final Entry<QName, Object> entry : entries) {
-            writer.startLeafNode(new NodeIdentifier(entry.getKey()));
-            writer.scalarValue(entry.getValue());
-            writer.endNode();
-        }
-        writer.endNode();
-    }
-
-    boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
-        writer.startMapEntryNode(node.name(), node.size());
-        currentDepth++;
-        writeMapEntryChildren(node);
-        currentDepth--;
-        return true;
-    }
-
-    private boolean wasProcessedAsCompositeNode(final NormalizedNode node) throws IOException {
-        boolean processedAsCompositeNode = false;
+    public final NormalizedNodeWriter write(final NormalizedNode node) throws IOException {
         if (node instanceof ContainerNode n) {
-            if (!n.name().getNodeType().withoutRevision().equals(ROOT_DATA_QNAME)) {
-                writer.startContainerNode(n.name(), n.size());
-                currentDepth++;
-                processedAsCompositeNode = writeChildren(n.body(), false);
-                currentDepth--;
-            } else {
-                // write child nodes of data root container
-                for (final NormalizedNode child : n.body()) {
-                    currentDepth++;
-                    if (selectedByParameters(child, false)) {
-                        write(child);
-                    }
-                    currentDepth--;
-                }
-                processedAsCompositeNode = true;
-            }
+            writeContainer(n);
+        } else if (node instanceof MapNode n) {
+            writeMap(n);
         } else if (node instanceof MapEntryNode n) {
-            processedAsCompositeNode = writeMapEntryNode(n);
-        } else if (node instanceof UnkeyedListEntryNode n) {
-            writer.startUnkeyedListItem(n.name(), n.size());
-            currentDepth++;
-            processedAsCompositeNode = writeChildren(n.body(), false);
-            currentDepth--;
+            writeMapEntry(n);
+        } else if (node instanceof LeafNode<?> n) {
+            writeLeaf(n);
         } else if (node instanceof ChoiceNode n) {
-            writer.startChoiceNode(n.name(), n.size());
-            processedAsCompositeNode = writeChildren(n.body(), true);
+            writeChoice(n);
         } else if (node instanceof UnkeyedListNode n) {
-            writer.startUnkeyedList(n.name(), n.size());
-            processedAsCompositeNode = writeChildren(n.body(), false);
-        } else if (node instanceof UserMapNode n) {
-            writer.startOrderedMapNode(n.name(), n.size());
-            processedAsCompositeNode = writeChildren(n.body(), true);
-        } else if (node instanceof SystemMapNode n) {
-            writer.startMapNode(n.name(), n.size());
-            processedAsCompositeNode = writeChildren(n.body(), true);
+            writeUnkeyedList(n);
+        } else if (node instanceof UnkeyedListEntryNode n) {
+            writeUnkeyedListEntry(n);
         } else if (node instanceof LeafSetNode<?> n) {
-            if (n.ordering() == Ordering.USER) {
-                writer.startOrderedLeafSet(n.name(), n.size());
-            } else {
-                writer.startLeafSet(n.name(), n.size());
-            }
-            currentDepth++;
-            processedAsCompositeNode = writeChildren(n.body(), true);
-            currentDepth--;
+            writeLeafSet(n);
+        } else if (node instanceof LeafSetEntryNode<?> n) {
+            writeLeafSetEntry(n);
+        } else if (node instanceof AnydataNode<?> n) {
+            writeAnydata(n);
+        } else if (node instanceof AnyxmlNode<?> n) {
+            writeAnyxml(n);
+        } else {
+            throw new IOException("Unhandled contract " + node.contract().getSimpleName());
         }
-
-        return processedAsCompositeNode;
+        return this;
     }
 
-    private static final class OrderedRestconfNormalizedNodeWriter extends NormalizedNodeWriter {
-        private static final Logger LOG = LoggerFactory.getLogger(OrderedRestconfNormalizedNodeWriter.class);
+    protected abstract void writeAnydata(AnydataNode<?> node) throws IOException;
 
-        OrderedRestconfNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final DepthParam depth,
-                final List<Set<QName>> fields) {
-            super(writer, depth, fields);
-        }
+    protected abstract void writeAnyxml(AnyxmlNode<?> node) throws IOException;
 
-        @Override
-        boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
-            writer.startMapEntryNode(node.name(), node.size());
+    protected abstract void writeChoice(ChoiceNode node) throws IOException;
 
-            final var qnames = node.name().keySet();
-            // Write out all the key children
-            currentDepth++;
-            for (var qname : qnames) {
-                final var child = node.childByArg(new NodeIdentifier(qname));
-                if (child != null) {
-                    if (selectedByParameters(child, false)) {
-                        write(child);
-                    }
-                } else {
-                    LOG.info("No child for key element {} found", qname);
-                }
-            }
+    protected abstract void writeContainer(ContainerNode node) throws IOException;
 
-            // Write all the rest
-            final boolean result = writeChildren(Iterables.filter(node.body(), input -> {
-                if (!qnames.contains(input.name().getNodeType())) {
-                    return true;
-                }
+    protected abstract void writeLeaf(LeafNode<?> node) throws IOException;
 
-                LOG.debug("Skipping key child {}", input);
-                return false;
-            }), false);
-            currentDepth--;
-            return result;
-        }
-    }
+    protected abstract void writeLeafSet(LeafSetNode<?> node) throws IOException;
+
+    protected abstract void writeLeafSetEntry(LeafSetEntryNode<?> node) throws IOException;
+
+    protected abstract void writeMap(MapNode node) throws IOException;
+
+    protected abstract void writeMapEntry(MapEntryNode node) throws IOException;
+
+    protected abstract void writeUnkeyedList(UnkeyedListNode node) throws IOException;
+
+    protected abstract void writeUnkeyedListEntry(UnkeyedListEntryNode node) throws IOException;
 }
