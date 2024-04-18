@@ -60,7 +60,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer offset,
             final @Nullable Integer limit) throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, offset, limit);
+        final OpenApiDataStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, offset, limit);
         return Response.ok(stream).build();
     }
 
@@ -70,7 +70,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo)
             throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo);
+        final OpenApiDataStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo);
         return Response.ok(stream).build();
     }
 
@@ -94,7 +94,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getMountDocByModule(final String instanceNum, final String module,
             final String revision, final UriInfo uriInfo) throws IOException {
-        final OpenApiInputStream stream =
+        final OpenApiDataStream stream =
             mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision);
         return Response.ok(stream).build();
     }
@@ -102,7 +102,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer offset,
             final @Nullable Integer limit) throws IOException {
-        final OpenApiInputStream stream =
+        final OpenApiDataStream stream =
             mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), offset, limit);
         return Response.ok(stream).build();
     }
