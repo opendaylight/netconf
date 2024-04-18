@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -61,8 +60,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public Response getAllModulesDoc(final UriInfo uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, width, depth, offset,
-            limit);
+        final var stream = openApiGeneratorRFC8040.getControllerModulesDoc(uriInfo, width, depth, offset, limit);
         return Response.ok(stream).build();
     }
 
@@ -72,8 +70,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
     @Override
     public Response getDocByModule(final String module, final String revision, final UriInfo uriInfo,
             final @Nullable Integer width, final @Nullable Integer depth) throws IOException {
-        final OpenApiInputStream stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, width,
-            depth);
+        final var stream = openApiGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, width, depth);
         return Response.ok(stream).build();
     }
 
@@ -87,7 +84,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
 
     @Override
     public Response getListOfMounts(final UriInfo uriInfo) {
-        final List<MountPointInstance> entity = mountPointOpenApiRFC8040
+        final var entity = mountPointOpenApiRFC8040
                 .getInstanceIdentifiers().entrySet().stream()
                 .map(entry -> new MountPointInstance(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
@@ -98,9 +95,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public Response getMountDocByModule(final String instanceNum, final String module,
             final String revision, final UriInfo uriInfo, final @Nullable Integer width, final @Nullable Integer depth)
             throws IOException {
-        final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, width,
-                depth);
+        final var stream = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
+            revision, width, depth);
         return Response.ok(stream).build();
     }
 
@@ -108,9 +104,8 @@ public final class OpenApiServiceImpl implements OpenApiService {
     public Response getMountDoc(final String instanceNum, final UriInfo uriInfo, final @Nullable Integer width,
             final @Nullable Integer depth, final @Nullable Integer offset, final @Nullable Integer limit)
             throws IOException {
-        final OpenApiInputStream stream =
-            mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), width, depth, offset,
-                limit);
+        final var stream = mountPointOpenApiRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), width, depth,
+            offset, limit);
         return Response.ok(stream).build();
     }
 }
