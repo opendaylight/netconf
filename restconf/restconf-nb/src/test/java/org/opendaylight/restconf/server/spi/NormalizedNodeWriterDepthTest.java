@@ -185,10 +185,7 @@ class NormalizedNodeWriterDepthTest extends AbstractNormalizedNodeWriterTest {
 
         final var inOrder = inOrder(writer);
         inOrder.verify(writer).startMapEntryNode(mapEntryNodeIdentifier, 2);
-        // write only the key
-        inOrder.verify(writer).startLeafNode(KEY_FIELD_NID);
-        inOrder.verify(writer).scalarValue(keyLeafNodeValue);
-        inOrder.verify(writer, times(2)).endNode();
+        inOrder.verify(writer).endNode();
     }
 
     /**
