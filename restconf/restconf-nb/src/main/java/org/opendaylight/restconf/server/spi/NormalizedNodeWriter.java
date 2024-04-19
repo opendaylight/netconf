@@ -17,7 +17,6 @@ import java.util.Set;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.api.query.DepthParam;
-import org.opendaylight.restconf.server.spi.DefaultNormalizedNodeWriter.OrderedRestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.AnydataNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
@@ -89,8 +88,7 @@ public abstract class NormalizedNodeWriter implements Flushable, Closeable {
      */
     public static final NormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
             final boolean orderKeyLeaves, final @Nullable DepthParam depth, final @Nullable List<Set<QName>> fields) {
-        return orderKeyLeaves ? new OrderedRestconfNormalizedNodeWriter(writer, depth, fields)
-                : new DefaultNormalizedNodeWriter(writer, depth, fields);
+        return new DefaultNormalizedNodeWriter(writer, !orderKeyLeaves, depth, fields);
     }
 
     @Override

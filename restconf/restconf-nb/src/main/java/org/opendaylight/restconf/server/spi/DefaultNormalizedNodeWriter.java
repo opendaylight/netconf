@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.server.spi;
 
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
@@ -29,8 +28,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is an experimental iterator over a {@link NormalizedNode}. This is essentially
@@ -39,17 +36,19 @@ import org.slf4j.LoggerFactory;
  * us to write multiple nodes.
  */
 // FIXME: this is a copy&paste from yangtools' NormalizedNodeWriter then adapted for filtering
-sealed class DefaultNormalizedNodeWriter extends NormalizedNodeWriter {
+final class DefaultNormalizedNodeWriter extends NormalizedNodeWriter {
     private static final QName ROOT_DATA_QNAME = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "data");
 
+    private final MapBodyOrder mapBodyOrder;
     private final Integer maxDepth;
     private final List<Set<QName>> fields;
 
-    int currentDepth = 0;
+    private int currentDepth = 0;
 
-    DefaultNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final DepthParam depth,
-            final List<Set<QName>> fields) {
+    DefaultNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final boolean iterationOrder,
+            final DepthParam depth, final List<Set<QName>> fields) {
         super(writer);
+        mapBodyOrder = iterationOrder ? IterationMapBodyOrder.INSTANCE : DefaultMapBodyOrder.INSTANCE;
         maxDepth = depth == null ? null : depth.value();
         this.fields = fields;
     }
@@ -198,7 +197,7 @@ sealed class DefaultNormalizedNodeWriter extends NormalizedNodeWriter {
      * @param mixinParent {@code true} if parent is mixin, {@code false} otherwise
      * @throws IOException when the writer reports it
      */
-    protected final void writeChildren(final Iterable<? extends NormalizedNode> children, final boolean mixinParent)
+    protected void writeChildren(final Iterable<? extends NormalizedNode> children, final boolean mixinParent)
             throws IOException {
         for (var child : children) {
             if (selectedByParameters(child, mixinParent)) {
@@ -210,7 +209,7 @@ sealed class DefaultNormalizedNodeWriter extends NormalizedNodeWriter {
 
     private void writeMapEntryChildren(final MapEntryNode mapEntryNode) throws IOException {
         if (selectedByParameters(mapEntryNode, false)) {
-            writeChildren(mapEntryNode.body(), false);
+            writeChildren(mapBodyOrder.orderBody(mapEntryNode), false);
         } else if (fields == null && maxDepth != null && currentDepth == maxDepth) {
             writeOnlyKeys(mapEntryNode.name().entrySet());
         }
@@ -223,44 +222,5 @@ sealed class DefaultNormalizedNodeWriter extends NormalizedNodeWriter {
             writer.endNode();
         }
         writer.endNode();
-    }
-
-    static final class OrderedRestconfNormalizedNodeWriter extends DefaultNormalizedNodeWriter {
-        private static final Logger LOG = LoggerFactory.getLogger(OrderedRestconfNormalizedNodeWriter.class);
-
-        OrderedRestconfNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final DepthParam depth,
-                final List<Set<QName>> fields) {
-            super(writer, depth, fields);
-        }
-
-        @Override
-        protected void writeMapEntry(final MapEntryNode node) throws IOException {
-            writer.startMapEntryNode(node.name(), node.size());
-
-            final var qnames = node.name().keySet();
-            // Write out all the key children
-            currentDepth++;
-            for (var qname : qnames) {
-                final var child = node.childByArg(new NodeIdentifier(qname));
-                if (child != null) {
-                    if (selectedByParameters(child, false)) {
-                        write(child);
-                    }
-                } else {
-                    LOG.info("No child for key element {} found", qname);
-                }
-            }
-
-            // Write all the rest
-            writeChildren(Iterables.filter(node.body(), input -> {
-                if (!qnames.contains(input.name().getNodeType())) {
-                    return true;
-                }
-
-                LOG.debug("Skipping key child {}", input);
-                return false;
-            }), false);
-            currentDepth--;
-        }
     }
 }
