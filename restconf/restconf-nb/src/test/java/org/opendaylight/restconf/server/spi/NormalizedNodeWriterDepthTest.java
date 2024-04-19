@@ -113,11 +113,11 @@ class NormalizedNodeWriterDepthTest extends AbstractNormalizedNodeWriterTest {
         final var inOrder = inOrder(writer);
         inOrder.verify(writer).startMapNode(LIST_NID, 1);
         inOrder.verify(writer).startMapEntryNode(mapEntryNodeIdentifier, 2);
-        inOrder.verify(writer, times(2)).startLeafNode(KEY_FIELD_NID);
+        inOrder.verify(writer).startLeafNode(KEY_FIELD_NID);
         inOrder.verify(writer).scalarValue(keyLeafNodeValue);
         inOrder.verify(writer).endNode();
-        inOrder.verify(writer, times(2)).startLeafNode(KEY_FIELD_NID);
-        inOrder.verify(writer, times(2)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer).startLeafNode(KEY_FIELD_NID);
+        inOrder.verify(writer).scalarValue(keyLeafNodeValue);
         inOrder.verify(writer, times(2)).endNode();
         // FIXME this assertion is not working because leaves are not written in expected order
         inOrder.verify(writer).startLeafNode(anotherLeafNodeIdentifier);
