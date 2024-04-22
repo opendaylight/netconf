@@ -11,6 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import java.io.FileWriter;
+import java.io.IOException;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NamespaceURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
@@ -91,7 +93,16 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             // there is no validation since the document may contain yang schemas
             final NetconfMessage message = processDocument(netconfMessage, session);
             LOG.debug("Responding with message {}", message);
-            session.sendMessage(message);
+            session.sendMessage(message).addListener(future -> {
+                final var cause = future.cause();
+                if (cause != null) {
+                    LOG.debug("Failed to send response {}", message.getDocument().getDocumentElement()
+                        .getAttributeNode(XmlNetconfConstants.MESSAGE_ID), cause);
+                } else {
+                    LOG.debug("Finished sending response {}", message.getDocument().getDocumentElement()
+                        .getAttributeNode(XmlNetconfConstants.MESSAGE_ID));
+                }
+            });
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcSuccess(session));
         } catch (final RuntimeException e) {
             // TODO: should send generic error or close session?
