@@ -30,6 +30,7 @@ import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -91,7 +92,18 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             // there is no validation since the document may contain yang schemas
             final NetconfMessage message = processDocument(netconfMessage, session);
             LOG.debug("Responding with message {}", message);
-            session.sendMessage(message);
+            session.sendMessage(message).addListener(future -> {
+                final var cause = future.cause();
+                if (cause != null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Failed to send response {}", getMessageId(message), cause);
+                    }
+                    session.onOutgoingRpcError();
+                    monitoringSessionListener.onSessionEvent(SessionEvent.outRpcError(session));
+                } else if (LOG.isDebugEnabled()) {
+                    LOG.debug("Finished sending response {}", getMessageId(message));
+                }
+            });
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcSuccess(session));
         } catch (final RuntimeException e) {
             // TODO: should send generic error or close session?
@@ -107,6 +119,10 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             monitoringSessionListener.onSessionEvent(SessionEvent.outRpcError(session));
             SendErrorExceptionUtil.sendErrorMessage(session, e, netconfMessage);
         }
+    }
+
+    private static Attr getMessageId(final NetconfMessage message) {
+        return message.getDocument().getDocumentElement().getAttributeNode(XmlNetconfConstants.MESSAGE_ID);
     }
 
     @Override
