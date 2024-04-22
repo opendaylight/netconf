@@ -91,7 +91,18 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             // there is no validation since the document may contain yang schemas
             final NetconfMessage message = processDocument(netconfMessage, session);
             LOG.debug("Responding with message {}", message);
-            session.sendMessage(message);
+            session.sendMessage(message).addListener(future -> {
+                final var cause = future.cause();
+                if (cause != null) {
+                    LOG.debug("Failed to send response {}", message.getDocument().getDocumentElement()
+                        .getAttributeNode(XmlNetconfConstants.MESSAGE_ID), cause);
+                    session.onOutgoingRpcError();
+                    monitoringSessionListener.onSessionEvent(SessionEvent.outRpcError(session));
+                } else {
+                    LOG.debug("Finished sending response {}", message.getDocument().getDocumentElement()
+                        .getAttributeNode(XmlNetconfConstants.MESSAGE_ID));
+                }
+            });
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcSuccess(session));
         } catch (final RuntimeException e) {
             // TODO: should send generic error or close session?
