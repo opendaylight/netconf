@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "ccadd184_0bbb8970",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-23T09:36:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70a85035_f811c1fc",
+      "revId": "10824c6eafb06adc4d178b8e0d6db410f4481d38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "fba869f3_4da7c1d1",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 8
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbef887c_d6c43da8",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-23T09:36:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92e52c88_abd4587e",
+      "revId": "10824c6eafb06adc4d178b8e0d6db410f4481d38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "362a4122_3f5fca9a",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-04-23T08:30:18Z",
       "side": 1,
       "message": "from",
+      "revId": "10824c6eafb06adc4d178b8e0d6db410f4481d38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8e82e11_07a69176",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-23T09:36:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "362a4122_3f5fca9a",
       "revId": "10824c6eafb06adc4d178b8e0d6db410f4481d38",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
