@@ -86,12 +86,11 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
     @Override
     public void onMessage(final NetconfServerSession session, final NetconfMessage netconfMessage) {
         try {
-
             Preconditions.checkState(operationRouter != null, "Cannot handle message, session up was not yet received");
             // there is no validation since the document may contain yang schemas
             final NetconfMessage message = processDocument(netconfMessage, session);
             LOG.debug("Responding with message {}", message);
-            session.sendMessage(message);
+            final var future = session.sendMessage(message);
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcSuccess(session));
         } catch (final RuntimeException e) {
             // TODO: should send generic error or close session?

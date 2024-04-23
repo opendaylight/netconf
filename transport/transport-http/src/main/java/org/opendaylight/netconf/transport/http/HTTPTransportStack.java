@@ -25,7 +25,7 @@ public abstract sealed class HTTPTransportStack extends AbstractOverlayTransport
     }
 
     @Override
-    protected void onUnderlayChannelEstablished(final @NonNull TransportChannel underlayChannel) {
+    protected void onUnderlayChannelEstablished(final @NonNull HTTPTransportChannel underlayChannel) {
         underlayChannel.channel().pipeline().addLast(channelInitializer);
         Futures.addCallback(channelInitializer.completeFuture(), new FutureCallback<>() {
             @Override

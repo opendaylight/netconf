@@ -31,7 +31,7 @@ public abstract sealed class TLSTransportStack extends AbstractOverlayTransportS
     }
 
     @Override
-    protected final void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
+    protected final void onUnderlayChannelEstablished(final TLSTransportChannel underlayChannel) {
         final var channel = underlayChannel.channel();
         final var sslHandler = factory.createSslHandler(channel);
 
