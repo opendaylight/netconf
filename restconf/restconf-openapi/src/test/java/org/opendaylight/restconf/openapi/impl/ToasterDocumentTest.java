@@ -38,7 +38,7 @@ public class ToasterDocumentTest extends AbstractDocumentTest {
      */
     @Test
     public void getDocByModuleTest() throws Exception {
-        final var jsonControllerDoc = getDocByModule(TOASTER, TOASTER_REV);
+        final var jsonControllerDoc = getDocByModule(TOASTER, TOASTER_REV, 0);
         final var expectedJson = getExpectedDoc("toaster-document/controller-toaster.json");
         JSONAssert.assertEquals(expectedJson, jsonControllerDoc, IGNORE_ORDER);
     }

@@ -31,7 +31,7 @@ public abstract class BaseYangOpenApiGenerator {
         this.schemaService = requireNonNull(schemaService);
     }
 
-    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo) throws IOException {
+    public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo, final Integer width) throws IOException {
         final var context = requireNonNull(schemaService.getGlobalContext());
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
@@ -40,19 +40,19 @@ public abstract class BaseYangOpenApiGenerator {
         final var basePath = getBasePath();
         final var modules = context.getModules();
         return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
-            modules, basePath);
+            modules, basePath, width);
     }
 
-    public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo)
-            throws IOException {
+    public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
+            final Integer width) throws IOException {
         final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getApiDeclaration(module, revision, uriInfo, schemaContext, "", CONTROLLER_RESOURCE_NAME);
+        return getApiDeclaration(module, revision, uriInfo, schemaContext, "", CONTROLLER_RESOURCE_NAME, width);
     }
 
     public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
-            final EffectiveModelContext schemaContext, final String urlPrefix, final @NonNull String deviceName)
-            throws IOException {
+            final EffectiveModelContext schemaContext, final String urlPrefix, final @NonNull String deviceName,
+            final Integer width) throws IOException {
         final Optional<Revision> rev;
 
         try {
@@ -72,7 +72,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var basePath = getBasePath();
         final var modules = List.of(module);
         return new OpenApiInputStream(schemaContext, title, url, SECURITY,  deviceName, urlPrefix, true, false,
-            modules, basePath);
+            modules, basePath, width);
     }
 
     public String createHostFromUriInfo(final UriInfo uriInfo) {

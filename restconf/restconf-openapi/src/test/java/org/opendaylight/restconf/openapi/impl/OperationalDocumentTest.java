@@ -48,7 +48,7 @@ public class OperationalDocumentTest extends AbstractDocumentTest {
     public void getDocByModuleTest(final String moduleName, final String revision, final String jsonPath)
             throws Exception {
         final var expectedJson = getExpectedDoc("operational-document/" + jsonPath);
-        final var moduleDoc = getDocByModule(moduleName, revision);
+        final var moduleDoc = getDocByModule(moduleName, revision, 0);
         JSONAssert.assertEquals(expectedJson, moduleDoc, IGNORE_ORDER);
     }
 
