@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.openapi.model;
 
+import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.widthList;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.List;
@@ -22,16 +24,17 @@ public final class RpcSchemaEntity extends SchemaEntity {
     public RpcSchemaEntity(final @NonNull SchemaNode value, final @NonNull String title,
             final @Nullable String discriminator, final @NonNull String type,
             final @NonNull SchemaInferenceStack context, final @NonNull String parentName, final boolean isParentConfig,
-            final @NonNull DefinitionNames definitionNames) {
-        super(value, title, discriminator, type, context, parentName, isParentConfig, definitionNames);
+            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width) {
+        super(value, title, discriminator, type, context, parentName, isParentConfig, definitionNames, width);
     }
 
     @Override
     void generateProperties(final @NonNull JsonGenerator generator, final @NonNull List<String> required)
             throws IOException {
-        for (final var childNode : ((ContainerLike) value()).getChildNodes()) {
+        final var childNodes = widthList((ContainerLike) value(), width);
+        for (final var childNode : childNodes) {
             new PropertyEntity(childNode, generator, stack(), required, parentName(), isParentConfig(),
-                definitionNames());
+                definitionNames(), width);
         }
     }
 }
