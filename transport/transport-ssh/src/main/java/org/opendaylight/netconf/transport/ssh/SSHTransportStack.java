@@ -25,6 +25,7 @@ import org.opendaylight.netconf.transport.api.AbstractOverlayTransportStack;
 import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.opendaylight.netconf.transport.api.TransportChannelListener;
 import org.opendaylight.netconf.transport.api.TransportStack;
+import org.opendaylight.netconf.transport.tcp.TCPTransportChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     private static final Logger LOG = LoggerFactory.getLogger(SSHTransportStack.class);
 
     // Underlay TransportChannels which do not have an open subsystem
-    private final Map<Long, TransportChannel> underlays = new ConcurrentHashMap<>();
+    private final Map<Long, SSHTransportChannel> underlays = new ConcurrentHashMap<>();
     private final Map<Long, Session> sessions = new ConcurrentHashMap<>();
     private final TransportIoService ioService;
 
@@ -64,7 +65,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
     }
 
     @Override
-    protected void onUnderlayChannelEstablished(final TransportChannel underlayChannel) {
+    protected void onUnderlayChannelEstablished(final SSHTransportChannel underlayChannel) {
         LOG.debug("Underlay establishing, attaching SSH to {}", underlayChannel);
         // Acquire underlying channel, create a TransportIoSession and attach its handler to this channel -- which takes
         // care of routing bytes between the underlay channel and SSHD's network-facing side.
@@ -147,7 +148,7 @@ public abstract sealed class SSHTransportStack extends AbstractOverlayTransportS
 
     abstract void onAuthenticated(Session session) throws IOException;
 
-    final @NonNull TransportChannel getUnderlayOf(final Long sessionId) throws IOException {
+    final @NonNull SSHTransportChannel getUnderlayOf(final Long sessionId) throws IOException {
         final var ret = underlays.get(sessionId);
         if (ret == null) {
             throw new IOException("Cannot find underlay for " + sessionId);

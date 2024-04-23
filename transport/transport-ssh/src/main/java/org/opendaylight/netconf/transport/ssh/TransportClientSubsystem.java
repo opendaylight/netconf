@@ -15,7 +15,6 @@ import io.netty.channel.ChannelHandlerContext;
 import java.io.IOException;
 import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
 import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
-import org.opendaylight.netconf.transport.api.TransportChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,7 @@ final class TransportClientSubsystem extends ChannelSubsystem {
         throw new UnsupportedOperationException();
     }
 
-    synchronized ListenableFuture<ChannelHandlerContext> open(final TransportChannel underlay) throws IOException {
+    synchronized ListenableFuture<ChannelHandlerContext> open(final SSHTransportChannel underlay) throws IOException {
         LOG.debug("Opening client subsystem \"{}\"", getSubsystem());
 
         final var ret = SettableFuture.<ChannelHandlerContext>create();

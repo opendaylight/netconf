@@ -12,14 +12,14 @@ import org.eclipse.jdt.annotation.NonNull;
 /**
  * Transport-level channel event listener.
  */
-public interface TransportChannelListener {
+public interface TransportChannelListener<C extends TransportChannel> {
     /**
      * Invoked when a {@link TransportChannel} is established. Implementations of this method are expected to attach
      * to validate the channel and connect it to the messages layer.
      *
      * @param channel Established channel
      */
-    void onTransportChannelEstablished(@NonNull TransportChannel channel);
+    void onTransportChannelEstablished(@NonNull C channel);
 
     /**
      * Invoked when a {@link TransportChannel} could not be established. Implementations of this method are expected

@@ -19,14 +19,14 @@ import org.opendaylight.yangtools.yang.common.Empty;
  * Abstract base class for {@link TransportStack}s overlaid on a different stack.
  */
 public abstract class AbstractOverlayTransportStack<C extends TransportChannel> extends AbstractTransportStack<C> {
-    private final @NonNull TransportChannelListener asListener = new TransportChannelListener() {
+    private final @NonNull TransportChannelListener asListener = new TransportChannelListener<C>() {
         @Override
         public void onTransportChannelFailed(final Throwable cause) {
             notifyTransportChannelFailed(cause);
         }
 
         @Override
-        public void onTransportChannelEstablished(final TransportChannel channel) {
+        public void onTransportChannelEstablished(@NonNull C channel) {
             onUnderlayChannelEstablished(channel);
         }
     };
@@ -46,7 +46,7 @@ public abstract class AbstractOverlayTransportStack<C extends TransportChannel> 
         return asListener;
     }
 
-    protected abstract void onUnderlayChannelEstablished(@NonNull TransportChannel underlayChannel);
+    protected abstract void onUnderlayChannelEstablished(@NonNull C underlayChannel);
 
     final void setUnderlay(final TransportStack underlay) {
         this.underlay = requireNonNull(underlay);
