@@ -50,19 +50,22 @@ public final class SchemasStream extends InputStream {
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
 
+    private final Integer width;
+
     private Reader reader;
     private ReadableByteChannel channel;
     private boolean eof;
 
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule,
-            final ByteArrayOutputStream stream, final JsonGenerator generator) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
         this.isForSingleModule = isForSingleModule;
         this.stream = stream;
         this.generator = generator;
+        this.width = width;
     }
 
     @Override
@@ -81,7 +84,7 @@ public final class SchemasStream extends InputStream {
         while (read == -1) {
             if (iterator.hasNext()) {
                 reader = new BufferedReader(new InputStreamReader(
-                    new SchemaStream(toComponents(iterator.next(), context, isForSingleModule), writer),
+                    new SchemaStream(toComponents(iterator.next()), writer),
                         StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
@@ -112,7 +115,7 @@ public final class SchemasStream extends InputStream {
         while (read == -1) {
             if (iterator.hasNext()) {
                 channel = Channels.newChannel(
-                    new SchemaStream(toComponents(iterator.next(), context, isForSingleModule), writer));
+                    new SchemaStream(toComponents(iterator.next()), writer));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 continue;
             }
@@ -126,8 +129,7 @@ public final class SchemasStream extends InputStream {
         return read;
     }
 
-    private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context,
-            final boolean isForSingleModule) {
+    private Deque<SchemaEntity> toComponents(final Module module) {
         final var result = new ArrayDeque<SchemaEntity>();
         final var definitionNames = new DefinitionNames();
         final var stack = SchemaInferenceStack.of(context);
@@ -172,14 +174,17 @@ public final class SchemasStream extends InputStream {
             stack.exit();
         }
 
-        for (final var childNode : module.getChildNodes()) {
+        final var childNodes = !isApplied(width) ?
+                module.getChildNodes() :
+                module.getChildNodes().stream().limit(width).toList();
+        for (final var childNode : childNodes) {
             processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
                 true);
         }
         return result;
     }
 
-    private static void processDataAndActionNodes(final DataSchemaNode node, final String title,
+    private void processDataAndActionNodes(final DataSchemaNode node, final String title,
             final SchemaInferenceStack stack, final DefinitionNames definitionNames,
             final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
@@ -197,8 +202,17 @@ public final class SchemasStream extends InputStream {
             result.add(child);
             stack.enterSchemaTree(node.getQName());
             processActions(node, newTitle, stack, definitionNames, result, parentName);
-            for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
-                processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
+            if (isApplied(width)) {
+                final var childrenList = ((DataNodeContainer) node).getChildNodes().toArray();
+                final var limit = width < childrenList.length ? width : childrenList.length;
+                for (int i = 0; i < limit; i++) {
+                    processDataAndActionNodes((DataSchemaNode) childrenList[i], newTitle, stack, definitionNames,
+                        result, newTitle, isConfig);
+                }
+            } else {
+                for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
+                    processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
+                }
             }
             stack.exit();
         } else if (node instanceof ChoiceSchemaNode choiceNode && !choiceNode.getCases().isEmpty()) {
@@ -208,8 +222,18 @@ public final class SchemasStream extends InputStream {
                     .orElseThrow(() -> new IllegalStateException("No cases found in ChoiceSchemaNode")));
             stack.enterSchemaTree(choiceNode.getQName());
             stack.enterSchemaTree(caseNode.getQName());
-            for (final var childNode : caseNode.getChildNodes()) {
-                processDataAndActionNodes(childNode, title, stack, definitionNames, result, parentName, isParentConfig);
+            if (isApplied(width)) {
+                final var childrenList = caseNode.getChildNodes().toArray();
+                final var limit = width < childrenList.length ? width : childrenList.length;
+                for (int i = 0; i < limit; i++) {
+                    processDataAndActionNodes((DataSchemaNode) childrenList[i], title, stack, definitionNames, result,
+                        parentName, isParentConfig);
+                }
+            } else {
+                for (final var childNode : caseNode.getChildNodes()) {
+                    processDataAndActionNodes(childNode, title, stack, definitionNames, result, parentName,
+                        isParentConfig);
+                }
             }
             stack.exit(); // Exit the CaseSchemaNode context
             stack.exit(); // Exit the ChoiceSchemaNode context
@@ -234,6 +258,16 @@ public final class SchemasStream extends InputStream {
                 result.add(output);
             }
             stack.exit();
+        }
+    }
+
+    private boolean isApplied(final Integer param) {
+        if (param == null || param == 0) {
+            return false;
+        } else if (param > 0) {
+            return true;
+        } else {
+            return false;
         }
     }
 }
