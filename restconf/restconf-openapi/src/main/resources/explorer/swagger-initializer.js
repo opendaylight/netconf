@@ -4,7 +4,7 @@ window.onload = function() {
     xmlHttp.send( null );
 
     var base_url_rfc = document.URL.split('/openapi')[0] + '/openapi/api/v3/mounts/';
-    var swagger_urls = [{url: document.URL.split('/openapi')[0] + "/openapi/api/v3/single", name: "Controller resources - RestConf RFC 8040"}];
+    var swagger_urls = [{url: document.URL.split('/openapi')[0] + '/openapi/api/v3/single?depth=3&width=5', name: 'Controller resources - RestConf RFC 8040'}];
     var devices = JSON.parse(xmlHttp.responseText);
     for (var i =0; i < devices.length; i++) {
       var device_name = devices[i]['instance'].split('=')[2].replace('/', '');
