@@ -12,6 +12,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,7 +30,7 @@ public interface OpenApiService {
     @GET
     @Path("/single")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getAllModulesDoc(@Context UriInfo uriInfo) throws IOException;
+    Response getAllModulesDoc(@Context UriInfo uriInfo, @QueryParam("width") Integer width) throws IOException;
 
     /**
      * Generates Swagger compliant document listing APIs for module.
@@ -38,7 +39,7 @@ public interface OpenApiService {
     @Path("/{module}({revision})")
     @Produces(MediaType.APPLICATION_JSON)
     Response getDocByModule(@PathParam("module") String module, @PathParam("revision") String revision,
-                            @Context UriInfo uriInfo) throws IOException;
+                            @Context UriInfo uriInfo, @QueryParam("width") Integer width) throws IOException;
 
     /**
      * Redirects to embedded swagger ui.
@@ -66,7 +67,7 @@ public interface OpenApiService {
     @Produces(MediaType.APPLICATION_JSON)
     Response getMountDocByModule(@PathParam("instance") String instanceNum,
                                  @PathParam("module") String module, @PathParam("revision") String revision,
-                                 @Context UriInfo uriInfo) throws IOException;
+                                 @Context UriInfo uriInfo, @QueryParam("width") Integer width) throws IOException;
 
     /**
      * Generates Swagger compliant document listing APIs for all modules of mount point.
@@ -74,5 +75,6 @@ public interface OpenApiService {
     @GET
     @Path("/mounts/{instance}")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo) throws IOException;
+    Response getMountDoc(@PathParam("instance") String instanceNum, @Context UriInfo uriInfo,
+                         @QueryParam("width") Integer width) throws IOException;
 }
