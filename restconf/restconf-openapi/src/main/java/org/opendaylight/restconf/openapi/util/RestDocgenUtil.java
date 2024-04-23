@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.util;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,6 +15,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
@@ -60,5 +63,12 @@ public final class RestDocgenUtil {
             return module.getName() + ":" + node.getLocalName();
         }
         return node.getLocalName();
+    }
+
+    public static Collection<? extends DataSchemaNode> widthList(final DataNodeContainer node, final Integer width) {
+        if (width > 0) {
+            return node.getChildNodes().stream().limit(width).toList(); // limit children to width
+        }
+        return node.getChildNodes(); // width not applied - processing all children
     }
 }
