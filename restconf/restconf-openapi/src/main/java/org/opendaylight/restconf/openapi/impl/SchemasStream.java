@@ -50,19 +50,22 @@ public final class SchemasStream extends InputStream {
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
 
+    private final Integer width;
+
     private Reader reader;
     private ReadableByteChannel channel;
     private boolean eof;
 
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule,
-            final ByteArrayOutputStream stream, final JsonGenerator generator) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
         this.isForSingleModule = isForSingleModule;
         this.stream = stream;
         this.generator = generator;
+        this.width = width;
     }
 
     @Override
@@ -126,7 +129,7 @@ public final class SchemasStream extends InputStream {
         return read;
     }
 
-    private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context,
+    private Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context,
             final boolean isForSingleModule) {
         final var result = new ArrayDeque<SchemaEntity>();
         final var definitionNames = new DefinitionNames();
@@ -172,9 +175,20 @@ public final class SchemasStream extends InputStream {
             stack.exit();
         }
 
-        for (final var childNode : module.getChildNodes()) {
-            processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
-                true);
+        if (width == null || width == 0) {
+            for (final var childNode : module.getChildNodes()) {
+                processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
+                    true);
+            }
+        } else if (width > 0) {
+            final var childrenList = module.getChildNodes().toArray();
+            final var limit = width < childrenList.length ? width : childrenList.length;
+            for (int i = 0; i < limit; i++) {
+                processDataAndActionNodes((DataSchemaNode) childrenList[i], moduleName, stack, definitionNames, result,
+                    moduleName, true);
+            }
+        } else {
+            throw new IllegalArgumentException("Incorrect value for width parameter!");
         }
         return result;
     }
