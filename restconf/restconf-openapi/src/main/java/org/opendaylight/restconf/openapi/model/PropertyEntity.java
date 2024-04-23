@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.openapi.model;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.widthList;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.common.collect.Range;
@@ -98,16 +99,18 @@ public class PropertyEntity {
     private final @NonNull List<String> required;
     private final @NonNull String parentName;
     private final @NonNull DefinitionNames definitionNames;
+    private final @NonNull Integer width;
 
     public PropertyEntity(final @NonNull DataSchemaNode node, final @NonNull JsonGenerator generator,
             final @NonNull SchemaInferenceStack stack, final @NonNull List<String> required,
             final @NonNull String parentName, final boolean isParentConfig,
-            final @NonNull DefinitionNames definitionNames) throws IOException {
+            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width) throws IOException {
         this.node = requireNonNull(node);
         this.generator = requireNonNull(generator);
         this.required = requireNonNull(required);
         this.parentName = requireNonNull(parentName);
         this.definitionNames = requireNonNull(definitionNames);
+        this.width = requireNonNull(width);
         generate(stack, isParentConfig);
     }
 
@@ -130,7 +133,8 @@ public class PropertyEntity {
             final var caseSchemaNode = choice.getDefaultCase().orElse(
                 choice.getCases().stream().findFirst().orElseThrow());
             stack.enterSchemaTree(caseSchemaNode.getQName());
-            for (final var childNode : caseSchemaNode.getChildNodes()) {
+            final var childNodes = widthList(caseSchemaNode, width);
+            for (final var childNode : childNodes) {
                 if (childNode instanceof ChoiceSchemaNode childChoice) {
                     final var isChildConfig = isConfig && childNode.isConfiguration();
                     stack.enterSchemaTree(childNode.getQName());
