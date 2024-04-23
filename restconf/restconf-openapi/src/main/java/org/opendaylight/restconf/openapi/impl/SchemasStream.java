@@ -50,19 +50,22 @@ public final class SchemasStream extends InputStream {
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
 
+    private final Integer width;
+
     private Reader reader;
     private ReadableByteChannel channel;
     private boolean eof;
 
     public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule,
-            final ByteArrayOutputStream stream, final JsonGenerator generator) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
         this.isForSingleModule = isForSingleModule;
         this.stream = stream;
         this.generator = generator;
+        this.width = width;
     }
 
     @Override
@@ -81,7 +84,7 @@ public final class SchemasStream extends InputStream {
         while (read == -1) {
             if (iterator.hasNext()) {
                 reader = new BufferedReader(new InputStreamReader(
-                    new SchemaStream(toComponents(iterator.next(), context, isForSingleModule), writer),
+                    new SchemaStream(toComponents(iterator.next()), writer),
                         StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
@@ -112,7 +115,7 @@ public final class SchemasStream extends InputStream {
         while (read == -1) {
             if (iterator.hasNext()) {
                 channel = Channels.newChannel(
-                    new SchemaStream(toComponents(iterator.next(), context, isForSingleModule), writer));
+                    new SchemaStream(toComponents(iterator.next()), writer));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 continue;
             }
@@ -126,8 +129,7 @@ public final class SchemasStream extends InputStream {
         return read;
     }
 
-    private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context,
-            final boolean isForSingleModule) {
+    private Deque<SchemaEntity> toComponents(final Module module) {
         final var result = new ArrayDeque<SchemaEntity>();
         final var definitionNames = new DefinitionNames();
         final var stack = SchemaInferenceStack.of(context);
@@ -172,9 +174,20 @@ public final class SchemasStream extends InputStream {
             stack.exit();
         }
 
-        for (final var childNode : module.getChildNodes()) {
-            processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
-                true);
+        if (width == null || width == 0) {
+            for (final var childNode : module.getChildNodes()) {
+                processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
+                    true);
+            }
+        } else if (width > 0) {
+            final var childrenList = module.getChildNodes().toArray();
+            final var limit = width < childrenList.length ? width : childrenList.length;
+            for (int i = 0; i < limit; i++) {
+                processDataAndActionNodes((DataSchemaNode) childrenList[i], moduleName, stack, definitionNames, result,
+                    moduleName, true);
+            }
+        } else {
+            throw new IllegalArgumentException("Incorrect value for width parameter!");
         }
         return result;
     }
