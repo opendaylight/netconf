@@ -7,6 +7,9 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import static java.util.Objects.requireNonNullElse;
+import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.widthList;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -51,6 +54,7 @@ public final class SchemasStream extends InputStream {
     private final boolean isForSingleModule;
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
+    private final Integer width;
 
     private Reader reader;
     private ReadableByteChannel channel;
@@ -58,13 +62,14 @@ public final class SchemasStream extends InputStream {
 
     public SchemasStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule,
-            final ByteArrayOutputStream stream, final JsonGenerator generator) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
         this.iterator = iterator;
         this.modelContext = modelContext;
         this.writer = writer;
         this.isForSingleModule = isForSingleModule;
         this.stream = stream;
         this.generator = generator;
+        this.width = requireNonNullElse(width, 0);
     }
 
     @Override
@@ -83,7 +88,8 @@ public final class SchemasStream extends InputStream {
         while (read == -1) {
             if (iterator.hasNext()) {
                 reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(
-                    writeNextEntity(new SchemasEntity(toComponents(iterator.next(), modelContext, isForSingleModule)))),
+                    writeNextEntity(new SchemasEntity(toComponents(iterator.next(), modelContext, isForSingleModule,
+                            width)))),
                         StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
@@ -114,7 +120,7 @@ public final class SchemasStream extends InputStream {
         while (read == -1) {
             if (iterator.hasNext()) {
                 channel = Channels.newChannel(new ByteArrayInputStream(writeNextEntity(
-                    new SchemasEntity(toComponents(iterator.next(), modelContext, isForSingleModule)))));
+                    new SchemasEntity(toComponents(iterator.next(), modelContext, isForSingleModule, width)))));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 continue;
             }
@@ -134,7 +140,7 @@ public final class SchemasStream extends InputStream {
     }
 
     private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext modelContext,
-            final boolean isForSingleModule) {
+            final boolean isForSingleModule, final int width) {
         final var result = new ArrayDeque<SchemaEntity>();
         final var definitionNames = new DefinitionNames();
         final var stack = SchemaInferenceStack.of(modelContext);
@@ -149,14 +155,14 @@ public final class SchemasStream extends InputStream {
             final var rpcInput = rpc.getInput();
             if (!rpcInput.getChildNodes().isEmpty()) {
                 final var input = new RpcSchemaEntity(rpcInput, moduleName + "_" + rpcName + INPUT_SUFFIX, null,
-                    OBJECT_TYPE, stack, moduleName, false, definitionNames);
+                    OBJECT_TYPE, stack, moduleName, false, definitionNames, width);
                 result.add(input);
                 stack.enterSchemaTree(rpcInput.getQName());
                 for (final var child : rpcInput.getChildNodes()) {
                     if (!children.contains(child)) {
                         children.add(child);
                         processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName,
-                            false);
+                            false, width);
                     }
                 }
                 stack.exit();
@@ -164,14 +170,14 @@ public final class SchemasStream extends InputStream {
             final var rpcOutput = rpc.getOutput();
             if (!rpcOutput.getChildNodes().isEmpty()) {
                 final var output = new RpcSchemaEntity(rpcOutput, moduleName + "_" + rpcName + OUTPUT_SUFFIX, null,
-                    OBJECT_TYPE, stack, moduleName, false, definitionNames);
+                    OBJECT_TYPE, stack, moduleName, false, definitionNames, width);
                 result.add(output);
                 stack.enterSchemaTree(rpcOutput.getQName());
                 for (final var child : rpcOutput.getChildNodes()) {
                     if (!children.contains(child)) {
                         children.add(child);
                         processDataAndActionNodes(child, moduleName, stack, definitionNames, result, moduleName,
-                            false);
+                            false, width);
                     }
                 }
                 stack.exit();
@@ -179,16 +185,18 @@ public final class SchemasStream extends InputStream {
             stack.exit();
         }
 
-        for (final var childNode : module.getChildNodes()) {
+        final var childNodes = widthList(module, width);
+        for (final var childNode : childNodes) {
             processDataAndActionNodes(childNode, moduleName, stack, definitionNames, result, moduleName,
-                true);
+                true, width);
         }
         return result;
     }
 
     private static void processDataAndActionNodes(final DataSchemaNode node, final String title,
             final SchemaInferenceStack stack, final DefinitionNames definitionNames,
-            final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
+            final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig,
+            final int width) {
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
             final var newTitle = title + "_" + node.getQName().getLocalName();
             if (definitionNames.isListedNode(node, newTitle)) {
@@ -197,13 +205,15 @@ public final class SchemasStream extends InputStream {
             }
             final var discriminator = definitionNames.pickDiscriminator(node, List.of(newTitle));
             final var child = new NodeSchemaEntity(node, newTitle, discriminator, OBJECT_TYPE, stack, parentName,
-                isParentConfig, definitionNames);
+                isParentConfig, definitionNames, width);
             final var isConfig = node.isConfiguration() && isParentConfig;
             result.add(child);
             stack.enterSchemaTree(node.getQName());
-            processActions(node, newTitle, stack, definitionNames, result, parentName);
-            for (final var childNode : ((DataNodeContainer) node).getChildNodes()) {
-                processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig);
+            processActions(node, newTitle, stack, definitionNames, result, parentName, width);
+            final var childNodes = widthList((DataNodeContainer) node, width);
+            for (final var childNode : childNodes) {
+                processDataAndActionNodes(childNode, newTitle, stack, definitionNames, result, newTitle, isConfig,
+                    width);
             }
             stack.exit();
         } else if (node instanceof ChoiceSchemaNode choiceNode && !choiceNode.getCases().isEmpty()) {
@@ -213,8 +223,10 @@ public final class SchemasStream extends InputStream {
                     .orElseThrow(() -> new IllegalStateException("No cases found in ChoiceSchemaNode")));
             stack.enterSchemaTree(choiceNode.getQName());
             stack.enterSchemaTree(caseNode.getQName());
-            for (final var childNode : caseNode.getChildNodes()) {
-                processDataAndActionNodes(childNode, title, stack, definitionNames, result, parentName, isParentConfig);
+            final var childNodes = widthList(caseNode, width);
+            for (final var childNode : childNodes) {
+                processDataAndActionNodes(childNode, title, stack, definitionNames, result, parentName,
+                    isParentConfig, width);
             }
             stack.exit(); // Exit the CaseSchemaNode context
             stack.exit(); // Exit the ChoiceSchemaNode context
@@ -222,20 +234,21 @@ public final class SchemasStream extends InputStream {
     }
 
     private static void processActions(final DataSchemaNode node, final String title, final SchemaInferenceStack stack,
-            final DefinitionNames definitionNames, final ArrayDeque<SchemaEntity> result, final String parentName) {
+            final DefinitionNames definitionNames, final ArrayDeque<SchemaEntity> result, final String parentName,
+            final int width) {
         for (final var actionDef : ((ActionNodeContainer) node).getActions()) {
             stack.enterSchemaTree(actionDef.getQName());
             final var actionName = actionDef.getQName().getLocalName();
             final var actionInput = actionDef.getInput();
             if (!actionInput.getChildNodes().isEmpty()) {
                 final var input = new RpcSchemaEntity(actionInput, title + "_" + actionName + INPUT_SUFFIX, null,
-                    OBJECT_TYPE, stack, parentName, false, definitionNames);
+                    OBJECT_TYPE, stack, parentName, false, definitionNames, width);
                 result.add(input);
             }
             final var actionOutput = actionDef.getOutput();
             if (!actionOutput.getChildNodes().isEmpty()) {
                 final var output = new RpcSchemaEntity(actionOutput, title + "_" + actionName + OUTPUT_SUFFIX, null,
-                    OBJECT_TYPE, stack, parentName, false, definitionNames);
+                    OBJECT_TYPE, stack, parentName, false, definitionNames, width);
                 result.add(output);
             }
             stack.exit();
