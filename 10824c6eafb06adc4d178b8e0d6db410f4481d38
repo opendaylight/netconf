@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "70a85035_f811c1fc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-04-23T08:30:18Z",
+      "side": 1,
+      "message": "longer than 75 char",
+      "revId": "10824c6eafb06adc4d178b8e0d6db410f4481d38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "fba869f3_4da7c1d1",
@@ -14,6 +31,40 @@
       "writtenOn": "2024-04-18T20:20:33Z",
       "side": 1,
       "message": "recheck",
+      "revId": "10824c6eafb06adc4d178b8e0d6db410f4481d38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92e52c88_abd4587e",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-04-23T08:30:18Z",
+      "side": 1,
+      "message": "from",
+      "revId": "10824c6eafb06adc4d178b8e0d6db410f4481d38",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "362a4122_3f5fca9a",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-04-23T08:30:18Z",
+      "side": 1,
+      "message": "from",
       "revId": "10824c6eafb06adc4d178b8e0d6db410f4481d38",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
