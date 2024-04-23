@@ -27,22 +27,26 @@ public final class NodeSchemaEntity extends SchemaEntity {
     public NodeSchemaEntity(final @NonNull SchemaNode value, final @NonNull String title,
             final @Nullable String discriminator, final @NonNull String type,
             final @NonNull SchemaInferenceStack context, final @NonNull String parentName, final boolean isParentConfig,
-            final @NonNull DefinitionNames definitionNames) {
-        super(value, title, discriminator, type, context, parentName, isParentConfig, definitionNames);
+            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width) {
+        super(value, title, discriminator, type, context, parentName, isParentConfig, definitionNames, width);
     }
 
     @Override
     void generateProperties(final @NonNull JsonGenerator generator, final @NonNull List<String> required)
             throws IOException {
         final var childNodes = new HashMap<String, DataSchemaNode>();
-        for (final var childNode : ((DataNodeContainer) value()).getChildNodes()) {
+        final var dataSchemaNodes = width != null && width > 0
+            ? ((DataNodeContainer) value()).getChildNodes().stream().limit(width).toList()
+            : ((DataNodeContainer) value()).getChildNodes();
+        for (final var childNode : dataSchemaNodes) {
             childNodes.put(childNode.getQName().getLocalName(), childNode);
         }
         final boolean isValueConfig = ((DataSchemaNode) value()).isConfiguration();
+
         for (final var childNode : childNodes.values()) {
             if (shouldBeAddedAsProperty(childNode, isValueConfig)) {
                 new PropertyEntity(childNode, generator, stack(), required, parentName() + "_"
-                    + value().getQName().getLocalName(), isValueConfig, definitionNames());
+                    + value().getQName().getLocalName(), isValueConfig, definitionNames(), width);
             }
         }
     }
