@@ -1,0 +1,3651 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "123 modules of RESTCONF",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That's because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/data/nodes/node=123/yang-ext:mount": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - action-types - action-types",
+        "requestBody": {
+          "description": "list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/action-types_list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "123 root"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "Queries the config (startup) datastore on the mounted hosted.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "GET - 123 - datastore - data",
+        "tags": [
+          "123 root"
+        ]
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount": {
+      "get": {
+        "description": "Queries the available operations (RPC calls) on the mounted hosted.",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "GET - 123 - datastore - operations",
+        "tags": [
+          "123 root"
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/action-types:list={name}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - action-types - 123 - list",
+        "requestBody": {
+          "description": "list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action-types:list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/action-types_list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - action-types - 123 - list",
+        "requestBody": {
+          "description": "list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "action-types:list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/action-types_list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - action-types - list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - action-types - list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/action-types_list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/action-types:list={name}/list-action": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - action-types - list-action",
+        "requestBody": {
+          "description": "list-action_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/action-types_list_list-action_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/action-types_list_list-action_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC list-action success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_list_list-action_output"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/action-types_list_list-action_output"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 action-types"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/choice-test:first-container": {
+      "put": {
+        "description": "",
+        "summary": "PUT - choice-test - 123 - first-container",
+        "requestBody": {
+          "description": "first-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "choice-test:first-container": {
+                    "$ref": "#/components/schemas/choice-test_first-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/choice-test_first-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 choice-test"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - choice-test - 123 - first-container",
+        "requestBody": {
+          "description": "first-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "choice-test:first-container": {
+                    "$ref": "#/components/schemas/choice-test_first-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/choice-test_first-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 choice-test"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - choice-test - first-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 choice-test"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - choice-test - first-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/choice-test_first-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "first-container": {
+                      "$ref": "#/components/schemas/choice-test_first-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 choice-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/definition-test:binary-container": {
+      "put": {
+        "description": "",
+        "summary": "PUT - definition-test - 123 - binary-container",
+        "requestBody": {
+          "description": "binary-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "definition-test:binary-container": {
+                    "$ref": "#/components/schemas/definition-test_binary-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/definition-test_binary-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 definition-test"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - definition-test - 123 - binary-container",
+        "requestBody": {
+          "description": "binary-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "definition-test:binary-container": {
+                    "$ref": "#/components/schemas/definition-test_binary-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/definition-test_binary-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 definition-test"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - definition-test - binary-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 definition-test"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - definition-test - binary-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/definition-test_binary-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "binary-container": {
+                      "$ref": "#/components/schemas/definition-test_binary-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 definition-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/duplication-test:test-rpc": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - duplication-test - test-rpc",
+        "requestBody": {
+          "description": "test-rpc_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc success"
+          }
+        },
+        "tags": [
+          "123 duplication-test"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/duplication-test:test-rpc2": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - duplication-test - test-rpc2",
+        "requestBody": {
+          "description": "test-rpc2_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc2_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc2_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc2 success"
+          }
+        },
+        "tags": [
+          "123 duplication-test"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/duplication-test:test-rpc3": {
+      "post": {
+        "description": "",
+        "summary": "POST - 123 - duplication-test - test-rpc3",
+        "requestBody": {
+          "description": "test-rpc3_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/duplication-test_test-rpc3_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/duplication-test_test-rpc3_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC test-rpc3 success"
+          }
+        },
+        "tags": [
+          "123 duplication-test"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/mandatory-test:root-container": {
+      "put": {
+        "description": "",
+        "summary": "PUT - mandatory-test - 123 - root-container",
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - mandatory-test - 123 - root-container",
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "mandatory-test:root-container": {
+                    "$ref": "#/components/schemas/mandatory-test_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/mandatory-test_root-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - mandatory-test - root-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - mandatory-test - root-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/mandatory-test_root-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-container": {
+                      "$ref": "#/components/schemas/mandatory-test_root-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 mandatory-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/my-yang:data": {
+      "put": {
+        "description": "",
+        "summary": "PUT - my-yang - 123 - data",
+        "requestBody": {
+          "description": "data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "my-yang:data": {
+                    "$ref": "#/components/schemas/my-yang_data",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/my-yang_data"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 my-yang"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - my-yang - 123 - data",
+        "requestBody": {
+          "description": "data",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "my-yang:data": {
+                    "$ref": "#/components/schemas/my-yang_data",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/my-yang_data"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 my-yang"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - my-yang - data",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 my-yang"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - my-yang - data",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/my-yang_data"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/my-yang_data",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 my-yang"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - path-params-test - cont",
+        "requestBody": {
+          "description": "list1",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "list1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": []
+      },
+      "put": {
+        "description": "",
+        "summary": "PUT - path-params-test - 123 - cont",
+        "requestBody": {
+          "description": "cont",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:cont": {
+                    "$ref": "#/components/schemas/path-params-test_cont",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - path-params-test - 123 - cont",
+        "requestBody": {
+          "description": "cont",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:cont": {
+                    "$ref": "#/components/schemas/path-params-test_cont",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - path-params-test - cont",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - path-params-test - cont",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "cont": {
+                      "$ref": "#/components/schemas/path-params-test_cont",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/path-params-test:cont/list1={name}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - path-params-test - 123 - list1",
+        "requestBody": {
+          "description": "list1",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - path-params-test - 123 - list1",
+        "requestBody": {
+          "description": "list1",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "path-params-test:list1": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/path-params-test_cont_list1",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/path-params-test_cont_list1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - path-params-test - list1",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - path-params-test - list1",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/path-params-test_cont_list1"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "list1": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/path-params-test_cont_list1",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 path-params-test"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - recursive - container-root",
+        "requestBody": {
+          "description": "root-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "root-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/recursive_container-root_root-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root_root-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": []
+      },
+      "put": {
+        "description": "",
+        "summary": "PUT - recursive - 123 - container-root",
+        "requestBody": {
+          "description": "container-root",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "recursive:container-root": {
+                    "$ref": "#/components/schemas/recursive_container-root",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - recursive - 123 - container-root",
+        "requestBody": {
+          "description": "container-root",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "recursive:container-root": {
+                    "$ref": "#/components/schemas/recursive_container-root",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - recursive - container-root",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - recursive - container-root",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/recursive_container-root"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "container-root": {
+                      "$ref": "#/components/schemas/recursive_container-root",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/recursive:container-root/root-list={name}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - recursive - 123 - root-list",
+        "requestBody": {
+          "description": "root-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "recursive:root-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/recursive_container-root_root-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root_root-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - recursive - 123 - root-list",
+        "requestBody": {
+          "description": "root-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "recursive:root-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/recursive_container-root_root-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/recursive_container-root_root-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - recursive - root-list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - recursive - root-list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/recursive_container-root_root-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/recursive_container-root_root-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 recursive"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/string-types:test": {
+      "put": {
+        "description": "Tests various combinations of regex expressions found in snmp yang models,\nwhich are causing problems because of isBasicLatin expression.\n\nAccording to https://unicode.org/charts/PDF/U0000.pdf basic latin characters are in range\n0x00-0x7F ([\\x00-\\xFF] or [\\u0000-\\u00FF]). This means it should be safe to replace isBasicLatin\nin regex expressions for characters in this range.",
+        "summary": "PUT - string-types - 123 - test",
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "string-types:test": {
+                    "$ref": "#/components/schemas/string-types_test",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/string-types_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 string-types"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "Tests various combinations of regex expressions found in snmp yang models,\nwhich are causing problems because of isBasicLatin expression.\n\nAccording to https://unicode.org/charts/PDF/U0000.pdf basic latin characters are in range\n0x00-0x7F ([\\x00-\\xFF] or [\\u0000-\\u00FF]). This means it should be safe to replace isBasicLatin\nin regex expressions for characters in this range.",
+        "summary": "PATCH - string-types - 123 - test",
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "string-types:test": {
+                    "$ref": "#/components/schemas/string-types_test",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/string-types_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 string-types"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "Tests various combinations of regex expressions found in snmp yang models,\nwhich are causing problems because of isBasicLatin expression.\n\nAccording to https://unicode.org/charts/PDF/U0000.pdf basic latin characters are in range\n0x00-0x7F ([\\x00-\\xFF] or [\\u0000-\\u00FF]). This means it should be safe to replace isBasicLatin\nin regex expressions for characters in this range.",
+        "summary": "DELETE - 123 - string-types - test",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 string-types"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "Tests various combinations of regex expressions found in snmp yang models,\nwhich are causing problems because of isBasicLatin expression.\n\nAccording to https://unicode.org/charts/PDF/U0000.pdf basic latin characters are in range\n0x00-0x7F ([\\x00-\\xFF] or [\\u0000-\\u00FF]). This means it should be safe to replace isBasicLatin\nin regex expressions for characters in this range.",
+        "summary": "GET - 123 - string-types - test",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/string-types_test"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "test": {
+                      "$ref": "#/components/schemas/string-types_test",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 string-types"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/strings-examples-length:test": {
+      "put": {
+        "description": "",
+        "summary": "PUT - strings-examples-length - 123 - test",
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "strings-examples-length:test": {
+                    "$ref": "#/components/schemas/strings-examples-length_test",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/strings-examples-length_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 strings-examples-length"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - strings-examples-length - 123 - test",
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "strings-examples-length:test": {
+                    "$ref": "#/components/schemas/strings-examples-length_test",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/strings-examples-length_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 strings-examples-length"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - strings-examples-length - test",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 strings-examples-length"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - strings-examples-length - test",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/strings-examples-length_test"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "test": {
+                      "$ref": "#/components/schemas/strings-examples-length_test",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 strings-examples-length"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/strings-from-regex:test": {
+      "put": {
+        "description": "",
+        "summary": "PUT - strings-from-regex - 123 - test",
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "strings-from-regex:test": {
+                    "$ref": "#/components/schemas/strings-from-regex_test",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/strings-from-regex_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 strings-from-regex"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - strings-from-regex - 123 - test",
+        "requestBody": {
+          "description": "test",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "strings-from-regex:test": {
+                    "$ref": "#/components/schemas/strings-from-regex_test",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/strings-from-regex_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 strings-from-regex"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - strings-from-regex - test",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 strings-from-regex"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - strings-from-regex - test",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/strings-from-regex_test"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "test": {
+                      "$ref": "#/components/schemas/strings-from-regex_test",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 strings-from-regex"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - test-container-childs - root-container",
+        "requestBody": {
+          "description": "nested-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "nested-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container_nested-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": []
+      },
+      "put": {
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - root-container",
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:root-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - root-container",
+        "requestBody": {
+          "description": "root-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:root-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - root-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - root-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "root-container": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container/nested-container": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - test-container-childs - nested-container",
+        "requestBody": {
+          "description": "mandatory-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": []
+      },
+      "put": {
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - nested-container",
+        "requestBody": {
+          "description": "nested-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:nested-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container_nested-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - nested-container",
+        "requestBody": {
+          "description": "nested-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:nested-container": {
+                    "$ref": "#/components/schemas/test-container-childs_root-container_nested-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - nested-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - nested-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "nested-container": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container_nested-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/test-container-childs:root-container/nested-container/mandatory-list={id}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - test-container-childs - 123 - mandatory-list",
+        "requestBody": {
+          "description": "mandatory-list",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - test-container-childs - 123 - mandatory-list",
+        "requestBody": {
+          "description": "mandatory-list",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "test-container-childs:mandatory-list": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - test-container-childs - mandatory-list",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - test-container-childs - mandatory-list",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "mandatory-list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 test-container-childs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/toaster:make-toast": {
+      "post": {
+        "description": "Make some toast.\n  The toastDone notification will be sent when\n  the toast is finished.\n  An 'in-use' error will be returned if toast\n  is already being made.\n  A 'resource-denied' error will be returned\n  if the toaster service is disabled.",
+        "summary": "POST - 123 - toaster - make-toast",
+        "requestBody": {
+          "description": "make-toast_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/toaster_make-toast_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster_make-toast_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC make-toast success"
+          }
+        },
+        "tags": [
+          "123 toaster"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/toaster:cancel-toast": {
+      "post": {
+        "description": "Stop making toast, if any is being made.\n  A 'resource-denied' error will be returned\n  if the toaster service is disabled.",
+        "summary": "POST - 123 - toaster - cancel-toast",
+        "requestBody": {
+          "description": "cancel-toast_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "xml": {
+                  "name": "input",
+                  "namespace": "http://netconfcentral.org/ns/toaster"
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC cancel-toast success"
+          }
+        },
+        "tags": [
+          "123 toaster"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/toaster2:make-toast": {
+      "post": {
+        "description": "Make some toast.\n  The toastDone notification will be sent when\n  the toast is finished.\n  An 'in-use' error will be returned if toast\n  is already being made.\n  A 'resource-denied' error will be returned\n  if the toaster service is disabled.",
+        "summary": "POST - 123 - toaster2 - make-toast",
+        "requestBody": {
+          "description": "make-toast_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/toaster2_make-toast_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_make-toast_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC make-toast success"
+          }
+        },
+        "tags": [
+          "123 toaster2"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/toaster2:cancel-toast": {
+      "post": {
+        "description": "Stop making toast, if any is being made.\n  A 'resource-denied' error will be returned\n  if the toaster service is disabled.",
+        "summary": "POST - 123 - toaster2 - cancel-toast",
+        "requestBody": {
+          "description": "cancel-toast_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "xml": {
+                  "name": "input",
+                  "namespace": "http://netconfcentral.org/ns/toaster2"
+                },
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC cancel-toast success"
+          }
+        },
+        "tags": [
+          "123 toaster2"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/operations/nodes/node=123/yang-ext:mount/toaster2:restock-toaster": {
+      "post": {
+        "description": "Restocks the toaster with the amount of bread specified.",
+        "summary": "POST - 123 - toaster2 - restock-toaster",
+        "requestBody": {
+          "description": "restock-toaster_input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "input": {
+                    "$ref": "#/components/schemas/toaster2_restock-toaster_input",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_restock-toaster_input"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "RPC restock-toaster success"
+          }
+        },
+        "tags": [
+          "123 toaster2"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/toaster2:toaster": {
+      "put": {
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "PUT - toaster2 - 123 - toaster",
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "toaster2:toaster": {
+                    "$ref": "#/components/schemas/toaster2_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_toaster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 toaster2"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "PATCH - toaster2 - 123 - toaster",
+        "requestBody": {
+          "description": "toaster",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "toaster2:toaster": {
+                    "$ref": "#/components/schemas/toaster2_toaster",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/toaster2_toaster"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 toaster2"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "DELETE - 123 - toaster2 - toaster",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 toaster2"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "Top-level container for all toaster database objects.",
+        "summary": "GET - 123 - toaster2 - toaster",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/toaster2_toaster"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "toaster": {
+                      "$ref": "#/components/schemas/toaster2_toaster",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 toaster2"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - 123 - typed-params - typed",
+        "requestBody": {
+          "description": "string",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "string": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_string",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": []
+      },
+      "put": {
+        "description": "",
+        "summary": "PUT - typed-params - 123 - typed",
+        "requestBody": {
+          "description": "typed",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:typed": {
+                    "$ref": "#/components/schemas/typed-params_typed",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - typed",
+        "requestBody": {
+          "description": "typed",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:typed": {
+                    "$ref": "#/components/schemas/typed-params_typed",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - typed",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - typed-params - typed",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "typed": {
+                      "$ref": "#/components/schemas/typed-params_typed",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/nodes/node=123/yang-ext:mount/typed-params:typed/string={string-key}": {
+      "put": {
+        "description": "",
+        "summary": "PUT - typed-params - 123 - string",
+        "requestBody": {
+          "description": "string",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "typed-params:string": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_string",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "string-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - typed-params - 123 - string",
+        "requestBody": {
+          "description": "string",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "typed-params:string": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/typed-params_typed_string",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/typed-params_typed_string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "string-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - 123 - typed-params - string",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "string-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - 123 - typed-params - string",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/typed-params_typed_string"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "string": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/typed-params_typed_string",
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "123 typed-params"
+        ],
+        "parameters": [
+          {
+            "name": "string-key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "action-types_list": {
+        "title": "action-types_list",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_list_list-action_input": {
+        "title": "action-types_list_list-action_input",
+        "type": "object",
+        "properties": {
+          "la-input": {
+            "description": "",
+            "type": "string",
+            "example": "Some la-input"
+          }
+        },
+        "required": [
+          "la-input"
+        ],
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "action-types_list_list-action_output": {
+        "title": "action-types_list_list-action_output",
+        "type": "object",
+        "properties": {
+          "la-output": {
+            "description": "",
+            "type": "string",
+            "example": "Some la-output"
+          }
+        },
+        "required": [
+          "la-output"
+        ],
+        "xml": {
+          "name": "output",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:action:types"
+        }
+      },
+      "choice-test_first-container": {
+        "title": "choice-test_first-container",
+        "type": "object",
+        "properties": {
+          "leaf-default": {
+            "description": "",
+            "type": "string",
+            "default": "default-value",
+            "example": "Some leaf-default"
+          }
+        },
+        "xml": {
+          "name": "first-container",
+          "namespace": "urn:opendaylight:choice-test"
+        }
+      },
+      "definition-test_binary-container": {
+        "title": "definition-test_binary-container",
+        "type": "object",
+        "properties": {
+          "binary-data": {
+            "description": "",
+            "type": "string",
+            "format": "byte",
+            "default": "SGVsbG8gdGVzdCE="
+          }
+        },
+        "xml": {
+          "name": "binary-container",
+          "namespace": "urn:definition-test"
+        }
+      },
+      "duplication-test_test-rpc_input": {
+        "title": "duplication-test_test-rpc_input",
+        "type": "object",
+        "properties": {
+          "input-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_first": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {},
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      },
+      "duplication-test_test-rpc2_input": {
+        "title": "duplication-test_test-rpc2_input",
+        "type": "object",
+        "properties": {
+          "input-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_test-rpc3_input": {
+        "title": "duplication-test_test-rpc3_input",
+        "type": "object",
+        "properties": {
+          "input-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf"
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:test"
+        }
+      },
+      "duplication-test_first1": {
+        "title": "duplication-test_first",
+        "type": "object",
+        "properties": {
+          "input-leaf1": {
+            "description": "",
+            "type": "string",
+            "example": "Some input-leaf1"
+          }
+        },
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:duplication:service"
+        }
+      },
+      "mandatory-test_root-container": {
+        "title": "mandatory-test_root-container",
+        "type": "object",
+        "properties": {
+          "optional-root-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some optional-root-leaf"
+          }
+        },
+        "xml": {
+          "name": "root-container",
+          "namespace": "http://example.com/test"
+        }
+      },
+      "my-yang_data": {
+        "title": "my-yang_data",
+        "type": "object",
+        "properties": {
+          "my-data": {
+            "description": "",
+            "type": "string",
+            "example": "Some my-data"
+          }
+        },
+        "xml": {
+          "name": "data",
+          "namespace": "urn:opendaylight:params:xml:ns:yang:my-yang"
+        }
+      },
+      "path-params-test_cont": {
+        "title": "path-params-test_cont",
+        "type": "object",
+        "properties": {
+          "list1": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/path-params-test_cont_list1"
+            },
+            "description": ""
+          }
+        },
+        "xml": {
+          "name": "cont",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "path-params-test_cont_list1": {
+        "title": "path-params-test_cont_list1",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "list1",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:params"
+        }
+      },
+      "recursive_container-root": {
+        "title": "recursive_container-root",
+        "type": "object",
+        "properties": {
+          "root-list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/recursive_container-root_root-list"
+            },
+            "description": ""
+          }
+        },
+        "xml": {
+          "name": "container-root",
+          "namespace": "urn:opendaylight:test:recursive"
+        }
+      },
+      "recursive_container-root_root-list": {
+        "title": "recursive_container-root_root-list",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "",
+            "type": "string",
+            "example": "Some name"
+          }
+        },
+        "xml": {
+          "name": "root-list",
+          "namespace": "urn:opendaylight:test:recursive"
+        }
+      },
+      "string-types_test": {
+        "title": "string-types_test",
+        "type": "object",
+        "description": "Tests various combinations of regex expressions found in snmp yang models,\nwhich are causing problems because of isBasicLatin expression.\n\nAccording to https://unicode.org/charts/PDF/U0000.pdf basic latin characters are in range\n0x00-0x7F ([\\x00-\\xFF] or [\\u0000-\\u00FF]). This means it should be safe to replace isBasicLatin\nin regex expressions for characters in this range.",
+        "properties": {
+          "display-string": {
+            "description": "",
+            "type": "string",
+            "example": "",
+            "minLength": 0,
+            "maxLength": 255
+          }
+        },
+        "xml": {
+          "name": "test",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:string:types"
+        }
+      },
+      "strings-examples-length_test": {
+        "title": "strings-examples-length_test",
+        "type": "object",
+        "properties": {
+          "my-mac-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00:00:00:",
+            "minLength": 12,
+            "maxLength": 18
+          }
+        },
+        "xml": {
+          "name": "test",
+          "namespace": "urn:ietf:params:xml:ns:yang:strings:examples"
+        }
+      },
+      "strings-from-regex_test": {
+        "title": "strings-from-regex_test",
+        "type": "object",
+        "properties": {
+          "mac-address": {
+            "description": "",
+            "type": "string",
+            "example": "00:00:00:00:00:00",
+            "minLength": 0,
+            "maxLength": 2147483647
+          }
+        },
+        "xml": {
+          "name": "test",
+          "namespace": "urn:ietf:params:xml:ns:yang:strings:regex"
+        }
+      },
+      "test-container-childs_root-container": {
+        "title": "test-container-childs_root-container",
+        "type": "object",
+        "properties": {
+          "nested-container": {
+            "$ref": "#/components/schemas/test-container-childs_root-container_nested-container"
+          }
+        },
+        "xml": {
+          "name": "root-container",
+          "namespace": "http://example.com/test/container/child"
+        }
+      },
+      "test-container-childs_root-container_nested-container": {
+        "title": "test-container-childs_root-container_nested-container",
+        "type": "object",
+        "properties": {
+          "mandatory-list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/test-container-childs_root-container_nested-container_mandatory-list"
+            },
+            "description": "",
+            "example": [
+              {
+                "address": "Some address",
+                "name": "Some name",
+                "id": 0
+              },
+              {
+                "address": "Some address",
+                "name": "Some name",
+                "id": 1
+              },
+              {
+                "address": "Some address",
+                "name": "Some name",
+                "id": 2
+              }
+            ],
+            "minItems": 3,
+            "maxItems": 5
+          }
+        },
+        "required": [
+          "mandatory-list"
+        ],
+        "xml": {
+          "name": "nested-container",
+          "namespace": "http://example.com/test/container/child"
+        }
+      },
+      "test-container-childs_root-container_nested-container_mandatory-list": {
+        "title": "test-container-childs_root-container_nested-container_mandatory-list",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          }
+        },
+        "xml": {
+          "name": "mandatory-list",
+          "namespace": "http://example.com/test/container/child"
+        }
+      },
+      "toaster_make-toast_input": {
+        "title": "toaster_make-toast_input",
+        "type": "object",
+        "properties": {
+          "toasterDoneness": {
+            "description": "This variable controls how well-done is the\n      ensuing toast. It should be on a scale of 1 to 10.\n      Toast made at 10 generally is considered unfit\n      for human consumption; toast made at 1 is warmed\n      lightly.",
+            "type": "integer",
+            "format": "int64",
+            "default": 5,
+            "example": 1
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "http://netconfcentral.org/ns/toaster"
+        }
+      },
+      "toaster2_make-toast_input": {
+        "title": "toaster2_make-toast_input",
+        "type": "object",
+        "properties": {
+          "toasterDoneness": {
+            "description": "This variable controls how well-done is the\n      ensuing toast. It should be on a scale of 1 to 10.\n      Toast made at 10 generally is considered unfit\n      for human consumption; toast made at 1 is warmed\n      lightly.",
+            "type": "integer",
+            "format": "int64",
+            "default": 5,
+            "example": 1
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        }
+      },
+      "toaster2_restock-toaster_input": {
+        "title": "toaster2_restock-toaster_input",
+        "type": "object",
+        "properties": {
+          "amountOfBreadToStock": {
+            "description": "Indicates the amount of bread to re-stock",
+            "type": "integer",
+            "format": "int64",
+            "example": 0
+          }
+        },
+        "xml": {
+          "name": "input",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        }
+      },
+      "toaster2_toaster": {
+        "title": "toaster2_toaster",
+        "type": "object",
+        "description": "Top-level container for all toaster database objects.",
+        "properties": {},
+        "xml": {
+          "name": "toaster",
+          "namespace": "http://netconfcentral.org/ns/toaster2"
+        }
+      },
+      "typed-params_typed": {
+        "title": "typed-params_typed",
+        "type": "object",
+        "properties": {
+          "string": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/typed-params_typed_string"
+            },
+            "description": ""
+          }
+        },
+        "xml": {
+          "name": "typed",
+          "namespace": "urn:typed-params"
+        }
+      },
+      "typed-params_typed_string": {
+        "title": "typed-params_typed_string",
+        "type": "object",
+        "properties": {
+          "string-key": {
+            "description": "",
+            "type": "string",
+            "example": "Some string-key"
+          }
+        },
+        "xml": {
+          "name": "string",
+          "namespace": "urn:typed-params"
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
