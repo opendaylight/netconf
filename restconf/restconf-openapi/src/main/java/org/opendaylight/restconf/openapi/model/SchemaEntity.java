@@ -32,11 +32,12 @@ public abstract sealed class SchemaEntity extends OpenApiEntity permits NodeSche
     private final boolean isParentConfig;
     private final @NonNull String parentName;
     private final @NonNull DefinitionNames definitionNames;
+    protected final @NonNull Integer width;
 
     public SchemaEntity(final @NonNull SchemaNode value, final @NonNull String title,
             final @Nullable String discriminator, final @NonNull String type,
             final @NonNull SchemaInferenceStack context, final @NonNull String parentName, final boolean isParentConfig,
-            final @NonNull DefinitionNames definitionNames) {
+            final @NonNull DefinitionNames definitionNames, final @NonNull Integer width) {
         this.value = requireNonNull(value);
         this.title = requireNonNull(title);
         this.type = requireNonNull(type);
@@ -45,6 +46,7 @@ public abstract sealed class SchemaEntity extends OpenApiEntity permits NodeSche
         this.isParentConfig = isParentConfig;
         this.definitionNames = requireNonNull(definitionNames);
         this.discriminator = requireNonNullElse(discriminator, "");
+        this.width = requireNonNullElse(width, 0);
     }
 
     @Override

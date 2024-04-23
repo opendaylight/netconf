@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.openapi.impl;
 
+import static java.util.Objects.requireNonNullElse;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolveFullNameFromNode;
 import static org.opendaylight.restconf.openapi.util.RestDocgenUtil.resolvePathArgumentsName;
 
@@ -73,6 +74,7 @@ public final class PathsStream extends InputStream {
     private final boolean includeDataStore;
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
+    private final Integer width;
 
     private boolean hasRootPostLink;
     private boolean hasAddedDataStore;
@@ -83,7 +85,7 @@ public final class PathsStream extends InputStream {
     public PathsStream(final EffectiveModelContext schemaContext, final OpenApiBodyWriter writer,
             final String deviceName, final String urlPrefix, final boolean isForSingleModule,
             final boolean includeDataStore, final Iterator<? extends Module> iterator, final String basePath,
-            final ByteArrayOutputStream stream, final JsonGenerator generator) {
+            final ByteArrayOutputStream stream, final JsonGenerator generator, final Integer width) {
         this.iterator = iterator;
         this.writer = writer;
         this.schemaContext = schemaContext;
@@ -94,6 +96,7 @@ public final class PathsStream extends InputStream {
         this.basePath = basePath;
         this.stream = stream;
         this.generator = generator;
+        this.width = requireNonNullElse(width, 0);
         hasRootPostLink = false;
         hasAddedDataStore = false;
     }
@@ -175,7 +178,10 @@ public final class PathsStream extends InputStream {
             final var entity = new PathEntity(resolvedPath, post);
             result.add(entity);
         }
-        for (final var node : module.getChildNodes()) {
+        final var childNodes = width > 0
+            ? module.getChildNodes().stream().limit(width).toList() // limit children to width
+            : module.getChildNodes(); // width not applied - processing all children
+        for (final var node : childNodes) {
             final var moduleName = module.getName();
             final boolean isConfig = node.isConfiguration();
             final var nodeLocalName = node.getQName().getLocalName();
@@ -184,27 +190,25 @@ public final class PathsStream extends InputStream {
                 if (isConfig && !hasRootPostLink && isForSingleModule) {
                     final var resolvedPath = basePath + DATA + urlPrefix;
                     result.add(new PathEntity(resolvedPath,
-                        new PostEntity(node, deviceName, moduleName, List.of(), nodeLocalName, module, List.of())));
+                            new PostEntity(node, deviceName, moduleName, List.of(), nodeLocalName, module, List.of())));
                     hasRootPostLink = true;
                 }
                 //process first node
                 final var pathParams = new ArrayList<ParameterEntity>();
                 final var localName = moduleName + ":" + nodeLocalName;
                 final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
-                processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, schemaContext,
-                    deviceName, basePath, null, List.of());
+                processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, null, List.of());
             }
         }
         return result;
     }
 
-    private static void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
+    private void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
-            final boolean isConfig, final EffectiveModelContext schemaContext, final String deviceName,
-            final String basePath, final SchemaNode parentNode, final List<SchemaNode> parentNodes) {
+            final boolean isConfig, final SchemaNode parentNode, final List<SchemaNode> parentNodes) {
         final var resourcePath = basePath + DATA + path;
         final var fullName = resolveFullNameFromNode(node.getQName(), schemaContext);
-        final var firstChild = getListOrContainerChildNode((DataNodeContainer) node);
+        final var firstChild = getListOrContainerChildNode((DataNodeContainer) node, width);
         if (firstChild != null && node instanceof ContainerSchemaNode) {
             result.add(processTopPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig,
                 fullName, firstChild, deviceName));
@@ -212,7 +216,6 @@ public final class PathsStream extends InputStream {
             result.add(processDataPathEntity(node, resourcePath, pathParams, moduleName, refPath,
                 isConfig, fullName, deviceName));
         }
-        final var childNodes = ((DataNodeContainer) node).getChildNodes();
         final var listOfParents = new ArrayList<>(parentNodes);
         if (parentNode != null) {
             listOfParents.add(parentNode);
@@ -229,6 +232,9 @@ public final class PathsStream extends InputStream {
                     refPath, deviceName, parentNode, listOfParentsForActions));
             });
         }
+        final var childNodes = width > 0
+            ? ((DataNodeContainer) node).getChildNodes().stream().limit(width).toList() // limit children to width
+            : ((DataNodeContainer) node).getChildNodes(); // width not applied - processing all children
         for (final var childNode : childNodes) {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 final var childParams = new ArrayList<>(pathParams);
@@ -237,13 +243,19 @@ public final class PathsStream extends InputStream {
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
                 processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
-                    schemaContext, deviceName, basePath, node, listOfParents);
+                    node, listOfParents);
             }
         }
     }
 
-    private static <T extends DataNodeContainer> DataSchemaNode getListOrContainerChildNode(final T node) {
-        return node.getChildNodes().stream()
+    private static <T extends DataNodeContainer> DataSchemaNode getListOrContainerChildNode(final T node,
+            final int width) {
+        // Note: Since post using first container/list among children to prevent missing schema for ref error it
+        // should be also limited by width here even if it means not generating POST at all
+        final var childNodesStream = width > 0
+            ? node.getChildNodes().stream().limit(width) // limit children to width
+            : node.getChildNodes().stream(); // width not applied - processing all children
+        return childNodesStream
             .filter(n -> n instanceof ListSchemaNode || n instanceof ContainerSchemaNode)
             .findFirst().orElse(null);
     }
