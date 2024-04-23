@@ -36,6 +36,8 @@ public final class ComponentsStream extends InputStream {
     private final ByteArrayOutputStream stream;
     private final boolean isForSingleModule;
 
+    private final Integer width;
+
     private boolean schemasWritten;
     private boolean securityWritten;
     private Reader reader;
@@ -43,13 +45,14 @@ public final class ComponentsStream extends InputStream {
 
     public ComponentsStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
             final JsonGenerator generator, final ByteArrayOutputStream stream,
-            final Iterator<? extends Module> iterator, final boolean isForSingleModule) {
+            final Iterator<? extends Module> iterator, final boolean isForSingleModule, final Integer width) {
         this.iterator = iterator;
         this.context = context;
         this.writer = writer;
         this.generator = generator;
         this.stream = stream;
         this.isForSingleModule = isForSingleModule;
+        this.width = width;
     }
 
     @Override
@@ -65,7 +68,7 @@ public final class ComponentsStream extends InputStream {
         while (read == -1) {
             if (!schemasWritten) {
                 reader = new InputStreamReader(new SchemasStream(context, writer, iterator, isForSingleModule, stream,
-                    generator), StandardCharsets.UTF_8);
+                    generator, width), StandardCharsets.UTF_8);
                 read = reader.read();
                 schemasWritten = true;
                 continue;
@@ -99,7 +102,7 @@ public final class ComponentsStream extends InputStream {
         while (read == -1) {
             if (!schemasWritten) {
                 channel = Channels.newChannel(new SchemasStream(context, writer, iterator, isForSingleModule, stream,
-                    generator));
+                    generator, width));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 schemasWritten = true;
                 continue;

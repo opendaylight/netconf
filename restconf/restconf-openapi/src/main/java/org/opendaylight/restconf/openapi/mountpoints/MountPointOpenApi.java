@@ -132,7 +132,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
-            final String revision) throws IOException  {
+            final String revision, final Integer width) throws IOException  {
         final YangInstanceIdentifier iid = longIdToInstanceId.get(id);
         final EffectiveModelContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -143,13 +143,13 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         }
 
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
-            return generateDataStoreOpenApi(context, uriInfo, urlPrefix, deviceName);
+            return generateDataStoreOpenApi(context, uriInfo, urlPrefix, deviceName, width);
         }
-        return openApiGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix, deviceName);
+        return openApiGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix, deviceName, width);
     }
 
-    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final @Nullable String strPageNum)
-            throws IOException {
+    public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final @Nullable String strPageNum,
+            final Integer width) throws IOException {
         final var iid = longIdToInstanceId.get(id);
         final var context = getSchemaContext(iid);
         final var urlPrefix = getYangMountUrl(iid);
@@ -179,7 +179,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         final var url = schema + "://" + host + "/";
         final var basePath = openApiGenerator.getBasePath();
         return new OpenApiInputStream(context, title, url, SECURITY, deviceName, urlPrefix, false, includeDataStore,
-            modules, basePath);
+            modules, basePath, width);
     }
 
     private static String extractDeviceName(final YangInstanceIdentifier iid) {
@@ -188,14 +188,15 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     }
 
     private OpenApiInputStream generateDataStoreOpenApi(final EffectiveModelContext modelContext,
-            final UriInfo uriInfo, final String urlPrefix, final String deviceName) throws IOException {
+            final UriInfo uriInfo, final String urlPrefix, final String deviceName, final Integer width)
+            throws IOException {
         final var schema = openApiGenerator.createSchemaFromUriInfo(uriInfo);
         final var host = openApiGenerator.createHostFromUriInfo(uriInfo);
         final var url = schema + "://" + host + "/";
         final var basePath = openApiGenerator.getBasePath();
         final var modules = modelContext.getModules();
         return new OpenApiInputStream(modelContext, urlPrefix, url, SECURITY, deviceName, urlPrefix, true, false,
-            modules, basePath);
+            modules, basePath, width);
     }
 
     @Override
