@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b806a663_7bbca8e7",
+        "filename": "restconf/restconf-openapi/src/main/resources/explorer/swagger-initializer.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-04-24T06:14:03Z",
+      "side": 1,
+      "message": "We need to deal with mount point, too.",
+      "revId": "b28a192ae09a5e50d39f5b7c301b115caa8c0177",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
