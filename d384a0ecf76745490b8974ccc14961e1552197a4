@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4d04fe1_5dd3144c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-04-24T08:08:11Z",
+      "side": 1,
+      "message": "IMHO this patches introduces even more inconsistency. We need to exactly know what is that logic in add-keystore-entry which requires correct PEM format.",
+      "revId": "d384a0ecf76745490b8974ccc14961e1552197a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3cfc770_b56f10ed",
+        "filename": "keystore/keystore-legacy/src/main/java/org/opendaylight/netconf/keystore/legacy/impl/DefaultNetconfKeystoreService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-04-24T08:08:11Z",
+      "side": 1,
+      "message": "Why this not method is not used by add-keystore-entry?",
+      "revId": "d384a0ecf76745490b8974ccc14961e1552197a4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
