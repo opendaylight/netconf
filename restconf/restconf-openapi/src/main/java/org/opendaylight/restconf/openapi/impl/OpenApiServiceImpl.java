@@ -83,7 +83,7 @@ public final class OpenApiServiceImpl implements OpenApiService {
      */
     @Override
     public Response getApiExplorer(final UriInfo uriInfo) {
-        return Response.seeOther(uriInfo.getBaseUriBuilder().path("../../explorer/index.html").build()).build();
+        return Response.seeOther(uriInfo.getBaseUriBuilder().path("../../misc/index.html").build()).build();
     }
 
     @Override
