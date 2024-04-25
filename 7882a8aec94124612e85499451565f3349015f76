@@ -34,6 +34,24 @@
       "parentUuid": "be002540_c703b7c6",
       "revId": "7882a8aec94124612e85499451565f3349015f76",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d708bfaa_8925fc59",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/ssh/SshProxyServer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-04-25T14:55:58Z",
+      "side": 0,
+      "message": "`Nio2ServiceFactory` does not have constructor without parameters - we cannot extend it without creating thread pool with CPU cores size.",
+      "parentUuid": "e9b4cf43_e61df971",
+      "revId": "7882a8aec94124612e85499451565f3349015f76",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
