@@ -22,3 +22,9 @@
     align-items: center;
     display: flex;
 }
+
+.swagger-ui .schemes-server-container .select-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 210px;
+}
