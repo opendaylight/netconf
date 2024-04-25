@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "957997ba_3f02d012",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-optional.yang",
+        "patchSetId": 18
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-25T23:30:45Z",
+      "side": 1,
+      "message": "fix formatting and add a proper description",
+      "range": {
+        "startLine": 33,
+        "startChar": 12,
+        "endLine": 33,
+        "endChar": 20
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb9cf7e5_c24a1e79",
+        "filename": "apps/netconf-topology/src/main/yang/netconf-node-optional.yang",
+        "patchSetId": 18
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-25T23:30:45Z",
+      "side": 1,
+      "message": "this needs a much better description",
+      "range": {
+        "startLine": 37,
+        "startChar": 37,
+        "endLine": 37,
+        "endChar": 62
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "279685f7_427cbc34",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-25T23:30:45Z",
+      "side": 1,
+      "message": "I can\u0027t say I am a fan of this. what is it that we are trying to do here?",
+      "range": {
+        "startLine": 73,
+        "startChar": 18,
+        "endLine": 73,
+        "endChar": 49
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0689ed48_38ee0bd3",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/NetconfDevice.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-25T23:30:45Z",
+      "side": 1,
+      "message": "why is this un-inlined?",
+      "range": {
+        "startLine": 150,
+        "startChar": 22,
+        "endLine": 150,
+        "endChar": 52
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "393e788c_c81f613a",
+        "filename": "plugins/netconf-client-mdsal/src/main/java/org/opendaylight/netconf/client/mdsal/impl/NetconfMessageTransformUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-25T23:30:45Z",
+      "side": 1,
+      "message": "not referenced here, this should be living as close to its user as possible",
+      "range": {
+        "startLine": 95,
+        "startChar": 39,
+        "endLine": 95,
+        "endChar": 68
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "918a65ae_e5c1b9da",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/StreamsConfiguration.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-25T23:30:45Z",
+      "side": 1,
+      "message": "huh?",
+      "range": {
+        "startLine": 20,
+        "startChar": 14,
+        "endLine": 20,
+        "endChar": 15
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8d2236a_c5f5c228",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/streams/devnotif/SubscribeDeviceNotificationRpc.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-25T23:30:45Z",
+      "side": 1,
+      "message": "hard coded path: NOPE, NEVER",
+      "range": {
+        "startLine": 117,
+        "startChar": 31,
+        "endLine": 118,
+        "endChar": 59
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5aff5428_335f1856",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/streams/devnotif/SubscribeDeviceNotificationRpc.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-25T23:30:45Z",
+      "side": 1,
+      "message": "this should be descriptive",
+      "range": {
+        "startLine": 120,
+        "startChar": 72,
+        "endLine": 120,
+        "endChar": 91
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14b304ae_ec92daf2",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/server/mdsal/streams/devnotif/SubscribeDeviceNotificationRpc.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-25T23:30:45Z",
+      "side": 1,
+      "message": "what sort of error reporting is this?!",
+      "range": {
+        "startLine": 123,
+        "startChar": 12,
+        "endLine": 123,
+        "endChar": 42
+      },
+      "revId": "626dce69b0b610147ee9950224e02a83b0d671f1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
