@@ -16,6 +16,24 @@
       "message": "JIRA:",
       "revId": "baedc8171ead1a7571196a19da041238f5784591",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc5adeec_9ed7d80f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 9074
+      },
+      "writtenOn": "2024-04-25T11:13:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbc41d07_e3f39bba",
+      "revId": "baedc8171ead1a7571196a19da041238f5784591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
