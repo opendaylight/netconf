@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be002540_c703b7c6",
+        "filename": "apps/netconf-nb/src/main/java/org/opendaylight/netconf/northbound/ssh/SshProxyServer.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-04-25T13:56:59Z",
+      "side": 0,
+      "message": "Here we should use just `this` in ideal case.\n\nHere we are trying to make our won SSHD\u0027s `Nio2ServiceFactory` in ODL\u0027s `NioServiceWithPoolFactory extends AbstractNioServiceFactory`.\n\nOur goal is ho have single thread executor service what is not possible to have with SSHD\u0027s `Nio2ServiceFactory`.",
+      "revId": "7882a8aec94124612e85499451565f3349015f76",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
