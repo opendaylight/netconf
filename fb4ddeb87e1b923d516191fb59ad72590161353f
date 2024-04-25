@@ -35,6 +35,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "308e8df6_64d607a2",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PaginationService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-25T13:04:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9abd78e0_f419e1ed",
+      "revId": "fb4ddeb87e1b923d516191fb59ad72590161353f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a320577_965d5a89",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-04-25T12:43:49Z",
       "side": 1,
       "message": "private?",
+      "revId": "fb4ddeb87e1b923d516191fb59ad72590161353f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47441afb_ee28e098",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PaginationService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-25T13:04:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a320577_965d5a89",
       "revId": "fb4ddeb87e1b923d516191fb59ad72590161353f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
@@ -69,6 +105,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2c5bd4e_d2dea884",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PaginationService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-25T13:04:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a7c4d3d_0939b603",
+      "revId": "fb4ddeb87e1b923d516191fb59ad72590161353f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f0f0eb0_dded5ace",
@@ -82,6 +136,30 @@
       "writtenOn": "2024-04-25T12:43:49Z",
       "side": 1,
       "message": "not needed",
+      "range": {
+        "startLine": 144,
+        "startChar": 28,
+        "endLine": 144,
+        "endChar": 37
+      },
+      "revId": "fb4ddeb87e1b923d516191fb59ad72590161353f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1be208b_007ecd42",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/PaginationService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 9255
+      },
+      "writtenOn": "2024-04-25T13:04:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f0f0eb0_dded5ace",
       "range": {
         "startLine": 144,
         "startChar": 28,
