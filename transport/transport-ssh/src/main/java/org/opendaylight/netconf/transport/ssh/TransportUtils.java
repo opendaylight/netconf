@@ -9,6 +9,7 @@ package org.opendaylight.netconf.transport.ssh;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -21,6 +22,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.shaded.sshd.client.ClientBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.BaseBuilder;
 import org.opendaylight.netconf.shaded.sshd.common.NamedFactory;
+import org.opendaylight.netconf.shaded.sshd.common.channel.ChannelAsyncOutputStream;
 import org.opendaylight.netconf.shaded.sshd.common.cipher.BuiltinCiphers;
 import org.opendaylight.netconf.shaded.sshd.common.cipher.Cipher;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoOutputStream;
@@ -289,12 +291,16 @@ final class TransportUtils {
 
     static ChannelHandlerContext attachUnderlay(final IoOutputStream out, final TransportChannel underlay,
             final ChannelInactive inactive) {
+        if (!(out instanceof ChannelAsyncOutputStream asyncOut)) {
+            throw new VerifyException("Unexpected output " + out);
+        }
+
         // Note that there may be multiple handlers already present on the channel, hence we are attaching last, but
         // from the logical perspective we are the head handlers.
         final var pipeline = underlay.channel().pipeline();
 
         // outbound packet handler, i.e. moving bytes from the channel into SSHD's pipeline
-        pipeline.addLast(new OutboundChannelHandler(out));
+        pipeline.addLast(new OutboundChannelHandler(asyncOut));
 
         // invoke requested action on channel termination
         underlay.channel().closeFuture().addListener(future -> inactive.onChannelInactive());
