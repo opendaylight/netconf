@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2da22d3d_3039b229",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-26T14:08:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce14ce74_a88e9eb6",
+      "revId": "bcfad4ff50c819cc6c2db0bb57797caeef90d93d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "f06f0f51_b0a8ee55",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -52,6 +70,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42c44d14_43988d9e",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/OutboundChannelHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-26T14:08:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95b3beef_a03d7633",
+      "revId": "bcfad4ff50c819cc6c2db0bb57797caeef90d93d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d11fd2d6_bd790b8c",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-04-26T13:03:50Z",
       "side": 1,
       "message": "Do you mean write()?",
+      "revId": "bcfad4ff50c819cc6c2db0bb57797caeef90d93d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "960ae997_dfd010c4",
+        "filename": "transport/transport-ssh/src/main/java/org/opendaylight/netconf/transport/ssh/OutboundChannelHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2024-04-26T14:08:01Z",
+      "side": 1,
+      "message": "no, startWrite(). Note the difference in traced mesages. write() is the public entrypoint where we do not know internal state. startWrite() is when we know we want to issue a writeBuffer()",
+      "parentUuid": "d11fd2d6_bd790b8c",
       "revId": "bcfad4ff50c819cc6c2db0bb57797caeef90d93d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
