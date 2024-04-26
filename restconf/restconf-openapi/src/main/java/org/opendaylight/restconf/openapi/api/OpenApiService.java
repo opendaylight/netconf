@@ -12,6 +12,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -35,9 +36,9 @@ public interface OpenApiService {
      * Generates Swagger compliant document listing APIs for module.
      */
     @GET
-    @Path("/{module}({revision})")
+    @Path("/{module}")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getDocByModule(@PathParam("module") String module, @PathParam("revision") String revision,
+    Response getDocByModule(@PathParam("module") String module, @QueryParam("revision") String revision,
                             @Context UriInfo uriInfo) throws IOException;
 
     /**
@@ -62,10 +63,10 @@ public interface OpenApiService {
      * Generates Swagger compliant document listing APIs for module.
      */
     @GET
-    @Path("/mounts/{instance}/{module}({revision})")
+    @Path("/mounts/{instance}/{module}")
     @Produces(MediaType.APPLICATION_JSON)
     Response getMountDocByModule(@PathParam("instance") String instanceNum,
-                                 @PathParam("module") String module, @PathParam("revision") String revision,
+                                 @PathParam("module") String module, @QueryParam("revision") String revision,
                                  @Context UriInfo uriInfo) throws IOException;
 
     /**
