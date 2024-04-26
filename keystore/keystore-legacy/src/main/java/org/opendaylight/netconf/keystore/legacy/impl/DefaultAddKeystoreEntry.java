@@ -11,10 +11,13 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Base64;
+import org.bouncycastle.openssl.PEMParser;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -53,18 +56,26 @@ final class DefaultAddKeystoreEntry extends AbstractRpc implements AddKeystoreEn
         final var encrypted = new ArrayList<KeyCredential>(plain.size());
         for (var credential : plain.values()) {
             final var keyId = credential.getKeyId();
-            try {
-                encrypted.add(new KeyCredentialBuilder()
-                    .setKeyId(credential.getKeyId())
-                    .setPrivateKey(encryptToBytes(credential.getPrivateKey()))
-                    .setPassphrase(encryptToBytes(credential.getPassphrase()))
-                    .build());
-            } catch (GeneralSecurityException e) {
-                LOG.debug("Cannot decrypt key credential {}}", credential, e);
-                return RpcResultBuilder.<AddKeystoreEntryOutput>failed()
-                    .withError(ErrorType.APPLICATION, "Failed to decrypt key " + keyId, e)
-                    .buildFuture();
+            final var privateKey = credential.getPrivateKey();
+
+            try (var obj = new PEMParser(new StringReader(privateKey.replace("\\n", "\n")))){
+                if (obj.readObject() != null) {
+                    try {
+                        encrypted.add(new KeyCredentialBuilder()
+                            .setKeyId(keyId)
+                            .setPrivateKey(encryptToBytes(privateKey))
+                            .setPassphrase(encryptToBytes(credential.getPassphrase()))
+                            .build());
+                    } catch (GeneralSecurityException e) {
+                        LOG.debug("Cannot decrypt key credential {}}", credential, e);
+                        return RpcResultBuilder.<AddKeystoreEntryOutput>failed()
+                            .withError(ErrorType.APPLICATION, "Failed to decrypt key " + keyId, e)
+                            .buildFuture();
+                    }
+                }
+            } catch (IOException ignored) {
             }
+
         }
 
         final var tx = newTransaction();
