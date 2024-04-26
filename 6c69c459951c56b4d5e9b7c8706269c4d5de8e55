@@ -18,6 +18,24 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8590cef0_05d4180c",
+        "filename": "restconf/restconf-openapi/src/main/resources/explorer/swagger-initializer.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 9332
+      },
+      "writtenOn": "2024-04-26T18:30:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a8b88bd_cb99f3ff",
+      "revId": "6c69c459951c56b4d5e9b7c8706269c4d5de8e55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69b95224_a3970dfb",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-26T08:06:06Z",
       "side": 1,
       "message": "params has to be added at the end of completed URL\n\nexample: 192.168.56.25:8181/openapi/api/v3/mounts/1?depth\u003d10\u0026width\u003d10",
+      "revId": "6c69c459951c56b4d5e9b7c8706269c4d5de8e55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c67127a_072cf2e8",
+        "filename": "restconf/restconf-openapi/src/main/resources/explorer/swagger-initializer.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9332
+      },
+      "writtenOn": "2024-04-26T18:30:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69b95224_a3970dfb",
       "revId": "6c69c459951c56b4d5e9b7c8706269c4d5de8e55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
