@@ -11,10 +11,15 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Base64;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -51,11 +56,32 @@ final class DefaultAddKeystoreEntry extends AbstractRpc implements AddKeystoreEn
 
         LOG.debug("Adding keypairs: {}", plain);
         final var encrypted = new ArrayList<KeyCredential>(plain.size());
+        final var invalidKeys = new ArrayList<String>();
+
+        for (var credential : plain.values()) {
+            try (var keyReader = new PEMParser(new StringReader(credential.getPrivateKey().replace("\\n", "\n")))) {
+                final var obj = keyReader.readObject();
+
+                if (!(obj instanceof PEMEncryptedKeyPair || obj instanceof PEMKeyPair)) {
+                    throw new IOException();
+                }
+            } catch (IOException e) {
+                LOG.debug("Failed to process key: {}", credential.getKeyId());
+                invalidKeys.add(credential.getKeyId());
+            }
+        }
+
+        if (!invalidKeys.isEmpty()) {
+            return RpcResultBuilder.<AddKeystoreEntryOutput>failed()
+                .withError(ErrorType.APPLICATION, "Failed to process invalid keys: " + invalidKeys)
+                .buildFuture();
+        }
+
         for (var credential : plain.values()) {
             final var keyId = credential.getKeyId();
             try {
                 encrypted.add(new KeyCredentialBuilder()
-                    .setKeyId(credential.getKeyId())
+                    .setKeyId(keyId)
                     .setPrivateKey(encryptToBytes(credential.getPrivateKey()))
                     .setPassphrase(encryptToBytes(credential.getPassphrase()))
                     .build());
