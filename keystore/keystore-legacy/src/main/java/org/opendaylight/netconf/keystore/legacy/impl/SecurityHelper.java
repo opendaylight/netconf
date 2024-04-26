@@ -78,7 +78,7 @@ final class SecurityHelper {
             } else if (obj instanceof PEMKeyPair plain) {
                 keyPair = plain;
             } else {
-                throw new IOException("Unhandled private key " + obj.getClass());
+                throw new IOException("Unhandled private key " + (obj == null ? "":obj.getClass()));
             }
 
             return new JcaPEMKeyConverter().getKeyPair(keyPair);
