@@ -18,6 +18,23 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f06f0f51_b0a8ee55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-04-26T13:05:00Z",
+      "side": 1,
+      "message": "Otherwise seems to help by testing of testool with junos models (a lot of writes).",
+      "revId": "bcfad4ff50c819cc6c2db0bb57797caeef90d93d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95b3beef_a03d7633",
