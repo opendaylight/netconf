@@ -22,3 +22,38 @@
     align-items: center;
     display: flex;
 }
+
+.swagger-ui .schemes-server-container .input-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 210px;
+}
+
+.swagger-ui .schemes-server-container .input-wrapper input {
+    border: 2px solid #41444e;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .25);
+    color: #3b4151;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 5px 5px 10px;
+}
+
+.swagger-ui .schemes-server-container .input-wrapper label {
+    margin: 4px 0 1px;
+}
+
+.swagger-ui input {
+    appearance: none;
+    background: #f7f7f7;
+    background-size: auto;
+    background-size: 20px;
+    border: 2px solid #41444e;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.25);
+    color: #3b4151;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 5px 40px 5px 10px;
+}
