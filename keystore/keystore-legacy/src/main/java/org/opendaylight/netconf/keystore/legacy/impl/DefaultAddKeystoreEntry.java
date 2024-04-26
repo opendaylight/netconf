@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.keystore.entry.KeyCredential;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev240708.keystore.entry.KeyCredentialBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.ErrorTag;
 import org.opendaylight.yangtools.yang.common.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 final class DefaultAddKeystoreEntry extends AbstractRpc implements AddKeystoreEntry {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAddKeystoreEntry.class);
+    private final SecurityHelper securityHelper = new SecurityHelper();
 
     private final AAAEncryptionService encryptionService;
 
@@ -51,11 +54,28 @@ final class DefaultAddKeystoreEntry extends AbstractRpc implements AddKeystoreEn
 
         LOG.debug("Adding keypairs: {}", plain);
         final var encrypted = new ArrayList<KeyCredential>(plain.size());
+        final var invalidKeys = new ArrayList<String>();
+
+        for (var credential : plain.values()) {
+            try {
+                securityHelper.decodePrivateKey(credential.getPrivateKey(), "");
+            } catch (IOException e) {
+                LOG.debug("Failed to process key: {}", credential.getKeyId());
+                invalidKeys.add(credential.getKeyId());
+            }
+        }
+
+        if (!invalidKeys.isEmpty()) {
+            return RpcResultBuilder.<AddKeystoreEntryOutput>failed()
+                .withError(ErrorType.RPC, ErrorTag.INVALID_VALUE, "Failed to process invalid keys: " + invalidKeys)
+                .buildFuture();
+        }
+
         for (var credential : plain.values()) {
             final var keyId = credential.getKeyId();
             try {
                 encrypted.add(new KeyCredentialBuilder()
-                    .setKeyId(credential.getKeyId())
+                    .setKeyId(keyId)
                     .setPrivateKey(encryptToBytes(credential.getPrivateKey()))
                     .setPassphrase(encryptToBytes(credential.getPassphrase()))
                     .build());

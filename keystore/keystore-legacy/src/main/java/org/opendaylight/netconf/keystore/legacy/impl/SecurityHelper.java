@@ -63,6 +63,10 @@ final class SecurityHelper {
         try (var keyReader = new PEMParser(new StringReader(privateKey.replace("\\n", "\n")))) {
             final var obj = keyReader.readObject();
 
+            if (obj == null) {
+                throw new IOException("Unable to parse private key");
+            }
+
             final PEMKeyPair keyPair;
             if (obj instanceof PEMEncryptedKeyPair encrypted) {
                 keyPair = encrypted.decryptKeyPair(new JcePEMDecryptorProviderBuilder()
