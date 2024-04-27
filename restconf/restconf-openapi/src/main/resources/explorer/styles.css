@@ -23,6 +23,10 @@
     display: flex;
 }
 
+.swagger-ui .topbar .topbar-wrapper img {
+    content:url('logo_small.png');
+}
+
 .swagger-ui .schemes-server-container .input-wrapper {
     display: flex;
     flex-direction: column;
