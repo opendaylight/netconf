@@ -316,8 +316,9 @@ public abstract class RestconfStrategy implements DatabindAware {
     private void merge(final @NonNull SettableRestconfFuture<DataPatchResult> future,
             final @NonNull YangInstanceIdentifier path, final @NonNull NormalizedNode data) {
         final var tx = prepareWriteExecution();
-        // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
-        tx.ensureParentsByMerge(path);
+        if (tx instanceof MdsalRestconfTransaction mdTx) {
+            mdTx.ensureParentsByMerge(path);
+        }
         tx.merge(path, data);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
@@ -663,7 +664,9 @@ public abstract class RestconfStrategy implements DatabindAware {
                         break;
                     case Merge:
                         try {
-                            tx.ensureParentsByMerge(targetNode);
+                            if (tx instanceof MdsalRestconfTransaction mdTx) {
+                                mdTx.ensureParentsByMerge(targetNode);
+                            }
                             tx.merge(targetNode, patchEntity.getNode());
                             editCollection.add(new PatchStatusEntity(editId, true, null));
                         } catch (RestconfDocumentedException e) {

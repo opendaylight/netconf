@@ -28,6 +28,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -82,6 +83,10 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     private DOMMountPoint mountPoint;
     @Mock
     private NetconfDataTreeService netconfService;
+    @Mock
+    private RestconfTransaction transaction;
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
+    private MdsalRestconfStrategy mdsalRestconfStrategy;
 
     @Before
     public void before() {
