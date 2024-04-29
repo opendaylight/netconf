@@ -313,6 +313,21 @@ abstract class AbstractRestconfStrategyTest extends AbstractJukeboxTest {
 
     abstract @NonNull RestconfStrategy testPatchListDataStrategy();
 
+/*    @Test
+    public final void testEnsureParentsByMergeInvocation() {
+        final var strategy = testPatchListDataStrategy();
+        final var transaction = spy(strategy.prepareWriteExecution());
+        doReturn(transaction).when(strategy).prepareWriteExecution();
+
+        strategy.merge(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST).getOrThrow();
+
+        if (strategy instanceof MdsalRestconfStrategy) {
+            verify(transaction, times(1)).ensureParentsByMerge(JUKEBOX_IID);
+        } else {
+            verify(transaction, never()).ensureParentsByMerge(any());
+        }
+    }*/
+
     @Test
     public final void testPatchDataReplaceMergeAndRemove() {
         final var buildArtistList = ImmutableNodes.newSystemMapBuilder()

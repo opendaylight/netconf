@@ -127,8 +127,6 @@ abstract class RestconfTransaction {
      *
      * @param path    path of data
      */
-    // FIXME: this method should only be invoked in MdsalRestconfStrategy, and even then only if we are crossing
-    //        an implicit list.
     final void ensureParentsByMerge(final YangInstanceIdentifier path) {
         final var normalizedPathWithoutChildArgs = new ArrayList<PathArgument>();
         YangInstanceIdentifier rootNormalizedPath = null;
