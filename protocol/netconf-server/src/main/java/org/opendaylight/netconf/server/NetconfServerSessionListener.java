@@ -93,15 +93,12 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             final NetconfMessage message = processDocument(netconfMessage, session);
             LOG.debug("Responding with message {}", message);
             session.sendMessage(message).addListener(future -> {
-                final var cause = future.cause();
-                if (cause != null) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Failed to send response {}", getMessageId(message), cause);
-                    }
+                if (!future.isSuccess()) {
+                    LOG.error("Failed to send response {}", getMessageId(message), future.cause());
                     session.onOutgoingRpcError();
                     monitoringSessionListener.onSessionEvent(SessionEvent.outRpcError(session));
-                } else if (LOG.isDebugEnabled()) {
-                    LOG.debug("Finished sending response {}", getMessageId(message));
+                } else {
+                    LOG.info("Finished sending response {}", getMessageId(message));
                 }
             });
             monitoringSessionListener.onSessionEvent(SessionEvent.inRpcSuccess(session));
