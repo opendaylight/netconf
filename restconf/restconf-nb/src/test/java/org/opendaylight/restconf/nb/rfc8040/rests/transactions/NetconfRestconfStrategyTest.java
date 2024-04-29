@@ -27,6 +27,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -62,6 +63,10 @@ import org.w3c.dom.DOMException;
 public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyTest {
     @Mock
     private NetconfDataTreeService netconfService;
+    @Mock
+    private RestconfTransaction transaction;
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
+    private NetconfRestconfStrategy strategy;
 
     @Before
     public void before() {
@@ -327,6 +332,16 @@ public final class NetconfRestconfStrategyTest extends AbstractRestconfStrategyT
         verify(netconfService).getConfig(JUKEBOX_IID);
         verify(netconfService).replace(LogicalDatastoreType.CONFIGURATION, JUKEBOX_IID, JUKEBOX_WITH_BANDS,
             Optional.empty());
+    }
+
+    @Test
+    public void testNetconfRestconfStrategyEnsureParentsByMergeNotInvoked() {
+        doReturn(transaction).when(strategy).prepareWriteExecution();
+        doReturn(Futures.immediateFuture(null)).when(transaction).commit();
+
+        strategy.merge(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST).getOrThrow();
+
+        verify(transaction, never()).ensureParentsByMerge(any());
     }
 
     @Override

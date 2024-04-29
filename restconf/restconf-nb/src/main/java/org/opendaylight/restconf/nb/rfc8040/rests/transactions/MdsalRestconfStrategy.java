@@ -155,6 +155,15 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
         }
     }
 
+    @Override
+    RestconfTransaction executeMergeTransaction(final @NonNull YangInstanceIdentifier path,
+            final @NonNull NormalizedNode data) {
+        final var tx = prepareWriteExecution();
+        tx.ensureParentsByMerge(path);
+        tx.merge(path, data);
+        return tx;
+    }
+
     /**
      * Translate a {@link FieldsParam} to a complete list of child nodes organized into levels, suitable for use with
      * {@link NormalizedNodeWriter}.
