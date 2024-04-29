@@ -176,7 +176,7 @@ public abstract class RestconfStrategy implements DatabindAware {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStrategy.class);
     private static final @NonNull DataPutResult PUT_CREATED = new DataPutResult(true);
     private static final @NonNull DataPutResult PUT_REPLACED = new DataPutResult(false);
-    private static final @NonNull DataPatchResult PATCH_EMPTY = new DataPatchResult();
+    protected static final @NonNull DataPatchResult PATCH_EMPTY = new DataPatchResult();
 
     private final @NonNull ImmutableMap<QName, RpcImplementation> localRpcs;
     private final @NonNull ApiPathNormalizer pathNormalizer;
@@ -310,10 +310,7 @@ public abstract class RestconfStrategy implements DatabindAware {
 
     private void merge(final @NonNull SettableRestconfFuture<DataPatchResult> future,
             final @NonNull YangInstanceIdentifier path, final @NonNull NormalizedNode data) {
-        final var tx = prepareWriteExecution();
-        // FIXME: this method should be further specialized to eliminate this call -- it is only needed for MD-SAL
-        tx.ensureParentsByMerge(path);
-        tx.merge(path, data);
+        final var tx = executeMergeTransaction(path, data);
         Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
@@ -326,6 +323,13 @@ public abstract class RestconfStrategy implements DatabindAware {
                 future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path, modelContext()));
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    protected RestconfTransaction executeMergeTransaction(final @NonNull YangInstanceIdentifier path,
+        final @NonNull NormalizedNode data) {
+        final var tx = prepareWriteExecution();
+        tx.merge(path, data);
+        return tx;
     }
 
     public @NonNull RestconfFuture<DataPutResult> dataPUT(final ServerRequest request, final ApiPath apiPath,
