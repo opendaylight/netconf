@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "180eeca8_6a6733d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-04-29T10:57:08Z",
+      "side": 1,
+      "message": "1) no need to edit .gitignore\n2) we have our own index.css",
+      "revId": "0e84714392adf2a5195575e67a553e3a2a673e8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
