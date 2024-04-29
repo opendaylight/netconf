@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7874478c_95d806c0",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/api/OpenApiService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-04-29T08:34:02Z",
+      "side": 1,
+      "message": "This has to be changed as well",
+      "range": {
+        "startLine": 41,
+        "startChar": 65,
+        "endLine": 41,
+        "endChar": 74
+      },
+      "revId": "7a3ea9f8305854cc7cae1fd028f4fea2c3bd3dae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
