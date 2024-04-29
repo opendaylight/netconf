@@ -16,6 +16,24 @@
       "message": "1) no need to edit .gitignore\n2) we have our own index.css",
       "revId": "0e84714392adf2a5195575e67a553e3a2a673e8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99546e1b_b7f6c78a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9332
+      },
+      "writtenOn": "2024-04-29T17:45:15Z",
+      "side": 1,
+      "message": "1) But how would we upload new versions on swagger ui files? They will not be tracked by git.\n2) This index.css is from here https://github.com/swagger-api/swagger-ui/blob/master/dist/index.css. Custom styles file is called styles.css",
+      "parentUuid": "180eeca8_6a6733d4",
+      "revId": "0e84714392adf2a5195575e67a553e3a2a673e8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
