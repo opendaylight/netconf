@@ -13,6 +13,7 @@ import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATI
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import org.opendaylight.restconf.common.errors.RestconfFuture;
 import org.opendaylight.restconf.common.errors.SettableRestconfFuture;
 import org.opendaylight.restconf.server.api.DataGetParams;
 import org.opendaylight.restconf.server.api.DataGetResult;
+import org.opendaylight.restconf.server.api.DataPatchResult;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Data;
 import org.opendaylight.restconf.server.api.ServerRequest;
@@ -153,6 +155,25 @@ public final class MdsalRestconfStrategy extends RestconfStrategy {
         try (var tx = dataBroker.newReadOnlyTransaction()) {
             return tx.exists(LogicalDatastoreType.CONFIGURATION, path);
         }
+    }
+
+    @Override
+    protected void merge(final @NonNull SettableRestconfFuture<DataPatchResult> future,
+            final @NonNull YangInstanceIdentifier path, final @NonNull NormalizedNode data) {
+        final var tx = prepareWriteExecution();
+        tx.ensureParentsByMerge(path);  // Directly call the method without checking type
+        tx.merge(path, data);
+        Futures.addCallback(tx.commit(), new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo result) {
+                future.set(PATCH_EMPTY);
+            }
+
+            @Override
+            public void onFailure(final Throwable cause) {
+                future.setFailure(TransactionUtil.decodeException(cause, "MERGE", path, modelContext()));
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     /**
