@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
@@ -22,11 +23,13 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.Futures;
 import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -80,6 +83,10 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
     private DOMMountPoint mountPoint;
     @Mock
     private NetconfDataTreeService netconfService;
+    @Mock
+    private RestconfTransaction transaction;
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
+    private MdsalRestconfStrategy mdsalRestconfStrategy;
 
     @Before
     public void before() {
@@ -479,5 +486,15 @@ public final class MdsalRestconfStrategyTest extends AbstractRestconfStrategyTes
         assertEquals(ErrorTag.OPERATION_FAILED, error.getErrorTag());
         assertEquals("Could not find a supported access interface in mount point", error.getErrorMessage());
         assertEquals(JUKEBOX_IID, error.getErrorPath());
+    }
+
+    @Test
+    public void testEnsureParentsByMergeInvoked() {
+        doReturn(transaction).when(mdsalRestconfStrategy).prepareWriteExecution();
+        doReturn(Futures.immediateFuture(null)).when(transaction).commit();
+
+        mdsalRestconfStrategy.merge(JUKEBOX_IID, JUKEBOX_WITH_PLAYLIST).getOrThrow();
+
+        verify(transaction, times(1)).ensureParentsByMerge(JUKEBOX_IID);
     }
 }
