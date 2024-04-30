@@ -10,6 +10,7 @@ package org.opendaylight.netconf.keystore.legacy.impl;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev231109.AddTrustedCertificate;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 final class DefaultAddTrustedCertificate extends AbstractRpc implements AddTrustedCertificate {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAddTrustedCertificate.class);
+    private final SecurityHelper securityHelper = new SecurityHelper();
 
     DefaultAddTrustedCertificate(final DataBroker dataBroker) {
         super(dataBroker);
@@ -37,6 +39,16 @@ final class DefaultAddTrustedCertificate extends AbstractRpc implements AddTrust
         final var certs = input.getTrustedCertificate();
         if (certs == null || certs.isEmpty()) {
             return RpcResultBuilder.success(new AddTrustedCertificateOutputBuilder().build()).buildFuture();
+        }
+
+        // Validate certificates
+        for (var certificate : certs.values()) {
+            try {
+                securityHelper.generateCertificate(certificate.getCertificate().getBytes(StandardCharsets.UTF_8));
+            } catch (GeneralSecurityException e) {
+                LOG.debug("Failed to generate certificate for {}", certificate.getName(), e);
+                throw new IllegalArgumentException("Failed to generate certificate for: " + certificate.getName(), e);
+            }
         }
 
         LOG.debug("Updating trusted certificates: {}", certs);
