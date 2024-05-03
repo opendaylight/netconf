@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f00c045f_1c940b10",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 9229
+      },
+      "writtenOn": "2024-05-03T07:40:01Z",
+      "side": 1,
+      "message": "don\u0027t we need to check here that offset is smaller than size of modules, like on end value? It seems like start could be bigger and cause error on sublist method.",
+      "range": {
+        "startLine": 113,
+        "startChar": 12,
+        "endLine": 113,
+        "endChar": 72
+      },
+      "revId": "2532b4eeb629ceb8b0614ac2eed371c0ad5f2c3c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
