@@ -13,6 +13,7 @@ import static org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.getSourc
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -150,7 +151,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         if (localTask != null) {
             LOG.debug("{}: Netconf session initiated, starting keepalives", deviceId);
             LOG.trace("{}: Scheduling keepalives every {}s", deviceId, keepaliveDelaySeconds);
-            localTask.enableKeepalive();
+            // schedule first KeepaliveTask and do not decrement suppressedCounter at the same time
+            localTask.reschedule();
         }
     }
 
@@ -198,7 +200,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
      * response received, or the rcp could not even be sent) immediate reconnect is triggered as netconf session
      * is considered inactive/failed.
      */
-    private final class KeepaliveTask implements TimerTask, FutureCallback<DOMRpcResult> {
+    @VisibleForTesting
+    final class KeepaliveTask implements TimerTask, FutureCallback<DOMRpcResult> {
         // Keepalive RPC static resources
         static final @NonNull ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(
             NETCONF_GET_CONFIG_NODEID, getSourceNode(NETCONF_RUNNING_NODEID), NetconfMessageTransformUtil.EMPTY_FILTER);
@@ -207,6 +210,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
 
         @GuardedBy("this")
         private boolean suppressed = false;
+
+        @GuardedBy("this")
+        private int suppressedCounter = 0;
 
         private volatile long lastActivity;
 
@@ -233,10 +239,16 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         synchronized void disableKeepalive() {
             // unsuppressed -> suppressed
             suppressed = true;
+            suppressedCounter++;
         }
 
         synchronized void enableKeepalive() {
             recordActivity();
+            suppressedCounter--;
+            if (suppressedCounter > 0) {
+                LOG.debug("{}: Skipping to enable keepalive while expecting {} RPC reply", deviceId, suppressedCounter);
+                return;
+            }
             if (suppressed) {
                 // suppressed -> unsuppressed
                 suppressed = false;
