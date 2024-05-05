@@ -13,6 +13,7 @@ import static org.opendaylight.netconf.client.mdsal.impl.NetconfBaseOps.getSourc
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
 import static org.opendaylight.netconf.client.mdsal.impl.NetconfMessageTransformUtil.NETCONF_RUNNING_NODEID;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -198,7 +199,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
      * response received, or the rcp could not even be sent) immediate reconnect is triggered as netconf session
      * is considered inactive/failed.
      */
-    private final class KeepaliveTask implements TimerTask, FutureCallback<DOMRpcResult> {
+    @VisibleForTesting
+    final class KeepaliveTask implements TimerTask, FutureCallback<DOMRpcResult> {
         // Keepalive RPC static resources
         static final @NonNull ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(
             NETCONF_GET_CONFIG_NODEID, getSourceNode(NETCONF_RUNNING_NODEID), NetconfMessageTransformUtil.EMPTY_FILTER);
@@ -335,8 +337,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler {
         public void onSuccess(final V result) {
             // No matter what response we got,
             // rpc-reply or rpc-error, we got it from device so the netconf session is OK.
-            userFuture.set(result);
             enableKeepalive();
+            userFuture.set(result);
         }
 
         @Override
