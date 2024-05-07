@@ -43,6 +43,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.InstanceIdentifierTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaInferenceStack;
 import org.slf4j.Logger;
@@ -213,7 +214,8 @@ public class FilterContentValidator {
                     keys.put(qualifiedName, keyValue);
                 } else {
                     final TypeDefinition<? extends TypeDefinition<?>> keyType = listKey.getType();
-                    if (keyType instanceof IdentityrefTypeDefinition || keyType instanceof LeafrefTypeDefinition) {
+                    if (keyType instanceof IdentityrefTypeDefinition || keyType instanceof LeafrefTypeDefinition
+                            || keyType instanceof InstanceIdentifierTypeDefinition) {
                         final Document document = filterContent.getDomElement().getOwnerDocument();
                         final NamespaceContext nsContext = new UniversalNamespaceContextImpl(document, false);
                         final EffectiveModelContext modelContext = schemaContext.getCurrentContext();
