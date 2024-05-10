@@ -16,10 +16,13 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
@@ -52,13 +55,24 @@ final class SecurityHelper {
         return dsaFactory.generatePrivate(keySpec);
     }
 
-    @NonNull X509Certificate generateCertificate(final byte[] certificate) throws GeneralSecurityException {
-        // TODO: https://stackoverflow.com/questions/43809909/is-certificatefactory-getinstancex-509-thread-safe
-        //        indicates this is thread-safe in most cases, but can we get a better assurance?
-        if (certFactory == null) {
-            certFactory = CertificateFactory.getInstance("X.509");
+
+    @NonNull X509Certificate generatePemCertificate(final String certificate) throws IOException {
+        if (bcProv == null) {
+            final var prov = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
+            bcProv = prov != null ? prov : new BouncyCastleProvider();
         }
-        return (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(certificate));
+
+        try (var keyReader = new PEMParser(new StringReader(certificate.replace("\\n", "\n")))) {
+            final var obj = keyReader.readObject();
+
+            if (obj instanceof X509CertificateHolder encrypted) {
+                return new JcaX509CertificateConverter().getCertificate(encrypted);
+            } else {
+                throw new IOException("Unhandled private key " + obj.getClass());
+            }
+        } catch (CertificateException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @NonNull KeyPair decodePrivateKey(final String privateKey, final String passphrase) throws IOException {

@@ -188,21 +188,12 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
             }
 
             final var certs = new ArrayList<X509Certificate>(certChain.size());
-            for (int i = 0, size = certChain.size(); i < size; i++) {
-                final byte[] bytes;
-                try {
-                    bytes = base64Decode(new String(certChain.get(i), StandardCharsets.UTF_8));
-                } catch (IllegalArgumentException e) {
-                    LOG.debug("Failed to decode certificate chain item {} for private key {}", i, keyName, e);
-                    failure = updateFailure(failure, e);
-                    continue;
-                }
-
+            for (byte[] bytes : certChain) {
                 final X509Certificate x509cert;
                 try {
-                    x509cert = securityHelper.generateCertificate(bytes);
-                } catch (GeneralSecurityException e) {
-                    LOG.debug("Failed to generate certificate chain item {} for private key {}", i, keyName, e);
+                    x509cert = securityHelper.generatePemCertificate(new String(bytes, StandardCharsets.UTF_8));
+                } catch (IOException e) {
+                    LOG.debug("Failed to generate certificate for {}", keyName, e);
                     failure = updateFailure(failure, e);
                     continue;
                 }
@@ -217,19 +208,11 @@ public final class DefaultNetconfKeystoreService implements NetconfKeystoreServi
         for (var cert : newState.trustedCertificates.values()) {
             final var certName = cert.requireName();
 
-            final byte[] bytes;
-            try {
-                bytes = base64Decode(new String(cert.requireCertificate(), StandardCharsets.UTF_8));
-            } catch (IllegalArgumentException e) {
-                LOG.debug("Failed to decode trusted certificate {}", certName, e);
-                failure = updateFailure(failure, e);
-                continue;
-            }
-
             final X509Certificate x509cert;
             try {
-                x509cert = securityHelper.generateCertificate(bytes);
-            } catch (GeneralSecurityException e) {
+                x509cert = securityHelper
+                        .generatePemCertificate(new String(cert.requireCertificate(), StandardCharsets.UTF_8));
+            } catch (IOException e) {
                 LOG.debug("Failed to generate certificate for {}", certName, e);
                 failure = updateFailure(failure, e);
                 continue;
