@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ccbe9a5c_76d45a21",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-05-10T14:35:21Z",
+      "side": 1,
+      "message": "the change provided to this test is absolutely unnecessary.\noriginal case is to validate the additional data node (defined by model\naugmentation) is not being affected by adapter on device status changes. \n\nno reason to set/fetch/check full node content if only augmentation is in scope.",
+      "range": {
+        "startLine": 110,
+        "startChar": 9,
+        "endLine": 110,
+        "endChar": 40
+      },
+      "revId": "6782db8ff75cc9bd51d5ab4f84307801b04fec27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "baeb3d33_3ed50b51",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-05-10T14:35:21Z",
+      "side": 1,
+      "message": "this only works because async update by `adapter.setDeviceAsFailed(null)`\nis not completed yet. `expectedData` still contains success status so this \nshould fail on assertion if `adapter.setDeviceAsFailed(null)` is followed by \nAwaitility.await() as in #testFailedDeviceIntegration()\n\nsuggested to revert to state when only augmented field is updated/checked\n(not full node), awaitility added to ensure dapter\u0027s commit is completed",
+      "range": {
+        "startLine": 194,
+        "startChar": 8,
+        "endLine": 194,
+        "endChar": 20
+      },
+      "revId": "6782db8ff75cc9bd51d5ab4f84307801b04fec27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
