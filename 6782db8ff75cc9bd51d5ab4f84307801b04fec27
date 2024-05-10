@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "38488955_1aec0d7c",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-10T15:11:05Z",
+      "side": 1,
+      "message": "since we set Credentials as a mandatory field, we cannot make a put request for node without Credentials",
+      "parentUuid": "ccbe9a5c_76d45a21",
+      "range": {
+        "startLine": 110,
+        "startChar": 9,
+        "endLine": 110,
+        "endChar": 40
+      },
+      "revId": "6782db8ff75cc9bd51d5ab4f84307801b04fec27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "baeb3d33_3ed50b51",
         "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
         "patchSetId": 38
@@ -37,6 +61,30 @@
       "writtenOn": "2024-05-10T14:35:21Z",
       "side": 1,
       "message": "this only works because async update by `adapter.setDeviceAsFailed(null)`\nis not completed yet. `expectedData` still contains success status so this \nshould fail on assertion if `adapter.setDeviceAsFailed(null)` is followed by \nAwaitility.await() as in #testFailedDeviceIntegration()\n\nsuggested to revert to state when only augmented field is updated/checked\n(not full node), awaitility added to ensure dapter\u0027s commit is completed",
+      "range": {
+        "startLine": 194,
+        "startChar": 8,
+        "endLine": 194,
+        "endChar": 20
+      },
+      "revId": "6782db8ff75cc9bd51d5ab4f84307801b04fec27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78be28f6_90955d45",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-10T15:11:05Z",
+      "side": 1,
+      "message": "Added Awaitility.await(), expected status changed accordingly",
+      "parentUuid": "baeb3d33_3ed50b51",
       "range": {
         "startLine": 194,
         "startChar": 8,
