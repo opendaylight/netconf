@@ -16,6 +16,80 @@
       "message": "recheck",
       "revId": "caa73e923592806ef002b3cd519ff105bddef427",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea7f49f0_3c9d9db3",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-05-10T13:41:45Z",
+      "side": 1,
+      "message": "the reason of exception here is an attempt to create a node which already exists -- see NetconfDeviceTopologyAdapter constructor",
+      "range": {
+        "startLine": 161,
+        "startChar": 12,
+        "endLine": 161,
+        "endChar": 15
+      },
+      "revId": "caa73e923592806ef002b3cd519ff105bddef427",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89a8f3fb_f1684dcb",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-05-10T13:41:45Z",
+      "side": 1,
+      "message": "add Awaitility.await() to ensure adapter completes the transaction",
+      "revId": "caa73e923592806ef002b3cd519ff105bddef427",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93972122_30e754d4",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-05-10T13:41:45Z",
+      "side": 1,
+      "message": "add Awaitility.await() to ensure adapter completes the transaction",
+      "revId": "caa73e923592806ef002b3cd519ff105bddef427",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e722c60_57153c93",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-05-10T13:41:45Z",
+      "side": 1,
+      "message": "assertion fails here because the status value within expectedData is not updated and remain same as for success connection",
+      "revId": "caa73e923592806ef002b3cd519ff105bddef427",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
