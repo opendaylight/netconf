@@ -32,7 +32,6 @@ import org.opendaylight.yangtools.yang.model.api.AnydataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ElementCountConstraint;
@@ -153,7 +152,7 @@ public class PropertyEntity {
         final var name = schemaNode.getQName().getLocalName();
         final var shouldBeAddedAsChild = !isParentConfig || schemaNode.isConfiguration();
         if (schemaNode instanceof ListSchemaNode || schemaNode instanceof ContainerSchemaNode) {
-            processDataNodeContainer((DataNodeContainer) schemaNode, stack);
+            processDataNodeContainer(schemaNode, stack);
             if (shouldBeAddedAsChild && isSchemaNodeMandatory(schemaNode)) {
                 required.add(name);
             }
@@ -174,14 +173,13 @@ public class PropertyEntity {
         stack.exit();
     }
 
-    private void processDataNodeContainer(final DataNodeContainer dataNode, final SchemaInferenceStack stack)
+    private void processDataNodeContainer(final DataSchemaNode dataNode, final SchemaInferenceStack stack)
             throws IOException {
-        final var schemaNode = (DataSchemaNode) dataNode;
-        final var localName = schemaNode.getQName().getLocalName();
+        final var localName = dataNode.getQName().getLocalName();
         final var nodeName = parentName + "_" + localName;
 
         final String discriminator;
-        final var nodeWithParentName = Map.of(nodeName, schemaNode);
+        final var nodeWithParentName = Map.of(nodeName, dataNode);
         if (!definitionNames.isListedNode(nodeWithParentName)) {
             final var parentNameConfigLocalName = parentName + "_" + localName;
             final var names = List.of(parentNameConfigLocalName);
@@ -190,7 +188,7 @@ public class PropertyEntity {
             discriminator = definitionNames.getDiscriminator(nodeWithParentName);
         }
 
-        processRef(nodeName, schemaNode, discriminator, stack);
+        processRef(nodeName, dataNode, discriminator, stack);
     }
 
     private void processRef(final String name, final SchemaNode schemaNode, String discriminator,
