@@ -1,0 +1,711 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.0",
+    "title": "netconf-1309",
+    "description": "We are providing full API for configurational data which can be edited (by POST, PUT, PATCH and DELETE).\nFor operational data we only provide GET API.\n\nFor majority of request you can see only config data in examples. That's because we can show only one example\nper request. The exception when you can see operational data in example is when data are representing\noperational (config false) container with no config data in it."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8181/"
+    }
+  ],
+  "paths": {
+    "/rests/data": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - netconf-1309 - netconf-1309",
+        "requestBody": {
+          "description": "first",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "first": {
+                    "$ref": "#/components/schemas/netconf-1309_first",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_first"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      }
+    },
+    "/rests/data/netconf-1309:first": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - netconf-1309 - first",
+        "requestBody": {
+          "description": "test-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container": {
+                    "$ref": "#/components/schemas/netconf-1309_first_test-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_first_test-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "put": {
+        "description": "",
+        "summary": "PUT - netconf-1309 - Controller - first",
+        "requestBody": {
+          "description": "first",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "netconf-1309:first": {
+                    "$ref": "#/components/schemas/netconf-1309_first",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_first"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - netconf-1309 - Controller - first",
+        "requestBody": {
+          "description": "first",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "netconf-1309:first": {
+                    "$ref": "#/components/schemas/netconf-1309_first",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_first"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - Controller - netconf-1309 - first",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - Controller - netconf-1309 - first",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/netconf-1309_first"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "first": {
+                      "$ref": "#/components/schemas/netconf-1309_first",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/netconf-1309:first/test-container": {
+      "put": {
+        "description": "",
+        "summary": "PUT - netconf-1309 - Controller - test-container",
+        "requestBody": {
+          "description": "test-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "netconf-1309:test-container": {
+                    "$ref": "#/components/schemas/netconf-1309_first_test-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_first_test-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - netconf-1309 - Controller - test-container",
+        "requestBody": {
+          "description": "test-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "netconf-1309:test-container": {
+                    "$ref": "#/components/schemas/netconf-1309_first_test-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_first_test-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - Controller - netconf-1309 - test-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - Controller - netconf-1309 - test-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/netconf-1309_first_test-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "test-container": {
+                      "$ref": "#/components/schemas/netconf-1309_first_test-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/netconf-1309:second": {
+      "post": {
+        "description": "\n\nNote:\nIn example payload, you can see only the first data node child of the resource to be created, following the\nguidelines of RFC 8040, which allows us to create only one resource in POST request.\n",
+        "summary": "POST - Controller - netconf-1309 - second",
+        "requestBody": {
+          "description": "test-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "test-container": {
+                    "$ref": "#/components/schemas/netconf-1309_second_test-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_second_test-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "put": {
+        "description": "",
+        "summary": "PUT - netconf-1309 - Controller - second",
+        "requestBody": {
+          "description": "second",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "netconf-1309:second": {
+                    "$ref": "#/components/schemas/netconf-1309_second",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_second"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - netconf-1309 - Controller - second",
+        "requestBody": {
+          "description": "second",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "netconf-1309:second": {
+                    "$ref": "#/components/schemas/netconf-1309_second",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_second"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - Controller - netconf-1309 - second",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - Controller - netconf-1309 - second",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/netconf-1309_second"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "second": {
+                      "$ref": "#/components/schemas/netconf-1309_second",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/rests/data/netconf-1309:second/test-container": {
+      "put": {
+        "description": "",
+        "summary": "PUT - netconf-1309 - Controller - test-container",
+        "requestBody": {
+          "description": "test-container",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "netconf-1309:test-container": {
+                    "$ref": "#/components/schemas/netconf-1309_second_test-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_second_test-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "patch": {
+        "description": "",
+        "summary": "PATCH - netconf-1309 - Controller - test-container",
+        "requestBody": {
+          "description": "test-container",
+          "content": {
+            "application/yang-data+json": {
+              "schema": {
+                "properties": {
+                  "netconf-1309:test-container": {
+                    "$ref": "#/components/schemas/netconf-1309_second_test-container",
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "application/yang-data+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/netconf-1309_second_test-container"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Updated"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "delete": {
+        "description": "",
+        "summary": "DELETE - Controller - netconf-1309 - test-container",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": []
+      },
+      "get": {
+        "description": "",
+        "summary": "GET - Controller - netconf-1309 - test-container",
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/netconf-1309_second_test-container"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "test-container": {
+                      "$ref": "#/components/schemas/netconf-1309_second_test-container",
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Controller netconf-1309"
+        ],
+        "parameters": [
+          {
+            "name": "content",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "config",
+                "nonconfig",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "netconf-1309_first": {
+        "title": "netconf-1309_first",
+        "type": "object",
+        "properties": {
+          "test-container": {
+            "$ref": "#/components/schemas/netconf-1309_first_test-container"
+          }
+        },
+        "xml": {
+          "name": "first",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:netconf:1309"
+        }
+      },
+      "netconf-1309_first_test-container": {
+        "title": "netconf-1309_first_test-container",
+        "type": "object",
+        "properties": {
+          "test-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some test-leaf"
+          }
+        },
+        "xml": {
+          "name": "test-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:netconf:1309"
+        }
+      },
+      "netconf-1309_second": {
+        "title": "netconf-1309_second",
+        "type": "object",
+        "properties": {
+          "test-container": {
+            "$ref": "#/components/schemas/netconf-1309_second_test-container"
+          }
+        },
+        "xml": {
+          "name": "second",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:netconf:1309"
+        }
+      },
+      "netconf-1309_second_test-container": {
+        "title": "netconf-1309_second_test-container",
+        "type": "object",
+        "properties": {
+          "test-leaf": {
+            "description": "",
+            "type": "string",
+            "example": "Some test-leaf"
+          }
+        },
+        "xml": {
+          "name": "test-container",
+          "namespace": "urn:ietf:params:xml:ns:yang:test:netconf:1309"
+        }
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "scheme": "basic",
+        "type": "http"
+      }
+    }
+  },
+  "security": [
+    {
+      "basicAuth": []
+    }
+  ]
+}
