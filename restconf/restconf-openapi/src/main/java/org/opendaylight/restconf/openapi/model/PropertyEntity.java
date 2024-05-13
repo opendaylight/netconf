@@ -181,10 +181,8 @@ public class PropertyEntity {
         final var nodeName = parentName + "_" + localName;
 
         final String discriminator;
-        if (!definitionNames.isListedNode(schemaNode)) {
-            final var parentNameConfigLocalName = parentName + "_" + localName;
-            final var names = List.of(parentNameConfigLocalName);
-            discriminator = definitionNames.pickDiscriminator(schemaNode, names);
+        if (!definitionNames.isListedNode(schemaNode, nodeName)) {
+            discriminator = definitionNames.pickDiscriminator(schemaNode, List.of(nodeName));
         } else {
             discriminator = definitionNames.getDiscriminator(schemaNode);
         }
