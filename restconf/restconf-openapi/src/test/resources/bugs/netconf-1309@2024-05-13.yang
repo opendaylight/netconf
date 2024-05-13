@@ -1,0 +1,24 @@
+module netconf-1309 {
+    yang-version 1.1;
+    namespace "urn:ietf:params:xml:ns:yang:test:netconf:1309";
+    prefix "n-1309";
+    revision 2024-05-13 {
+      description "Initial revision.";
+    }
+
+    grouping test-grouping {
+      container test-container {
+        leaf test-leaf {
+          type string;
+        }
+      }
+    }
+
+    container first {
+      uses test-grouping;
+    }
+
+    container second {
+      uses test-grouping;
+    }
+}
