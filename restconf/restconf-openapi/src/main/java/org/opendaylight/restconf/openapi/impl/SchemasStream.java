@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.opendaylight.restconf.openapi.jaxrs.OpenApiBodyWriter;
 import org.opendaylight.restconf.openapi.model.NodeSchemaEntity;
 import org.opendaylight.restconf.openapi.model.RpcSchemaEntity;
@@ -183,14 +184,15 @@ public final class SchemasStream extends InputStream {
             final SchemaInferenceStack stack, final DefinitionNames definitionNames,
             final ArrayDeque<SchemaEntity> result, final String parentName, final boolean isParentConfig) {
         if (node instanceof ContainerSchemaNode || node instanceof ListSchemaNode) {
-            if (definitionNames.isListedNode(node)) {
+            final var newTitle = title + "_" + node.getQName().getLocalName();
+            final var nodeWithParentName = Map.of(newTitle, node);
+            if (definitionNames.isListedNode(nodeWithParentName)) {
                 // This means schema for this node is already processed
                 return;
             }
-            final var newTitle = title + "_" + node.getQName().getLocalName();
             final var parentNameConfigLocalName = parentName + "_" + node.getQName().getLocalName();
             final var names = List.of(parentNameConfigLocalName);
-            final var discriminator = definitionNames.pickDiscriminator(node, names);
+            final var discriminator = definitionNames.pickDiscriminator(nodeWithParentName, names);
             final var child = new NodeSchemaEntity(node, newTitle, discriminator, OBJECT_TYPE, stack, parentName,
                 isParentConfig, definitionNames);
             final var isConfig = node.isConfiguration() && isParentConfig;

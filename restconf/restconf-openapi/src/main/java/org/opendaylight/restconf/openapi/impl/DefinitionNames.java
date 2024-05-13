@@ -10,11 +10,12 @@ package org.opendaylight.restconf.openapi.impl;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 
 public class DefinitionNames {
-    private final HashMap<SchemaNode, String> discriminators;
+    private final Map<Map<String, DataSchemaNode>, String> discriminators;
     private final Set<String> names;
 
     public DefinitionNames() {
@@ -32,14 +33,14 @@ public class DefinitionNames {
         return discriminator;
     }
 
-    public String pickDiscriminator(final SchemaNode node, final List<String> clearNames) {
+    public String pickDiscriminator(final Map<String, DataSchemaNode> nodeWithParent, final List<String> clearNames) {
         String discriminator = "";
         for (final String clearName: clearNames) {
             if (names.contains(clearName)) {
                 discriminator = String.valueOf(pickDiscriminator(clearNames, 1));
             }
         }
-        discriminators.put(node, discriminator);
+        discriminators.put(nodeWithParent, discriminator);
         for (final String clearName : clearNames) {
             names.add(clearName + discriminator);
         }
@@ -54,11 +55,11 @@ public class DefinitionNames {
         }
     }
 
-    public boolean isListedNode(final SchemaNode node) {
-        return discriminators.containsKey(node);
+    public boolean isListedNode(final Map<String, DataSchemaNode> nodeWithParent) {
+        return discriminators.containsKey(nodeWithParent);
     }
 
-    public String getDiscriminator(final SchemaNode node) {
-        return discriminators.get(node);
+    public String getDiscriminator(final Map<String, DataSchemaNode> nodeWithParent) {
+        return discriminators.get(nodeWithParent);
     }
 }

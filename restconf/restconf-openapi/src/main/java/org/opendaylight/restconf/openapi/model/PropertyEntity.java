@@ -176,17 +176,18 @@ public class PropertyEntity {
 
     private void processDataNodeContainer(final DataNodeContainer dataNode, final SchemaInferenceStack stack)
             throws IOException {
-        final var schemaNode = (SchemaNode) dataNode;
+        final var schemaNode = (DataSchemaNode) dataNode;
         final var localName = schemaNode.getQName().getLocalName();
         final var nodeName = parentName + "_" + localName;
 
         final String discriminator;
-        if (!definitionNames.isListedNode(schemaNode)) {
+        final var nodeWithParentName = Map.of(nodeName, schemaNode);
+        if (!definitionNames.isListedNode(nodeWithParentName)) {
             final var parentNameConfigLocalName = parentName + "_" + localName;
             final var names = List.of(parentNameConfigLocalName);
-            discriminator = definitionNames.pickDiscriminator(schemaNode, names);
+            discriminator = definitionNames.pickDiscriminator(nodeWithParentName, names);
         } else {
-            discriminator = definitionNames.getDiscriminator(schemaNode);
+            discriminator = definitionNames.getDiscriminator(nodeWithParentName);
         }
 
         processRef(nodeName, schemaNode, discriminator, stack);
