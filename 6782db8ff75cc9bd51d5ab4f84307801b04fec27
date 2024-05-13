@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7ed5cf5f_6caca88e",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 38
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 8894
+      },
+      "writtenOn": "2024-05-13T07:55:15Z",
+      "side": 1,
+      "message": "credentials are inserted when topology node is created\nfrom within NetconfDeviceTopologyAdapter constructor, \nin test it\u0027s done via setup() method\ncurrent test puts augmentation node as a child node under topology node,\nno need to override whole the node with same content in order to add \nan additional leaf node of string type",
+      "parentUuid": "38488955_1aec0d7c",
+      "range": {
+        "startLine": 110,
+        "startChar": 9,
+        "endLine": 110,
+        "endChar": 40
+      },
+      "revId": "6782db8ff75cc9bd51d5ab4f84307801b04fec27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "baeb3d33_3ed50b51",
         "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
         "patchSetId": 38
