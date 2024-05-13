@@ -54,8 +54,8 @@ public class DefinitionNames {
         }
     }
 
-    public boolean isListedNode(final SchemaNode node) {
-        return discriminators.containsKey(node);
+    public boolean isListedNode(final SchemaNode node, final String name) {
+        return discriminators.containsKey(node) && names.contains(name);
     }
 
     public String getDiscriminator(final SchemaNode node) {
