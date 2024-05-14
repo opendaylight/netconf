@@ -41,12 +41,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
@@ -100,8 +100,8 @@ import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
  *
  * @author Thomas Pantelis
  */
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     private static final String ACTOR_SYSTEM_NAME = "test";
     private static final RemoteDeviceId DEVICE_ID = new RemoteDeviceId("device", new InetSocketAddress(65535));
     private static final List<SourceIdentifier> SOURCE_IDENTIFIERS = List.of(new SourceIdentifier("testID"));
@@ -133,8 +133,8 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     private NetconfNodeManager netconfNodeManager;
     private String masterAddress;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         final Timeout responseTimeout = Timeout.apply(1, TimeUnit.SECONDS);
 
         slaveSystem = ActorSystem.create(ACTOR_SYSTEM_NAME, ConfigFactory.load().getConfig("Slave"));
@@ -174,11 +174,14 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
         slaveSchemaRepository.registerSchemaSourceListener(
                 TextToIRTransformer.create(slaveSchemaRepository, slaveSchemaRepository));
 
+        final var provider = createDeviceSchemaProvider(slaveSchemaRepository);
+        doReturn(slaveSchemaRepository).when(provider).registry();
+
         NetconfTopologySetup slaveSetup = NetconfTopologySetup.builder()
                 .setActorSystem(slaveSystem)
                 .setDataBroker(mockDataBroker)
                 .setBaseSchemaProvider(BASE_SCHEMAS)
-                .setDeviceSchemaProvider(createDeviceSchemaProvider(slaveSchemaRepository))
+                .setDeviceSchemaProvider(provider)
                 .build();
 
         netconfNodeManager = new NetconfNodeManager(slaveSetup, DEVICE_ID, responseTimeout,
@@ -189,20 +192,19 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
     private static DeviceNetconfSchemaProvider createDeviceSchemaProvider(final SharedSchemaRepository repository) {
         final var provider = mock(DeviceNetconfSchemaProvider.class);
-        doReturn(repository).when(provider).registry();
         doReturn(repository).when(provider).repository();
         return provider;
     }
 
-    @After
-    public void teardown() {
+    @AfterEach
+    void teardown() {
         TestKit.shutdownActorSystem(slaveSystem, true);
         TestKit.shutdownActorSystem(masterSystem, true);
     }
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testSlaveMountPointRegistration() throws InterruptedException, ExecutionException, TimeoutException {
+    void testSlaveMountPointRegistration() throws InterruptedException, ExecutionException, TimeoutException {
         initializeMaster();
 
         Registration mockListenerReg = mock(Registration.class);
@@ -304,7 +306,7 @@ public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testSlaveMountPointRegistrationFailuresAndRetries()
+    void testSlaveMountPointRegistrationFailuresAndRetries()
             throws InterruptedException, ExecutionException, TimeoutException {
         final NodeId nodeId = new NodeId("device");
         final NodeKey nodeKey = new NodeKey(nodeId);
