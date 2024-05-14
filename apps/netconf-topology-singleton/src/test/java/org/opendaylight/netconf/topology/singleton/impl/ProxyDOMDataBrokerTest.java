@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import akka.actor.ActorSystem;
 import akka.actor.Status.Success;
@@ -18,8 +18,8 @@ import akka.util.Timeout;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -47,7 +47,7 @@ public class ProxyDOMDataBrokerTest {
     private final ProxyDOMDataBroker proxy = new ProxyDOMDataBroker(DEVICE_ID, masterActor.ref(), system.dispatcher(),
             Timeout.apply(5, TimeUnit.SECONDS));
 
-    @AfterClass
+    @AfterAll
     public static void staticTearDown() {
         TestKit.shutdownActorSystem(system, true);
     }

@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
@@ -21,7 +21,7 @@ import akka.testkit.TestProbe;
 import akka.util.Timeout;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
  *
  * @author Thomas Pantelis
  */
-public abstract class ReadTransactionActorTestAdapter {
+abstract class ReadTransactionActorTestAdapter {
     static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
     static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);

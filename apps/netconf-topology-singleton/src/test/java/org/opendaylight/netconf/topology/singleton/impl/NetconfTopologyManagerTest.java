@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -33,13 +33,13 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
@@ -80,8 +80,8 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.parser.impl.DefaultYangParserFactory;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     private static final Uint16 ACTOR_RESPONSE_WAIT_TIME = Uint16.TEN;
     private static final String TOPOLOGY_ID = "topologyID";
 
@@ -118,8 +118,8 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     private final Map<InstanceIdentifier<Node>, Function<NetconfTopologySetup, NetconfTopologyContext>>
             mockContextMap = new HashMap<>();
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
 
         AbstractDataBrokerTest dataBrokerTest = new AbstractDataBrokerTest() {
@@ -151,13 +151,13 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
         };
     }
 
-    @After
-    public void after() {
+    @AfterEach
+    void after() {
         schemaAssembler.close();
     }
 
     @Test
-    public void testRegisterDataTreeChangeListener() throws Exception {
+    void testRegisterDataTreeChangeListener() throws Exception {
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
             try (ReadTransaction readTx = dataBroker.newReadOnlyTransaction()) {
                 return readTx.exists(LogicalDatastoreType.OPERATIONAL,
@@ -180,7 +180,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testOnDataTreeChanged() {
+    void testOnDataTreeChanged() {
         // Notify of 2 created Node objects.
         final NodeId nodeId1 = new NodeId("node-id-1");
         final InstanceIdentifier<Node> nodeInstanceId1 = NetconfTopologyUtils.createTopologyNodeListPath(
@@ -328,7 +328,7 @@ public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testClusterSingletonServiceRegistrationFailure() throws Exception {
+    void testClusterSingletonServiceRegistrationFailure() throws Exception {
         final NodeId nodeId = new NodeId("node-id");
         final InstanceIdentifier<Node> nodeInstanceId = NetconfTopologyUtils.createTopologyNodeListPath(
                 new NodeKey(nodeId), TOPOLOGY_ID);
