@@ -16,7 +16,6 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.XMLNamespace;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public final class RestDocgenUtil {
     private static final Map<XMLNamespace, Map<Optional<Revision>, Module>> NAMESPACE_AND_REVISION_TO_MODULE =
@@ -36,11 +35,11 @@ public final class RestDocgenUtil {
      * @return name of {@code node}
      */
     public static String resolvePathArgumentsName(@NonNull final QName node, @NonNull final QName parent,
-                                                  @NonNull final EffectiveModelContext schemaContext) {
+                                                  @NonNull final EffectiveModelContext modelContext) {
         if (isEqualNamespaceAndRevision(node, parent)) {
             return node.getLocalName();
         } else {
-            return resolveFullNameFromNode(node, schemaContext);
+            return resolveFullNameFromNode(node, modelContext);
         }
     }
 
@@ -49,14 +48,14 @@ public final class RestDocgenUtil {
                 && parent.getRevision().equals(node.getRevision());
     }
 
-    public static String resolveFullNameFromNode(final QName node, final SchemaContext schemaContext) {
+    public static String resolveFullNameFromNode(final QName node, final EffectiveModelContext modelContext) {
         final XMLNamespace namespace = node.getNamespace();
         final Optional<Revision> revision = node.getRevision();
 
         final Map<Optional<Revision>, Module> revisionToModule =
             NAMESPACE_AND_REVISION_TO_MODULE.computeIfAbsent(namespace, k -> new HashMap<>());
         final Module module = revisionToModule.computeIfAbsent(revision,
-                k -> schemaContext.findModule(namespace, k).orElse(null));
+                k -> modelContext.findModule(namespace, k).orElse(null));
         if (module != null) {
             return module.getName() + ":" + node.getLocalName();
         }

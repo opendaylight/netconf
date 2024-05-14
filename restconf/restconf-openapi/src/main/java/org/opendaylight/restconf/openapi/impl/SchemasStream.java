@@ -45,7 +45,7 @@ public final class SchemasStream extends InputStream {
 
     private final Iterator<? extends Module> iterator;
     private final OpenApiBodyWriter writer;
-    private final EffectiveModelContext context;
+    private final EffectiveModelContext modelContext;
     private final boolean isForSingleModule;
     private final ByteArrayOutputStream stream;
     private final JsonGenerator generator;
@@ -54,11 +54,11 @@ public final class SchemasStream extends InputStream {
     private ReadableByteChannel channel;
     private boolean eof;
 
-    public SchemasStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
+    public SchemasStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule,
             final ByteArrayOutputStream stream, final JsonGenerator generator) {
         this.iterator = iterator;
-        this.context = context;
+        this.modelContext = modelContext;
         this.writer = writer;
         this.isForSingleModule = isForSingleModule;
         this.stream = stream;
@@ -81,7 +81,7 @@ public final class SchemasStream extends InputStream {
         while (read == -1) {
             if (iterator.hasNext()) {
                 reader = new BufferedReader(new InputStreamReader(
-                    new SchemaStream(toComponents(iterator.next(), context, isForSingleModule), writer),
+                    new SchemaStream(toComponents(iterator.next(), modelContext, isForSingleModule), writer),
                         StandardCharsets.UTF_8));
                 read = reader.read();
                 continue;
@@ -112,7 +112,7 @@ public final class SchemasStream extends InputStream {
         while (read == -1) {
             if (iterator.hasNext()) {
                 channel = Channels.newChannel(
-                    new SchemaStream(toComponents(iterator.next(), context, isForSingleModule), writer));
+                    new SchemaStream(toComponents(iterator.next(), modelContext, isForSingleModule), writer));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 continue;
             }
@@ -126,11 +126,11 @@ public final class SchemasStream extends InputStream {
         return read;
     }
 
-    private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext context,
+    private static Deque<SchemaEntity> toComponents(final Module module, final EffectiveModelContext modelContext,
             final boolean isForSingleModule) {
         final var result = new ArrayDeque<SchemaEntity>();
         final var definitionNames = new DefinitionNames();
-        final var stack = SchemaInferenceStack.of(context);
+        final var stack = SchemaInferenceStack.of(modelContext);
         final var moduleName = module.getName();
         if (isForSingleModule) {
             definitionNames.addUnlinkedName(moduleName + "_module");
