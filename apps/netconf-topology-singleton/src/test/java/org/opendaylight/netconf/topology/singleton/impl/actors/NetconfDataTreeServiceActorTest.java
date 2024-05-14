@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -27,12 +27,12 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -63,8 +63,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfDataTreeServiceActorTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfDataTreeServiceActorTest {
     static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
     static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
@@ -80,20 +80,20 @@ public class NetconfDataTreeServiceActorTest {
     private TestProbe probe;
     private ActorRef actorRef;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         actorRef = TestActorRef.create(system,
             NetconfDataTreeServiceActor.props(netconfService, Duration.ofSeconds(2)));
         probe = TestProbe.apply(system);
     }
 
-    @AfterClass
-    public static void staticTearDown() {
+    @AfterAll
+    static void staticTearDown() {
         TestKit.shutdownActorSystem(system, true);
     }
 
     @Test
-    public void testGet() {
+    void testGet() {
         doReturn(immediateFluentFuture(Optional.of(NODE))).when(netconfService).get(PATH);
         actorRef.tell(new GetRequest(PATH), probe.ref());
 
@@ -103,7 +103,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testGetEmpty() {
+    void testGetEmpty() {
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).get(PATH);
         actorRef.tell(new GetRequest(PATH), probe.ref());
 
@@ -112,7 +112,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testGetFailure() {
+    void testGetFailure() {
         final ReadFailedException cause = new ReadFailedException("fail");
         doReturn(immediateFailedFluentFuture(cause)).when(netconfService).get(PATH);
         actorRef.tell(new GetRequest(PATH), probe.ref());
@@ -123,7 +123,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testGetConfig() {
+    void testGetConfig() {
         doReturn(immediateFluentFuture(Optional.of(NODE))).when(netconfService).getConfig(PATH);
         actorRef.tell(new GetConfigRequest(PATH), probe.ref());
 
@@ -133,7 +133,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testGetConfigEmpty() {
+    void testGetConfigEmpty() {
         doReturn(immediateFluentFuture(Optional.empty())).when(netconfService).getConfig(PATH);
         actorRef.tell(new GetConfigRequest(PATH), probe.ref());
 
@@ -142,7 +142,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testGetConfigFailure() {
+    void testGetConfigFailure() {
         final ReadFailedException cause = new ReadFailedException("fail");
         doReturn(immediateFailedFluentFuture(cause)).when(netconfService).getConfig(PATH);
         actorRef.tell(new GetConfigRequest(PATH), probe.ref());
@@ -153,7 +153,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testLock() {
+    void testLock() {
         final ListenableFuture<? extends DOMRpcResult> future = Futures.immediateFuture(new DefaultDOMRpcResult());
         doReturn(future).when(netconfService).lock();
         actorRef.tell(new LockRequest(), probe.ref());
@@ -161,7 +161,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testMerge() {
+    void testMerge() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
             .merge(STORE, PATH, NODE, Optional.empty());
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
@@ -170,7 +170,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testReplace() {
+    void testReplace() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
             .replace(STORE, PATH, NODE, Optional.empty());
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
@@ -179,7 +179,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
             .create(STORE, PATH, NODE, Optional.empty());
         final NormalizedNodeMessage node = new NormalizedNodeMessage(PATH, NODE);
@@ -188,7 +188,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
             .delete(STORE, PATH);
         actorRef.tell(new DeleteEditConfigRequest(STORE, PATH), probe.ref());
@@ -196,7 +196,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testRemove() {
+    void testRemove() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService)
             .remove(STORE, PATH);
         actorRef.tell(new RemoveEditConfigRequest(STORE, PATH), probe.ref());
@@ -204,7 +204,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testCommit() {
+    void testCommit() {
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(netconfService).commit();
         actorRef.tell(new CommitRequest(), probe.ref());
 
@@ -213,7 +213,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testCommitFail() {
+    void testCommitFail() {
         final RpcError rpcError = RpcResultBuilder.newError(ErrorType.APPLICATION, new ErrorTag("fail"), "fail");
         final TransactionCommitFailedException failure = new TransactionCommitFailedException("fail", rpcError);
         final NetconfServiceFailedException cause = new NetconfServiceFailedException(
@@ -227,7 +227,7 @@ public class NetconfDataTreeServiceActorTest {
     }
 
     @Test
-    public void testIdleTimeout() {
+    void testIdleTimeout() {
         final TestProbe testProbe = new TestProbe(system);
         testProbe.watch(actorRef);
         doReturn(Futures.immediateFuture(new DefaultDOMRpcResult())).when(netconfService).unlock();
