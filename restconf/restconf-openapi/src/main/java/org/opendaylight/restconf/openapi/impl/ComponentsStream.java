@@ -31,7 +31,7 @@ public final class ComponentsStream extends InputStream {
 
     private final Iterator<? extends Module> iterator;
     private final OpenApiBodyWriter writer;
-    private final EffectiveModelContext context;
+    private final EffectiveModelContext modelContext;
     private final JsonGenerator generator;
     private final ByteArrayOutputStream stream;
     private final boolean isForSingleModule;
@@ -41,11 +41,11 @@ public final class ComponentsStream extends InputStream {
     private Reader reader;
     private ReadableByteChannel channel;
 
-    public ComponentsStream(final EffectiveModelContext context, final OpenApiBodyWriter writer,
+    public ComponentsStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
             final JsonGenerator generator, final ByteArrayOutputStream stream,
             final Iterator<? extends Module> iterator, final boolean isForSingleModule) {
         this.iterator = iterator;
-        this.context = context;
+        this.modelContext = modelContext;
         this.writer = writer;
         this.generator = generator;
         this.stream = stream;
@@ -64,8 +64,8 @@ public final class ComponentsStream extends InputStream {
         var read = reader.read();
         while (read == -1) {
             if (!schemasWritten) {
-                reader = new InputStreamReader(new SchemasStream(context, writer, iterator, isForSingleModule, stream,
-                    generator), StandardCharsets.UTF_8);
+                reader = new InputStreamReader(new SchemasStream(modelContext, writer, iterator, isForSingleModule,
+                    stream, generator), StandardCharsets.UTF_8);
                 read = reader.read();
                 schemasWritten = true;
                 continue;
@@ -98,8 +98,8 @@ public final class ComponentsStream extends InputStream {
         var read = channel.read(ByteBuffer.wrap(array, off, len));
         while (read == -1) {
             if (!schemasWritten) {
-                channel = Channels.newChannel(new SchemasStream(context, writer, iterator, isForSingleModule, stream,
-                    generator));
+                channel = Channels.newChannel(new SchemasStream(modelContext, writer, iterator, isForSingleModule,
+                    stream, generator));
                 read = channel.read(ByteBuffer.wrap(array, off, len));
                 schemasWritten = true;
                 continue;

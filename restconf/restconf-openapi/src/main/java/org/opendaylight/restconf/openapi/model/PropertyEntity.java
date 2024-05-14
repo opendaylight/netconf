@@ -545,14 +545,14 @@ public class PropertyEntity {
     }
 
     private String processIdentityRefType(final IdentityrefTypeDefinition leafTypeDef,
-            final EffectiveModelContext schemaContext, final TypeDef def) {
+            final EffectiveModelContext modelContext, final TypeDef def) {
         final var schemaNode = leafTypeDef.getIdentities().iterator().next();
         def.setExample(schemaNode.getQName().getLocalName());
 
-        final var derivedIds = schemaContext.getDerivedIdentities(schemaNode);
+        final var derivedIds = modelContext.getDerivedIdentities(schemaNode);
         final var enumPayload = new ArrayList<String>();
         enumPayload.add(schemaNode.getQName().getLocalName());
-        populateEnumWithDerived(derivedIds, enumPayload, schemaContext);
+        populateEnumWithDerived(derivedIds, enumPayload, modelContext);
         final var schemaEnum = new ArrayList<>(enumPayload);
 
         def.setEnums(schemaEnum);
@@ -561,10 +561,10 @@ public class PropertyEntity {
     }
 
     private void populateEnumWithDerived(final Collection<? extends IdentitySchemaNode> derivedIds,
-            final List<String> enumPayload, final EffectiveModelContext context) {
+            final List<String> enumPayload, final EffectiveModelContext modelContext) {
         for (final var derivedId : derivedIds) {
             enumPayload.add(derivedId.getQName().getLocalName());
-            populateEnumWithDerived(context.getDerivedIdentities(derivedId), enumPayload, context);
+            populateEnumWithDerived(modelContext.getDerivedIdentities(derivedId), enumPayload, modelContext);
         }
     }
 
@@ -666,9 +666,9 @@ public class PropertyEntity {
     }
 
     private String processInstanceIdentifierType(final InstanceIdentifierTypeDefinition iidType,
-            final DataSchemaNode schemaNode, final EffectiveModelContext schemaContext,final TypeDef def) {
+            final DataSchemaNode schemaNode, final EffectiveModelContext modelContext,final TypeDef def) {
         // create example instance-identifier to the first container of node's module if exists or leave it empty
-        final var module = schemaContext.findModule(schemaNode.getQName().getModule());
+        final var module = modelContext.findModule(schemaNode.getQName().getModule());
         if (module.isPresent()) {
             final var container = module.orElseThrow().getChildNodes().stream()
                 .filter(n -> n instanceof ContainerSchemaNode)

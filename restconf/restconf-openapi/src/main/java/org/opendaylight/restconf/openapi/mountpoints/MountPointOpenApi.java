@@ -37,7 +37,6 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,17 +75,17 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
 
     public Map<String, Long> getInstanceIdentifiers() {
         final Map<String, Long> urlToId = new HashMap<>();
-        final SchemaContext context = globalSchema.getGlobalContext();
+        final EffectiveModelContext modelContext = globalSchema.getGlobalContext();
         for (final Entry<YangInstanceIdentifier, Long> entry : instanceIdToLongId.entrySet()) {
-            final String modName = findModuleName(entry.getKey(), context);
+            final String modName = findModuleName(entry.getKey(), modelContext);
             urlToId.put(generateUrlPrefixFromInstanceID(entry.getKey(), modName), entry.getValue());
         }
         return urlToId;
     }
 
-    private static String findModuleName(final YangInstanceIdentifier id, final SchemaContext context) {
+    private static String findModuleName(final YangInstanceIdentifier id, final EffectiveModelContext modelContext) {
         final PathArgument rootQName = id.getPathArguments().iterator().next();
-        for (final Module mod : context.getModules()) {
+        for (final Module mod : modelContext.getModules()) {
             if (mod.findDataChildByName(rootQName.getNodeType()).isPresent()) {
                 return mod.getName();
             }
@@ -118,7 +117,7 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
         return builder.toString();
     }
 
-    private EffectiveModelContext getSchemaContext(final YangInstanceIdentifier id) {
+    private EffectiveModelContext getModelContext(final YangInstanceIdentifier id) {
         if (id == null) {
             return null;
         }
@@ -133,24 +132,24 @@ public class MountPointOpenApi implements DOMMountPointListener, AutoCloseable {
     public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
             final String revision) throws IOException  {
         final YangInstanceIdentifier iid = longIdToInstanceId.get(id);
-        final EffectiveModelContext context = getSchemaContext(iid);
+        final EffectiveModelContext modelContext = getModelContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
         final String deviceName = extractDeviceName(iid);
 
-        if (context == null) {
+        if (modelContext == null) {
             return null;
         }
 
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
-            return generateDataStoreOpenApi(context, uriInfo, urlPrefix, deviceName);
+            return generateDataStoreOpenApi(modelContext, uriInfo, urlPrefix, deviceName);
         }
-        return openApiGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix, deviceName);
+        return openApiGenerator.getApiDeclaration(module, revision, uriInfo, modelContext, urlPrefix, deviceName);
     }
 
     public OpenApiInputStream getMountPointApi(final UriInfo uriInfo, final Long id, final @Nullable String strPageNum)
             throws IOException {
         final var iid = longIdToInstanceId.get(id);
-        final var context = getSchemaContext(iid);
+        final var context = getModelContext(iid);
         final var urlPrefix = getYangMountUrl(iid);
         final var deviceName = extractDeviceName(iid);
 
