@@ -44,7 +44,7 @@ public final class OpenApiInputStream extends InputStream {
 
     private boolean eof;
 
-    public OpenApiInputStream(final EffectiveModelContext context, final String title, final String url,
+    public OpenApiInputStream(final EffectiveModelContext modelContext, final String title, final String url,
             final List<Map<String, List<String>>> security, final String deviceName, final String urlPrefix,
             final boolean isForSingleModule, final boolean includeDataStore, final Collection<? extends Module> modules,
             final String basePath) throws IOException {
@@ -52,9 +52,9 @@ public final class OpenApiInputStream extends InputStream {
         stack.add(new OpenApiVersionStream(new OpenApiVersionEntity(), writer));
         stack.add(new InfoStream(new InfoEntity(title), writer));
         stack.add(new ServersStream(new ServersEntity(List.of(new ServerEntity(url))), writer));
-        stack.add(new PathsStream(context, writer, deviceName, urlPrefix, isForSingleModule, includeDataStore,
+        stack.add(new PathsStream(modelContext, writer, deviceName, urlPrefix, isForSingleModule, includeDataStore,
             modules.iterator(), basePath, stream, generator));
-        stack.add(new ComponentsStream(context, writer, generator, stream, modules.iterator(), isForSingleModule));
+        stack.add(new ComponentsStream(modelContext, writer, generator, stream, modules.iterator(), isForSingleModule));
         stack.add(new SecurityStream(writer, new SecurityEntity(security)));
     }
 

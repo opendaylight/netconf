@@ -65,7 +65,7 @@ public final class PathsStream extends InputStream {
 
     private final Iterator<? extends Module> iterator;
     private final OpenApiBodyWriter writer;
-    private final EffectiveModelContext schemaContext;
+    private final EffectiveModelContext modelContext;
     private final String deviceName;
     private final String urlPrefix;
     private final String basePath;
@@ -80,13 +80,13 @@ public final class PathsStream extends InputStream {
     private ReadableByteChannel channel;
     private boolean eof;
 
-    public PathsStream(final EffectiveModelContext schemaContext, final OpenApiBodyWriter writer,
+    public PathsStream(final EffectiveModelContext modelContext, final OpenApiBodyWriter writer,
             final String deviceName, final String urlPrefix, final boolean isForSingleModule,
             final boolean includeDataStore, final Iterator<? extends Module> iterator, final String basePath,
             final ByteArrayOutputStream stream, final JsonGenerator generator) {
         this.iterator = iterator;
         this.writer = writer;
-        this.schemaContext = schemaContext;
+        this.modelContext = modelContext;
         this.isForSingleModule = isForSingleModule;
         this.deviceName = deviceName;
         this.urlPrefix = urlPrefix;
@@ -191,7 +191,7 @@ public final class PathsStream extends InputStream {
                 final var pathParams = new ArrayList<ParameterEntity>();
                 final var localName = moduleName + ":" + nodeLocalName;
                 final var path = urlPrefix + "/" + processPath(node, pathParams, localName);
-                processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, schemaContext,
+                processChildNode(node, pathParams, moduleName, result, path, nodeLocalName, isConfig, modelContext,
                     deviceName, basePath, null, List.of());
             }
         }
@@ -200,10 +200,10 @@ public final class PathsStream extends InputStream {
 
     private static void processChildNode(final DataSchemaNode node, final List<ParameterEntity> pathParams,
             final String moduleName, final Deque<PathEntity> result, final String path, final String refPath,
-            final boolean isConfig, final EffectiveModelContext schemaContext, final String deviceName,
+            final boolean isConfig, final EffectiveModelContext modelContext, final String deviceName,
             final String basePath, final SchemaNode parentNode, final List<SchemaNode> parentNodes) {
         final var resourcePath = basePath + DATA + path;
-        final var fullName = resolveFullNameFromNode(node.getQName(), schemaContext);
+        final var fullName = resolveFullNameFromNode(node.getQName(), modelContext);
         final var firstChild = getListOrContainerChildNode((DataNodeContainer) node);
         if (firstChild != null && node instanceof ContainerSchemaNode) {
             result.add(processTopPathEntity(node, resourcePath, pathParams, moduleName, refPath, isConfig,
@@ -223,7 +223,7 @@ public final class PathsStream extends InputStream {
             final var actionParams = new ArrayList<>(pathParams);
             actionContainer.getActions().forEach(actionDef -> {
                 final var resourceActionPath = path + "/" + resolvePathArgumentsName(actionDef.getQName(),
-                    node.getQName(), schemaContext);
+                    node.getQName(), modelContext);
                 final var childPath = basePath + OPERATIONS + resourceActionPath;
                 result.add(processActionPathEntity(actionDef, childPath, actionParams, moduleName,
                     refPath, deviceName, parentNode, listOfParentsForActions));
@@ -233,11 +233,11 @@ public final class PathsStream extends InputStream {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 final var childParams = new ArrayList<>(pathParams);
                 final var newRefPath = refPath + "_" + childNode.getQName().getLocalName();
-                final var localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), schemaContext);
+                final var localName = resolvePathArgumentsName(childNode.getQName(), node.getQName(), modelContext);
                 final var resourceDataPath = path + "/" + processPath(childNode, childParams, localName);
                 final var newConfig = isConfig && childNode.isConfiguration();
                 processChildNode(childNode, childParams, moduleName, result, resourceDataPath, newRefPath, newConfig,
-                    schemaContext, deviceName, basePath, node, listOfParents);
+                    modelContext, deviceName, basePath, node, listOfParents);
             }
         }
     }

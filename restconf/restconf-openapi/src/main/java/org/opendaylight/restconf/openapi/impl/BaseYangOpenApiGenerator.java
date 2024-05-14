@@ -38,26 +38,26 @@ public abstract class BaseYangOpenApiGenerator {
     }
 
     public OpenApiInputStream getControllerModulesDoc(final UriInfo uriInfo) throws IOException {
-        final var context = requireNonNull(schemaService.getGlobalContext());
+        final var modelContext = requireNonNull(schemaService.getGlobalContext());
         final var schema = createSchemaFromUriInfo(uriInfo);
         final var host = createHostFromUriInfo(uriInfo);
         final var title = "Controller modules of RESTCONF";
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
-        final var modules = getModulesWithoutDuplications(context);
-        return new OpenApiInputStream(context, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
+        final var modules = getModulesWithoutDuplications(modelContext);
+        return new OpenApiInputStream(modelContext, title, url, SECURITY, CONTROLLER_RESOURCE_NAME, "",false, false,
             modules, basePath);
     }
 
     public OpenApiInputStream getApiDeclaration(final String module, final String revision, final UriInfo uriInfo)
             throws IOException {
-        final EffectiveModelContext schemaContext = schemaService.getGlobalContext();
-        Preconditions.checkState(schemaContext != null);
-        return getApiDeclaration(module, revision, uriInfo, schemaContext, "", CONTROLLER_RESOURCE_NAME);
+        final var modelContext = schemaService.getGlobalContext();
+        Preconditions.checkState(modelContext != null);
+        return getApiDeclaration(module, revision, uriInfo, modelContext, "", CONTROLLER_RESOURCE_NAME);
     }
 
     public OpenApiInputStream getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
-            final EffectiveModelContext schemaContext, final String urlPrefix, final @NonNull String deviceName)
+            final EffectiveModelContext modelContext, final String urlPrefix, final @NonNull String deviceName)
             throws IOException {
         final Optional<Revision> rev;
 
@@ -67,7 +67,7 @@ public abstract class BaseYangOpenApiGenerator {
             throw new IllegalArgumentException(e);
         }
 
-        final var module = schemaContext.findModule(moduleName, rev).orElse(null);
+        final var module = modelContext.findModule(moduleName, rev).orElse(null);
         Preconditions.checkArgument(module != null,
                 "Could not find module by name,revision: " + moduleName + "," + revision);
 
@@ -77,7 +77,7 @@ public abstract class BaseYangOpenApiGenerator {
         final var url = schema + "://" + host + "/";
         final var basePath = getBasePath();
         final var modules = List.of(module);
-        return new OpenApiInputStream(schemaContext, title, url, SECURITY,  deviceName, urlPrefix, true, false,
+        return new OpenApiInputStream(modelContext, title, url, SECURITY,  deviceName, urlPrefix, true, false,
             modules, basePath);
     }
 
@@ -96,8 +96,8 @@ public abstract class BaseYangOpenApiGenerator {
 
     public abstract String getBasePath();
 
-    public static Set<Module> getModulesWithoutDuplications(final @NonNull EffectiveModelContext schemaContext) {
-        return new LinkedHashSet<>(schemaContext.getModules()
+    public static Set<Module> getModulesWithoutDuplications(final @NonNull EffectiveModelContext modelContext) {
+        return new LinkedHashSet<>(modelContext.getModules()
             .stream()
             .collect(Collectors.toMap(
                 Module::getName,
