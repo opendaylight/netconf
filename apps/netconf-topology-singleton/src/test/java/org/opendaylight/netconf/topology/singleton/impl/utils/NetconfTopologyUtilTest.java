@@ -7,24 +7,24 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NetconfTopologyUtilTest {
+class NetconfTopologyUtilTest {
     @Test
-    public void testCreateActorPath() {
+    void testCreateActorPath() {
         final String actorPath = NetconfTopologyUtils.createActorPath("member", "name");
         assertEquals("member/user/name", actorPath);
     }
 
     @Test
-    public void testCreateListPath() {
+    void testCreateListPath() {
         final InstanceIdentifier<Node> listPath =
                 NetconfTopologyUtils.createTopologyNodeListPath(new NodeKey(new NodeId("nodeId")), "topologyId");
 

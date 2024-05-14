@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -23,7 +23,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Status.Failure;
 import akka.actor.Status.Success;
 import akka.testkit.TestProbe;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -43,13 +43,13 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
  *
  * @author Thomas Pantelis
  */
-public abstract class WriteTransactionActorTestAdapter {
+abstract class WriteTransactionActorTestAdapter {
     private DOMDataTreeWriteTransaction mockWriteTx;
     private TestProbe probe;
     private ActorRef actorRef;
     private ActorSystem system;
 
-    public void init(final DOMDataTreeWriteTransaction inMockWriteTx, final ActorSystem inSystem,
+    void init(final DOMDataTreeWriteTransaction inMockWriteTx, final ActorSystem inSystem,
             final ActorRef inActorRef) {
         this.mockWriteTx = inMockWriteTx;
         this.probe = TestProbe.apply(inSystem);
@@ -58,27 +58,27 @@ public abstract class WriteTransactionActorTestAdapter {
     }
 
     @Test
-    public void testPut() {
+    void testPut() {
         final NormalizedNodeMessage normalizedNodeMessage = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new PutRequest(STORE, normalizedNodeMessage), probe.ref());
         verify(mockWriteTx).put(STORE, PATH, NODE);
     }
 
     @Test
-    public void testMerge() {
+    void testMerge() {
         final NormalizedNodeMessage normalizedNodeMessage = new NormalizedNodeMessage(PATH, NODE);
         actorRef.tell(new MergeRequest(STORE, normalizedNodeMessage), probe.ref());
         verify(mockWriteTx).merge(STORE, PATH, NODE);
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         actorRef.tell(new DeleteRequest(STORE, PATH), probe.ref());
         verify(mockWriteTx).delete(STORE, PATH);
     }
 
     @Test
-    public void testCancel() {
+    void testCancel() {
         when(mockWriteTx.cancel()).thenReturn(true);
         actorRef.tell(new CancelRequest(), probe.ref());
 
@@ -87,7 +87,7 @@ public abstract class WriteTransactionActorTestAdapter {
     }
 
     @Test
-    public void testSubmit() {
+    void testSubmit() {
         doReturn(emptyFluentFuture()).when(mockWriteTx).commit();
         actorRef.tell(new SubmitRequest(), probe.ref());
 
@@ -96,7 +96,7 @@ public abstract class WriteTransactionActorTestAdapter {
     }
 
     @Test
-    public void testSubmitFail() {
+    void testSubmitFail() {
         final RpcError rpcError =
                 RpcResultBuilder.newError(ErrorType.APPLICATION, new ErrorTag("fail"), "fail");
         final TransactionCommitFailedException cause = new TransactionCommitFailedException("fail", rpcError);
@@ -109,7 +109,7 @@ public abstract class WriteTransactionActorTestAdapter {
     }
 
     @Test
-    public void testIdleTimeout() {
+    void testIdleTimeout() {
         final TestProbe testProbe = new TestProbe(system);
         testProbe.watch(actorRef);
         verify(mockWriteTx, timeout(3000)).cancel();
