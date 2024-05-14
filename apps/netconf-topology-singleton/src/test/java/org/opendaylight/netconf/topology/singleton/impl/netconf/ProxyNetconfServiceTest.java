@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.netconf;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import akka.actor.ActorSystem;
 import akka.actor.Status;
@@ -24,10 +24,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -55,7 +54,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
-public class ProxyNetconfServiceTest {
+class ProxyNetconfServiceTest {
     private static final RemoteDeviceId DEVICE_ID =
         new RemoteDeviceId("dev1", InetSocketAddress.createUnresolved("localhost", 17830));
     private static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
@@ -65,16 +64,16 @@ public class ProxyNetconfServiceTest {
     private TestProbe masterActor;
     private ContainerNode node;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         masterActor = new TestProbe(system);
         node = ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont")))
             .build();
     }
 
-    @AfterClass
-    public static void staticTearDown() {
+    @AfterAll
+    static void staticTearDown() {
         TestKit.shutdownActorSystem(system, true);
     }
 
@@ -89,28 +88,28 @@ public class ProxyNetconfServiceTest {
     }
 
     @Test
-    public void testLock() {
+    void testLock() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.lock();
         masterActor.expectMsgClass(LockRequest.class);
     }
 
     @Test
-    public void testUnlock() {
+    void testUnlock() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.unlock();
         masterActor.expectMsgClass(UnlockRequest.class);
     }
 
     @Test
-    public void testDiscardChanges() {
+    void testDiscardChanges() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.discardChanges();
         masterActor.expectMsgClass(DiscardChangesRequest.class);
     }
 
     @Test
-    public void testGet() throws Exception {
+    void testGet() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         final ListenableFuture<Optional<NormalizedNode>> get = netconf.get(PATH);
         final GetRequest getRequest = masterActor.expectMsgClass(GetRequest.class);
@@ -121,7 +120,7 @@ public class ProxyNetconfServiceTest {
     }
 
     @Test
-    public void testGetFailure() throws InterruptedException, TimeoutException {
+    void testGetFailure() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
 
         final ListenableFuture<Optional<NormalizedNode>> get = netconf.get(PATH);
@@ -129,18 +128,13 @@ public class ProxyNetconfServiceTest {
         final RuntimeException mockEx = new RuntimeException("fail");
         masterActor.reply(new Status.Failure(mockEx));
 
-        try {
-            get.get(5, TimeUnit.SECONDS);
-            fail("Exception should be thrown");
-        } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
-            assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
-            assertEquals(mockEx, cause.getCause());
-        }
+        final var cause = assertThrows(ExecutionException.class, () -> get.get(5, TimeUnit.SECONDS)).getCause();
+        assertInstanceOf(ReadFailedException.class, cause, "Unexpected cause " + cause);
+        assertEquals(mockEx, cause.getCause());
     }
 
     @Test
-    public void testGetEmpty() throws Exception {
+    void testGetEmpty() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         final ListenableFuture<Optional<NormalizedNode>> get = netconf.get(PATH);
         masterActor.expectMsgClass(GetRequest.class);
@@ -150,7 +144,7 @@ public class ProxyNetconfServiceTest {
     }
 
     @Test
-    public void testGetConfig() throws Exception {
+    void testGetConfig() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         final ListenableFuture<Optional<NormalizedNode>> getConfig = netconf.getConfig(PATH);
         final GetConfigRequest getRequest = masterActor.expectMsgClass(GetConfigRequest.class);
@@ -161,7 +155,7 @@ public class ProxyNetconfServiceTest {
     }
 
     @Test
-    public void testGetConfigFailure() throws InterruptedException, TimeoutException {
+    void testGetConfigFailure() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
 
         final ListenableFuture<Optional<NormalizedNode>> getConfig = netconf.getConfig(PATH);
@@ -169,18 +163,13 @@ public class ProxyNetconfServiceTest {
         final RuntimeException mockEx = new RuntimeException("fail");
         masterActor.reply(new Status.Failure(mockEx));
 
-        try {
-            getConfig.get(5, TimeUnit.SECONDS);
-            fail("Exception should be thrown");
-        } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
-            assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
-            assertEquals(mockEx, cause.getCause());
-        }
+        final var cause = assertThrows(ExecutionException.class, () -> getConfig.get(5, TimeUnit.SECONDS)).getCause();
+        assertInstanceOf(ReadFailedException.class, cause, "Unexpected cause " + cause);
+        assertEquals(mockEx, cause.getCause());
     }
 
     @Test
-    public void testGetConfigEmpty() throws Exception {
+    void testGetConfigEmpty() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         final ListenableFuture<Optional<NormalizedNode>> getConfig = netconf.getConfig(PATH);
         masterActor.expectMsgClass(GetConfigRequest.class);
@@ -190,7 +179,7 @@ public class ProxyNetconfServiceTest {
     }
 
     @Test
-    public void testMerge() {
+    void testMerge() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.merge(STORE, PATH, node, Optional.empty());
         final MergeEditConfigRequest mergeRequest = masterActor.expectMsgClass(MergeEditConfigRequest.class);
@@ -200,7 +189,7 @@ public class ProxyNetconfServiceTest {
     }
 
     @Test
-    public void testReplace() {
+    void testReplace() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.replace(STORE, PATH, node, Optional.empty());
         final ReplaceEditConfigRequest replaceRequest = masterActor.expectMsgClass(ReplaceEditConfigRequest.class);
@@ -210,7 +199,7 @@ public class ProxyNetconfServiceTest {
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.create(STORE, PATH, node, Optional.empty());
         final CreateEditConfigRequest createRequest = masterActor.expectMsgClass(CreateEditConfigRequest.class);
@@ -220,7 +209,7 @@ public class ProxyNetconfServiceTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.delete(STORE, PATH);
         final DeleteEditConfigRequest deleteRequest = masterActor.expectMsgClass(DeleteEditConfigRequest.class);
@@ -229,7 +218,7 @@ public class ProxyNetconfServiceTest {
     }
 
     @Test
-    public void testRemove() {
+    void testRemove() {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         netconf.remove(STORE, PATH);
         final RemoveEditConfigRequest removeRequest = masterActor.expectMsgClass(RemoveEditConfigRequest.class);
@@ -238,58 +227,38 @@ public class ProxyNetconfServiceTest {
     }
 
     @Test
-    public void testCommit() throws InterruptedException, ExecutionException, TimeoutException {
+    void testCommit() throws Exception {
         ProxyNetconfService netconf = newSuccessfulProxyNetconfService();
         commit(netconf);
     }
 
     @Test
-    public void testFutureOperationsWithMasterDown() throws InterruptedException, TimeoutException {
-        ProxyNetconfService netconf = newSuccessfulProxyNetconfService(
-            Timeout.apply(500, TimeUnit.MILLISECONDS));
+    void testFutureOperationsWithMasterDown() {
+        final var netconf = newSuccessfulProxyNetconfService(Timeout.apply(500, TimeUnit.MILLISECONDS));
 
-        ListenableFuture<?> future = netconf.get(PATH);
+        final var future = netconf.get(PATH);
         masterActor.expectMsgClass(GetRequest.class);
+        final var cause = assertThrows(ExecutionException.class, () -> future.get(5, TimeUnit.SECONDS)).getCause();
+        assertInstanceOf(ReadFailedException.class, cause, "Unexpected cause " + cause);
+        verifyDocumentedException(cause.getCause());
 
-        // master doesn't reply
-        try {
-            future.get(5, TimeUnit.SECONDS);
-            fail("Exception should be thrown");
-        } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
-            assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
-            verifyDocumentedException(cause.getCause());
-        }
-
-        future = netconf.getConfig(PATH);
+        final var configFuture = netconf.getConfig(PATH);
         masterActor.expectMsgClass(GetConfigRequest.class);
 
-        // master doesn't reply
-        try {
-            future.get(5, TimeUnit.SECONDS);
-            fail("Exception should be thrown");
-        } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
-            assertTrue("Unexpected cause " + cause, cause instanceof ReadFailedException);
-            verifyDocumentedException(cause.getCause());
-        }
+        final var configCause =
+            assertThrows(ExecutionException.class, () -> configFuture.get(5, TimeUnit.SECONDS)).getCause();
+        assertInstanceOf(ReadFailedException.class, configCause, "Unexpected cause " + configCause);
+        verifyDocumentedException(configCause.getCause());
 
-        future = netconf.commit();
+        final var commitFuture = netconf.commit();
         masterActor.expectMsgClass(CommitRequest.class);
-
-        // master doesn't reply
-        try {
-            future.get(5, TimeUnit.SECONDS);
-            fail("Exception should be thrown");
-        } catch (final ExecutionException e) {
-            Throwable cause = e.getCause();
-            assertTrue("Unexpected cause " + cause, cause instanceof NetconfServiceFailedException);
-            verifyDocumentedException(cause.getCause());
-        }
+        final var commitCause =
+            assertThrows(ExecutionException.class, () -> commitFuture.get(5, TimeUnit.SECONDS)).getCause();
+        assertInstanceOf(NetconfServiceFailedException.class, commitCause, "Unexpected cause " + commitCause);
+        verifyDocumentedException(commitCause.getCause());
     }
 
-    private void commit(final ProxyNetconfService netconf)
-        throws InterruptedException, ExecutionException, TimeoutException {
+    private void commit(final ProxyNetconfService netconf) throws Exception {
         final ListenableFuture<?> submit = netconf.commit();
         masterActor.expectMsgClass(CommitRequest.class);
         masterActor.reply(new InvokeRpcMessageReply(null, List.of()));
@@ -297,8 +266,7 @@ public class ProxyNetconfServiceTest {
     }
 
     private static void verifyDocumentedException(final Throwable cause) {
-        assertTrue("Unexpected cause " + cause, cause instanceof DocumentedException);
-        final DocumentedException de = (DocumentedException) cause;
+        final var de = assertInstanceOf(DocumentedException.class, cause, "Unexpected cause " + cause);
         assertEquals(ErrorSeverity.WARNING, de.getErrorSeverity());
         assertEquals(ErrorTag.OPERATION_FAILED, de.getErrorTag());
         assertEquals(ErrorType.APPLICATION, de.getErrorType());

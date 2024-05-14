@@ -11,27 +11,27 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 import akka.actor.ActorSystem;
 import akka.testkit.TestActorRef;
 import akka.testkit.javadsl.TestKit;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class ReadTransactionActorTest extends ReadTransactionActorTestAdapter {
+@ExtendWith(MockitoExtension.class)
+class ReadTransactionActorTest extends ReadTransactionActorTestAdapter {
     private static ActorSystem system = ActorSystem.apply();
 
     @Mock
     private DOMDataTreeReadTransaction mockReadTx;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         init(mockReadTx, system, TestActorRef.create(system, ReadTransactionActor.props(mockReadTx)));
     }
 
-    @AfterClass
-    public static void staticTearDown() {
+    @AfterAll
+    static void staticTearDown() {
         TestKit.shutdownActorSystem(system, true);
     }
 }
