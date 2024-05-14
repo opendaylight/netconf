@@ -16,6 +16,24 @@
       "message": "does not seem necessary",
       "revId": "b4ef70e2e0cb1d423424786bdb7ad83dccaacacf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6410a21f_6d926ddd",
+        "filename": "restconf/restconf-nb/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/transactions/RestconfStrategy.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-14T06:13:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70e9f1ab_5c25f3e5",
+      "revId": "b4ef70e2e0cb1d423424786bdb7ad83dccaacacf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     }
   ]
 }
