@@ -11,28 +11,28 @@ import akka.actor.ActorSystem;
 import akka.testkit.TestActorRef;
 import akka.testkit.javadsl.TestKit;
 import java.time.Duration;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class WriteTransactionActorTest extends WriteTransactionActorTestAdapter {
+@ExtendWith(MockitoExtension.class)
+class WriteTransactionActorTest extends WriteTransactionActorTestAdapter {
     private static ActorSystem system = ActorSystem.apply();
 
     @Mock
     private DOMDataTreeWriteTransaction mockWriteTx;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         init(mockWriteTx, system, TestActorRef.create(system,
                 WriteTransactionActor.props(mockWriteTx, Duration.ofSeconds(2))));
     }
 
-    @AfterClass
-    public static void staticTearDown() {
+    @AfterAll
+    static void staticTearDown() {
         TestKit.shutdownActorSystem(system, true);
     }
 }

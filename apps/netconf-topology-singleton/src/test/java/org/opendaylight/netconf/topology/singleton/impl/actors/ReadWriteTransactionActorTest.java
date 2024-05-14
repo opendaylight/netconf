@@ -11,16 +11,16 @@ import akka.actor.ActorSystem;
 import akka.testkit.TestActorRef;
 import akka.testkit.javadsl.TestKit;
 import java.time.Duration;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class ReadWriteTransactionActorTest {
+@ExtendWith(MockitoExtension.class)
+class ReadWriteTransactionActorTest {
     private static ActorSystem system = ActorSystem.apply();
 
     @Mock
@@ -29,76 +29,76 @@ public class ReadWriteTransactionActorTest {
     private final ReadTransactionActorTestAdapter readTestAdapter = new ReadTransactionActorTestAdapter() {};
     private final WriteTransactionActorTestAdapter writeTestAdapter = new WriteTransactionActorTestAdapter() {};
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         TestActorRef<?> actorRef = TestActorRef.create(system, ReadWriteTransactionActor.props(mockReadWriteTx,
                 Duration.ofSeconds(2)));
         readTestAdapter.init(mockReadWriteTx, system, actorRef);
         writeTestAdapter.init(mockReadWriteTx, system, actorRef);
     }
 
-    @AfterClass
-    public static void staticTearDown() {
+    @AfterAll
+    static void staticTearDown() {
         TestKit.shutdownActorSystem(system, true);
     }
 
     @Test
-    public void testRead() {
+    void testRead() {
         readTestAdapter.testRead();
     }
 
     @Test
-    public void testReadEmpty() {
+    void testReadEmpty() {
         readTestAdapter.testReadEmpty();
     }
 
     @Test
-    public void testReadFailure() {
+    void testReadFailure() {
         readTestAdapter.testReadFailure();
     }
 
     @Test
-    public void testExists() {
+    void testExists() {
         readTestAdapter.testExists();
     }
 
     @Test
-    public void testExistsFailure() {
+    void testExistsFailure() {
         readTestAdapter.testExistsFailure();
     }
 
     @Test
-    public void testPut() {
+    void testPut() {
         writeTestAdapter.testPut();
     }
 
     @Test
-    public void testMerge() {
+    void testMerge() {
         writeTestAdapter.testMerge();
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         writeTestAdapter.testDelete();
     }
 
     @Test
-    public void testCancel() throws Exception {
+    void testCancel() throws Exception {
         writeTestAdapter.testCancel();
     }
 
     @Test
-    public void testSubmit() throws Exception {
+    void testSubmit() throws Exception {
         writeTestAdapter.testSubmit();
     }
 
     @Test
-    public void testSubmitFail() throws Exception {
+    void testSubmitFail() throws Exception {
         writeTestAdapter.testSubmitFail();
     }
 
     @Test
-    public void testIdleTimeout() throws Exception {
+    void testIdleTimeout() throws Exception {
         writeTestAdapter.testIdleTimeout();
     }
 }

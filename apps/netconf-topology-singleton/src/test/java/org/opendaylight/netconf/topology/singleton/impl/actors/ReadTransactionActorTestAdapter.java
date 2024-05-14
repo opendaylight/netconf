@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
@@ -21,7 +21,7 @@ import akka.testkit.TestProbe;
 import akka.util.Timeout;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
  *
  * @author Thomas Pantelis
  */
-public abstract class ReadTransactionActorTestAdapter {
+abstract class ReadTransactionActorTestAdapter {
     static final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
     static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
@@ -52,7 +52,7 @@ public abstract class ReadTransactionActorTestAdapter {
     private TestProbe probe;
     private ActorRef actorRef;
 
-    public void init(final DOMDataTreeReadOperations inMockReadTx, final ActorSystem system,
+    void init(final DOMDataTreeReadOperations inMockReadTx, final ActorSystem system,
             final ActorRef inActorRef) {
         mockReadTx = inMockReadTx;
         probe = TestProbe.apply(system);
@@ -60,7 +60,7 @@ public abstract class ReadTransactionActorTestAdapter {
     }
 
     @Test
-    public void testRead() {
+    void testRead() {
         doReturn(immediateFluentFuture(Optional.of(NODE))).when(mockReadTx).read(STORE, PATH);
         actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
 
@@ -70,7 +70,7 @@ public abstract class ReadTransactionActorTestAdapter {
     }
 
     @Test
-    public void testReadEmpty() {
+    void testReadEmpty() {
         doReturn(immediateFluentFuture(Optional.empty())).when(mockReadTx).read(STORE, PATH);
         actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
 
@@ -79,7 +79,7 @@ public abstract class ReadTransactionActorTestAdapter {
     }
 
     @Test
-    public void testReadFailure() {
+    void testReadFailure() {
         final ReadFailedException cause = new ReadFailedException("fail");
         doReturn(immediateFailedFluentFuture(cause)).when(mockReadTx).read(STORE, PATH);
         actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
@@ -90,7 +90,7 @@ public abstract class ReadTransactionActorTestAdapter {
     }
 
     @Test
-    public void testExists() {
+    void testExists() {
         doReturn(immediateTrueFluentFuture()).when(mockReadTx).exists(STORE, PATH);
         actorRef.tell(new ExistsRequest(STORE, PATH), probe.ref());
 
@@ -99,7 +99,7 @@ public abstract class ReadTransactionActorTestAdapter {
     }
 
     @Test
-    public void testExistsFailure() {
+    void testExistsFailure() {
         final ReadFailedException cause = new ReadFailedException("fail");
         doReturn(immediateFailedFluentFuture(cause)).when(mockReadTx).exists(STORE, PATH);
         actorRef.tell(new ExistsRequest(STORE, PATH), probe.ref());

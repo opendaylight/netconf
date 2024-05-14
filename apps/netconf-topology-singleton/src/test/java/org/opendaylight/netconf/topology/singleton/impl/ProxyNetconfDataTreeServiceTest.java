@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import akka.actor.ActorSystem;
 import akka.actor.Status;
@@ -24,8 +24,8 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.client.mdsal.api.RemoteDeviceId;
@@ -50,7 +50,7 @@ import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
-public class ProxyNetconfDataTreeServiceTest {
+class ProxyNetconfDataTreeServiceTest {
     private static final FiniteDuration EXP_NO_MESSAGE_TIMEOUT = Duration.apply(300, TimeUnit.MILLISECONDS);
     private static final RemoteDeviceId DEVICE_ID =
         new RemoteDeviceId("dev1", InetSocketAddress.createUnresolved("localhost", 17830));
@@ -67,25 +67,25 @@ public class ProxyNetconfDataTreeServiceTest {
     private final ProxyNetconfDataTreeService proxy = new ProxyNetconfDataTreeService(DEVICE_ID, masterActor.ref(),
         system.dispatcher(), Timeout.apply(5, TimeUnit.SECONDS));
 
-    @AfterClass
-    public static void staticTearDown() {
+    @AfterAll
+    static void staticTearDown() {
         TestKit.shutdownActorSystem(system, true);
     }
 
     @Test
-    public void testLock() {
+    void testLock() {
         lock();
     }
 
     @Test
-    public void testUnlock() {
+    void testUnlock() {
         lock();
         proxy.unlock();
         masterActor.expectMsgClass(UnlockRequest.class);
     }
 
     @Test
-    public void testUnlockWithoutLock() {
+    void testUnlockWithoutLock() {
         try {
             proxy.unlock();
             fail("Should throw IllegalStateException");
@@ -95,14 +95,14 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testDiscardChanges() {
+    void testDiscardChanges() {
         lock();
         proxy.discardChanges();
         masterActor.expectMsgClass(DiscardChangesRequest.class);
     }
 
     @Test
-    public void testDiscardChangesWithoutLock() {
+    void testDiscardChangesWithoutLock() {
         try {
             proxy.discardChanges();
             fail("Should throw IllegalStateException");
@@ -112,7 +112,7 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testGet() {
+    void testGet() {
         proxy.get(YangInstanceIdentifier.of());
         masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
         masterActor.reply(new Status.Success(masterActor.ref()));
@@ -120,7 +120,7 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testGetConfig() {
+    void testGetConfig() {
         proxy.getConfig(YangInstanceIdentifier.of());
         masterActor.expectMsgClass(NetconfDataTreeServiceRequest.class);
         masterActor.reply(new Status.Success(masterActor.ref()));
@@ -128,14 +128,14 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testMerge() {
+    void testMerge() {
         lock();
         proxy.merge(STORE, PATH, NODE, Optional.empty());
         masterActor.expectMsgClass(MergeEditConfigRequest.class);
     }
 
     @Test
-    public void testMergeWithoutLock() {
+    void testMergeWithoutLock() {
         try {
             proxy.merge(STORE, PATH, NODE, Optional.empty());
             fail("Should throw IllegalStateException");
@@ -145,14 +145,14 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testReplace() {
+    void testReplace() {
         lock();
         proxy.replace(STORE, PATH, NODE, Optional.empty());
         masterActor.expectMsgClass(ReplaceEditConfigRequest.class);
     }
 
     @Test
-    public void testReplaceWithoutLock() {
+    void testReplaceWithoutLock() {
         try {
             proxy.replace(STORE, PATH, NODE, Optional.empty());
             fail("Should throw IllegalStateException");
@@ -162,14 +162,14 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         lock();
         proxy.create(STORE, PATH, NODE, Optional.empty());
         masterActor.expectMsgClass(CreateEditConfigRequest.class);
     }
 
     @Test
-    public void testCreateWithoutLock() {
+    void testCreateWithoutLock() {
         try {
             proxy.create(STORE, PATH, NODE, Optional.empty());
             fail("Should throw IllegalStateException");
@@ -179,14 +179,14 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testDelete() {
+    void testDelete() {
         lock();
         proxy.delete(STORE, PATH);
         masterActor.expectMsgClass(DeleteEditConfigRequest.class);
     }
 
     @Test
-    public void testDeleteWithoutLock() {
+    void testDeleteWithoutLock() {
         try {
             proxy.delete(STORE, PATH);
             fail("Should throw IllegalStateException");
@@ -196,14 +196,14 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testRemove() {
+    void testRemove() {
         lock();
         proxy.remove(STORE, PATH);
         masterActor.expectMsgClass(RemoveEditConfigRequest.class);
     }
 
     @Test
-    public void testRemoveWithoutLock() {
+    void testRemoveWithoutLock() {
         try {
             proxy.remove(STORE, PATH);
             fail("Should throw IllegalStateException");
@@ -213,14 +213,14 @@ public class ProxyNetconfDataTreeServiceTest {
     }
 
     @Test
-    public void testCommit() {
+    void testCommit() {
         lock();
         proxy.commit();
         masterActor.expectMsgClass(CommitRequest.class);
     }
 
     @Test
-    public void testCommitWithoutLock() {
+    void testCommitWithoutLock() {
         try {
             proxy.commit();
             fail("Should throw IllegalStateException");
