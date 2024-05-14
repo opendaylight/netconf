@@ -24,6 +24,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0824cf90_2e34a5fe",
+        "filename": "apps/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-14T11:57:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4daefa80_4f5b9771",
+      "range": {
+        "startLine": 69,
+        "startChar": 20,
+        "endLine": 69,
+        "endChar": 49
+      },
+      "revId": "9df42dea379aec27fae65587e68a37513d8a1fb4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a1e74fda_47b1562f",
@@ -47,6 +71,30 @@
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f05fc87d_09c3f385",
+        "filename": "apps/netconf-topology/src/main/java/org/opendaylight/netconf/topology/spi/NetconfTopologyDeviceSalFacade.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-14T11:57:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1e74fda_47b1562f",
+      "range": {
+        "startLine": 27,
+        "startChar": 42,
+        "endLine": 27,
+        "endChar": 71
+      },
+      "revId": "9df42dea379aec27fae65587e68a37513d8a1fb4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7790291_427ad814",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-05-14T09:57:56Z",
       "side": 1,
       "message": "pls revert back to put",
+      "range": {
+        "startLine": 123,
+        "startChar": 12,
+        "endLine": 123,
+        "endChar": 17
+      },
+      "revId": "9df42dea379aec27fae65587e68a37513d8a1fb4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5e5e8a3_ddac91f5",
+        "filename": "apps/netconf-topology/src/test/java/org/opendaylight/netconf/topology/spi/NetconfDeficeTopologyAdapterIntegrationTest.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 9173
+      },
+      "writtenOn": "2024-05-14T11:57:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7790291_427ad814",
       "range": {
         "startLine": 123,
         "startChar": 12,
