@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
+import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -574,10 +575,14 @@ public class PropertyEntity {
             type = type.getBaseType();
         }
 
+        Integer minLength = null;
+        Integer maxLength = null;
         if (type.getLengthConstraint().isPresent()) {
             final var range = type.getLengthConstraint().orElseThrow().getAllowedRanges().span();
-            def.setMinLength(range.lowerEndpoint());
-            def.setMaxLength(range.upperEndpoint());
+            minLength = range.lowerEndpoint();
+            maxLength = range.upperEndpoint();
+            def.setMinLength(minLength);
+            def.setMaxLength(maxLength);
         }
 
         if (type.getPatternConstraints().iterator().hasNext()) {
@@ -591,7 +596,7 @@ public class PropertyEntity {
             var defaultValue = "";
             try {
                 final var regExp = new RegExp(regex);
-                defaultValue = regExp.toAutomaton().getShortestExample(true);
+                defaultValue = generateExample(regExp.toAutomaton(), minLength, maxLength);
             } catch (IllegalArgumentException ex) {
                 LOG.warn("Cannot create example string for type: {} with regex: {}.", stringType.getQName(), regex);
             }
@@ -604,6 +609,25 @@ public class PropertyEntity {
             def.setDefaultValue(stringType.getDefaultValue().orElseThrow().toString());
         }
         return STRING_TYPE;
+    }
+
+    private static String generateExample(final Automaton automaton, final Integer minLength,
+            final Integer maxLength) {
+        var example = automaton.getShortestExample(true);
+        if (example == null) {
+            return "";
+        }
+        if (minLength != null && example.length() < minLength) {
+            final var extendedExample = new StringBuilder(example);
+            while (extendedExample.length() < minLength) {
+                extendedExample.append(example);
+            }
+            example = extendedExample.toString();
+        }
+        if (maxLength != null && example.length() > maxLength) {
+            return example.substring(0, maxLength);
+        }
+        return example;
     }
 
     private String processNumberType(final RangeRestrictedTypeDefinition<?, ?> leafTypeDef,final TypeDef def) {
