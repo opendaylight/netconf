@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import akka.actor.ActorSystem;
 import akka.actor.Status.Success;
@@ -18,8 +18,8 @@ import akka.util.Timeout;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  *
  * @author Thomas Pantelis
  */
-public class ProxyDOMDataBrokerTest {
+class ProxyDOMDataBrokerTest {
     private static final RemoteDeviceId DEVICE_ID =
             new RemoteDeviceId("dev1", InetSocketAddress.createUnresolved("localhost", 17830));
 
@@ -47,13 +47,13 @@ public class ProxyDOMDataBrokerTest {
     private final ProxyDOMDataBroker proxy = new ProxyDOMDataBroker(DEVICE_ID, masterActor.ref(), system.dispatcher(),
             Timeout.apply(5, TimeUnit.SECONDS));
 
-    @AfterClass
-    public static void staticTearDown() {
+    @AfterAll
+    static void staticTearDown() {
         TestKit.shutdownActorSystem(system, true);
     }
 
     @Test
-    public void testNewReadOnlyTransaction() {
+    void testNewReadOnlyTransaction() {
         final DOMDataTreeReadTransaction tx = proxy.newReadOnlyTransaction();
         masterActor.expectMsgClass(NewReadTransactionRequest.class);
         masterActor.reply(new Success(masterActor.ref()));
@@ -65,7 +65,7 @@ public class ProxyDOMDataBrokerTest {
     }
 
     @Test
-    public void testNewWriteOnlyTransaction() {
+    void testNewWriteOnlyTransaction() {
         final DOMDataTreeWriteTransaction tx = proxy.newWriteOnlyTransaction();
         masterActor.expectMsgClass(NewWriteTransactionRequest.class);
         masterActor.reply(new Success(masterActor.ref()));
@@ -77,7 +77,7 @@ public class ProxyDOMDataBrokerTest {
     }
 
     @Test
-    public void testNewReadWriteTransaction() {
+    void testNewReadWriteTransaction() {
         final DOMDataTreeReadWriteTransaction tx = proxy.newReadWriteTransaction();
         masterActor.expectMsgClass(NewReadWriteTransactionRequest.class);
         masterActor.reply(new Success(masterActor.ref()));
@@ -89,12 +89,12 @@ public class ProxyDOMDataBrokerTest {
     }
 
     @Test
-    public void testCreateTransactionChain() {
+    void testCreateTransactionChain() {
         assertThrows(UnsupportedOperationException.class, proxy::createTransactionChain);
     }
 
     @Test
-    public void testGetSupportedExtensions() {
+    void testGetSupportedExtensions() {
         assertEquals(List.of(), proxy.supportedExtensions());
     }
 }
