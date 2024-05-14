@@ -8,12 +8,12 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -45,12 +45,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.annotation.NonNull;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
@@ -166,8 +166,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Pantelis
  */
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
+@ExtendWith(MockitoExtension.class)
+class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final Logger LOG = LoggerFactory.getLogger(MountPointEndToEndTest.class);
 
     private static final String TOP_MODULE_NAME = "opendaylight-mdsal-list-test";
@@ -234,8 +234,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private SchemaResourceManager resourceManager;
     private NetconfTopologySchemaAssembler schemaAssembler;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         deleteCacheDir();
 
         schemaAssembler = new NetconfTopologySchemaAssembler(1, 1, 0, TimeUnit.SECONDS);
@@ -287,8 +287,8 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
         FileUtils.deleteQuietly(new File(TEST_ROOT_DIRECTORY));
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         deleteCacheDir();
         TestKit.shutdownActorSystem(slaveSystem, true);
         TestKit.shutdownActorSystem(masterSystem, true);
@@ -382,7 +382,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void test() throws Exception {
+    void test() throws Exception {
         testMaster();
 
         testSlave();
@@ -729,7 +729,7 @@ public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
             }
         }
 
-        assertNotNull(rpc + " rpc not found in " + topModule.getRpcs(), rpcDefinition);
+        assertNotNull(rpcDefinition, rpc + " rpc not found in " + topModule.getRpcs());
         return rpcDefinition;
     }
 

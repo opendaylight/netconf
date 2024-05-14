@@ -7,14 +7,11 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -56,13 +53,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
@@ -126,8 +123,8 @@ import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToIRTransformer;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
+@ExtendWith(MockitoExtension.class)
+class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     private static final Timeout TIMEOUT = Timeout.create(Duration.ofSeconds(5));
     private static final SourceIdentifier SOURCE_IDENTIFIER1 = new SourceIdentifier("yang1");
@@ -171,8 +168,8 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     @Mock
     private DeviceNetconfSchemaProvider deviceSchemaProvider;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         remoteDeviceId = new RemoteDeviceId("netconf-topology",
                 new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
 
@@ -189,28 +186,16 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
 
         masterRef = TestActorRef.create(system, props, "master_messages");
-
-        resetMountPointMocks();
-
-        doReturn(mockMountPointBuilder).when(mockMountPointService).createMountPoint(any());
-
-        doReturn(mockSchemaSourceReg1).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
-        doReturn(mockSchemaSourceReg2).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER2));
-
-        doReturn(mockSchemaContextFactory).when(mockSchemaRepository).createEffectiveModelContextFactory();
-
-        doReturn(mockDOMRpcService).when(mockRpc).domRpcService();
-
     }
 
-    @After
-    public void teardown() {
+    @AfterEach
+    void teardown() {
         TestKit.shutdownActorSystem(system, true);
         system = null;
     }
 
     @Test
-    public void testInitializeAndRefreshMasterData() {
+    void testInitializeAndRefreshMasterData() {
 
         // Test CreateInitialMasterActorData.
 
@@ -233,7 +218,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testAskForMasterMountPoint() {
+    void testAskForMasterMountPoint() {
 
         // Test with master not setup yet.
 
@@ -242,7 +227,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         masterRef.tell(new AskForMasterMountPoint(kit.getRef()), kit.getRef());
 
         final Failure failure = kit.expectMsgClass(Failure.class);
-        assertTrue(failure.cause() instanceof NotMasterException);
+        assertInstanceOf(NotMasterException.class, failure.cause());
 
         // Now initialize - master should send the RegisterMountPoint message.
 
@@ -257,7 +242,9 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testRegisterAndUnregisterMountPoint() throws Exception {
+    void testRegisterAndUnregisterMountPoint() throws Exception {
+        resetMountPointMocks();
+        mockForMountPoint();
 
         ActorRef slaveRef = registerSlaveMountPoint();
 
@@ -327,7 +314,10 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
 //    @SuppressWarnings("unchecked")
     @Test
-    public void testRegisterMountPointWithSchemaFailures() throws Exception {
+    void testRegisterMountPointWithSchemaFailures() throws Exception {
+        resetMountPointMocks();
+        mockForMountPoint();
+
         var deviceSchemaProvider2 = mock(DeviceNetconfSchemaProvider.class);
         doReturn(mockRegistry).when(deviceSchemaProvider2).registry();
         doReturn(mockSchemaRepository).when(deviceSchemaProvider2).repository();
@@ -410,7 +400,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testMissingSchemaSourceOnMissingProvider() throws Exception {
+    void testMissingSchemaSourceOnMissingProvider() throws Exception {
         final var repository = new SharedSchemaRepository("test");
 
         final var deviceSchemaProvider2 = mock(DeviceNetconfSchemaProvider.class);
@@ -435,7 +425,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testYangTextSchemaSourceRequest() throws Exception {
+    void testYangTextSchemaSourceRequest() throws Exception {
         doReturn(masterSchemaRepository).when(deviceSchemaProvider).repository();
 
         final var sourceIdentifier = new SourceIdentifier("testID");
@@ -461,12 +451,14 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         final var failedSchemaFuture = proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
         final var ex = assertThrows(MissingSchemaSourceException.class,
             () -> Await.result(failedSchemaFuture, TIMEOUT.duration()));
-        assertThat(ex.getMessage(), startsWith("No providers registered for source"));
-        assertThat(ex.getMessage(), containsString(sourceIdentifier.toString()));
+        assertTrue(ex.getMessage().startsWith("No providers registered for source"));
+        assertTrue(ex.getMessage().contains(sourceIdentifier.toString()));
     }
 
     @Test
-    public void testSlaveInvokeRpc() throws Exception {
+    void testSlaveInvokeRpc() throws Exception {
+        resetMountPointMocks();
+        mockForMountPointRpc();
 
         initializeMaster(List.of(new SourceIdentifier("testID")));
         registerSlaveMountPoint();
@@ -475,7 +467,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(mockMountPointBuilder).addService(eq(DOMRpcService.class), domRPCServiceCaptor.capture());
 
         final DOMRpcService slaveDomRPCService = domRPCServiceCaptor.getValue();
-        assertTrue(slaveDomRPCService instanceof ProxyDOMRpcService);
+        assertInstanceOf(ProxyDOMRpcService.class, slaveDomRPCService);
 
         final QName testQName = QName.create("", "TestQname");
         final ContainerNode outputNode = ImmutableNodes.newContainerBuilder()
@@ -529,12 +521,15 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         final ExecutionException e = assertThrows(ExecutionException.class, () -> future.get(2, TimeUnit.SECONDS));
         final Throwable cause = e.getCause();
-        assertThat(cause, instanceOf(DOMRpcException.class));
+        assertInstanceOf(DOMRpcException.class, cause);
         assertEquals("mock", cause.getMessage());
     }
 
     @Test
-    public void testSlaveInvokeAction() throws Exception {
+    void testSlaveInvokeAction() throws Exception {
+        resetMountPointMocks();
+        mockForMountPointRpc();
+
         initializeMaster(List.of(new SourceIdentifier("testActionID")));
         registerSlaveMountPoint();
 
@@ -580,12 +575,15 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         final ExecutionException e = assertThrows(ExecutionException.class, () -> future.get(2, TimeUnit.SECONDS));
         final Throwable cause = e.getCause();
-        assertThat(cause, instanceOf(DOMActionException.class));
+        assertInstanceOf(DOMActionException.class, cause);
         assertEquals("mock", cause.getMessage());
     }
 
     @Test
-    public void testSlaveNewTransactionRequests() {
+    void testSlaveNewTransactionRequests() {
+        resetMountPointMocks();
+        mockForMountPointRpc();
+
         doReturn(mock(DOMDataTreeReadTransaction.class)).when(mockDOMDataBroker).newReadOnlyTransaction();
         doReturn(mock(DOMDataTreeReadWriteTransaction.class)).when(mockDOMDataBroker).newReadWriteTransaction();
         doReturn(mock(DOMDataTreeWriteTransaction.class)).when(mockDOMDataBroker).newWriteOnlyTransaction();
@@ -597,7 +595,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(mockMountPointBuilder).addService(eq(DOMDataBroker.class), domDataBrokerCaptor.capture());
 
         final DOMDataBroker slaveDOMDataBroker = domDataBrokerCaptor.getValue();
-        assertTrue(slaveDOMDataBroker instanceof ProxyDOMDataBroker);
+        assertInstanceOf(ProxyDOMDataBroker.class, slaveDOMDataBroker);
 
         slaveDOMDataBroker.newReadOnlyTransaction();
         verify(mockDOMDataBroker).newReadOnlyTransaction();
@@ -610,7 +608,9 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     }
 
     @Test
-    public void testSlaveNewNetconfDataTreeServiceRequest() {
+    void testSlaveNewNetconfDataTreeServiceRequest() {
+        mockForMountPointRpc();
+
         initializeMaster(List.of());
         registerSlaveMountPoint();
 
@@ -618,7 +618,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         verify(mockMountPointBuilder).addService(eq(NetconfDataTreeService.class), netconfCaptor.capture());
 
         final NetconfDataTreeService slaveNetconfService = netconfCaptor.getValue();
-        assertTrue(slaveNetconfService instanceof ProxyNetconfDataTreeService);
+        assertInstanceOf(ProxyNetconfDataTreeService.class, slaveNetconfService);
 
         final YangInstanceIdentifier PATH = YangInstanceIdentifier.of();
         final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
@@ -688,7 +688,7 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
     }
 
     private void resetMountPointMocks() {
-        reset(mockMountPointReg, mockMountPointBuilder);
+        resetMocks();
 
         doNothing().when(mockMountPointReg).close();
 
@@ -698,5 +698,23 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     private static PotentialSchemaSource<?> withSourceId(final SourceIdentifier identifier) {
         return argThat(argument -> identifier.equals(argument.getSourceIdentifier()));
+    }
+
+    private void mockForMountPoint() {
+        doReturn(mockMountPointBuilder).when(mockMountPointService).createMountPoint(any());
+
+        doReturn(mockSchemaSourceReg1).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
+        doReturn(mockSchemaSourceReg2).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER2));
+
+        doReturn(mockSchemaContextFactory).when(mockSchemaRepository).createEffectiveModelContextFactory();
+    }
+
+    private void mockForMountPointRpc() {
+        mockForMountPoint();
+        doReturn(mockDOMRpcService).when(mockRpc).domRpcService();
+    }
+
+    private void resetMocks() {
+        reset(mockMountPointReg, mockMountPointBuilder);
     }
 }
