@@ -7,9 +7,35 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
-public class JsonPatchBodyMountPointTest extends JsonPatchBodyTest {
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
+import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+
+class JsonPatchBodyMountPointTest extends JsonPatchBodyTest {
+
+    @BeforeEach
+    final void before() {
+        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
+        doReturn(Optional.of(new FixedDOMSchemaService(IID_SCHEMA))).when(mountPoint)
+            .getService(DOMSchemaService.class);
+        doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
+        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
+    }
+
     @Override
     String mountPrefix() {
         return "instance-identifier-module:cont/yang-ext:mount";

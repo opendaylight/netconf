@@ -8,12 +8,12 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Set;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContext;
@@ -22,8 +22,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 /**
  * Unit test for {@link MdsalFieldsParam}.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class MdsalFieldsParamTest extends AbstractFieldsTranslatorTest<Set<QName>> {
+@ExtendWith(MockitoExtension.class)
+class MdsalFieldsParamTest extends AbstractFieldsTranslatorTest<Set<QName>> {
     @Override
     protected List<Set<QName>> translateFields(final EffectiveModelContext modelContext,
             final DataSchemaContext startNode, final FieldsParam fields) {
