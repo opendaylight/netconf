@@ -1,0 +1,38 @@
+module strings-examples-length {
+  yang-version 1.1;
+  namespace "urn:ietf:params:xml:ns:yang:strings:examples";
+  prefix "str-el";
+
+  typedef MyMacAddress {
+    type string {
+      length "12..18";
+      pattern '(([0-9A-Fa-f]{2}):)*';
+    }
+  }
+
+  typedef MyPhysAddress {
+    type string {
+      length "5";
+      pattern '([0-9a-fA-F]{2}(:[0-9a-fA-F]{2})*)?';
+    }
+  }
+
+  typedef myString {
+    type string {
+      length "5 | 10";
+      pattern '[0-9a-fA-F]*';
+    }
+  }
+
+  container test {
+    leaf my-mac-address {
+      type MyMacAddress;
+    }
+    leaf my-phys-address {
+      type MyPhysAddress;
+    }
+    leaf my-string {
+      type myString;
+    }
+  }
+}

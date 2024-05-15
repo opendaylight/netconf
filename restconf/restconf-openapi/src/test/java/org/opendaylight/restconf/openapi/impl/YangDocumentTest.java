@@ -68,6 +68,11 @@ public class YangDocumentTest extends AbstractDocumentTest {
      */
     private static final String STRINGS_FROM_REGEX = "strings-from-regex";
     /**
+     * Model strings-examples-length is used for test correct generating of string patterns with length restriction
+     * for openapi.
+     */
+    private static final String STRING_EXAMPLES_LENGTH = "strings-examples-length";
+    /**
      * Model test-container-childs is used for test correct generating of min-elements, max-elements and example
      * elements for openapi.
      */
@@ -136,6 +141,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
             Arguments.of(RECURSIVE, RECURSIVE_REV, "controller-recursive.json"),
             Arguments.of(STRING_TYPES, null, "controller-string-types.json"),
             Arguments.of(STRINGS_FROM_REGEX, null, "controller-string-from-regex.json"),
+            Arguments.of(STRING_EXAMPLES_LENGTH, null, "controller-string-examples-length.json"),
             Arguments.of(TOASTER, TOASTER_REV, "controller-toaster.json"),
             Arguments.of(TOASTER_AUGMENTED, TOASTER_AUGMENTED_REV, "controller-toaster-augmented.json"),
             Arguments.of(TOASTER_SHORT, TOASTER_SHORT_REV, "controller-toaster2.json"),
@@ -180,6 +186,7 @@ public class YangDocumentTest extends AbstractDocumentTest {
             Arguments.of(RECURSIVE, RECURSIVE_REV, "device-recursive.json"),
             Arguments.of(STRING_TYPES, null, "device-string-types.json"),
             Arguments.of(STRINGS_FROM_REGEX, null, "device-string-from-regex.json"),
+            Arguments.of(STRING_EXAMPLES_LENGTH, null, "device-string-examples-length.json"),
             Arguments.of(TOASTER, TOASTER_REV, "device-toaster.json"),
             Arguments.of(TOASTER_AUGMENTED, TOASTER_AUGMENTED_REV, "device-toaster-augmented.json"),
             Arguments.of(TOASTER_SHORT, TOASTER_SHORT_REV, "device-toaster2.json"),
