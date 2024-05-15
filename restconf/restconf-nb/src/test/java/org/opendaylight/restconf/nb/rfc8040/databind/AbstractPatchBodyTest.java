@@ -8,44 +8,34 @@
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
 import static java.util.Objects.requireNonNull;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.Optional;
 import java.util.function.Function;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
-import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.server.api.PatchBody;
 import org.opendaylight.restconf.server.spi.DefaultResourceContext;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
     private final Function<InputStream, PatchBody> bodyConstructor;
 
     @Mock
-    private DOMDataBroker dataBroker;
+    DOMDataBroker dataBroker;
     @Mock
     DOMMountPointService mountPointService;
     @Mock
@@ -53,18 +43,6 @@ abstract class AbstractPatchBodyTest extends AbstractInstanceIdentifierTest {
 
     AbstractPatchBodyTest(final Function<InputStream, PatchBody> bodyConstructor) {
         this.bodyConstructor = requireNonNull(bodyConstructor);
-    }
-
-    @Before
-    public final void before() {
-        doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
-        doReturn(Optional.of(new FixedDOMSchemaService(IID_SCHEMA))).when(mountPoint)
-            .getService(DOMSchemaService.class);
-        doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(DOMActionService.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(DOMRpcService.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(DOMMountPointService.class);
-        doReturn(Optional.empty()).when(mountPoint).getService(NetconfDataTreeService.class);
     }
 
     @NonNull String mountPrefix() {

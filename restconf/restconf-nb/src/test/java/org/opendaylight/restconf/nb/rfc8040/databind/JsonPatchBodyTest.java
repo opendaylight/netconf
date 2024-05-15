@@ -7,10 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.JsonPatchBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -18,13 +19,13 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
-public class JsonPatchBodyTest extends AbstractPatchBodyTest {
-    public JsonPatchBodyTest() {
+class JsonPatchBodyTest extends AbstractPatchBodyTest {
+    JsonPatchBodyTest() {
         super(JsonPatchBody::new);
     }
 
     @Test
-    public final void modulePatchDataTest() throws Exception {
+    final void modulePatchDataTest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             {
               "ietf-yang-patch:yang-patch" : {
@@ -65,7 +66,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of successful Patch consisting of create and delete Patch operations.
      */
     @Test
-    public final void modulePatchCreateAndDeleteTest() throws Exception {
+    final void modulePatchCreateAndDeleteTest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             {
               "ietf-yang-patch:yang-patch" : {
@@ -105,7 +106,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * {@link RestconfDocumentedException} with error code 400.
      */
     @Test
-    public final void modulePatchValueMissingNegativeTest() throws Exception {
+    final void modulePatchValueMissingNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 {
@@ -130,7 +131,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * {@link RestconfDocumentedException} with error code 400.
      */
     @Test
-    public final void modulePatchValueNotSupportedNegativeTest() throws Exception {
+    final void modulePatchValueNotSupportedNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 {
@@ -161,7 +162,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test using Patch when target is completely specified in request URI and thus target leaf contains only '/' sign.
      */
     @Test
-    public final void modulePatchCompleteTargetInURITest() throws Exception {
+    final void modulePatchCompleteTargetInURITest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont", """
             {
               "ietf-yang-patch:yang-patch" : {
@@ -212,7 +213,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch merge operation on list. Test consists of two edit operations - replace and merge.
      */
     @Test
-    public final void modulePatchMergeOperationOnListTest() throws Exception {
+    final void modulePatchMergeOperationOnListTest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             {
               "ietf-yang-patch:yang-patch" : {
@@ -252,7 +253,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch merge operation on container. Test consists of two edit operations - create and merge.
      */
     @Test
-    public final void modulePatchMergeOperationOnContainerTest() throws Exception {
+    final void modulePatchMergeOperationOnContainerTest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont", """
             {
               "ietf-yang-patch:yang-patch" : {
@@ -303,7 +304,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test reading simple leaf value.
      */
     @Test
-    public final void modulePatchSimpleLeafValueTest() throws Exception {
+    final void modulePatchSimpleLeafValueTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             {
               "ietf-yang-patch:yang-patch" : {
@@ -329,7 +330,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch on the top-level container with empty URI for data root.
      */
     @Test
-    public final void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
+    final void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "", """
             {
               "ietf-yang-patch:yang-patch" : {
@@ -359,7 +360,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch on the top-level container with the full path in the URI and "/" in 'target'.
      */
     @Test
-    public final void modulePatchTargetTopLevelContainerWithFullPathURITest() throws Exception {
+    final void modulePatchTargetTopLevelContainerWithFullPathURITest() throws Exception {
         final var returnValue = parse(mountPrefix(), "instance-identifier-patch-module:patch-cont", """
             {
               "ietf-yang-patch:yang-patch": {
@@ -404,7 +405,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch on the second-level list with the full path in the URI and "/" in 'target'.
      */
     @Test
-    public final void modulePatchTargetSecondLevelListWithFullPathURITest() throws Exception {
+    final void modulePatchTargetSecondLevelListWithFullPathURITest() throws Exception {
         final var returnValue = parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=my-leaf-set",
             """
             {
@@ -446,7 +447,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of Yang Patch on the top augmented element.
      */
     @Test
-    public final void modulePatchTargetTopLevelAugmentedContainerTest() throws Exception {
+    final void modulePatchTargetTopLevelAugmentedContainerTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "", """
             {
                 "ietf-yang-patch:yang-patch": {
@@ -477,7 +478,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch on the system map node element.
      */
     @Test
-    public final void modulePatchTargetMapNodeTest() throws Exception {
+    final void modulePatchTargetMapNodeTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "", """
             {
                 "ietf-yang-patch:yang-patch": {
@@ -513,7 +514,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of Yang Patch on the leaf set node element.
      */
     @Test
-    public final void modulePatchTargetLeafSetNodeTest() throws Exception {
+    final void modulePatchTargetLeafSetNodeTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "", """
             {
                 "ietf-yang-patch:yang-patch": {
@@ -542,7 +543,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of Yang Patch on the unkeyed list node element.
      */
     @Test
-    public final void modulePatchTargetUnkeyedListNodeTest() throws Exception {
+    final void modulePatchTargetUnkeyedListNodeTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "", """
             {
                 "ietf-yang-patch:yang-patch": {
@@ -578,7 +579,7 @@ public class JsonPatchBodyTest extends AbstractPatchBodyTest {
      * Test of Yang Patch on the case node element.
      */
     @Test
-    public final void modulePatchTargetCaseNodeTest() throws Exception {
+    final void modulePatchTargetCaseNodeTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "", """
             {
                 "ietf-yang-patch:yang-patch": {

@@ -7,10 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.server.api.XmlPatchBody;
 import org.opendaylight.yangtools.yang.common.ErrorTag;
@@ -18,13 +19,13 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.spi.node.ImmutableNodes;
 
-public class XmlPatchBodyTest extends AbstractPatchBodyTest {
-    public XmlPatchBodyTest() {
+class XmlPatchBodyTest extends AbstractPatchBodyTest {
+    XmlPatchBodyTest() {
         super(XmlPatchBody::new);
     }
 
     @Test
-    public final void moduleDataTest() throws Exception {
+    final void moduleDataTest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
@@ -60,7 +61,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test trying to use Patch create operation which requires value without value. Error code 400 should be returned.
      */
     @Test
-    public final void moduleDataValueMissingNegativeTest() throws Exception {
+    final void moduleDataValueMissingNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
@@ -80,7 +81,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * returned.
      */
     @Test
-    public final void moduleDataNotValueNotSupportedNegativeTest() throws Exception {
+    final void moduleDataNotValueNotSupportedNegativeTest() {
         final var ex = assertThrows(RestconfDocumentedException.class,
             () -> parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
                 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
@@ -106,7 +107,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch with absolute target path.
      */
     @Test
-    public final void moduleDataAbsoluteTargetPathTest() throws Exception {
+    final void moduleDataAbsoluteTargetPathTest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
@@ -142,7 +143,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test using Patch when target is completely specified in request URI and thus target leaf contains only '/' sign.
      */
     @Test
-    public final void modulePatchCompleteTargetInURITest() throws Exception {
+    final void modulePatchCompleteTargetInURITest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
@@ -187,7 +188,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of Yang Patch merge operation on list. Test consists of two edit operations - replace and merge.
      */
     @Test
-    public final void moduleDataMergeOperationOnListTest() throws Exception {
+    final void moduleDataMergeOperationOnListTest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>Test merge operation</patch-id>
@@ -223,7 +224,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of Yang Patch merge operation on container. Test consists of two edit operations - create and merge.
      */
     @Test
-    public final void moduleDataMergeOperationOnContainerTest() throws Exception {
+    final void moduleDataMergeOperationOnContainerTest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "instance-identifier-patch-module:patch-cont", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>Test merge operation</patch-id>
@@ -268,7 +269,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of Yang Patch on the top-level container with empty URI for data root.
      */
     @Test
-    public final void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
+    final void modulePatchTargetTopLevelContainerWithEmptyURITest() throws Exception {
         checkPatchContext(parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
@@ -292,7 +293,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch on the top-level container with the full path in the URI and "/" in 'target'.
      */
     @Test
-    public final void modulePatchTargetTopLevelContainerWithFullPathURITest() throws Exception {
+    final void modulePatchTargetTopLevelContainerWithFullPathURITest() throws Exception {
         final var returnValue = parse(mountPrefix(), "instance-identifier-patch-module:patch-cont", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
@@ -331,7 +332,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch on the second-level list with the full path in the URI and "/" in 'target'.
      */
     @Test
-    public final void modulePatchTargetSecondLevelListWithFullPathURITest() throws Exception {
+    final void modulePatchTargetSecondLevelListWithFullPathURITest() throws Exception {
         final var returnValue = parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=my-leaf-set",
             """
                 <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
@@ -366,7 +367,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of Yang Patch on the top augmented element.
      */
     @Test
-    public final void moduleTargetTopLevelAugmentedContainerTest() throws Exception {
+    final void moduleTargetTopLevelAugmentedContainerTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
@@ -393,7 +394,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch on the top system map node element.
      */
     @Test
-    public final void moduleTargetMapNodeTest() throws Exception {
+    final void moduleTargetMapNodeTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>map-patch</patch-id>
@@ -425,7 +426,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of YANG Patch on the leaf set node element.
      */
     @Test
-    public final void modulePatchTargetLeafSetNodeTest() throws Exception {
+    final void modulePatchTargetLeafSetNodeTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>set-patch</patch-id>
@@ -450,7 +451,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of Yang Patch on the top unkeyed list element.
      */
     @Test
-    public final void moduleTargetUnkeyedListNodeTest() throws Exception {
+    final void moduleTargetUnkeyedListNodeTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>list-patch</patch-id>
@@ -482,7 +483,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test of Yang Patch on the top case node element.
      */
     @Test
-    public final void moduleTargetCaseNodeTest() throws Exception {
+    final void moduleTargetCaseNodeTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>choice-patch</patch-id>
@@ -509,7 +510,7 @@ public class XmlPatchBodyTest extends AbstractPatchBodyTest {
      * Test reading simple leaf value.
      */
     @Test
-    public final void modulePatchSimpleLeafValueTest() throws Exception {
+    final void modulePatchSimpleLeafValueTest() throws Exception {
         final var returnValue = parse(mountPrefix(), "instance-identifier-patch-module:patch-cont/my-list1=leaf1", """
             <yang-patch xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-patch">
                 <patch-id>test-patch</patch-id>
