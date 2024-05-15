@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "721f4f5c_4079ce77",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-15T11:00:35Z",
+      "side": 1,
+      "message": "IMO schemaContext can be @NonNull.",
+      "revId": "e9f4c4123ea86fdc2c4f4fd7cd4fc6bad7b4ada2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a0bd3a3_d85f0baa",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/impl/BaseYangOpenApiGenerator.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-15T11:00:35Z",
+      "side": 1,
+      "message": "Can we use something like:\nstream\n.map(Comparing)\n.distinct()\n.toSet\n\nIMO we can stay with Set.",
+      "revId": "e9f4c4123ea86fdc2c4f4fd7cd4fc6bad7b4ada2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbe340e5_9342954f",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-15T11:00:35Z",
+      "side": 1,
+      "message": "We can stay with Set.",
+      "revId": "e9f4c4123ea86fdc2c4f4fd7cd4fc6bad7b4ada2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35668ff0_ac679f67",
+        "filename": "restconf/restconf-openapi/src/main/java/org/opendaylight/restconf/openapi/mountpoints/MountPointOpenApi.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-15T11:00:35Z",
+      "side": 1,
+      "message": "Anyway we would like to sort according to \u0027name\u0027.",
+      "revId": "e9f4c4123ea86fdc2c4f4fd7cd4fc6bad7b4ada2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95d3ac1a_5b426429",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/ToasterDocumentTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-15T11:00:35Z",
+      "side": 1,
+      "message": "More 4 spaces or better in one line.",
+      "revId": "e9f4c4123ea86fdc2c4f4fd7cd4fc6bad7b4ada2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d31136a_25294db6",
+        "filename": "restconf/restconf-openapi/src/test/java/org/opendaylight/restconf/openapi/impl/ToasterDocumentTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-15T11:00:35Z",
+      "side": 1,
+      "message": "More 4 spaces or better in one line.",
+      "revId": "e9f4c4123ea86fdc2c4f4fd7cd4fc6bad7b4ada2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
