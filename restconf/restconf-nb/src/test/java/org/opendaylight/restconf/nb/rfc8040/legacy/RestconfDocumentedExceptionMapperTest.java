@@ -7,13 +7,13 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.legacy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -21,12 +21,10 @@ import javax.ws.rs.core.Response.Status;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.jaxrs.JaxRsMediaTypes;
@@ -40,15 +38,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-@RunWith(Parameterized.class)
-public class RestconfDocumentedExceptionMapperTest {
+class RestconfDocumentedExceptionMapperTest {
     private static final QNameModule MONITORING_MODULE_INFO =
         QNameModule.ofRevision("instance:identifier:patch:module", "2015-11-21");
 
     private static RestconfDocumentedExceptionMapper exceptionMapper;
 
-    @BeforeClass
-    public static void setupExceptionMapper() {
+    @BeforeAll
+    static void setupExceptionMapper() {
         final var schemaContext = YangParserTestUtils.parseYangResources(
                 RestconfDocumentedExceptionMapperTest.class, "/restconf/impl/ietf-restconf@2017-01-26.yang",
                 "/instanceidentifier/yang/instance-identifier-patch-module.yang");
@@ -63,8 +60,7 @@ public class RestconfDocumentedExceptionMapperTest {
      *
      * @return Testing data for parametrized test.
      */
-    @Parameters(name = "{index}: {0}: {1}")
-    public static Iterable<Object[]> data() {
+    private static Stream<Object[]> data() {
         final RestconfDocumentedException sampleComplexError =
             new RestconfDocumentedException("general message", new IllegalStateException("cause"), List.of(
                 new RestconfError(ErrorType.APPLICATION, ErrorTag.BAD_ATTRIBUTE, "message 1", "app tag #1"),
@@ -79,10 +75,10 @@ public class RestconfDocumentedExceptionMapperTest {
                     .node(QName.create(MONITORING_MODULE_INFO, "my-leaf12"))
                     .build())));
 
-        return Arrays.asList(new Object[][] {
+        return Stream.of(new Object[][] {
             {
                 "Mapping of the exception with one error entry but null status code. This status code should"
-                        + "be derived from single error entry; JSON output",
+                        + " be derived from single error entry; JSON output",
                 new RestconfDocumentedException("Sample error message"),
                 mockHttpHeaders(MediaType.APPLICATION_JSON_TYPE, List.of(JaxRsMediaTypes.APPLICATION_YANG_PATCH_JSON)),
                 Response.status(Status.INTERNAL_SERVER_ERROR)
@@ -199,24 +195,19 @@ public class RestconfDocumentedExceptionMapperTest {
         });
     }
 
-    @Parameter
-    public String testDescription;
-    @Parameter(1)
-    public RestconfDocumentedException thrownException;
-    @Parameter(2)
-    public HttpHeaders httpHeaders;
-    @Parameter(3)
-    public Response expectedResponse;
-
-    @Test
-    public void testMappingOfExceptionToResponse() throws JSONException {
+    @ParameterizedTest
+    @MethodSource("data")
+    void testMappingOfExceptionToResponse(String testDescription, RestconfDocumentedException thrownException,
+        HttpHeaders httpHeaders, Response expectedResponse) throws JSONException {
         exceptionMapper.setHttpHeaders(httpHeaders);
         final Response response = exceptionMapper.toResponse(thrownException);
         compareResponseWithExpectation(expectedResponse, response);
     }
 
-    @Test
-    public void testFormattingJson() throws JSONException {
+    @ParameterizedTest
+    @MethodSource("data")
+    void testFormattingJson(String testDescription, RestconfDocumentedException thrownException,
+        HttpHeaders httpHeaders, Response expectedResponse) throws JSONException {
         assumeTrue(expectedResponse.getMediaType().equals(JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON));
 
         exceptionMapper.setHttpHeaders(httpHeaders);
@@ -235,8 +226,8 @@ public class RestconfDocumentedExceptionMapperTest {
             throws JSONException {
         final String errorMessage = String.format("Actual response %s doesn't equal to expected response %s",
                 actualResponse, expectedResponse);
-        assertEquals(errorMessage, expectedResponse.getStatus(), actualResponse.getStatus());
-        assertEquals(errorMessage, expectedResponse.getMediaType(), actualResponse.getMediaType());
+        assertEquals(expectedResponse.getStatus(), actualResponse.getStatus(), errorMessage);
+        assertEquals(expectedResponse.getMediaType(), actualResponse.getMediaType(), errorMessage);
         if (JaxRsMediaTypes.APPLICATION_YANG_DATA_JSON.equals(expectedResponse.getMediaType())) {
             JSONAssert.assertEquals(expectedResponse.getEntity().toString(),
                     actualResponse.getEntity().toString(), true);
