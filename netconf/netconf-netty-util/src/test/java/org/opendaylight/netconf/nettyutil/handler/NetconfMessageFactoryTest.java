@@ -7,18 +7,18 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.netty.buffer.Unpooled;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class NetconfMessageFactoryTest {
+class NetconfMessageFactoryTest {
     @Test
-    public void testAuth() throws Exception {
+    void testAuth() throws Exception {
         NetconfXMLToHelloMessageDecoder parser = new NetconfXMLToHelloMessageDecoder();
         File authHelloFile = new File(getClass().getResource("/netconfMessages/client_hello_with_auth.xml").getFile());
 

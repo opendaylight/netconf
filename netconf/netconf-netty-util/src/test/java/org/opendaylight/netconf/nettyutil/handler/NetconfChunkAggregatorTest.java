@@ -7,15 +7,15 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class NetconfChunkAggregatorTest {
+class NetconfChunkAggregatorTest {
     private static final String CHUNKED_MESSAGE = "\n#4\n"
             + "<rpc"
             + "\n#18\n"
@@ -36,7 +36,7 @@ public class NetconfChunkAggregatorTest {
     private final NetconfChunkAggregator agr = new NetconfChunkAggregator(4096);
 
     @Test
-    public void testMultipleChunks() throws Exception {
+    void testMultipleChunks() {
         final var output = new ArrayList<>();
         final var input = Unpooled.copiedBuffer(CHUNKED_MESSAGE.getBytes(StandardCharsets.UTF_8));
         agr.decode(null, input, output);
@@ -48,7 +48,7 @@ public class NetconfChunkAggregatorTest {
     }
 
     @Test
-    public void testOneChunks() throws Exception {
+    void testOneChunks() {
         final var output = new ArrayList<>();
         final var input = Unpooled.copiedBuffer(CHUNKED_MESSAGE_ONE.getBytes(StandardCharsets.UTF_8));
         agr.decode(null, input, output);

@@ -7,17 +7,17 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class NetconfEOMAggregatorTest {
+class NetconfEOMAggregatorTest {
     private static final String COMM_1 = """
         <?xml version="1.0" encoding="UTF-8"?>
         <rpc-reply message-id="105"
@@ -157,13 +157,13 @@ public class NetconfEOMAggregatorTest {
 
     private static NetconfEOMAggregator aggregator;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         aggregator = new NetconfEOMAggregator();
     }
 
     @Test
-    public void testDecodeMessagesReadAtOnce() {
+    void testDecodeMessagesReadAtOnce() {
         final ByteBuf in = Unpooled.copiedBuffer(COMM_1.getBytes());
         final List<Object> out = new LinkedList<>();
 
@@ -174,7 +174,7 @@ public class NetconfEOMAggregatorTest {
     }
 
     @Test
-    public void testDecodeMessagesReadByteByByte() {
+    void testDecodeMessagesReadByteByByte() {
         final ByteBuf in = Unpooled.buffer();
         final List<Object> out = new LinkedList<>();
 
@@ -189,7 +189,7 @@ public class NetconfEOMAggregatorTest {
     }
 
     @Test
-    public void testDecodeMultipleStreams() {
+    void testDecodeMultipleStreams() {
         final ByteBuf in = Unpooled.copiedBuffer(COMM_1.getBytes());
         final List<Object> out = new LinkedList<>();
 
@@ -205,7 +205,7 @@ public class NetconfEOMAggregatorTest {
     }
 
     @Test
-    public void testDecodeBufferReset() {
+    void testDecodeBufferReset() {
         final ByteBuf in = Unpooled.buffer();
         final List<Object> out = new LinkedList<>();
 
@@ -227,7 +227,7 @@ public class NetconfEOMAggregatorTest {
     }
 
     @Test
-    public void testDecodeEmptyMessage() {
+    void testDecodeEmptyMessage() {
         final ByteBuf in = Unpooled.buffer();
         final List<Object> out = new LinkedList<>();
 

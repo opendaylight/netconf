@@ -8,47 +8,42 @@
 
 package org.opendaylight.netconf.nettyutil.handler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class ChunkedFramingMechanismEncoderTest {
+@ExtendWith(MockitoExtension.class)
+class ChunkedFramingMechanismEncoderTest {
 
-    private int chunkSize;
+    private static final int CHUNK_SIZE = 256;
     @Mock
     private ChannelHandlerContext ctx;
 
-    @Before
-    public void setUp() {
-        chunkSize = 256;
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIllegalSize() throws Exception {
-        new ChunkedFramingMechanismEncoder(10);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIllegalSizeMax() throws Exception {
-        new ChunkedFramingMechanismEncoder(Integer.MAX_VALUE);
+    @Test
+    void testIllegalSize() {
+        assertThrows(IllegalArgumentException.class, () -> new ChunkedFramingMechanismEncoder(10));
     }
 
     @Test
-    public void testEncode() throws Exception {
-        final ChunkedFramingMechanismEncoder encoder = new ChunkedFramingMechanismEncoder(chunkSize);
+    void testIllegalSizeMax() {
+        assertThrows(IllegalArgumentException.class, () -> new ChunkedFramingMechanismEncoder(Integer.MAX_VALUE));
+    }
+
+    @Test
+    void testEncode() {
+        final ChunkedFramingMechanismEncoder encoder = new ChunkedFramingMechanismEncoder(CHUNK_SIZE);
         final int lastChunkSize = 20;
-        final ByteBuf src = Unpooled.wrappedBuffer(getByteArray(chunkSize * 4 + lastChunkSize));
+        final ByteBuf src = Unpooled.wrappedBuffer(getByteArray(CHUNK_SIZE * 4 + lastChunkSize));
         final ByteBuf destination = Unpooled.buffer();
         encoder.encode(ctx, src, destination);
 
