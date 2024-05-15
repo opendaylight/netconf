@@ -8,13 +8,13 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.restconf.api.query.FieldsParam;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -26,8 +26,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 /**
  * Unit test for {@link NetconfFieldsParam}.
  */
-@RunWith(MockitoJUnitRunner.class)
-public class NetconfFieldsParamTest extends AbstractFieldsTranslatorTest<YangInstanceIdentifier> {
+@ExtendWith(MockitoExtension.class)
+class NetconfFieldsParamTest extends AbstractFieldsTranslatorTest<YangInstanceIdentifier> {
     @Override
     protected List<YangInstanceIdentifier> translateFields(final EffectiveModelContext modelContext,
             final DataSchemaContext startNode, final FieldsParam fields) {
