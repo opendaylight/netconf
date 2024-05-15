@@ -28,8 +28,8 @@ import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.FixedDOMSchemaService;
-import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.query.PrettyPrintParam;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
@@ -64,7 +64,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
 
     @Test
     void testInvokeAction() throws Exception {
-        doReturn(Futures.immediateFuture(new SimpleDOMActionResult(ImmutableNodes.newContainerBuilder()
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME))
             .build())))
             .when(actionService).invokeAction(eq(RESET_PATH), any(), any());
@@ -89,7 +89,7 @@ class Netconf799Test extends AbstractInstanceIdentifierTest {
 
     @Test
     void testInvokeActionOutput() throws Exception {
-        doReturn(Futures.immediateFuture(new SimpleDOMActionResult(ImmutableNodes.newContainerBuilder()
+        doReturn(Futures.immediateFuture(new DefaultDOMRpcResult(ImmutableNodes.newContainerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(OUTPUT_QNAME))
             .withChild(ImmutableNodes.leafNode(QName.create(OUTPUT_QNAME, "timestamp"), "somevalue"))
             .build())))

@@ -36,7 +36,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
-import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
@@ -47,7 +46,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService.YangTextSourceExtension;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
-import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.api.ApiPath;
 import org.opendaylight.restconf.api.FormattableBody;
@@ -1450,7 +1449,7 @@ public abstract class RestconfStrategy implements DatabindAware {
         }
 
         return dataInvokePOST(actionService, path, input)
-            .transform(result -> outputToInvokeResult(path, result.getOutput().orElse(null)));
+            .transform(result -> outputToInvokeResult(path, result.value()));
     }
 
     /**
@@ -1460,19 +1459,19 @@ public abstract class RestconfStrategy implements DatabindAware {
      * @param yangIId invocation context
      * @param schemaPath schema path of data
      * @param actionService action service to invoke action
-     * @return {@link DOMActionResult}
+     * @return {@link DOMRpcResult}
      */
-    private static RestconfFuture<DOMActionResult> dataInvokePOST(final DOMActionService actionService,
+    private static RestconfFuture<DOMRpcResult> dataInvokePOST(final DOMActionService actionService,
             final Action path, final @NonNull ContainerNode input) {
-        final var ret = new SettableRestconfFuture<DOMActionResult>();
+        final var ret = new SettableRestconfFuture<DOMRpcResult>();
 
         Futures.addCallback(actionService.invokeAction(
             path.inference().toSchemaInferenceStack().toSchemaNodeIdentifier(),
             DOMDataTreeIdentifier.of(LogicalDatastoreType.OPERATIONAL, path.instance()), input),
-            new FutureCallback<DOMActionResult>() {
+            new FutureCallback<DOMRpcResult>() {
                 @Override
-                public void onSuccess(final DOMActionResult result) {
-                    final var errors = result.getErrors();
+                public void onSuccess(final DOMRpcResult result) {
+                    final var errors = result.errors();
                     LOG.debug("InvokeAction Error Message {}", errors);
                     if (errors.isEmpty()) {
                         ret.set(result);
@@ -1484,7 +1483,7 @@ public abstract class RestconfStrategy implements DatabindAware {
                 @Override
                 public void onFailure(final Throwable cause) {
                     if (cause instanceof DOMActionException) {
-                        ret.set(new SimpleDOMActionResult(List.of(RpcResultBuilder.newError(
+                        ret.set(new DefaultDOMRpcResult(List.of(RpcResultBuilder.newError(
                             ErrorType.RPC, ErrorTag.OPERATION_FAILED, cause.getMessage()))));
                     } else if (cause instanceof RestconfDocumentedException e) {
                         ret.setFailure(e);

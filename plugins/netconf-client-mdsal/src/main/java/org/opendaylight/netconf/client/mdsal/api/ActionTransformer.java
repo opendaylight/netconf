@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.client.mdsal.api;
 
-import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.stmt.SchemaNodeIdentifier.Absolute;
@@ -33,7 +33,7 @@ public interface ActionTransformer {
      *
      * @param action - action schema path
      * @param message - message to parsing
-     * @return {@link DOMActionResult}
+     * @return {@link DOMRpcResult}
      */
-    DOMActionResult toActionResult(Absolute action, NetconfMessage message);
+    DOMRpcResult toActionResult(Absolute action, NetconfMessage message);
 }
