@@ -18,7 +18,7 @@ import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;

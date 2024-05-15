@@ -15,7 +15,7 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class NetconfEOMAggregatorTest {
     private static final String COMM_1 = """

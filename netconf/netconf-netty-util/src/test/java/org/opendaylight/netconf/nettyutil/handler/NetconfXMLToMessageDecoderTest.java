@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.xml.sax.SAXParseException;
 
