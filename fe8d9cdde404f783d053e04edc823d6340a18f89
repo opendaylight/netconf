@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d613680_b41b83cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2024-05-15T11:08:24Z",
+      "side": 1,
+      "message": "IMO this should be done in a whole package for all fields and methods as well.",
+      "revId": "fe8d9cdde404f783d053e04edc823d6340a18f89",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81"
+    }
+  ]
+}
