@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
@@ -17,11 +17,11 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.concurrent.Promise;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.CapabilityURN;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.messages.HelloMessage;
@@ -34,7 +34,7 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecode
 import org.opendaylight.netconf.test.util.XmlFileLoader;
 import org.w3c.dom.Document;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class Netconf539Test {
     @Mock
     private NetconfSessionListener<TestingNetconfSession> listener;
@@ -44,7 +44,7 @@ public class Netconf539Test {
     private EmbeddedChannel channel;
     private TestSessionNegotiator negotiator;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         channel = new EmbeddedChannel();
         channel.pipeline().addLast(AbstractChannelInitializer.NETCONF_MESSAGE_ENCODER,
@@ -75,9 +75,9 @@ public class Netconf539Test {
         final HelloMessage helloMessage = new HelloMessage(helloDocument);
         final TestingNetconfSession session = negotiator.getSessionForHelloMessage(helloMessage);
         assertNotNull(session);
-        assertTrue("NetconfChunkAggregator was not installed in the Netconf pipeline",
-            channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR) instanceof NetconfChunkAggregator);
-        assertTrue("ChunkedFramingMechanismEncoder was not installed in the Netconf pipeline",
-            channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER) instanceof ChunkedFramingMechanismEncoder);
+        assertInstanceOf(NetconfChunkAggregator.class, channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR),
+            "NetconfChunkAggregator was not installed in the Netconf pipeline");
+        assertInstanceOf(ChunkedFramingMechanismEncoder.class, channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER),
+            "ChunkedFramingMechanismEncoder was not installed in the Netconf pipeline");
     }
 }
