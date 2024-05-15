@@ -8,9 +8,11 @@
 package org.opendaylight.netconf.nettyutil.handler;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.Iterables;
 import io.netty.buffer.ByteBuf;
@@ -18,14 +20,14 @@ import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import java.util.List;
 import org.hamcrest.CoreMatchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.HelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 
-public class NetconfXMLToHelloMessageDecoderTest {
+class NetconfXMLToHelloMessageDecoderTest {
 
     @Test
-    public void testDecodeWithHeader() throws Exception {
+    void testDecodeWithHeader() throws Exception {
         final ByteBuf src = Unpooled.wrappedBuffer(String.format("%s\n%s",
                 "[tomas;10.0.0.0:10000;tcp;client;]",
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>").getBytes());
@@ -33,8 +35,7 @@ public class NetconfXMLToHelloMessageDecoderTest {
         new NetconfXMLToHelloMessageDecoder().decode(null, src, out);
 
         assertEquals(1, out.size());
-        assertThat(out.get(0), CoreMatchers.instanceOf(HelloMessage.class));
-        final HelloMessage hello = (HelloMessage) out.get(0);
+        final HelloMessage hello = assertInstanceOf(HelloMessage.class, out.get(0));
         assertTrue(hello.getAdditionalHeader().isPresent());
         assertEquals("[tomas;10.0.0.0:10000;tcp;client;]" + System.lineSeparator(),
                 hello.getAdditionalHeader().orElseThrow().toFormattedString());
@@ -43,20 +44,19 @@ public class NetconfXMLToHelloMessageDecoderTest {
     }
 
     @Test
-    public void testDecodeNoHeader() throws Exception {
+    void testDecodeNoHeader() throws Exception {
         final ByteBuf src =
                 Unpooled.wrappedBuffer("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
         final List<Object> out = new ArrayList<>();
         new NetconfXMLToHelloMessageDecoder().decode(null, src, out);
 
         assertEquals(1, out.size());
-        assertThat(out.get(0), CoreMatchers.instanceOf(HelloMessage.class));
-        final HelloMessage hello = (HelloMessage) out.get(0);
+        final HelloMessage hello = assertInstanceOf(HelloMessage.class, out.get(0));
         assertFalse(hello.getAdditionalHeader().isPresent());
     }
 
     @Test
-    public void testDecodeCaching() throws Exception {
+    void testDecodeCaching() throws Exception {
         final ByteBuf msg1 =
                 Unpooled.wrappedBuffer("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
         final ByteBuf msg2 =
@@ -74,12 +74,12 @@ public class NetconfXMLToHelloMessageDecoderTest {
         assertEquals(2, Iterables.size(decoder.getPostHelloNetconfMessages()));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testDecodeNotHelloReceived() throws Exception {
+    @Test
+    void testDecodeNotHelloReceived() {
         final ByteBuf msg1 =
                 Unpooled.wrappedBuffer("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
         final List<Object> out = new ArrayList<>();
         NetconfXMLToHelloMessageDecoder decoder = new NetconfXMLToHelloMessageDecoder();
-        decoder.decode(null, msg1, out);
+        assertThrows(IllegalStateException.class, () -> decoder.decode(null, msg1, out));
     }
 }

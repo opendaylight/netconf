@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import io.netty.buffer.Unpooled;
 import java.io.ByteArrayOutputStream;
@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.api.messages.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.xmlunit.builder.DiffBuilder;
 
-public class NetconfEXIHandlersTest {
+class NetconfEXIHandlersTest {
     private final String msgAsString = "<netconf-message/>";
 
     private NetconfMessageToEXIEncoder netconfMessageToEXIEncoder;
@@ -32,8 +32,8 @@ public class NetconfEXIHandlersTest {
     private NetconfMessage msg;
     private byte[] msgAsExi;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         final var codec = NetconfEXICodec.forParameters(EXIParameters.empty());
         netconfMessageToEXIEncoder = NetconfMessageToEXIEncoder.create(codec);
         netconfEXIToMessageDecoder = NetconfEXIToMessageDecoder.create(codec);
@@ -52,7 +52,7 @@ public class NetconfEXIHandlersTest {
     }
 
     @Test
-    public void testEncodeDecode() throws Exception {
+    void testEncodeDecode() throws Exception {
         final var buffer = Unpooled.buffer();
         netconfMessageToEXIEncoder.encode(null, msg, buffer);
         final int exiLength = msgAsExi.length;
@@ -71,6 +71,6 @@ public class NetconfEXIHandlersTest {
             .withTest(((NetconfMessage) out.get(0)).getDocument())
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 }

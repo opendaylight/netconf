@@ -8,16 +8,16 @@
 
 package org.opendaylight.netconf.nettyutil.handler;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class EOMFramingMechanismEncoderTest {
+class EOMFramingMechanismEncoderTest {
 
     @Test
-    public void testEncode() throws Exception {
+    void testEncode() {
         final byte[] content = new byte[50];
         final ByteBuf source = Unpooled.wrappedBuffer(content);
         final ByteBuf destination = Unpooled.buffer();
