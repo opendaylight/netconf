@@ -7,11 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.databind;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.restconf.nb.rfc8040.AbstractInstanceIdentifierTest;
 import org.opendaylight.restconf.server.api.DatabindContext;
 import org.opendaylight.restconf.server.api.DatabindPath.Action;
@@ -32,8 +32,8 @@ abstract class AbstractOperationInputBodyTest extends AbstractInstanceIdentifier
 
     private static Action RESET_PATH;
 
-    @BeforeClass
-    public static final void setupInference() {
+    @BeforeAll
+    static final void setupInference() {
         final var stack = SchemaInferenceStack.ofDataTreePath(IID_SCHEMA, CONT_QNAME, CONT1_QNAME);
         final var action = assertInstanceOf(ActionEffectiveStatement.class, stack.enterSchemaTree(RESET_QNAME));
 
@@ -42,7 +42,7 @@ abstract class AbstractOperationInputBodyTest extends AbstractInstanceIdentifier
     }
 
     @Test
-    public final void moduleSubContainerDataPostActionTest() throws Exception {
+    final void moduleSubContainerDataPostActionTest() throws Exception {
         final var body = moduleSubContainerDataPostActionBody();
 
         assertEquals(ImmutableNodes.newContainerBuilder()
@@ -54,7 +54,7 @@ abstract class AbstractOperationInputBodyTest extends AbstractInstanceIdentifier
     abstract OperationInputBody moduleSubContainerDataPostActionBody();
 
     @Test
-    public final void testEmpty() throws Exception {
+    final void testEmpty() throws Exception {
         final var body = testEmptyBody();
         assertEquals(ImmutableNodes.newContainerBuilder().withNodeIdentifier(INPUT_NID).build(),
             body.toContainerNode(RESET_PATH));
@@ -63,7 +63,7 @@ abstract class AbstractOperationInputBodyTest extends AbstractInstanceIdentifier
     abstract OperationInputBody testEmptyBody();
 
     @Test
-    public final void testRpcModuleInput() throws Exception {
+    final void testRpcModuleInput() throws Exception {
         final var rpcTest = QName.create("invoke:rpc:module", "2013-12-03", "rpc-test");
         final var modelContext = YangParserTestUtils.parseYangResourceDirectory("/invoke-rpc");
         final var stack = SchemaInferenceStack.of(modelContext);
