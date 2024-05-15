@@ -7,16 +7,16 @@
  */
 package org.opendaylight.netconf.nettyutil.handler.exi;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
 import org.opendaylight.netconf.shaded.exificient.core.FidelityOptions;
 import org.xmlunit.builder.DiffBuilder;
 
-public class NetconfStartExiMessageTest {
+class NetconfStartExiMessageTest {
     @Test
-    public void testCreateEmpty() {
+    void testCreateEmpty() {
         assertCreate("""
               <rpc message-id="id" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
               <start-exi xmlns="urn:ietf:params:xml:ns:netconf:exi:1.0">
@@ -26,7 +26,7 @@ public class NetconfStartExiMessageTest {
     }
 
     @Test
-    public void testCreateFull() throws Exception {
+    void testCreateFull() throws Exception {
         final var fullOptions = FidelityOptions.createDefault();
         fullOptions.setFidelity(FidelityOptions.FEATURE_LEXICAL_VALUE, true);
         fullOptions.setFidelity(FidelityOptions.FEATURE_DTD, true);
@@ -57,7 +57,7 @@ public class NetconfStartExiMessageTest {
             .ignoreWhitespace()
             .checkForIdentical()
             .build();
-        assertFalse(diff.toString(), diff.hasDifferences());
+        assertFalse(diff.hasDifferences(), diff.toString());
     }
 
 }

@@ -8,44 +8,46 @@
 
 package org.opendaylight.netconf.nettyutil.handler;
 
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import javax.xml.transform.Transformer;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class ThreadLocalTransformersTest {
+class ThreadLocalTransformersTest {
 
     private ExecutorService executorService;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         executorService = Executors.newSingleThreadExecutor();
     }
 
     @Test
-    public void testGetDefaultTransformer() throws Exception {
+    void testGetDefaultTransformer() throws Exception {
         final Transformer t1 = ThreadLocalTransformers.getDefaultTransformer();
         final Transformer t2 = ThreadLocalTransformers.getDefaultTransformer();
-        Assert.assertSame(t1, t2);
+        assertSame(t1, t2);
         final Future<Transformer> future = executorService.submit(ThreadLocalTransformers::getDefaultTransformer);
-        Assert.assertNotSame(t1, future.get());
+        assertNotSame(t1, future.get());
     }
 
     @Test
-    public void testGetPrettyTransformer() throws Exception {
+    void testGetPrettyTransformer() throws Exception {
         final Transformer t1 = ThreadLocalTransformers.getPrettyTransformer();
         final Transformer t2 = ThreadLocalTransformers.getPrettyTransformer();
-        Assert.assertSame(t1, t2);
+        assertSame(t1, t2);
         final Future<Transformer> future = executorService.submit(ThreadLocalTransformers::getPrettyTransformer);
-        Assert.assertNotSame(t1, future.get());
+        assertNotSame(t1, future.get());
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() {
         executorService.shutdown();
     }
 }

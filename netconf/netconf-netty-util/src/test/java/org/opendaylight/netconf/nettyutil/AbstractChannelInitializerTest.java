@@ -18,15 +18,15 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.concurrent.Promise;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.opendaylight.netconf.api.NetconfSession;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class AbstractChannelInitializerTest {
+@ExtendWith(MockitoExtension.class)
+class AbstractChannelInitializerTest {
 
     @Mock
     private Channel channel;
@@ -35,14 +35,14 @@ public class AbstractChannelInitializerTest {
     @Mock
     private Promise<NetconfSession> sessionPromise;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         doReturn(pipeline).when(channel).pipeline();
         doReturn(pipeline).when(pipeline).addLast(anyString(), any(ChannelHandler.class));
     }
 
     @Test
-    public void testInit() throws Exception {
+    void testInit() {
         final TestingInitializer testingInitializer = new TestingInitializer();
         testingInitializer.initialize(channel, sessionPromise);
         verify(pipeline, times(4)).addLast(anyString(), any(ChannelHandler.class));

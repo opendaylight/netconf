@@ -8,73 +8,62 @@
 
 package org.opendaylight.netconf.nettyutil.handler.exi;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Arrays;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
-import org.opendaylight.netconf.shaded.exificient.core.EXIFactory;
 import org.opendaylight.netconf.shaded.exificient.core.FidelityOptions;
 
-@RunWith(Parameterized.class)
-public class EXIParametersTest {
+class EXIParametersTest {
 
-    @Parameterized.Parameters
-    public static Iterable<Object[]> data() throws Exception {
-        final String noChangeXml =
-                "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n"
-                + "<alignment>bit-packed</alignment>\n"
-                + "</start-exi>\n";
+    @ParameterizedTest
+    @MethodSource("getData")
+    void testFromXmlElement(final String sourceXml, final CodingMode coding, final FidelityOptions fidelity)
+            throws Exception {
+        final var opts =
+            EXIParameters.fromXmlElement(
+                XmlElement.fromDomElement(
+                    XmlUtil.readXmlToElement(sourceXml)));
+
+        final var factory = opts.getFactory();
+        assertEquals(fidelity, factory.getFidelityOptions());
+        assertEquals(coding, factory.getCodingMode());
+    }
+
+    static Stream<Arguments> getData() throws Exception {
+        final var noChangeXml =
+            "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n"
+            + "<alignment>bit-packed</alignment>\n"
+            + "</start-exi>\n";
 
 
-        final String fullOptionsXml =
-                "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n"
-                + "<alignment>byte-aligned</alignment>\n"
-                + "<fidelity>\n"
-                + "<comments/>\n"
-                + "<dtd/>\n"
-                + "<lexical-values/>\n"
-                + "<pis/>\n"
-                + "<prefixes/>\n"
-                + "</fidelity>\n"
-                + "</start-exi>\n";
+        final var fullOptionsXml =
+            "<start-exi xmlns=\"urn:ietf:params:xml:ns:netconf:exi:1.0\">\n"
+            + "<alignment>byte-aligned</alignment>\n"
+            + "<fidelity>\n"
+            + "<comments/>\n"
+            + "<dtd/>\n"
+            + "<lexical-values/>\n"
+            + "<pis/>\n"
+            + "<prefixes/>\n"
+            + "</fidelity>\n"
+            + "</start-exi>\n";
 
-        final FidelityOptions fullOptions = FidelityOptions.createDefault();
+        final var fullOptions = FidelityOptions.createDefault();
         fullOptions.setFidelity(FidelityOptions.FEATURE_LEXICAL_VALUE, true);
         fullOptions.setFidelity(FidelityOptions.FEATURE_DTD, true);
         fullOptions.setFidelity(FidelityOptions.FEATURE_COMMENT, true);
         fullOptions.setFidelity(FidelityOptions.FEATURE_PREFIX, true);
         fullOptions.setFidelity(FidelityOptions.FEATURE_PI, true);
 
-        return Arrays.asList(new Object[][]{
-            {noChangeXml, CodingMode.BIT_PACKED, FidelityOptions.createDefault()},
-            {fullOptionsXml, CodingMode.BYTE_PACKED, fullOptions},
-        });
-    }
-
-    private final String sourceXml;
-    private final CodingMode coding;
-    private final FidelityOptions fidelity;
-
-    public EXIParametersTest(final String sourceXml, final CodingMode coding, final FidelityOptions fidelity) {
-        this.sourceXml = sourceXml;
-        this.coding = coding;
-        this.fidelity = fidelity;
-    }
-
-    @Test
-    public void testFromXmlElement() throws Exception {
-        final EXIParameters opts =
-                EXIParameters.fromXmlElement(
-                        XmlElement.fromDomElement(
-                                XmlUtil.readXmlToElement(sourceXml)));
-
-        final EXIFactory factory = opts.getFactory();
-        assertEquals(fidelity, factory.getFidelityOptions());
-        assertEquals(coding, factory.getCodingMode());
+        return Stream.of(
+            Arguments.of(noChangeXml, CodingMode.BIT_PACKED, FidelityOptions.createDefault()),
+            Arguments.of(fullOptionsXml, CodingMode.BYTE_PACKED, fullOptions)
+        );
     }
 }
